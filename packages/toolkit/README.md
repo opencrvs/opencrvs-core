@@ -58,7 +58,6 @@ Toolkit "re-exports" common definitions (e.g. events, conditionals) and make the
 - All dependencies of the functions and moduless used from `packages/commons` **must** be also defined in the package.json of the toolkit. Otherwise someone installing the package will get errors.
 - Package is published and should be used without knowledge of rest of the monorepo
 - Package exposes `/events, /scopes` directory, with types, from `packages/commons` through the library, others are excluded.
-
 - If the above directories have subdirectories, the types are not exposed by default. The compiled JavaScript is available though through `esbuild`. See `build.sh` on how to expose subdirectories:
 
 ```sh
