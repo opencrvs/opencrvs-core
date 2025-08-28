@@ -119,7 +119,7 @@ export function Review() {
       : form
 
   return (
-    <FormLayout route={ROUTES.V2.EVENTS.REGISTER}>
+    <FormLayout route={ROUTES.V2.EVENTS.CORRECTION}>
       <ReviewComponent.Body
         form={formWithNewValues}
         formConfig={formConfig}

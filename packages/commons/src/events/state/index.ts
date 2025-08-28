@@ -32,6 +32,7 @@ import {
   FullDocumentPath,
   FullDocumentUrl
 } from '../../documents'
+import { getOnlyVisibleFormValues } from '..'
 
 export function getStatusFromActions(actions: Array<Action>) {
   return actions
@@ -94,7 +95,8 @@ export function getAssignedUserSignatureFromActions(
 }
 
 function aggregateActionDeclarations(
-  actions: Array<ActionDocument>
+  actions: Array<ActionDocument>,
+  config: EventConfig
 ): EventState {
   /** Types that are not taken into the aggregate values (e.g. while printing certificate)
    * stop auto filling collector form with previous print action data)
@@ -106,7 +108,7 @@ function aggregateActionDeclarations(
     ActionType.REJECT_CORRECTION
   ]
 
-  return actions.reduce((declaration, action) => {
+  const aggregatedDeclaration = actions.reduce((declaration, action) => {
     if (
       excludedActions.some((excludedAction) => excludedAction === action.type)
     ) {
@@ -129,6 +131,11 @@ function aggregateActionDeclarations(
 
     return deepMerge(declaration, action.declaration)
   }, {})
+
+  return getOnlyVisibleFormValues(
+    config.declaration.pages.flatMap((x) => x.fields),
+    aggregatedDeclaration
+  )
 }
 
 type NonNullableDeep<T> = T extends [unknown, ...unknown[]] // <-- ✨ tiny change: handle tuples first
@@ -223,7 +230,7 @@ export function getCurrentEventState(
   // Includes only accepted actions metadata. Sometimes (e.g. on updatedAt) we want to show the accepted timestamp rather than the request timestamp.
   const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
 
-  const declaration = aggregateActionDeclarations(acceptedActions)
+  const declaration = aggregateActionDeclarations(acceptedActions, config)
 
   return deepDropNulls({
     id: event.id,

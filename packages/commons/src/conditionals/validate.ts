@@ -206,6 +206,18 @@ export function isFieldVisible(
   return isFieldConditionMet(field, form, ConditionalType.SHOW, context)
 }
 
+export function getOnlyVisibleFormValues(
+  field: FieldConfig[],
+  form: EventState
+) {
+  return field.reduce((acc, f) => {
+    if (isFieldVisible(f, form) && form[f.id] !== undefined) {
+      acc[f.id] = form[f.id]
+    }
+    return acc
+  }, {} as EventState)
+}
+
 function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
   const fieldValue = form[field.id]
   return !field.required && (fieldValue === undefined || fieldValue === '')
