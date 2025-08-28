@@ -19,10 +19,10 @@ import {
 } from '@events/storage/postgres/events/events'
 import { env } from '@events/environment'
 import { indexEventsInBulk } from '../indexing/indexing'
-import { getInmemoryEventConfigurations } from '../config/config'
+import { getInMemoryEventConfigurations } from '../config/config'
 
 async function reindexSearch(token: string) {
-  const configurations = await getInmemoryEventConfigurations(token)
+  const configurations = await getInMemoryEventConfigurations(token)
   let buffer: EventDocument[] = []
 
   async function flush() {

@@ -45,7 +45,7 @@ async function getEventConfigurations(token: string) {
 /**
  * @returns in-memory event configurations when running in production-like environment.
  */
-export async function getInmemoryEventConfigurations(token: string) {
+export async function getInMemoryEventConfigurations(token: string) {
   if (!env.isProduction) {
     logger.info(
       `Running in ${process.env.NODE_ENV} mode. Fetching event configurations from API`
@@ -70,7 +70,7 @@ async function findEventConfigurationById({
   token: string
   eventType: string
 }) {
-  const configurations = await getInmemoryEventConfigurations(token)
+  const configurations = await getInMemoryEventConfigurations(token)
   return configurations.find((config) => config.id === eventType)
 }
 

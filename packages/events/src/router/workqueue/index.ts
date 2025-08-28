@@ -21,7 +21,7 @@ import {
 } from '@opencrvs/commons'
 import { router, publicProcedure } from '@events/router/trpc'
 import {
-  getInmemoryEventConfigurations,
+  getInMemoryEventConfigurations,
   getIMemoryWorkqueueConfigurations
 } from '@events/service/config/config'
 import { getEventCount } from '@events/service/indexing/indexing'
@@ -54,7 +54,7 @@ export const workqueueRouter = router({
       >
       return getEventCount(
         options.input,
-        await getInmemoryEventConfigurations(options.ctx.token),
+        await getInMemoryEventConfigurations(options.ctx.token),
         searchScopeOptions,
         options.ctx.user.primaryOfficeId
       )
