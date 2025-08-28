@@ -54,9 +54,10 @@ export const getLocations = async () => {
 export const getChildLocations = async (parentIdToSearch: string) => {
   const locations = await locationsRepo.getChildLocations(parentIdToSearch)
 
-  return locations.map(({ id, name, parentId }) => ({
+  return locations.map(({ id, name, parentId, locationType }) => ({
     id,
     name,
-    partOf: parentId
+    partOf: parentId,
+    locationType
   }))
 }

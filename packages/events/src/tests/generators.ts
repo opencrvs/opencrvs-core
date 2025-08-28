@@ -57,7 +57,7 @@ export function payloadGenerator(rng: () => number) {
           name: `Location name ${i}`,
           partOf: null,
           locationType: 'ADMIN_STRUCTURE'
-        }))
+        })) as Location[]
       }
 
       return input.map((location, i) => ({
@@ -65,7 +65,7 @@ export function payloadGenerator(rng: () => number) {
         name: location.name ?? `Location name ${i}`,
         partOf: null,
         locationType: 'ADMIN_STRUCTURE'
-      }))
+      })) as Location[]
     }
   }
 

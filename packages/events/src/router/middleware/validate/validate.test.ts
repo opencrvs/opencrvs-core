@@ -13,7 +13,7 @@ import { getFieldErrors } from './index'
 
 describe('getFieldErrors()', () => {
   it('should return an empty array there are no fields to validate', () => {
-    const errors = getFieldErrors([], {}, {})
+    const errors = getFieldErrors([], {}, { locations: [] }, {})
     expect(errors).toEqual([])
   })
 
@@ -32,6 +32,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       {},
+      { locations: [] },
       {}
     )
     expect(errors).toMatchSnapshot()
@@ -51,7 +52,8 @@ describe('getFieldErrors()', () => {
           }
         }
       ],
-      { 'test.checkbox': true }
+      { 'test.checkbox': true },
+      { locations: [] }
     )
 
     expect(errors).toMatchSnapshot()
@@ -78,6 +80,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.checkbox': true },
+      { locations: [] },
       {}
     )
 
@@ -105,6 +108,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       {},
+      { locations: [] },
       {}
     )
 
@@ -132,6 +136,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.checkbox': true },
+      { locations: [] },
       { 'test.text': 'helloooo' }
     )
 
@@ -175,6 +180,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.checkbox': true },
+      { locations: [] },
       { 'test.text': 'helloooo' }
     )
 
@@ -206,6 +212,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.input': 'not hello!' },
+      { locations: [] },
       {}
     )
 
@@ -237,6 +244,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.input': 'helloooo' },
+      { locations: [] },
       {}
     )
 

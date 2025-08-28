@@ -10,16 +10,18 @@
  */
 import { generateUuid, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { Location } from '@events/service/locations/locations'
 
 test('Returns single location in right format', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const setLocationPayload = [
+  const setLocationPayload: Location[] = [
     {
       id: generateUuid(),
       partOf: null,
-      name: 'Location foobar'
+      name: 'Location foobar',
+      locationType: 'ADMIN_STRUCTURE'
     }
   ]
 

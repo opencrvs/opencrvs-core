@@ -3,9 +3,7 @@
 --
 
 -- Dumped from database version 17.5 (Debian 17.5-1.pgdg120+1)
--- Dumped by pg_dump version 17.5
-
--- Started on 2025-08-06 14:43:51 EEST
+-- Dumped by pg_dump version 17.5 (Debian 17.5-1.pgdg120+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -67,6 +65,19 @@ CREATE TYPE app.action_type AS ENUM (
 
 
 ALTER TYPE app.action_type OWNER TO events_migrator;
+
+--
+-- Name: location_type; Type: TYPE; Schema: app; Owner: events_migrator
+--
+
+CREATE TYPE app.location_type AS ENUM (
+    'HEALTH_FACILITY',
+    'CRVS_OFFICE',
+    'ADMIN_STRUCTURE'
+);
+
+
+ALTER TYPE app.location_type OWNER TO events_migrator;
 
 --
 -- Name: user_type; Type: TYPE; Schema: app; Owner: events_migrator
@@ -191,7 +202,8 @@ CREATE TABLE app.locations (
     parent_id uuid,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    deleted_at timestamp with time zone
+    deleted_at timestamp with time zone,
+    location_type app.location_type
 );
 
 
@@ -401,8 +413,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.events TO events_app;
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 
-
--- Completed on 2025-08-06 14:43:52 EEST
 
 --
 -- PostgreSQL database dump complete
