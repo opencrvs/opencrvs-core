@@ -14,7 +14,7 @@ import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
 import { expect, waitFor, within, userEvent } from '@storybook/test'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType, TestUserRole } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import {
@@ -30,14 +30,9 @@ const generator = testDataGenerator()
 
 const meta: Meta<typeof Request.Pages> = {
   title: 'CorrectionRequest',
-  loaders: [
-    () => {
-      window.localStorage.setItem(
-        'opencrvs',
-        generator.user.token.registrationAgent
-      )
-    }
-  ]
+  parameters: {
+    userRole: TestUserRole.enum.REGISTRATION_AGENT
+  }
 }
 
 export default meta
@@ -102,7 +97,6 @@ export const ReviewWithChanges: Story = {
         canvas.getByRole('button', { name: 'Continue' })
       ).toBeDisabled()
     })
-    await userEvent.click(canvas.getByTestId('exit-button'))
   }
 }
 
