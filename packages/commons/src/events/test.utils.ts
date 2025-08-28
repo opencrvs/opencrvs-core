@@ -168,8 +168,14 @@ export function mapFieldTypeToMockValue(
       return {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: '123e4567-e89b-12d3-a456-426614174000',
-        streetLevelDetails: {}
+        administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        streetLevelDetails: {
+          town: 'Example Town',
+          residentialArea: 'Example Residential Area',
+          street: 'Example Street',
+          number: '55',
+          zipCode: '123456'
+        }
       }
     case FieldType.DATE:
       return '2021-01-01'

@@ -850,7 +850,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
         },
         {
           id: 'applicant.address',
-          type: 'ADDRESS',
+          type: FieldType.ADDRESS,
           required: true,
           secured: true,
           conditionals: [],
@@ -858,6 +858,60 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
             defaultMessage: "Applicant's address",
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.address.label'
+          },
+          configuration: {
+            streetAddressForm: [
+              {
+                id: 'town',
+                required: false,
+                label: {
+                  id: 'v2.field.address.town.label',
+                  defaultMessage: 'Town',
+                  description: 'This is the label for the field'
+                },
+                type: FieldType.TEXT
+              },
+              {
+                id: 'residentialArea',
+                required: false,
+                label: {
+                  id: 'v2.field.address.residentialArea.label',
+                  defaultMessage: 'Residential Area',
+                  description: 'This is the label for the field'
+                },
+                type: FieldType.TEXT
+              },
+              {
+                id: 'street',
+                required: false,
+                label: {
+                  id: 'v2.field.address.street.label',
+                  defaultMessage: 'Street',
+                  description: 'This is the label for the field'
+                },
+                type: FieldType.TEXT
+              },
+              {
+                id: 'number',
+                required: false,
+                label: {
+                  id: 'v2.field.address.number.label',
+                  defaultMessage: 'Number',
+                  description: 'This is the label for the field'
+                },
+                type: FieldType.TEXT
+              },
+              {
+                id: 'zipCode',
+                required: false,
+                label: {
+                  id: 'v2.field.address.postcodeOrZip.label',
+                  defaultMessage: 'Postcode / Zip',
+                  description: 'This is the label for the field'
+                },
+                type: FieldType.TEXT
+              }
+            ]
           }
         }
       ]
