@@ -65,6 +65,11 @@ export function server() {
       trpcServer(req, res)
     } else {
       // If it's a REST request, handle it with the REST server
+
+      // Ensure Content-Type is set, otherwise default to JSON. Fixes trpc-to-openapi crashing as it only supports 'application/json'
+      if (!req.headers['content-type']) {
+        req.headers['content-type'] = 'application/json'
+      }
       void restServer(req, res)
     }
   })
