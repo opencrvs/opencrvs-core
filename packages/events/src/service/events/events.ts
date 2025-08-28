@@ -380,11 +380,9 @@ export async function addAction(
 
   const updatedEvent = await getEventById(eventId)
 
-  // Only send the event to Elasticsearch if it contains a NOTIFY or DECLARE action.
-  // These actions indicate that the client has sent a record, so we only index in these cases.
-  const shouldIndexEvent = updatedEvent.actions.some(
-    ({ type }) => type === ActionType.NOTIFY || type === ActionType.DECLARE
-  )
+  // Only send the event to Elasticsearch if it is not a draft.
+  const shouldIndexEvent =
+    getStatusFromActions(updatedEvent.actions) !== 'CREATED'
 
   if (shouldIndexEvent) {
     await indexEvent(updatedEvent, configuration)
