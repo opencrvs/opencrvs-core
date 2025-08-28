@@ -112,54 +112,6 @@ const eventConfig: EventConfig = tennisClubMembershipEvent
 
 const declarationForm = getDeclaration(eventConfig)
 
-export const AddressReviewUrban: StoryObj<typeof Review> = {
-  name: 'Review output (Urban)',
-  parameters: {
-    layout: 'centered'
-  },
-  render: function Component() {
-    return (
-      <Review.Body
-        form={{
-          'applicant.address': {
-            country: 'FAR',
-            addressType: AddressType.DOMESTIC
-          }
-        }}
-        formConfig={declarationForm}
-        title="My address form with address output"
-        // eslint-disable-next-line no-console
-        onEdit={(values) => console.log(values)}
-      >
-        <div />
-      </Review.Body>
-    )
-  }
-}
-export const AddressReviewRural: StoryObj<typeof Review> = {
-  name: 'Review output (Rural)',
-  parameters: {
-    layout: 'centered'
-  },
-  render: function Component() {
-    return (
-      <Review.Body
-        form={{
-          'applicant.address': {
-            country: 'FAR',
-            addressType: AddressType.DOMESTIC
-          }
-        }}
-        formConfig={declarationForm}
-        title="My address form with address output"
-        // eslint-disable-next-line no-console
-        onEdit={(values) => console.log(values)}
-      >
-        <div />
-      </Review.Body>
-    )
-  }
-}
 export const AddressReviewInvalid: StoryObj<typeof Review> = {
   name: 'Review output (Invalid)',
   parameters: {
