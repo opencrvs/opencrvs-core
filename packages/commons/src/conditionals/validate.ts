@@ -208,10 +208,11 @@ export function isFieldVisible(
 
 export function getOnlyVisibleFormValues(
   field: FieldConfig[],
-  form: EventState
+  form: EventState,
+  context: { locations: Array<Location> }
 ) {
   return field.reduce((acc, f) => {
-    if (isFieldVisible(f, form) && form[f.id] !== undefined) {
+    if (isFieldVisible(f, form, context) && form[f.id] !== undefined) {
       acc[f.id] = form[f.id]
     }
     return acc

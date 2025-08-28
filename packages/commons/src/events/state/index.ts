@@ -134,7 +134,8 @@ function aggregateActionDeclarations(
 
   return getOnlyVisibleFormValues(
     config.declaration.pages.flatMap((x) => x.fields),
-    aggregatedDeclaration
+    aggregatedDeclaration,
+    { locations: [] }
   )
 }
 
