@@ -4,9 +4,15 @@ exports[`Action updates > partial declaration update accounts for conditional fi
 {
   "applicant.address": {
     "addressType": "DOMESTIC",
-    "administrativeArea": "123e4567-e89b-12d3-a456-426614174000",
+    "administrativeArea": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
     "country": "FAR",
-    "streetLevelDetails": {},
+    "streetLevelDetails": {
+      "number": "55",
+      "residentialArea": "Example Residential Area",
+      "street": "Example Street",
+      "town": "Example Town",
+      "zipCode": "123456",
+    },
   },
   "applicant.age": 25,
   "applicant.dobUnknown": true,
@@ -72,9 +78,15 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "declaration": {
         "applicant.address": {
           "addressType": "DOMESTIC",
-          "administrativeArea": "123e4567-e89b-12d3-a456-426614174000",
+          "administrativeArea": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
           "country": "FAR",
-          "streetLevelDetails": {},
+          "streetLevelDetails": {
+            "number": "55",
+            "residentialArea": "Example Residential Area",
+            "street": "Example Street",
+            "town": "Example Town",
+            "zipCode": "123456",
+          },
         },
         "applicant.age": 19,
         "applicant.dobUnknown": true,
@@ -140,9 +152,15 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "declaration": {
         "applicant.address": {
           "addressType": "DOMESTIC",
-          "administrativeArea": "123e4567-e89b-12d3-a456-426614174000",
+          "administrativeArea": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
           "country": "FAR",
-          "streetLevelDetails": {},
+          "streetLevelDetails": {
+            "number": "55",
+            "residentialArea": "Example Residential Area",
+            "street": "Example Street",
+            "town": "Example Town",
+            "zipCode": "123456",
+          },
         },
         "applicant.age": 19,
         "applicant.dobUnknown": true,
@@ -208,9 +226,15 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "declaration": {
         "applicant.address": {
           "addressType": "DOMESTIC",
-          "administrativeArea": "123e4567-e89b-12d3-a456-426614174000",
+          "administrativeArea": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
           "country": "FAR",
-          "streetLevelDetails": {},
+          "streetLevelDetails": {
+            "number": "55",
+            "residentialArea": "Example Residential Area",
+            "street": "Example Street",
+            "town": "Example Town",
+            "zipCode": "123456",
+          },
         },
         "applicant.age": 19,
         "applicant.dobUnknown": true,
