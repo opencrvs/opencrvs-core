@@ -302,15 +302,13 @@ export function CorrectionDetails({
           .filter((field) => isFieldDisplayedOnReview(field, form))
           .filter((f) => hasFieldChanged(f, form, previousFormValues))
           .map((f) => {
-            const original = previousFormValues[f.id]
-              ? Output({
-                  field: f,
-                  value: previousFormValues[f.id],
-                  showPreviouslyMissingValuesAsChanged: false,
-                  previousForm: previousFormValues,
-                  formConfig
-                })
-              : '-'
+            const original = Output({
+              field: f,
+              value: previousFormValues[f.id],
+              showPreviouslyMissingValuesAsChanged: false,
+              previousForm: previousFormValues,
+              formConfig
+            })
 
             const correction = form[f.id]
               ? Output({
@@ -322,8 +320,8 @@ export function CorrectionDetails({
 
             return {
               fieldLabel: intl.formatMessage(f.label),
-              original,
-              correction
+              original: original ? original : '-',
+              correction: correction ? correction : '-'
             }
           })
 
