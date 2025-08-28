@@ -16,22 +16,22 @@ import {
   ActionDocument,
   ActionInputWithType,
   ActionType,
+  ConfigurableScopes,
+  ConfigurableScopeType,
   DeleteActionInput,
+  EventDocument,
   findScope,
   getAssignedUserFromActions,
   getScopes,
+  IAuthHeader,
   inScope,
   Scope,
   TokenUserType,
-  WorkqueueCountInput,
-  ConfigurableScopeType,
-  IAuthHeader,
   UUID,
-  EventDocument,
-  ConfigurableScopes
+  WorkqueueCountInput
 } from '@opencrvs/commons'
 import { getEventById } from '@events/service/events/events'
-import { TrpcContext } from '@events/context'
+import { TrpcContextWithToken, TrpcContextWithUser } from '@events/context'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -90,7 +90,7 @@ function inConfigurableScopes(
   return getAuthorizedEntitiesFromScopes(foundScopes)
 }
 
-type CtxWithAuthorizedEntities = TrpcContext & {
+type CtxWithAuthorizedEntities = TrpcContextWithToken & {
   authorizedEntities?: { events?: string[] }
 }
 
@@ -106,9 +106,9 @@ export function requiresAnyOfScopes(
   configurableScopes?: ConfigurableScopeType[]
 ) {
   const fn: MiddlewareFunction<
-    TrpcContext,
+    TrpcContextWithToken,
     OpenApiMeta,
-    TrpcContext,
+    TrpcContextWithToken,
     CtxWithAuthorizedEntities,
     unknown
   > = async (opts) => {
@@ -187,10 +187,10 @@ export const eventTypeAuthorization: MiddlewareFunction<
 }
 
 export const requireAssignment: MiddlewareFunction<
-  TrpcContext,
+  TrpcContextWithUser,
   OpenApiMeta,
-  TrpcContext,
-  TrpcContext & { isDuplicateAction?: boolean; event: EventDocument },
+  TrpcContextWithUser,
+  TrpcContextWithUser & { isDuplicateAction?: boolean; event: EventDocument },
   ActionInputWithType | DeleteActionInput
 > = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
@@ -238,10 +238,10 @@ export const requireAssignment: MiddlewareFunction<
 }
 
 export const requireScopeForWorkqueues: MiddlewareFunction<
-  TrpcContext,
+  TrpcContextWithToken,
   OpenApiMeta,
-  TrpcContext,
-  TrpcContext,
+  TrpcContextWithToken,
+  TrpcContextWithToken,
   WorkqueueCountInput
 > = async ({ next, ctx, input }) => {
   const scopes = getScopes({ Authorization: setBearerForToken(ctx.token) })

@@ -13,7 +13,7 @@ import { initTRPC, TRPCError } from '@trpc/server'
 import superjson from 'superjson'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { logger, TokenUserType } from '@opencrvs/commons'
-import { TrpcContext } from '@events/context'
+import { resolveUserDetails, TrpcContext } from '@events/context'
 
 export const t = initTRPC.context<TrpcContext>().meta<OpenApiMeta>().create({
   transformer: superjson
@@ -21,17 +21,37 @@ export const t = initTRPC.context<TrpcContext>().meta<OpenApiMeta>().create({
 
 export const router = t.router
 
+export const unauthorizedProcedure = t.procedure
+
 /**
- * System procedures are available to both system (API key) users and
- * human users depending on the scopes they have
+ * Authorised procedures are available to system (API key) users,
+ * human users and the super user depending on the scopes they have
  */
-export const systemProcedure = t.procedure
+
+export const authorizedProcedure = t.procedure.use(async (opts) => {
+  const context = opts.ctx
+  if (!context.token) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Authorization token is missing'
+    })
+  }
+
+  const user = await resolveUserDetails(context.token)
+  return opts.next({
+    ctx: {
+      ...context,
+      token: context.token,
+      user
+    }
+  })
+})
 
 /**
  * Public procedures are only available to human users
  * and will throw an error if a system user tries to access them
  */
-export const publicProcedure = t.procedure.use(async (opts) => {
+export const userProcedure = authorizedProcedure.use(async (opts) => {
   const { user } = opts.ctx
 
   if (user.type === TokenUserType.enum.system) {

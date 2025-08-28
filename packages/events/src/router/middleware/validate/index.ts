@@ -43,7 +43,6 @@ import {
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
-import { TrpcContext } from '@events/context'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
 import {
   getInvalidUpdateKeys,
@@ -321,16 +320,15 @@ function validateCorrectableFields({
 }
 
 export const validateAction: MiddlewareFunction<
-  TrpcContext,
+  unknown,
   OpenApiMeta,
-  TrpcContext,
-  TrpcContext & { isDuplicateAction?: boolean; event: EventDocument },
+  unknown,
+  unknown,
   ActionInputWithType
-> = async ({ input, next, ctx }) => {
+> = async ({ input, next }) => {
   const actionType = input.type
   const event = await getEventById(input.eventId)
   const eventConfig = await getEventConfigurationById({
-    token: ctx.token,
     eventType: event.type
   })
 

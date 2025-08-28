@@ -34,7 +34,7 @@ import {
 import { TokenUserType } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware'
-import { systemProcedure } from '@events/router/trpc'
+import { authorizedProcedure } from '@events/router/trpc'
 
 import {
   getEventById,
@@ -200,7 +200,7 @@ export function getDefaultActionProcedures(
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
 
   return {
-    request: systemProcedure
+    request: authorizedProcedure
       .meta(meta)
       .use(requireScopesMiddleware)
       .input(inputSchema)
@@ -217,11 +217,11 @@ export function getDefaultActionProcedures(
           return ctx.event
         }
 
-        await throwConflictIfActionNotAllowed(eventId, actionType, ctx.token)
+        await throwConflictIfActionNotAllowed(eventId, actionType)
 
         // Certain actions are not allowed if the event is waiting for correction
         if (!allowIfWaitingForCorrection) {
-          await throwConflictIfWaitingForCorrection(eventId, token)
+          await throwConflictIfWaitingForCorrection(eventId)
         }
 
         const event = await getEventById(eventId)
@@ -277,7 +277,7 @@ export function getDefaultActionProcedures(
         )
       }),
 
-    accept: systemProcedure
+    accept: authorizedProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema.merge(acceptInputFields))
       .use(middleware.validateAction)
@@ -322,7 +322,7 @@ export function getDefaultActionProcedures(
         )
       }),
 
-    reject: systemProcedure
+    reject: authorizedProcedure
       .use(requireScopesMiddleware)
       .input(
         z.object({

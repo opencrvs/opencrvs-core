@@ -18,11 +18,11 @@ import {
   streamEventDocuments
 } from '@events/storage/postgres/events/events'
 import { env } from '@events/environment'
-import { indexEventsInBulk } from '../indexing/indexing'
+import { ensureIndexExists, indexEventsInBulk } from '../indexing/indexing'
 import { getEventConfigurations } from '../config/config'
 
-async function reindexSearch(token: string) {
-  const configurations = await getEventConfigurations(token)
+async function reindexSearch() {
+  const configurations = await getEventConfigurations()
   let buffer: EventDocument[] = []
 
   async function flush() {
@@ -59,7 +59,13 @@ async function reindexSearch(token: string) {
   })
 }
 
-export async function reindex(token: string) {
+export async function reindex() {
+  const configurations = await getEventConfigurations()
+  for (const configuration of configurations) {
+    logger.info(`Ensuring index exists for: ${configuration.id}`)
+    await ensureIndexExists(configuration, { overwrite: true })
+  }
+
   const objStream = Readable.from(streamEventDocuments())
 
   // Stream to reindex endpoint in country config. PassThrough forks the stream.
@@ -72,7 +78,7 @@ export async function reindex(token: string) {
   const eventDocumentStreamForSearch = new PassThrough({ objectMode: true })
   objStream.pipe(eventDocumentStreamForSearch)
 
-  const searchIndexingStream = await reindexSearch(token)
+  const searchIndexingStream = await reindexSearch()
   const searchIndexingPromise = new Promise((resolve, reject) => {
     eventDocumentStreamForSearch
       .pipe(searchIndexingStream)
@@ -85,8 +91,7 @@ export async function reindex(token: string) {
     {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
       // Converts object stream to JSON string stream so that it can
       // be sent to the country config reindex endpoint

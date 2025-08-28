@@ -14,11 +14,10 @@ import { array } from 'zod'
 import { EventConfig, getOrThrow, WorkqueueConfig } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
-export async function getEventConfigurations(token: string) {
+export async function getEventConfigurations() {
   const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
+      'Content-Type': 'application/json'
     }
   })
 
@@ -30,26 +29,21 @@ export async function getEventConfigurations(token: string) {
 }
 
 async function findEventConfigurationById({
-  token,
   eventType
 }: {
-  token: string
   eventType: string
 }) {
-  const configurations = await getEventConfigurations(token)
+  const configurations = await getEventConfigurations()
   return configurations.find((config) => config.id === eventType)
 }
 
 export async function getEventConfigurationById({
-  token,
   eventType
 }: {
-  token: string
   eventType: string
 }) {
   return getOrThrow(
     await findEventConfigurationById({
-      token,
       eventType
     }),
     `No configuration found for event type: ${eventType}`

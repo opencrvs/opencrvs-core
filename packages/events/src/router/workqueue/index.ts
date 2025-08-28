@@ -19,7 +19,7 @@ import {
   WorkqueueCountInput,
   WorkqueueCountOutput
 } from '@opencrvs/commons'
-import { router, publicProcedure } from '@events/router/trpc'
+import { router, userProcedure } from '@events/router/trpc'
 import {
   getEventConfigurations,
   getWorkqueueConfigurations
@@ -29,14 +29,14 @@ import { requireScopeForWorkqueues } from '@events/router/middleware'
 
 export const workqueueRouter = router({
   config: router({
-    list: publicProcedure
+    list: userProcedure
       .input(z.void())
       .output(z.array(WorkqueueConfig))
       .query(async (options) => {
         return getWorkqueueConfigurations(options.ctx.token)
       })
   }),
-  count: publicProcedure
+  count: userProcedure
     .input(WorkqueueCountInput)
     .use(requireScopeForWorkqueues)
     .output(WorkqueueCountOutput)
@@ -54,7 +54,7 @@ export const workqueueRouter = router({
       >
       return getEventCount(
         options.input,
-        await getEventConfigurations(options.ctx.token),
+        await getEventConfigurations(),
         searchScopeOptions,
         options.ctx.user.primaryOfficeId
       )

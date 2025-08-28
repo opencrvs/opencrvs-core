@@ -34,14 +34,10 @@ export class RequestNotFoundError extends TRPCError {
  * @param token - The authentication token
  * @throws {TRPCError} When the event is already waiting for correction
  */
-export async function throwConflictIfWaitingForCorrection(
-  eventId: UUID,
-  token: string
-) {
+export async function throwConflictIfWaitingForCorrection(eventId: UUID) {
   const event = await getEventById(eventId)
 
   const eventConfig = await getEventConfigurationById({
-    token,
     eventType: event.type
   })
 

@@ -14,7 +14,7 @@ import { upsertEventWithActions } from '@events/storage/postgres/events/import'
 import { getEventConfigurationById } from '../config/config'
 import { indexEvent } from '../indexing/indexing'
 
-export async function importEvent(eventDocument: EventDocument, token: string) {
+export async function importEvent(eventDocument: EventDocument) {
   const transactionId = getUUID()
   const { actions, ...event } = eventDocument
 
@@ -44,7 +44,6 @@ export async function importEvent(eventDocument: EventDocument, token: string) {
   )
 
   const config = await getEventConfigurationById({
-    token,
     eventType: event.type
   })
   await indexEvent(createdEvent, config)

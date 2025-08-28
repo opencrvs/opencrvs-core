@@ -12,10 +12,10 @@
 import { logger } from '@opencrvs/commons'
 import '@opencrvs/commons/monitoring'
 import { env } from './environment'
-import { getAnonymousToken } from './service/auth'
 import { getEventConfigurations } from './service/config/config'
-import { ensureIndexExists } from './service/indexing/indexing'
+// import { ensureIndexExists } from './service/indexing/indexing'
 import { server } from './server'
+import { ensureIndexExists } from './service/indexing/indexing'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
@@ -26,9 +26,7 @@ appModulePath.addPath(path.join(__dirname, '../'))
 
 export async function main() {
   try {
-    const configurations = await getEventConfigurations(
-      await getAnonymousToken()
-    )
+    const configurations = await getEventConfigurations()
     for (const configuration of configurations) {
       logger.info(`Loaded event configuration: ${configuration.id}`)
       await ensureIndexExists(configuration)

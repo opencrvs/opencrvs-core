@@ -34,7 +34,6 @@ export const SCOPES = {
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
   RECORD_IMPORT: 'record.import',
-  REINDEX: 'record.reindex',
   /**
    * @TODO This is a temporary scope to be used for V2 Events custom events declaration
    */
@@ -165,10 +164,7 @@ const IntegrationScopes = z.union([
 ])
 
 // Internal operations
-const InternalOperationsScopes = z.union([
-  z.literal(SCOPES.RECORD_IMPORT),
-  z.literal(SCOPES.REINDEX)
-])
+const InternalOperationsScopes = z.literal(SCOPES.RECORD_IMPORT)
 
 // Declare
 const DeclareScopes = z.union([

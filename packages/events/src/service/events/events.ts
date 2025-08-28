@@ -80,7 +80,6 @@ function getValidFileValue(
 
 async function deleteEventAttachments(token: string, event: EventDocument) {
   const configuration = await getEventConfigurationById({
-    token,
     eventType: event.type
   })
 
@@ -102,12 +101,10 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
 
 export async function throwConflictIfActionNotAllowed(
   eventId: UUID,
-  actionType: ActionType,
-  token: string
+  actionType: ActionType
 ) {
   const event = await getEventById(eventId)
   const eventConfig = await getEventConfigurationById({
-    token,
     eventType: event.type
   })
   const eventStatus = getStatusFromActions(event.actions)
@@ -260,7 +257,6 @@ export async function addAction(
 ): Promise<EventDocument> {
   const event = await getEventById(eventId)
   const configuration = await getEventConfigurationById({
-    token,
     eventType: event.type
   })
 
@@ -425,11 +421,9 @@ export async function addAsyncRejectAction({
   createdByRole,
   createdByUserType,
   createdAtLocation,
-  token,
   eventType
 }: AsyncRejectActionInput) {
   const configuration = await getEventConfigurationById({
-    token,
     eventType
   })
 
