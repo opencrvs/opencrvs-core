@@ -17,15 +17,20 @@ import {
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { BIRTH_EVENT } from '../events/Constants'
+import { ActionType } from '../events/ActionType'
+import { TranslationConfig } from 'src/events/TranslationConfig'
 
+function generateTranslationConfig(message: string): TranslationConfig {
+  return {
+    defaultMessage: message,
+    description: 'Description for ${message}',
+    id: message
+  }
+}
 const child = defineFormPage({
   id: 'child',
   type: PageTypes.enum.FORM,
-  title: {
-    defaultMessage: "Child's details",
-    description: 'Form section title for Child',
-    id: 'v2.form.birth.child.title'
-  },
+  title: generateTranslationConfig("Child's details"),
   fields: [
     {
       id: 'child.firstNames',
@@ -33,11 +38,7 @@ const child = defineFormPage({
       required: true,
       configuration: { maxLength: 32 },
       hideLabel: true,
-      label: {
-        defaultMessage: "Child's  first name",
-        description: 'This is the label for the field',
-        id: 'v2.event.birth.action.declare.form.section.child.field.name.label'
-      }
+      label: generateTranslationConfig("Child's  first name")
     },
     {
       id: 'child.familyName',
@@ -45,21 +46,13 @@ const child = defineFormPage({
       required: true,
       configuration: { maxLength: 32 },
       hideLabel: true,
-      label: {
-        defaultMessage: "Child's last name",
-        description: 'This is the label for the field',
-        id: 'v2.event.birth.action.declare.form.section.child.field.name.label'
-      }
+      label: generateTranslationConfig("Child's last name")
     },
     {
       id: 'child.DoB',
       type: 'DATE',
       required: true,
-      label: {
-        defaultMessage: 'Date of birth',
-        description: 'This is the label for the field',
-        id: 'v2.event.birth.action.declare.form.section.child.field.dob.label'
-      }
+      label: generateTranslationConfig('Date of birth')
     }
   ]
 })
@@ -67,82 +60,95 @@ const child = defineFormPage({
 const mother = defineFormPage({
   id: 'mother',
   type: PageTypes.enum.FORM,
-  title: {
-    defaultMessage: "Mother's details",
-    description: 'Form section title for mothers details',
-    id: 'v2.form.section.mother.title'
-  },
+  title: generateTranslationConfig("Mother's details"),
   fields: [
     {
       id: 'mother.firstNames',
       configuration: { maxLength: 32 },
       type: FieldType.TEXT,
       required: true,
-      label: {
-        defaultMessage: 'First name(s)',
-        description: 'This is the label for the field',
-        id: `v2.event.birth.action.declare.form.section.person.field.firstname.label`
-      }
+      label: generateTranslationConfig('First name(s)')
     },
     {
       id: `mother.familyName`,
       configuration: { maxLength: 32 },
       type: FieldType.TEXT,
       required: true,
-      label: {
-        defaultMessage: 'Last name',
-        description: 'This is the label for the field',
-        id: `v2.event.birth.action.declare.form.section.person.field.surname.label`
-      }
+      label: generateTranslationConfig('Last name')
     },
     {
       id: `mother.DoB`,
       type: 'DATE',
       required: true,
-      label: {
-        defaultMessage: 'Date of birth',
-        description: 'This is the label for the field',
-        id: `v2.event.birth.action.declare.form.section.person.field.dob.label`
-      }
+      label: generateTranslationConfig('Date of birth')
     },
     {
       id: 'mother.identifier',
       type: FieldType.ID,
       required: true,
-      label: {
-        defaultMessage: 'ID Number',
-        description: 'This is the label for the field',
-        id: `v2.event.birth.action.declare.form.section.person.field.nid.label`
-      }
+      label: generateTranslationConfig('ID Number')
     }
   ]
 })
 
+const BIRTH_DECLARATION_REVIEW = {
+  title: generateTranslationConfig(
+    '{child.name.firstname, select, __EMPTY__ {Birth declaration} other {{child.name.surname, select, __EMPTY__ {Birth declaration for {child.name.firstname}} other {Birth declaration for {child.name.firstname} {child.name.surname}}}}}'
+  ),
+  fields: [
+    {
+      id: 'review.comment',
+      type: FieldType.TEXTAREA,
+      label: generateTranslationConfig('Comment'),
+      required: true
+    },
+    {
+      type: FieldType.SIGNATURE,
+      id: 'review.signature',
+      required: true,
+      label: generateTranslationConfig('Signature of informant'),
+      signaturePromptLabel: generateTranslationConfig('Draw signature')
+    }
+  ]
+}
+
 const BIRTH_DECLARATION_FORM = defineDeclarationForm({
-  label: {
-    defaultMessage: 'Birth decalration form',
-    id: 'v2.event.birth.action.declare.form.label',
-    description: 'This is what this form is referred as in the system'
-  },
+  label: generateTranslationConfig('Birth decalration form'),
 
   pages: [child, mother]
 })
 
 export const v2BirthEvent = defineConfig({
   id: BIRTH_EVENT,
-  title: {
-    defaultMessage: '{child.name.firstname} {child.name.surname}',
-    description: 'This is the title of the summary',
-    id: 'v2.event.birth.title'
-  },
-  label: {
-    defaultMessage: 'Birth',
-    description: 'This is what this event is referred as in the system',
-    id: 'v2.event.birth.label'
-  },
+  title: generateTranslationConfig(
+    '{child.name.firstname} {child.name.surname}'
+  ),
+  label: generateTranslationConfig('Birth'),
   summary: {
     fields: []
   },
-  actions: [],
-  declaration: BIRTH_DECLARATION_FORM
+  declaration: BIRTH_DECLARATION_FORM,
+  actions: [
+    {
+      type: ActionType.READ,
+      label: generateTranslationConfig('Read'),
+      review: BIRTH_DECLARATION_REVIEW
+    },
+    {
+      type: ActionType.DECLARE,
+      label: generateTranslationConfig('Declare'),
+      review: BIRTH_DECLARATION_REVIEW
+    },
+    {
+      type: ActionType.VALIDATE,
+      label: generateTranslationConfig('Validate'),
+      review: BIRTH_DECLARATION_REVIEW
+    },
+    {
+      type: ActionType.REGISTER,
+      label: generateTranslationConfig('Register'),
+      review: BIRTH_DECLARATION_REVIEW
+    }
+  ],
+  advancedSearch: []
 })

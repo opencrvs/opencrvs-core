@@ -17,12 +17,17 @@ import type {
 import { toast } from 'react-hot-toast'
 import { TRPCClientError } from '@trpc/client'
 import { useSyncExternalStore } from 'react'
+import { isEmpty } from 'lodash'
 import {
   ActionType,
+  ActionUpdate,
   EventDocument,
   getCurrentEventState,
   omitHiddenAnnotationFields,
-  omitHiddenPaginatedFields
+  omitHiddenPaginatedFields,
+  deepMerge,
+  EventState,
+  EventConfig
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -65,6 +70,46 @@ function errorToastOnConflict(error: TRPCClientError<AppRouter>) {
   if (error.data?.httpStatus === 409) {
     toast.error(ToastKey.NOT_ASSIGNED_ERROR)
   }
+}
+
+// Merge actionUpdate with the existing declaration to avoid losing dependent fields.
+// For example: if the correction payload contains only `informant.name`, but not `informant.relation`,
+// running omitHiddenPaginatedFields on the payload alone would remove `informant.name` (since its parent `informant.relation` is missing).
+// By merging first, we preserve such dependencies, and then run a diff to keep only the valid correction fields.
+function getCleanedDeclarationDiff(
+  eventConfiguration: EventConfig,
+  originalDeclaration?: EventState,
+  declarationDiff?: EventState
+): ActionUpdate | undefined {
+  if (isEmpty(declarationDiff)) {
+    return declarationDiff
+  }
+
+  // If there's no original declaration, just clean the update and return it
+  if (isEmpty(originalDeclaration)) {
+    return omitHiddenPaginatedFields(
+      eventConfiguration.declaration,
+      declarationDiff
+    )
+  }
+
+  // Merge original + updates so we get the final event state
+  // (Needed because omitHiddenPaginatedFields func requires a full snapshot, not partial)
+  const merged = deepMerge(originalDeclaration, declarationDiff)
+
+  // Remove any hidden/paginated fields from the merged declaration
+  // (Ensures we only consider fields relevant to the event configuration)
+  const cleanedDeclaration = omitHiddenPaginatedFields(
+    eventConfiguration.declaration,
+    merged
+  )
+
+  // From the update, keep only fields that are valid in the cleaned declaration
+  // (Prevents applying updates to hidden/invalid fields)
+  const cleanedDeclarationDiff: ActionUpdate = Object.fromEntries(
+    Object.entries(declarationDiff).filter(([key]) => key in cleanedDeclaration)
+  )
+  return cleanedDeclarationDiff
 }
 
 setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
@@ -359,8 +404,9 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 
     return {
       ...params,
-      declaration: omitHiddenPaginatedFields(
-        eventConfiguration.declaration,
+      declaration: getCleanedDeclarationDiff(
+        eventConfiguration,
+        originalDeclaration,
         params.declaration
       ),
       annotation
@@ -394,10 +440,15 @@ export function useEventCustomAction(mutationKey: MutationKey) {
         throw new Error('Event configuration not found')
       }
 
+      const originalDeclaration = params.fullEvent
+        ? getCurrentEventState(params.fullEvent, eventConfiguration).declaration
+        : {}
+
       return mutation.mutate({
         ...params,
-        declaration: omitHiddenPaginatedFields(
-          eventConfiguration.declaration,
+        declaration: getCleanedDeclarationDiff(
+          eventConfiguration,
+          originalDeclaration,
           params.declaration
         )
       })

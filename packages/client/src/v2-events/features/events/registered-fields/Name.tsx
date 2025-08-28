@@ -194,6 +194,15 @@ function stringify(value?: NameFieldValue) {
   return joinValues([value?.firstname, value?.middlename, value?.surname])
 }
 
+function toCertificateVariables(value?: NameFieldValue) {
+  return {
+    fullname: stringify(value),
+    firstname: value?.firstname,
+    middlename: value?.middlename,
+    surname: value?.surname
+  }
+}
+
 export const Name = {
   Input: NameInput,
   Output: ({
@@ -218,5 +227,6 @@ export const Name = {
       </>
     )
   },
-  stringify
+  stringify,
+  toCertificateVariables
 }
