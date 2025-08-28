@@ -26,6 +26,7 @@ import {
   aggregateActionDeclarations,
   deepMerge,
   getAcceptedActions,
+  getCompleteActionAnnotation,
   omitHiddenPaginatedFields
 } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
@@ -327,10 +328,18 @@ export function getActionAnnotation({
   const activeActions = getAcceptedActions(event)
 
   const action = findLast(activeActions, (a) => a.type === actionType)
+
+  const actionWithCompleteAnnotation = action && {
+    ...action,
+    annotation: getCompleteActionAnnotation({}, event, action)
+  }
+
   const matchingDraft = draft?.action.type === actionType ? draft : undefined
 
   const sortedActions = orderBy(
-    [action, matchingDraft?.action].filter((a) => a !== undefined),
+    [actionWithCompleteAnnotation, matchingDraft?.action].filter(
+      (a) => a !== undefined
+    ),
     'createdAt',
     'asc'
   )

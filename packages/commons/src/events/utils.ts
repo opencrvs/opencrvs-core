@@ -502,6 +502,38 @@ export function getPendingAction(actions: Action[]): ActionDocument {
   return pendingActions[0]
 }
 
+export function getCompleteActionAnnotation(
+  annotation: EventState,
+  event: EventDocument,
+  action: ActionDocument
+): EventState {
+  /*
+   * When an action has an `originalActionId`, it means this action is linked
+   * to another one (the "original" action).
+   *
+   * - The original action, with status `Requested`, was created by core.
+   * - The linked action (with status `Accepted`) comes from
+   *   the country configuration in response to that request.
+   *
+   * If we find the original action, we merge its annotation into the current one
+   * so that the current action includes the original details.
+   */
+  if (action.originalActionId) {
+    const originalAction = event.actions.find(
+      ({ id }) => id === action.originalActionId
+    )
+    if (originalAction?.status !== ActionStatus.Requested) {
+      return annotation
+    }
+
+    return deepMerge(
+      deepMerge(annotation, originalAction.annotation ?? {}),
+      action.annotation ?? {}
+    )
+  }
+  return deepMerge(annotation, action.annotation ?? {})
+}
+
 function getCompleteActionDeclaration(
   declaration: EventState,
   event: EventDocument,
