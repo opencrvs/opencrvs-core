@@ -17,11 +17,10 @@ import { AppBar, Button, Frame, Icon, Stack } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
-import { useWorkqueueConfigurations } from '@client/v2-events/features/events/useWorkqueueConfiguration'
 import { advancedSearchMessages } from '@client/v2-events/features/events/Search/AdvancedSearch'
 import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { WORKQUEUE_OUTBOX, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
+import { useAllWorkqueueConfigurations } from '@client/v2-events/features/events/useAllWorkqueueConfigurations'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
 
@@ -50,12 +49,9 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const navigate = useNavigate()
   const intl = useIntl()
-  const workqueues = useWorkqueueConfigurations()
-  const coreWorkqueues = [WORKQUEUE_OUTBOX, WORKQUEUE_DRAFT]
+  const workqueues = useAllWorkqueueConfigurations()
 
-  const workqueueConfig = [...workqueues, ...coreWorkqueues].find(
-    ({ slug }) => slug === workqueueSlug
-  )
+  const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
 
   return (
     <Frame
