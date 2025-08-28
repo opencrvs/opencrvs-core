@@ -24,6 +24,7 @@ describe('getFieldErrors()', () => {
           id: 'test.checkbox',
           type: FieldType.CHECKBOX,
           required: true,
+          defaultValue: false,
           label: {
             id: 'test.checkbox.label',
             defaultMessage: 'Test Field',
@@ -44,6 +45,7 @@ describe('getFieldErrors()', () => {
           id: 'test.checkbox',
           type: FieldType.CHECKBOX,
           required: true,
+          defaultValue: false,
           label: {
             id: 'test.checkbox.label',
             defaultMessage: 'Test Field',
@@ -64,6 +66,7 @@ describe('getFieldErrors()', () => {
           id: 'test.checkbox',
           type: FieldType.CHECKBOX,
           required: true,
+          defaultValue: false,
           label: {
             id: 'test.field.label',
             defaultMessage: 'Test Field',
@@ -91,6 +94,7 @@ describe('getFieldErrors()', () => {
           id: 'test.checkbox',
           type: FieldType.CHECKBOX,
           required: true,
+          defaultValue: false,
           label: {
             id: 'test.field.label',
             defaultMessage: 'Test Field',
@@ -118,6 +122,7 @@ describe('getFieldErrors()', () => {
           id: 'test.checkbox',
           type: FieldType.CHECKBOX,
           required: true,
+          defaultValue: false,
           label: {
             id: 'test.field.label',
             defaultMessage: 'Test Field',
