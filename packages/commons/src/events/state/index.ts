@@ -37,7 +37,6 @@ import {
   FullDocumentPath,
   FullDocumentUrl
 } from '../../documents'
-import { getOnlyVisibleFormValues } from '..'
 
 export function getStatusFromActions(actions: Array<Action>) {
   return actions
