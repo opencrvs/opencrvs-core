@@ -336,8 +336,7 @@ export function eventPayloadGenerator(rng: () => number) {
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
           createdByUserType: TokenUserType.Enum.user,
-          createdByRole: '@todo',
-          createdAtLocation: '@todo' as UUID
+          createdByRole: '@todo'
         }
       }
 
