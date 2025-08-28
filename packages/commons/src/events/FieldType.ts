@@ -15,6 +15,7 @@ export const FieldType = {
   NAME: 'NAME',
   PHONE: 'PHONE',
   ID: 'ID',
+  INTL_PHONE: 'INTL_PHONE',
   ADDRESS: 'ADDRESS',
   TEXT: 'TEXT',
   NUMBER: 'NUMBER',

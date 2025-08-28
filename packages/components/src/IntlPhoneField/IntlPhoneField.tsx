@@ -50,17 +50,12 @@ export const IntlPhoneField = ({
 
   const handleCountryChange = (code: string) => {
     setCountry(code)
+    onChange(`${code}${SEPARATOR}${phoneNumber}`)
   }
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPhoneNumber(e.target.value)
-  }
-
-  const handleBlur = (event: React.FocusEvent<any>) => {
-    if (props.onBlur) props.onBlur(event)
-    if (onChange) {
-      onChange(`${selectedCountry}${SEPARATOR}${phoneNumber}`)
-    }
+    onChange(`${selectedCountry}${SEPARATOR}${e.target.value}`)
   }
 
   return (
@@ -77,7 +72,6 @@ export const IntlPhoneField = ({
         width={175}
         data-testid={props['data-testid'] && `${props['data-testid']}-country`}
         options={options}
-        onBlur={handleBlur}
         onChange={handleCountryChange}
         {...props}
       />
@@ -91,7 +85,6 @@ export const IntlPhoneField = ({
         focusInput={focusInput}
         placeholder="Phone number"
         type="tel"
-        onBlur={handleBlur}
         value={phoneNumber}
         onChange={handlePhoneChange}
         {...props}

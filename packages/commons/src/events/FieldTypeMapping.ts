@@ -36,6 +36,7 @@ import {
   DataField,
   NameField,
   PhoneField,
+  IntlPhoneField,
   IdField,
   DateRangeField,
   SelectDateRangeField,
@@ -124,6 +125,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.PHONE:
+    case FieldType.INTL_PHONE:
     case FieldType.ID:
       schema = required ? NonEmptyTextValue : TextValue
       break
@@ -201,6 +203,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.DATA:
     case FieldType.NAME:
     case FieldType.PHONE:
+    case FieldType.INTL_PHONE:
     case FieldType.BUTTON:
     case FieldType.HTTP:
     case FieldType.ID:
@@ -301,6 +304,13 @@ export const isPhoneFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: PhoneField } => {
   return field.config.type === FieldType.PHONE
+}
+
+export const isIntlPhoneFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: IntlPhoneField } => {
+  return field.config.type === FieldType.INTL_PHONE
 }
 
 export const isIdFieldType = (field: {

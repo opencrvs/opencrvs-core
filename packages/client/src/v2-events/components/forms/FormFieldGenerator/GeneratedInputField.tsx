@@ -47,6 +47,7 @@ import {
   getDeclarationFields,
   isNameFieldType,
   isPhoneFieldType,
+  isIntlPhoneFieldType,
   isIdFieldType,
   getValidatorsForField,
   DateRangeFieldValue,
@@ -70,7 +71,7 @@ import {
   SelectCountry,
   Text,
   Number,
-  Phone,
+  IntlPhone,
   AdministrativeArea,
   Divider,
   PageHeader,
@@ -199,7 +200,20 @@ export const GeneratedInputField = React.memo(
     if (isPhoneFieldType(field)) {
       return (
         <InputField {...field.inputFieldProps}>
-          <Phone.Input
+          <Text.Input
+            {...inputProps}
+            disabled={disabled}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isIntlPhoneFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <IntlPhone.Input
             {...inputProps}
             country={field.config.country}
             disabled={disabled}

@@ -53,6 +53,7 @@ export const useEventFormData = create<EventFormData>()((set, get) => {
 
     setFormValues: (form: EventState) => {
       const formValues = removeUndefinedKeys(form)
+      console.log(formValues)
       return set(() => ({ formValues }))
     },
 

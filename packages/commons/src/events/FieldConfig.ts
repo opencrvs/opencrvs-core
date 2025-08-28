@@ -414,12 +414,17 @@ const NameField = BaseField.extend({
 }).describe('Name input field')
 
 const PhoneField = BaseField.extend({
+  defaultValue: NonEmptyTextValue.optional(),
+  type: z.literal(FieldType.PHONE)
+}).describe('Phone input field')
+
+const IntlPhoneField = BaseField.extend({
   country: z.string(),
   options: z
     .array(IntlPhoneOption)
     .describe('A list of options not requiring translations'),
   defaultValue: NonEmptyTextValue.optional(),
-  type: z.literal(FieldType.PHONE)
+  type: z.literal(FieldType.INTL_PHONE)
 }).describe('Phone input field')
 
 const IdField = BaseField.extend({
@@ -627,6 +632,7 @@ export type FieldConfig =
   | z.infer<typeof Select>
   | z.infer<typeof NameField>
   | z.infer<typeof PhoneField>
+  | z.infer<typeof IntlPhoneField>
   | z.infer<typeof IdField>
   | z.infer<typeof Checkbox>
   | z.infer<typeof File>
@@ -664,6 +670,7 @@ export type FieldConfigInput =
   | z.input<typeof Select>
   | z.input<typeof NameField>
   | z.input<typeof PhoneField>
+  | z.input<typeof IntlPhoneField>
   | z.input<typeof IdField>
   | z.input<typeof Checkbox>
   | z.input<typeof File>
@@ -705,6 +712,7 @@ export const FieldConfig: z.ZodType<
     Select,
     NameField,
     PhoneField,
+    IntlPhoneField,
     IdField,
     Checkbox,
     File,
@@ -729,6 +737,7 @@ export const FieldConfig: z.ZodType<
 export type SelectField = z.infer<typeof Select>
 export type NameField = z.infer<typeof NameField>
 export type PhoneField = z.infer<typeof PhoneField>
+export type IntlPhoneField = z.infer<typeof IntlPhoneField>
 export type IdField = z.infer<typeof IdField>
 export type LocationField = z.infer<typeof Location>
 export type RadioField = z.infer<typeof RadioGroup>

@@ -30,6 +30,7 @@ import { SelectCountry } from './SelectCountry'
 import { SelectDateRangeField } from './SelectDateRangeField'
 import { Text } from './Text'
 import { TimeField } from './TimeField'
+import { IntlPhone } from './IntlPhone'
 
 export * from './Address'
 export * from './AdministrativeArea'
@@ -41,7 +42,7 @@ export * from './DateField'
 export * from './Divider'
 export * from './Http'
 export * from './LocationSearch'
-export * from './Phone'
+export * from './IntlPhone'
 export * from './Name'
 export * from './Number'
 export * from './PageHeader'
@@ -99,6 +100,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return SelectDateRangeField
     case FieldType.HTTP:
       return Http
+    case FieldType.INTL_PHONE:
+      return IntlPhone
     default:
       return undefined
   }

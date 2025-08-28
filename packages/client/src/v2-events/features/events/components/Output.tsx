@@ -40,6 +40,7 @@ import {
   isNameFieldType,
   isIdFieldType,
   isPhoneFieldType,
+  isIntlPhoneFieldType,
   isSelectDateRangeFieldType,
   isLocationFieldType,
   FileFieldWithOptionValue,
@@ -48,6 +49,7 @@ import {
 } from '@opencrvs/commons/client'
 import {
   Address,
+  IntlPhone,
   AdministrativeArea,
   BulletList,
   Checkbox,
@@ -120,6 +122,10 @@ export function ValueOutput(
 
   if (isNumberFieldType(field)) {
     return Number.Output(field)
+  }
+
+  if (isIntlPhoneFieldType(field)) {
+    return IntlPhone.Output(field)
   }
 
   if (isFileFieldType(field)) {

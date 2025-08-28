@@ -201,6 +201,8 @@ export function mapFieldTypeToMockValue(
         loading: false
       } satisfies HttpFieldValue
     case FieldType.FILE_WITH_OPTIONS:
+    case FieldType.INTL_PHONE:
+      return '+44|123456'
     case FieldType.DATA:
       return undefined
   }

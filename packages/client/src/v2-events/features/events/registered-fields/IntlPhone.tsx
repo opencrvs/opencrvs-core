@@ -25,8 +25,9 @@ function IntlPhoneField({
   value,
   disabled,
   type,
-  options,
   country,
+  options,
+  onChange,
   ...props
 }: PhoneFieldProps) {
   const [FieldValue, setFieldValue] = React.useState<string>(value ?? '')
@@ -34,6 +35,13 @@ function IntlPhoneField({
   React.useEffect(() => {
     setFieldValue(value ?? '')
   }, [value])
+
+  const handleChange = React.useCallback(
+    (val: string) => {
+      onChange(val)
+    },
+    [onChange]
+  )
 
   return (
     <IntlPhoneFieldComponent
@@ -43,17 +51,12 @@ function IntlPhoneField({
       disabled={disabled}
       options={options}
       value={FieldValue}
-      onBlur={(e) => {
-        props.onChange(FieldValue)
-        if (props.onBlur) {
-          props.onBlur(e)
-        }
-      }}
+      onChange={handleChange}
     />
   )
 }
 
-export const Phone = {
+export const IntlPhone = {
   Input: IntlPhoneField,
   Output: ({ value }: { value?: string }) => <>{value?.toString() || ''}</>
 }
