@@ -10,7 +10,7 @@
  */
 import { useSelector } from 'react-redux'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { Scope, SCOPES } from '@opencrvs/commons/client'
+import { findScope, Scope, SCOPES } from '@opencrvs/commons/client'
 import { User, Location } from '@client/utils/gateway'
 import { SUBMISSION_STATUS } from '@client/declarations'
 import {
@@ -128,6 +128,12 @@ export function usePermissions() {
   const canEditUser = (
     user: Pick<User, 'primaryOffice'> & { role: { id: string } }
   ) => {
+    const editableRoleIds = findScope(userScopes ?? [], 'user.edit')?.options
+      ?.role
+
+    if (editableRoleIds) {
+      return editableRoleIds.includes(user.role.id)
+    }
     if (!userPrimaryOffice?.id) {
       return false
     }
