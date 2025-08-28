@@ -21,20 +21,6 @@ export async function setLocations(locations: NewLocations[]) {
   const db = getClient()
 
   await db
-    .insertInto('locations')
-    .values(locations.map((loc) => ({ ...loc, deletedAt: null })))
-    .onConflict((oc) =>
-      oc.column('id').doUpdateSet({
-        name: (eb) => eb.ref('excluded.name'),
-        parentId: (eb) => eb.ref('excluded.parentId'),
-        locationType: (eb) => eb.ref('excluded.locationType'),
-        updatedAt: () => sql`now()`,
-        deletedAt: null
-      })
-    )
-    .execute()
-
-  await db
     .updateTable('locations')
     .set({ deletedAt: sql`now()` })
     .where('deletedAt', 'is', null)
@@ -55,6 +41,7 @@ export async function setLocations(locations: NewLocations[]) {
         oc.column('id').doUpdateSet({
           name: (eb) => eb.ref('excluded.name'),
           parentId: (eb) => eb.ref('excluded.parentId'),
+          locationType: (eb) => eb.ref('excluded.locationType'),
           updatedAt: () => sql`now()`,
           deletedAt: null
         })
