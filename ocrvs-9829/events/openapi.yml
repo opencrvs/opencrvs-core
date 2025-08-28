@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: ed59c701-efb4-4dcb-9cf4-3742dcf0a1dd
+                transactionId: 74628099-f1ed-414d-816c-e0fc74335a4e
                 type: v2.birth
       responses:
         "200":
@@ -520,6 +520,7 @@ paths:
                   type: boolean
                 createdAtLocation:
                   type: string
+                  format: uuid
                 type:
                   type: string
                   enum:
@@ -530,7 +531,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 89dc3e97-9f34-4aa9-b097-48ee8ef342e8
+                transactionId: 45aef54d-0adc-49c3-be15-73f73bda03de
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -985,6 +986,7 @@ paths:
                   type: boolean
                 createdAtLocation:
                   type: string
+                  format: uuid
                 type:
                   type: string
                   enum:
@@ -1444,6 +1446,7 @@ paths:
                   type: boolean
                 createdAtLocation:
                   type: string
+                  format: uuid
                 requestId:
                   type: string
                 type:
@@ -1906,6 +1909,7 @@ paths:
                   type: boolean
                 createdAtLocation:
                   type: string
+                  format: uuid
                 requestId:
                   type: string
                 type:

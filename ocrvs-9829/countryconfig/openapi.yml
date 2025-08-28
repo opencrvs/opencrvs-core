@@ -12660,6 +12660,7 @@ components:
           type: boolean
         createdAtLocation:
           type: string
+          format: uuid
         type:
           type: string
           const: VALIDATE
@@ -13098,6 +13099,7 @@ components:
           type: boolean
         createdAtLocation:
           type: string
+          format: uuid
         type:
           type: string
           const: REGISTER
@@ -13534,6 +13536,7 @@ components:
           type: boolean
         createdAtLocation:
           type: string
+          format: uuid
         type:
           type: string
           const: NOTIFY
@@ -13543,7 +13546,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 4abd4739-bc0a-4c87-9661-deb3a13c5dc8
+        transactionId: 6eb5a5bf-08e0-4754-96ee-70d4bee8aed5
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -13973,6 +13976,7 @@ components:
           type: boolean
         createdAtLocation:
           type: string
+          format: uuid
         type:
           type: string
           const: DECLARE
@@ -14406,6 +14410,7 @@ components:
           type: boolean
         createdAtLocation:
           type: string
+          format: uuid
         type:
           type: string
           const: REJECT
@@ -14852,6 +14857,7 @@ components:
           type: boolean
         createdAtLocation:
           type: string
+          format: uuid
         type:
           type: string
           const: MARKED_AS_DUPLICATE
@@ -15285,6 +15291,7 @@ components:
           type: boolean
         createdAtLocation:
           type: string
+          format: uuid
         type:
           type: string
           const: ARCHIVE
@@ -15731,6 +15738,7 @@ components:
           type: boolean
         createdAtLocation:
           type: string
+          format: uuid
         type:
           type: string
           const: ASSIGN
@@ -16167,6 +16175,7 @@ components:
           type: boolean
         createdAtLocation:
           type: string
+          format: uuid
         type:
           type: string
           const: UNASSIGN
@@ -16603,6 +16612,7 @@ components:
           type: boolean
         createdAtLocation:
           type: string
+          format: uuid
         type:
           type: string
           const: PRINT_CERTIFICATE
@@ -17041,6 +17051,7 @@ components:
           type: boolean
         createdAtLocation:
           type: string
+          format: uuid
         type:
           type: string
           const: REQUEST_CORRECTION
@@ -17474,6 +17485,7 @@ components:
           type: boolean
         createdAtLocation:
           type: string
+          format: uuid
         requestId:
           type: string
         type:
@@ -17923,6 +17935,7 @@ components:
           type: boolean
         createdAtLocation:
           type: string
+          format: uuid
         requestId:
           type: string
         type:
@@ -18359,6 +18372,7 @@ components:
           type: boolean
         createdAtLocation:
           type: string
+          format: uuid
         type:
           type: string
           const: READ
