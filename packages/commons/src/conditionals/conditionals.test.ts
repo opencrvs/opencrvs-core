@@ -320,7 +320,7 @@ describe('date comparisons', () => {
 })
 
 describe('leaf level validations', () => {
-  it.only('validates leaf level fields', () => {
+  it('validates leaf level fields', () => {
     expect(
       validate(
         field('applicant.address').isValidAdministrativeLeafLevel(),

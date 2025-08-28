@@ -26,9 +26,7 @@ const testCases = [
     address: {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'sadsad-sadsad-sadsadsd-sdsdsd',
-      district: 'gdgfhdfg-wwqret-dfgfgsd-ewrew',
-      urbanOrRural: 'URBAN'
+      administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa'
     },
     success: true
   },
@@ -37,9 +35,14 @@ const testCases = [
     address: {
       country: 'BGD',
       addressType: AddressType.INTERNATIONAL,
-      province: 'sadsad-sadsad-sadsadsd-sdsdsd',
-      district: 'gdgfhdfg-wwqret-dfgfgsd-ewrew',
-      urbanOrRural: 'URBAN'
+      streetLevelDetails: [
+        {
+          streetName: 'Main St',
+          streetNumber: '123',
+          city: 'Dhaka',
+          postalCode: '1212'
+        }
+      ]
     },
     success: false
   },
@@ -48,8 +51,12 @@ const testCases = [
     address: {
       country: 'BGD',
       addressType: AddressType.INTERNATIONAL,
-      state: 'sadsad-sadsad-sadsadsd-sdsdsd',
-      district2: 'gdgfhdfg-wwqret-dfgfgsd-ewrew'
+      streetLevelDetails: {
+        streetName: 'Main St',
+        streetNumber: '123',
+        city: 'Dhaka',
+        postalCode: '1212'
+      }
     },
     success: true
   }
