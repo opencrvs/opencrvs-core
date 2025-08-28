@@ -302,24 +302,26 @@ export function CorrectionDetails({
           .filter((field) => isFieldDisplayedOnReview(field, form))
           .filter((f) => hasFieldChanged(f, form, previousFormValues))
           .map((f) => {
-            const originalOutput = Output({
+            const original = Output({
               field: f,
               value: previousFormValues[f.id],
               showPreviouslyMissingValuesAsChanged: false,
               previousForm: previousFormValues,
-              formConfig
+              formConfig,
+              displayEmptyAsDash: true
             })
 
-            const correctionOutput = Output({
+            const correction = Output({
               field: f,
               value: form[f.id],
-              showPreviouslyMissingValuesAsChanged: false
+              showPreviouslyMissingValuesAsChanged: false,
+              displayEmptyAsDash: true
             })
 
             return {
               fieldLabel: intl.formatMessage(f.label),
-              original: originalOutput ?? '-',
-              correction: correctionOutput ?? '-'
+              original,
+              correction
             }
           })
 

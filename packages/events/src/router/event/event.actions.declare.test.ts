@@ -181,6 +181,7 @@ test('successfully validates a fields on a conditional page, which is visible', 
       surname: 'Doe'
     },
     'recommender.none': true,
+    'senior-pass.recommender': true,
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
