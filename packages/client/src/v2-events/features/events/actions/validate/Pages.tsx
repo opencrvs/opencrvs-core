@@ -16,6 +16,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import {
+  ActionType,
   getCurrentEventState,
   getDeclarationPages
 } from '@opencrvs/commons/client'
@@ -82,7 +83,7 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        declaration={eventIndex.declaration}
+        actionType={ActionType.VALIDATE}
         eventConfig={configuration}
         form={form}
         formPages={formPages}

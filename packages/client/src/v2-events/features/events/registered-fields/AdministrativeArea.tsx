@@ -17,6 +17,7 @@ import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { Select } from './Select'
+import { LocationSearch } from './LocationSearch'
 
 function useAdminLocations(partOf: string) {
   const locationMap = useSelector(getAdminStructureLocations)
@@ -72,8 +73,8 @@ function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
   return location ? location.name : ''
 }
 
-function stringify(locations: Location[], value: string) {
-  const location = locations.find((l) => l.id === value)
+function stringify(value: string, context: { locations: Location[] }) {
+  const location = context.locations.find((l) => l.id === value)
 
   const name = location?.name
   return name ?? EMPTY_TOKEN
@@ -82,5 +83,6 @@ function stringify(locations: Location[], value: string) {
 export const AdministrativeArea = {
   Input: AdministrativeAreaInput,
   Output: AdministrativeAreaOutput,
-  stringify
+  stringify,
+  toCertificateVariables: LocationSearch.toCertificateVariables
 }
