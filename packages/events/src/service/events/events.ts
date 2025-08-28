@@ -380,7 +380,15 @@ export async function addAction(
 
   const updatedEvent = await getEventById(eventId)
 
-  await indexEvent(updatedEvent, configuration)
+  // Only send the event to Elasticsearch if it contains a NOTIFY or DECLARE action.
+  // These actions indicate that the client has sent a record, so we only index in these cases.
+  const shouldIndexEvent = updatedEvent.actions.some(
+    ({ type }) => type === ActionType.NOTIFY || type === ActionType.DECLARE
+  )
+
+  if (shouldIndexEvent) {
+    await indexEvent(updatedEvent, configuration)
+  }
 
   const previousDraft = await draftsRepo.findLatestDraftForAction(
     event.id,
