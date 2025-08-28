@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { IntlShape, useIntl } from 'react-intl'
 import {
   FieldPropsWithoutReferenceValue,
   SelectField,
@@ -17,6 +16,8 @@ import {
   TranslationConfig
 } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
+import { useIntlWithFormData } from '@client/v2-events/messages/utils'
+import { StringifierContext } from './RegisteredField'
 
 export type SelectInputProps = Omit<
   FieldPropsWithoutReferenceValue<'SELECT'>,
@@ -28,7 +29,7 @@ export type SelectInputProps = Omit<
 } & { 'data-testid'?: string }
 
 function SelectInput({ onChange, value, ...props }: SelectInputProps) {
-  const intl = useIntl()
+  const intl = useIntlWithFormData()
   const { options } = props
   const selectedOption = options.find((option) => option.value === value)
   const formattedOptions = options.map((option: SelectOption) => ({
@@ -56,24 +57,28 @@ function SelectOutput({
   value: string | undefined
   options: SelectOption[]
 }) {
-  const intl = useIntl()
+  const intl = useIntlWithFormData()
   const selectedOption = options.find((option) => option.value === value)
 
   return selectedOption ? intl.formatMessage(selectedOption.label) : ''
 }
 
-function stringify(intl: IntlShape, value: string, fieldConfig: SelectField) {
-  const option = fieldConfig.options.find((opt) => opt.value === value)
+function stringify(value: string, context: StringifierContext<SelectField>) {
+  if (!context.config) {
+    return value
+  }
+
+  const option = context.config.options.find((opt) => opt.value === value)
 
   if (!option) {
     // eslint-disable-next-line no-console
     console.error(
-      `Could not find option with value ${value} for field ${fieldConfig.id}`
+      `Could not find option with value ${value} for field ${context.config.id}`
     )
     return value
   }
 
-  return intl.formatMessage(option.label)
+  return context.intl.formatMessage(option.label)
 }
 
 export const Select = {
