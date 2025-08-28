@@ -462,19 +462,19 @@ export const mockOfflineData = {
     },
     ADMIN_STRUCTURE: [
       {
-        id: 'region',
+        id: 'province',
         label: {
-          id: 'v2.field.address.region.label',
-          defaultMessage: 'Region',
-          description: 'Label for region in address component'
+          id: 'v2.field.address.province.label',
+          defaultMessage: 'Province',
+          description: 'Label for province in address'
         }
       },
       {
-        id: 'zone',
+        id: 'district',
         label: {
-          id: 'v2.field.address.zone.label',
-          defaultMessage: 'Zone',
-          description: 'Label for zone in address component'
+          id: 'v2.field.address.district.label',
+          defaultMessage: 'District',
+          description: 'Label for district in address'
         }
       }
     ],
