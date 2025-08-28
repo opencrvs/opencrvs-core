@@ -97,8 +97,8 @@ function TimeOutput({ value }: { value?: string }) {
   return <>{parseAndFormatTime(intl, value)}</>
 }
 
-function stringify(intl: IntlShape, value?: string) {
-  return parseAndFormatTime(intl, value)
+function stringify(value: string | undefined, context: { intl: IntlShape }) {
+  return parseAndFormatTime(context.intl, value)
 }
 
 export const TimeField = {
