@@ -307,20 +307,20 @@ export function CorrectionDetails({
               value: previousFormValues[f.id],
               showPreviouslyMissingValuesAsChanged: false,
               previousForm: previousFormValues,
-              formConfig
+              formConfig,
+              displayEmptyAsDash: true
             })
 
-            const correction = form[f.id]
-              ? Output({
-                  field: f,
-                  value: form[f.id],
-                  showPreviouslyMissingValuesAsChanged: false
-                })
-              : '-'
+            const correction = Output({
+              field: f,
+              value: form[f.id],
+              showPreviouslyMissingValuesAsChanged: false,
+              displayEmptyAsDash: true
+            })
 
             return {
               fieldLabel: intl.formatMessage(f.label),
-              original: original ? original : '-',
+              original,
               correction
             }
           })
