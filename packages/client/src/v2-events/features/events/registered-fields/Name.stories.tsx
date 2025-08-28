@@ -16,7 +16,7 @@ import styled from 'styled-components'
 import { FieldType, NameField, NameFieldValue } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { Output, ValueOutput } from '../components/Output'
+import { ValueOutput } from '../components/Output'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Name',
