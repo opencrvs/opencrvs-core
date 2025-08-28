@@ -15,6 +15,17 @@ import {
   setupTestCase,
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
+import { indexEvent } from '@events/service/indexing/indexing'
+
+vi.mock('@events/service/indexing/indexing', async () => {
+  const actual = await vi.importActual<
+    typeof import('@events/service/indexing/indexing')
+  >('@events/service/indexing/indexing')
+  return {
+    ...actual,
+    indexEvent: vi.fn()
+  }
+})
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -188,4 +199,42 @@ test('Returns event with all actions', async () => {
       (action) => action.type === ActionType.READ
     )
   ).toHaveLength(2)
+})
+
+test('event.get does not index the event', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  expect(indexEvent).not.toHaveBeenCalled()
+
+  vi.mocked(indexEvent).mockClear()
+
+  const fetchedEvent = await client.event.get(event.id)
+
+  expect(fetchedEvent.id).toEqual(event.id)
+  expect(indexEvent).not.toHaveBeenCalled()
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
+
+  const createAction = fetchedEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.validate.request(
+    generator.event.actions.validate(event.id)
+  )
+
+  expect(indexEvent).toHaveBeenCalledTimes(3)
 })
