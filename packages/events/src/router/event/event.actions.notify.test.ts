@@ -12,6 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import {
   ActionType,
+  generateUuid,
   getAcceptedActions,
   getUUID,
   SCOPES,
@@ -206,7 +207,23 @@ describe('event.actions.notify', () => {
 
   describe('system user', () => {
     test('should require createdAtLocation for system user', async () => {
-      const { generator } = await setupTestCase()
+      const { user, generator, rng } = await setupTestCase()
+
+      const dataSeedingClient = createTestClient(user, [
+        SCOPES.USER_DATA_SEEDING
+      ])
+
+      const parentId = generateUuid(rng)
+
+      const locationPayload = generator.locations.set([
+        { id: parentId },
+        { partOf: parentId },
+        { partOf: parentId }
+      ])
+
+      await dataSeedingClient.locations.set(locationPayload)
+
+      const locations = await dataSeedingClient.locations.get()
 
       const client = createSystemTestClient('test-system', [
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
@@ -237,13 +254,24 @@ describe('event.actions.notify', () => {
         })
       ).rejects.toMatchSnapshot()
 
-      const locations = await getLocations()
+      await expect(
+        client.event.actions.notify.request({
+          ...payload,
+          createdAtLocation: parentId
+        })
+      ).rejects.toMatchSnapshot()
+
+      const childLocation = locations.find((l) => l.partOf === parentId)
+
+      if (!childLocation) {
+        throw new Error('Child location not found')
+      }
 
       // should succeed, since it is a valid location id
       await expect(
         client.event.actions.notify.request({
           ...payload,
-          createdAtLocation: locations[2].id
+          createdAtLocation: childLocation.id
         })
       ).resolves.not.toThrow()
     })

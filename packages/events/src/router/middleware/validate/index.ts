@@ -48,6 +48,7 @@ import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
+import { isLeafLocation } from '@events/storage/postgres/events/locations'
 import {
   getInvalidUpdateKeys,
   getVerificationPageErrors,
@@ -398,7 +399,7 @@ export const validateAction: MiddlewareFunction<
   throw new Error('Trying to validate unsupported action type')
 }
 
-// When performing actions via REST API, we need to ensure that a 'createdAtLocation' is provided in the payload.
+// When performing actions via REST API, we need to ensure that a valid 'createdAtLocation' is provided in the payload.
 // For normal users, the createdAtLocation is resolved on the backend from the user's primaryOfficeId.
 export const requireLocationForSystemUserAction: MiddlewareFunction<
   TrpcContext,
@@ -424,6 +425,15 @@ export const requireLocationForSystemUserAction: MiddlewareFunction<
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'createdAtLocation is required and must be a valid office id'
+    })
+  }
+
+  // Ensure given location is a leaf location, i.e. an office location
+  const isLeaf = await isLeafLocation(input.createdAtLocation)
+  if (!isLeaf) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'createdAtLocation must be an office location'
     })
   }
 
