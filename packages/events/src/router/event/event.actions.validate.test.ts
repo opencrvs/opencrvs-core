@@ -364,7 +364,7 @@ test('Event status changes after validation action is accepted', async () => {
   const validatePayload = generator.event.actions.validate(event.id, {
     keepAssignment: true
   })
-  const EventAfterValidatedAction =
+  const eventAfterValidatedAction =
     await client.event.actions.validate.request(validatePayload)
 
   const statusAfterDeclareAction = getCurrentEventState(
@@ -372,11 +372,11 @@ test('Event status changes after validation action is accepted', async () => {
     tennisClubMembershipEvent
   ).status
   const statusAfterValidateAction = getCurrentEventState(
-    EventAfterValidatedAction,
+    eventAfterValidatedAction,
     tennisClubMembershipEvent
   ).status
 
-  expect(EventAfterValidatedAction.actions).toStrictEqual([
+  expect(eventAfterValidatedAction.actions).toStrictEqual([
     ...eventAfterDeclareAction.actions,
     expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({
@@ -421,7 +421,7 @@ test('Event status does not change if validation action is rejected', async () =
   const validatePayload = generator.event.actions.validate(event.id, {
     keepAssignment: true
   })
-  const EventAfterValidatedAction =
+  const eventAfterValidatedAction =
     await client.event.actions.validate.request(validatePayload)
 
   const statusAfterDeclareAction = getCurrentEventState(
@@ -429,11 +429,11 @@ test('Event status does not change if validation action is rejected', async () =
     tennisClubMembershipEvent
   ).status
   const statusAfterValidateAction = getCurrentEventState(
-    EventAfterValidatedAction,
+    eventAfterValidatedAction,
     tennisClubMembershipEvent
   ).status
 
-  expect(EventAfterValidatedAction.actions).toStrictEqual([
+  expect(eventAfterValidatedAction.actions).toStrictEqual([
     ...eventAfterDeclareAction.actions,
     expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({
