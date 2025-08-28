@@ -398,6 +398,8 @@ export const validateAction: MiddlewareFunction<
   throw new Error('Trying to validate unsupported action type')
 }
 
+// When performing actions via REST API, we need to ensure that a 'createdAtLocation' is provided in the payload.
+// For normal users, the createdAtLocation is resolved on the backend from the user's primaryOfficeId.
 export const requireLocationForSystemUserAction: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
