@@ -231,7 +231,7 @@ function extractAddressLines(
   ]
   return Object.fromEntries(
     Object.entries(obj).filter(
-      ([key, value]) => !keysToIgnore.includes(key) && value !== undefined
+      ([key, value]) => !keysToIgnore.includes(key) && value
     )
   )
 }
@@ -391,10 +391,9 @@ function AddressOutput({
       ? customAddressFields
       : []
 
-  function flattenAddressObject(obj: AddressFieldValue): Record<string, any> {
-    if (!obj) {
-      return {}
-    }
+  function flattenAddressObject(
+    obj: AddressFieldValue
+  ): Record<string, string | undefined> {
     const { streetLevelDetails, ...rest } = obj
     return {
       ...rest,
