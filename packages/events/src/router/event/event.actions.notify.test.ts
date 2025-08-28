@@ -208,15 +208,11 @@ describe('event.actions.notify', () => {
     test('should require createdAtLocation for system user', async () => {
       const { generator } = await setupTestCase()
 
-      let client = createSystemTestClient('test-system', [
+      const client = createSystemTestClient('test-system', [
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
       const event = await client.event.create(generator.event.create())
-
-      client = createSystemTestClient('test-system-2', [
-        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
-      ])
 
       const payload = generator.event.actions.notify(event.id)
 

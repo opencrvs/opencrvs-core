@@ -28,6 +28,7 @@ import {
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   createEvent,
+  createSystemTestClient,
   createTestClient,
   sanitizeForSnapshot,
   setupTestCase,
@@ -1334,6 +1335,48 @@ test('User with my-jurisdiction scope only sees events from their primary office
 
   // Test user should only see their own event
   const { results: events } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+    }
+  })
+
+  expect(events).toHaveLength(1)
+  expect(events[0].updatedAtLocation).toBe(ownOfficeId)
+  expect(
+    sanitizeForSnapshot(events[0], UNSTABLE_EVENT_FIELDS)
+  ).toMatchSnapshot()
+})
+
+test('User with my-jurisdiction scope only sees events created by system user to their primary office', async () => {
+  const { user, generator, locations } = await setupTestCase(5541)
+
+  const client = createSystemTestClient('test-system', [
+    `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+  ])
+
+  const ownOfficeId = user.primaryOfficeId
+
+  const ownLocationEvent = await client.event.create(generator.event.create())
+  const otherLocationEvent = await client.event.create(generator.event.create())
+
+  const userClient = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=tennis-club-membership,access=my-jurisdiction]'
+  ])
+
+  await client.event.actions.notify.request({
+    ...generator.event.actions.notify(ownLocationEvent.id),
+    createdAtLocation: ownOfficeId
+  })
+
+  await client.event.actions.notify.request({
+    ...generator.event.actions.notify(otherLocationEvent.id),
+    createdAtLocation: locations[1].id
+  })
+
+  // Test user should only see event created in their own location
+  const { results: events } = await userClient.event.search({
     query: {
       type: 'and',
       clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
