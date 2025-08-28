@@ -43,7 +43,7 @@ export async function requestActionConfirmation(
       ),
       {
         method: 'POST',
-        body: JSON.stringify({ event }),
+        body: JSON.stringify(event),
         headers: {
           'Content-Type': 'application/json',
           Authorization: token
