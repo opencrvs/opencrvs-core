@@ -10,6 +10,7 @@
  */
 
 import { TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons'
+import { getAllUniqueFields } from '@opencrvs/commons/events'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('event config can be fetched', async () => {
@@ -21,4 +22,16 @@ test('event config can be fetched', async () => {
   expect(config[1].id).toEqual('tennis-club-membership_premium')
 
   expect(config.length).toEqual(2)
+})
+
+test('event config checkbox fields has a default value', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user)
+  const configs = await client.event.config.get()
+  const checkboxFields = getAllUniqueFields(configs[0]).filter(
+    (f) => f.type === 'CHECKBOX'
+  )
+
+  // Fields should be parsed with default values
+  checkboxFields.map((field) => expect(field.defaultValue).toBe(false))
 })
