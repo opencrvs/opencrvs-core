@@ -78,14 +78,15 @@ function EventOverviewFull({
     ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
 
-  const { flags, legalStatuses, duplicates, ...flattenedEventIndex } = {
-    ...flattenEventIndex(eventWithDrafts),
-    // drafts should not affect the status of the event
-    // so the status and flags are taken from the eventIndex
-    'event.status': status,
-    'event.assignedTo': assignedTo,
-    flags: eventIndex.flags
-  }
+  const { flags, legalStatuses, potentialDuplicates, ...flattenedEventIndex } =
+    {
+      ...flattenEventIndex(eventWithDrafts),
+      // drafts should not affect the status of the event
+      // so the status and flags are taken from the eventIndex
+      'event.status': status,
+      'event.assignedTo': assignedTo,
+      flags: eventIndex.flags
+    }
 
   const { getEventTitle } = useEventTitle()
   const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
@@ -146,14 +147,15 @@ function EventOverviewProtected({
     ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
 
-  const { flags, legalStatuses, duplicates, ...flattenedEventIndex } = {
-    ...flattenEventIndex(eventWithDrafts),
-    // drafts should not affect the status of the event
-    // so the status and flags are taken from the eventIndex
-    'event.status': status,
-    'event.assignedTo': assignedTo,
-    flags: eventIndex.flags
-  }
+  const { flags, legalStatuses, potentialDuplicates, ...flattenedEventIndex } =
+    {
+      ...flattenEventIndex(eventWithDrafts),
+      // drafts should not affect the status of the event
+      // so the status and flags are taken from the eventIndex
+      'event.status': status,
+      'event.assignedTo': assignedTo,
+      flags: eventIndex.flags
+    }
 
   const { getEventTitle } = useEventTitle()
   const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
