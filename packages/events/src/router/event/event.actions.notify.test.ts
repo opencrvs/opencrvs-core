@@ -22,6 +22,7 @@ import {
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
+import { getLocations } from '@events/storage/postgres/events/locations'
 
 describe('event.actions.notify', () => {
   describe('authorization', () => {
@@ -204,6 +205,54 @@ describe('event.actions.notify', () => {
   })
 
   describe('system user', () => {
+    test('should require createdAtLocation for system user', async () => {
+      const { generator } = await setupTestCase()
+
+      let client = createSystemTestClient('test-system', [
+        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+      ])
+
+      const event = await client.event.create(generator.event.create())
+
+      client = createSystemTestClient('test-system-2', [
+        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+      ])
+
+      const payload = generator.event.actions.notify(event.id)
+
+      // Should throw error since createdAtLocation is not given
+      await expect(
+        client.event.actions.notify.request(payload)
+      ).rejects.toMatchSnapshot()
+
+      // Should throw error since given createdAtLocation is not an uuid
+      await expect(
+        client.event.actions.notify.request({
+          ...payload,
+          createdAtLocation: 'foobar'
+        })
+      ).rejects.toMatchSnapshot()
+
+      // Should throw error since given createdAtLocation is not a valid location
+      await expect(
+        client.event.actions.notify.request({
+          ...payload,
+          createdAtLocation: getUUID()
+        })
+      ).rejects.toMatchSnapshot()
+
+      const locations = await getLocations()
+      console.log(locations)
+
+      // should succeed, since it is a valid location id
+      await expect(
+        client.event.actions.notify.request({
+          ...payload,
+          createdAtLocation: locations[2].id
+        })
+      ).resolves.not.toThrow()
+    })
+
     test('should not require assignment or create unassign action for system user', async () => {
       const { generator } = await setupTestCase()
 
@@ -217,9 +266,12 @@ describe('event.actions.notify', () => {
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
-      await client.event.actions.notify.request(
-        generator.event.actions.notify(event.id)
-      )
+      const locations = await getLocations()
+
+      await client.event.actions.notify.request({
+        ...generator.event.actions.notify(event.id),
+        createdAtLocation: locations[3].id
+      })
 
       const { user } = await setupTestCase()
       client = createTestClient(user)

@@ -282,6 +282,9 @@ export async function addAction(
 
   const content = ('content' in input && input.content) || undefined
 
+  const createdAtLocation =
+    user.type === 'system' ? input.createdAtLocation : user.primaryOfficeId
+
   if (input.type === ActionType.ARCHIVE && input.reason.isDuplicate) {
     await eventsRepo.createAction({
       eventId,
@@ -295,7 +298,7 @@ export async function addAction(
       createdByRole: user.role,
       createdByUserType: user.type,
       createdBySignature: user.signature,
-      createdAtLocation: user.primaryOfficeId,
+      createdAtLocation,
       originalActionId: input.originalActionId,
       reasonMessage: input.reason.message,
       reasonIsDuplicate: input.reason.isDuplicate
@@ -315,7 +318,7 @@ export async function addAction(
       createdByRole: user.role,
       createdByUserType: user.type,
       createdBySignature: user.signature,
-      createdAtLocation: user.primaryOfficeId,
+      createdAtLocation,
       originalActionId: input.originalActionId,
       assignedTo: user.id
     })
@@ -345,7 +348,7 @@ export async function addAction(
       createdByRole: user.role,
       createdByUserType: user.type,
       createdBySignature: user.signature,
-      createdAtLocation: user.primaryOfficeId,
+      createdAtLocation,
       originalActionId: input.originalActionId,
       requestId: hasRequestId ? input.requestId : undefined,
       reasonIsDuplicate: hasReason

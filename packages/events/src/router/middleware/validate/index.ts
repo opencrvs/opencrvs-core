@@ -408,6 +408,13 @@ export const requireLocationForSystemUserAction: MiddlewareFunction<
   const { user } = ctx
 
   if (user.type !== 'system') {
+    if (input.createdAtLocation) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'createdAtLocation is not allowed for non-system users'
+      })
+    }
+
     return next()
   }
 
