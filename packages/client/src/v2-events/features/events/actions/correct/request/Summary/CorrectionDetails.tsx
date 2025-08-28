@@ -306,7 +306,9 @@ export function CorrectionDetails({
               ? Output({
                   field: f,
                   value: previousFormValues[f.id],
-                  showPreviouslyMissingValuesAsChanged: false
+                  showPreviouslyMissingValuesAsChanged: false,
+                  previousForm: previousFormValues,
+                  formConfig
                 })
               : '-'
 
