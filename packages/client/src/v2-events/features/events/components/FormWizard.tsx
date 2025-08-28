@@ -22,10 +22,10 @@ export const messages = defineMessages({
     description: 'Back button text',
     id: 'buttons.back'
   },
-  backToReview: {
-    defaultMessage: 'Back to review',
-    description: 'Back to review button text',
-    id: 'buttons.backToReview'
+  goToReview: {
+    defaultMessage: 'Go to review',
+    description: 'Go to review button text',
+    id: 'v2.buttons.goToReview'
   }
 })
 
@@ -38,8 +38,6 @@ export type FormWizardProps = PropsWithChildren<{
   /** Callback when the user submits the form wizard */
   onSubmit: () => void
   pageTitle: string
-
-  showReviewButton?: boolean
 }>
 
 export const FormWizard = ({
@@ -49,8 +47,7 @@ export const FormWizard = ({
   pageTitle,
   onNextPage,
   onPreviousPage,
-  continueButtonText = 'Continue',
-  showReviewButton
+  continueButtonText = 'Continue'
 }: FormWizardProps & {
   continueButtonText?: string
 }) => {
@@ -80,7 +77,7 @@ export const FormWizard = ({
               {continueButtonText}
             </Button>
             <Button size="large" type="secondary" onClick={onSubmit}>
-              {intl.formatMessage(messages.backToReview)}
+              {intl.formatMessage(messages.goToReview)}
             </Button>
           </Stack>
         </Content>
