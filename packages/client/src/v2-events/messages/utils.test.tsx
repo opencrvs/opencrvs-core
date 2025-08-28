@@ -12,7 +12,13 @@ import React from 'react'
 import { describe, it, expect } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { IntlProvider } from 'react-intl'
-import { EMPTY_TOKEN, useIntlFormatMessageWithFlattenedParams } from './utils'
+import { useEventFormData } from '../features/events/useEventFormData'
+import { useActionAnnotation } from '../features/events/useActionAnnotation'
+import {
+  EMPTY_TOKEN,
+  useIntlFormatMessageWithFlattenedParams,
+  useIntlWithFormData
+} from './utils'
 
 describe('useIntlFormatMessageWithFlattenedParams', () => {
   describe('formatMessage()', () => {
@@ -117,5 +123,80 @@ describe('useIntlFormatMessageWithFlattenedParams', () => {
         expect(formattedMessage).toBe('Hello to John Doe')
       })
     })
+  })
+})
+
+describe('useIntlWithFormData', () => {
+  beforeEach(() => {
+    useEventFormData.setState({
+      formValues: { 'person.firstname': 'Tareq' }
+    })
+    useActionAnnotation.setState({ annotation: { lastname: 'Aziz' } })
+  })
+
+  const messages = {
+    'test.greeting': 'Hello, {person.firstname} {lastname}!',
+    'test.partial': 'Hi, {person.firstname}!',
+    'test.missing': 'Nothing here.',
+    'test.params': 'Hello, {person.firstname} {sruname}'
+  }
+
+  function renderUseIntlHook() {
+    return renderHook(() => useIntlWithFormData(), {
+      wrapper: ({ children }) => (
+        <IntlProvider locale="en" messages={messages}>
+          {children}
+        </IntlProvider>
+      )
+    })
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('formats a message using formValues and annotation', () => {
+    const { result } = renderUseIntlHook()
+    const formatted = result.current.formatMessage({
+      id: 'test.greeting',
+      defaultMessage: 'Hello Stranger'
+    })
+    expect(formatted).toBe('Hello, Tareq Aziz!')
+  })
+
+  it('formats a message if only some values exist', () => {
+    const { result } = renderUseIntlHook()
+    const formatted = result.current.formatMessage({
+      id: 'test.partial',
+      defaultMessage: 'Hi!'
+    })
+    expect(formatted).toBe('Hi, Tareq!')
+  })
+
+  it('falls back to defaultMessage if id not found', () => {
+    const { result } = renderUseIntlHook()
+    const formatted = result.current.formatMessage(
+      { id: 'non.existent', defaultMessage: 'Default says hi {person.name}.' },
+      { 'person.name': 'Tareq' }
+    )
+    expect(formatted).toBe('Default says hi Tareq.')
+  })
+
+  it('does not throw if provided variable is null', () => {
+    const { result } = renderUseIntlHook()
+    const formatted = result.current.formatMessage(
+      { id: 'test.greeting', defaultMessage: 'Hello Stranger' },
+      { firstname: null }
+    )
+    expect(formatted).toContain('Hello,')
+  })
+
+  it('render with provided variable', () => {
+    const { result } = renderUseIntlHook()
+    const formatted = result.current.formatMessage(
+      { id: 'test.params', defaultMessage: 'Hello Stranger' },
+      { 'person.firstname': 'Jon', sruname: 'Doe' }
+    )
+    expect(formatted).toContain('Hello, Jon Doe')
   })
 })
