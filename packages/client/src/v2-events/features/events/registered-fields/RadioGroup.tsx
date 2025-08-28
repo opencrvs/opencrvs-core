@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useIntl } from 'react-intl'
 import {
   FieldPropsWithoutReferenceValue,
   RadioGroup as RadioGroupField,
@@ -20,6 +19,7 @@ import {
   RadioSize
 } from '@opencrvs/components'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
+import { useIntlWithFormData } from '@client/v2-events/messages/utils'
 import { StringifierContext } from './RegisteredField'
 
 function RadioGroupInput({
@@ -32,7 +32,7 @@ function RadioGroupInput({
   onChange: (val: string | undefined) => void
   value?: string
 }) {
-  const intl = useIntl()
+  const intl = useIntlWithFormData()
 
   const selectedOption = options.find((option) => option.value === value)
   const formattedOptions = options.map((option: SelectOption) => ({
@@ -66,7 +66,7 @@ function RadioGroupOutput({
   value: Stringifiable
   options: SelectOption[]
 }) {
-  const intl = useIntl()
+  const intl = useIntlWithFormData()
   const selectedOption = options.find((option) => option.value === value)
 
   return selectedOption ? intl.formatMessage(selectedOption.label) : ''
