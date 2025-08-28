@@ -531,7 +531,7 @@ export function getCompleteActionAnnotation(
   return deepMerge(annotation, action.annotation ?? {})
 }
 
-function getCompleteActionDeclaration(
+export function getCompleteActionDeclaration(
   declaration: EventState,
   event: EventDocument,
   action: ActionDocument
