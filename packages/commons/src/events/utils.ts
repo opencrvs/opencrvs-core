@@ -39,7 +39,11 @@ import {
   EventState
 } from './ActionDocument'
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
-import { isConditionMet, isFieldVisible } from '../conditionals/validate'
+import {
+  getOnlyVisibleFormValues,
+  isConditionMet,
+  isFieldVisible
+} from '../conditionals/validate'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID, UUID } from '../uuid'
@@ -498,7 +502,10 @@ export function getPendingAction(actions: Action[]): ActionDocument {
   return pendingActions[0]
 }
 
-export function aggregateActionDeclarations(event: EventDocument): EventState {
+export function aggregateActionDeclarations(
+  event: EventDocument,
+  config: EventConfig
+): EventState {
   /*
    * Types that are not taken into the aggregate values (e.g. while printing certificate)
    * stop auto filling collector form with previous print action data)
@@ -513,54 +520,62 @@ export function aggregateActionDeclarations(event: EventDocument): EventState {
     a.createdAt.localeCompare(b.createdAt)
   )
 
-  return acceptedActions.reduce((declaration, action) => {
-    if (
-      excludedActions.some((excludedAction) => excludedAction === action.type)
-    ) {
-      return declaration
-    }
-
-    /*
-     * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
-     * details in the correction. To do this, we find the original request that this
-     * approval is for and merge its details with the current data of the record.
-     */
-
-    if (action.type === ActionType.APPROVE_CORRECTION) {
-      const requestAction = acceptedActions.find(
-        ({ id }) => id === action.requestId
-      )
-      if (!requestAction) {
-        return declaration
-      }
-      return deepMerge(declaration, requestAction.declaration)
-    }
-
-    /*
-     * When an action has an `originalActionId`, it means this action is linked
-     * to another one (the "original" action).
-     *
-     * - The original action, with status `Requested`, was created by core.
-     * - The linked action (with status `Accepted`) comes from
-     *   the country configuration in response to that request.
-     *
-     * If we find the original action, we merge its declaration into the current one
-     * so that the current action includes the original details.
-     */
-    if (action.originalActionId) {
-      const originalAction = event.actions.find(
-        ({ id }) => id === action.originalActionId
-      )
-      if (originalAction?.status !== ActionStatus.Requested) {
+  const aggregatedDeclaration = acceptedActions.reduce(
+    (declaration, action) => {
+      if (
+        excludedActions.some((excludedAction) => excludedAction === action.type)
+      ) {
         return declaration
       }
 
-      return deepMerge(
-        deepMerge(declaration, originalAction.declaration),
-        action.declaration
-      )
-    }
+      /*
+       * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
+       * details in the correction. To do this, we find the original request that this
+       * approval is for and merge its details with the current data of the record.
+       */
 
-    return deepMerge(declaration, action.declaration)
-  }, {})
+      if (action.type === ActionType.APPROVE_CORRECTION) {
+        const requestAction = acceptedActions.find(
+          ({ id }) => id === action.requestId
+        )
+        if (!requestAction) {
+          return declaration
+        }
+        return deepMerge(declaration, requestAction.declaration)
+      }
+
+      /*
+       * When an action has an `originalActionId`, it means this action is linked
+       * to another one (the "original" action).
+       *
+       * - The original action, with status `Requested`, was created by core.
+       * - The linked action (with status `Accepted`) comes from
+       *   the country configuration in response to that request.
+       *
+       * If we find the original action, we merge its declaration into the current one
+       * so that the current action includes the original details.
+       */
+      if (action.originalActionId) {
+        const originalAction = event.actions.find(
+          ({ id }) => id === action.originalActionId
+        )
+        if (originalAction?.status !== ActionStatus.Requested) {
+          return declaration
+        }
+
+        return deepMerge(
+          deepMerge(declaration, originalAction.declaration),
+          action.declaration
+        )
+      }
+
+      return deepMerge(declaration, action.declaration)
+    },
+    {}
+  )
+
+  return getOnlyVisibleFormValues(
+    config.declaration.pages.flatMap(({ fields }) => fields),
+    aggregatedDeclaration
+  )
 }

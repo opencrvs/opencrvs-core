@@ -37,6 +37,7 @@ import {
   FullDocumentPath,
   FullDocumentUrl
 } from '../../documents'
+import { getOnlyVisibleFormValues } from '..'
 
 export function getStatusFromActions(actions: Array<Action>) {
   return actions
@@ -185,7 +186,7 @@ export function getCurrentEventState(
   // Includes only accepted actions metadata. Sometimes (e.g. on updatedAt) we want to show the accepted timestamp rather than the request timestamp.
   const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
 
-  const declaration = aggregateActionDeclarations(event)
+  const declaration = aggregateActionDeclarations(event, config)
 
   return deepDropNulls({
     id: event.id,
