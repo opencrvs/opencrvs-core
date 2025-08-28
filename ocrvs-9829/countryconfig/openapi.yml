@@ -12663,6 +12663,9 @@ components:
             - string
             - "null"
           format: uuid
+          description: A valid office location ID. This is required for system users
+            performing actions. The provided location must be a leaf-location,
+            i.e. it must not have any children locations.
         type:
           type: string
           const: VALIDATE
@@ -13104,6 +13107,9 @@ components:
             - string
             - "null"
           format: uuid
+          description: A valid office location ID. This is required for system users
+            performing actions. The provided location must be a leaf-location,
+            i.e. it must not have any children locations.
         type:
           type: string
           const: REGISTER
@@ -13543,6 +13549,9 @@ components:
             - string
             - "null"
           format: uuid
+          description: A valid office location ID. This is required for system users
+            performing actions. The provided location must be a leaf-location,
+            i.e. it must not have any children locations.
         type:
           type: string
           const: NOTIFY
@@ -13552,7 +13561,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 67d89b71-2d92-4fc4-b967-04d1dd7e7c27
+        transactionId: 183b26f6-6f4e-4329-a3ed-21dbecd1c8fd
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -13985,6 +13994,9 @@ components:
             - string
             - "null"
           format: uuid
+          description: A valid office location ID. This is required for system users
+            performing actions. The provided location must be a leaf-location,
+            i.e. it must not have any children locations.
         type:
           type: string
           const: DECLARE
@@ -14421,6 +14433,9 @@ components:
             - string
             - "null"
           format: uuid
+          description: A valid office location ID. This is required for system users
+            performing actions. The provided location must be a leaf-location,
+            i.e. it must not have any children locations.
         type:
           type: string
           const: REJECT
@@ -14870,6 +14885,9 @@ components:
             - string
             - "null"
           format: uuid
+          description: A valid office location ID. This is required for system users
+            performing actions. The provided location must be a leaf-location,
+            i.e. it must not have any children locations.
         type:
           type: string
           const: MARKED_AS_DUPLICATE
@@ -15306,6 +15324,9 @@ components:
             - string
             - "null"
           format: uuid
+          description: A valid office location ID. This is required for system users
+            performing actions. The provided location must be a leaf-location,
+            i.e. it must not have any children locations.
         type:
           type: string
           const: ARCHIVE
@@ -15755,6 +15776,9 @@ components:
             - string
             - "null"
           format: uuid
+          description: A valid office location ID. This is required for system users
+            performing actions. The provided location must be a leaf-location,
+            i.e. it must not have any children locations.
         type:
           type: string
           const: ASSIGN
@@ -16194,6 +16218,9 @@ components:
             - string
             - "null"
           format: uuid
+          description: A valid office location ID. This is required for system users
+            performing actions. The provided location must be a leaf-location,
+            i.e. it must not have any children locations.
         type:
           type: string
           const: UNASSIGN
@@ -16633,6 +16660,9 @@ components:
             - string
             - "null"
           format: uuid
+          description: A valid office location ID. This is required for system users
+            performing actions. The provided location must be a leaf-location,
+            i.e. it must not have any children locations.
         type:
           type: string
           const: PRINT_CERTIFICATE
@@ -17074,6 +17104,9 @@ components:
             - string
             - "null"
           format: uuid
+          description: A valid office location ID. This is required for system users
+            performing actions. The provided location must be a leaf-location,
+            i.e. it must not have any children locations.
         type:
           type: string
           const: REQUEST_CORRECTION
@@ -17510,6 +17543,9 @@ components:
             - string
             - "null"
           format: uuid
+          description: A valid office location ID. This is required for system users
+            performing actions. The provided location must be a leaf-location,
+            i.e. it must not have any children locations.
         requestId:
           type: string
         type:
@@ -17962,6 +17998,9 @@ components:
             - string
             - "null"
           format: uuid
+          description: A valid office location ID. This is required for system users
+            performing actions. The provided location must be a leaf-location,
+            i.e. it must not have any children locations.
         requestId:
           type: string
         type:
@@ -18401,6 +18440,9 @@ components:
             - string
             - "null"
           format: uuid
+          description: A valid office location ID. This is required for system users
+            performing actions. The provided location must be a leaf-location,
+            i.e. it must not have any children locations.
         type:
           type: string
           const: READ
