@@ -95,7 +95,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
             defaultValue: {
               country: 'FAR',
               addressType: AddressType.DOMESTIC,
-              administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+              administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa'
             }
           }
         ]}
@@ -172,7 +172,7 @@ export const AddressReviewInvalid: StoryObj<typeof Review> = {
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            adminLevel1: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+            administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
           } as AddressFieldValue
         }}
         formConfig={declarationForm}
@@ -215,14 +215,26 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
         form={{
           'applicant.address': {
             country: 'FAR',
-            addressType: AddressType.DOMESTIC
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+            streetLevelDetails: {
+              town: 'Example Town',
+              residentialArea: 'Example Residential Area',
+              street: 'Example Street',
+              number: '55',
+              zipCode: '123456'
+            }
           }
         }}
         formConfig={declarationForm}
         previousFormValues={{
           'applicant.address': {
             country: 'FAR',
-            addressType: AddressType.DOMESTIC
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+            streetLevelDetails: {
+              town: 'Example Village'
+            }
           }
         }}
         title="My address form with address changed"
