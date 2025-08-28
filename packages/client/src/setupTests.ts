@@ -51,7 +51,24 @@ const config = {
     REGISTRATION_TARGET: 45,
     PRINT_IN_ADVANCE: true
   },
-  ADMIN_STRUCTURE: ['adminLevel1', 'adminLevel2'],
+  ADMIN_STRUCTURE: [
+    {
+      id: 'region',
+      label: {
+        id: 'v2.field.address.region.label',
+        defaultMessage: 'Region',
+        description: 'Label for region in address component'
+      }
+    },
+    {
+      id: 'zone',
+      label: {
+        id: 'v2.field.address.zone.label',
+        defaultMessage: 'Zone',
+        description: 'Label for zone in address component'
+      }
+    }
+  ],
   FEATURES: {
     DEATH_REGISTRATION: true,
     MARRIAGE_REGISTRATION: true,

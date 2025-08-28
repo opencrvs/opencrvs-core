@@ -460,7 +460,24 @@ export const mockOfflineData = {
       REGISTRATION_TARGET: 45,
       PRINT_IN_ADVANCE: true
     },
-    ADMIN_STRUCTURE: ['adminLevel1', 'adminLevel2'],
+    ADMIN_STRUCTURE: [
+      {
+        id: 'region',
+        label: {
+          id: 'v2.field.address.region.label',
+          defaultMessage: 'Region',
+          description: 'Label for region in address component'
+        }
+      },
+      {
+        id: 'zone',
+        label: {
+          id: 'v2.field.address.zone.label',
+          defaultMessage: 'Zone',
+          description: 'Label for zone in address component'
+        }
+      }
+    ],
     MARRIAGE: {
       REGISTRATION_TARGET: 45,
       PRINT_IN_ADVANCE: true
@@ -478,7 +495,7 @@ export const mockOfflineData = {
       'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
     DECLARATION_AUDIT_LOCATIONS: 'WARD,UNION',
     _id: '61a8c105c04ac94fe46ceb27',
-    COUNTRY: 'FAR',
+    COUNTRY: 'BGD',
     COUNTRY_LOGO: {
       fileName: 'logo.png',
       // Farajaland Logo
