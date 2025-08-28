@@ -31,11 +31,7 @@ import {
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
-import {
-  formDataStringifierFactory,
-  getFormDataStringifier,
-  stringifySimpleField
-} from '@client/v2-events/hooks/useFormDataStringifier'
+import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { getOfflineData } from '@client/offline/selectors'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { IAdminStructureItem } from '@client/utils/referenceApi'
@@ -59,20 +55,22 @@ function isDomesticAddress() {
   )
 }
 
+type OutputMode = 'withIds' | 'withNames'
 function getAdminLevelHierarchy(
   locationUUID: string | undefined,
   locations: Location[],
-  adminStructure: string[]
+  adminStructure: string[],
+  outputMode: OutputMode = 'withIds'
 ) {
-  // Collect the chain of location IDs from leaf to root
-  const collectedIds: string[] = []
+  // Collect location objects from leaf to root
+  const collectedLocations: Location[] = []
 
   let current = locationUUID
     ? locations.find((l) => l.id === locationUUID.toString())
     : null
 
   while (current) {
-    collectedIds.push(current.id)
+    collectedLocations.push(current)
     if (!current.partOf) {
       break
     }
@@ -81,12 +79,19 @@ function getAdminLevelHierarchy(
   }
 
   // Reverse so root is first, leaf is last
-  collectedIds.reverse()
+  collectedLocations.reverse()
 
-  // Map collected IDs to the provided key order
+  // Map collected locations to the provided admin structure
   const hierarchy: Partial<Record<string, string>> = {}
-  for (let i = 0; i < adminStructure.length && i < collectedIds.length; i++) {
-    hierarchy[adminStructure[i]] = collectedIds[i]
+  for (
+    let i = 0;
+    i < adminStructure.length && i < collectedLocations.length;
+    i++
+  ) {
+    hierarchy[adminStructure[i]] =
+      outputMode === 'withNames'
+        ? collectedLocations[i].name
+        : collectedLocations[i].id
   }
 
   return hierarchy
@@ -208,15 +213,6 @@ const ALL_ADDRESS_INPUT_FIELDS = [
 ] satisfies Array<FieldConfigWithoutAddress>
 
 type AddressFieldIdentifier = (typeof ALL_ADDRESS_FIELDS)[number]['id']
-
-function getFilteredFields(fieldsToShow?: Array<string>) {
-  if (!fieldsToShow) {
-    return ALL_ADDRESS_INPUT_FIELDS
-  }
-  return ALL_ADDRESS_INPUT_FIELDS.filter((field) =>
-    fieldsToShow.includes(field.id)
-  )
-}
 
 function extractAddressLines(
   obj: Partial<AddressFieldValue>,
@@ -360,18 +356,18 @@ function AddressOutput({
     (location) => location.locationType === 'ADMIN_STRUCTURE'
   )
 
-  const targetAdminUUId = value.administrativeArea
+  const targetAdminUUID = value.administrativeArea
 
   const { config } = useSelector(getOfflineData)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
 
-  const location = targetAdminUUId?.toString()
-    ? adminStructureLocations.find((l) => l.id === targetAdminUUId.toString())
+  const location = targetAdminUUID?.toString()
+    ? adminStructureLocations.find((l) => l.id === targetAdminUUID.toString())
     : null
 
   const adminLevels = getAdminLevelHierarchy(
-    targetAdminUUId,
+    targetAdminUUID,
     adminStructureLocations,
     adminLevelIds
   )
@@ -448,18 +444,35 @@ function toCertificateVariables(
    * form data stringifier so location and other form fields can handle stringifying their own data
    */
 
-  const stringifier = getFormDataStringifier(context.intl, context.locations)
-  const result = stringifier(ALL_ADDRESS_FIELDS, value as EventState)
+  const { config } = useSelector(getOfflineData)
+  const appConfigAdminLevels = config.ADMIN_STRUCTURE.map((level) => level.id)
 
-  return result
+  const { administrativeArea, streetLevelDetails } = value
+  const { intl, locations } = context
+
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
+
+  const adminLevels = getAdminLevelHierarchy(
+    administrativeArea,
+    adminStructureLocations,
+    appConfigAdminLevels,
+    'withNames'
+  )
+
+  const stringifier = getFormDataStringifier(intl, locations)
+  const stringifiedResult = stringifier(ALL_ADDRESS_FIELDS, value as EventState)
+
+  return {
+    ...stringifiedResult,
+    ...adminLevels,
+    streetLevelDetails
+  }
 }
 
 export const Address = {
   Input: AddressInput,
   Output: AddressOutput,
-  stringify: () => {
-    // @todo
-    return ''
-  },
   toCertificateVariables: toCertificateVariables
 }

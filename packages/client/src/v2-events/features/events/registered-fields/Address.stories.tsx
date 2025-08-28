@@ -259,13 +259,13 @@ export const AddressInCopy: StoryObj<typeof Review> = {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: 'e15d54b0-8c74-45f0-aa35-e1b0501b38dc',
+        administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
         streetLevelDetails: {
-          addressLine1: 'Example Town',
-          addressLine2: 'Example Residential Area',
-          addressLine3: 'Example Street',
-          addressLine4: '55',
-          addressLine5: '123456'
+          town: 'Example Town',
+          residentialArea: 'Example Residential Area',
+          street: 'Example Street',
+          number: '55',
+          zipCode: '123456'
         }
       }
     }
