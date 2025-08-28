@@ -11,10 +11,23 @@
 
 import fetch from 'node-fetch'
 import { array } from 'zod'
-import { EventConfig, getOrThrow, WorkqueueConfig } from '@opencrvs/commons'
+import {
+  EventConfig,
+  getOrThrow,
+  logger,
+  WorkqueueConfig
+} from '@opencrvs/commons'
 import { env } from '@events/environment'
+/**
+ * During 1.9.0 we support only docker swarm configuration.
+ * In docker swarm deployment process updates all the containers.
+ * There shouldn't be a situation where countryconfig changes and events do not restart.
+ */
 
-export async function getEventConfigurations(token: string) {
+let inMemoryEventConfigurations: EventConfig[] | null = null
+let inMemoryWorkqueueConfigurations: WorkqueueConfig[] | null = null
+
+async function getEventConfigurations(token: string) {
   const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json',
@@ -29,6 +42,27 @@ export async function getEventConfigurations(token: string) {
   return array(EventConfig).parse(await res.json())
 }
 
+/**
+ * @returns in-memory event configurations when running in production-like environment.
+ */
+export async function getInMemoryEventConfigurations(token: string) {
+  if (!env.isProduction) {
+    logger.info(
+      `Running in ${process.env.NODE_ENV} mode. Fetching event configurations from API`
+    )
+    // In development, we should always fetch the latest configurations
+    return getEventConfigurations(token)
+  }
+
+  if (inMemoryEventConfigurations) {
+    logger.info('Returning in-memory event configurations')
+    return inMemoryEventConfigurations
+  }
+
+  inMemoryEventConfigurations = await getEventConfigurations(token)
+  return inMemoryEventConfigurations
+}
+
 async function findEventConfigurationById({
   token,
   eventType
@@ -36,7 +70,7 @@ async function findEventConfigurationById({
   token: string
   eventType: string
 }) {
-  const configurations = await getEventConfigurations(token)
+  const configurations = await getInMemoryEventConfigurations(token)
   return configurations.find((config) => config.id === eventType)
 }
 
@@ -56,7 +90,7 @@ export async function getEventConfigurationById({
   )
 }
 
-export async function getWorkqueueConfigurations(token: string) {
+async function getWorkqueueConfigurations(token: string) {
   const res = await fetch(new URL('/workqueue', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json',
@@ -69,4 +103,25 @@ export async function getWorkqueueConfigurations(token: string) {
   }
 
   return array(WorkqueueConfig).parse(await res.json())
+}
+
+/**
+ * @returns in-memory workqueue configurations when running in production-like environment.
+ */
+export async function getIMemoryWorkqueueConfigurations(token: string) {
+  if (!env.isProduction) {
+    logger.info(
+      `Running in ${process.env.NODE_ENV} mode. Fetching workqueue configurations from API`
+    )
+    // In production, we should always fetch the latest configurations
+    return getWorkqueueConfigurations(token)
+  }
+
+  if (inMemoryWorkqueueConfigurations) {
+    logger.info('Returning in-memory workqueue configurations')
+    return inMemoryWorkqueueConfigurations
+  }
+
+  inMemoryWorkqueueConfigurations = await getWorkqueueConfigurations(token)
+  return inMemoryWorkqueueConfigurations
 }
