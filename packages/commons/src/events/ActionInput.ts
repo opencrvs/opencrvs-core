@@ -27,7 +27,11 @@ export const BaseActionInput = z.object({
   declaration: ActionUpdate.default({}),
   annotation: ActionUpdate.optional(),
   originalActionId: UUID.optional(), // should not be part of base action.
-  keepAssignment: z.boolean().optional()
+  keepAssignment: z.boolean().optional(),
+  // createdAtLocation is an office id.
+  // This is only required for requests made by system users.
+  // For normal users, the createdAtLocation is resolved on the backend from the user's primaryOfficeId.
+  createdAtLocation: z.string().optional()
 })
 
 const CreateActionInput = BaseActionInput.merge(

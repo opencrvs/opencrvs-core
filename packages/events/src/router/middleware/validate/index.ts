@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
+import {
+  MiddlewareFunction,
+  TRPCError
+} from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import {
   ActionType,
@@ -393,4 +396,27 @@ export const validateAction: MiddlewareFunction<
   }
 
   throw new Error('Trying to validate unsupported action type')
+}
+
+export const requireLocationForSystemUserAction: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  ActionInputWithType
+> = async ({ input, next, ctx }) => {
+  const { user } = ctx
+
+  if (user.type !== 'system') {
+    return next()
+  }
+
+  if (!input.createdAtLocation) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'createdAtLocation is required and must be a valid office id'
+    })
+  }
+
+  return next()
 }
