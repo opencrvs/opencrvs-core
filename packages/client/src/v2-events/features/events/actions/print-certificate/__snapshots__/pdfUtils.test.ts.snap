@@ -11,7 +11,7 @@ exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
   "createdAtLocation": {
     "country": "Farajaland",
     "district": "Embe",
-    "location": "HQ Office",
+    "name": "HQ Office",
     "province": "Pualula",
   },
   "createdBy": {
@@ -33,7 +33,7 @@ exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
   "updatedAtLocation": {
     "country": "Farajaland",
     "district": "Embe",
-    "location": "HQ Office",
+    "name": "HQ Office",
     "province": "Pualula",
   },
   "updatedBy": {
