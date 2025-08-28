@@ -12659,7 +12659,9 @@ components:
         keepAssignment:
           type: boolean
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
           format: uuid
         type:
           type: string
@@ -13098,7 +13100,9 @@ components:
         keepAssignment:
           type: boolean
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
           format: uuid
         type:
           type: string
@@ -13535,7 +13539,9 @@ components:
         keepAssignment:
           type: boolean
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
           format: uuid
         type:
           type: string
@@ -13546,7 +13552,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 264d9b8a-723f-40c2-9736-5dc0ec03747a
+        transactionId: bb69388e-1cdb-43b1-9486-d8250cb1e174
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -13975,7 +13981,9 @@ components:
         keepAssignment:
           type: boolean
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
           format: uuid
         type:
           type: string
@@ -14409,7 +14417,9 @@ components:
         keepAssignment:
           type: boolean
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
           format: uuid
         type:
           type: string
@@ -14856,7 +14866,9 @@ components:
         keepAssignment:
           type: boolean
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
           format: uuid
         type:
           type: string
@@ -15290,7 +15302,9 @@ components:
         keepAssignment:
           type: boolean
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
           format: uuid
         type:
           type: string
@@ -15737,7 +15751,9 @@ components:
         keepAssignment:
           type: boolean
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
           format: uuid
         type:
           type: string
@@ -16174,7 +16190,9 @@ components:
         keepAssignment:
           type: boolean
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
           format: uuid
         type:
           type: string
@@ -16611,7 +16629,9 @@ components:
         keepAssignment:
           type: boolean
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
           format: uuid
         type:
           type: string
@@ -17050,7 +17070,9 @@ components:
         keepAssignment:
           type: boolean
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
           format: uuid
         type:
           type: string
@@ -17484,7 +17506,9 @@ components:
         keepAssignment:
           type: boolean
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
           format: uuid
         requestId:
           type: string
@@ -17934,7 +17958,9 @@ components:
         keepAssignment:
           type: boolean
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
           format: uuid
         requestId:
           type: string
@@ -18371,7 +18397,9 @@ components:
         keepAssignment:
           type: boolean
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
           format: uuid
         type:
           type: string
