@@ -473,10 +473,6 @@ function isAcceptedAction(a: Action): a is ActionDocument {
   return a.status === ActionStatus.Accepted
 }
 
-export function getAcceptedActions(event: EventDocument): ActionDocument[] {
-  return event.actions.filter(isAcceptedAction)
-}
-
 function getPendingActions(actions: Action[]): ActionDocument[] {
   const actionGroups: Record<string, Action[]> = groupBy(
     actions,
@@ -565,6 +561,14 @@ function getCompleteActionDeclaration(
     )
   }
   return deepMerge(declaration, action.declaration)
+}
+
+export function getAcceptedActions(event: EventDocument): ActionDocument[] {
+  return event.actions.filter(isAcceptedAction).map((action) => ({
+    ...action,
+    declaration: getCompleteActionDeclaration({}, event, action),
+    annotation: getCompleteActionAnnotation({}, event, action)
+  }))
 }
 
 export function aggregateActionDeclarations(
