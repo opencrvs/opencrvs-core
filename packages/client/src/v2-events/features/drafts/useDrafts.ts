@@ -124,7 +124,6 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
         createdBy: '@todo',
         createdByUserType: 'user',
         createdByRole: '@todo',
-        createdAtLocation: '@todo' as UUID,
         ...variables,
         originalActionId: variables.originalActionId as UUID,
         /*
