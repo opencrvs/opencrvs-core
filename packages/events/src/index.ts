@@ -34,14 +34,14 @@ export async function main() {
       await ensureIndexExists(configuration)
     }
   } catch (error) {
-    logger.error(error)
+    if (error instanceof Error) {
+      logger.error(error.message)
+    }
     if (env.isProd) {
       process.exit(1)
     }
-    /*
-     * SIGUSR2 tells nodemon to restart the process without waiting for new file changes
-     */
-    setTimeout(() => process.kill(process.pid, 'SIGUSR2'), 3000)
+    setTimeout(() => void main(), 5000)
+
     return
   }
   server().listen(5555)

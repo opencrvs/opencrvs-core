@@ -16,18 +16,20 @@ import {
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
   FullDocumentPath,
+  FileUploadWithOptions,
   MimeType,
   SelectOption
 } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
-import { formMessages as messages } from '@client/i18n/messages'
+import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { DocumentUploader } from './SimpleDocumentUploader'
 import { DocumentListPreview } from './DocumentListPreview'
 import { DocumentPreview } from './DocumentPreview'
 import { File } from './FileInput'
 import { useOnFileChange } from './useOnFileChange'
+import { SingleDocumentPreview } from './SingleDocumentPreview'
 
 const UploadWrapper = styled.div`
   width: 100%;
@@ -58,6 +60,10 @@ const DocumentTypeRequiredError = {
   description: 'Show error message if the document type is not selected'
 }
 
+/**
+ * Document uploader with option for selecting a document type.
+ * If you don't need to select a document type, use @see SimpleDocumentUploader.
+ */
 function DocumentUploaderWithOption({
   value,
   onChange,
@@ -75,7 +81,7 @@ function DocumentUploaderWithOption({
   acceptedFileTypes?: MimeType[]
   options: SelectOption[]
   value: FileFieldWithOptionValue
-  onChange: (file?: FileFieldValueWithOption[]) => void
+  onChange: (file: FileFieldValueWithOption[]) => void
   error?: string
   hideOnEmptyOption?: boolean
   autoSelectOnlyOption?: boolean
@@ -99,27 +105,22 @@ function DocumentUploaderWithOption({
   const [previewImage, setPreviewImage] =
     useState<FileFieldValueWithOption | null>(null)
 
-  const { uploadFile, deleteFile: deleteFileFromBackend } = useFileUpload(
-    name,
-    {
-      onSuccess: ({ type, originalFilename, path, id }) => {
-        const newFile = {
-          path,
-          originalFilename: originalFilename,
-          type: type,
-          option: id
-        }
-
-        setFilesBeingProcessed((prev) =>
-          prev.filter(({ label }) => label !== id)
-        )
-
-        setFiles((prevFiles) => getUpdatedFiles(prevFiles, newFile))
-        onChange(getUpdatedFiles(files, newFile))
-        setSelectedOption(undefined)
+  const { uploadFile } = useFileUpload(name, {
+    onSuccess: ({ type, originalFilename, path, id }) => {
+      const newFile = {
+        path,
+        originalFilename,
+        type: type,
+        option: id
       }
+
+      setFilesBeingProcessed((prev) => prev.filter(({ label }) => label !== id))
+
+      setFiles((prevFiles) => getUpdatedFiles(prevFiles, newFile))
+      onChange(getUpdatedFiles(files, newFile))
+      setSelectedOption(undefined)
     }
-  )
+  })
 
   const getLabelForDocumentOption = (docType: string) => {
     const label = options.find(({ value: val }) => val === docType)?.label
@@ -145,9 +146,13 @@ function DocumentUploaderWithOption({
   })
 
   const onDeleteFile = (path: FullDocumentPath) => {
-    deleteFileFromBackend(path)
-    setFiles((prevFiles) => prevFiles.filter((file) => file.path !== path))
-    onChange(files.filter((file) => file.path !== path))
+    setFiles((prevFiles) => {
+      const updatedFiles = prevFiles.filter((file) => file.path !== path)
+      onChange(updatedFiles)
+
+      return updatedFiles
+    })
+
     setPreviewImage(null)
   }
 
@@ -244,7 +249,54 @@ function DocumentUploaderWithOption({
   )
 }
 
-const DocumentWithOptionOutput = null
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+function DocumentWithOptionOutput({
+  value,
+  config
+}: {
+  value?: FileFieldWithOptionValue
+  config: FileUploadWithOptions
+}) {
+  const intl = useIntl()
+  const [previewImage, setPreviewImage] =
+    useState<FileFieldValueWithOption | null>(null)
+
+  if (!value || value.length === 0) {
+    return null
+  }
+
+  return (
+    <Wrapper>
+      {value.map((file) => {
+        const label = config.options.find((x) => x.value === file.option)?.label
+        return (
+          <SingleDocumentPreview
+            key={file.originalFilename}
+            attachment={file}
+            label={label ? intl.formatMessage(label) : file.option}
+            onSelect={() => setPreviewImage(file)}
+          />
+        )
+      })}
+      {previewImage && (
+        <DocumentPreview
+          disableDelete={true}
+          goBack={() => {
+            setPreviewImage(null)
+          }}
+          previewImage={previewImage}
+          title={intl.formatMessage(buttonMessages.preview)}
+          onDelete={() => setPreviewImage(null)}
+        />
+      )}
+    </Wrapper>
+  )
+}
 
 export const FileWithOption = {
   Input: DocumentUploaderWithOption,

@@ -11,14 +11,16 @@
 
 import { Location } from '@events/service/locations/locations'
 import {
+  ActionType,
+  CertificateTemplateConfig,
+  EventConfig,
   EventDocument,
+  FieldType,
   getCurrentEventState,
   isMinioUrl,
-  User,
-  CertificateTemplateConfig,
   LanguageConfig,
-  EventConfig,
-  FieldType
+  PrintCertificateAction,
+  User
 } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
@@ -28,6 +30,7 @@ import {
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 import { useEventConfiguration } from '../features/events/useEventConfiguration'
+import { useEvents } from '../features/events/useEvents/useEvents'
 
 async function replaceMinioUrlWithBase64(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,17 +79,28 @@ export const usePrintableCertificate = ({
     event,
     eventConfiguration
   )
+  const { getEvent } = useEvents()
+
+  const actions = getEvent.getFromCache(event.id).actions
+  const copiesPrintedForTemplate =
+    actions.filter(
+      (action) =>
+        action.type === ActionType.PRINT_CERTIFICATE &&
+        (action as PrintCertificateAction).content?.templateId ===
+          certificateConfig?.id
+    ).length + 1 // +1 for the current print action
 
   const modifiedMetadata = {
     ...metadata,
     // Temporarily add `modifiedAt` to the last action's data to display
     // the current certification date in the certificate preview on the review page.
-    modifiedAt: new Date().toISOString()
+    modifiedAt: new Date().toISOString(),
     // Since 'modifiedDate' represents the last action's 'createdAt' date, and when
     // we actually print certificate, in this particular case, last action is PRINT_CERTIFICATE
+    copiesPrintedForTemplate
   }
 
-  if (!language || !certificateConfig) {
+  if (!language || !certificateConfig?.svg) {
     return { svgCode: null }
   }
 
@@ -104,7 +118,14 @@ export const usePrintableCertificate = ({
 
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
-  const handleCertify = async (updatedEvent: EventDocument) => {
+  /**
+   * NOTE: We have separated the preparing and printing of the PDF certificate. Without the separation, user is already unassigned from the event and cache is cleared. We end up losing the images in the PDF unless we run actions in correct order.
+   * 1. Prepare 2. Trigger print action 3. Open the PDF in a new window 4. Redirect user to workqueue.
+   *
+   * Prepares the PDF certificate by resolving image urls to base64 and compiles them into SVG template.
+   * @returns function that opens a new window with the PDF certificate
+   */
+  const preparePdfCertificate = async (updatedEvent: EventDocument) => {
     const { declaration: updatedDeclaration, ...updatedMetadata } =
       getCurrentEventState(updatedEvent, eventConfiguration)
     const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
@@ -118,7 +139,8 @@ export const usePrintableCertificate = ({
         ...updatedMetadata,
         // Temporarily add `modifiedAt` to the last action's data to display
         // the current certification date in the certificate preview on the review page.
-        modifiedAt: new Date().toISOString()
+        modifiedAt: new Date().toISOString(),
+        copiesPrintedForTemplate
       },
       $declaration: declarationWithResolvedImages,
       locations,
@@ -133,11 +155,11 @@ export const usePrintableCertificate = ({
       certificateFonts
     )
 
-    printAndDownloadPdf(pdfTemplate, event.id)
+    return () => printAndDownloadPdf(pdfTemplate, event.id)
   }
 
   return {
     svgCode,
-    handleCertify
+    preparePdfCertificate
   }
 }

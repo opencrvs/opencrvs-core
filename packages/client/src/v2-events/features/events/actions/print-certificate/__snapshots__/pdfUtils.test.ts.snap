@@ -6,6 +6,7 @@ exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
     "name": "Joseph Musonda",
     "signature": "",
   },
+  "copiesPrintedForTemplate": 1,
   "createdAt": "1 February 2000",
   "createdAtLocation": {
     "country": "Farajaland",

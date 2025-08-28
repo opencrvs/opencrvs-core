@@ -19,7 +19,6 @@ import {
   Draft,
   EventDocument,
   EventInput,
-  FieldConfig,
   FieldType,
   FieldUpdateValue,
   FileFieldValue,
@@ -30,16 +29,19 @@ import {
   isWriteAction,
   getStatusFromActions,
   EventConfig,
-  AVAILABLE_ACTIONS_BY_EVENT_STATUS,
-  EventStatus
+  EventStatus,
+  getAvailableActionsForEvent,
+  getCurrentEventState,
+  DisplayableAction
 } from '@opencrvs/commons/events'
 import { TokenUserType, UUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
-import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
+import { indexEvent } from '@events/service/indexing/indexing'
 import * as eventsRepo from '@events/storage/postgres/events/events'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { TrpcUserContext } from '@events/context'
+import { getUnreferencedDraftFiles } from '../files/utils'
 
 class EventNotFoundError extends TRPCError {
   constructor(id: string) {
@@ -100,13 +102,19 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
 
 export async function throwConflictIfActionNotAllowed(
   eventId: UUID,
-  actionType: ActionType
+  actionType: ActionType,
+  token: string
 ) {
   const event = await getEventById(eventId)
+  const eventConfig = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
   const eventStatus = getStatusFromActions(event.actions)
 
-  const allowedActions: ActionType[] =
-    AVAILABLE_ACTIONS_BY_EVENT_STATUS[eventStatus]
+  const allowedActions: DisplayableAction[] = getAvailableActionsForEvent(
+    getCurrentEventState(event, eventConfig)
+  )
 
   if (!allowedActions.includes(actionType)) {
     throw new TRPCError({
@@ -130,7 +138,6 @@ export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
 
   const { id } = event
   await deleteEventAttachments(token, event)
-  await deleteEventIndex(event)
   await draftsRepo.deleteDraftsByEventId(id)
   await eventsRepo.deleteEventById(id)
 
@@ -154,8 +161,7 @@ function generateTrackingId(): string {
 export async function createEvent({
   eventInput,
   user,
-  transactionId,
-  config
+  transactionId
 }: {
   eventInput: z.infer<typeof EventInput>
   user: TrpcUserContext
@@ -179,8 +185,6 @@ export async function createEvent({
     createdAtLocation: user.primaryOfficeId
   })
 
-  await indexEvent(event, config)
-
   return event
 }
 
@@ -200,28 +204,42 @@ function extractFileValues(
       fieldName: key
     })
   }
+
   return fileValues
 }
 
-async function cleanUnreferencedAttachmentsFromPreviousDrafts(
+/**
+ *
+ * Deletes files from external source that are referenced in previous drafts but not in the current draft.
+ *
+ */
+export async function deleteUnreferencedFilesFromPreviousDrafts(
   token: string,
-  fieldConfigs: FieldConfig[],
-  fileValuesInCurrentAction: { fieldName: string; file: FileFieldValue }[],
-  drafts: Draft[]
+  {
+    event,
+    currentDraft,
+    previousDraft,
+    configuration
+  }: {
+    event: EventDocument
+    currentDraft?: Draft
+    previousDraft: Draft
+    configuration: EventConfig
+  }
 ): Promise<void> {
-  const previousFileValuesInDrafts = drafts
-    .map((draft) => extractFileValues(draft.action.declaration, fieldConfigs))
-    .flat()
+  const unreferencedFiles = getUnreferencedDraftFiles({
+    event,
+    currentDraft,
+    previousDraft,
+    configuration
+  })
 
-  for (const previousFileValue of previousFileValuesInDrafts) {
-    if (
-      !fileValuesInCurrentAction.some(
-        (curr) =>
-          curr.fieldName === previousFileValue.fieldName &&
-          curr.file.path === previousFileValue.file.path
-      )
-    ) {
-      await deleteFile(previousFileValue.file.path, token)
+  for (const file of unreferencedFiles) {
+    const isDeleted = await deleteFile(file.value, token)
+
+    if (!isDeleted) {
+      // eslint-disable-next-line no-console
+      console.error(`Unable to delete unused file: ${JSON.stringify(file)}`)
     }
   }
 }
@@ -255,9 +273,14 @@ export async function addAction(
 
   for (const file of fileValuesInCurrentAction) {
     if (!(await fileExists(file.file.path, token))) {
-      throw new Error(`File not found: ${file.file.path}`)
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `File not found: ${file.file.path}`
+      })
     }
   }
+
+  const content = ('content' in input && input.content) || undefined
 
   if (input.type === ActionType.ARCHIVE && input.reason.isDuplicate) {
     await eventsRepo.createAction({
@@ -266,6 +289,7 @@ export async function addAction(
       actionType: ActionType.MARKED_AS_DUPLICATE,
       declaration: input.declaration,
       annotation: input.annotation,
+      content: content,
       status,
       createdBy: user.id,
       createdByRole: user.role,
@@ -285,6 +309,7 @@ export async function addAction(
       actionType: input.type,
       declaration: input.declaration,
       annotation: input.annotation,
+      content: content,
       status: ActionStatus.Accepted,
       createdBy: user.id,
       createdByRole: user.role,
@@ -296,7 +321,9 @@ export async function addAction(
     })
   } else {
     const hasReason =
-      input.type === ActionType.ARCHIVE || input.type === ActionType.REJECT
+      input.type === ActionType.ARCHIVE ||
+      input.type === ActionType.REJECT ||
+      input.type === ActionType.REJECT_CORRECTION
 
     const hasRequestId =
       input.type === ActionType.APPROVE_CORRECTION ||
@@ -312,6 +339,7 @@ export async function addAction(
       actionType: input.type,
       declaration: input.declaration,
       annotation: input.annotation,
+      content: content,
       status,
       createdBy: user.id,
       createdByRole: user.role,
@@ -350,25 +378,26 @@ export async function addAction(
     })
   }
 
-  const drafts = await draftsRepo.getDraftsForAction(
-    eventId,
-    user.id,
-    input.type
-  )
-
-  await cleanUnreferencedAttachmentsFromPreviousDrafts(
-    token,
-    fieldConfigs,
-    fileValuesInCurrentAction,
-    drafts
-  )
-
   const updatedEvent = await getEventById(eventId)
 
   await indexEvent(updatedEvent, configuration)
 
+  const previousDraft = await draftsRepo.findLatestDraftForAction(
+    event.id,
+    user.id,
+    input.type
+  )
+
   if (input.type !== ActionType.READ && input.type !== ActionType.ASSIGN) {
     await draftsRepo.deleteDraftsByEventId(eventId)
+  }
+
+  if (previousDraft) {
+    await deleteUnreferencedFilesFromPreviousDrafts(token, {
+      event: updatedEvent,
+      configuration,
+      previousDraft
+    })
   }
 
   return updatedEvent

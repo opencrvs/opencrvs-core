@@ -9,15 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  useQuery,
-  useQueryClient,
-  useSuspenseQuery
-} from '@tanstack/react-query'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import { useSyncExternalStore } from 'react'
-import { EventIndex, QueryType, UUID, getUUID } from '@opencrvs/commons/client'
-import { queryClient, useTRPC } from '@client/v2-events/trpc'
+import { QueryType, SearchQuery, UUID, getUUID } from '@opencrvs/commons/client'
+import { useTRPC } from '@client/v2-events/trpc'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
@@ -31,7 +26,7 @@ import {
 import { useGetEvents } from './procedures/list'
 import { useGetEventCounts } from './procedures/count'
 import { findLocalEventIndex } from './api'
-import { MutationType, QueryOptions } from './procedures/utils'
+import { QueryOptions } from './procedures/utils'
 
 export function useEvents() {
   const trpc = useTRPC()
@@ -49,22 +44,26 @@ export function useEvents() {
     },
     getOutbox: useOutbox,
     searchEvent: {
-      useQuery: (query: QueryType) => {
+      useQuery: (
+        query: SearchQuery,
+        options: QueryOptions<typeof trpc.event.search> = {}
+      ) => {
         return useQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
-          refetchOnMount: true,
-          staleTime: 0
+          refetchOnMount: 'always',
+          staleTime: 0,
+          ...options
         })
       },
       useSuspenseQuery: (
-        query: QueryType,
+        query: SearchQuery,
         options: QueryOptions<typeof trpc.event.search> = {}
       ) => {
         return useSuspenseQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
-          refetchOnMount: true,
+          refetchOnMount: 'always',
           staleTime: 0,
           ...options
         }).data
@@ -77,28 +76,28 @@ export function useEvents() {
           clauses: [{ id }]
         } satisfies QueryType
 
-        const options = trpc.event.search.queryOptions(query)
+        const options = trpc.event.search.queryOptions({ query })
 
         return useQuery({
           ...options,
-          queryKey: trpc.event.search.queryKey(query),
+          queryKey: trpc.event.search.queryKey({ query }),
           enabled: !findLocalEventIndex(id),
           staleTime: 0,
-          refetchOnMount: true,
+          refetchOnMount: 'always',
           queryFn: async (...args) => {
             const queryFn = options.queryFn
             if (!queryFn) {
               throw new Error('Query function is not defined')
             }
             const res = await queryFn(...args)
-            if (res.length === 0) {
+            if (res.total === 0) {
               throw new Error(`No event found with id: ${id}`)
             }
             return res
           },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
-            return eventIndex ? [eventIndex] : undefined
+            return eventIndex ? { results: [eventIndex], total: 1 } : undefined
           }
         })
       },
@@ -108,25 +107,25 @@ export function useEvents() {
           clauses: [{ id }]
         } satisfies QueryType
 
-        const options = trpc.event.search.queryOptions(query)
+        const options = trpc.event.search.queryOptions({ query })
 
         return useSuspenseQuery({
           ...options,
-          queryKey: trpc.event.search.queryKey(query),
+          queryKey: trpc.event.search.queryKey({ query }),
           queryFn: async (...args) => {
             const queryFn = options.queryFn
             if (!queryFn) {
               throw new Error('Query function is not defined')
             }
             const res = await queryFn(...args)
-            if (res.length === 0) {
+            if (res.total === 0) {
               throw new Error(`No event found with id: ${id}`)
             }
             return res
           },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
-            return eventIndex ? [eventIndex] : undefined
+            return eventIndex ? { results: [eventIndex], total: 1 } : undefined
           }
         }).data
       }
@@ -139,9 +138,9 @@ export function useEvents() {
       declare: useEventAction(trpc.event.actions.declare.request),
       register: useEventAction(trpc.event.actions.register.request),
       correction: {
-        request: useEventAction(trpc.event.actions.correction.request),
-        approve: useEventAction(trpc.event.actions.correction.approve),
-        reject: useEventAction(trpc.event.actions.correction.reject)
+        request: useEventAction(trpc.event.actions.correction.request.request),
+        approve: useEventAction(trpc.event.actions.correction.approve.request),
+        reject: useEventAction(trpc.event.actions.correction.reject.request)
       },
       assignment: {
         assign: {
@@ -185,6 +184,9 @@ export function useEvents() {
       ]),
       registerOnValidate: useEventCustomAction([
         ...customMutationKeys.registerOnValidate
+      ]),
+      makeCorrectionOnRequest: useEventCustomAction([
+        ...customMutationKeys.makeCorrectionOnRequest
       ])
     }
   }

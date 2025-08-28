@@ -15,17 +15,15 @@ import { useIntl } from 'react-intl'
 import {
   EventDocument,
   getCurrentEventState,
-  getAcceptedActions,
-  getCurrentEventStateWithDrafts,
+  dangerouslyGetCurrentEventStateWithDrafts,
   EventIndex,
-  applyDraftsToEventIndex,
+  applyDraftToEventIndex,
   deepDropNulls,
   EventStatus
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
-
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
@@ -37,7 +35,6 @@ import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useDrafts } from '../../drafts/useDrafts'
 import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
-
 import { ActionMenu } from './components/ActionMenu'
 import { EventOverviewProvider } from './EventOverviewContext'
 
@@ -58,13 +55,18 @@ function EventOverviewFull({
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
-  const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts(eventIndex.id)
-  const eventWithDrafts = getCurrentEventStateWithDrafts({
-    event,
-    drafts,
-    configuration: eventConfiguration
+  const { getRemoteDraftByEventId } = useDrafts()
+  const draft = getRemoteDraftByEventId(eventIndex.id, {
+    refetchOnMount: 'always'
   })
+  const eventWithDrafts = draft
+    ? dangerouslyGetCurrentEventStateWithDrafts({
+        event,
+        draft,
+        configuration: eventConfiguration
+      })
+    : getCurrentEventState(event, eventConfiguration)
+
   const { getUser } = useUsers()
   const intl = useIntl()
 
@@ -79,9 +81,10 @@ function EventOverviewFull({
   const { flags, legalStatuses, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // drafts should not affect the status of the event
-    // so the status is taken from the eventIndex
+    // so the status and flags are taken from the eventIndex
     'event.status': status,
-    'event.assignedTo': assignedTo
+    'event.assignedTo': assignedTo,
+    flags: eventIndex.flags
   }
 
   const { getEventTitle } = useEventTitle()
@@ -105,6 +108,7 @@ function EventOverviewFull({
       <EventSummary
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
+        flags={flags}
       />
       <EventHistory fullEvent={event} />
     </Content>
@@ -123,12 +127,15 @@ function EventOverviewProtected({
 }) {
   const { eventConfiguration } = useEventConfiguration(eventIndex.type)
   const { status } = eventIndex
-  const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts(eventIndex.id)
+  const { getRemoteDraftByEventId } = useDrafts()
+  const draft = getRemoteDraftByEventId(eventIndex.id)
 
-  const eventWithDrafts = deepDropNulls(
-    applyDraftsToEventIndex(eventIndex, drafts, eventConfiguration)
-  )
+  const eventWithDrafts = draft
+    ? deepDropNulls(
+        applyDraftToEventIndex(eventIndex, draft, eventConfiguration)
+      )
+    : eventIndex
+
   const { getUser } = useUsers()
   const intl = useIntl()
 
@@ -142,9 +149,10 @@ function EventOverviewProtected({
   const { flags, legalStatuses, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // drafts should not affect the status of the event
-    // so the status is taken from the eventIndex
+    // so the status and flags are taken from the eventIndex
     'event.status': status,
-    'event.assignedTo': assignedTo
+    'event.assignedTo': assignedTo,
+    flags: eventIndex.flags
   }
 
   const { getEventTitle } = useEventTitle()
@@ -173,6 +181,7 @@ function EventOverviewProtected({
         hideSecuredFields
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
+        flags={flags}
       />
       <EventHistorySkeleton />
     </Content>
@@ -190,7 +199,7 @@ function EventOverviewContainer() {
 
   // Suspense query is not used here because we want to refetch when an event action is performed
   const getEventQuery = searchEventById.useQuery(params.eventId)
-  const eventIndex = getEventQuery.data?.[0]
+  const eventIndex = getEventQuery.data?.results[0]
 
   const fullEvent = getEvent.findFromCache(params.eventId).data
 

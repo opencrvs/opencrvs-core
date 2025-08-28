@@ -25,15 +25,13 @@ export const EventStatus = z.enum([
   'DECLARED',
   'VALIDATED',
   'REGISTERED',
-  'CERTIFIED',
-  'REJECTED',
   'ARCHIVED'
 ])
 
 export type EventStatus = z.infer<typeof EventStatus>
 
 export const InherentFlags = {
-  PRINTED: 'printed',
+  PENDING_CERTIFICATION: 'pending-certification',
   INCOMPLETE: 'incomplete',
   REJECTED: 'rejected',
   CORRECTION_REQUESTED: 'correction-requested'
@@ -41,7 +39,7 @@ export const InherentFlags = {
 
 export type InherentFlags = (typeof InherentFlags)[keyof typeof InherentFlags]
 
-export const Flag = z
+export const ActionFlag = z
   .string()
   .regex(
     new RegExp(
@@ -53,8 +51,9 @@ export const Flag = z
     ),
     'Flag must be in the format ActionType:ActionStatus (lowerCase)'
   )
-  .or(z.nativeEnum(InherentFlags))
+export const Flag = ActionFlag.or(z.nativeEnum(InherentFlags))
 
+export type ActionFlag = z.infer<typeof ActionFlag>
 export type Flag = z.infer<typeof Flag>
 
 export const ZodDate = z.string().date()

@@ -41,7 +41,7 @@ export function Pages() {
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const navigate = useNavigate()
   const drafts = useDrafts()
-  const { modal, redirectToOrigin } = useEventFormNavigation()
+  const { modal, closeActionView } = useEventFormNavigation()
   const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
@@ -74,7 +74,7 @@ export function Pages() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          redirectToOrigin(searchParams.workqueue)
+          closeActionView(searchParams.workqueue)
         })
       }
     >

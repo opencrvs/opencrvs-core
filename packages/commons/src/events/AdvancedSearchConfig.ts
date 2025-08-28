@@ -10,11 +10,11 @@
  */
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
-import { SelectOption, ValidationConfig } from './FieldConfig'
+import { FieldConfig, SelectOption, ValidationConfig } from './FieldConfig'
 import { FieldConditional } from './Conditional'
 import { FieldValue } from './FieldValue'
 
-const MatchType = z.enum(['fuzzy', 'exact', 'range'])
+const MatchType = z.enum(['fuzzy', 'exact', 'range', 'within'])
 
 const BaseField = z.object({
   config: z.object({
@@ -82,24 +82,14 @@ export type SearchQueryParams = z.infer<typeof SearchQueryParams>
 
 export const FieldConfigSchema = BaseField.extend({
   fieldId: z.string(),
-  fieldType: z.literal('field'),
-  alternateFieldIds: z
-    .array(z.string())
-    .optional()
-    .describe(
-      `Sometimes there might be need to search a value against multiple field of same FormField type. For example
-      search Country, Province, District against child.address.private and child.address.other. In such case, we 
-      add a one field as fieldId, and accomodate others in alternateFieldIds`
-    ),
-  excludeInSearchQuery: z.boolean().default(false).optional()
-    .describe(`Sometimes there will be search fields which are used to 
-    conditionally display another search field, but its not needed in search query. For example, child.placeOfBirth 
-    is select field, which has 3 options, FACILITY, PRIVATE_HOME, OTHER. Upon selecting any of the option, pops up another field
-    related to the selected option, whose value is required in the search query. But child.placeOfBirth itself is not needed in the query.
-    In such case, populate this field (excludeInSearchQuery) with boolean true`)
+  fieldType: z.literal('field')
 })
 
-export const EventFieldId = z.enum([
+/**
+ * The event fields that are available for advanced search. These are the values
+ * that can be passed to the `event` function to create a field config.
+ */
+export const EventFieldIdInput = z.enum([
   'trackingId',
   'status',
   'legalStatuses.REGISTERED.acceptedAt',
@@ -107,6 +97,25 @@ export const EventFieldId = z.enum([
   'updatedAt'
 ])
 
+/**
+ * Represent the prefix used to differentiate event metadata fields from
+ * the declaration ones in advanced search form.
+ */
+export const METADATA_FIELD_PREFIX = 'event.'
+
+/**
+ * The field IDs that are actually used in the advanced search. The `event`
+ * function prefixes the `EventFieldIdInput` values with METADATA_FIELD_PREFIX.
+ */
+export const EventFieldId = z.enum([
+  `${METADATA_FIELD_PREFIX}trackingId`,
+  `${METADATA_FIELD_PREFIX}status`,
+  `${METADATA_FIELD_PREFIX}legalStatuses.REGISTERED.acceptedAt`,
+  `${METADATA_FIELD_PREFIX}legalStatuses.REGISTERED.createdAtLocation`,
+  `${METADATA_FIELD_PREFIX}updatedAt`
+])
+
+export type EventFieldIdInput = z.infer<typeof EventFieldIdInput>
 export type EventFieldId = z.infer<typeof EventFieldId>
 
 export const EventFieldConfigSchema = BaseField.extend({
@@ -126,5 +135,8 @@ export const AdvancedSearchConfig = z.object({
   fields: z.array(SearchField).describe('Advanced search fields.')
 })
 
-export type AdvancedSearchConfigInput = z.infer<typeof AdvancedSearchConfig>
 export type AdvancedSearchConfig = z.infer<typeof AdvancedSearchConfig>
+export type AdvancedSearchConfigWithFieldsResolved = Omit<
+  AdvancedSearchConfig,
+  'fields'
+> & { fields: FieldConfig[] }

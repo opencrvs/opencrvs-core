@@ -27,7 +27,9 @@ import {
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent,
   TranslationConfig,
-  UUID
+  UUID,
+  DisplayableAction,
+  ClientSpecificAction
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { AssignmentStatus } from '@client/v2-events/utils'
@@ -37,7 +39,7 @@ import {
   addLocalEventConfig
 } from '@client/v2-events/features/events/useEvents/api'
 import { ActionMenu } from '../ActionMenu'
-import { actionLabels } from '../useActionMenuItems'
+import { actionLabels } from '../useAllowedActionConfigurations'
 
 const generator = testDataGenerator()
 
@@ -53,8 +55,8 @@ const actionProps: ActionBase = {
   transactionId: getUUID()
 }
 
-export const mockActions: Record<
-  ActionType | 'ASSIGNED_TO_SELF' | 'ASSIGNED_TO_OTHERS',
+const mockActions: Record<
+  ActionType | DisplayableAction | 'ASSIGNED_TO_SELF' | 'ASSIGNED_TO_OTHERS',
   Action
 > = {
   [ActionType.CREATE]: { ...actionProps, type: ActionType.CREATE },
@@ -81,6 +83,10 @@ export const mockActions: Record<
     ...actionProps,
     type: ActionType.REQUEST_CORRECTION
   },
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
+    ...actionProps,
+    type: ActionType.REQUEST_CORRECTION
+  },
   [ActionType.APPROVE_CORRECTION]: {
     ...actionProps,
     type: ActionType.APPROVE_CORRECTION,
@@ -89,7 +95,8 @@ export const mockActions: Record<
   [ActionType.REJECT_CORRECTION]: {
     ...actionProps,
     type: ActionType.REJECT_CORRECTION,
-    requestId: '827bf7e8-0e1e-66e71287a2c8-aee7-4cef'
+    requestId: '827bf7e8-0e1e-66e71287a2c8-aee7-4cef',
+    reason: { message: 'No legal proof' }
   },
   [ActionType.DELETE]: {
     ...actionProps,
@@ -202,7 +209,7 @@ export interface Scenario {
   name: string
   recordDownloaded: boolean
   actions: (keyof typeof mockActions)[]
-  expected: Record<ActionType, AssertType>
+  expected: Partial<Record<DisplayableAction, AssertType>>
 }
 
 export function createStoriesFromScenarios(
@@ -211,6 +218,31 @@ export function createStoriesFromScenarios(
 ): Record<string, StoryObj<typeof ActionMenu>> {
   return scenarios.reduce(
     (acc, { name, actions, expected, recordDownloaded }) => {
+      // Because Validate, Register and Review correction both have same message ('Review'),
+      // We need to consider them as one
+      const reviewLikeActions: (keyof typeof expected)[] = [
+        'VALIDATE',
+        'REGISTER',
+        'REVIEW_CORRECTION_REQUEST'
+      ]
+      // Normalize all review-like actions to the **first non-hidden value**
+      let normalizedValue: AssertType | undefined
+
+      for (const action of reviewLikeActions) {
+        const value = expected[action]
+        if (value !== AssertType.HIDDEN) {
+          normalizedValue = value
+          break
+        }
+      }
+
+      // Apply normalized value to all related actions
+      if (normalizedValue !== undefined) {
+        for (const action of reviewLikeActions) {
+          expected[action] = normalizedValue
+        }
+      }
+
       const event = getMockEvent(actions, role)
       acc[name] = {
         loaders: [
@@ -239,9 +271,12 @@ export function createStoriesFromScenarios(
           msw: {
             handlers: {
               event: [
-                tRPCMsw.event.search.query(() => [
-                  getCurrentEventState(event, tennisClubMembershipEvent)
-                ])
+                tRPCMsw.event.search.query(() => ({
+                  total: 1,
+                  results: [
+                    getCurrentEventState(event, tennisClubMembershipEvent)
+                  ]
+                }))
               ]
             }
           }

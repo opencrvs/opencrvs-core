@@ -19,7 +19,8 @@ import {
   has,
   isNil,
   uniqBy,
-  cloneDeep
+  cloneDeep,
+  orderBy
 } from 'lodash'
 import {
   ActionType,
@@ -80,10 +81,7 @@ export function getPrintCertificatePages(configuration: EventConfig) {
 
 export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
   if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
-    return [
-      ...actionConfig.onboardingForm.flatMap(({ fields }) => fields),
-      ...actionConfig.additionalDetailsForm.flatMap(({ fields }) => fields)
-    ]
+    return actionConfig.correctionForm.pages.flatMap(({ fields }) => fields)
   }
 
   if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
@@ -124,7 +122,7 @@ export const findRecordActionPages = (
   const action = config.actions.find((a) => a.type === actionType)
 
   if (action?.type === ActionType.REQUEST_CORRECTION) {
-    return [...action.onboardingForm, ...action.additionalDetailsForm]
+    return action.correctionForm.pages
   }
 
   if (action?.type === ActionType.PRINT_CERTIFICATE) {
@@ -197,26 +195,34 @@ export function omitHiddenPaginatedFields(
   return omitHiddenFields(visiblePagesFormFields, declaration)
 }
 
-export function findActiveDrafts(event: EventDocument, drafts: Draft[]) {
-  const actions = event.actions
-    .slice()
-    .filter(({ type }) => type !== ActionType.READ)
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+/**
+ *
+ * @returns a draft for the event that has been created since the last non-read action.
+ */
+export function findActiveDraftForEvent(
+  event: EventDocument,
+  draft: Draft
+): Draft | undefined {
+  const actions = orderBy(
+    event.actions.filter(({ type }) => type !== ActionType.READ),
+    ['createdAt'],
+    ['asc']
+  )
 
   const lastAction = actions[actions.length - 1]
-  return (
-    drafts
-      // Temporally allows equal timestamps as the generated demo data is not perfect yet
-      // should be > rather than >=
-      .filter(({ createdAt }) => createdAt >= lastAction.createdAt)
-      .filter(({ eventId }) => eventId === event.id)
-  )
+  // After migrations have been run, there should always be [0..1[ actions.
+  // Temporally allows equal timestamps as the generated demo data is not perfect yet
+  const isDraftActive = draft.createdAt >= lastAction.createdAt
+
+  const isDraftForEvent = event.id === draft.eventId
+
+  return isDraftActive && isDraftForEvent ? draft : undefined
 }
 
 export function createEmptyDraft(
   eventId: UUID,
   draftId: UUID,
-  actionType: ActionType
+  actionType: Exclude<ActionType, 'DELETE'>
 ): Draft {
   return {
     id: draftId,
@@ -259,13 +265,10 @@ export function getActionVerificationPageIds(
   annotation: ActionUpdate
 ): string[] {
   if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
-    return [
-      ...getVisibleVerificationPageIds(actionConfig.onboardingForm, annotation),
-      ...getVisibleVerificationPageIds(
-        actionConfig.additionalDetailsForm,
-        annotation
-      )
-    ]
+    return getVisibleVerificationPageIds(
+      actionConfig.correctionForm.pages,
+      annotation
+    )
   }
 
   if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
@@ -297,6 +300,14 @@ export function omitHiddenAnnotationFields(
   )
 }
 
+/**
+ * Merges two documents together.
+ *
+ * @example deepMerge({'review.signature': { path: '/path.png', type: 'image/png' }}, { foo: 'bar'}) } => { 'review.signature': { path: '/path.png', type: 'image/png' }, foo: 'bar' }
+ *
+ * NOTE: When merging deep objects, the values from the second object will override the first one.
+ * @example { annotation: {'review.signature': { path: '/path.png', type: 'image/png' }}, { annotation: { foo: 'bar'}) } } => { annotation: { foo: 'bar' } }
+ */
 export function deepMerge<
   T extends Record<string, unknown>,
   K extends Record<string, unknown>
@@ -405,20 +416,45 @@ export function timePeriodToDateRange(value: SelectDateRangeValue) {
   let startDate: Date
   switch (value) {
     case 'last7Days':
-      startDate = subDays(new Date(), 6)
+      startDate = subDays(new Date(), 7)
       break
     case 'last30Days':
-      startDate = subDays(new Date(), 29)
+      startDate = subDays(new Date(), 30)
       break
     case 'last90Days':
-      startDate = subDays(new Date(), 89)
+      startDate = subDays(new Date(), 90)
       break
     case 'last365Days':
-      startDate = subDays(new Date(), 364)
+      startDate = subDays(new Date(), 365)
       break
   }
   return {
     startDate: startDate.toISOString(),
     endDate: new Date().toISOString()
+  }
+}
+
+export function mergeDrafts(currentDraft: Draft, incomingDraft: Draft): Draft {
+  if (currentDraft.eventId !== incomingDraft.eventId) {
+    throw new Error(
+      `Cannot merge drafts for different events: ${currentDraft.eventId} and ${incomingDraft.eventId}`
+    )
+  }
+
+  return {
+    ...currentDraft,
+    ...incomingDraft,
+    action: {
+      ...currentDraft.action,
+      ...incomingDraft.action,
+      declaration: deepMerge(
+        currentDraft.action.declaration,
+        incomingDraft.action.declaration
+      ),
+      annotation: deepMerge(
+        currentDraft.action.annotation ?? {},
+        incomingDraft.action.annotation ?? {}
+      )
+    }
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,6 +9,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable no-console */
 import {
   IntlShape,
   MessageDescriptor,
@@ -75,7 +77,12 @@ export const stringifyEventMetadata = ({
   locations,
   users
 }: {
-  metadata: NonNullable<EventMetadata & { modifiedAt: string }>
+  metadata: NonNullable<
+    EventMetadata & {
+      modifiedAt: string
+      copiesPrintedForTemplate: number | undefined
+    }
+  >
   intl: IntlShape
   locations: Location[]
   users: User[]
@@ -165,7 +172,8 @@ export const stringifyEventMetadata = ({
               : undefined
           }
         : null
-    }
+    },
+    copiesPrintedForTemplate: metadata.copiesPrintedForTemplate
   }
 }
 
@@ -191,38 +199,6 @@ function isMessageDescriptor(obj: unknown): obj is MessageDescriptor {
   )
 }
 
-function formatAllNonStringValues(
-  templateData: EventState,
-  intl: IntlShape
-): EventState {
-  const formattedData: EventState = {}
-
-  for (const key of Object.keys(templateData)) {
-    const value = templateData[key]
-
-    if (isMessageDescriptor(value)) {
-      formattedData[key] = intl.formatMessage(value)
-    } else if (Array.isArray(value)) {
-      // Address field: country label is a MessageDescriptor but others are strings
-      formattedData[key] = value
-        .filter(Boolean)
-        .map((item) =>
-          isMessageDescriptor(item) ? intl.formatMessage(item) : item
-        )
-        .join(', ')
-    } else if (typeof value === 'object' && value !== null) {
-      formattedData[key] = formatAllNonStringValues(
-        value satisfies EventState,
-        intl
-      ) as FieldValue
-    } else {
-      formattedData[key] = String(value)
-    }
-  }
-
-  return formattedData
-}
-
 const cache = createIntlCache()
 
 export function compileSvg({
@@ -235,7 +211,10 @@ export function compileSvg({
   config
 }: {
   templateString: string
-  $metadata: EventMetadata & { modifiedAt: string }
+  $metadata: EventMetadata & {
+    modifiedAt: string
+    copiesPrintedForTemplate: number | undefined
+  }
   $declaration: EventState
   locations: Location[]
   users: User[]
@@ -251,6 +230,10 @@ export function compileSvg({
   )
 
   const customHelpers = getHandlebarHelpers()
+
+  const stringifyDeclaration = getFormDataStringifier(intl, locations)
+  const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
+  const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
 
   for (const helperName of Object.keys(customHelpers)) {
     /*
@@ -279,10 +262,6 @@ export function compileSvg({
    * @example { 'informant.address': { 'other': { 'district': 'quix' } } } // $lookup 'informant.address.other.district' => 'quix'
    */
   function $lookup(obj: EventMetadata | EventState, propertyPath: string) {
-    const stringifyDeclaration = getFormDataStringifier(intl, locations)
-    const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
-    const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
-
     const resolvedMetadata = stringifyEventMetadata({
       metadata: $metadata,
       intl,
@@ -330,12 +309,64 @@ export function compileSvg({
         return ''
       }
 
-      const id = idParts.map((part) => part?.toString().toLowerCase()).join('.')
+      // NOTE: If you are having isues with casing mismatch, please ensure that you are using lookup helper rather than $lookup. Former returns actual values, latter stringified ones.
+      const id = idParts.map((part) => part?.toString()).join('.')
 
       return intl.formatMessage({
         id,
         defaultMessage: 'Missing translation for ' + id
       })
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
+  )
+
+  /**
+   * Handlebars helper: $intlWithParams
+   *
+   * Usage example in SVG template:
+   *   <tspan>{{ $intlWithParams 'constants.greeting' 'name' (lookup $declaration "child.name") }}</tspan>
+   * This helper allows for dynamic translation with parameters.
+   * It takes a translation ID as the first argument, followed by pairs of parameter names and values.
+   * The last argument is the Handlebars options object.
+   * It constructs a params object from the pairs and uses `intl.formatMessage`
+   * to fetch the localized translation with the provided parameters.
+   * If any parameter is undefined, it returns an empty string to prevent rendering issues.
+   * If the translation for the constructed ID is missing,
+   * it falls back to showing: 'Missing translation for [id]'.
+   * This is especially useful in templates where dynamic values
+   * (like names, dates, etc.)
+   * need to be translated using i18n keys with parameters.
+   */
+
+  Handlebars.registerHelper(
+    '$intlWithParams',
+
+    function (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      this: any,
+      ...args: [...(string | undefined)[], Handlebars.HelperOptions]
+    ) {
+      const id = args[0] as string
+      const paramPairs = args.slice(1, -1)
+
+      // Build params object from pairs
+      const params: Record<string, unknown> = {}
+      for (let i = 0; i < paramPairs.length; i += 2) {
+        const key = paramPairs[i] as string | undefined
+        const value = paramPairs[i + 1]
+        if (key == undefined || value == undefined) {
+          return ''
+        }
+        params[key] = value
+      }
+
+      return intl.formatMessage(
+        {
+          id,
+          defaultMessage: 'Missing translation for ' + id
+        },
+        params as Record<string, string | number | boolean>
+      )
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
   )
@@ -411,10 +442,9 @@ export function compileSvg({
   )
 
   const template = Handlebars.compile(templateString)
-  $declaration = formatAllNonStringValues($declaration, intl)
 
   const data = {
-    $declaration,
+    $declaration: resolvedDeclaration,
     $metadata,
     $references: {
       locations,
@@ -466,6 +496,13 @@ async function downloadAndEmbedImages(svgString: string): Promise<string> {
       if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
         const response = await fetch(href)
         const blob = await response.blob()
+
+        if (!response.ok) {
+          console.error('Failed to fetch image:', href)
+          console.error(
+            'Ensure the URL is correct and image is requested before cache is cleaned.'
+          )
+        }
 
         const base64 = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader()
@@ -574,7 +611,7 @@ interface PdfTemplate {
   fonts: Record<string, TFontFamilyTypes>
 }
 
-function createPDF(template: PdfTemplate): pdfMake.TCreatedPdf {
+function createPdf(template: PdfTemplate): pdfMake.TCreatedPdf {
   return pdfMake.createPdf(template.definition, undefined, template.fonts)
 }
 
@@ -582,7 +619,7 @@ export function printAndDownloadPdf(
   template: PdfTemplate,
   declarationId: string
 ) {
-  const pdf = createPDF(template)
+  const pdf = createPdf(template)
   if (isMobileDevice()) {
     pdf.download(`${declarationId}`)
   } else {

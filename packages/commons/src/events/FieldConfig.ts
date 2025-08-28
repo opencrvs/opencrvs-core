@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/*  eslint-disable max-lines */
 import { z } from 'zod'
 import { Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
@@ -20,12 +21,15 @@ import {
   TextValue,
   DateRangeFieldValue,
   SignatureFieldValue,
-  SelectDateRangeValue
+  SelectDateRangeValue,
+  TimeValue,
+  ButtonFieldValue
 } from './FieldValue'
 import {
   AddressFieldValue,
   FileFieldValue,
-  FileFieldWithOptionValue
+  FileFieldWithOptionValue,
+  HttpFieldValue
 } from './CompositeFieldValue'
 import { extendZodWithOpenApi } from 'zod-openapi'
 extendZodWithOpenApi(z)
@@ -34,11 +38,17 @@ const FieldId = z.string().describe('Unique identifier for the field')
 
 export const FieldReference = z
   .object({
-    $$field: FieldId
+    $$field: FieldId,
+    $$subfield: z
+      .array(z.string())
+      .optional()
+      .describe(
+        'If the FieldValue is an object, subfield can be used to refer to e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+      )
   })
   .describe('Reference to a field by its ID')
 
-const ParentReference = FieldReference.optional()
+export type FieldReference = z.infer<typeof FieldReference>
 
 export const ValidationConfig = z.object({
   validator: Conditional,
@@ -49,15 +59,27 @@ export type ValidationConfig = z.infer<typeof ValidationConfig>
 
 const BaseField = z.object({
   id: FieldId,
-  parent: ParentReference,
-  conditionals: z.array(FieldConditional).default([]).optional(),
+  label: TranslationConfig,
+  parent: FieldReference.optional().describe(
+    'Reference to a parent field. If a field has a parent, it will be reset when the parent field is changed.'
+  ),
   required: z.boolean().default(false).optional(),
+  conditionals: z.array(FieldConditional).default([]).optional(),
   secured: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),
   validation: z.array(ValidationConfig).default([]).optional(),
-  label: TranslationConfig,
   helperText: TranslationConfig.optional(),
-  hideLabel: z.boolean().default(false).optional()
+  hideLabel: z.boolean().default(false).optional(),
+  uncorrectable: z
+    .boolean()
+    .default(false)
+    .optional()
+    .describe(
+      'Indicates if the field can be changed during a record correction.'
+    ),
+  value: FieldReference.optional().describe(
+    'Reference to a parent field. If field has a value, the value will be copied when the parent field is changed.'
+  )
 })
 
 export type BaseField = z.infer<typeof BaseField>
@@ -67,7 +89,7 @@ const Divider = BaseField.extend({
 })
 export type Divider = z.infer<typeof Divider>
 
-const TextField = BaseField.extend({
+export const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z
@@ -175,10 +197,21 @@ const DateField = BaseField.extend({
 
 export type DateField = z.infer<typeof DateField>
 
-/**
- * For internal use only. Needed for search functionality.
- */
-export const DateRangeField = BaseField.extend({
+const TimeField = BaseField.extend({
+  type: z.literal(FieldType.TIME),
+  defaultValue: TimeValue.optional(),
+  configuration: z
+    .object({
+      notice: TranslationConfig.describe(
+        'Text to display above the time input'
+      ).optional()
+    })
+    .optional()
+}).describe('A single date input (HH-mm)')
+
+export type TimeField = z.infer<typeof TimeField>
+
+const DateRangeField = BaseField.extend({
   type: z.literal(FieldType.DATE_RANGE),
   defaultValue: DateRangeFieldValue.optional(),
   configuration: z
@@ -205,18 +238,28 @@ const HtmlFontVariant = z.enum([
 
 export type HtmlFontVariant = z.infer<typeof HtmlFontVariant>
 
+const ParagraphConfiguration = z
+  .object({
+    styles: z
+      .object({
+        fontVariant: HtmlFontVariant.optional().describe(
+          'Font variant to use for the paragraph text'
+        ),
+        hint: z
+          .boolean()
+          .optional()
+          .describe('When true, paragraph is styled as a hint with grey color')
+      })
+      .optional()
+  })
+  .default({})
+
+export type ParagraphConfiguration = z.infer<typeof ParagraphConfiguration>
+
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
   defaultValue: NonEmptyTextValue.optional(),
-  configuration: z
-    .object({
-      styles: z
-        .object({
-          fontVariant: HtmlFontVariant.optional()
-        })
-        .optional()
-    })
-    .default({})
+  configuration: ParagraphConfiguration
 }).describe('A read-only HTML <p> paragraph')
 
 export type Paragraph = z.infer<typeof Paragraph>
@@ -327,25 +370,45 @@ export const SelectDateRangeField = BaseField.extend({
 
 export type SelectDateRangeField = z.infer<typeof SelectDateRangeField>
 
+export const NameConfig = z.object({
+  firstname: z
+    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .optional(),
+  middlename: z
+    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .optional(),
+  surname: z
+    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .optional()
+})
+
+export type NameConfig = z.infer<typeof NameConfig>
+
 const NameField = BaseField.extend({
   type: z.literal(FieldType.NAME),
   defaultValue: z
     .object({
-      firstname: NonEmptyTextValue,
-      surname: NonEmptyTextValue
+      firstname: NonEmptyTextValue.optional(),
+      middlename: NonEmptyTextValue.optional(),
+      surname: NonEmptyTextValue.optional()
     })
     .optional(),
   configuration: z
     .object({
+      name: NameConfig.default({
+        firstname: { required: true },
+        surname: { required: true }
+      }).optional(),
+      order: z.array(z.enum(['firstname', 'middlename', 'surname'])).optional(),
       maxLength: z.number().optional().describe('Maximum length of the text'),
       prefix: TranslationConfig.optional(),
-      postfix: TranslationConfig.optional(),
-      includeMiddlename: z
-        .boolean()
-        .default(false)
-        .optional()
-        .describe('To make middle name visible in Name form field'),
-      searchMode: z.boolean().optional()
+      postfix: TranslationConfig.optional()
+    })
+    .default({
+      name: {
+        firstname: { required: true },
+        surname: { required: true }
+      }
     })
     .optional()
 }).describe('Name input field')
@@ -455,12 +518,36 @@ export type Office = z.infer<typeof Office>
 
 const Address = BaseField.extend({
   type: z.literal(FieldType.ADDRESS),
-  defaultValue: AddressFieldValue.optional(),
   configuration: z
     .object({
-      searchMode: z.boolean().optional()
+      lineSeparator: z.string().optional(),
+      fields: z
+        .array(
+          z.enum([
+            'number',
+            'country',
+            'province',
+            'addressType',
+            'district',
+            'urbanOrRural',
+            'town',
+            'residentialArea',
+            'street',
+            'zipCode',
+            'village',
+            'state',
+            'district2',
+            'cityOrTown',
+            'addressLine1',
+            'addressLine2',
+            'addressLine3',
+            'postcodeOrZip'
+          ])
+        )
+        .optional()
     })
-    .optional()
+    .optional(),
+  defaultValue: AddressFieldValue.optional()
 }).describe('Address input field – a combination of location and text fields')
 
 export const DataEntry = z.union([
@@ -484,20 +571,53 @@ const DataField = BaseField.extend({
 
 export type DataField = z.infer<typeof DataField>
 
-/*
- * This needs to be exported so that Typescript can refer to the type in
- * the declaration output type. If it can't do that, you might start encountering
- * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
- * errors when compiling
- */
+const ButtonField = BaseField.extend({
+  type: z.literal(FieldType.BUTTON),
+  defaultValue: ButtonFieldValue.optional(),
+  configuration: z.object({
+    icon: z
+      .string()
+      .optional()
+      .describe(
+        'Icon for the button. You can find icons from OpenCRVS UI-Kit.'
+      ),
+    loading: z
+      .boolean()
+      .optional()
+      .describe('Whether the button is in a loading state and shows a spinner'),
+    text: TranslationConfig.describe('Text to display on the button')
+  })
+}).describe('Generic button without any built-in functionality')
+
+export type ButtonField = z.infer<typeof ButtonField>
+
+const HttpField = BaseField.extend({
+  type: z.literal(FieldType.HTTP),
+  defaultValue: HttpFieldValue.optional(),
+  configuration: z.object({
+    trigger: FieldReference,
+    url: z.string().describe('URL to send the HTTP request to'),
+    method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
+    headers: z.record(z.string()).optional(),
+    body: z.record(z.string()).optional(),
+    params: z.record(z.string()).optional(),
+    timeout: z
+      .number()
+      .default(15000)
+      .describe('Request timeout in milliseconds')
+  })
+}).describe('HTTP request function triggered by a button click')
+
+export type HttpField = z.infer<typeof HttpField>
 
 /** @knipignore */
-export type Inferred =
+export type FieldConfig =
   | z.infer<typeof Address>
   | z.infer<typeof TextField>
   | z.infer<typeof NumberField>
   | z.infer<typeof TextAreaField>
   | z.infer<typeof DateField>
+  | z.infer<typeof TimeField>
   | z.infer<typeof DateRangeField>
   | z.infer<typeof SelectDateRangeField>
   | z.infer<typeof Paragraph>
@@ -520,14 +640,19 @@ export type Inferred =
   | z.infer<typeof SignatureField>
   | z.infer<typeof EmailField>
   | z.infer<typeof DataField>
+  | z.infer<typeof ButtonField>
+  | z.infer<typeof HttpField>
 
 /** @knipignore */
 /**
  * This is the type that should be used for the input of the FieldConfig. Useful when config uses zod defaults.
  */
-export type InferredInput =
+export type FieldConfigInput =
   | z.input<typeof Address>
   | z.input<typeof TextField>
+  | z.input<typeof TimeField>
+  | z.input<typeof SelectDateRangeField>
+  | z.input<typeof ButtonField>
   | z.input<typeof NumberField>
   | z.input<typeof TextAreaField>
   | z.input<typeof DateField>
@@ -552,14 +677,26 @@ export type InferredInput =
   | z.input<typeof SignatureField>
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
+  | z.input<typeof HttpField>
 
-export const FieldConfig = z
+/*
+ *  Using explicit type for the FieldConfig schema intentionally as it's
+ *  referenced quite extensively througout various other schemas. Leaving the
+ *  type to be inferred causes typescript compiler to fail with "inferred type
+ *  exeeds max lenght"
+ */
+export const FieldConfig: z.ZodType<
+  FieldConfig,
+  z.ZodTypeDef,
+  FieldConfigInput
+> = z
   .discriminatedUnion('type', [
     Address,
     TextField,
     NumberField,
     TextAreaField,
     DateField,
+    TimeField,
     DateRangeField,
     SelectDateRangeField,
     Paragraph,
@@ -581,7 +718,9 @@ export const FieldConfig = z
     SignatureField,
     EmailField,
     FileUploadWithOptions,
-    DataField
+    DataField,
+    ButtonField,
+    HttpField
   ])
   .openapi({
     description: 'Form field configuration',
@@ -596,11 +735,24 @@ export type LocationField = z.infer<typeof Location>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
 export type NumberField = z.infer<typeof NumberField>
-export type FieldConfig = Inferred
-
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
+export type FieldPropsWithoutReferenceValue<T extends FieldType> = Omit<
+  Extract<FieldConfig, { type: T }>,
+  'value'
+>
 export type SelectOption = z.infer<typeof SelectOption>
 
 export type AdministrativeAreaConfiguration = z.infer<
   typeof AdministrativeAreaConfiguration
 >
+
+/**
+ * Union of file-related fields. Using common type should help with compiler to know where to add new cases.
+ */
+export const AnyFileField = z.discriminatedUnion('type', [
+  SignatureField,
+  File,
+  FileUploadWithOptions
+])
+
+export type AnyFileField = z.infer<typeof AnyFileField>

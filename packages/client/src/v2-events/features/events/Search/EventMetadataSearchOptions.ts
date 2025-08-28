@@ -52,22 +52,6 @@ export const statusOptions = [
     }
   },
   {
-    value: EventStatus.enum.CERTIFIED,
-    label: {
-      defaultMessage: 'Certified',
-      description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusCertified'
-    }
-  },
-  {
-    value: EventStatus.enum.REJECTED,
-    label: {
-      defaultMessage: 'Rejected',
-      description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusRejected'
-    }
-  },
-  {
     value: EventStatus.enum.ARCHIVED,
     label: {
       defaultMessage: 'Archived',

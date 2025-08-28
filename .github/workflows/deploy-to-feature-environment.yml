@@ -44,14 +44,14 @@ jobs:
 
       - name: Get input data (when manually triggered)
         env:
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
-          PR_NUMBER=${{ github.event.inputs.pr_number }}
+          PR_NUMBER=${{ inputs.pr_number }}
           PR_DATA=$(gh pr view $PR_NUMBER --json headRefName,headRefOid)
           BRANCH_NAME=$(echo "$PR_DATA" | jq -r '.headRefName')
           echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_ENV
-          echo "keep_e2e=${{ github.event.inputs.keep_e2e }}" >> $GITHUB_ENV
+          echo "keep_e2e=${{ inputs.keep_e2e }}" >> $GITHUB_ENV
           echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
 
       - name: Get PR labels on push event
@@ -98,22 +98,22 @@ jobs:
           echo "BRANCH_NAME=$(echo ${{ github.head_ref }})" >> $GITHUB_ENV
       - name: Get e2e branch
         id: get_e2e_branch
+        # ls-remote should provide list of branches. When none are found, it should be empty string.
         run: |
           e2e_repo_url="https://github.com/opencrvs/e2e.git"
-
-          if git ls-remote --heads "$e2e_repo_url" | grep -q "refs/heads/${{ github.head_ref }}"; then
+          if [ -n "$(git ls-remote --heads "$e2e_repo_url" "refs/heads/${{ github.head_ref }}")" ]; then
             e2e_branch=${{ github.head_ref }}
-          elif git ls-remote --heads "$e2e_repo_url" | grep -q "refs/heads/${{ github.base_ref }}"; then
+          elif [ -n "$(git ls-remote --heads "$e2e_repo_url" "refs/heads/${{ github.base_ref }}")" ]; then
             e2e_branch="${{ github.base_ref }}"
           else
             e2e_branch="develop"
           fi
+          echo "e2e branch name=${e2e_branch}"
           echo "branch=$e2e_branch" >> $GITHUB_OUTPUT
       - name: Get PR Author
         id: get_author
         env:
-          # TODO: Chech if token is needed here?
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           AUTHOR=$(gh pr view $PR_NUMBER --json author --jq '.author.login')
           echo "PR is created by $AUTHOR"
@@ -149,19 +149,27 @@ jobs:
     needs: generate_stack_name_and_branch
     uses: ./.github/workflows/build-images-from-branch.yml
     with:
-      branch_name: ${{  needs.generate_stack_name_and_branch.outputs.branch_name  }}
+      branch_tag_name: ${{ needs.generate_stack_name_and_branch.outputs.branch_name }}
+      skip_security_check: true
     secrets: inherit
 
   trigger-e2e:
-    if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false) }}
+    if: always()
     runs-on: ubuntu-24.04
-    needs: generate_stack_name_and_branch
-    environment: ${{  needs.generate_stack_name_and_branch.outputs.slugified_branch  }}
+    needs: [generate_stack_name_and_branch, trigger-build]
     outputs:
       run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
       deployment_link: ${{ steps.print-links.outputs.deployment_link }}
     steps:
       - uses: actions/checkout@v3
+      - name: Check trigger-build status and exit on non-success
+        run: |
+          if [ ${{ needs.trigger-build.outputs.build_status }} == 'success' ]; then
+            echo "Trigger build completed without issues"
+          else
+            echo "Trigger build job failed"
+            exit 1
+          fi
 
       - name: Parse the branch name and set it as environment variable
         run: |
@@ -170,7 +178,7 @@ jobs:
 
       - name: Get PR Information
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           PR_NUMBER=${{ needs.generate_stack_name_and_branch.outputs.pr_number }}
           PR_DATA=$(gh pr view $PR_NUMBER --json headRefName,headRefOid)
@@ -213,7 +221,8 @@ jobs:
         id: dispatch_e2e
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GH_TOKEN }}
+          # TODO: Replace with fine-grained e2e token
+          github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |
             const result = await github.rest.repos.createDispatchEvent({
               owner: 'opencrvs',
@@ -276,14 +285,11 @@ jobs:
       - name: Wait for Environment Deployment (Deploy Job)
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GH_TOKEN }}
+          github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |
             const owner = 'opencrvs';
             const repo = 'e2e';
             const runId = ${{ needs.trigger-e2e.outputs.run_id }};
-            const prNumber = ${{ needs.generate_stack_name_and_branch.outputs.pr_number }};
-            const deployMessage = `Your environment is deployed to ${{ needs.trigger-e2e.outputs.deployment_link }}`;
-
             let deployJobCompleted = false;
 
             // Check if deploy job has completed
@@ -328,7 +334,13 @@ jobs:
                 await new Promise(resolve => setTimeout(resolve, 10000));
               }
             }
-
+      - name: Update github comment on PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.CORE_ISSUES_PR_TOKEN }}
+          script: |
+            const prNumber = ${{ needs.generate_stack_name_and_branch.outputs.pr_number }};
+            const deployMessage = `Your environment is deployed to ${{ needs.trigger-e2e.outputs.deployment_link }}`;
             // Check if the comment already exists
             const comments = await github.rest.issues.listComments({
               owner: 'opencrvs',
@@ -353,7 +365,7 @@ jobs:
       - name: Wait for E2E Workflow Completion
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GH_TOKEN }}
+          github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |
             const owner = 'opencrvs';
             const repo = 'e2e';

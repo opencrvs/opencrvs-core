@@ -14,6 +14,7 @@ import * as jwt from 'jsonwebtoken'
 import {
   ActionType,
   createPrng,
+  EventDocument,
   generateRandomSignature,
   getUUID,
   Scope,
@@ -171,17 +172,23 @@ export const setupTestCase = async (rngSeed?: number) => {
   await seed.locations(generator.locations.set(5))
 
   const locations = await getLocations()
-  const user = seed.user(
+  const defaultUser = seed.user(
     generator.user.create({
       primaryOfficeId: locations[0].id
     })
   )
-  const users = [user]
+  const secondaryUser = seed.user(
+    generator.user.create({
+      primaryOfficeId: locations[1].id
+    })
+  )
+
+  const users = [defaultUser, secondaryUser]
 
   return {
     locations,
     user: {
-      ...user,
+      ...defaultUser,
       signature: generateRandomSignature(rng)
     },
     eventsDb,
@@ -202,8 +209,20 @@ export const setupTestCase = async (rngSeed?: number) => {
 function actionToClientAction(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
+  action: Extract<ActionType, 'CREATE'>
+): () => Promise<EventDocument>
+function actionToClientAction(
+  client: ReturnType<typeof createTestClient>,
+  generator: ReturnType<typeof payloadGenerator>,
+  action: Exclude<ActionType, 'CREATE'>
+): (eventId: string) => Promise<EventDocument>
+function actionToClientAction(
+  client: ReturnType<typeof createTestClient>,
+  generator: ReturnType<typeof payloadGenerator>,
   action: ActionType
-) {
+):
+  | (() => Promise<EventDocument>)
+  | ((eventId: string) => Promise<EventDocument>) {
   switch (action) {
     case ActionType.CREATE:
       return async () => client.event.create(generator.event.create())
@@ -242,10 +261,16 @@ function actionToClientAction(
             keepAssignment: true
           })
         )
+    case ActionType.REQUEST_CORRECTION:
+      return async (eventId: string) =>
+        client.event.actions.correction.request.request(
+          generator.event.actions.correction.request(eventId, {
+            keepAssignment: true
+          })
+        )
 
     case ActionType.NOTIFY:
     case ActionType.DETECT_DUPLICATE:
-    case ActionType.REQUEST_CORRECTION:
     case ActionType.APPROVE_CORRECTION:
     case ActionType.ASSIGN:
     case ActionType.UNASSIGN:
@@ -262,14 +287,17 @@ function actionToClientAction(
 
 /**
  * Create event based on actions to be used in tests.
- * Created through API to make sure it get indexed properly. (To seed directly to database we need: https://github.com/opencrvs/opencrvs-core/issues/8884)
+ * Created through API to make sure it get indexed properly.
+
+ * To seed directly to database we need:
+ * https://github.com/opencrvs/opencrvs-core/issues/8884
  */
 export async function createEvent(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  actions?: Exclude<ActionType, typeof ActionType.CREATE>[]
+  actions: Exclude<ActionType, typeof ActionType.CREATE>[]
 ): Promise<ReturnType<typeof client.event.create>> {
-  let createdEvent: Awaited<ReturnType<typeof client.event.create>> | undefined
+  let createdEvent: EventDocument | undefined
 
   // Always first create the event
   const createAction = actionToClientAction(
@@ -278,10 +306,9 @@ export async function createEvent(
     ActionType.CREATE
   )
 
-  // @ts-expect-error -- createEvent does not accept any arguments
   createdEvent = await createAction()
 
-  for (const action of actions ?? []) {
+  for (const action of actions) {
     const clientAction = actionToClientAction(client, generator, action)
     createdEvent = await clientAction(createdEvent.id)
   }

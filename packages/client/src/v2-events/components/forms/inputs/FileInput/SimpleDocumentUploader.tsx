@@ -32,6 +32,10 @@ export const DocumentUploader = styled(ImageUploader)<{ fullWidth?: boolean }>`
   }
 `
 
+const Preview = styled(SingleDocumentPreview)`
+  padding: 0px 10px 8px 10px;
+`
+
 const FieldDescription = styled.div`
   margin-top: 0px;
   margin-bottom: 6px;
@@ -48,6 +52,7 @@ interface SimpleDocumentUploaderProps {
   disableDeleteInPreview?: boolean
   onComplete: (file: File | null) => void
   touched?: boolean
+  disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   previewTransformer?: (files: FileFieldValue) => FileFieldValue
   maxFileSize: number
@@ -63,6 +68,7 @@ export function SimpleDocumentUploader({
   file,
   description,
   error: errorProps,
+  disabled,
   disableDeleteInPreview,
   touched,
   width,
@@ -104,7 +110,7 @@ export function SimpleDocumentUploader({
       {errorMessage && (touched || error) && (
         <ErrorText id="field-error">{errorMessage}</ErrorText>
       )}
-      <SingleDocumentPreview
+      <Preview
         attachment={file}
         label={label}
         onDelete={onDelete}
@@ -121,6 +127,7 @@ export function SimpleDocumentUploader({
       )}
       <DocumentUploader
         data-testid={name}
+        disabled={disabled}
         fullWidth={width === 'full'}
         id={name}
         name={name}

@@ -21,11 +21,13 @@ import {
   isCheckboxFieldType,
   isCountryFieldType,
   isDateFieldType,
+  isTimeFieldType,
   isDateRangeFieldType,
   isDividerFieldType,
   isEmailFieldType,
   isFacilityFieldType,
   isFileFieldType,
+  isFileFieldWithOptionType,
   isNumberFieldType,
   isOfficeFieldType,
   isPageHeaderFieldType,
@@ -38,7 +40,8 @@ import {
   isIdFieldType,
   isPhoneFieldType,
   isSelectDateRangeFieldType,
-  isLocationFieldType
+  isLocationFieldType,
+  FileFieldWithOptionValue
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -54,11 +57,13 @@ import {
   SelectCountry,
   Paragraph,
   Number,
-  Text
+  Text,
+  TimeField
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
+import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -70,7 +75,13 @@ const Deleted = styled.del`
  *
  *  @returns sensible default value for the field type given the field configuration.
  */
-export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
+export function ValueOutput(
+  field: {
+    config: FieldConfig
+    value: FieldValue
+  },
+  searchMode?: {} | boolean
+) {
   if (
     isEmailFieldType(field) ||
     isIdFieldType(field) ||
@@ -88,6 +99,10 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
     return DateField.Output({ value: field.value })
   }
 
+  if (isTimeFieldType(field)) {
+    return TimeField.Output({ value: field.value })
+  }
+
   if (isDateRangeFieldType(field)) {
     return DateRangeField.Output({ value: field.value })
   }
@@ -101,11 +116,15 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   }
 
   if (isNumberFieldType(field)) {
-    return Number.Output({ value: field.value })
+    return Number.Output(field)
   }
 
   if (isFileFieldType(field)) {
-    return File.Output
+    return File.Output(field)
+  }
+
+  if (isFileFieldWithOptionType(field)) {
+    return FileWithOption.Output(field)
   }
 
   if (isBulletListFieldType(field)) {
@@ -133,7 +152,20 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   if (isAddressFieldType(field)) {
     return Address.Output({
       value: field.value,
-      searchMode: field.config.configuration?.searchMode
+      fields:
+        searchMode === true
+          ? [
+              'country',
+              'province',
+              'district',
+              'state',
+              'district2',
+              'urbanOrRural',
+              'town',
+              'village'
+            ]
+          : undefined,
+      lineSeparator: searchMode === true ? ', ' : undefined
     })
   }
 
@@ -145,7 +177,7 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   }
 
   if (isNameFieldType(field)) {
-    return Name.Output({ value: field.value })
+    return Name.Output({ value: field.value, configuration: field.config })
   }
 
   if (isAdministrativeAreaFieldType(field)) {
@@ -174,10 +206,10 @@ export function Output({
   field: FieldConfig
   value?: FieldValue
   previousValue?: FieldValue
-  showPreviouslyMissingValuesAsChanged: boolean
+  showPreviouslyMissingValuesAsChanged?: boolean
 }) {
-  // Explicitly check for undefined, so that e.g. number 0 is considered a value
-  const hasValue = value !== undefined
+  // Explicitly check for nil, so that e.g. number 0 is considered a value
+  const hasValue = !_.isNil(value)
 
   if (!hasValue) {
     if (previousValue) {

@@ -9,11 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
-import { FileFieldValue, MimeType } from '@opencrvs/commons/client'
+import React, { useState } from 'react'
+import { useIntl } from 'react-intl'
+import {
+  FileFieldValue,
+  MimeType,
+  File as FileConfig
+} from '@opencrvs/commons/client'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { getFullDocumentPath } from '@client/v2-events/cache'
+import { buttonMessages } from '@client/i18n/messages'
 import { SimpleDocumentUploader } from './SimpleDocumentUploader'
+import { DocumentPreview } from './DocumentPreview'
+import { SingleDocumentPreview } from './SingleDocumentPreview'
 
 function FileInput({
   width,
@@ -25,18 +33,20 @@ function FileInput({
   maxFileSize,
   label,
   error,
-  touched
+  touched,
+  disabled
 }: {
   width?: 'full' | 'auto'
   acceptedFileTypes?: MimeType[]
   maxFileSize: number
   value: FileFieldValue | undefined
-  onChange: (file?: FileFieldValue) => void
+  onChange: (file: FileFieldValue | null) => void
   name: string
   description?: string
   error?: string
   label: string
   touched?: boolean
+  disabled?: boolean
 }) {
   const [file, setFile] = React.useState(value)
 
@@ -44,13 +54,13 @@ function FileInput({
     onSuccess: ({ path, originalFilename, type }) => {
       setFile({
         path,
-        originalFilename: originalFilename,
+        originalFilename,
         type: type
       })
 
       onChange({
         path,
-        originalFilename: originalFilename,
+        originalFilename,
         type: type
       })
     }
@@ -60,6 +70,7 @@ function FileInput({
     <SimpleDocumentUploader
       acceptedFileTypes={acceptedFileTypes}
       description={description}
+      disabled={disabled}
       error={error}
       file={file}
       label={label}
@@ -81,13 +92,53 @@ function FileInput({
           setFile(undefined)
         }
         setFile(undefined)
-        onChange(undefined)
+        onChange(null)
       }}
     />
   )
 }
 
+function FileOutput({
+  value,
+  config
+}: {
+  value?: FileFieldValue
+  config: FileConfig
+}) {
+  const intl = useIntl()
+  const [previewImage, setPreviewImage] = useState<boolean>(false)
+
+  if (!value) {
+    return null
+  }
+
+  return (
+    <>
+      <SingleDocumentPreview
+        attachment={value}
+        label={
+          config.configuration.fileName
+            ? intl.formatMessage(config.configuration.fileName)
+            : intl.formatMessage(config.label)
+        }
+        onSelect={() => setPreviewImage(true)}
+      />
+      {previewImage && (
+        <DocumentPreview
+          disableDelete={true}
+          goBack={() => {
+            setPreviewImage(false)
+          }}
+          previewImage={value}
+          title={intl.formatMessage(buttonMessages.preview)}
+          onDelete={() => setPreviewImage(false)}
+        />
+      )}
+    </>
+  )
+}
+
 export const File = {
   Input: FileInput,
-  Output: null
+  Output: FileOutput
 }

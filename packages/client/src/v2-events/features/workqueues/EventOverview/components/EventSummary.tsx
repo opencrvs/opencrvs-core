@@ -15,7 +15,10 @@ import {
   EventConfig,
   getDeclarationFields,
   areConditionsMet,
-  getMixedPath
+  getMixedPath,
+  Flag,
+  ActionFlag,
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -51,8 +54,20 @@ const messages = {
     value: {
       id: 'v2.event.summary.status.value',
       defaultMessage:
-        '{event.status, select, CREATED {Draft} NOTIFIED {Incomplete} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
+        '{event.status, select, CREATED {Draft} NOTIFIED {Notified} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
       description: 'Status of the event'
+    }
+  },
+  flags: {
+    label: {
+      id: 'v2.event.summary.flags.label',
+      defaultMessage: 'Flags',
+      description: 'Flags of the event'
+    },
+    placeholder: {
+      id: 'v2.event.summary.flags.placeholder',
+      defaultMessage: 'No flags',
+      description: 'Message when no flags are present'
     }
   },
   event: {
@@ -101,10 +116,12 @@ const messages = {
 export function EventSummary({
   event,
   eventConfiguration,
+  flags,
   hideSecuredFields = false
 }: {
   event: Record<string, FieldValue | null>
   eventConfiguration: EventConfig
+  flags: Flag[]
   hideSecuredFields?: boolean
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
@@ -154,6 +171,11 @@ export function EventSummary({
     }
   })
 
+  const flattenedFlags = flags
+    .filter((flag) => !ActionFlag.safeParse(flag).success)
+    .filter((flag) => flag !== InherentFlags.INCOMPLETE)
+    .join(', ')
+
   return (
     <>
       <Summary id="summary">
@@ -171,6 +193,13 @@ export function EventSummary({
           data-testid="status"
           label={intl.formatMessage(messages.status.label)}
           value={intl.formatMessage(messages.status.value, event)}
+        />
+        <Summary.Row
+          key="flags"
+          data-testid="flags"
+          label={intl.formatMessage(messages.flags.label)}
+          placeholder={intl.formatMessage(messages.flags.placeholder)}
+          value={flattenedFlags}
         />
         <Summary.Row
           key="event"

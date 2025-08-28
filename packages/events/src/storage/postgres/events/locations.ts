@@ -10,33 +10,43 @@
  */
 
 import { sql } from 'kysely'
+import { chunk } from 'lodash'
+import { logger } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
-import { NewLocations } from './schema/app/Locations'
+import { Locations, NewLocations } from './schema/app/Locations'
+
+const INSERT_MAX_CHUNK_SIZE = 10000
 
 export async function setLocations(locations: NewLocations[]) {
   const db = getClient()
-  const locationIds = locations.map(({ id }) => id)
-
-  await db
-    .insertInto('locations')
-    .values(locations.map((loc) => ({ ...loc, deletedAt: null })))
-    .onConflict((oc) =>
-      oc.column('id').doUpdateSet({
-        name: (eb) => eb.ref('excluded.name'),
-        externalId: (eb) => eb.ref('excluded.externalId'),
-        parentId: (eb) => eb.ref('excluded.parentId'),
-        updatedAt: () => sql`now()`,
-        deletedAt: null
-      })
-    )
-    .execute()
 
   await db
     .updateTable('locations')
     .set({ deletedAt: sql`now()` })
     .where('deletedAt', 'is', null)
-    .where('id', 'not in', locationIds)
     .execute()
+
+  for (const [index, batch] of chunk(
+    locations,
+    INSERT_MAX_CHUNK_SIZE
+  ).entries()) {
+    logger.info(
+      `Processing ${(index + 1) * INSERT_MAX_CHUNK_SIZE}/${locations.length} locations`
+    )
+    // Insert or update the locations in the database
+    await db
+      .insertInto('locations')
+      .values(batch.map((loc) => ({ ...loc, deletedAt: null })))
+      .onConflict((oc) =>
+        oc.column('id').doUpdateSet({
+          name: (eb) => eb.ref('excluded.name'),
+          parentId: (eb) => eb.ref('excluded.parentId'),
+          updatedAt: () => sql`now()`,
+          deletedAt: null
+        })
+      )
+      .execute()
+  }
 }
 
 export async function getLocations() {
@@ -48,4 +58,25 @@ export async function getLocations() {
     .where('deletedAt', 'is', null)
     .$narrowType<{ deletedAt: null }>()
     .execute()
+}
+
+export async function getChildLocations(id: string) {
+  const db = getClient()
+
+  const { rows } = await sql<Locations>`
+    WITH RECURSIVE r AS (
+      SELECT id, parent_id
+      FROM app.locations
+      WHERE id = ${id}
+      UNION ALL
+      SELECT l.id, l.parent_id
+      FROM app.locations l
+      JOIN r ON l.parent_id = r.id
+    )
+    SELECT l.*
+    FROM app.locations l
+    JOIN r ON r.id = l.id
+    WHERE l.id <> ${id};
+  `.execute(db)
+  return rows
 }

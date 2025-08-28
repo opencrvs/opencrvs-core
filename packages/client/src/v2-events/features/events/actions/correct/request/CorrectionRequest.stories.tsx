@@ -13,17 +13,37 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
-import { ActionType } from '@opencrvs/commons/client'
+import { expect, waitFor, within, userEvent } from '@storybook/test'
+import {
+  ActionType,
+  EventDocument,
+  generateUuid,
+  tennisClubMembershipEvent,
+  generateActionDocument
+} from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import {
+  tennisClubMembershipEventDocument,
+  tennisClubMembershipEventWithCorrectionRequest
+} from '@client/v2-events/features/events/fixtures'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import { router } from './router'
 import * as Request from './index'
 
+const generator = testDataGenerator()
+
 const meta: Meta<typeof Request.Pages> = {
-  title: 'CorrectionRequest'
+  title: 'CorrectionRequest',
+  loaders: [
+    () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.registrationAgent
+      )
+    }
+  ]
 }
 
 export default meta
@@ -40,8 +60,11 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 const draft = testDataGenerator().event.draft({
   eventId: tennisClubMembershipEventDocument.id,
-  actionType: ActionType.REQUEST_CORRECTION
+  actionType: ActionType.REQUEST_CORRECTION,
+  annotation: undefined,
+  omitFields: ['applicant.image']
 })
+
 function FormClear() {
   const drafts = useDrafts()
   useEffect(() => {
@@ -59,10 +82,10 @@ export const ReviewWithChanges: Story = {
     reactRouter: {
       router: {
         path: '/',
-        element: <FormClear />,
+        element: <Outlet />,
         children: [router]
       },
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -75,33 +98,20 @@ export const ReviewWithChanges: Story = {
         ]
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await expect(canvas.queryByText('Add attachment')).not.toBeInTheDocument()
+    await waitFor(async () => {
+      await expect(
+        canvas.getByRole('button', { name: 'Continue' })
+      ).toBeDisabled()
+    })
   }
 }
 
-export const AdditionalDetails: Story = {
-  parameters: {
-    offline: {
-      drafts: [draft]
-    },
-    reactRouter: {
-      router: router,
-      initialPath:
-        ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.buildPath({
-          eventId: tennisClubMembershipEventDocument.id
-        })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ]
-      }
-    }
-  }
-}
-export const Summary: Story = {
+export const Review: Story = {
   parameters: {
     offline: {
       drafts: [draft]
@@ -109,10 +119,10 @@ export const Summary: Story = {
     reactRouter: {
       router: {
         path: '/',
-        element: <FormClear />,
+        element: <Outlet />,
         children: [router]
       },
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({
+      initialPath: ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -125,5 +135,160 @@ export const Summary: Story = {
         ]
       }
     }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await waitFor(async () => {
+      await expect(
+        canvas.getByRole('button', { name: 'Continue' })
+      ).toBeDisabled()
+    })
+
+    await step('Change applicant values', async () => {
+      await userEvent.click(
+        canvas.getByTestId('change-button-applicant.address')
+      )
+
+      await userEvent.click(canvas.getByTestId('location__country'))
+      await userEvent.type(canvas.getByTestId('location__country'), 'Far')
+      await userEvent.click(canvas.getByText('Farajaland', { exact: true }))
+
+      await userEvent.type(canvas.getByTestId('text__state'), 'My State')
+      await userEvent.type(canvas.getByTestId('text__district2'), 'My District')
+      await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
+    })
+
+    await step('Go back to review', async () => {
+      await userEvent.click(
+        canvas.getByRole('button', { name: 'Back to review' })
+      )
+      await expect(canvas.queryByText('Add attachment')).not.toBeInTheDocument()
+      await waitFor(async () => {
+        await expect(
+          canvas.getByRole('button', { name: 'Continue' })
+        ).toBeDisabled()
+      })
+
+      await expect(canvas.queryByText('Add attachment')).not.toBeInTheDocument()
+    })
+
+    await step('Change recommender values', async () => {
+      await userEvent.click(canvas.getByTestId('change-button-recommender.id'))
+      await userEvent.type(
+        canvas.getByTestId('text__recommender____id'),
+        '1234567890'
+      )
+    })
+
+    await step('Go back to review', async () => {
+      await userEvent.click(
+        canvas.getByRole('button', { name: 'Back to review' })
+      )
+      await waitFor(async () => {
+        await expect(
+          canvas.getByRole('button', { name: 'Continue' })
+        ).toBeEnabled()
+      })
+    })
+  }
+}
+
+export const Summary: Story = {
+  parameters: {
+    offline: {
+      drafts: [draft],
+      events: [tennisClubMembershipEventDocument]
+    },
+    reactRouter: {
+      router: {
+        path: '/',
+        element: <FormClear />,
+        children: [router]
+      },
+      initialPath: ROUTES.V2.EVENTS.CORRECTION.SUMMARY.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('Check the summary table', async () => {
+      void expect(await canvas.findByText('Verify ID')).toBeInTheDocument()
+      void expect(await canvas.findByText('Yes')).toBeInTheDocument()
+      void expect(
+        await canvas.findByText('Another registration agent or field agent')
+      ).toBeInTheDocument()
+      void expect(
+        await canvas.findByText("Child's name was incorrect")
+      ).toBeInTheDocument()
+      void expect(await canvas.findByText('Riku Rouvila')).toBeInTheDocument()
+      void expect(await canvas.findByText('Max McLaren')).toBeInTheDocument()
+    })
+  }
+}
+
+export const ReviewCorrection: Story = {
+  loaders: [
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.localRegistrar
+      )
+      // Intermittent failures starts to happen when global state gets out of whack.
+      // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
+  parameters: {
+    reactRouter: {
+      router: {
+        path: '/',
+        element: <Outlet />,
+        children: [router]
+      },
+      initialPath: ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
+        eventId: tennisClubMembershipEventWithCorrectionRequest.id
+      })
+    }
+  },
+
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitFor(async () => {
+      await expect(
+        canvas.queryByRole('button', { name: 'Continue' })
+      ).toBeNull()
+    })
+
+    await waitFor(async () => {
+      await expect(
+        canvas.getByRole('button', { name: /approve/i })
+      ).toBeInTheDocument()
+    })
+
+    await waitFor(async () => {
+      await expect(
+        canvas.getByRole('button', { name: /reject/i })
+      ).toBeInTheDocument()
+    })
+
+    await expect(canvas.queryByText('Add attachment')).not.toBeInTheDocument()
+
+    await userEvent.click(canvas.getByRole('button', { name: /approve/i }))
+    await userEvent.click(canvas.getByTestId('close-dialog'))
+
+    await userEvent.click(canvas.getByRole('button', { name: /reject/i }))
+    const confirmButton = canvas.getByRole('button', { name: /confirm/i })
+    await expect(confirmButton).toBeDisabled()
+
+    const reasonInput = canvasElement.querySelector('#reject-correction-reason')
+    if (reasonInput) {
+      await userEvent.type(reasonInput, 'Missing legal documentation')
+      await expect(confirmButton).toBeEnabled()
+    }
+
+    await userEvent.click(canvas.getByTestId('close-dialog'))
   }
 }

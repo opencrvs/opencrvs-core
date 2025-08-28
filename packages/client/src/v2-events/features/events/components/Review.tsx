@@ -40,8 +40,9 @@ import {
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
-import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { getScope } from '@client/profile/profileSelectors'
+import { ReviewCorrection } from '../actions/correct/request/ReviewCorrection'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -279,7 +280,9 @@ function FormReview({
   previousForm,
   onEdit,
   showPreviouslyMissingValuesAsChanged,
-  readonlyMode
+  readonlyMode,
+  isCorrection = false,
+  isReviewCorrection = false
 }: {
   formConfig: FormConfig
   form: EventState
@@ -287,6 +290,8 @@ function FormReview({
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
   readonlyMode?: boolean
+  isCorrection?: boolean
+  isReviewCorrection?: boolean
 }) {
   const intl = useIntl()
   const visiblePages = formConfig.pages.filter((page) =>
@@ -353,13 +358,23 @@ function FormReview({
             }
           )
 
+          const hasCorrectableFields = displayedFields.some(
+            (field) => !field.uncorrectable
+          )
+
+          // If the page has any correctable fields, show the change all link
+          const showChangeAllLink =
+            !readonlyMode &&
+            (!isCorrection || hasCorrectableFields) &&
+            !isReviewCorrection
+
           return (
             <DeclarationDataContainer
               key={'Section_' + page.title.defaultMessage}
             >
               <Accordion
                 action={
-                  !readonlyMode && (
+                  showChangeAllLink && (
                     <Link
                       onClick={(e) => {
                         e.stopPropagation()
@@ -378,31 +393,45 @@ function FormReview({
               >
                 <ListReview id={'Section_' + page.id}>
                   {displayedFields.map(
-                    ({ id, label, errorDisplay, valueDisplay }) => (
-                      <ListReview.Row
-                        key={id}
-                        actions={
-                          !readonlyMode && (
-                            <Link
-                              data-testid={`change-button-${id}`}
-                              onClick={(e) => {
-                                e.stopPropagation()
+                    ({
+                      id,
+                      label,
+                      errorDisplay,
+                      valueDisplay,
+                      uncorrectable
+                    }) => {
+                      const shouldHideEditLink =
+                        readonlyMode ||
+                        (isCorrection && uncorrectable) ||
+                        isReviewCorrection
 
-                                onEdit({
-                                  pageId: page.id,
-                                  fieldId: id
-                                })
-                              }}
-                            >
-                              {intl.formatMessage(reviewMessages.changeButton)}
-                            </Link>
-                          )
-                        }
-                        id={id}
-                        label={intl.formatMessage(label)}
-                        value={errorDisplay || valueDisplay}
-                      />
-                    )
+                      return (
+                        <ListReview.Row
+                          key={id}
+                          actions={
+                            !shouldHideEditLink && (
+                              <Link
+                                data-testid={`change-button-${id}`}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  onEdit({
+                                    pageId: page.id,
+                                    fieldId: id
+                                  })
+                                }}
+                              >
+                                {intl.formatMessage(
+                                  reviewMessages.changeButton
+                                )}
+                              </Link>
+                            )
+                          }
+                          id={id}
+                          label={intl.formatMessage(label)}
+                          value={errorDisplay || valueDisplay}
+                        />
+                      )
+                    }
                   )}
                 </ListReview>
               </Accordion>
@@ -428,7 +457,9 @@ function ReviewComponent({
   title,
   onAnnotationChange,
   readonlyMode,
-  reviewFields
+  reviewFields,
+  isCorrection = false,
+  isReviewCorrection = false
 }: {
   children: React.ReactNode
   formConfig: FormConfig
@@ -448,6 +479,8 @@ function ReviewComponent({
   title: string
   onAnnotationChange?: (values: EventState) => void
   readonlyMode?: boolean
+  isCorrection?: boolean
+  isReviewCorrection?: boolean
 }) {
   const scopes = useSelector(getScope)
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
@@ -468,11 +501,14 @@ function ReviewComponent({
   return (
     <Row>
       <LeftColumn>
+        {isReviewCorrection && <ReviewCorrection form={form} />}
         <Card>
           <ReviewHeader title={title} />
           <FormReview
             form={form}
             formConfig={formConfig}
+            isCorrection={isCorrection}
+            isReviewCorrection={isReviewCorrection}
             previousForm={previousForm}
             readonlyMode={readonlyMode}
             showPreviouslyMissingValuesAsChanged={
@@ -500,7 +536,7 @@ function ReviewComponent({
       {pageIdsWithFile.length > 0 && (
         <RightColumn>
           <DocumentViewer
-            disabled={readonlyMode}
+            disabled={readonlyMode || isCorrection || isReviewCorrection}
             form={form}
             formConfig={formConfig}
             // @todo: ask about this rule

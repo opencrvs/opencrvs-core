@@ -128,7 +128,6 @@ describe('event.actions.notify', () => {
       }
     }
 
-    // @TODO:  the error seems quite verbose. Check what causes it and if we can improve it
     await expect(
       // @ts-expect-error -- Intentionally passing incorrect type
       client.event.actions.notify.request(payload)
@@ -157,7 +156,7 @@ describe('event.actions.notify', () => {
     ).rejects.toMatchSnapshot()
   })
 
-  test(`${ActionType.NOTIFY} action fails if invalid value is sent`, async () => {
+  test(`${ActionType.NOTIFY} action does not fail even if invalid value is sent`, async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, [
       SCOPES.RECORD_SUBMIT_INCOMPLETE,
@@ -170,14 +169,18 @@ describe('event.actions.notify', () => {
       eventId: event.id,
       transactionId: getUUID(),
       declaration: {
-        // applicant.dob can not be in the future
+        // applicant.dob can not be in the future in actions other than `NOTIFY`
         'applicant.dob': '2050-01-01'
       }
     }
 
-    await expect(
-      client.event.actions.notify.request(payload)
-    ).rejects.toMatchSnapshot()
+    const fetchedEvent = await client.event.actions.notify.request(payload)
+    expect(fetchedEvent.actions).toEqual([
+      expect.objectContaining({ type: ActionType.CREATE }),
+      expect.objectContaining({ type: ActionType.ASSIGN }),
+      expect.objectContaining({ type: ActionType.NOTIFY }),
+      expect.objectContaining({ type: ActionType.UNASSIGN })
+    ])
   })
 
   test(`${ActionType.NOTIFY} is idempotent`, async () => {

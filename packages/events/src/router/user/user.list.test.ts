@@ -23,7 +23,6 @@ test('Returns empty list when no ids provided', async () => {
 })
 
 test('Returns empty list when no ids match', async () => {
-  // console.log(mswServer.listHandlers().map((x) => x))
   const { user } = await setupTestCase()
   const client = createTestClient(user)
   mswServer.use(
@@ -53,7 +52,8 @@ test('Returns user in correct format', async () => {
       id: user.id,
       name: user.name,
       role: user.role,
-      signature: user.signature
+      signature: user.signature,
+      primaryOfficeId: user.primaryOfficeId
     }
   ])
 })

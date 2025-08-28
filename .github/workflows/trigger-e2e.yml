@@ -9,6 +9,7 @@
 name: 'Trigger integration E2E tests in Farajaland development'
 
 on:
+
   push:
     branches:
       - develop

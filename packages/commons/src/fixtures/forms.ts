@@ -744,12 +744,34 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
             defaultMessage: "Applicant's name",
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.firstname.label'
-          }
+          },
+          configuration: {
+            name: {
+              firstname: { required: true },
+              middlename: { required: false },
+              surname: { required: true }
+            }
+          },
+          validation: [
+            {
+              validator: field('applicant.name').object({
+                firstname: field('firstname').isValidEnglishName(),
+                surname: field('surname').isValidEnglishName()
+              }),
+              message: {
+                defaultMessage:
+                  "Input contains invalid characters. Please use only letters (a-z, A-Z), numbers (0-9), hyphens (-), apostrophes(') and underscores (_)",
+                description: 'This is the error message for invalid name',
+                id: 'v2.error.invalidName'
+              }
+            }
+          ]
         },
         {
           id: 'applicant.email',
           type: 'EMAIL',
           required: false,
+          uncorrectable: true,
           conditionals: [],
           label: {
             defaultMessage: "Applicant's email",
@@ -819,6 +841,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           id: 'applicant.image',
           type: FieldType.FILE,
           required: false,
+          uncorrectable: true,
           label: {
             defaultMessage: "Applicant's profile picture",
             description: 'This is the label for the field',
@@ -965,22 +988,6 @@ export const statusOptions = [
       defaultMessage: 'Registered',
       description: 'Option for form field: status of record',
       id: 'v2.advancedSearch.form.recordStatusRegistered'
-    }
-  },
-  {
-    value: EventStatus.enum.CERTIFIED,
-    label: {
-      defaultMessage: 'Certified',
-      description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusCertified'
-    }
-  },
-  {
-    value: EventStatus.enum.REJECTED,
-    label: {
-      defaultMessage: 'Rejected',
-      description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusRejected'
     }
   },
   {

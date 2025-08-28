@@ -57,7 +57,7 @@ export const Default: Story = {
       handlers: {
         event: [
           tRPCMsw.event.search.query(() => {
-            return [eventQueryDataGenerator({}, 123123)]
+            return { total: 1, results: [eventQueryDataGenerator({}, 123123)] }
           }),
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]

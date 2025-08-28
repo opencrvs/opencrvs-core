@@ -22,7 +22,8 @@ import {
   generateEventDraftDocument,
   generateWorkqueues,
   getCurrentEventState,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  UUID
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -102,7 +103,7 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
 
     await step('User is taken to the view record page', async () => {
       const list = await canvas.findByRole('list')
-      await userEvent.click(within(list).getByText('View record'))
+      await userEvent.click(within(list).getByText('View'))
 
       await waitFor(async () => {
         await canvas.findByText("Applicant's name")
@@ -128,15 +129,7 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
     },
     msw: {
       handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return eventDocument
-          }),
-          tRPCMsw.event.search.query(() => {
-            return [
-              getCurrentEventState(eventDocument, tennisClubMembershipEvent)
-            ]
-          }),
+        workqueues: [
           tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues()
           }),
@@ -144,6 +137,19 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
             return input.reduce((acc, { slug }) => {
               return { ...acc, [slug]: 7 }
             }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              total: 1,
+              results: [
+                getCurrentEventState(eventDocument, tennisClubMembershipEvent)
+              ]
+            }
           })
         ],
         drafts: [
@@ -166,7 +172,8 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
                 name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
                 role: 'LOCAL_REGISTRAR',
                 signature: undefined,
-                avatar: undefined
+                avatar: undefined,
+                primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
               }
             ]
           }),
@@ -176,7 +183,8 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
               name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
               role: 'LOCAL_REGISTRAR',
               signature: undefined,
-              avatar: undefined
+              avatar: undefined,
+              primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
             }
           })
         ]
@@ -232,7 +240,8 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
                 ],
                 role: 'SOCIAL_WORKER',
                 signature: undefined,
-                avatar: undefined
+                avatar: undefined,
+                primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
               }
             ]
           }),
@@ -242,7 +251,8 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
               name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
               role: 'LOCAL_REGISTRAR',
               signature: undefined,
-              avatar: undefined
+              avatar: undefined,
+              primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
             }
           })
         ]

@@ -30,7 +30,6 @@ import {
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { RejectionState, Review } from './Review'
@@ -545,7 +544,7 @@ export const ReviewWithIncompleteName: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
         eventId: eventDocumentWithoutSurname.id
       })
     }

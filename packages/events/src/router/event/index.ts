@@ -18,7 +18,6 @@ import {
   ACTION_ALLOWED_SCOPES,
   ActionStatus,
   ActionType,
-  ApproveCorrectionActionInput,
   AssignActionInput,
   CONFIG_GET_ALLOWED_SCOPES,
   DeleteActionInput,
@@ -28,11 +27,9 @@ import {
   EventDocument,
   EventIndex,
   EventInput,
-  RejectCorrectionActionInput,
-  RequestCorrectionActionInput,
+  SearchQuery,
   UnassignActionInput,
-  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
-  QueryType
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -41,20 +38,25 @@ import {
   getEventConfigurationById,
   getEventConfigurations
 } from '@events/service/config/config'
-import { approveCorrection } from '@events/service/events/actions/approve-correction'
 import { assignRecord } from '@events/service/events/actions/assign'
-import { rejectCorrection } from '@events/service/events/actions/reject-correction'
 import { unassignRecord } from '@events/service/events/actions/unassign'
 import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
 import {
   addAction,
+  deleteUnreferencedFilesFromPreviousDrafts,
   createEvent,
   deleteEvent,
   getEventById,
   throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
+import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { importEvent } from '@events/service/events/import'
-import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
+import {
+  findRecordsByQuery,
+  getIndexedEvents
+} from '@events/service/indexing/indexing'
+import { reindex } from '@events/service/events/reindex'
+import { UserContext } from '../../context'
 import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)
@@ -148,7 +150,15 @@ export const eventRouter = router({
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
-      await throwConflictIfActionNotAllowed(input.eventId, ActionType.DELETE)
+      if (ctx.isDuplicateAction) {
+        return ctx.event
+      }
+
+      await throwConflictIfActionNotAllowed(
+        input.eventId,
+        ActionType.DELETE,
+        ctx.token
+      )
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
   draft: router({
@@ -157,16 +167,47 @@ export const eventRouter = router({
     }),
     create: publicProcedure
       .input(DraftInput)
+      .use(middleware.requireAssignment)
       .output(Draft)
       .mutation(async ({ input, ctx }) => {
-        const { eventId } = input
-        await getEventById(eventId)
+        const { eventId, type } = input
 
-        return createDraft(input, {
+        // Consecutive middlewares lose some of the typing.
+        const user = UserContext.parse(ctx.user)
+        await throwConflictIfActionNotAllowed(eventId, type, ctx.token)
+
+        const previousDraft = await draftsRepo.findLatestDraftForAction(
           eventId,
-          user: ctx.user,
+          user.id,
+          input.type
+        )
+
+        if (previousDraft?.transactionId === input.transactionId) {
+          return previousDraft
+        }
+
+        const currentDraft = await createDraft(input, {
+          eventId,
+          user,
           transactionId: input.transactionId
         })
+
+        const event = await getEventById(eventId)
+        const configuration = await getEventConfigurationById({
+          token: ctx.token,
+          eventType: event.type
+        })
+
+        if (previousDraft) {
+          await deleteUnreferencedFilesFromPreviousDrafts(ctx.token, {
+            event,
+            configuration,
+            currentDraft,
+            previousDraft
+          })
+        }
+
+        return currentDraft
       })
   }),
   actions: router({
@@ -182,7 +223,7 @@ export const eventRouter = router({
     assignment: router({
       assign: publicProcedure
         .input(AssignActionInput)
-        .use(middleware.validateAction(ActionType.ASSIGN))
+        .use(middleware.validateAction)
         .mutation(async (options) => {
           return assignRecord({
             input: options.input,
@@ -192,7 +233,7 @@ export const eventRouter = router({
         }),
       unassign: publicProcedure
         .input(UnassignActionInput)
-        .use(middleware.validateAction(ActionType.UNASSIGN))
+        .use(middleware.validateAction)
         .mutation(async (options) => {
           return unassignRecord(options.input, {
             eventId: options.input.eventId,
@@ -202,66 +243,13 @@ export const eventRouter = router({
         })
     }),
     correction: router({
-      request: publicProcedure
-        .use(
-          requiresAnyOfScopes(
-            ACTION_ALLOWED_SCOPES[ActionType.REQUEST_CORRECTION]
-          )
-        )
-        .input(RequestCorrectionActionInput)
-        .use(middleware.requireAssignment)
-        .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
-        .mutation(async ({ input, ctx }) => {
-          if (ctx.isDuplicateAction) {
-            return ctx.event
-          }
-
-          return addAction(input, {
-            eventId: input.eventId,
-            user: ctx.user,
-            token: ctx.token,
-            status: ActionStatus.Accepted
-          })
-        }),
-      approve: publicProcedure
-        .use(
-          requiresAnyOfScopes(
-            ACTION_ALLOWED_SCOPES[ActionType.APPROVE_CORRECTION]
-          )
-        )
-        .input(ApproveCorrectionActionInput)
-        .use(middleware.requireAssignment)
-        .use(middleware.validateAction(ActionType.APPROVE_CORRECTION))
-        .mutation(async ({ input, ctx }) => {
-          if (ctx.isDuplicateAction) {
-            return ctx.event
-          }
-          return approveCorrection(input, {
-            eventId: input.eventId,
-            user: ctx.user,
-            token: ctx.token
-          })
-        }),
-      reject: publicProcedure
-        .use(
-          requiresAnyOfScopes(
-            ACTION_ALLOWED_SCOPES[ActionType.REJECT_CORRECTION]
-          )
-        )
-        .input(RejectCorrectionActionInput)
-        .use(middleware.requireAssignment)
-        .use(middleware.validateAction(ActionType.REJECT_CORRECTION))
-        .mutation(async ({ input, ctx }) => {
-          if (ctx.isDuplicateAction) {
-            return ctx.event
-          }
-
-          return rejectCorrection(input, {
-            eventId: input.eventId,
-            user: ctx.user,
-            token: ctx.token
-          })
-        })
+      request: router(
+        getDefaultActionProcedures(ActionType.REQUEST_CORRECTION)
+      ),
+      approve: router(
+        getDefaultActionProcedures(ActionType.APPROVE_CORRECTION)
+      ),
+      reject: router(getDefaultActionProcedures(ActionType.REJECT_CORRECTION))
     })
   }),
   list: systemProcedure
@@ -270,6 +258,7 @@ export const eventRouter = router({
     .query(async ({ ctx }) => {
       const userId = ctx.user.id
       const eventConfigs = await getEventConfigurations(ctx.token)
+
       return getIndexedEvents(userId, eventConfigs)
     }),
   search: publicProcedure
@@ -283,8 +272,13 @@ export const eventRouter = router({
     })
     // @todo: remove legacy scopes once all users are configured with new search scopes
     .use(requiresAnyOfScopes([], ['search']))
-    .input(QueryType)
-    .output(z.array(EventIndex))
+    .input(SearchQuery)
+    .output(
+      z.object({
+        results: z.array(EventIndex),
+        total: z.number()
+      })
+    )
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getEventConfigurations(ctx.token)
       const scopes = getScopes({ Authorization: ctx.token })
@@ -296,7 +290,7 @@ export const eventRouter = router({
         throw new Error('No search scope provided')
       }
       const searchScopeOptions = searchScope.options
-      return getIndex(
+      return findRecordsByQuery(
         input,
         eventConfigs,
         searchScopeOptions,
@@ -315,5 +309,21 @@ export const eventRouter = router({
     })
     .input(EventDocument)
     .output(EventDocument)
-    .mutation(async ({ input, ctx }) => importEvent(input, ctx.token))
+    .mutation(async ({ input, ctx }) => importEvent(input, ctx.token)),
+  reindex: systemProcedure
+    .input(z.void())
+    .use(requiresAnyOfScopes([SCOPES.REINDEX]))
+    .output(z.void())
+    .meta({
+      openapi: {
+        summary:
+          'Triggers reindexing of search, workqueues and notifies country config',
+        method: 'POST',
+        path: '/events/reindex',
+        tags: ['events']
+      }
+    })
+    .mutation(async ({ ctx }) => {
+      await reindex(ctx.token)
+    })
 })

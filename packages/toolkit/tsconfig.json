@@ -16,10 +16,11 @@
         "../commons/src/conditionals/conditionals.ts"
       ],
       "@opencrvs/commons/scopes": ["../commons/src/scopes.ts"],
-      "@opencrvs/commons/events": ["../commons/src/events/index.ts"]
+      "@opencrvs/commons/events": ["../commons/src/events/index.ts"],
+      "@opencrvs/commons/notification": ["../commons/src/notification/index.ts"]
     }
   },
-  "references": [{ "path": "../commons" }],
+  "references": [{ "path": "../commons/tsconfig-commonjs.json" }],
   "include": ["src/**/*.ts"],
   "exclude": ["**/node_modules/**", "dist"]
 }

@@ -22,7 +22,7 @@ import {
   getActionAnnotation,
   getDeclaration,
   getActionReview,
-  EventStatus
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -63,7 +63,7 @@ export function Review() {
   const drafts = useDrafts()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
-  const { redirectToOrigin } = useEventFormNavigation()
+  const { closeActionView: closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
@@ -153,7 +153,7 @@ export function Review() {
         transactionId: uuid(),
         annotation
       })
-      redirectToOrigin(slug)
+      closeActionView(slug)
     }
   }
 
@@ -184,7 +184,7 @@ export function Review() {
         })
       }
 
-      redirectToOrigin(slug)
+      closeActionView(slug)
     }
   }
 
@@ -194,7 +194,7 @@ export function Review() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          redirectToOrigin(slug)
+          closeActionView(slug)
         })
       }
     >
@@ -215,7 +215,7 @@ export function Review() {
           primaryButtonType="positive"
           onConfirm={handleRegistration}
           onReject={
-            currentEventState.status === EventStatus.enum.REJECTED
+            currentEventState.flags.includes(InherentFlags.REJECTED)
               ? undefined
               : handleRejection
           }
