@@ -44,7 +44,8 @@ import {
   isLocationFieldType,
   FileFieldWithOptionValue,
   EventState,
-  FormConfig
+  FormConfig,
+  FieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -334,9 +335,7 @@ export function Output({
   if (!hasPreviousValue && showPreviouslyMissingValuesAsChanged) {
     return (
       <>
-        <Deleted>
-          <ValueOutput config={{ ...field, required: true }} value="-" />
-        </Deleted>
+        <Deleted>{'-'}</Deleted>
         <br />
         <ValueOutput config={field} value={value} />
       </>
