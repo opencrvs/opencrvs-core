@@ -201,7 +201,7 @@ test('Returns event with all actions', async () => {
   ).toHaveLength(2)
 })
 
-test('event.get does not index the event', async () => {
+test('indexes event correctly', async () => {
   vi.mocked(indexEvent).mockClear()
 
   const { user, generator } = await setupTestCase()
