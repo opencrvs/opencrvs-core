@@ -9,6 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { NameFieldValue } from './events/CompositeFieldValue'
+import * as z from 'zod'
+
 export function getOrThrow<T>(x: T, message: string) {
   if (x === undefined || x === null) {
     throw new Error(message)
@@ -29,4 +32,22 @@ export function joinValues(
     .filter((value) => !!value)
     .join(separator)
     .trim()
+}
+
+export const FullNameV1 = z.array(
+  z.object({
+    use: z.string(),
+    family: z.string(),
+    given: z.array(z.string())
+  })
+)
+
+export type FullNameV1 = z.infer<typeof FullNameV1>
+
+export function personNameFromV1ToV2([name]: FullNameV1): NameFieldValue {
+  return {
+    firstname: name.given[0],
+    middlename: name.given.slice(1).join(' '),
+    surname: name.family
+  }
 }
