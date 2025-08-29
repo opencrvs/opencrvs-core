@@ -12,12 +12,12 @@
 import { TRPCError } from '@trpc/server'
 import { omit } from 'lodash'
 import {
+  ActionStatus,
   ActionType,
   AddressType,
   createPrng,
   EventDocument,
   generateActionDeclarationInput,
-  getAcceptedActions,
   getUUID,
   SCOPES
 } from '@opencrvs/commons'
@@ -129,9 +129,14 @@ test('a correction request can be added to a registered event', async () => {
       generator.event.actions.correction.request(event.id)
     )
 
-  expect(withCorrectionRequest.actions.slice(-2)).toEqual([
+  expect(withCorrectionRequest.actions.slice(-3)).toEqual([
     expect.objectContaining({
-      type: ActionType.REQUEST_CORRECTION
+      type: ActionType.REQUEST_CORRECTION,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.REQUEST_CORRECTION,
+      status: ActionStatus.Accepted
     }),
     expect.objectContaining({ type: ActionType.UNASSIGN })
   ])
@@ -224,12 +229,17 @@ test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they
   })
 
   const response = await client.event.actions.correction.request.request(data)
-  const activeActions = getAcceptedActions(response)
 
-  const savedAction = activeActions.find(
-    (action) => action.type === ActionType.REQUEST_CORRECTION
+  const savedAction = response.actions.find(
+    ({ type, status }) =>
+      type === ActionType.REQUEST_CORRECTION &&
+      status === ActionStatus.Requested
   )
-  expect(savedAction?.declaration).toEqual(form)
+
+  expect(savedAction?.status).toEqual(ActionStatus.Requested)
+  if (savedAction?.status === ActionStatus.Requested) {
+    expect(savedAction.declaration).toEqual(form)
+  }
 })
 
 test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, async () => {

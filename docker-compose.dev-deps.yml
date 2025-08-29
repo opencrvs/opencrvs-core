@@ -15,7 +15,7 @@ services:
       - './data/mongo:/data/db'
 
   postgres:
-    image: postgres:17
+    image: postgres:17.6
     container_name: postgres
     restart: always
     environment:
