@@ -460,11 +460,11 @@ describe('for user with defined scope that can edit only reg agent users', () =>
     component.update()
   })
 
-  it('should show edit user buttons for reg agent user', async () => {
+  it('should show edit user buttons for reg agent user', () => {
     expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
   })
 
-  it('should not show edit user buttons for national system admin', async () => {
+  it('should not show edit user buttons for national system admin', () => {
     expect(component.find('#user-item-1-menu').length >= 1).toBe(false)
   })
 })
