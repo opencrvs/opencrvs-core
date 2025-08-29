@@ -27,7 +27,7 @@ import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import * as Joi from 'joi'
 import uuid from 'uuid/v4'
-import { getEventConfigurations } from './countryconfig'
+import { getInMemoryEventConfigurations } from './countryconfig'
 
 export enum EventType {
   Birth = 'birth',
@@ -85,7 +85,8 @@ export async function registerSystem(
       throw new Error('System with NATIONAL_ID already exists !')
     }
 
-    const eventConfigurations = await getEventConfigurations(authorization)
+    const eventConfigurations =
+      await getInMemoryEventConfigurations(authorization)
     const eventIds = eventConfigurations.map((eventConfig) => eventConfig.id)
     const systemScopes = getSystemIntegrationRoleScopes(type, eventIds)
 
