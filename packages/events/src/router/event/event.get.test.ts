@@ -202,46 +202,6 @@ test('Returns event with all actions', async () => {
   ).toHaveLength(2)
 })
 
-test('indexes event correctly for ', async () => {
-  vi.mocked(indexEvent).mockClear()
-
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const event = await client.event.create(generator.event.create())
-  expect(indexEvent).not.toHaveBeenCalled()
-
-  vi.mocked(indexEvent).mockClear()
-
-  const fetchedEvent = await client.event.get(event.id)
-
-  expect(fetchedEvent.id).toEqual(event.id)
-  expect(indexEvent).not.toHaveBeenCalled()
-
-  await client.event.actions.declare.request(
-    generator.event.actions.declare(event.id)
-  )
-
-  const createAction = fetchedEvent.actions.filter(
-    (action) => action.type === ActionType.CREATE
-  )
-
-  const assignmentInput = generator.event.actions.assign(event.id, {
-    assignedTo: createAction[0].createdBy
-  })
-
-  await client.event.actions.assignment.assign({
-    ...assignmentInput,
-    transactionId: getUUID()
-  })
-
-  await client.event.actions.validate.request(
-    generator.event.actions.validate(event.id)
-  )
-
-  expect(indexEvent).toHaveBeenCalledTimes(3)
-})
-
 describe('Event indexing behavior', () => {
   let client: ReturnType<typeof createTestClient>
   let generator: Awaited<ReturnType<typeof setupTestCase>>['generator']
@@ -355,6 +315,46 @@ describe('Event indexing behavior', () => {
         generator.event.actions.register(event.id)
       )
       expect(indexEvent).toHaveBeenCalledTimes(5) // declare -> assign -> validate -> assign -> register
+    })
+
+    test('indexes on register (with reads)', async () => {
+      const event = await client.event.create(generator.event.create())
+      await client.event.actions.declare.request(
+        generator.event.actions.declare(event.id)
+      )
+
+      await client.event.get(event.id)
+
+      const createAction = event.actions.find(
+        (action: { type: string }) => action.type === ActionType.CREATE
+      )
+
+      const assignmentInput = generator.event.actions.assign(event.id, {
+        assignedTo: createAction?.createdBy
+      })
+
+      await client.event.actions.assignment.assign({
+        ...assignmentInput,
+        transactionId: getUUID()
+      })
+
+      await client.event.actions.validate.request(
+        generator.event.actions.validate(event.id)
+      )
+
+      await client.event.get(event.id)
+
+      await client.event.actions.assignment.assign({
+        ...assignmentInput,
+        transactionId: getUUID()
+      })
+
+      await client.event.actions.register.request(
+        generator.event.actions.register(event.id)
+      )
+
+      await client.event.get(event.id)
+      expect(indexEvent).toHaveBeenCalledTimes(8) // declare -> view -> assign -> validate -> view -> assign -> register -> view
     })
 
     test('indexes on notify', async () => {
