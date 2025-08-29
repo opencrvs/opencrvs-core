@@ -286,28 +286,33 @@ export const SearchResultComponent = ({
     })[]
   ) => {
     return eventsWithDraft.map(({ meta, ...event }) => {
-      const actionConfigs = actions
-        .map((actionType) => ({
-          actionComponent: (
-            <ActionCta
-              actionType={actionType}
-              event={event}
-              redirectParam={slug}
-            />
-          )
-        }))
-        .concat(
-          allowRetry ? { actionComponent: <RetryButton event={event} /> } : []
+      const actionConfigsWithoutDownloadButton = isWideScreen
+        ? actions
+            .map((actionType) => ({
+              actionComponent: (
+                <ActionCta
+                  actionType={actionType}
+                  event={event}
+                  redirectParam={slug}
+                />
+              )
+            }))
+            .concat(
+              allowRetry
+                ? { actionComponent: <RetryButton event={event} /> }
+                : []
+            )
+        : []
+
+      const actionConfigs = actionConfigsWithoutDownloadButton.concat({
+        actionComponent: (
+          <DownloadButton
+            key={`DownloadButton-${event.id}`}
+            event={event}
+            isDraft={slug === CoreWorkqueues.DRAFT}
+          />
         )
-        .concat({
-          actionComponent: (
-            <DownloadButton
-              key={`DownloadButton-${event.id}`}
-              event={event}
-              isDraft={slug === CoreWorkqueues.DRAFT}
-            />
-          )
-        })
+      })
 
       const eventConfig = eventConfigs.find(({ id }) => id === event.type)
       if (!eventConfig) {
