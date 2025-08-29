@@ -40,6 +40,7 @@ import {
   makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -194,7 +195,11 @@ export function FormSectionComponent({
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not -
   useOnlineStatus()
-
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
   const intl = useIntl()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
@@ -387,7 +392,11 @@ export function FormSectionComponent({
   const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
     const fieldErrors = errors[field.id]?.errors
     const hasErrors = fieldErrors && fieldErrors.length > 0
-    return isFieldVisible(field, completeForm, { locations: [] }) && hasErrors
+    return (
+      isFieldVisible(field, completeForm, {
+        locations: adminStructureLocations
+      }) && hasErrors
+    )
   })
 
   useEffect(() => {
@@ -402,12 +411,18 @@ export function FormSectionComponent({
   return (
     <section className={className}>
       {fieldsWithFormikSeparator.map((field) => {
-        if (!isFieldVisible(field, completeForm, { locations: [] })) {
+        if (
+          !isFieldVisible(field, completeForm, {
+            locations: adminStructureLocations
+          })
+        ) {
           return null
         }
 
         const isDisabled =
-          !isFieldEnabled(field, completeForm, { locations: [] }) ||
+          !isFieldEnabled(field, completeForm, {
+            locations: adminStructureLocations
+          }) ||
           (isCorrection && field.uncorrectable)
 
         const visibleError = errors[field.id]?.errors[0]?.message

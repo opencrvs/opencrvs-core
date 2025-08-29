@@ -19,6 +19,7 @@ import {
   runFieldValidations,
   runStructuralValidations
 } from '@opencrvs/commons/client'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 
 interface FieldErrors {
   errors: {
@@ -34,6 +35,12 @@ export function getValidationErrorsForForm(
   fields: FieldConfig[],
   values: EventState
 ) {
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
+
   return fields.reduce((errorsForAllFields: Errors, field) => {
     if (
       // eslint-disable-next-line
@@ -48,7 +55,7 @@ export function getValidationErrorsForForm(
       [field.id]: runFieldValidations({
         field,
         values,
-        context: { locations: [] }
+        context: { locations: adminStructureLocations }
       })
     }
   }, {})
@@ -58,6 +65,11 @@ export function getStructuralValidationErrorsForForm(
   fields: FieldConfig[],
   values: EventState
 ) {
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
   return fields.reduce((errorsForAllFields: Errors, field) => {
     if (
       // eslint-disable-next-line
@@ -72,7 +84,7 @@ export function getStructuralValidationErrorsForForm(
       [field.id]: runStructuralValidations({
         field,
         values,
-        context: { locations: [] }
+        context: { locations: adminStructureLocations }
       })
     }
   }, {})
@@ -89,6 +101,11 @@ export function validationErrorsInActionFormExist({
   annotation?: EventState
   reviewFields?: FieldConfig[]
 }): boolean {
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
   // We don't want to validate hidden fields
   const formWithoutHiddenFields = omitHiddenPaginatedFields(formConfig, form, {
     locations: []
@@ -97,11 +114,13 @@ export function validationErrorsInActionFormExist({
   const visibleAnnotationFields = omitHiddenFields(
     reviewFields,
     annotation ?? {},
-    { locations: [] }
+    { locations: adminStructureLocations }
   )
 
   const hasValidationErrors = formConfig.pages
-    .filter((page) => isPageVisible(page, form, { locations: [] }))
+    .filter((page) =>
+      isPageVisible(page, form, { locations: adminStructureLocations })
+    )
     .some((page) => {
       const fieldErrors = getValidationErrorsForForm(
         page.fields,
