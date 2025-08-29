@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 40424a52-7cdb-428e-af73-68625d2db4a0
+                transactionId: d919e68f-1083-4221-a05e-27dfbf585308
                 type: v2.birth
       responses:
         "200":
@@ -518,6 +518,13 @@ paths:
                   format: uuid
                 keepAssignment:
                   type: boolean
+                createdAtLocation:
+                  type: string
+                  nullable: true
+                  format: uuid
+                  description: A valid office location ID. This is required for system users
+                    performing actions. The provided location must be a
+                    leaf-location, i.e. it must not have any children locations.
                 type:
                   type: string
                   enum:
@@ -528,7 +535,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 067cfeab-9ec5-451c-a49d-5c701927c879
+                transactionId: e18f0dad-020b-455a-ad78-b2356289c52a
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -981,6 +988,13 @@ paths:
                   format: uuid
                 keepAssignment:
                   type: boolean
+                createdAtLocation:
+                  type: string
+                  nullable: true
+                  format: uuid
+                  description: A valid office location ID. This is required for system users
+                    performing actions. The provided location must be a
+                    leaf-location, i.e. it must not have any children locations.
                 type:
                   type: string
                   enum:
@@ -1438,6 +1452,13 @@ paths:
                   format: uuid
                 keepAssignment:
                   type: boolean
+                createdAtLocation:
+                  type: string
+                  nullable: true
+                  format: uuid
+                  description: A valid office location ID. This is required for system users
+                    performing actions. The provided location must be a
+                    leaf-location, i.e. it must not have any children locations.
                 requestId:
                   type: string
                 type:
@@ -1898,6 +1919,13 @@ paths:
                   format: uuid
                 keepAssignment:
                   type: boolean
+                createdAtLocation:
+                  type: string
+                  nullable: true
+                  format: uuid
+                  description: A valid office location ID. This is required for system users
+                    performing actions. The provided location must be a
+                    leaf-location, i.e. it must not have any children locations.
                 requestId:
                   type: string
                 type:
