@@ -11,10 +11,10 @@
 
 import { TRPCError } from '@trpc/server'
 import {
+  ActionStatus,
   ActionType,
   AddressType,
   generateActionDeclarationInput,
-  getAcceptedActions,
   SCOPES
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
@@ -121,12 +121,16 @@ test('Skips required field validation when they are conditionally hidden', async
   })
 
   const response = await client.event.actions.declare.request(data)
-  const activeActions = getAcceptedActions(response)
 
-  const savedAction = activeActions.find(
-    (action) => action.type === ActionType.DECLARE
+  const savedAction = response.actions.find(
+    ({ type, status }) =>
+      type === ActionType.DECLARE && status === ActionStatus.Requested
   )
-  expect(savedAction?.declaration).toEqual(form)
+
+  expect(savedAction?.status).toEqual(ActionStatus.Requested)
+  if (savedAction?.status === ActionStatus.Requested) {
+    expect(savedAction.declaration).toEqual(form)
+  }
 })
 
 test('gives validation error when a conditional page, which is visible, has a required field', async () => {
@@ -193,12 +197,16 @@ test('successfully validates a fields on a conditional page, which is visible', 
   })
 
   const response = await client.event.actions.declare.request(data)
-  const activeActions = getAcceptedActions(response)
 
-  const savedAction = activeActions.find(
-    (action) => action.type === ActionType.DECLARE
+  const savedAction = response.actions.find(
+    ({ type, status }) =>
+      type === ActionType.DECLARE && status === ActionStatus.Requested
   )
-  expect(savedAction?.declaration).toEqual(form)
+
+  expect(savedAction?.status).toEqual(ActionStatus.Requested)
+  if (savedAction?.status === ActionStatus.Requested) {
+    expect(savedAction.declaration).toEqual(form)
+  }
 })
 
 test('Prevents adding birth date in future', async () => {
@@ -272,7 +280,12 @@ test('valid action is appended to event actions', async () => {
     expect.objectContaining({ type: ActionType.CREATE }),
     expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({
-      type: ActionType.DECLARE
+      type: ActionType.DECLARE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.DECLARE,
+      status: ActionStatus.Accepted
     }),
     expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({

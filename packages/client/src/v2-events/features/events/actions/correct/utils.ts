@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { isEqual } from 'lodash'
+import { isEqual, isNil } from 'lodash'
 import {
   FieldConfig,
   EventState,
@@ -24,7 +24,14 @@ export function hasFieldChanged(
   previousFormValues: EventState
 ) {
   const isVisible = isFieldVisible(f, form, { locations: [] })
-  const valueHasChanged = !isEqual(previousFormValues[f.id], form[f.id])
+
+  const prevValue = previousFormValues[f.id]
+  const currValue = form[f.id]
+
+  // Ensure that if previous value is 'undefined' and current value is 'null'
+  // it doesn't get detected as a value change
+  const bothNil = isNil(prevValue) && isNil(currValue)
+  const valueHasChanged = !isEqual(prevValue, currValue) && !bothNil
 
   return isVisible && valueHasChanged
 }

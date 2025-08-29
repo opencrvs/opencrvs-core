@@ -54,3 +54,5 @@ export * from '../conditionals/validate'
 export * from './field'
 export * from './event'
 export * from './locations'
+
+export { UUID } from '../uuid'

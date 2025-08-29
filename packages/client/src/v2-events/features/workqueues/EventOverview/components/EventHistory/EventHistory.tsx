@@ -24,7 +24,8 @@ import {
   ActionDocument,
   ActionType,
   EventDocument,
-  getAcceptedActions
+  getAcceptedActions,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -83,14 +84,6 @@ const messages = defineMessages({
 const Header = styled(Text)`
   margin-bottom: 20px;
 `
-
-// At first we tried adding a field such as 'userType' to all actions etc, but that would have caused file changes to like 20 files.
-// So lets Keep It Stupid Simple and just check it there is no location -> machine user.
-function isUserAction(
-  item: ActionDocument
-): item is ActionDocument & { createdAtLocation: string } {
-  return Boolean(item.createdAtLocation)
-}
 
 const SystemName = styled.div`
   display: flex;
@@ -223,7 +216,7 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         const immediateApprovedCorrection = visibleHistory.find(
           (h) =>
             h.type === ActionType.APPROVE_CORRECTION &&
-            h.requestId === x.id &&
+            (h.requestId === x.id || h.requestId === x.originalActionId) &&
             h.annotation?.isImmediateCorrection &&
             h.createdBy === x.createdBy
         )
@@ -254,11 +247,9 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       currentPageNumber * DEFAULT_HISTORY_RECORD_PAGE_SIZE
     )
     .map((action) => {
-      const userAction = isUserAction(action)
       const user = getUser(action.createdBy)
       const system = systems.find((s) => s._id === action.createdBy)
-
-      const location = userAction
+      const location = action.createdAtLocation
         ? getLocation(action.createdAtLocation)
         : undefined
 
@@ -271,6 +262,7 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         id: user.primaryOfficeId
       })
 
+      const userAction = action.createdByUserType === TokenUserType.enum.user
       const userName = userAction
         ? getUsersFullName(user.name, intl.locale)
         : (system?.name ?? intl.formatMessage(messages.systemDefaultName))

@@ -11,7 +11,7 @@
 
 import { sql } from 'kysely'
 import { chunk } from 'lodash'
-import { logger } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { Locations, NewLocations } from './schema/app/Locations'
 
@@ -80,4 +80,18 @@ export async function getChildLocations(id: string) {
     WHERE l.id <> ${id};
   `.execute(db)
   return rows
+}
+
+// Check if a location is a leaf location, i.e. it has no children
+export async function isLeafLocation(id: UUID) {
+  const db = getClient()
+
+  const result = await db
+    .selectFrom('locations')
+    .select('id')
+    .where('parentId', '=', id)
+    .limit(1)
+    .executeTakeFirst()
+
+  return !result
 }

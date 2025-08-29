@@ -241,8 +241,9 @@ export function Output({
   formConfig?: FormConfig
   displayEmptyAsDash?: boolean
 }) {
-  // Explicitly check for nil, so that e.g. number 0 is considered a value
-  const hasValue = !_.isNil(value)
+  // Explicitly check for undefined, so that e.g. number 0 is considered a value,
+  // even null is considered as value removed
+  const hasValue = !isUndefined(value)
 
   let previousValueField: FieldConfig | undefined
 
