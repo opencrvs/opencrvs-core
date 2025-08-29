@@ -28,7 +28,9 @@ import {
   Action,
   RequestedCorrectionAction,
   getCompleteActionDeclaration,
-  getCurrentEventState
+  getCurrentEventState,
+  ActionDocument,
+  getAcceptedActions
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
@@ -97,7 +99,9 @@ export function Review() {
     form
   })
 
-  const writeActions = event.actions.filter((a) => !isMetaAction(a.type))
+  const writeActions: ActionDocument[] = getAcceptedActions(event).filter(
+    (a) => !isMetaAction(a.type)
+  )
   const lastWriteAction = writeActions[writeActions.length - 1]
 
   const completeDeclaration = getCompleteActionDeclaration(
