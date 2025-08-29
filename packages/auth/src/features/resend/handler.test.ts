@@ -14,11 +14,11 @@ import {
 } from '@auth/tests/util'
 import { AuthServer, createServer } from '@auth/server'
 
-jest.mock('@opencrvs/commons', () => {
-  const actual = jest.requireActual('@opencrvs/commons')
+jest.mock('@auth/features/verifyCode/service', () => {
+  const actual = jest.requireActual('@auth/features/verifyCode/service')
   return {
     ...actual,
-    triggerUserEventNotification: jest.fn()
+    sendVerificationCode: jest.fn().mockResolvedValue(undefined)
   }
 })
 
