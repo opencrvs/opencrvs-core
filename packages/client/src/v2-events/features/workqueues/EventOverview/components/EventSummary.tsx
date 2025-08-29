@@ -113,6 +113,8 @@ const messages = {
   }
 }
 
+export const summaryMessages = messages
+
 export function EventSummary({
   event,
   eventConfiguration,

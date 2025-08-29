@@ -9,13 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { noop } from 'lodash'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 import {
   ActionType,
+  EventIndex,
   getActionReview,
   getCurrentEventState,
   getDeclaration
@@ -29,12 +31,14 @@ import { Review as ReviewComponent } from '@client/v2-events/features/events/com
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { FormHeader } from '@client/v2-events/layouts/form/FormHeader'
+import { findLocalEventIndex } from '../../useEvents/api'
 import { DuplicateForm } from './DuplicateForm'
+import { DuplicateComparison } from './DuplicateComparison'
 
 export const duplicateMessages = {
   duplicateDeclarationDetails: {
     id: 'v2.duplicates.content.header',
-    defaultMessage: 'Declaration Details',
+    defaultMessage: 'Declaration details',
     description: 'Declaration details header of two duplicate ones'
   },
   duplicateReviewHeader: {
@@ -92,6 +96,16 @@ export const duplicateMessages = {
     id: 'v2.duplicates.compare.supportingDocuments',
     defaultMessage: 'Supporting documents',
     description: 'Supporting documents header for duplicates comparison'
+  },
+  registeredAt: {
+    id: 'v2.duplicates.content.registeredAt',
+    defaultMessage: 'Registered at',
+    description: 'Registered at label for duplicates comparison'
+  },
+  registeredBy: {
+    id: 'v2.duplicates.content.registeredBy',
+    defaultMessage: 'Registered by',
+    description: 'Registered by label for duplicates comparison'
   }
 }
 
@@ -113,9 +127,23 @@ function ReviewDuplicate() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
 
   const intl = useIntl()
-
+  const navigate = useNavigate()
   const events = useEvents()
-  const event = events.getEvent.viewEvent(eventId)
+  const event = events.getEvent.findFromCache(eventId).data
+
+  useEffect(() => {
+    if (!event) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Event with id ${eventId} not found in cache. Redirecting to overview.`
+      )
+      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+    }
+  }, [event, eventId, navigate])
+
+  if (!event) {
+    return <div />
+  }
 
   const [selectedTab, selectTab] = useState<string>(event.trackingId)
 
@@ -124,6 +152,21 @@ function ReviewDuplicate() {
   )
 
   const eventState = getCurrentEventState(event, configuration)
+
+  const potentialDuplicates = eventState.duplicates.reduce<
+    Record<string, EventIndex>
+  >((acc, { id, trackingId }) => {
+    const localEventIndex = findLocalEventIndex(id)
+    if (!localEventIndex) {
+      console.warn(
+        `Event with id ${id} and trackingId ${trackingId} not found in cache.`
+      )
+      navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+      return acc
+    }
+    acc[trackingId] = localEventIndex
+    return acc
+  }, {})
 
   const tabs: IFormTabs[] = [
     {
@@ -178,12 +221,10 @@ function ReviewDuplicate() {
           </ReviewComponent.Body>
         </React.Suspense>
       ) : (
-        <span>
-          {intl.formatMessage(duplicateMessages.duplicateComparePageTitle, {
-            actualTrackingId: event.trackingId,
-            duplicateTrackingId: selectedTab
-          })}
-        </span>
+        <DuplicateComparison
+          originalEvent={eventState}
+          potentialDuplicateEvent={potentialDuplicates[selectedTab]}
+        />
       )}
     </Frame>
   )

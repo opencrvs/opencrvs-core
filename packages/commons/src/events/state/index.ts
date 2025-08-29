@@ -200,7 +200,9 @@ export function resolveDateOfEvent(
   return parsedDate.success ? parsedDate.data : undefined
 }
 
-function extractDuplicatesFromActions(actions: Action[]): PotentialDuplicate[] {
+export function extractDuplicatesFromActions(
+  actions: Action[]
+): PotentialDuplicate[] {
   return actions.reduce<PotentialDuplicate[]>((duplicates, action) => {
     if (action.type === ActionType.DUPLICATE_DETECTED) {
       duplicates = action.content.duplicates
