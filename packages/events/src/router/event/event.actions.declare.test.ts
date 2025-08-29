@@ -14,11 +14,14 @@ import {
   ActionStatus,
   ActionType,
   AddressType,
-  generateActionDeclarationInput,
-  SCOPES
+  generateActionDeclarationInput
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createTestClient,
+  RECORD_DECLARE_SCOPE,
+  setupTestCase
+} from '@events/tests/utils'
 
 test(`prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()
@@ -33,7 +36,7 @@ test(`prevents forbidden access if missing required scope`, async () => {
 
 test(`allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
+  const client = createTestClient(user, [RECORD_DECLARE_SCOPE])
 
   await expect(
     client.event.actions.declare.request(

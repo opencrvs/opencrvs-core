@@ -21,6 +21,7 @@ import { env } from '@events/environment'
 import {
   createEvent,
   createTestClient,
+  RECORD_DECLARE_SCOPE,
   setupTestCase
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
@@ -299,7 +300,7 @@ test(`Adds ${InherentFlags.INCOMPLETE} flag after ${ActionType.NOTIFY} is called
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     SCOPES.RECORD_SUBMIT_INCOMPLETE,
-    SCOPES.RECORD_DECLARE
+    RECORD_DECLARE_SCOPE
   ])
 
   const event = await createEvent(client, generator, [])
@@ -316,7 +317,7 @@ test(`Removes ${InherentFlags.INCOMPLETE} flag after ${ActionType.DECLARE} is ca
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     SCOPES.RECORD_SUBMIT_INCOMPLETE,
-    SCOPES.RECORD_DECLARE
+    RECORD_DECLARE_SCOPE
   ])
 
   const event = await createEvent(client, generator, [])
