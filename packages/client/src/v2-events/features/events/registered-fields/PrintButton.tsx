@@ -27,7 +27,11 @@ interface PrintButtonProps {
   template: string
   buttonLabel?: { id: string; defaultMessage: string }
   disabled?: boolean
-  onChange?: (value: boolean) => void
+  /**
+   * Optional callback to set a form value when the print action completes.
+   * This allows satisfying a "required" constraint for this field.
+   */
+  onChange?: (value: string) => void
 }
 
 const addedButtonLabel = { id: 'print.certificate', defaultMessage: 'Print' }
@@ -88,17 +92,16 @@ export const PrintButton = {
     })
 
     const handlePrint = async () => {
-      // Emit a form value to allow conditionals to react to the click
-      try {
-        onChange?.(true)
-      } catch {
-        // no-op: do not break printing if form callback throws
-      }
       if (!certificateConfig || !language) {
         return
       }
-      if (event && eventConfiguration && typeof handleCertify === 'function') {
-        await handleCertify(event)
+      if (!handleCertify) {
+        return
+      }
+      await handleCertify(event)
+      // Notify form that print action has occurred to satisfy required validation if needed
+      if (typeof onChange === 'function') {
+        onChange(new Date().toISOString())
       }
     }
 
