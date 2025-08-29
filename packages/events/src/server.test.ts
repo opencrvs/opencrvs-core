@@ -99,13 +99,12 @@ test('Server starts up and returns an event based on context dependency values',
   }
 
   mswServer.use(
-    http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
-      return HttpResponse.json({
-        ...mockUserResponse
-      })
-    })
+    http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () =>
+      HttpResponse.json(mockUserResponse)
+    )
   )
 
+  // TODO CIHAN: encode the JWT token again
   const response = await customClient.event.create.mutate(
     {
       transactionId: getUUID(),

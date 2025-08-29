@@ -39,7 +39,6 @@ import { TrpcContext } from '@events/context'
  */
 export function setBearerForToken(token: string) {
   const bearer = 'Bearer'
-
   return token.startsWith(bearer) ? token : `${bearer} ${token}`
 }
 
