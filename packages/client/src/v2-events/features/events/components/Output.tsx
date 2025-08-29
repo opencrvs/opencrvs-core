@@ -241,7 +241,8 @@ export function Output({
   previousValue,
   showPreviouslyMissingValuesAsChanged = true,
   previousForm,
-  formConfig
+  formConfig,
+  displayEmptyAsDash = false
 }: {
   field: FieldConfig
   value?: FieldValue
@@ -249,6 +250,7 @@ export function Output({
   showPreviouslyMissingValuesAsChanged?: boolean
   previousForm?: EventState
   formConfig?: FormConfig
+  displayEmptyAsDash?: boolean
 }) {
   // Explicitly check for nil, so that e.g. number 0 is considered a value
   const hasValue = !_.isNil(value)
@@ -281,6 +283,10 @@ export function Output({
       })
     }
 
+    if (displayEmptyAsDash) {
+      return '-'
+    }
+
     return ValueOutput({ config: field, value: '' })
   }
 
@@ -294,6 +300,10 @@ export function Output({
     })
 
     if (valueOutput === null) {
+      if (displayEmptyAsDash) {
+        return '-'
+      }
+
       return null
     }
 

@@ -223,7 +223,7 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         const immediateApprovedCorrection = visibleHistory.find(
           (h) =>
             h.type === ActionType.APPROVE_CORRECTION &&
-            h.requestId === x.id &&
+            (h.requestId === x.id || h.requestId === x.originalActionId) &&
             h.annotation?.isImmediateCorrection &&
             h.createdBy === x.createdBy
         )
