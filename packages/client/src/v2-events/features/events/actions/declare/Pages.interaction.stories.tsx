@@ -12,6 +12,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import * as selectEvent from 'react-select-event'
 import {
   ActionStatus,
   ActionType,
@@ -415,12 +416,17 @@ export const CanSubmitValidlyFilledForm: Story = {
         await canvas.findByText('Tennis club membership application')
       )
 
-      await userEvent.click(await canvas.findByText('Select...'))
-      await userEvent.click(await canvas.findByText('Bangladesh'))
-      await userEvent.click(await canvas.findByText('Select...'))
-      await userEvent.click(await canvas.findByText('Central'))
-      await userEvent.click(await canvas.findByText('Select...'))
-      await userEvent.click(await canvas.findByText('Ibombo'))
+      const country = await canvas.findByTestId('location__country')
+      await userEvent.click(country)
+      await selectEvent.select(country, 'Bangladesh')
+
+      const province = await canvas.findByTestId('location__province')
+      await userEvent.click(province)
+      await selectEvent.select(province, 'Central')
+
+      const district = await canvas.findByTestId('location__district')
+      await userEvent.click(district)
+      await selectEvent.select(district, 'Ibombo')
 
       const continueButton = await canvas.findByText('Continue')
       await userEvent.click(continueButton)
