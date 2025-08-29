@@ -167,7 +167,6 @@ function expectRenderOutput(template: string, output: string) {
     language: { lang: 'en', messages: {} },
     config: tennisClubMembershipEvent
   })
-
   expect(result).toBe(output)
 }
 
@@ -189,6 +188,26 @@ describe('SVG compiler', () => {
       expectRenderOutput(
         '<svg><text>{{ $lookup ($action "DECLARE") "createdAt" }}</text></svg>',
         '<svg><text>23 January 2025</text></svg>'
+      )
+    })
+  })
+  describe('$lookup', () => {
+    it('stringifies complex form field values using the stringifier of said form input', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $lookup $declaration "applicant.name.fullname" }}</text></svg>',
+        '<svg><text>John Doe</text></svg>'
+      )
+    })
+    it('also gives you an access to the fields inside the value', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $lookup $declaration "applicant.name.firstname" }}</text></svg>',
+        '<svg><text>John</text></svg>'
+      )
+    })
+    it('as a debugging helper, renders a json object as JSON instead of [object Object]', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $lookup $declaration "applicant.name" }}</text></svg>',
+        '<svg><text>{&quot;fullname&quot;:&quot;John Doe&quot;,&quot;firstname&quot;:&quot;John&quot;,&quot;surname&quot;:&quot;Doe&quot;}</text></svg>'
       )
     })
   })

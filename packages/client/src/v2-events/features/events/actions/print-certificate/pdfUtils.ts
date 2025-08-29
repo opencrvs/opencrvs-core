@@ -10,12 +10,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable no-console */
-import {
-  IntlShape,
-  MessageDescriptor,
-  createIntl,
-  createIntlCache
-} from 'react-intl'
+import { IntlShape, createIntl, createIntlCache } from 'react-intl'
 import Handlebars from 'handlebars'
 import htmlToPdfmake from 'html-to-pdfmake'
 import type {
@@ -30,7 +25,6 @@ import {
   EventState,
   User,
   LanguageConfig,
-  FieldValue,
   EventConfig,
   getMixedPath,
   EventMetadata,
@@ -90,20 +84,40 @@ export const stringifyEventMetadata = ({
   users: User[]
 }) => {
   return {
-    modifiedAt: DateField.stringify(intl, metadata.modifiedAt),
+    modifiedAt: DateField.toCertificateVariables(metadata.modifiedAt, {
+      intl,
+      locations
+    }),
     assignedTo: findUserById(metadata.assignedTo ?? '', users),
     // @TODO: DATE_OF_EVENT config needs to be defined some other way and bake it in.
     dateOfEvent: metadata.dateOfEvent
-      ? DateField.stringify(intl, metadata.dateOfEvent)
-      : DateField.stringify(intl, metadata[DEFAULT_DATE_OF_EVENT_PROPERTY]),
-    createdAt: DateField.stringify(intl, metadata.createdAt),
-    createdBy: findUserById(metadata.createdBy, users),
-    createdAtLocation: LocationSearch.stringify(
+      ? DateField.toCertificateVariables(metadata.dateOfEvent, {
+          intl,
+          locations
+        })
+      : DateField.toCertificateVariables(
+          metadata[DEFAULT_DATE_OF_EVENT_PROPERTY],
+          {
+            intl,
+            locations
+          }
+        ),
+    createdAt: DateField.toCertificateVariables(metadata.createdAt, {
       intl,
-      locations,
-      metadata.createdAtLocation
+      locations
+    }),
+    createdBy: findUserById(metadata.createdBy, users),
+    createdAtLocation: LocationSearch.toCertificateVariables(
+      metadata.createdAtLocation,
+      {
+        intl,
+        locations
+      }
     ),
-    updatedAt: DateField.stringify(intl, metadata.updatedAt),
+    updatedAt: DateField.toCertificateVariables(metadata.updatedAt, {
+      intl,
+      locations
+    }),
     updatedBy: metadata.updatedBy
       ? findUserById(metadata.updatedBy, users)
       : '',
@@ -112,31 +126,32 @@ export const stringifyEventMetadata = ({
     trackingId: metadata.trackingId,
     status: EventStatus.enum.REGISTERED,
     updatedByUserRole: metadata.updatedByUserRole,
-    updatedAtLocation: LocationSearch.stringify(
-      intl,
-      locations,
-      metadata.updatedAtLocation
+    updatedAtLocation: LocationSearch.toCertificateVariables(
+      metadata.updatedAtLocation,
+      {
+        intl,
+        locations
+      }
     ),
     flags: [],
     legalStatuses: {
       [EventStatus.enum.DECLARED]: metadata.legalStatuses.DECLARED
         ? {
-            createdAt: DateField.stringify(
-              intl,
-              metadata.legalStatuses.DECLARED.createdAt
+            createdAt: DateField.toCertificateVariables(
+              metadata.legalStatuses.DECLARED.createdAt,
+              { intl, locations }
             ),
             createdBy: findUserById(
               metadata.legalStatuses.DECLARED.createdBy,
               users
             ),
-            createdAtLocation: LocationSearch.stringify(
-              intl,
-              locations,
-              metadata.legalStatuses.DECLARED.createdAtLocation
+            createdAtLocation: LocationSearch.toCertificateVariables(
+              metadata.legalStatuses.DECLARED.createdAtLocation,
+              { intl, locations }
             ),
-            acceptedAt: DateField.stringify(
-              intl,
-              metadata.legalStatuses.DECLARED.acceptedAt
+            acceptedAt: DateField.toCertificateVariables(
+              metadata.legalStatuses.DECLARED.acceptedAt,
+              { intl, locations }
             ),
             createdByRole: metadata.legalStatuses.DECLARED.createdByRole,
             createdBySignature:
@@ -145,22 +160,21 @@ export const stringifyEventMetadata = ({
         : null,
       [EventStatus.enum.REGISTERED]: metadata.legalStatuses.REGISTERED
         ? {
-            createdAt: DateField.stringify(
-              intl,
-              metadata.legalStatuses.REGISTERED.createdAt
+            createdAt: DateField.toCertificateVariables(
+              metadata.legalStatuses.REGISTERED.createdAt,
+              { intl, locations }
             ),
             createdBy: findUserById(
               metadata.legalStatuses.REGISTERED.createdBy,
               users
             ),
-            createdAtLocation: LocationSearch.stringify(
-              intl,
-              locations,
-              metadata.legalStatuses.REGISTERED.createdAtLocation
+            createdAtLocation: LocationSearch.toCertificateVariables(
+              metadata.legalStatuses.REGISTERED.createdAtLocation,
+              { intl, locations }
             ),
-            acceptedAt: DateField.stringify(
-              intl,
-              metadata.legalStatuses.REGISTERED.acceptedAt
+            acceptedAt: DateField.toCertificateVariables(
+              metadata.legalStatuses.REGISTERED.acceptedAt,
+              { intl, locations }
             ),
             createdByRole: metadata.legalStatuses.REGISTERED.createdByRole,
             registrationNumber:
@@ -188,17 +202,6 @@ const certificateBaseTemplate = {
     content: []
   },
   fonts: {}
-}
-
-function isMessageDescriptor(obj: unknown): obj is MessageDescriptor {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    'id' in obj &&
-    'defaultMessage' in obj &&
-    typeof (obj as MessageDescriptor).id === 'string' &&
-    typeof (obj as MessageDescriptor).defaultMessage === 'string'
-  )
 }
 
 const cache = createIntlCache()
@@ -302,46 +305,57 @@ export function compileSvg({
    * @example {'foo': {'bar': {'baz': 'quix'}} } // $lookup 'foo.bar.baz' => 'quix'
    * @example { 'informant.address': { 'other': { 'district': 'quix' } } } // $lookup 'informant.address.other.district' => 'quix'
    */
-  function $lookup(
-    obj: EventMetadata | EventState | ActionDocument,
-    propertyPath: string
-  ) {
-    const resolvedMetadata = stringifyEventMetadata({
-      metadata: $metadata,
-      intl,
-      locations,
-      users
-    })
+  function $lookup(obj: EventMetadata | EventState, propertyPath: string) {
+    function doLookup() {
+      const resolvedMetadata = stringifyEventMetadata({
+        metadata: $metadata,
+        intl,
+        locations,
+        users
+      })
 
-    if (isEqual($metadata, obj)) {
-      return getMixedPath(resolvedMetadata, propertyPath)
-    }
-
-    if (isEqual(resolvedDeclaration, obj)) {
-      return getMixedPath(resolvedDeclaration, propertyPath)
-    }
-
-    const action = ActionDocument.safeParse(obj)
-    if (action.success) {
-      const resolvedAction = {
-        id: action.data.id,
-        type: action.data.type,
-        createdAt: DateField.stringify(intl, action.data.createdAt),
-        createdBy: users.find((user) => user.id === action.data.createdBy),
-        createdByUserType: action.data.createdByUserType,
-        createdBySignature: action.data.createdBySignature,
-        createdAtLocation: LocationSearch.stringify(
-          intl,
-          locations,
-          action.data.createdAtLocation
-        ),
-        createdByRole: action.data.createdByRole
+      if (isEqual($metadata, obj)) {
+        return getMixedPath(resolvedMetadata, propertyPath)
       }
 
-      return getMixedPath(resolvedAction, propertyPath)
-    }
+      if (isEqual(resolvedDeclaration, obj)) {
+        return getMixedPath(resolvedDeclaration, propertyPath)
+      }
 
-    return obj[propertyPath as keyof typeof obj] ?? ''
+      const action = ActionDocument.safeParse(obj)
+      if (action.success) {
+        const resolvedAction = {
+          id: action.data.id,
+          type: action.data.type,
+          createdAt: DateField.stringify(action.data.createdAt, {
+            intl,
+            locations
+          }),
+          createdBy: users.find((user) => user.id === action.data.createdBy),
+          createdByUserType: action.data.createdByUserType,
+          createdBySignature: action.data.createdBySignature,
+          createdAtLocation: LocationSearch.toCertificateVariables(
+            action.data.createdAtLocation,
+            {
+              intl,
+              locations
+            }
+          ),
+          createdByRole: action.data.createdByRole
+        }
+
+        return getMixedPath(resolvedAction, propertyPath)
+      }
+      return obj[propertyPath as keyof typeof obj] ?? ''
+    }
+    const result = doLookup()
+    if (typeof result === 'object') {
+      return {
+        ...result,
+        toString: () => JSON.stringify(result)
+      }
+    }
+    return result
   }
 
   Handlebars.registerHelper('$lookup', $lookup)

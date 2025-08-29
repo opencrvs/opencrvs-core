@@ -79,9 +79,7 @@ const BaseField = z.object({
     ),
   value: FieldReference.optional().describe(
     'Reference to a parent field. If field has a value, the value will be copied when the parent field is changed.'
-    // @TODO: When Zod is upgraded to v4, remove this any to fix error TS7056
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) as any
+  )
 })
 
 export type BaseField = z.infer<typeof BaseField>
@@ -603,15 +601,8 @@ const HttpField = BaseField.extend({
 
 export type HttpField = z.infer<typeof HttpField>
 
-/*
- * This needs to be exported so that Typescript can refer to the type in
- * the declaration output type. If it can't do that, you might start encountering
- * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
- * errors when compiling
- */
-
 /** @knipignore */
-export type Inferred =
+export type FieldConfig =
   | z.infer<typeof Address>
   | z.infer<typeof TextField>
   | z.infer<typeof NumberField>
@@ -647,9 +638,12 @@ export type Inferred =
 /**
  * This is the type that should be used for the input of the FieldConfig. Useful when config uses zod defaults.
  */
-export type InferredInput =
+export type FieldConfigInput =
   | z.input<typeof Address>
   | z.input<typeof TextField>
+  | z.input<typeof TimeField>
+  | z.input<typeof SelectDateRangeField>
+  | z.input<typeof ButtonField>
   | z.input<typeof NumberField>
   | z.input<typeof TextAreaField>
   | z.input<typeof DateField>
@@ -675,7 +669,17 @@ export type InferredInput =
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
-export const FieldConfig = z
+/*
+ *  Using explicit type for the FieldConfig schema intentionally as it's
+ *  referenced quite extensively througout various other schemas. Leaving the
+ *  type to be inferred causes typescript compiler to fail with "inferred type
+ *  exeeds max lenght"
+ */
+export const FieldConfig: z.ZodType<
+  FieldConfig,
+  z.ZodTypeDef,
+  FieldConfigInput
+> = z
   .discriminatedUnion('type', [
     Address,
     TextField,
@@ -721,8 +725,11 @@ export type LocationField = z.infer<typeof Location>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
 export type NumberField = z.infer<typeof NumberField>
-export type FieldConfig = Inferred
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
+export type FieldPropsWithoutReferenceValue<T extends FieldType> = Omit<
+  Extract<FieldConfig, { type: T }>,
+  'value'
+>
 export type SelectOption = z.infer<typeof SelectOption>
 
 export type AdministrativeAreaConfiguration = z.infer<
@@ -739,3 +746,8 @@ export const AnyFileField = z.discriminatedUnion('type', [
 ])
 
 export type AnyFileField = z.infer<typeof AnyFileField>
+
+export type FieldTypeToFieldConfig<T extends FieldType> = Extract<
+  FieldConfigInput,
+  { type: T }
+>

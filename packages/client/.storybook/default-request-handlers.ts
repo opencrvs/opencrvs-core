@@ -107,6 +107,11 @@ export const handlers = {
           partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
         },
         {
+          id: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+          name: 'Isango',
+          partOf: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID
+        },
+        {
           id: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
           name: 'Isamba',
           partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID

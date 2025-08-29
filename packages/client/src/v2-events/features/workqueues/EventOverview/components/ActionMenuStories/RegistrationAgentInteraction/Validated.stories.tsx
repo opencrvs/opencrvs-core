@@ -39,7 +39,9 @@ const validatedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      [ActionType.READ]: AssertType.ENABLED,
+      [ActionType.ASSIGN]: AssertType.ENABLED,
+      [ActionType.ARCHIVE]: AssertType.DISABLED
     }
   },
   {
@@ -55,7 +57,24 @@ const validatedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      [ActionType.READ]: AssertType.ENABLED,
+      [ActionType.ARCHIVE]: AssertType.DISABLED
+    }
+  },
+  {
+    name: 'AssignedToSelf',
+    recordDownloaded: true,
+    actions: [
+      ActionType.CREATE,
+      AssignmentStatus.ASSIGNED_TO_SELF,
+      ActionType.DECLARE,
+      ActionType.VALIDATE
+    ],
+    expected: {
+      ...getHiddenActions(),
+      [ActionType.READ]: AssertType.ENABLED,
+      [ActionType.UNASSIGN]: AssertType.ENABLED,
+      [ActionType.ARCHIVE]: AssertType.ENABLED
     }
   }
 ]
@@ -67,3 +86,4 @@ const stories = createStoriesFromScenarios(
 
 export const Unassigned = stories['Unassigned']
 export const AssignedToOthers = stories['AssignedToOthers']
+export const AssignedToSelf = stories['AssignedToSelf']

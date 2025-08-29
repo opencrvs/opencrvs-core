@@ -11,6 +11,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import React from 'react'
+import { useIntl } from 'react-intl'
 import {
   ActionType,
   EventIndex,
@@ -31,7 +32,11 @@ import {
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
-import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+import {
+  AssignmentStatus,
+  getAssignmentStatus,
+  getUsersFullName
+} from '@client/v2-events/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { getScope } from '@client/profile/profileSelectors'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -40,6 +45,10 @@ import { ITokenPayload } from '@client/utils/authUtils'
 import { useModal } from '@client/hooks/useModal'
 import { AssignModal } from '@client/v2-events/components/AssignModal'
 import { useOnlineStatus } from '@client/utils'
+import { UnassignModal } from '@client/v2-events/components/UnassignModal'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useArchiveModal } from '@client/v2-events/hooks/useArchiveModal'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -116,6 +125,11 @@ export const actionLabels = {
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'v2.event.birth.action.validate.label'
   },
+  [ActionType.ARCHIVE]: {
+    defaultMessage: 'Archive',
+    description: 'Label for archive record button in dropdown menu',
+    id: 'v2.event.birth.action.archive.label'
+  },
   [ActionType.REGISTER]: {
     defaultMessage: 'Review',
     description: 'Label for review record button in dropdown menu',
@@ -167,7 +181,22 @@ function useViewableActionConfigurations(
 
   const { findFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(findFromCache(event.id).data)
-  const [modal, openModal] = useModal()
+
+  const [assignModal, openAssignModal] = useModal()
+  const intl = useIntl()
+  const { getUser } = useUsers()
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+  const assignedToUser = getUser.useQuery(event.assignedTo || '', {
+    enabled: !!event.assignedTo
+  })
+  const assignedUserFullName = assignedToUser.data
+    ? getUsersFullName(assignedToUser.data.name, intl.locale)
+    : null
+  const assignedOffice = assignedToUser.data?.primaryOfficeId || ''
+  const assignedOfficeName =
+    locations.find((l) => l.id === assignedOffice)?.name || ''
+  const { archiveModal, onArchive } = useArchiveModal()
 
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
@@ -209,7 +238,7 @@ function useViewableActionConfigurations(
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
   return {
-    modal,
+    modals: [assignModal, archiveModal],
     config: {
       [ActionType.READ]: {
         label: actionLabels[ActionType.READ],
@@ -220,7 +249,7 @@ function useViewableActionConfigurations(
         label: actionLabels[ActionType.ASSIGN],
         icon: 'PushPin' as const,
         onClick: async (workqueue?: string) => {
-          const assign = await openModal<boolean>((close) => (
+          const assign = await openAssignModal<boolean>((close) => (
             <AssignModal close={close} />
           ))
           if (!assign) {
@@ -243,6 +272,17 @@ function useViewableActionConfigurations(
         label: actionLabels[ActionType.UNASSIGN],
         icon: 'ArrowCircleDown' as const,
         onClick: async () => {
+          const unassign = await openAssignModal<boolean>((close) => (
+            <UnassignModal
+              assignedSelf={isDownloadedAndAssignedToUser}
+              close={close}
+              name={assignedUserFullName}
+              officeName={assignedOfficeName}
+            />
+          ))
+          if (!unassign) {
+            return
+          }
           await events.actions.assignment.unassign.mutateAsync({
             eventId,
             transactionId: getUUID(),
@@ -280,6 +320,14 @@ function useViewableActionConfigurations(
               { workqueue }
             )
           )
+        },
+        disabled: !isDownloadedAndAssignedToUser
+      },
+      [ActionType.ARCHIVE]: {
+        label: actionLabels[ActionType.ARCHIVE],
+        icon: 'Archive' as const,
+        onClick: async () => {
+          await onArchive(event.id)
         },
         disabled: !isDownloadedAndAssignedToUser
       },
@@ -394,7 +442,7 @@ export function useAllowedActionConfigurations(
     .getAllRemoteDrafts()
     .find((draft) => draft.eventId === event.id)
 
-  const { config, modal } = useViewableActionConfigurations(
+  const { config, modals } = useViewableActionConfigurations(
     event,
     authentication,
     openDraft
@@ -440,7 +488,7 @@ export function useAllowedActionConfigurations(
   // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
   if (hasOnlyMetaActions) {
     return [
-      modal,
+      modals,
       [
         {
           ...config[ActionType.READ],
@@ -450,7 +498,7 @@ export function useAllowedActionConfigurations(
     ] satisfies [React.ReactNode, ActionMenuItem[]]
   }
 
-  return [modal, allowedWorkqueueConfigs] satisfies [
+  return [modals, allowedWorkqueueConfigs] satisfies [
     React.ReactNode,
     ActionMenuItem[]
   ]

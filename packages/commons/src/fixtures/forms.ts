@@ -841,6 +841,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           id: 'applicant.image',
           type: FieldType.FILE,
           required: false,
+          uncorrectable: true,
           label: {
             defaultMessage: "Applicant's profile picture",
             description: 'This is the label for the field',
@@ -878,6 +879,19 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
             defaultMessage: 'Senior pass ID',
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.field.id.label'
+          }
+        },
+        {
+          id: 'senior-pass.recommender',
+          type: 'CHECKBOX',
+          required: true,
+          parent: field('recommender.none'),
+          defaultValue: false,
+          conditionals: [],
+          label: {
+            defaultMessage: 'Does recommender have senior pass?',
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.field.recommender'
           }
         }
       ]

@@ -20,7 +20,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
       <tspan x="62" y="413.552">Date of certification&#10;</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-      <tspan x="62" y="460.352">{{$lookup $metadata "createdAtLocation.location"}}, {{$lookup $metadata "createdAtLocation.country"}}</tspan>
+      <tspan x="62" y="460.352">{{$lookup $metadata "createdAtLocation.name"}}, {{$lookup $metadata "createdAtLocation.country"}}</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0em">
       <tspan x="62" y="447.552">Place of certification&#10;</tspan>
@@ -68,7 +68,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     </mask>
     <g mask="url(#mask0_5_2)">
       <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-        <tspan x="312" y="247.708">{{ $lookup $declaration "applicant.name" }}</tspan>
+        <tspan x="312" y="247.708">{{ $lookup $declaration "applicant.name.fullname" }}</tspan>
       </text>
     </g>
     <path d="M70 253.5H514" stroke="#ECECEC" />
@@ -99,7 +99,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     </mask>
     <g mask="url(#mask2_5_2)">
       <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-        <tspan x="312" y="287.708">{{ $lookup $declaration "recommender.name"  }}</tspan>
+        <tspan x="312" y="287.708">{{ $lookup $declaration "recommender.name.fullname"  }}</tspan>
       </text>
     </g>
     <path d="M70 293.5H514" stroke="#ECECEC" />

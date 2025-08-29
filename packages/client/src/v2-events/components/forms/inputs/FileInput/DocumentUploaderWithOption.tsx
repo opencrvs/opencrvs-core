@@ -11,7 +11,6 @@
 
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useIntl } from 'react-intl'
 import {
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
@@ -24,6 +23,7 @@ import { ErrorText } from '@opencrvs/components'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
+import { useIntlWithFormData } from '@client/v2-events/messages/utils'
 import { DocumentUploader } from './SimpleDocumentUploader'
 import { DocumentListPreview } from './DocumentListPreview'
 import { DocumentPreview } from './DocumentPreview'
@@ -87,7 +87,7 @@ function DocumentUploaderWithOption({
   autoSelectOnlyOption?: boolean
   maxFileSize: number
 }) {
-  const intl = useIntl()
+  const intl = useIntlWithFormData()
   const documentTypeRequiredErrorMessage = intl.formatMessage(
     DocumentTypeRequiredError
   )
@@ -262,7 +262,7 @@ function DocumentWithOptionOutput({
   value?: FileFieldWithOptionValue
   config: FileUploadWithOptions
 }) {
-  const intl = useIntl()
+  const intl = useIntlWithFormData()
   const [previewImage, setPreviewImage] =
     useState<FileFieldValueWithOption | null>(null)
 
