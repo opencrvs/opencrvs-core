@@ -87,8 +87,8 @@ export function useArchiveModal() {
       actions.archive.mutate({
         eventId,
         transactionId: getUUID(),
-        content: {
-          reason: 'Archived from action menu'
+        reason: {
+          message: 'Archived from action menu'
         }
       })
     }
