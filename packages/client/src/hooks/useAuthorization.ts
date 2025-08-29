@@ -131,7 +131,7 @@ export function usePermissions() {
     const editableRoleIds = findScope(userScopes ?? [], 'user.edit')?.options
       ?.role
 
-    if (editableRoleIds) {
+    if (Array.isArray(editableRoleIds)) {
       return editableRoleIds.includes(user.role.id)
     }
     if (!userPrimaryOffice?.id) {
