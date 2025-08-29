@@ -29,7 +29,8 @@ import {
   isNonInteractiveFieldType,
   SystemVariables,
   InteractiveFieldType,
-  FieldReference
+  FieldReference,
+  getAllUniqueFields
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -203,11 +204,26 @@ export function FormSectionComponent({
     id: makeFormFieldIdFormikCompatible(field.id)
   }))
 
+  // fieldsWithDotSeparator may fallback to pageFieldsWithDotIds when eventConfig
+  // isn’t loaded yet. This guarantees we always have a usable set of fields.
+  // Once eventConfig is available, we derive all fields (with dot-separated IDs)
+  // so parent → child relationships can be resolved consistently across pages.
+  const allFieldsWithDotSeparator: FieldConfig[] = useMemo(() => {
+    if (eventConfig) {
+      const allConfigFields = getAllUniqueFields(eventConfig)
+      return allConfigFields.map((field) => ({
+        ...field,
+        id: makeFormFieldIdFormikCompatible(field.id)
+      }))
+    }
+    return fieldsWithDotSeparator
+  }, [eventConfig, fieldsWithDotSeparator])
+
   // Create a reference map of parent fields and their their children for quick access.
   // This is used to reset the values of child fields when a parent field changes.
   const fieldsByParentId: IndexMap<FieldConfig[]> = useMemo(
-    () => groupBy(fieldsWithDotSeparator, (field) => field.parent?.$$field),
-    [fieldsWithDotSeparator]
+    () => groupBy(allFieldsWithDotSeparator, (field) => field.parent?.$$field),
+    [allFieldsWithDotSeparator]
   )
 
   const errors = makeFormFieldIdsFormikCompatible(errorsWithDotSeparator)

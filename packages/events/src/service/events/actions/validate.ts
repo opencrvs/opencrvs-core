@@ -17,7 +17,7 @@ import {
 } from '@opencrvs/commons/events'
 
 import { getUUID, UUID } from '@opencrvs/commons'
-import { getEventConfigurations } from '@events/service/config/config'
+import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 import { addAction, getEventById } from '@events/service/events/events'
 import { TrpcUserContext } from '@events/context'
@@ -34,7 +34,7 @@ export async function validate(
     token: string
   }
 ) {
-  const configs = await getEventConfigurations(token)
+  const configs = await getInMemoryEventConfigurations(token)
   const storedEvent = await getEventById(eventId)
   const config = configs.find((c) => c.id === storedEvent.type)
 
