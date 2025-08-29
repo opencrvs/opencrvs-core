@@ -17,7 +17,7 @@ import * as config from '@events/service/config/config'
 export const Location = z.object({
   id: UUID,
   name: z.string(),
-  partOf: UUID.nullable(),
+  parentId: UUID.nullable(),
   validUntil: z.date().nullable()
 })
 
@@ -28,17 +28,25 @@ export type Location = z.infer<typeof Location>
  * @param incomingLocations - Locations to be set
  */
 
-export async function syncLocations() {
-  const locations = await config.getLocations()
-
+export async function setLocations(locations: Location[]) {
   return locationsRepo.setLocations(
-    locations.map(({ id, name, partOf, validUntil }) => ({
+    locations.map(({ id, name, parentId, validUntil }) => ({
       id,
       name,
-      parentId: partOf,
+      parentId: parentId,
       validUntil: validUntil ? validUntil.toISOString() : null
     }))
   )
+}
+
+/**
+ * Syncs locations from V1 to V2 database.
+ * @param incomingLocations - Locations to be set
+ */
+
+export async function syncLocations() {
+  const locations = await config.getLocations()
+  return setLocations(locations)
 }
 
 export const getLocations = async () => {
@@ -47,7 +55,7 @@ export const getLocations = async () => {
   return locations.map(({ id, name, parentId, validUntil }) => ({
     id,
     name,
-    partOf: parentId,
+    parentId,
     validUntil: validUntil ? new Date(validUntil) : null
   }))
 }
@@ -59,6 +67,6 @@ export const getChildLocations = async (parentIdToSearch: string) => {
     id,
     name,
     validUntil,
-    partOf: parentId
+    parentId
   }))
 }

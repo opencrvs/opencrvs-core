@@ -16,6 +16,7 @@ import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
 import {
   getLocations,
   Location,
+  setLocations,
   syncLocations
 } from '@events/service/locations/locations'
 import { requiresAnyOfScopes } from '../middleware'
@@ -39,5 +40,12 @@ export const locationRouter = router({
     .mutation(async () => {
       await syncLocations()
     }),
-  get: publicProcedure.output(z.array(Location)).query(getLocations)
+  get: publicProcedure.output(z.array(Location)).query(getLocations),
+  set: systemProcedure
+    .use(requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING]))
+    .input(z.array(Location).min(1))
+    .output(z.void())
+    .mutation(async ({ input }) => {
+      await setLocations(input)
+    })
 })

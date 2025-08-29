@@ -111,8 +111,12 @@ function toCertificateVariables(
   const locationId = value.toString()
   const location = context.locations.find((loc) => loc.id === locationId)
 
-  const district = context.locations.find((loc) => loc.id === location?.partOf)
-  const province = context.locations.find((loc) => loc.id === district?.partOf)
+  const district = context.locations.find(
+    (loc) => loc.id === location?.parentId
+  )
+  const province = context.locations.find(
+    (loc) => loc.id === district?.parentId
+  )
 
   return {
     name: location?.name || '',

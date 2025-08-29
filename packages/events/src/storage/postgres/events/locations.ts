@@ -11,7 +11,7 @@
 
 import { sql } from 'kysely'
 import { chunk } from 'lodash'
-import { logger, UUID } from '@opencrvs/commons'
+import { logger } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { Locations, NewLocations } from './schema/app/Locations'
 
@@ -41,18 +41,6 @@ export async function addLocations(locations: NewLocations[]) {
       )
       .execute()
   }
-}
-
-export async function deleteLocations(locationIds: UUID[]) {
-  const db = getClient()
-
-  await db
-    .updateTable('locations')
-    .set({ deletedAt: sql`now()` })
-    .where('id', 'in', locationIds)
-    .execute()
-
-  logger.info(`Deleted ${locationIds.length} locations`)
 }
 
 export async function setLocations(locations: NewLocations[]) {

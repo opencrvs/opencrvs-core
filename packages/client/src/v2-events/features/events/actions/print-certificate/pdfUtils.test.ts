@@ -32,17 +32,20 @@ const locations = [
   {
     id: '35391063-7dca-4e57-abd3-20dcc8538a64' as UUID,
     name: 'HQ Office',
-    partOf: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID
+    parentId: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID,
+    validUntil: null
   },
   {
     id: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID,
     name: 'Embe',
-    partOf: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID
+    parentId: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
+    validUntil: null
   },
   {
     id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
     name: 'Pualula',
-    partOf: null
+    parentId: null,
+    validUntil: null
   }
 ]
 const userId = '677fb08730f3abfa33072769'
