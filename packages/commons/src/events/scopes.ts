@@ -55,7 +55,6 @@ export const ACTION_ALLOWED_SCOPES = {
     SCOPES.RECORD_EXPORT_RECORDS
   ],
   [ActionType.CREATE]: [
-    SCOPES.RECORD_DECLARE,
     SCOPES.RECORD_SUBMIT_INCOMPLETE,
     SCOPES.RECORD_SUBMIT_FOR_REVIEW
   ],
@@ -90,10 +89,10 @@ export const ACTION_ALLOWED_SCOPES = {
 } satisfies Record<DisplayableAction, RequiredScopes>
 
 export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
-  [ActionType.READ]: [],
-  [ActionType.CREATE]: ['record.notify'],
+  [ActionType.READ]: ['record.declare', 'record.notify'],
+  [ActionType.CREATE]: ['record.declare', 'record.notify'],
   [ActionType.NOTIFY]: ['record.notify'],
-  [ActionType.DECLARE]: [],
+  [ActionType.DECLARE]: ['record.declare'],
   [ActionType.DELETE]: [],
   [ActionType.VALIDATE]: [],
   [ActionType.REGISTER]: [],

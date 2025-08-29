@@ -10,11 +10,11 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { SCOPES } from '@opencrvs/commons'
 import { ActionType, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/events'
 import {
   createSystemTestClient,
   createTestClient,
+  RECORD_DECLARE_SCOPE,
   setupTestCase
 } from '@events/tests/utils'
 
@@ -31,7 +31,7 @@ describe('event.create', () => {
 
     test(`allows access with required scope`, async () => {
       const { user, generator } = await setupTestCase()
-      const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
+      const client = createTestClient(user, [RECORD_DECLARE_SCOPE])
 
       await expect(
         client.event.create(generator.event.create())
@@ -105,7 +105,9 @@ describe('event.create', () => {
 
   test('event with unknown type cannot be created', async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      'record.declare[event=EVENT_TYPE_THAT_DOES_NOT_EXIST]'
+    ])
     await expect(
       client.event.create(
         generator.event.create({

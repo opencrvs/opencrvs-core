@@ -13,6 +13,7 @@ import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import {
   ActionType,
+  BIRTH_EVENT,
   createPrng,
   EventDocument,
   generateRandomSignature,
@@ -90,6 +91,8 @@ export function sanitizeForSnapshot(data: unknown, fields: string[]) {
 
 const { createCallerFactory } = t
 
+export const RECORD_DECLARE_SCOPE = `record.declare[event=${BIRTH_EVENT}|v2.death|tennis-club-membership]`
+
 export const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_DECLARE,
   SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
@@ -102,6 +105,7 @@ export const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_SUBMIT_FOR_UPDATES,
   SCOPES.RECORD_UNASSIGN_OTHERS,
   SCOPES.SEARCH_BIRTH,
+  RECORD_DECLARE_SCOPE,
   'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]'
 ]
 

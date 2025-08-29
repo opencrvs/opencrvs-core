@@ -328,11 +328,18 @@ const WorkqueueScope = z.object({
   })
 })
 
-const NotifyRecordScope = z.object({
-  type: z.literal('record.notify'),
+const EventScopeBase = z.object({
   options: z.object({
     event: z.array(z.string())
   })
+})
+
+const DeclareRecordScope = EventScopeBase.extend({
+  type: z.literal('record.declare')
+})
+
+const NotifyRecordScope = EventScopeBase.extend({
+  type: z.literal('record.notify')
 })
 
 const SearchScope = z.object({
@@ -350,7 +357,8 @@ const ConfigurableRawScopes = z.discriminatedUnion('type', [
   CreateUserScope,
   EditUserScope,
   WorkqueueScope,
-  NotifyRecordScope
+  NotifyRecordScope,
+  DeclareRecordScope
 ])
 
 type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>

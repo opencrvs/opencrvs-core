@@ -179,10 +179,9 @@ describe('Overwriting parent field', () => {
         }
       )
     )
-    const output = await setupTestCase()
-    const user = output.user
+    const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
-    const generator = output.generator
+
     const declaration = {
       'child.firstNames': 'John',
       'child.familyName': 'Doe',
@@ -196,6 +195,7 @@ describe('Overwriting parent field', () => {
       'informant.dob': '1988-06-12',
       'informant.dobUnknown': false
     }
+
     let event = await client.event.create(
       generator.event.create({ type: BIRTH_EVENT })
     )

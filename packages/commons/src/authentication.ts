@@ -27,6 +27,7 @@ export const DEFAULT_ROLES_DEFINITION = [
     },
     scopes: [
       // new scopes
+      // TODO CIHAN: remove these scopes here and elsewhere?
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -47,6 +48,7 @@ export const DEFAULT_ROLES_DEFINITION = [
     scopes: [
       SCOPES.PERFORMANCE,
       SCOPES.CERTIFY,
+      'record.declare[event=v2.birth|v2.death|tennis-club-membership]',
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -80,6 +82,7 @@ export const DEFAULT_ROLES_DEFINITION = [
     scopes: [
       SCOPES.PERFORMANCE,
       SCOPES.CERTIFY,
+      'record.declare[event=v2.birth|v2.death|tennis-club-membership]',
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -194,6 +197,8 @@ export function hasScope(authHeader: IAuthHeader, scope: Scope) {
 
 export function inScope(authHeader: IAuthHeader, scopes: Scope[]) {
   const tokenScopes = getScopes(authHeader)
+  // TODO CIHAN: remove this
+  console.log('tokenScopes', tokenScopes)
   return scopes.some((scope) => tokenScopes.includes(scope))
 }
 

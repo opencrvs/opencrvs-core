@@ -28,6 +28,7 @@ import {
   createTestClient,
   sanitizeForSnapshot,
   setupTestCase,
+  TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
 import { mswServer } from '../../tests/msw'
@@ -271,6 +272,13 @@ const multiFileConfig = {
   advancedSearch: []
 } satisfies EventConfig
 
+const scopes = [
+  ...TEST_USER_DEFAULT_SCOPES.filter(
+    (scope) => !scope.startsWith('record.declare')
+  ),
+  `record.declare[event=${multiFileConfig.id}]`
+]
+
 describe('Action updates', () => {
   const deleteFileMock = vi.fn()
   const fileExistsMock = vi.fn()
@@ -376,7 +384,7 @@ describe('Action updates', () => {
 
   it('File references are removed with explicit null', async () => {
     const { user } = await setupTestCase()
-    const client = createTestClient(user)
+    const client = createTestClient(user, scopes)
 
     const originalEvent = await client.event.create({
       transactionId: generateTransactionId(),
@@ -422,7 +430,7 @@ describe('Action updates', () => {
 
   it('file with option references are removed with empty array', async () => {
     const { user } = await setupTestCase()
-    const client = createTestClient(user)
+    const client = createTestClient(user, scopes)
 
     const originalEvent = await client.event.create({
       transactionId: generateTransactionId(),
