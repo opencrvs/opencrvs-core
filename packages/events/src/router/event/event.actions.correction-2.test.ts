@@ -168,7 +168,7 @@ describe('Overwriting parent field', () => {
         return HttpResponse.json([modiedV2BirthEvent])
       }),
       http.post(
-        `${env.COUNTRY_CONFIG_URL}/events/v2-birth/actions/:action`,
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/v2-birth/actions/:action`,
         (ctx) => {
           const payload =
             ctx.params.action === ActionType.REGISTER

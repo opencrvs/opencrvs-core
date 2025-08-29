@@ -27,7 +27,7 @@ export const Draft = z.object({
   createdAt: z.string().datetime(),
   action: ActionBase.extend({
     type: ActionTypes.exclude([ActionTypes.Enum.DELETE])
-  }).omit({ id: true })
+  }).omit({ id: true, createdAtLocation: true })
 })
 
 export const DraftInput = BaseActionInput.extend({

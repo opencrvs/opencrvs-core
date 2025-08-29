@@ -13,7 +13,7 @@ import { logger } from '@opencrvs/commons'
 import '@opencrvs/commons/monitoring'
 import { env } from './environment'
 import { getAnonymousToken } from './service/auth'
-import { getEventConfigurations } from './service/config/config'
+import { getInMemoryEventConfigurations } from './service/config/config'
 import { ensureIndexExists } from './service/indexing/indexing'
 import { server } from './server'
 
@@ -26,7 +26,7 @@ appModulePath.addPath(path.join(__dirname, '../'))
 
 export async function main() {
   try {
-    const configurations = await getEventConfigurations(
+    const configurations = await getInMemoryEventConfigurations(
       await getAnonymousToken()
     )
     for (const configuration of configurations) {

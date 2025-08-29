@@ -12,7 +12,7 @@ import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import { z } from 'zod'
 import { OpenApiMeta } from 'trpc-to-openapi'
-import { getUUID, UUID } from '@opencrvs/commons'
+import { UUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -29,7 +29,8 @@ import {
   ACTION_ALLOWED_CONFIGURABLE_SCOPES,
   RequestCorrectionActionInput,
   ApproveCorrectionActionInput,
-  RejectCorrectionActionInput
+  RejectCorrectionActionInput,
+  getPendingAction
 } from '@opencrvs/commons/events'
 import { TokenUserType } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
@@ -207,11 +208,11 @@ export function getDefaultActionProcedures(
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
+      .use(middleware.requireLocationForSystemUserAction)
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user, isDuplicateAction } = ctx
         const { eventId } = input
-        const actionId = getUUID()
 
         if (isDuplicateAction) {
           return ctx.event
@@ -224,13 +225,17 @@ export function getDefaultActionProcedures(
           await throwConflictIfWaitingForCorrection(eventId, token)
         }
 
-        const event = await getEventById(eventId)
+        const eventWithRequestedAction = await addAction(input, {
+          eventId,
+          user,
+          token,
+          status: ActionStatus.Requested
+        })
 
         const { responseStatus, body } = await requestActionConfirmation(
-          input,
-          event,
-          token,
-          actionId
+          input.type,
+          eventWithRequestedAction,
+          token
         )
 
         // If we get an unexpected failure response, we just return HTTP 500 without saving the
@@ -266,8 +271,20 @@ export function getDefaultActionProcedures(
           }
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { declaration, annotation, ...strippedInput } = input
+
+        const requestedAction = getPendingAction(
+          eventWithRequestedAction.actions
+        )
+
         return addAction(
-          { ...input, ...parsedBody },
+          {
+            ...strippedInput,
+            declaration: {},
+            originalActionId: requestedAction.id,
+            ...parsedBody
+          },
           {
             eventId,
             user,
