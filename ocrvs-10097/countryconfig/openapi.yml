@@ -89,6 +89,12 @@ components:
             $$field:
               type: string
               description: Unique identifier for the field
+            $$subfield:
+              type: array
+              items:
+                type: string
+              description: 'If the FieldValue is an object, subfield can be used to refer to
+                e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
           required:
             - $$field
           description: Reference to a field by its ID
@@ -380,26 +386,6 @@ components:
                         fieldType:
                           type: string
                           const: field
-                        alternateFieldIds:
-                          type: array
-                          items:
-                            type: string
-                          description: >-
-                            Sometimes there might be need to search a value
-                            against multiple field of same FormField type. For
-                            example
-                                  search Country, Province, District against child.address.private and child.address.other. In such case, we
-                                  add a one field as fieldId, and accomodate others in alternateFieldIds
-                        excludeInSearchQuery:
-                          type: boolean
-                          default: false
-                          description: >-
-                            Sometimes there will be search fields which are used
-                            to
-                                conditionally display another search field, but its not needed in search query. For example, child.placeOfBirth
-                                is select field, which has 3 options, FACILITY, PRIVATE_HOME, OTHER. Upon selecting any of the option, pops up another field
-                                related to the selected option, whose value is required in the search query. But child.placeOfBirth itself is not needed in the query.
-                                In such case, populate this field (excludeInSearchQuery) with boolean true
                       required:
                         - config
                         - fieldId
@@ -688,24 +674,33 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default:
                 &a5 []
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -725,16 +720,62 @@ components:
                   - message
               default:
                 &a6 []
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: ADDRESS
+            configuration:
+              type: object
+              properties:
+                lineSeparator:
+                  type: string
+                fields:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - number
+                      - country
+                      - province
+                      - addressType
+                      - district
+                      - urbanOrRural
+                      - town
+                      - residentialArea
+                      - street
+                      - zipCode
+                      - village
+                      - state
+                      - district2
+                      - cityOrTown
+                      - addressLine1
+                      - addressLine2
+                      - addressLine3
+                      - postcodeOrZip
             defaultValue:
               anyOf:
                 - oneOf:
@@ -816,11 +857,6 @@ components:
                     - addressType
                     - state
                     - district2
-            configuration:
-              type: object
-              properties:
-                searchMode:
-                  type: boolean
           required:
             - id
             - label
@@ -831,23 +867,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -866,13 +911,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: TEXT
@@ -906,23 +969,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -941,13 +1013,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: NUMBER
@@ -976,23 +1066,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1011,13 +1110,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: TEXTAREA
@@ -1052,23 +1169,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1087,13 +1213,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: DATE
@@ -1117,23 +1261,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1152,13 +1305,122 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
+            type:
+              type: string
+              const: TIME
+            defaultValue:
+              type: string
+              pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+            configuration:
+              type: object
+              properties:
+                notice:
+                  $ref: "#/components/schemas/TranslationConfig"
+                  description: Text to display above the time input
+          required:
+            - id
+            - label
+            - type
+          description: A single date input (HH-mm)
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a5
+            secured:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a6
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: DATE_RANGE
@@ -1198,23 +1460,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1233,13 +1504,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: SELECT_DATE_RANGE
@@ -1278,23 +1567,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1313,13 +1611,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: PARAGRAPH
@@ -1344,6 +1660,10 @@ components:
                         - h3
                         - h2
                         - h1
+                      description: Font variant to use for the paragraph text
+                    hint:
+                      type: boolean
+                      description: When true, paragraph is styled as a hint with grey color
               default: {}
           required:
             - id
@@ -1356,23 +1676,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1391,13 +1720,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: RADIO_GROUP
@@ -1440,23 +1787,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1475,13 +1831,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: BULLET_LIST
@@ -1514,23 +1888,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1549,13 +1932,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: PAGE_HEADER
@@ -1572,23 +1973,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1607,13 +2017,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: SELECT
@@ -1645,23 +2073,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1680,13 +2117,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: NAME
@@ -1713,6 +2168,8 @@ components:
                       properties:
                         required:
                           type: boolean
+                        label:
+                          $ref: "#/components/schemas/TranslationConfig"
                       required:
                         - required
                     middlename:
@@ -1720,6 +2177,8 @@ components:
                       properties:
                         required:
                           type: boolean
+                        label:
+                          $ref: "#/components/schemas/TranslationConfig"
                       required:
                         - required
                     surname:
@@ -1727,6 +2186,8 @@ components:
                       properties:
                         required:
                           type: boolean
+                        label:
+                          $ref: "#/components/schemas/TranslationConfig"
                       required:
                         - required
                   default:
@@ -1734,6 +2195,14 @@ components:
                       required: true
                     surname:
                       required: true
+                order:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - firstname
+                      - middlename
+                      - surname
                 maxLength:
                   type: number
                   description: Maximum length of the text
@@ -1741,8 +2210,6 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
-                searchMode:
-                  type: boolean
               default:
                 name:
                   firstname:
@@ -1759,23 +2226,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1794,13 +2270,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             defaultValue:
               type: string
               minLength: 1
@@ -1817,23 +2311,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1852,13 +2355,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             defaultValue:
               type: string
               minLength: 1
@@ -1875,23 +2396,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1910,13 +2440,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: CHECKBOX
@@ -1932,23 +2480,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1967,13 +2524,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: FILE
@@ -2037,23 +2612,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2072,13 +2656,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: COUNTRY
@@ -2095,23 +2697,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2130,13 +2741,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: ADMINISTRATIVE_AREA
@@ -2174,23 +2803,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2209,13 +2847,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: DIVIDER
@@ -2228,23 +2884,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2263,13 +2928,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: LOCATION
@@ -2297,23 +2980,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2332,13 +3024,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: FACILITY
@@ -2355,23 +3065,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2390,13 +3109,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: OFFICE
@@ -2413,23 +3150,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2448,13 +3194,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: SIGNATURE
@@ -2492,23 +3256,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2527,13 +3300,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: EMAIL
@@ -2557,23 +3348,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2592,13 +3392,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: FILE_WITH_OPTIONS
@@ -2665,23 +3483,32 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2700,13 +3527,31 @@ components:
                   - validator
                   - message
               default: *a6
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: DATA
@@ -2744,6 +3589,257 @@ components:
             - type
             - configuration
           description: Data field for displaying read-only data
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a5
+            secured:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a6
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
+            type:
+              type: string
+              const: BUTTON
+            defaultValue:
+              type: number
+            configuration:
+              type: object
+              properties:
+                icon:
+                  type: string
+                  description: Icon for the button. You can find icons from OpenCRVS UI-Kit.
+                loading:
+                  type: boolean
+                  description: Whether the button is in a loading state and shows a spinner
+                text:
+                  $ref: "#/components/schemas/TranslationConfig"
+                  description: Text to display on the button
+              required:
+                - text
+          required:
+            - id
+            - label
+            - type
+            - configuration
+          description: Generic button without any built-in functionality
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a5
+            secured:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a6
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
+            type:
+              type: string
+              const: HTTP
+            defaultValue:
+              type: object
+              properties:
+                loading:
+                  type: boolean
+                error:
+                  type:
+                    - object
+                    - "null"
+                  properties:
+                    statusCode:
+                      type: number
+                    message:
+                      type: string
+                  required:
+                    - statusCode
+                    - message
+                data: {}
+              required:
+                - loading
+            configuration:
+              type: object
+              properties:
+                trigger:
+                  type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  required:
+                    - $$field
+                  description: Reference to a field by its ID
+                url:
+                  type: string
+                  description: URL to send the HTTP request to
+                method:
+                  type: string
+                  enum:
+                    - GET
+                    - POST
+                    - PUT
+                    - DELETE
+                headers:
+                  type: object
+                  additionalProperties:
+                    type: string
+                body:
+                  type: object
+                  additionalProperties:
+                    type: string
+                params:
+                  type: object
+                  additionalProperties:
+                    type: string
+                timeout:
+                  type: number
+                  default: 15000
+                  description: Request timeout in milliseconds
+              required:
+                - trigger
+                - url
+                - method
+                - timeout
+          required:
+            - id
+            - label
+            - type
+            - configuration
+          description: HTTP request function triggered by a button click
       description: Form field configuration
     FieldConditional:
       oneOf:
@@ -3307,60 +4403,44 @@ components:
         type:
           type: string
           const: REQUEST_CORRECTION
-        onboardingForm:
-          type: array
-          items:
-            oneOf:
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    const: FORM
-                    default: FORM
-                required:
-                  - type
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    const: VERIFICATION
-                  actions:
-                    $ref: "#/components/schemas/VerificationActionConfig"
-                required:
-                  - type
-                  - actions
-        additionalDetailsForm:
-          type: array
-          items:
-            oneOf:
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    const: FORM
-                    default: FORM
-                required:
-                  - type
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    const: VERIFICATION
-                  actions:
-                    $ref: "#/components/schemas/VerificationActionConfig"
-                required:
-                  - type
-                  - actions
+        correctionForm:
+          type: object
+          properties:
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+              description: Human readable description of the form
+            pages:
+              type: array
+              items:
+                oneOf:
+                  - allOf:
+                      - $ref: "#/components/schemas/FormPageConfig"
+                    properties:
+                      type:
+                        type: string
+                        const: FORM
+                        default: FORM
+                    required:
+                      - type
+                  - allOf:
+                      - $ref: "#/components/schemas/FormPageConfig"
+                    properties:
+                      type:
+                        type: string
+                        const: VERIFICATION
+                      actions:
+                        $ref: "#/components/schemas/VerificationActionConfig"
+                    required:
+                      - type
+                      - actions
+          required:
+            - label
+            - pages
       required:
         - label
         - conditionals
         - type
-        - onboardingForm
-        - additionalDetailsForm
+        - correctionForm
     RejectCorrectionActionConfig:
       type: object
       properties:
@@ -3638,6 +4718,9 @@ components:
                       - REJECT
                       - ARCHIVE
                       - PRINT_CERTIFICATE
+                      - REQUEST_CORRECTION
+                      - APPROVE_CORRECTION
+                      - REJECT_CORRECTION
                 required:
                   - id
                   - transactionId
@@ -3727,6 +4810,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -3899,6 +4984,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         annotation:
           type:
             - object
@@ -3909,6 +5017,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -4080,6 +5190,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         status:
           type: string
@@ -4144,6 +5277,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -4316,6 +5451,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         annotation:
           type:
             - object
@@ -4326,6 +5484,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -4497,6 +5657,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         status:
           type: string
@@ -4557,6 +5740,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -4729,6 +5914,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         annotation:
           type:
             - object
@@ -4739,6 +5947,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -4910,6 +6120,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         status:
           type: string
@@ -4983,6 +6216,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -5155,6 +6390,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         annotation:
           type:
             - object
@@ -5165,6 +6423,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -5336,6 +6596,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         status:
           type: string
@@ -5396,6 +6679,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -5568,6 +6853,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         annotation:
           type:
             - object
@@ -5578,6 +6886,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -5749,6 +7059,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         status:
           type: string
@@ -5822,6 +7155,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -5994,6 +7329,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         annotation:
           type:
             - object
@@ -6004,6 +7362,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -6175,6 +7535,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         status:
           type: string
@@ -6235,6 +7618,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -6407,6 +7792,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         annotation:
           type:
             - object
@@ -6417,6 +7825,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -6588,6 +7998,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         status:
           type: string
@@ -6650,6 +8083,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -6822,6 +8257,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         annotation:
           type:
             - object
@@ -6832,6 +8290,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -7003,6 +8463,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         status:
           type: string
@@ -7063,6 +8546,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -7235,6 +8720,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         annotation:
           type:
             - object
@@ -7245,6 +8753,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -7416,6 +8926,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         status:
           type: string
@@ -7479,6 +9012,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -7651,6 +9186,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         annotation:
           type:
             - object
@@ -7661,6 +9219,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -7832,6 +9392,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         status:
           type: string
@@ -7892,6 +9475,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -8064,6 +9649,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         annotation:
           type:
             - object
@@ -8074,6 +9682,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -8245,6 +9855,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         status:
           type: string
@@ -8308,6 +9941,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -8480,6 +10115,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         annotation:
           type:
             - object
@@ -8490,6 +10148,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -8661,6 +10321,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         status:
           type: string
@@ -8677,6 +10360,18 @@ components:
           const: REJECT_CORRECTION
         requestId:
           type: string
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -8688,6 +10383,7 @@ components:
         - status
         - type
         - requestId
+        - reason
     UnassignedAction:
       type: object
       properties:
@@ -8724,6 +10420,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -8896,6 +10594,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         annotation:
           type:
             - object
@@ -8906,6 +10627,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -9077,6 +10800,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         status:
           type: string
@@ -9137,6 +10883,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -9309,6 +11057,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         annotation:
           type:
             - object
@@ -9319,6 +11090,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -9490,6 +11263,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         status:
           type: string
@@ -9504,6 +11300,13 @@ components:
         type:
           type: string
           const: PRINT_CERTIFICATE
+        content:
+          type:
+            - object
+            - "null"
+          properties:
+            templateId:
+              type: string
       required:
         - id
         - transactionId
@@ -9550,6 +11353,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -9722,6 +11527,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         annotation:
           type:
             - object
@@ -9732,6 +11560,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -9903,6 +11733,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         status:
           type: string
@@ -9960,6 +11813,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -10132,6 +11987,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
           default:
             &a13 {}
         annotation:
@@ -10142,6 +12020,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -10313,6 +12193,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         originalActionId:
           type: string
@@ -10347,6 +12250,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -10519,6 +12424,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
           default: *a13
         annotation:
           type: object
@@ -10528,6 +12456,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -10699,6 +12629,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         originalActionId:
           type: string
@@ -10733,6 +12686,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -10905,6 +12860,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
           default: *a13
         annotation:
           type: object
@@ -10914,6 +12892,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -11085,6 +13065,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         originalActionId:
           type: string
@@ -11117,6 +13120,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -11289,6 +13294,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
           default: *a13
         annotation:
           type: object
@@ -11298,6 +13326,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -11469,6 +13499,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         originalActionId:
           type: string
@@ -11484,7 +13537,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: c250c8dc-b1c1-4f0b-87cc-04e0dc910f5c
+        transactionId: bb00d65f-9cb6-4ce3-87ee-5e8d3e19a16a
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -11504,6 +13557,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -11676,6 +13731,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
           default: *a13
         annotation:
           type: object
@@ -11685,6 +13763,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -11856,6 +13936,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         originalActionId:
           type: string
@@ -11885,6 +13988,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -12057,6 +14162,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
           default: *a13
         annotation:
           type: object
@@ -12066,6 +14194,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -12237,6 +14367,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         originalActionId:
           type: string
@@ -12279,6 +14432,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -12451,6 +14606,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
           default: *a13
         annotation:
           type: object
@@ -12460,6 +14638,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -12631,6 +14811,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         originalActionId:
           type: string
@@ -12660,6 +14863,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -12832,6 +15037,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
           default: *a13
         annotation:
           type: object
@@ -12841,6 +15069,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -13012,6 +15242,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         originalActionId:
           type: string
@@ -13054,6 +15307,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -13226,6 +15481,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
           default: *a13
         annotation:
           type: object
@@ -13235,6 +15513,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -13406,6 +15686,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         originalActionId:
           type: string
@@ -13438,6 +15741,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -13610,6 +15915,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
           default: *a13
         annotation:
           type: object
@@ -13619,6 +15947,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -13790,6 +16120,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         originalActionId:
           type: string
@@ -13822,6 +16175,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -13993,6 +16348,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
           default: *a13
         annotation:
@@ -14003,6 +16381,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -14175,6 +16555,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
         originalActionId:
           type: string
           format: uuid
@@ -14184,6 +16587,11 @@ components:
           type: string
           const: PRINT_CERTIFICATE
           default: PRINT_CERTIFICATE
+        content:
+          type: object
+          properties:
+            templateId:
+              type: string
       required:
         - eventId
         - transactionId
@@ -14203,6 +16611,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -14375,6 +16785,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
           default: *a13
         annotation:
           type: object
@@ -14384,6 +16817,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -14555,6 +16990,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         originalActionId:
           type: string
@@ -14584,6 +17042,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -14756,6 +17216,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
           default: *a13
         annotation:
           type: object
@@ -14765,6 +17248,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -14936,6 +17421,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         originalActionId:
           type: string
@@ -14948,10 +17456,23 @@ components:
           type: string
           const: REJECT_CORRECTION
           default: REJECT_CORRECTION
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - eventId
         - transactionId
         - requestId
+        - reason
     ApproveCorrectionActionInput:
       type: object
       properties:
@@ -14968,6 +17489,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -15140,6 +17663,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
           default: *a13
         annotation:
           type: object
@@ -15149,6 +17695,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -15320,6 +17868,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         originalActionId:
           type: string
@@ -15352,6 +17923,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -15524,6 +18097,29 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
+                      - type: "null"
           default: *a13
         annotation:
           type: object
@@ -15533,6 +18129,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -15704,6 +18302,29 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type:
+                              - boolean
+                              - "null"
+                          error:
+                            type:
+                              - object
+                              - "null"
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            type: "null"
                       - type: "null"
         originalActionId:
           type: string
