@@ -94,7 +94,7 @@ function parseAndFormatTime(intl: IntlShape, value?: string) {
 
 function TimeOutput({ value }: { value?: string }) {
   const intl = useIntl()
-  return parseAndFormatTime(intl, value)}
+  return parseAndFormatTime(intl, value)
 }
 
 function stringify(value: string | undefined, context: { intl: IntlShape }) {
