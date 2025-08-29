@@ -13,7 +13,6 @@ import { logger } from '@opencrvs/commons'
 import '@opencrvs/commons/monitoring'
 import { env } from './environment'
 import { getEventConfigurations } from './service/config/config'
-// import { ensureIndexExists } from './service/indexing/indexing'
 import { server } from './server'
 import { ensureIndexExists } from './service/indexing/indexing'
 
