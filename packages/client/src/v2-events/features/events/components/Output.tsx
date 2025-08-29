@@ -333,9 +333,14 @@ export function Output({
   }
 
   if (!hasPreviousValue && showPreviouslyMissingValuesAsChanged) {
+    const deleted = ValueOutput({
+      config: { ...field, required: true },
+      value: undefined
+    })
+
     return (
       <>
-        <Deleted>{'-'}</Deleted>
+        <Deleted>{deleted ?? '-'}</Deleted>
         <br />
         <ValueOutput config={field} value={value} />
       </>
