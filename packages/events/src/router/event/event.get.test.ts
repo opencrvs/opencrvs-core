@@ -20,15 +20,9 @@ import { indexEvent } from '@events/service/indexing/indexing'
 type TestClient = ReturnType<typeof createTestClient>
 type CreatedEvent = Awaited<ReturnType<TestClient['event']['create']>>
 
-vi.mock('@events/service/indexing/indexing', async () => {
-  const actual = await vi.importActual<
-    typeof import('@events/service/indexing/indexing')
-  >('@events/service/indexing/indexing')
-  return {
-    ...actual,
-    indexEvent: vi.fn()
-  }
-})
+vi.mock('@events/service/indexing/indexing', () => ({
+  indexEvent: vi.fn()
+}))
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
