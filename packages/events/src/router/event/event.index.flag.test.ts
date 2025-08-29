@@ -40,7 +40,7 @@ test('Adds ACTION-requested flag while waiting for external validation', async (
 
   mswServer.use(
     http.post(
-      `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/REGISTER`,
+      `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
       () => {
         return HttpResponse.json(
           {},
@@ -79,7 +79,7 @@ test('Does not add any flags when accepted form countryconfig', async () => {
 
   mswServer.use(
     http.post(
-      `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/REGISTER`,
+      `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
       () => {
         return HttpResponse.json(
           { registrationNumber: 'SOME0REG0NUM' },
@@ -118,7 +118,7 @@ test('Adds ACTION-rejected flag when rejected form countryconfig', async () => {
 
   mswServer.use(
     http.post(
-      `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/REGISTER`,
+      `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
       () => {
         return HttpResponse.json(
           {},

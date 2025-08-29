@@ -13,7 +13,11 @@ import * as Joi from 'joi'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
-import { logger, triggerUserEventNotification } from '@opencrvs/commons'
+import {
+  logger,
+  triggerUserEventNotification,
+  personNameFromV1ToV2
+} from '@opencrvs/commons'
 import { getUserId } from '@user-mgnt/utils/userUtils'
 import { COUNTRY_CONFIG_URL } from '@user-mgnt/constants'
 
@@ -42,7 +46,7 @@ export default async function usernameReminderHandler(
       event: 'username-reminder',
       payload: {
         recipient: {
-          name: user.name,
+          name: personNameFromV1ToV2(user.name),
           email: user.emailForNotification,
           mobile: user.mobile
         },
