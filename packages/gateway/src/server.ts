@@ -160,8 +160,11 @@ export async function createServer() {
       }
     })
 
-    await app.start()
+    // Start database before application server.
+    // We have had issues where the database was not ready when the server started which resulted in redis instance being undefined.
+
     await database.start()
+    await app.start()
     app.log('info', `server started on port ${PORT}`)
   }
 
