@@ -24,7 +24,7 @@ import { joinValues } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { storage } from '@client/storage'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
-import { useWorkqueueConfigurations } from '@client/v2-events/features/events/useWorkqueueConfiguration'
+import { useCountryConfigWorkqueueConfigurations } from '@client/v2-events/features/events/useCountryConfigWorkqueueConfigurations'
 import { ROUTES } from '@client/v2-events/routes'
 import { removeToken } from '@client/utils/authUtils'
 import * as routes from '@client/navigation/routes'
@@ -63,7 +63,7 @@ export const Sidebar = ({
   const { getAllRemoteDrafts } = useDrafts()
   const drafts = getAllRemoteDrafts()
 
-  const workqueues = useWorkqueueConfigurations()
+  const workqueues = useCountryConfigWorkqueueConfigurations()
 
   const hasOutbox = hasOutboxWorkqueue(scopes ?? [])
   const hasDraft = hasDraftWorkqueue(scopes ?? [])

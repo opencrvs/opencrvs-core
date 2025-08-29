@@ -13,7 +13,10 @@ import { JWT_ISSUER } from '@auth/constants'
 import { env } from '@auth/environment'
 import * as crypto from 'crypto'
 import { IUserName, createToken } from '@auth/features/authenticate/service'
-import { triggerUserEventNotification } from '@opencrvs/commons'
+import {
+  triggerUserEventNotification,
+  personNameFromV1ToV2
+} from '@opencrvs/commons'
 
 interface ICodeDetails {
   code: string
@@ -75,7 +78,7 @@ export async function sendVerificationCode(
     payload: {
       code: verificationCode,
       recipient: {
-        name: userFullName,
+        name: personNameFromV1ToV2(userFullName),
         mobile,
         email
       }

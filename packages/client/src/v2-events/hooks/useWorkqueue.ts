@@ -17,7 +17,7 @@ import {
   WorkqueueConfig
 } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { useWorkqueueConfigurations } from '../features/events/useWorkqueueConfiguration'
+import { useCountryConfigWorkqueueConfigurations } from '../features/events/useCountryConfigWorkqueueConfigurations'
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { queryClient, useTRPC } from '../trpc'
 import { useUsers } from './useUsers'
@@ -48,7 +48,7 @@ export const useWorkqueue = (workqueueSlug: string) => {
 
   const { searchEvent } = useEvents()
 
-  const workqueues = useWorkqueueConfigurations()
+  const workqueues = useCountryConfigWorkqueueConfigurations()
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
 
   const deSerializedQueries = workqueues.map((wq) => ({
@@ -101,7 +101,7 @@ export function useWorkqueues() {
   const legacyUser = useSelector(getUserDetails)
   const { getUser } = useUsers()
   const [user] = getUser.useSuspenseQuery(legacyUser?.id ?? '')
-  const workqueues = useWorkqueueConfigurations()
+  const workqueues = useCountryConfigWorkqueueConfigurations()
   const trpc = useTRPC()
 
   return {
