@@ -190,8 +190,7 @@ CREATE TABLE app.locations (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     deleted_at timestamp with time zone,
-    status text DEFAULT 'active'::text,
-    CONSTRAINT locations_status_check CHECK ((status = ANY (ARRAY['active'::text, 'inactive'::text])))
+    valid_until timestamp with time zone
 );
 
 

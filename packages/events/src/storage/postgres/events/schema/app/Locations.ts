@@ -18,7 +18,7 @@ export default interface LocationsTable {
 
   deletedAt: ColumnType<string | null, string | null, string | null>
 
-  status: ColumnType<string | null, string | null, string | null>
+  validUntil: ColumnType<string | null, string | null, string | null>
 }
 
 export type Locations = Selectable<LocationsTable>

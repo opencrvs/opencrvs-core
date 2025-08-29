@@ -18,7 +18,7 @@ export const Location = z.object({
   id: UUID,
   name: z.string(),
   partOf: UUID.nullable(),
-  status: z.enum(['active', 'inactive'])
+  validUntil: z.date().nullable()
 })
 
 export type Location = z.infer<typeof Location>
@@ -32,10 +32,11 @@ export async function syncLocations() {
   const locations = await config.getLocations()
 
   return locationsRepo.setLocations(
-    locations.map(({ id, name, partOf }) => ({
+    locations.map(({ id, name, partOf, validUntil }) => ({
       id,
       name,
-      parentId: partOf
+      parentId: partOf,
+      validUntil: validUntil ? validUntil.toISOString() : null
     }))
   )
 }
@@ -43,19 +44,21 @@ export async function syncLocations() {
 export const getLocations = async () => {
   const locations = await locationsRepo.getLocations()
 
-  return locations.map(({ id, name, parentId }) => ({
+  return locations.map(({ id, name, parentId, validUntil }) => ({
     id,
     name,
-    partOf: parentId
+    partOf: parentId,
+    validUntil: validUntil ? new Date(validUntil) : null
   }))
 }
 
 export const getChildLocations = async (parentIdToSearch: string) => {
   const locations = await locationsRepo.getChildLocations(parentIdToSearch)
 
-  return locations.map(({ id, name, parentId }) => ({
+  return locations.map(({ id, name, parentId, validUntil }) => ({
     id,
     name,
+    validUntil,
     partOf: parentId
   }))
 }
