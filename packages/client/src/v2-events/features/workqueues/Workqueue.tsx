@@ -26,7 +26,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
 import { CoreWorkqueues } from '@client/v2-events/utils'
 import { SearchResultComponent } from '../events/Search/SearchResult'
-import { useWorkqueueConfigurations } from '../events/useWorkqueueConfiguration'
+import { useCountryConfigWorkqueueConfigurations } from '../events/useCountryConfigWorkqueueConfigurations'
 import { useOutbox } from '../events/useEvents/outbox'
 import { Outbox } from './Outbox'
 import { Draft } from './Draft'
@@ -43,7 +43,7 @@ const FabContainer = styled.div`
 function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const eventConfigs = useEventConfigurations()
-  const workqueues = useWorkqueueConfigurations()
+  const workqueues = useCountryConfigWorkqueueConfigurations()
 
   const { getResult } = useWorkqueue(workqueueSlug)
   const outbox = useOutbox()

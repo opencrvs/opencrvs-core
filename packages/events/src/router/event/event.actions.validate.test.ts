@@ -12,11 +12,12 @@
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
 import {
+  ActionStatus,
   ActionType,
   AddressType,
   createPrng,
+  EventStatus,
   generateActionDeclarationInput,
-  getAcceptedActions,
   getCurrentEventState,
   getUUID,
   SCOPES
@@ -177,12 +178,17 @@ test('Skips required field validation when they are conditionally hidden', async
   })
 
   const response = await client.event.actions.validate.request(declaration)
-  const activeActions = getAcceptedActions(response)
 
-  const savedAction = activeActions.find(
-    (action) => action.type === ActionType.VALIDATE
+  const savedAction = response.actions.find(
+    (action) =>
+      action.type === ActionType.VALIDATE &&
+      action.status === ActionStatus.Accepted
   )
-  expect(savedAction?.declaration).toEqual(form)
+
+  expect(savedAction).toMatchObject({
+    status: ActionStatus.Accepted,
+    declaration: {}
+  })
 })
 
 test('Prevents adding birth date in future', async () => {
@@ -295,12 +301,22 @@ test('valid action is appended to event actions', async () => {
     expect.objectContaining({ type: ActionType.CREATE }),
     expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({
-      type: ActionType.DECLARE
+      type: ActionType.DECLARE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.DECLARE,
+      status: ActionStatus.Accepted
     }),
     expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({
-      type: ActionType.VALIDATE
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Accepted
     }),
     expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({
@@ -384,4 +400,106 @@ test('deduplication check is performed before validation when configured', async
     status: 'DECLARED',
     duplicates: [existingEvent.id]
   })
+})
+
+test('Event status changes after validation action is accepted', async () => {
+  const { user, generator } = await setupTestCase(100)
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  const declarePayload = generator.event.actions.declare(event.id)
+  const eventAfterDeclareAction =
+    await client.event.actions.declare.request(declarePayload)
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event.id, {
+      assignedTo: user.id
+    })
+  )
+  const validatePayload = generator.event.actions.validate(event.id, {
+    keepAssignment: true
+  })
+  const eventAfterValidatedAction =
+    await client.event.actions.validate.request(validatePayload)
+
+  const statusAfterDeclareAction = getCurrentEventState(
+    eventAfterDeclareAction,
+    tennisClubMembershipEvent
+  ).status
+  const statusAfterValidateAction = getCurrentEventState(
+    eventAfterValidatedAction,
+    tennisClubMembershipEvent
+  ).status
+
+  expect(eventAfterValidatedAction.actions).toStrictEqual([
+    ...eventAfterDeclareAction.actions,
+    expect.objectContaining({ type: ActionType.ASSIGN }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Accepted
+    })
+  ])
+
+  expect(statusAfterDeclareAction).toBe(EventStatus.Enum.DECLARED)
+  expect(statusAfterValidateAction).toBe(EventStatus.Enum.VALIDATED)
+})
+
+test('Event status does not change if validation action is rejected', async () => {
+  const { user, generator } = await setupTestCase(100)
+  const client = createTestClient(user)
+  mswServer.use(
+    http.post(
+      `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/validate`,
+      () => {
+        return HttpResponse.json(
+          { error: 'Simulating rejection' },
+          // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
+          { status: 400 }
+        )
+      }
+    )
+  )
+  const event = await client.event.create(generator.event.create())
+  const declarePayload = generator.event.actions.declare(event.id)
+  const eventAfterDeclareAction =
+    await client.event.actions.declare.request(declarePayload)
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event.id, {
+      assignedTo: user.id
+    })
+  )
+  const validatePayload = generator.event.actions.validate(event.id, {
+    keepAssignment: true
+  })
+  const eventAfterValidatedAction =
+    await client.event.actions.validate.request(validatePayload)
+
+  const statusAfterDeclareAction = getCurrentEventState(
+    eventAfterDeclareAction,
+    tennisClubMembershipEvent
+  ).status
+  const statusAfterValidateAction = getCurrentEventState(
+    eventAfterValidatedAction,
+    tennisClubMembershipEvent
+  ).status
+
+  expect(eventAfterValidatedAction.actions).toStrictEqual([
+    ...eventAfterDeclareAction.actions,
+    expect.objectContaining({ type: ActionType.ASSIGN }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Rejected
+    })
+  ])
+
+  expect(statusAfterDeclareAction).toBe(statusAfterValidateAction)
 })

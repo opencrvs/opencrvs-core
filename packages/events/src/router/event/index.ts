@@ -36,7 +36,7 @@ import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
 import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
 import {
   getEventConfigurationById,
-  getEventConfigurations
+  getInMemoryEventConfigurations
 } from '@events/service/config/config'
 import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
@@ -85,7 +85,7 @@ const eventConfigGetProcedure: QueryProcedure<{
   .input(z.void())
   .output(z.array(EventConfig))
   .query(async (options) => {
-    return getEventConfigurations(options.ctx.token)
+    return getInMemoryEventConfigurations(options.ctx.token)
   })
 
 export const eventRouter = router({
@@ -256,7 +256,7 @@ export const eventRouter = router({
     .output(z.array(EventIndex))
     .query(async ({ ctx }) => {
       const userId = ctx.user.id
-      const eventConfigs = await getEventConfigurations(ctx.token)
+      const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
 
       return getIndexedEvents(userId, eventConfigs)
     }),
@@ -279,7 +279,7 @@ export const eventRouter = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      const eventConfigs = await getEventConfigurations(ctx.token)
+      const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
       const scopes = getScopes({ Authorization: ctx.token })
 
       const searchScope = findScope(scopes, 'search')

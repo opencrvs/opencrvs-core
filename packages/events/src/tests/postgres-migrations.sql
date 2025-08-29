@@ -2,8 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.5 (Debian 17.5-1.pgdg120+1)
--- Dumped by pg_dump version 17.5 (Debian 17.5-1.pgdg120+1)
+\restrict W5E68IST3cySf1Phe2rYnMEVjVfEY4D1FIncx2Ngwd818oEXhhByX90BFgpKEEl
+
+-- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
+-- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -269,11 +271,11 @@ ALTER TABLE ONLY app.event_actions
 
 
 --
--- Name: event_actions event_actions_transaction_id_action_type_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+-- Name: event_actions event_actions_transaction_id_action_type_status_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
 ALTER TABLE ONLY app.event_actions
-    ADD CONSTRAINT event_actions_transaction_id_action_type_key UNIQUE (transaction_id, action_type);
+    ADD CONSTRAINT event_actions_transaction_id_action_type_status_key UNIQUE (transaction_id, action_type, status);
 
 
 --
@@ -402,4 +404,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 --
 -- PostgreSQL database dump complete
 --
+
+\unrestrict W5E68IST3cySf1Phe2rYnMEVjVfEY4D1FIncx2Ngwd818oEXhhByX90BFgpKEEl
 

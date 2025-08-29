@@ -20,7 +20,8 @@ export function useActionForHistory() {
       const approveAction = actions.find(
         (x) =>
           x.type === ActionType.APPROVE_CORRECTION &&
-          x.requestId === action.id &&
+          (x.requestId === action.id ||
+            x.requestId === action.originalActionId) &&
           x.annotation?.isImmediateCorrection &&
           x.createdBy === action.createdBy
       )
