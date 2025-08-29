@@ -208,7 +208,11 @@ export function DuplicateComparison({
                           right: potentialDuplicateEvent.trackingId,
                           left: originalEvent.trackingId
                         }}
-                        label={item.label}
+                        label={
+                          <Text color="grey600" element="span" variant="bold16">
+                            {item.label}
+                          </Text>
+                        }
                         leftValue={
                           <RightAlignedOnSmallScreen
                             element="span"
