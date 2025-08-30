@@ -22,35 +22,3 @@ export class RequestNotFoundError extends TRPCError {
     })
   }
 }
-
-/**
- * Throws an error if the event is waiting for correction.
- * This is used to prevent users from performing certain actions if the event is waiting for correction.
- *
- * Why is this not a middleware, you ask?
- * Because we want it to work together with the idempotency, which is only checked in the mutation with the 'isDuplicateAction' flag.
- *
- * @param eventId - The ID of the event to check
- * @param token - The authentication token
- * @throws {TRPCError} When the event is already waiting for correction
- */
-export async function throwConflictIfWaitingForCorrection(
-  eventId: UUID,
-  token: string
-) {
-  const event = await getEventById(eventId)
-
-  const eventConfig = await getEventConfigurationById({
-    token,
-    eventType: event.type
-  })
-
-  const eventState = getCurrentEventState(event, eventConfig)
-
-  if (eventState.flags.includes(InherentFlags.CORRECTION_REQUESTED)) {
-    throw new TRPCError({
-      code: 'CONFLICT',
-      message: 'Event is waiting for correction'
-    })
-  }
-}
