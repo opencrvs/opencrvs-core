@@ -554,6 +554,41 @@ exports[`User with my-jurisdiction scope can see events from other offices based
 }
 `;
 
+exports[`User with my-jurisdiction scope only sees events created by system user to their primary office 1`] = `
+{
+  "createdAt": "[sanitized]",
+  "createdBy": "[sanitized]",
+  "createdByUserType": "[sanitized]",
+  "dateOfEvent": "[sanitized]",
+  "declaration": {
+    "applicant.age": 19,
+    "applicant.dobUnknown": true,
+    "applicant.image": {
+      "originalFilename": "abcd.png",
+      "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+      "type": "image/png",
+    },
+    "applicant.name": {
+      "firstname": "Chris",
+      "surname": "Smith",
+    },
+    "recommender.none": true,
+  },
+  "flags": [
+    "incomplete",
+  ],
+  "id": "[sanitized]",
+  "legalStatuses": {},
+  "status": "NOTIFIED",
+  "trackingId": "[sanitized]",
+  "type": "tennis-club-membership",
+  "updatedAt": "[sanitized]",
+  "updatedAtLocation": "[sanitized]",
+  "updatedBy": "[sanitized]",
+  "updatedByUserRole": "HEALTH",
+}
+`;
+
 exports[`User with my-jurisdiction scope only sees events from their primary office 1`] = `
 {
   "assignedTo": "[sanitized]",

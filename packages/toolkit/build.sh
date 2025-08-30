@@ -34,6 +34,10 @@ npx esbuild src/api/index.ts --bundle --format=cjs --outdir=./dist/api --allow-o
 mkdir -p ./dist/commons/api
 cp -r ../events/build/types/router/router.d.ts ./dist/commons/api
 
+# Build deduplication api
+npx esbuild src/events/deduplication.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external
+cp -r ../commons/build/dist/common/events/deduplication.d.ts ./dist/events/deduplication.d.ts
+
 # Build common notifications
 npx esbuild src/notification/index.ts --bundle --format=cjs --outdir=./dist/notification --allow-overwrite --packages=external
 mkdir -p ./dist/commons/notification

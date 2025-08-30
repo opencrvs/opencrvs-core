@@ -64,7 +64,7 @@ export function payloadGenerator(rng: () => number) {
       return input.map((location, i) => ({
         id: location.id ?? getUUID(),
         name: location.name ?? `Location name ${i}`,
-        parentId: null,
+        parentId: location.parentId ?? null,
         validUntil: null
       }))
     }
