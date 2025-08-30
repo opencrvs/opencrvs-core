@@ -1,0 +1,93 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`deduplication query input conversion > should convert childDobWithin5Days to dateRange query 1`] = `
+{
+  "bool": {
+    "must": [
+      {
+        "range": {
+          "declaration.child____dob": {
+            "gte": "2011-11-06T00:00:00.000Z",
+            "lte": "2011-11-16T00:00:00.000Z",
+          },
+        },
+      },
+    ],
+    "should": [
+      {
+        "distance_feature": {
+          "field": "declaration.child____dob",
+          "origin": "2011-11-11",
+          "pivot": "3d",
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`deduplication query input conversion > should convert exactNamedChild to strict query 1`] = `
+{
+  "match_phrase": {
+    "declaration.child____name.__fullname": "John Smith",
+  },
+}
+`;
+
+exports[`deduplication query input conversion > should convert sameMotherNid to strict query 1`] = `
+{
+  "match_phrase": {
+    "declaration.mother____nid": "1232314352",
+  },
+}
+`;
+
+exports[`deduplication query input conversion > should convert similar child name to fuzzy query 1`] = `
+{
+  "match": {
+    "declaration.child____name.__fullname": {
+      "boost": 1,
+      "fuzziness": "AUTO:4,7",
+      "query": "John Smith",
+    },
+  },
+}
+`;
+
+exports[`deduplication query input conversion > should convert similarAgedMother to dateRange query 1`] = `
+{
+  "bool": {
+    "must": [
+      {
+        "range": {
+          "declaration.mother____dob": {
+            "gte": "1998-11-11T00:00:00.000Z",
+            "lte": "2000-11-10T00:00:00.000Z",
+          },
+        },
+      },
+    ],
+    "should": [
+      {
+        "distance_feature": {
+          "field": "declaration.mother____dob",
+          "origin": "1999-11-11",
+          "pivot": "243d",
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`deduplication query input conversion > should convert similarNamedMother to fuzzy query 1`] = `
+{
+  "match": {
+    "declaration.mother____name.__fullname": {
+      "boost": 1,
+      "fuzziness": "AUTO:4,7",
+      "query": "Janet Smith",
+    },
+  },
+}
+`;
