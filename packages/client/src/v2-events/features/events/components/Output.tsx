@@ -73,6 +73,10 @@ const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
 `
 
+const DeletedEmpty = styled(Deleted)`
+  text-decoration: none;
+`
+
 /**
  *  Used for setting output/read (REVIEW) values for FORM input/write fields (string defaults based on FieldType).
  * For setting default fields for intl object @see setEmptyValuesForFields
@@ -337,7 +341,12 @@ export function Output({
 
     return (
       <>
-        <Deleted>{deleted || '-'}</Deleted>
+        {deleted ? (
+          <Deleted>{deleted}</Deleted>
+        ) : (
+          // For a deleted 'dash', we dont want to overline the dash
+          <DeletedEmpty>{'-'}</DeletedEmpty>
+        )}
         <br />
         <ValueOutput config={field} value={value} />
       </>
