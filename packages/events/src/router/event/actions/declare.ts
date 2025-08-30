@@ -20,10 +20,7 @@ import {
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
-import {
-  addAction,
-  throwConflictIfActionNotAllowed
-} from '@events/service/events/events'
+import { addAction } from '@events/service/events/events'
 import {
   ActionProcedure,
   defaultRequestHandler,
@@ -49,17 +46,10 @@ export function declareActionProcedures(): ActionProcedure {
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user, isDuplicateAction } = ctx
-        const { eventId } = input
 
         if (isDuplicateAction) {
           return ctx.event
         }
-
-        await throwConflictIfActionNotAllowed(
-          eventId,
-          ActionType.DECLARE,
-          ctx.token
-        )
 
         const configs = await getInMemoryEventConfigurations(token)
 

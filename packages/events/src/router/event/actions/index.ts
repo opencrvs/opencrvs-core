@@ -173,6 +173,8 @@ export async function defaultRequestHandler(
   token: string,
   actionConfirmationResponseSchema?: z.ZodType
 ) {
+  await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
+
   const eventWithRequestedAction = await addAction(input, {
     user,
     token,
@@ -296,12 +298,6 @@ export function getDefaultActionProcedures(
         if (duplicates.detected) {
           return duplicates.event
         }
-
-        await throwConflictIfActionNotAllowed(
-          input.eventId,
-          actionType,
-          ctx.token
-        )
 
         return defaultRequestHandler(
           input,
