@@ -13,11 +13,16 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { EventIndex } from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
+import { ROUTES } from '@client/v2-events/routes/routes'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { useEventTitle } from '../../useEvents/useEventTitle'
 import { duplicateMessages } from './ReviewDuplicate'
@@ -30,6 +35,12 @@ const SubPageContent = styled(Content)`
 `
 
 export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
+
+  const [{ workqueue: slug }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE
+  )
+
   const intl = useIntl()
 
   const navigate = useNavigate()
@@ -65,6 +76,11 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
         ))
         if (marAsNotDuplicate) {
           alert('Marked as not a duplicate')
+          if (slug) {
+            navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
+          } else {
+            navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+          }
         }
       }}
     >
@@ -89,6 +105,7 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
         ))
         if (marAsDuplicate) {
           alert('Marked as a duplicate')
+          navigate(ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }))
         }
       }}
     >
