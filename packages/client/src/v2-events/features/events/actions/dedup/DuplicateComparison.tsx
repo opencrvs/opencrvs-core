@@ -11,7 +11,12 @@
 import React from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
-import { EventIndex } from '@opencrvs/commons/client'
+import {
+  DeclarationFormConfig,
+  EventIndex,
+  EventState,
+  FieldType
+} from '@opencrvs/commons/client'
 import {
   ComparisonListView,
   Content,
@@ -24,15 +29,37 @@ import { summaryMessages } from '@client/v2-events/features/workqueues/EventOver
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { noop } from '@client/v2-events'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { ValueOutput } from '../../components/Output'
 import { AdministrativeArea } from '../../registered-fields'
+import { DocumentViewer } from '../../components/DocumentViewer'
 import { duplicateMessages } from './ReviewDuplicate'
 
 const RightAlignedOnSmallScreen = styled(Text)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     text-align: end;
   }
+`
+
+const SupportingDocumentWrapper = styled(Stack)`
+  position: sticky;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`
+
+const MobileOnly = styled.div`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: block;
+  }
+`
+
+const DocWrapper = styled.div`
+  padding: 8px 16px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
 `
 
 interface ComparisonDeclaration {
@@ -43,6 +70,31 @@ interface ComparisonDeclaration {
     rightValue: React.ReactNode
     leftValue: React.ReactNode
   }[]
+}
+
+export function SupportingDocumentList({
+  declaration,
+  declarationConfig
+}: {
+  declaration: EventState
+  declarationConfig: DeclarationFormConfig
+}) {
+  return declarationConfig.pages
+    .flatMap(({ fields }) => fields)
+    .filter(
+      (field) =>
+        field.type === FieldType.FILE ||
+        field.type === FieldType.FILE_WITH_OPTIONS
+    )
+    .filter(({ id }) => declaration[id])
+    .map((field) => (
+      <DocWrapper key={field.id}>
+        {ValueOutput({
+          config: field,
+          value: declaration[field.id]
+        })}
+      </DocWrapper>
+    ))
 }
 
 function ResolveFullName({ userId }: { userId?: string }) {
@@ -80,6 +132,10 @@ export function DuplicateComparison({
             ({ id }) =>
               originalEvent.declaration[id] ||
               potentialDuplicateEvent.declaration[id]
+          )
+          .filter(
+            ({ type }) =>
+              type !== FieldType.FILE && type !== FieldType.FILE_WITH_OPTIONS
           )
           .map((field) => ({
             label: intl.formatMessage(field.label),
@@ -236,6 +292,56 @@ export function DuplicateComparison({
               )
             })}
           </Stack>
+        </Content>
+      </div>
+      <div>
+        <Content
+          showTitleOnMobile
+          size={ContentSize.LARGE}
+          title={intl.formatMessage(
+            duplicateMessages.duplicateComparePageSupportingDocuments
+          )}
+        >
+          <SupportingDocumentWrapper gap={25} justifyContent={'space-between'}>
+            <div style={{ flex: 1 }}>
+              <Text color="redDark" element="p" variant="bold14">
+                {originalEvent.trackingId}
+              </Text>
+              <DocumentViewer
+                disabled={false}
+                form={originalEvent.declaration}
+                formConfig={eventConfiguration.declaration}
+                isDuplicateComparisonView={true}
+                showInMobile={false}
+                onEdit={noop}
+              />
+              <MobileOnly>
+                <SupportingDocumentList
+                  declaration={originalEvent.declaration}
+                  declarationConfig={eventConfiguration.declaration}
+                />
+              </MobileOnly>
+            </div>
+            <div style={{ flex: 1 }}>
+              <Text color="grey400" element="p" variant="bold14">
+                {potentialDuplicateEvent.trackingId}
+              </Text>
+              <DocumentViewer
+                disabled={false}
+                form={potentialDuplicateEvent.declaration}
+                formConfig={eventConfiguration.declaration}
+                isDuplicateComparisonView={true}
+                showInMobile={false}
+                onEdit={noop}
+              />
+              <MobileOnly>
+                <SupportingDocumentList
+                  declaration={potentialDuplicateEvent.declaration}
+                  declarationConfig={eventConfiguration.declaration}
+                />
+              </MobileOnly>
+            </div>
+          </SupportingDocumentWrapper>
         </Content>
       </div>
     </FullBodyContent>
