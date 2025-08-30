@@ -236,20 +236,25 @@ export function getDefaultActionProcedures(
             code: 'INTERNAL_SERVER_ERROR',
             message: 'Unexpected failure from notification API'
           })
+          // For Async flow, we just return the event with the requested action
+        } else if (
+          responseStatus === ActionConfirmationResponse.RequiresProcessing
+        ) {
+          return eventWithRequestedAction
         }
 
-        // If we immediately get a response, we can mark the action as aceepted or rejected
-        // and also validate the payload received from the notify API
-        if (
-          responseStatus === ActionConfirmationResponse.Rejected ||
-          responseStatus === ActionConfirmationResponse.Success
-        ) {
-          const status =
-            responseStatus === ActionConfirmationResponse.Success
-              ? ActionStatus.Accepted
-              : responseStatus
-          let parsedBody
+        let status: ActionStatus = ActionStatus.Requested
+        let parsedBody
 
+        // If we immediately get a rejected response, we can mark the action as rejected
+        if (responseStatus === ActionConfirmationResponse.Rejected) {
+          status = ActionStatus.Rejected
+        }
+
+        // If we immediately get a success response, we mark the action as succeeded
+        // and also validate the payload received from the notify API
+        if (responseStatus === ActionConfirmationResponse.Success) {
+          status = ActionStatus.Accepted
           if (actionConfirmationResponseSchema) {
             try {
               parsedBody = actionConfirmationResponseSchema.parse(body)
@@ -260,34 +265,28 @@ export function getDefaultActionProcedures(
               })
             }
           }
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { declaration, annotation, ...strippedInput } = input
-
-          const requestedAction = getPendingAction(
-            eventWithRequestedAction.actions
-          )
-
-          return addAction(
-            {
-              ...strippedInput,
-              declaration: {},
-              originalActionId: requestedAction.id,
-              ...parsedBody
-            },
-            {
-              eventId: input.eventId,
-              user,
-              token,
-              status
-            }
-          )
         }
-        // For Async flow, we just return the event with the requested action
-        responseStatus satisfies Extract<
-          ActionConfirmationResponse,
-          'RequiresProcessing'
-        >
-        return eventWithRequestedAction
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { declaration, annotation, ...strippedInput } = input
+
+        const requestedAction = getPendingAction(
+          eventWithRequestedAction.actions
+        )
+
+        return addAction(
+          {
+            ...strippedInput,
+            declaration: {},
+            originalActionId: requestedAction.id,
+            ...parsedBody
+          },
+          {
+            eventId: input.eventId,
+            user,
+            token,
+            status
+          }
+        )
       }),
 
     accept: systemProcedure
