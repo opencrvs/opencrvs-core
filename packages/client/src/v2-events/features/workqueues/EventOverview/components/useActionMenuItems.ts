@@ -348,15 +348,6 @@ export function useAction(event: EventIndex) {
   }
 }
 
-const ACTION_MENU_ACTIONS_BY_EVENT_STATUS = {
-  [EventStatus.enum.NOTIFIED]: [
-    ActionType.READ,
-    ActionType.VALIDATE,
-    ActionType.ARCHIVE,
-    ActionType.REJECT
-  ]
-} satisfies Partial<Record<EventStatus, ActionType[]>>
-
 /**
  * @returns a list of action menu items based on the event state and scopes provided.
  */
@@ -370,21 +361,7 @@ export function useActionMenuItems(event: EventIndex) {
     authentication.scope.includes(SCOPES.RECORD_UNASSIGN_OTHERS)
   )
 
-  // Find actions available based on the event status
-  let availableActions: DisplayableAction[] = []
-  if (
-    !event.flags.includes(InherentFlags.REJECTED) &&
-    event.status in ACTION_MENU_ACTIONS_BY_EVENT_STATUS
-  ) {
-    availableActions =
-      ACTION_MENU_ACTIONS_BY_EVENT_STATUS[
-        event.status as keyof typeof ACTION_MENU_ACTIONS_BY_EVENT_STATUS
-      ]
-  } else if (event.flags.includes(InherentFlags.POTENTIAL_DUPLICATE)) {
-    availableActions = [ActionType.READ, ActionType.MARK_AS_DUPLICATE]
-  } else {
-    availableActions = getAvailableActionsForEvent(event)
-  }
+  const availableActions = getAvailableActionsForEvent(event)
 
   const drafts = useDrafts()
 

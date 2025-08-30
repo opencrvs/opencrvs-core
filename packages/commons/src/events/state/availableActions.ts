@@ -55,6 +55,10 @@ export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
 export const getAvailableActionsForEvent = (
   event: EventIndex
 ): DisplayableAction[] => {
+  if (event.flags.includes(InherentFlags.POTENTIAL_DUPLICATE)) {
+    return [ActionType.READ, ActionType.MARK_AS_DUPLICATE, ActionType.ARCHIVE]
+  }
+
   if (event.flags.includes(InherentFlags.REJECTED)) {
     return [
       ActionType.READ,
@@ -62,6 +66,13 @@ export const getAvailableActionsForEvent = (
         ? ActionType.VALIDATE
         : ActionType.DECLARE,
       ActionType.ARCHIVE
+    ]
+  } else if (event.status === EventStatus.enum.NOTIFIED) {
+    return [
+      ActionType.READ,
+      ActionType.VALIDATE,
+      ActionType.ARCHIVE,
+      ActionType.REJECT
     ]
   }
 
