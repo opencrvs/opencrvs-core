@@ -10,7 +10,6 @@
  */
 import { z } from 'zod'
 import { ActionConfig } from './ActionConfig'
-import { DeduplicationConfig } from './DeduplicationConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
@@ -42,7 +41,6 @@ export const EventConfig = z
     label: TranslationConfig,
     actions: z.array(ActionConfig),
     declaration: DeclarationFormConfig,
-    deduplication: z.array(DeduplicationConfig).optional().default([]),
     advancedSearch: z.array(AdvancedSearchConfig).optional().default([])
   })
   .superRefine((event, ctx) => {
