@@ -163,14 +163,20 @@ test('Skips required field validation when they are conditionally hidden', async
 
   const response = await client.event.actions.register.request(data)
 
-  const savedAction = response.actions.find(
+  const registerActions = response.actions.filter(
     (action) => action.type === ActionType.REGISTER
   )
 
-  expect(savedAction).toMatchObject({
-    status: ActionStatus.Accepted,
-    declaration: data.declaration
-  })
+  expect(registerActions).toEqual([
+    expect.objectContaining({
+      status: ActionStatus.Requested,
+      declaration: data.declaration
+    }),
+    expect.objectContaining({
+      status: ActionStatus.Accepted,
+      declaration: {}
+    })
+  ])
 })
 
 test('Prevents adding birth date in future', async () => {
@@ -214,7 +220,7 @@ describe('Request and confirmation flow', () => {
   function mockNotifyApi(status: number) {
     return mswServer.use(
       http.post<never, { actionId: string }>(
-        `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/REGISTER`,
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
         () => {
           registrationNumber = generateRegistrationNumber(prng)
           const responseBody = status === 200 ? { registrationNumber } : {}
@@ -259,7 +265,14 @@ describe('Request and confirmation flow', () => {
       (action) => action.type === ActionType.REGISTER
     )
 
-    expect(registerActions).toHaveLength(1)
+    expect(registerActions).toEqual([
+      expect.objectContaining({
+        status: ActionStatus.Requested
+      }),
+      expect.objectContaining({
+        status: ActionStatus.Accepted
+      })
+    ])
   })
 
   describe('Synchronous confirmation flow', () => {
@@ -277,12 +290,14 @@ describe('Request and confirmation flow', () => {
 
       const response = await client.event.actions.register.request(data)
       const savedAction = response.actions.find(
-        (action) => action.type === ActionType.REGISTER
+        (action) =>
+          action.type === ActionType.REGISTER &&
+          action.status === ActionStatus.Accepted
       )
 
       expect(savedAction).toMatchObject({
         status: ActionStatus.Accepted,
-        declaration: data.declaration,
+        declaration: {},
         registrationNumber: registrationNumber
       })
     })
@@ -297,7 +312,7 @@ describe('Request and confirmation flow', () => {
 
       mswServer.use(
         http.post(
-          `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/REGISTER`,
+          `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
           () => {
             return HttpResponse.json(
               { registrationNumber: 1234567890 }, // Registration number is not a string as it should be
@@ -318,7 +333,11 @@ describe('Request and confirmation flow', () => {
       const registerActions = event.actions.filter(
         (action) => action.type === ActionType.REGISTER
       )
-      expect(registerActions).toHaveLength(0)
+      expect(registerActions).toEqual([
+        expect.objectContaining({
+          status: ActionStatus.Requested
+        })
+      ])
     })
 
     test('should mark action as rejected if notify API returns HTTP 400', async () => {
@@ -336,17 +355,21 @@ describe('Request and confirmation flow', () => {
       })
 
       const response = await client.event.actions.register.request(data)
-      const savedAction = response.actions.find(
+      const registerActions = response.actions.filter(
         (action) => action.type === ActionType.REGISTER
       )
 
-      expect(savedAction).toMatchObject({
-        status: ActionStatus.Rejected,
-        declaration
-      })
+      expect(registerActions).toEqual([
+        expect.objectContaining({
+          status: ActionStatus.Requested
+        }),
+        expect.objectContaining({
+          status: ActionStatus.Rejected
+        })
+      ])
     })
 
-    test('should not save action if notify API returns HTTP 500', async () => {
+    test(`should not save ${ActionStatus.Accepted} / ${ActionStatus.Rejected} action if notify API returns HTTP 500`, async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user)
 
@@ -368,7 +391,11 @@ describe('Request and confirmation flow', () => {
       const registerActions = registeredEvent.actions.filter(
         (action) => action.type === ActionType.REGISTER
       )
-      expect(registerActions).toHaveLength(0)
+      expect(registerActions).toEqual([
+        expect.objectContaining({
+          status: ActionStatus.Requested
+        })
+      ])
     })
   })
 

@@ -53,7 +53,6 @@ export const createDraft = async (
       createdBy: user.id,
       createdByRole: user.role,
       createdByUserType: user.type,
-      createdAtLocation: user.primaryOfficeId,
       declaration: draft.declaration,
       annotation: draft.annotation,
       type: input.type,
