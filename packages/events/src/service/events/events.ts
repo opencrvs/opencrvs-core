@@ -118,7 +118,7 @@ export async function throwConflictIfActionNotAllowed(
   if (!allowedActions.includes(actionType)) {
     throw new TRPCError({
       code: 'CONFLICT',
-      message: `Action '${actionType}' cannot be performed on an event in '${eventIndex.status}' state with "${eventIndex.flags.join(', ')}" flags. Available actions: ${allowedActions.join(', ')}.`
+      message: `Action '${actionType}' cannot be performed on an event in '${eventIndex.status}' state with [${eventIndex.flags.join(', ')}] flags. Available actions: ${allowedActions.join(', ')}.`
     })
   }
 }
