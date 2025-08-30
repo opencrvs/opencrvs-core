@@ -151,11 +151,8 @@ export const ReviewWithParentFieldChanges: Story = {
       await userEvent.type(canvas.getByTestId('location__country'), 'Far')
       await userEvent.click(canvas.getByText('Farajaland', { exact: true }))
 
-      await userEvent.type(canvas.getByTestId('text__town'), 'My Town')
-      await userEvent.type(
-        canvas.getByTestId('text__residentialArea'),
-        'My Residential Area'
-      )
+      await userEvent.type(canvas.getByTestId('text__state'), 'My State')
+      await userEvent.type(canvas.getByTestId('text__district2'), 'My District')
       await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
     })
 
