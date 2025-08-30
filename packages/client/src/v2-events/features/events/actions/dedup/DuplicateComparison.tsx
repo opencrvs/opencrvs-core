@@ -97,10 +97,10 @@ export function SupportingDocumentList({
     ))
 }
 
-function UserFullName({ userId }: { userId?: string }) {
+function UserFullName({ userId }: { userId: string }) {
   const intl = useIntl()
   const users = useUsers()
-  const user = users.getUser.useQuery(userId || '').data
+  const user = users.getUser.useQuery(userId).data
   if (!user) {
     return null
   }
@@ -209,14 +209,14 @@ export function DuplicateComparison({
       },
       {
         label: intl.formatMessage(duplicateMessages.registeredBy),
-        rightValue: (
+        rightValue: flattenedPotentialDuplicateEvent['event.registeredBy'] ? (
           <UserFullName
             userId={flattenedPotentialDuplicateEvent['event.registeredBy']}
           />
-        ),
-        leftValue: (
+        ) : null,
+        leftValue: flattenedOriginalEvent['event.registeredBy'] ? (
           <UserFullName userId={flattenedOriginalEvent['event.registeredBy']} />
-        )
+        ) : null
       }
     ]
   }
