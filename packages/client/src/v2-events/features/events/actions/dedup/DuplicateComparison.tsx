@@ -97,7 +97,7 @@ export function SupportingDocumentList({
     ))
 }
 
-function ResolveFullName({ userId }: { userId?: string }) {
+function UserFullName({ userId }: { userId?: string }) {
   const intl = useIntl()
   const users = useUsers()
   const user = users.getUser.useQuery(userId || '').data
@@ -210,14 +210,12 @@ export function DuplicateComparison({
       {
         label: intl.formatMessage(duplicateMessages.registeredBy),
         rightValue: (
-          <ResolveFullName
+          <UserFullName
             userId={flattenedPotentialDuplicateEvent['event.registeredBy']}
           />
         ),
         leftValue: (
-          <ResolveFullName
-            userId={flattenedOriginalEvent['event.registeredBy']}
-          />
+          <UserFullName userId={flattenedOriginalEvent['event.registeredBy']} />
         )
       }
     ]
