@@ -23,7 +23,8 @@ export const User = z.object({
   ),
   role: z.string(),
   avatar: FullDocumentPath.optional(),
-  signature: FullDocumentPath.optional()
+  signature: FullDocumentPath.optional(),
+  primaryOfficeId: z.string()
 })
 
 export type User = z.infer<typeof User>

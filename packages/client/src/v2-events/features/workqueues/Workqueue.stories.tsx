@@ -88,7 +88,7 @@ export const Workqueue: Story = {
             return [tennisClubMembershipEventIndex]
           }),
           tRPCMsw.event.search.query((input) => {
-            return queryData
+            return { results: queryData, total: queryData.length }
           })
         ]
       }
@@ -145,7 +145,10 @@ export const WorkqueueWithMultipleEventType: Story = {
             return [tennisClubMembershipEventIndex]
           }),
           tRPCMsw.event.search.query((input) => {
-            return queryDataWithMultipleEventType
+            return {
+              results: queryDataWithMultipleEventType,
+              total: queryDataWithMultipleEventType.length
+            }
           })
         ]
       }
@@ -184,7 +187,7 @@ export const WorkqueueWithPagination: Story = {
             return queryData
           }),
           tRPCMsw.event.search.query((input) => {
-            return queryData
+            return { results: queryData, total: queryData.length }
           })
         ]
       }
@@ -230,9 +233,10 @@ export const ReadyToPrintWorkqueue: Story = {
             )
           }),
           tRPCMsw.event.search.query((input) => {
-            return queryData.filter(
+            const results = queryData.filter(
               (record) => record.status === EventStatus.enum.REGISTERED
             )
+            return { results, total: results.length }
           })
         ]
       }
@@ -275,7 +279,7 @@ export const NoResults: Story = {
             return []
           }),
           tRPCMsw.event.search.query((input) => {
-            return []
+            return { results: [], total: 0 }
           })
         ]
       }
@@ -340,7 +344,7 @@ export const Draft: Story = {
             return []
           }),
           tRPCMsw.event.search.query((input) => {
-            return []
+            return { results: [], total: 0 }
           })
         ],
         event: [
@@ -351,7 +355,7 @@ export const Draft: Story = {
             return createdEvent
           }),
           tRPCMsw.event.search.query((input) => {
-            return []
+            return { results: [], total: 0 }
           })
         ],
         drafts: [

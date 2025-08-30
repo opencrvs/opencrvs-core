@@ -10,31 +10,8 @@
  */
 import { Location } from '@events/service/locations/locations'
 import { IntlShape, useIntl } from 'react-intl'
-import {
-  EventState,
-  FieldConfig,
-  FieldValue,
-  isAddressFieldType,
-  isCountryFieldType,
-  isAdministrativeAreaFieldType,
-  isFacilityFieldType,
-  isOfficeFieldType,
-  isLocationFieldType,
-  isRadioGroupFieldType,
-  isSelectFieldType,
-  isNameFieldType,
-  isDateFieldType
-} from '@opencrvs/commons/client'
-import {
-  Address,
-  AdministrativeArea,
-  RadioGroup,
-  SelectCountry as Country,
-  Select,
-  LocationSearch,
-  Name,
-  DateField
-} from '@client/v2-events/features/events/registered-fields'
+import { EventState, FieldConfig, FieldValue } from '@opencrvs/commons/client'
+import { getRegisteredFieldByFieldConfig } from '@client/v2-events/features/events/registered-fields'
 import { useLocations } from './useLocations'
 
 interface RecursiveStringRecord {
@@ -46,33 +23,8 @@ type FieldStringifier = (
   value: FieldValue
 ) => string | RecursiveStringRecord
 
-export function stringifySimpleField(intl: IntlShape, locations: Location[]) {
-  return (fieldConfig: FieldConfig, value: FieldValue) => {
-    const field = { config: fieldConfig, value }
-    if (
-      isLocationFieldType(field) ||
-      isAdministrativeAreaFieldType(field) ||
-      isFacilityFieldType(field) ||
-      isOfficeFieldType(field)
-    ) {
-      // Since all of the above field types are actually locations
-      return AdministrativeArea.stringify(locations, field.value)
-    }
-
-    if (isRadioGroupFieldType(field)) {
-      return RadioGroup.stringify(intl, field.value, field.config)
-    }
-
-    if (isCountryFieldType(field)) {
-      return Country.stringify(intl, field.value)
-    }
-
-    if (isSelectFieldType(field)) {
-      return Select.stringify(intl, field.value, field.config)
-    }
-
-    return !value ? '' : value.toString()
-  }
+export function stringifySimpleField(value: FieldValue) {
+  return !value ? '' : value.toString()
 }
 
 export const formDataStringifierFactory =
@@ -99,27 +51,27 @@ export const getFormDataStringifier = (
   intl: IntlShape,
   locations: Location[]
 ) => {
-  const simpleFieldStringifier = stringifySimpleField(intl, locations)
-
   const stringifier = (fieldConfig: FieldConfig, value: FieldValue) => {
-    const field = { config: fieldConfig, value }
-    if (isAddressFieldType(field)) {
-      return Address.stringify(intl, locations, field.value)
+    const field = getRegisteredFieldByFieldConfig(fieldConfig)
+    if (!field) {
+      return stringifySimpleField(value)
     }
 
-    if (isFacilityFieldType(field)) {
-      return LocationSearch.stringify(intl, locations, field.value)
+    if (field.toCertificateVariables) {
+      return field.toCertificateVariables(value, {
+        intl,
+        locations,
+        config: fieldConfig
+      })
     }
-
-    if (isNameFieldType(field)) {
-      return Name.stringify(field.value)
+    if (field.stringify) {
+      return field.stringify(value, {
+        intl,
+        locations,
+        config: fieldConfig
+      })
     }
-
-    if (isDateFieldType(field)) {
-      return DateField.stringify(intl, field.value)
-    }
-
-    return simpleFieldStringifier(fieldConfig, value)
+    return stringifySimpleField(value)
   }
 
   return formDataStringifierFactory(stringifier)

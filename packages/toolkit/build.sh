@@ -38,6 +38,11 @@ cp -r ../events/build/types/router/router.d.ts ./dist/commons/api
 npx esbuild src/events/deduplication.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external
 cp -r ../commons/build/dist/common/events/deduplication.d.ts ./dist/events/deduplication.d.ts
 
+# Build common notifications
+npx esbuild src/notification/index.ts --bundle --format=cjs --outdir=./dist/notification --allow-overwrite --packages=external
+mkdir -p ./dist/commons/notification
+cp -r ../commons/build/dist/common/notification/*.d.ts ./dist/commons/notification
+
 if [[ "$OSTYPE" == "darwin"* ]]; then
   sed -i '' 's|@opencrvs/events/build/types|../commons/api|g' dist/api/index.d.ts
   find dist -type f -exec sed -i '' 's|@opencrvs/commons|../commons|g' {} +

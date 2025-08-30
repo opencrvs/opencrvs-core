@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux'
 import { IntlShape, useIntl } from 'react-intl'
 import { Location } from '@events/service/locations/locations'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
-import { FieldProps } from '@opencrvs/commons/client'
+import { FieldPropsWithoutReferenceValue } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { getListOfLocations } from '@client/utils/validate'
 import { generateLocations } from '@client/utils/locationUtils'
@@ -50,7 +50,7 @@ function LocationSearchInput({
   searchableResource,
   onBlur,
   ...props
-}: FieldProps<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
+}: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
   searchableResource: ('locations' | 'facilities' | 'offices')[]
   value?: string
@@ -86,33 +86,36 @@ function LocationSearchInput({
   )
 }
 
-function stringify(
-  intl: IntlShape,
-  locations: Location[],
-  value: Stringifiable | undefined | null
+function toCertificateVariables(
+  value: Stringifiable | undefined | null,
+  context: {
+    intl: IntlShape
+    locations: Location[]
+  }
 ) {
   if (!value) {
     return {
-      location: '',
+      name: '',
       district: '',
       province: '',
       country: ''
     }
   }
 
-  const country = intl.formatMessage({
+  const country = context.intl.formatMessage({
     id: `countries.${window.config.COUNTRY}`,
     defaultMessage: 'Farajaland',
     description: 'Country name'
   })
 
   const locationId = value.toString()
-  const location = locations.find((loc) => loc.id === locationId)
-  const district = locations.find((loc) => loc.id === location?.partOf)
-  const province = locations.find((loc) => loc.id === district?.partOf)
+  const location = context.locations.find((loc) => loc.id === locationId)
+
+  const district = context.locations.find((loc) => loc.id === location?.partOf)
+  const province = context.locations.find((loc) => loc.id === district?.partOf)
 
   return {
-    location: location?.name || '',
+    name: location?.name || '',
     district: district?.name || '',
     province: province?.name || '',
     country: country
@@ -123,13 +126,12 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
   const intl = useIntl()
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
-  const { location, district, province, country } = stringify(
+  const { name, district, province, country } = toCertificateVariables(value, {
     intl,
-    locations,
-    value
-  )
+    locations
+  })
 
-  return [location, district, province, country]
+  return [name, district, province, country]
     .filter((loc) => loc !== '')
     .join(', ')
 }
@@ -137,5 +139,5 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
 export const LocationSearch = {
   Input: LocationSearchInput,
   Output: LocationSearchOutput,
-  stringify
+  toCertificateVariables: toCertificateVariables
 }

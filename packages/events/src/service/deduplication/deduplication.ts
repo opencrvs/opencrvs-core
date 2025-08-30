@@ -18,7 +18,8 @@ import {
   FieldValue,
   EventConfig,
   getDeclarationFieldById,
-  DateValue
+  DateValue,
+  FieldType
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
@@ -30,7 +31,8 @@ import {
   decodeEventIndex,
   EncodedEventIndex,
   encodeEventIndex,
-  encodeFieldId
+  encodeFieldId,
+  nameQueryKey
 } from '@events/service/indexing/utils'
 
 export function generateElasticsearchQuery(
@@ -68,8 +70,8 @@ export function generateElasticsearchQuery(
   const fieldConfig = getDeclarationFieldById(eventConfig, rawFieldId)
   const encodedFieldId = encodeFieldId(rawFieldId)
   const valuePath =
-    fieldConfig.type === 'NAME'
-      ? `${encodedFieldId}.__fullname`
+    fieldConfig.type === FieldType.NAME
+      ? nameQueryKey(encodedFieldId)
       : encodedFieldId
 
   const queryKey = declarationReference(valuePath)
@@ -95,7 +97,7 @@ export function generateElasticsearchQuery(
       if (!isPrimitiveQueryValue(queryValue)) {
         logger.warn(
           queryValue,
-          `Invalid query value for found for fuzzy matching ${rawFieldId}. Expected string, number or boolean`
+          `Invalid query value found for fuzzy matching ${rawFieldId}. Expected string, number or boolean`
         )
         return null
       }
@@ -134,16 +136,19 @@ export function generateElasticsearchQuery(
         )
         return null
       }
+      const pivot =
+        queryInput.options.pivot ??
+        Math.floor((queryInput.options.days * 2) / 3)
       return {
         bool: {
           must: [
             {
               range: {
                 [queryKey]: {
-                  gte: DateTime.fromJSDate(new Date(dateValue.data))
+                  gte: DateTime.fromISO(dateValue.data)
                     .minus({ days: queryInput.options.days })
                     .toISO(),
-                  lte: DateTime.fromJSDate(new Date(dateValue.data))
+                  lte: DateTime.fromISO(dateValue.data)
                     .plus({ days: queryInput.options.days })
                     .toISO()
                 }
@@ -154,8 +159,8 @@ export function generateElasticsearchQuery(
             {
               distance_feature: {
                 field: queryKey,
-                pivot: `${queryInput.options.pivot ?? Math.floor((queryInput.options.days * 2) / 3)}d`,
-                origin: new Date(dateValue.data)
+                pivot: `${pivot}d`,
+                origin: dateValue.data
               }
             }
           ]
@@ -193,10 +198,13 @@ export async function searchForDuplicates(
     }
   })
 
-  return result.hits.hits
-    .filter((hit) => hit._source)
-    .map((hit) => ({
+  return result.hits.hits.flatMap((hit) => {
+    if (!hit._source) {
+      return []
+    }
+    return {
       score: hit._score || 0,
-      event: decodeEventIndex(eventConfig, hit._source as EventIndex)
-    }))
+      event: decodeEventIndex(eventConfig, hit._source)
+    }
+  })
 }

@@ -23,7 +23,6 @@ import {
   deepDropNulls,
   applyDraftToEventIndex,
   WorkqueueActionsWithDefault,
-  isMetaAction,
   TranslationConfig
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
@@ -32,7 +31,7 @@ import {
   SORT_ORDER,
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
-import { Button, Link as TextButton } from '@opencrvs/components'
+import { Link as TextButton } from '@opencrvs/components'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
@@ -44,11 +43,9 @@ import { useOnlineStatus } from '@client/utils'
 import { CoreWorkqueues } from '@client/v2-events/utils'
 import RetryButton from '@client/v2-events/components/RetryButton'
 import { useEventTitle } from '../useEvents/useEventTitle'
-import {
-  useAction,
-  useActionMenuItems
-} from '../../workqueues/EventOverview/components/useActionMenuItems'
 import { deserializeSearchParams, serializeSearchParams } from './utils'
+import { ActionCta } from './ActionCta'
+import { SearchResultItemTitle } from './SearchResultItemTitle'
 
 const WithTestId = styled.div.attrs({
   'data-testid': 'search-result'
@@ -201,40 +198,6 @@ const ExtendedEventStatuses = {
   DRAFT: 'DRAFT'
 } as const
 
-function ActionComponent({
-  event,
-  actionType
-}: {
-  event: EventIndex
-  actionType: WorkqueueActionsWithDefault
-}) {
-  const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
-
-  const { config: configs } = useAction(event)
-  const actionMenuItems = useActionMenuItems(event)
-
-  const intl = useIntl()
-
-  const config =
-    actionType === 'DEFAULT'
-      ? actionMenuItems.find(({ type }) => !isMetaAction(type))
-      : configs[actionType]
-
-  if (!config) {
-    return null
-  }
-
-  return (
-    <Button
-      disabled={'disabled' in config && Boolean(config.disabled)}
-      type="primary"
-      onClick={async () => config.onClick(slug)}
-    >
-      {intl.formatMessage(config.label)}
-    </Button>
-  )
-}
-
 export const SearchResultComponent = ({
   columns,
   queryData: events,
@@ -245,7 +208,8 @@ export const SearchResultComponent = ({
   tabBarContent,
   actions = [],
   emptyMessage,
-  allowRetry
+  allowRetry,
+  totalResults
 }: PropsWithChildren<{
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
@@ -254,6 +218,7 @@ export const SearchResultComponent = ({
   offset?: number
   title: string
   allowRetry?: boolean
+  totalResults: number
   tabBarContent?: React.ReactNode
   actions?: WorkqueueActionsWithDefault[]
   emptyMessage?: TranslationConfig
@@ -293,6 +258,7 @@ export const SearchResultComponent = ({
   const [sortOrder, setSortOrder] = useState<
     (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
   >(SORT_ORDER.DESCENDING)
+  const isWideScreen = windowWidth > theme.grid.breakpoints.lg
 
   const getSortFunction = (column: string) => {
     if (
@@ -312,7 +278,6 @@ export const SearchResultComponent = ({
       setSortOrder(newSortOrder)
     }
   }
-
   const mapEventsToResultRows = (
     eventsWithDraft: (EventIndex & {
       title: string | null
@@ -321,24 +286,33 @@ export const SearchResultComponent = ({
     })[]
   ) => {
     return eventsWithDraft.map(({ meta, ...event }) => {
-      const actionConfigs = actions
-        .map((actionType) => ({
-          actionComponent: (
-            <ActionComponent actionType={actionType} event={event} />
-          )
-        }))
-        .concat(
-          allowRetry ? { actionComponent: <RetryButton event={event} /> } : []
+      const actionConfigsWithoutDownloadButton = isWideScreen
+        ? actions
+            .map((actionType) => ({
+              actionComponent: (
+                <ActionCta
+                  actionType={actionType}
+                  event={event}
+                  redirectParam={slug}
+                />
+              )
+            }))
+            .concat(
+              allowRetry
+                ? { actionComponent: <RetryButton event={event} /> }
+                : []
+            )
+        : []
+
+      const actionConfigs = actionConfigsWithoutDownloadButton.concat({
+        actionComponent: (
+          <DownloadButton
+            key={`DownloadButton-${event.id}`}
+            event={event}
+            isDraft={slug === CoreWorkqueues.DRAFT}
+          />
         )
-        .concat({
-          actionComponent: (
-            <DownloadButton
-              key={`DownloadButton-${event.id}`}
-              event={event}
-              isDraft={slug === CoreWorkqueues.DRAFT}
-            />
-          )
-        })
+      })
 
       const eventConfig = eventConfigs.find(({ id }) => id === event.type)
       if (!eventConfig) {
@@ -364,41 +338,33 @@ export const SearchResultComponent = ({
       }
 
       const status = getEventStatus()
+      const type = intl.formatMessage(eventConfig.label)
       return {
         ...event,
         actions: actionConfigs,
         label: eventConfig.label,
-        type: intl.formatMessage(eventConfig.label),
+        type,
         createdAt: formattedDuration(new Date(event.createdAt)),
         updatedAt: formattedDuration(new Date(event.updatedAt)),
         status: intl.formatMessage(messages.eventStatus, {
           status
         }),
-        title:
-          isInOutbox && !isInDrafts ? (
-            <IconWithName
-              flags={event.flags}
-              name={event.title}
-              status={status}
-            />
-          ) : (
-            <TextButton
-              color={event.useFallbackTitle ? 'red' : 'primary'}
-              onClick={() => {
-                return navigate(
-                  ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-                    eventId: event.id
-                  })
-                )
-              }}
-            >
-              <IconWithName
-                flags={event.flags}
-                name={event.title}
-                status={status}
-              />
-            </TextButton>
-          ),
+        title: (
+          <SearchResultItemTitle
+            event={event}
+            isInDrafts={isInDrafts}
+            isInOutbox={isInOutbox}
+            status={status}
+            type={type}
+            onClick={() => {
+              return navigate(
+                ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+                  eventId: event.id
+                })
+              )
+            }}
+          />
+        ),
         outbox: intl.formatMessage(
           isOnline ? messages.processingAction : messages.waitingForAction,
           {
@@ -424,7 +390,7 @@ export const SearchResultComponent = ({
   // @todo: update when workqueue actions buttons are updated
   // @TODO: separate types for action button vs other columns
   function getColumns(): Array<Column> {
-    if (windowWidth > theme.grid.breakpoints.lg) {
+    if (isWideScreen) {
       return columns.map(({ label, value }) => ({
         label: intl.formatMessage(label),
         width: value.$event === 'outbox' ? 35 : 15,
@@ -486,12 +452,9 @@ export const SearchResultComponent = ({
 
   const currentPageNumber = Math.floor(offset / limit) + 1
 
-  const paginatedData = allResults.slice(
-    limit * (currentPageNumber - 1),
-    limit * currentPageNumber
-  )
+  const paginatedData = allResults
 
-  const totalPages = events.length ? Math.ceil(events.length / limit) : 0
+  const totalPages = totalResults ? Math.ceil(totalResults / limit) : 0
 
   const isShowPagination = totalPages > 1
 
@@ -511,13 +474,34 @@ export const SearchResultComponent = ({
     }
   }
 
+  const responsiveColumns = isWideScreen
+    ? [
+        ...getDefaultColumns(),
+        ...getColumns(),
+        {
+          width: 20,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true,
+          alignment: ColumnContentAlignment.RIGHT
+        }
+      ]
+    : [
+        { ...getDefaultColumns()[0], width: 70 },
+        {
+          width: 30,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true,
+          alignment: ColumnContentAlignment.RIGHT
+        }
+      ]
+
   return (
     <WithTestId>
       <WQContentWrapper
         error={false}
         isMobileSize={windowWidth < theme.grid.breakpoints.lg}
         isShowPagination={isShowPagination}
-        noContent={events.length === 0}
+        noContent={totalResults === 0}
         noResultText={
           emptyMessage ? intl.formatMessage(emptyMessage) : noResultText
         }
@@ -528,16 +512,7 @@ export const SearchResultComponent = ({
         onPageChange={(page) => setOffset((page - 1) * limit)}
       >
         <Workqueue
-          columns={[
-            ...getDefaultColumns(),
-            ...getColumns(),
-            {
-              width: 20,
-              key: COLUMNS.ACTIONS,
-              isActionColumn: true,
-              alignment: ColumnContentAlignment.RIGHT
-            }
-          ]}
+          columns={responsiveColumns}
           content={paginatedData}
           hideLastBorder={!isShowPagination}
           sortOrder={sortOrder}

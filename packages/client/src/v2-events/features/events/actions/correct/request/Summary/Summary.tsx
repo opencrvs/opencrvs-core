@@ -127,12 +127,12 @@ export function Summary() {
         ...nullifiedHiddenValues
       },
       transactionId: generateTransactionId(),
-      annotation
+      annotation,
+      fullEvent: event
     }
     if (scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)) {
       events.customActions.makeCorrectionOnRequest.mutate({
         ...mutationPayload,
-        fullEvent: event,
         eventConfiguration
       })
     } else {
@@ -143,8 +143,8 @@ export function Summary() {
   }, [
     form,
     fields,
-    event,
     eventConfiguration,
+    event,
     scopes,
     events.customActions.makeCorrectionOnRequest,
     events.actions.correction.request,

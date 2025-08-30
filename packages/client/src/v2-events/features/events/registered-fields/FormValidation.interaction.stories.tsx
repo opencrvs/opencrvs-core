@@ -92,7 +92,12 @@ const parameters = {
           return createdEvent
         }),
         tRPCMsw.event.search.query((input) => {
-          return [getCurrentEventState(createdEvent, tennisClubMembershipEvent)]
+          return {
+            results: [
+              getCurrentEventState(createdEvent, tennisClubMembershipEvent)
+            ],
+            total: 1
+          }
         })
       ]
     }

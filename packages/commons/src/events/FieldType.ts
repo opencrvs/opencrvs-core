@@ -39,7 +39,9 @@ export const FieldType = {
   FACILITY: 'FACILITY',
   OFFICE: 'OFFICE',
   SIGNATURE: 'SIGNATURE',
-  DATA: 'DATA'
+  DATA: 'DATA',
+  BUTTON: 'BUTTON',
+  HTTP: 'HTTP'
 } as const
 
 /**

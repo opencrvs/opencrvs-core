@@ -12,10 +12,14 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
-import { sendUserName } from './service'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
-import { logger } from '@opencrvs/commons'
+import {
+  logger,
+  triggerUserEventNotification,
+  personNameFromV1ToV2
+} from '@opencrvs/commons'
 import { getUserId } from '@user-mgnt/utils/userUtils'
+import { COUNTRY_CONFIG_URL } from '@user-mgnt/constants'
 
 interface IResendUsernameSMSPayload {
   userId: string
@@ -32,25 +36,28 @@ export default async function usernameReminderHandler(
   if (!user) {
     throw unauthorized()
   }
-
-  await sendUserName(
-    user.username,
-    user.name,
-    {
-      Authorization: request.headers.authorization
-    },
-    user.mobile,
-    user.emailForNotification
-  )
-
   const remoteAddress =
     request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
     request.headers['x-real-user-agent'] || request.headers['user-agent']
 
-  const subjectPractitionerId = user.practitionerId
-
   try {
+    await triggerUserEventNotification({
+      event: 'username-reminder',
+      payload: {
+        recipient: {
+          name: personNameFromV1ToV2(user.name),
+          email: user.emailForNotification,
+          mobile: user.mobile
+        },
+        username: user.username
+      },
+      countryConfigUrl: COUNTRY_CONFIG_URL,
+      authHeader: { Authorization: request.headers.authorization }
+    })
+
+    const subjectPractitionerId = user.practitionerId
+
     const systemAdminUser: IUserModel | null = await User.findById(
       getUserId({ Authorization: request.headers.authorization })
     )

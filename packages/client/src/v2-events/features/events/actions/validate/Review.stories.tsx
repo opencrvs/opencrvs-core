@@ -11,7 +11,10 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import {
   ActionType,
+  createPrng,
+  generateActionDocument,
   generateEventDocument,
+  generateUuid,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -29,22 +32,61 @@ export default meta
 
 type Story = StoryObj<typeof Validate.Pages>
 
+const actions = [
+  generateActionDocument({
+    configuration: tennisClubMembershipEvent,
+    action: ActionType.CREATE
+  }),
+  generateActionDocument({
+    configuration: tennisClubMembershipEvent,
+    action: ActionType.DECLARE,
+    defaults: {
+      declaration: {
+        'applicant.name': {
+          firstname: 'Riku',
+          surname: 'Rouvila'
+        },
+        'applicant.dob': '2025-01-23',
+        'recommender.name': {
+          firstname: 'Euan',
+          surname: 'Millar'
+        }
+      }
+    },
+
+    annotation: {
+      'review.comment': 'asdasdasdasdasdasd'
+    }
+  })
+]
+
+const prng = createPrng(123123)
+const incompleteEventForLocalRegistrar = {
+  trackingId: generateUuid(prng),
+  type: tennisClubMembershipEvent.id,
+  actions,
+  createdAt: new Date(Date.now()).toISOString(),
+  id: generateUuid(prng),
+
+  updatedAt: new Date(Date.now()).toISOString()
+}
+
 export const ReviewForLocalRegistrarIncomplete: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
+        eventId: incompleteEventForLocalRegistrar.id
       })
     },
     offline: {
-      events: [tennisClubMembershipEventDocument]
+      events: [incompleteEventForLocalRegistrar]
     }
   }
 }
 const eventForlocalRegistrarComplete = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE]
+  actions: [ActionType.CREATE, ActionType.DECLARE]
 })
 
 export const ReviewForLocalRegistrarComplete: Story = {
@@ -63,7 +105,7 @@ export const ReviewForLocalRegistrarComplete: Story = {
 
 const eventForRegistrationAgentComplete = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE]
+  actions: [ActionType.CREATE, ActionType.DECLARE]
 })
 
 export const ReviewForRegistrationAgentComplete: Story = {
@@ -92,6 +134,15 @@ export const ReviewForRegistrationAgentComplete: Story = {
   }
 }
 
+const incompleteEventForRegistrationAgent = {
+  trackingId: generateUuid(prng),
+  type: tennisClubMembershipEvent.id,
+  actions,
+  createdAt: new Date(Date.now()).toISOString(),
+  id: generateUuid(prng),
+
+  updatedAt: new Date(Date.now()).toISOString()
+}
 export const ReviewForRegistrationAgentIncomplete: Story = {
   loaders: [
     async () => {
@@ -106,12 +157,12 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
   ],
   parameters: {
     offline: {
-      events: [tennisClubMembershipEventDocument]
+      events: [incompleteEventForRegistrationAgent]
     },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
+        eventId: incompleteEventForRegistrationAgent.id
       })
     }
   }

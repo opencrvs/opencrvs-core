@@ -19,6 +19,11 @@ on:
         type: boolean
         required: false
         default: false
+      skip_security_check:
+        description: Skip security scan
+        type: boolean
+        required: false
+        default: false
     outputs:
       build_status:
         description: build job output
@@ -33,6 +38,10 @@ on:
         type: boolean
         default: false
         description: Runs additional checks for release version
+      skip_security_check:
+        type: boolean
+        required: false
+        default: false
   push:
     branches:
       - develop
@@ -198,6 +207,7 @@ jobs:
 
   merge-services-manifest:
     needs: [base, build]
+    if: always()
     strategy:
       fail-fast: false
       matrix:
@@ -248,7 +258,8 @@ jobs:
   security-scans-pr:
     needs: [build, base]
     runs-on: ubuntu-24.04
-    if: github.event_name == 'pull_request' && (github.event.pull_request.base.ref == 'develop' || github.event.pull_request.base.ref == 'main')
+    if: >
+      github.event_name == 'pull_request' && (github.event.pull_request.base.ref == 'develop' || github.event.pull_request.base.ref == 'main') && !inputs.skip_security_check
     strategy:
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
@@ -286,7 +297,7 @@ jobs:
   security-scans-develop:
     needs: [build, base]
     runs-on: ubuntu-24.04
-    if: ${{ needs.base.outputs.branch == 'develop' || inputs.publish_release }}
+    if: ${{ (needs.base.outputs.branch == 'develop' || inputs.publish_release) && !inputs.skip_security_check }}
     strategy:
       fail-fast: false
       matrix:

@@ -46,5 +46,8 @@ function SelectDateRangeFieldInput(props: SelectDateRangeInputProps) {
 }
 
 export const SelectDateRangeField = {
-  Input: SelectDateRangeFieldInput
+  Input: SelectDateRangeFieldInput,
+  Output: Select.Output,
+  stringify: (value: SelectDateRangeValue | undefined) =>
+    value?.toString() ?? ''
 }

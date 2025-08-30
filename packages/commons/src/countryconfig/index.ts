@@ -10,7 +10,7 @@
  */
 
 import { z } from 'zod'
-import { ActionInput, ActionTypes, EventConfig, EventDocument } from '../events'
+import { ActionTypes, EventConfig, EventDocument } from '../events'
 import { ZodOpenApiPathsObject } from 'zod-openapi'
 
 export const countryConfigApi: ZodOpenApiPathsObject = {
@@ -31,7 +31,7 @@ export const countryConfigApi: ZodOpenApiPathsObject = {
     }
   },
 
-  '/events/{eventType}/actions/{actionType}': {
+  '/trigger/events/{eventType}/actions/{actionType}': {
     post: {
       tags: ['Events'],
       description: 'Receive a notification of an action',
@@ -55,9 +55,7 @@ export const countryConfigApi: ZodOpenApiPathsObject = {
         content: {
           'application/json': {
             schema: z.object({
-              actionId: z.string(),
-              event: EventDocument,
-              action: ActionInput
+              event: EventDocument
             })
           }
         }

@@ -17,12 +17,12 @@ import { userEvent, waitFor } from '@storybook/test'
 import {
   ActionType,
   createPrng,
-  FullDocumentPath,
   generateEventDocument,
   generateEventDraftDocument,
   generateWorkqueues,
   getCurrentEventState,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  UUID
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -143,9 +143,12 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
             return eventDocument
           }),
           tRPCMsw.event.search.query(() => {
-            return [
-              getCurrentEventState(eventDocument, tennisClubMembershipEvent)
-            ]
+            return {
+              total: 1,
+              results: [
+                getCurrentEventState(eventDocument, tennisClubMembershipEvent)
+              ]
+            }
           })
         ],
         drafts: [
@@ -168,7 +171,8 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
                 name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
                 role: 'LOCAL_REGISTRAR',
                 signature: undefined,
-                avatar: undefined
+                avatar: undefined,
+                primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
               }
             ]
           }),
@@ -178,7 +182,8 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
               name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
               role: 'LOCAL_REGISTRAR',
               signature: undefined,
-              avatar: undefined
+              avatar: undefined,
+              primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
             }
           })
         ]
@@ -234,7 +239,8 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
                 ],
                 role: 'SOCIAL_WORKER',
                 signature: undefined,
-                avatar: undefined
+                avatar: undefined,
+                primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
               }
             ]
           }),
@@ -244,7 +250,8 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
               name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
               role: 'LOCAL_REGISTRAR',
               signature: undefined,
-              avatar: undefined
+              avatar: undefined,
+              primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
             }
           })
         ]

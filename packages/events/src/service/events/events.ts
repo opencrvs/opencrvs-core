@@ -261,7 +261,8 @@ function buildAction(
     createdByRole: user.role,
     createdByUserType: user.type,
     createdBySignature: user.signature,
-    createdAtLocation: user.primaryOfficeId,
+    createdAtLocation:
+      user.type === 'system' ? input.createdAtLocation : user.primaryOfficeId,
     originalActionId: input.originalActionId
   }
   switch (input.type) {
@@ -352,10 +353,12 @@ export async function addAction(
   await eventsRepo.createAction(buildAction(input, status, user))
 
   // We want to unassign only if:
+  // - ActionStatus is not requested
   // - Action is a write action, since we dont want to unassign from e.g. READ action
   // - Keep assignment is false
   // - User is not a system user, since system users dont partake in assignment
   const shouldUnassign =
+    status !== ActionStatus.Requested &&
     isWriteAction(input.type) &&
     !input.keepAssignment &&
     user.type !== TokenUserType.enum.system

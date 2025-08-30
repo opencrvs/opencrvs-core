@@ -53,3 +53,5 @@ export * from '../conditionals/validate'
 // This is a workaround for the fact that field is not exported from events
 export * from './field'
 export * from './event'
+
+export { UUID } from '../uuid'

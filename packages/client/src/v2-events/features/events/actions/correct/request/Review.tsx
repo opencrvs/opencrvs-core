@@ -26,10 +26,13 @@ import {
   isMetaAction,
   deepMerge,
   Action,
-  RequestedCorrectionAction
+  RequestedCorrectionAction,
+  getCompleteActionDeclaration,
+  getCurrentEventState,
+  ActionDocument,
+  getAcceptedActions
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { getCurrentEventState } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -96,8 +99,17 @@ export function Review() {
     form
   })
 
-  const writeActions = event.actions.filter((a) => !isMetaAction(a.type))
+  const writeActions: ActionDocument[] = getAcceptedActions(event).filter(
+    (a) => !isMetaAction(a.type)
+  )
   const lastWriteAction = writeActions[writeActions.length - 1]
+
+  const completeDeclaration = getCompleteActionDeclaration(
+    {},
+    event,
+    lastWriteAction
+  )
+  lastWriteAction.declaration = completeDeclaration
   const lastActionIsCorrectionRequest = isLastActionCorrectionRequest(event)
 
   const canReviewCorrection =
@@ -119,7 +131,7 @@ export function Review() {
       : form
 
   return (
-    <FormLayout route={ROUTES.V2.EVENTS.REGISTER}>
+    <FormLayout route={ROUTES.V2.EVENTS.CORRECTION}>
       <ReviewComponent.Body
         form={formWithNewValues}
         formConfig={formConfig}

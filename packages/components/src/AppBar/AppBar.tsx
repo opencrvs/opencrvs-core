@@ -44,6 +44,8 @@ const MobileLeft = styled.div`
   align-items: center;
   gap: 16px;
   grid-column: 1;
+  overflow: hidden;
+  min-width: 0;
 `
 
 const MobileCenter = styled.div`
@@ -68,6 +70,7 @@ const Title = styled(Text)`
   overflow: hidden;
   text-overflow: ellipsis;
   height: 25px;
+  min-width: 0;
 `
 
 type IProps = {

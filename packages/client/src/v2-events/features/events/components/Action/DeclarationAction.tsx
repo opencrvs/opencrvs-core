@@ -12,6 +12,7 @@
 import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import {
   Draft,
   createEmptyDraft,
@@ -22,10 +23,15 @@ import {
   ActionType,
   Action,
   deepMerge,
-  getAnnotationFromDrafts,
-  mergeDrafts,
   getUUID,
-  deepDropNulls
+  deepDropNulls,
+  mergeDrafts,
+  EventDocument,
+  EventConfig,
+  getAvailableActionsForEvent,
+  getCurrentEventState,
+  ACTION_ALLOWED_SCOPES,
+  hasAnyOfScopes
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -35,36 +41,43 @@ import { createTemporaryId } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
+import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
-import { getEventDrafts } from './utils'
 
+/**
+ * Business requirement states that annotation must be prefilled from previous action.
+ * From architechtual perspective, each action has separate annotation of its own.
+ *
+ * @returns the previous declaration action type based on the current action type.
+ */
 function getPreviousDeclarationActionType(
   actions: Action[],
   currentActionType: DeclarationUpdateActionType
-): DeclarationUpdateActionType | undefined {
-  // If action type is DECLARE, there is no previous declaration action
+): DeclarationUpdateActionType | typeof ActionType.NOTIFY | undefined {
+  /** NOTE: If event is rejected before registration, there might be previous action of the same type present.
+   * Action arrays are intentionally ordered to get the latest prefilled annotation.
+   * */
+
+  let actionTypes: (DeclarationUpdateActionType | typeof ActionType.NOTIFY)[]
+
   if (currentActionType === ActionType.DECLARE) {
-    return
+    actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
   }
 
   // If action type is VALIDATE, we know that the previous declaration action is DECLARE
-  if (currentActionType === ActionType.VALIDATE) {
-    return ActionType.DECLARE
+  else if (currentActionType === ActionType.VALIDATE) {
+    actionTypes = [ActionType.VALIDATE, ActionType.DECLARE]
   }
 
   // If action type is REGISTER, we know that the previous declaration action is VALIDATE
-  if (currentActionType === ActionType.REGISTER) {
-    return ActionType.VALIDATE
+  else if (currentActionType === ActionType.REGISTER) {
+    actionTypes = [ActionType.VALIDATE]
+  } else {
+    // If action type is REQUEST_CORRECTION, we want to get the 'latest' action type
+    // Check for the most recent action type in order of precedence
+    actionTypes = [ActionType.REGISTER, ActionType.VALIDATE, ActionType.DECLARE]
   }
-
-  // If action type is REQUEST_CORRECTION, we want to get the 'latest' action type
-  // Check for the most recent action type in order of precedence
-  const actionTypes = [
-    ActionType.REGISTER,
-    ActionType.VALIDATE,
-    ActionType.DECLARE
-  ]
 
   for (const type of actionTypes) {
     if (actions.find((a) => a.type === type)) {
@@ -75,6 +88,44 @@ function getPreviousDeclarationActionType(
   return
 }
 
+/**
+ *
+ * @param actionType Action type of the declaration action
+ * @param event Event document
+ * @param configuration Event configuration
+ *
+ * Throws an error if the action is not allowed for the event or if the user does not have permission to perform the action.
+ */
+function useActionGuard(
+  actionType: DeclarationUpdateActionType,
+  event: EventDocument,
+  configuration: EventConfig
+) {
+  const userScopes = useSelector(getScope) ?? []
+
+  const eventState = getCurrentEventState(event, configuration)
+
+  const availableActions = getAvailableActionsForEvent(eventState)
+
+  const isActionAllowed = availableActions.includes(actionType)
+  if (!isActionAllowed) {
+    // If the action is not available for the event, redirect to the overview page
+    throw new Error(
+      `Action ${actionType} not available for the event ${event.id} with status ${getCurrentEventState(event, configuration).status} ${eventState.flags.length > 0 ? `(flags: ${eventState.flags.join(', ')})` : ''}`
+    )
+  }
+
+  const requiredScopes = ACTION_ALLOWED_SCOPES[actionType]
+
+  const canUserPerformAction = hasAnyOfScopes(userScopes, requiredScopes)
+
+  if (!canUserPerformAction) {
+    // If the user cannot perform the action, redirect to the unauthorized page
+    throw new Error(
+      `User does not have permission to perform action ${actionType} on event ${event.id}`
+    )
+  }
+}
 /**
  * Creates a wrapper component for the declaration action.
  * Manages the state of the declaration action and its local draft.
@@ -114,6 +165,8 @@ function DeclarationActionComponent({
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
+
+  useActionGuard(actionType, event, configuration)
 
   const remoteDraft: Draft | undefined = getRemoteDraftByEventId(event.id)
 

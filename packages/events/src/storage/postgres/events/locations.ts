@@ -10,32 +10,43 @@
  */
 
 import { sql } from 'kysely'
+import { chunk } from 'lodash'
+import { logger, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { Locations, NewLocations } from './schema/app/Locations'
 
+const INSERT_MAX_CHUNK_SIZE = 10000
+
 export async function setLocations(locations: NewLocations[]) {
   const db = getClient()
-  const locationIds = locations.map(({ id }) => id)
-
-  await db
-    .insertInto('locations')
-    .values(locations.map((loc) => ({ ...loc, deletedAt: null })))
-    .onConflict((oc) =>
-      oc.column('id').doUpdateSet({
-        name: (eb) => eb.ref('excluded.name'),
-        parentId: (eb) => eb.ref('excluded.parentId'),
-        updatedAt: () => sql`now()`,
-        deletedAt: null
-      })
-    )
-    .execute()
 
   await db
     .updateTable('locations')
     .set({ deletedAt: sql`now()` })
     .where('deletedAt', 'is', null)
-    .where('id', 'not in', locationIds)
     .execute()
+
+  for (const [index, batch] of chunk(
+    locations,
+    INSERT_MAX_CHUNK_SIZE
+  ).entries()) {
+    logger.info(
+      `Processing ${(index + 1) * INSERT_MAX_CHUNK_SIZE}/${locations.length} locations`
+    )
+    // Insert or update the locations in the database
+    await db
+      .insertInto('locations')
+      .values(batch.map((loc) => ({ ...loc, deletedAt: null })))
+      .onConflict((oc) =>
+        oc.column('id').doUpdateSet({
+          name: (eb) => eb.ref('excluded.name'),
+          parentId: (eb) => eb.ref('excluded.parentId'),
+          updatedAt: () => sql`now()`,
+          deletedAt: null
+        })
+      )
+      .execute()
+  }
 }
 
 export async function getLocations() {
@@ -68,4 +79,18 @@ export async function getChildLocations(id: string) {
     WHERE l.id <> ${id};
   `.execute(db)
   return rows
+}
+
+// Check if a location is a leaf location, i.e. it has no children
+export async function isLeafLocation(id: UUID) {
+  const db = getClient()
+
+  const result = await db
+    .selectFrom('locations')
+    .select('id')
+    .where('parentId', '=', id)
+    .limit(1)
+    .executeTakeFirst()
+
+  return !result
 }

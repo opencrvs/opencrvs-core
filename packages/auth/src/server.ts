@@ -76,7 +76,11 @@ export type AuthServer = {
 export async function createServer() {
   let whitelist: string[] = [env.DOMAIN]
   if (env.DOMAIN[0] !== '*') {
-    whitelist = [env.COUNTRY_CONFIG_URL, env.LOGIN_URL, env.CLIENT_APP_URL]
+    whitelist = [
+      env.COUNTRY_CONFIG_URL_EXTERNAL,
+      env.LOGIN_URL,
+      env.CLIENT_APP_URL
+    ]
   }
   logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
@@ -418,8 +422,10 @@ export async function createServer() {
   }
 
   async function start() {
-    await server.start()
+    // Start database before application server.
+    // We have had issues where the database was not ready when the server started which resulted in redis instance being undefined.
     await database.start()
+    await server.start()
     server.log('info', `server started on ${env.AUTH_HOST}:${env.AUTH_PORT}`)
   }
 

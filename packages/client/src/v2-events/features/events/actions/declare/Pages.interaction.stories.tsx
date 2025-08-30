@@ -83,7 +83,6 @@ function createDraftHandlers() {
           createdBy: 'test-user',
           createdByUserType: 'user',
           createdByRole: 'test-role',
-          createdAtLocation: 'test-location' as UUID,
           createdAt: new Date().toISOString(),
           status: ActionStatus.Accepted
         }
@@ -138,12 +137,15 @@ export const SaveAndExit: Story = {
             return undeclaredDraftEvent
           }),
           tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                undeclaredDraftEvent,
-                tennisClubMembershipEvent
-              )
-            ]
+            return {
+              results: [
+                getCurrentEventState(
+                  undeclaredDraftEvent,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
           })
         ]
       }
@@ -258,12 +260,15 @@ export const DraftShownInForm: Story = {
             ]
           }),
           tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                undeclaredDraftEvent,
-                tennisClubMembershipEvent
-              )
-            ]
+            return {
+              results: [
+                getCurrentEventState(
+                  undeclaredDraftEvent,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
           })
         ],
         event: [
@@ -373,7 +378,7 @@ export const FilledPagesVisibleInReview: Story = {
             return undeclaredDraftEvent
           }),
           tRPCMsw.event.search.query((input) => {
-            return []
+            return { results: [], total: 0 }
           })
         ]
       }

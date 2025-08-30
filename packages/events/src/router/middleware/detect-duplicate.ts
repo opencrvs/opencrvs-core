@@ -15,7 +15,6 @@ import {
   ActionStatus,
   ActionType,
   DeclarationActionConfig,
-  DeclareActionInput,
   EventDocument,
   getCurrentEventState,
   RegisterActionInput,
@@ -23,19 +22,18 @@ import {
 } from '@opencrvs/commons/events'
 import { getUUID } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
-import { getEventConfigurations } from '@events/service/config/config'
+import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 import { addAction, getEventById } from '@events/service/events/events'
 
-function isModifyAllowedAction(
+function requiresDedupCheck(
   input: ActionInputWithType
-): input is DeclareActionInput | ValidateActionInput | RegisterActionInput {
-  const modifyAllowedActions: ActionType[] = [
-    ActionType.DECLARE,
+): input is ValidateActionInput | RegisterActionInput {
+  const actionsRequiringCheck: ActionType[] = [
     ActionType.VALIDATE,
     ActionType.REGISTER
   ]
-  return modifyAllowedActions.includes(input.type)
+  return actionsRequiringCheck.includes(input.type)
 }
 
 export const detectDuplicate: MiddlewareFunction<
@@ -54,7 +52,7 @@ export const detectDuplicate: MiddlewareFunction<
   },
   ActionInputWithType
 > = async ({ input, next, ctx }) => {
-  if (!isModifyAllowedAction(input)) {
+  if (!requiresDedupCheck(input)) {
     return next({
       ctx: {
         duplicates: {
@@ -64,7 +62,7 @@ export const detectDuplicate: MiddlewareFunction<
     })
   }
   const { user, token } = ctx
-  const configs = await getEventConfigurations(token)
+  const configs = await getInMemoryEventConfigurations(token)
   const storedEvent = await getEventById(input.eventId)
   const config = configs.find((c) => c.id === storedEvent.type)
 

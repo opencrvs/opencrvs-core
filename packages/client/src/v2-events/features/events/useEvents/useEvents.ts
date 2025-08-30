@@ -11,7 +11,7 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import { QueryType, UUID, getUUID } from '@opencrvs/commons/client'
+import { QueryType, SearchQuery, UUID, getUUID } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
@@ -45,7 +45,7 @@ export function useEvents() {
     getOutbox: useOutbox,
     searchEvent: {
       useQuery: (
-        query: QueryType,
+        query: SearchQuery,
         options: QueryOptions<typeof trpc.event.search> = {}
       ) => {
         return useQuery({
@@ -57,7 +57,7 @@ export function useEvents() {
         })
       },
       useSuspenseQuery: (
-        query: QueryType,
+        query: SearchQuery,
         options: QueryOptions<typeof trpc.event.search> = {}
       ) => {
         return useSuspenseQuery({
@@ -76,11 +76,11 @@ export function useEvents() {
           clauses: [{ id }]
         } satisfies QueryType
 
-        const options = trpc.event.search.queryOptions(query)
+        const options = trpc.event.search.queryOptions({ query })
 
         return useQuery({
           ...options,
-          queryKey: trpc.event.search.queryKey(query),
+          queryKey: trpc.event.search.queryKey({ query }),
           enabled: !findLocalEventIndex(id),
           staleTime: 0,
           refetchOnMount: 'always',
@@ -90,14 +90,14 @@ export function useEvents() {
               throw new Error('Query function is not defined')
             }
             const res = await queryFn(...args)
-            if (res.length === 0) {
+            if (res.total === 0) {
               throw new Error(`No event found with id: ${id}`)
             }
             return res
           },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
-            return eventIndex ? [eventIndex] : undefined
+            return eventIndex ? { results: [eventIndex], total: 1 } : undefined
           }
         })
       },
@@ -107,25 +107,25 @@ export function useEvents() {
           clauses: [{ id }]
         } satisfies QueryType
 
-        const options = trpc.event.search.queryOptions(query)
+        const options = trpc.event.search.queryOptions({ query })
 
         return useSuspenseQuery({
           ...options,
-          queryKey: trpc.event.search.queryKey(query),
+          queryKey: trpc.event.search.queryKey({ query }),
           queryFn: async (...args) => {
             const queryFn = options.queryFn
             if (!queryFn) {
               throw new Error('Query function is not defined')
             }
             const res = await queryFn(...args)
-            if (res.length === 0) {
+            if (res.total === 0) {
               throw new Error(`No event found with id: ${id}`)
             }
             return res
           },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
-            return eventIndex ? [eventIndex] : undefined
+            return eventIndex ? { results: [eventIndex], total: 1 } : undefined
           }
         }).data
       }

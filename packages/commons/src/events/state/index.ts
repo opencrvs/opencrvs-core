@@ -23,7 +23,13 @@ import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
-import { deepMerge } from '../utils'
+import {
+  aggregateActionDeclarations,
+  deepMerge,
+  getAcceptedActions,
+  getCompleteActionAnnotation,
+  omitHiddenPaginatedFields
+} from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
 import { getFlagsFromActions } from './flags'
@@ -96,44 +102,6 @@ export function getAssignedUserSignatureFromActions(
   }, null)
 }
 
-function aggregateActionDeclarations(
-  actions: Array<ActionDocument>
-): EventState {
-  /** Types that are not taken into the aggregate values (e.g. while printing certificate)
-   * stop auto filling collector form with previous print action data)
-   */
-
-  const excludedActions = [
-    ActionType.REQUEST_CORRECTION,
-    ActionType.PRINT_CERTIFICATE,
-    ActionType.REJECT_CORRECTION
-  ]
-
-  return actions.reduce((declaration, action) => {
-    if (
-      excludedActions.some((excludedAction) => excludedAction === action.type)
-    ) {
-      return declaration
-    }
-
-    /*
-     * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
-     * details in the correction. To do this, we find the original request that this
-     * approval is for and merge its details with the current data of the record.
-     */
-
-    if (action.type === ActionType.APPROVE_CORRECTION) {
-      const requestAction = actions.find(({ id }) => id === action.requestId)
-      if (!requestAction) {
-        return declaration
-      }
-      return deepMerge(declaration, requestAction.declaration)
-    }
-
-    return deepMerge(declaration, action.declaration)
-  }, {})
-}
-
 type NonNullableDeep<T> = T extends [unknown, ...unknown[]] // <-- ✨ tiny change: handle tuples first
   ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
   : T extends UUID
@@ -178,11 +146,6 @@ export function deepDropNulls<T>(obj: T): NonNullableDeep<T> {
 
 export function isUndeclaredDraft(status: EventStatus): boolean {
   return status === EventStatus.enum.CREATED
-}
-export function getAcceptedActions(event: EventDocument): ActionDocument[] {
-  return event.actions.filter(
-    (a): a is ActionDocument => a.status === ActionStatus.Accepted
-  )
 }
 
 export const DEFAULT_DATE_OF_EVENT_PROPERTY =
@@ -240,7 +203,7 @@ export function getCurrentEventState(
   // Includes only accepted actions metadata. Sometimes (e.g. on updatedAt) we want to show the accepted timestamp rather than the request timestamp.
   const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
 
-  const declaration = aggregateActionDeclarations(acceptedActions)
+  const declaration = aggregateActionDeclarations(event, config)
 
   return deepDropNulls({
     id: event.id,
@@ -257,7 +220,7 @@ export function getCurrentEventState(
     assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
     updatedBy: requestActionMetadata.createdBy,
     updatedAtLocation: requestActionMetadata.createdAtLocation,
-    declaration,
+    declaration: omitHiddenPaginatedFields(config.declaration, declaration),
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),
@@ -383,10 +346,18 @@ export function getActionAnnotation({
   const activeActions = getAcceptedActions(event)
 
   const action = findLast(activeActions, (a) => a.type === actionType)
+
+  const actionWithCompleteAnnotation = action && {
+    ...action,
+    annotation: getCompleteActionAnnotation({}, event, action)
+  }
+
   const matchingDraft = draft?.action.type === actionType ? draft : undefined
 
   const sortedActions = orderBy(
-    [action, matchingDraft?.action].filter((a) => a !== undefined),
+    [actionWithCompleteAnnotation, matchingDraft?.action].filter(
+      (a) => a !== undefined
+    ),
     'createdAt',
     'asc'
   )

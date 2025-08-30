@@ -107,6 +107,11 @@ export const handlers = {
           partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
         },
         {
+          id: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+          name: 'Isango',
+          partOf: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID
+        },
+        {
           id: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
           name: 'Isamba',
           partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
@@ -1119,7 +1124,7 @@ export const handlers = {
       return HttpResponse.json({
         data: {
           getUser: {
-            id: '679397db138339c63cdc24e1',
+            id: testDataGenerator().user.id.localRegistrar,
             userMgntUserID: '679397db138339c63cdc24e1',
             creationDate: '1737725915295',
             username: 'k.mweene',
@@ -1178,7 +1183,8 @@ export const handlers = {
           name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
           role: 'LOCAL_REGISTRAR',
           signature: undefined,
-          avatar: undefined
+          avatar: undefined,
+          primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
         }
       ]
     }),
@@ -1194,7 +1200,8 @@ export const handlers = {
         ],
         role: 'LOCAL_REGISTRAR',
         signature: 'signature.png' as FullDocumentPath,
-        avatar: undefined
+        avatar: undefined,
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
       }
     })
   ],
@@ -1206,7 +1213,7 @@ export const handlers = {
       return [tennisClubMembershipEventIndex]
     }),
     tRPCMsw.event.search.query((input) => {
-      return []
+      return { results: [], total: 0 }
     })
   ],
   locations: [

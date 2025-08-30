@@ -152,11 +152,13 @@ export function EventSummary({
         label: field.label ?? config.label,
         emptyValueMessage: field.emptyValueMessage,
         secured: config.secured ?? false,
-        value: Output({
-          field: config,
-          showPreviouslyMissingValuesAsChanged: false,
-          value
-        })
+        value: (
+          <Output
+            field={config}
+            showPreviouslyMissingValuesAsChanged={false}
+            value={value}
+          />
+        )
       }
     }
 

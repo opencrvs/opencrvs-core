@@ -200,7 +200,7 @@ function EventOverviewContainer() {
 
   // Suspense query is not used here because we want to refetch when an event action is performed
   const getEventQuery = searchEventById.useQuery(params.eventId)
-  const eventIndex = getEventQuery.data?.[0]
+  const eventIndex = getEventQuery.data?.results[0]
 
   const fullEvent = getEvent.findFromCache(params.eventId).data
 

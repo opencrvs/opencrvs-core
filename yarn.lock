@@ -10070,6 +10070,23 @@
     "@types/node" "*"
     "@types/pdfkit" "*"
 
+"@types/pg-cursor@^2.7.2":
+  version "2.7.2"
+  resolved "https://registry.yarnpkg.com/@types/pg-cursor/-/pg-cursor-2.7.2.tgz#0b1f80685a48940d48c742c48c10f9a923290e76"
+  integrity sha512-m3xT8bVFCvx98LuzbvXyuCdT/Hjdd/v8ml4jL4K1QF70Y8clOfCFdgoaEB1FWdcSwcpoFYZTJQaMD9/GQ27efQ==
+  dependencies:
+    "@types/node" "*"
+    "@types/pg" "*"
+
+"@types/pg@*":
+  version "8.15.5"
+  resolved "https://registry.yarnpkg.com/@types/pg/-/pg-8.15.5.tgz#ef43e0f33b62dac95cae2f042888ec7980b30c09"
+  integrity sha512-LF7lF6zWEKxuT3/OR8wAZGzkg4ENGXFNyiV/JeOt9z5B+0ZVwbql9McqX5c/WStFq1GaGso7H1AzP/qSzmlCKQ==
+  dependencies:
+    "@types/node" "*"
+    pg-protocol "*"
+    pg-types "^2.2.0"
+
 "@types/pg@^8.15.1":
   version "8.15.1"
   resolved "https://registry.yarnpkg.com/@types/pg/-/pg-8.15.1.tgz#ee6fad7608d2348f55226a5fb5118efdab97ecf9"
@@ -20534,6 +20551,11 @@ json-stable-stringify-without-jsonify@^1.0.1:
   resolved "https://registry.npmjs.org/json-stable-stringify-without-jsonify/-/json-stable-stringify-without-jsonify-1.0.1.tgz"
   integrity sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==
 
+json-stream-stringify@^3.1.6:
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/json-stream-stringify/-/json-stream-stringify-3.1.6.tgz#ebe32193876fb99d4ec9f612389a8d8e2b5d54d4"
+  integrity sha512-x7fpwxOkbhFCaJDJ8vb1fBY3DdSa4AlITaz+HHILQJzdPMnHEFjxPwVUi1ALIbcIxDE0PNe/0i7frnY8QnBQog==
+
 json-stream@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/json-stream/-/json-stream-1.0.0.tgz"
@@ -23790,6 +23812,11 @@ pg-cursor@^2.15.0:
   version "2.15.0"
   resolved "https://registry.yarnpkg.com/pg-cursor/-/pg-cursor-2.15.0.tgz#600081ac5d1f3987ce7fbfc475b72c277db6037a"
   integrity sha512-sO3SQP9seXoaV7sddeKrPQk3zhnrMchCr71cYjkyNHCC6n3mA5AAyhK5foxy+yBtnBZuPqxzoiVxz3jKyV7D3g==
+
+pg-cursor@^2.15.3:
+  version "2.15.3"
+  resolved "https://registry.yarnpkg.com/pg-cursor/-/pg-cursor-2.15.3.tgz#19f05739ff95366eed28e80191a6321d0e036395"
+  integrity sha512-eHw63TsiGtFEfAd7tOTZ+TLy+i/2ePKS20H84qCQ+aQ60pve05Okon9tKMC+YN3j6XyeFoHnaim7Lt9WVafQsA==
 
 pg-int8@1.0.1:
   version "1.0.1"

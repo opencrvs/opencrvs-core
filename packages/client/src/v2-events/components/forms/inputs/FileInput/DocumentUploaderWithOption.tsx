@@ -11,7 +11,6 @@
 
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useIntl } from 'react-intl'
 import {
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
@@ -24,6 +23,7 @@ import { ErrorText } from '@opencrvs/components'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
+import { useIntlWithFormData } from '@client/v2-events/messages/utils'
 import { DocumentUploader } from './SimpleDocumentUploader'
 import { DocumentListPreview } from './DocumentListPreview'
 import { DocumentPreview } from './DocumentPreview'
@@ -81,13 +81,13 @@ function DocumentUploaderWithOption({
   acceptedFileTypes?: MimeType[]
   options: SelectOption[]
   value: FileFieldWithOptionValue
-  onChange: (file?: FileFieldValueWithOption[]) => void
+  onChange: (file: FileFieldValueWithOption[]) => void
   error?: string
   hideOnEmptyOption?: boolean
   autoSelectOnlyOption?: boolean
   maxFileSize: number
 }) {
-  const intl = useIntl()
+  const intl = useIntlWithFormData()
   const documentTypeRequiredErrorMessage = intl.formatMessage(
     DocumentTypeRequiredError
   )
@@ -146,8 +146,13 @@ function DocumentUploaderWithOption({
   })
 
   const onDeleteFile = (path: FullDocumentPath) => {
-    setFiles((prevFiles) => prevFiles.filter((file) => file.path !== path))
-    onChange(files.filter((file) => file.path !== path))
+    setFiles((prevFiles) => {
+      const updatedFiles = prevFiles.filter((file) => file.path !== path)
+      onChange(updatedFiles)
+
+      return updatedFiles
+    })
+
     setPreviewImage(null)
   }
 
@@ -257,7 +262,7 @@ function DocumentWithOptionOutput({
   value?: FileFieldWithOptionValue
   config: FileUploadWithOptions
 }) {
-  const intl = useIntl()
+  const intl = useIntlWithFormData()
   const [previewImage, setPreviewImage] =
     useState<FileFieldValueWithOption | null>(null)
 

@@ -308,11 +308,14 @@ function FormReview({
               const value = form[field.id]
               const previousValue = previousForm[field.id]
 
+              // previousForm, formConfig are used to find previous values with the same label if required
               const valueDisplay = Output({
                 field,
                 previousValue,
                 showPreviouslyMissingValuesAsChanged,
-                value
+                value,
+                previousForm,
+                formConfig
               })
 
               const error = runFieldValidations({
@@ -539,7 +542,7 @@ function ReviewComponent({
       {pageIdsWithFile.length > 0 && (
         <RightColumn>
           <DocumentViewer
-            disabled={readonlyMode}
+            disabled={readonlyMode || isCorrection || isReviewCorrection}
             form={form}
             formConfig={formConfig}
             // @todo: ask about this rule

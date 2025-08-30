@@ -50,5 +50,8 @@ function TextInput({
 
 export const Text = {
   Input: TextInput,
-  Output: ({ value }: { value?: string }) => <>{value?.toString() || ''}</>
+  Output: ({ value }: { value?: string }) => <>{value?.toString() || ''}</>,
+  stringify: (value: string | undefined) => {
+    return value?.toString() || ''
+  }
 }

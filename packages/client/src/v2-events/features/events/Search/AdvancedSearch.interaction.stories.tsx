@@ -16,7 +16,9 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { waitFor } from '@testing-library/dom'
 import {
+  ActionType,
   footballClubMembershipEvent,
+  generateEventDocument,
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
@@ -46,7 +48,11 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const trpcHandlers = createDeclarationTrpcMsw(tRPCMsw)
+const createdEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE]
+})
+const trpcHandlers = createDeclarationTrpcMsw(tRPCMsw, createdEventDocument)
 
 const defaultHandlers = {
   events: trpcHandlers.events.handlers,
