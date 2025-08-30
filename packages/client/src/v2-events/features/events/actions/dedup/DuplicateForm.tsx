@@ -16,45 +16,30 @@ import { useNavigate } from 'react-router-dom'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import {
-  ResponsiveModal,
-  Select,
-  Stack,
-  Text,
-  TextArea
-} from '@opencrvs/components/lib'
 import { EventIndex } from '@opencrvs/commons/client'
-import { buttonMessages } from '@client/i18n/messages'
+import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { useEventTitle } from '../../useEvents/useEventTitle'
 import { duplicateMessages } from './ReviewDuplicate'
+import { MarkAsNotDuplicateModal } from './MarkAsNotDuplicateModal'
+import { MarkAsDuplicateModal } from './MarkAsDuplicateModal'
 
 const SubPageContent = styled(Content)`
   margin: auto 0 20px;
   max-width: 100%;
 `
 
-const StyledText = styled(Text)`
-  padding-bottom: 4px;
-`
-
-const StyledTextArea = styled(TextArea)`
-  border-radius: 4px;
-  margin-bottom: 24px;
-`
-
 export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
   const intl = useIntl()
 
   const navigate = useNavigate()
-  const [showModal, setShowModal] = React.useState(false)
-  const [selectedTrackingId, setSelectedTrackingId] = React.useState('')
-  const [comment, setComment] = React.useState('')
   const { getEventTitle } = useEventTitle()
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     eventIndex.type
   )
+
+  const [modal, openModal] = useModal()
 
   const { title: name } = getEventTitle(configuration, eventIndex)
 
@@ -64,30 +49,23 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
     .map((duplicate) => duplicate.trackingId)
     .join(', ')
 
-  const toggleModal = () => {
-    setShowModal((prev) => !prev)
-  }
-
-  const handleCommentChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    setComment(event.target.value)
-  }
-
-  const [toggleNotDuplicate, setToggleNotDuplicate] = React.useState(false)
-
-  const toggleNotDuplicateModal = () => {
-    setToggleNotDuplicate((prevValue) => !prevValue)
-  }
-
   const notADuplicateButton = (
     <Button
       key="btn-not-a-duplicate"
       fullWidth
       id="not-a-duplicate"
       type="positive"
-      onClick={() => {
-        toggleNotDuplicateModal()
+      onClick={async () => {
+        const marAsNotDuplicate = await openModal<boolean>((close) => (
+          <MarkAsNotDuplicateModal
+            close={close}
+            name={name || ''}
+            trackingId={eventIndex.trackingId}
+          />
+        ))
+        if (marAsNotDuplicate) {
+          alert('Marked as not a duplicate')
+        }
       }}
     >
       <Icon name="NotePencil" />
@@ -101,8 +79,17 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
       fullWidth
       id="mark-as-duplicate"
       type="negative"
-      onClick={() => {
-        toggleModal()
+      onClick={async () => {
+        const marAsDuplicate = await openModal<boolean>((close) => (
+          <MarkAsDuplicateModal
+            close={close}
+            duplicates={eventIndex.duplicates}
+            originalTrackingId={eventIndex.trackingId}
+          />
+        ))
+        if (marAsDuplicate) {
+          alert('Marked as a duplicate')
+        }
       }}
     >
       <Icon name="Archive" />
@@ -128,108 +115,7 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
           })}
         ></SubPageContent>
       </div>
-
-      <ResponsiveModal
-        actions={[
-          <Button
-            key="cancel"
-            id="modal_cancel"
-            type="tertiary"
-            onClick={toggleModal}
-          >
-            {intl.formatMessage(buttonMessages.cancel)}
-          </Button>,
-          <Button
-            key="mark-as-duplicate-button"
-            disabled={!(Boolean(selectedTrackingId) && Boolean(comment))}
-            id="mark-as-duplicate-button"
-            type="negative"
-            onClick={() => {
-              alert('Mark as duplicate clicked')
-            }}
-          >
-            {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
-          </Button>
-        ]}
-        autoHeight={true}
-        handleClose={toggleModal}
-        id="mark-as-duplicate-modal"
-        show={showModal}
-        title={intl.formatMessage(
-          duplicateMessages.markAsDuplicateConfirmationTitle,
-          {
-            trackingId: eventIndex.trackingId
-          }
-        )}
-        titleHeightAuto={true}
-        width={840}
-      >
-        {
-          <>
-            <Stack alignItems="stretch" direction="column" gap={10}>
-              <Text element="span" variant="reg18">
-                {intl.formatMessage(duplicateMessages.duplicateDropdownMessage)}
-              </Text>
-              <Select
-                id="selectTrackingId"
-                isDisabled={false}
-                options={eventIndex.duplicates.map(({ trackingId }) => ({
-                  value: trackingId,
-                  label: trackingId
-                }))}
-                value={selectedTrackingId}
-                onChange={(val: string) => {
-                  setSelectedTrackingId(val)
-                }}
-              />
-              <StyledText element="span" variant="reg18">
-                {intl.formatMessage(duplicateMessages.markAsDuplicateReason)}
-              </StyledText>
-              <StyledTextArea
-                id="describe-reason"
-                {...{
-                  onChange: handleCommentChange
-                }}
-              />
-            </Stack>
-          </>
-        }
-      </ResponsiveModal>
-      <ResponsiveModal
-        actions={[
-          <Button
-            key="not-duplicateRegistration-cancel"
-            id="not-duplicate-cancel"
-            type="tertiary"
-            onClick={() => toggleNotDuplicateModal()}
-          >
-            {intl.formatMessage(buttonMessages.cancel)}
-          </Button>,
-          <Button
-            key="not-duplicateRegistration-confirm"
-            id="not-duplicate-confirm"
-            type="primary"
-            onClick={() => {
-              alert('Not a duplicate clicked')
-            }}
-          >
-            {intl.formatMessage(buttonMessages.confirm)}
-          </Button>
-        ]}
-        autoHeight={true}
-        handleClose={() => toggleNotDuplicateModal()}
-        id="not-duplicate-modal"
-        responsive={false}
-        show={toggleNotDuplicate}
-        title={intl.formatMessage(
-          duplicateMessages.notDuplicateContentConfirmationTitle,
-          {
-            name,
-            trackingId: eventIndex.trackingId
-          }
-        )}
-        titleHeightAuto={true}
-      ></ResponsiveModal>
+      {modal}
     </>
   )
 }
