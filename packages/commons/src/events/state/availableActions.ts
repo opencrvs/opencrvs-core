@@ -63,6 +63,8 @@ const ACTION_FILTERS: {
     !flags.includes(InherentFlags.CORRECTION_REQUESTED),
   [ActionType.REQUEST_CORRECTION]: (flags) =>
     !flags.includes(InherentFlags.CORRECTION_REQUESTED),
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: (flags) =>
+    flags.includes(InherentFlags.CORRECTION_REQUESTED),
   [ActionType.APPROVE_CORRECTION]: (flags) =>
     flags.includes(InherentFlags.CORRECTION_REQUESTED),
   [ActionType.REJECT_CORRECTION]: (flags) =>
@@ -88,7 +90,7 @@ function filterActionsByFlags(
  * (NOTIFIED & DECLARED) + REJECTED are an exception to this as we want to allow all the
  * actions available to CREATED minus DELETE plus ARCHIVE
  */
-function getAvailableActions(
+function getAvailableActionsWithoutFlagFilters(
   status: EventStatus,
   flags: Flag[]
 ): DisplayableAction[] {
@@ -98,7 +100,7 @@ function getAvailableActions(
     }
     case EventStatus.Enum.NOTIFIED: {
       if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActions(
+        return getAvailableActionsWithoutFlagFilters(
           EventStatus.Enum.CREATED,
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
         )
@@ -109,7 +111,7 @@ function getAvailableActions(
     }
     case EventStatus.Enum.DECLARED: {
       if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActions(
+        return getAvailableActionsWithoutFlagFilters(
           EventStatus.Enum.CREATED,
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
         )
@@ -120,7 +122,7 @@ function getAvailableActions(
     }
     case EventStatus.Enum.VALIDATED: {
       if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActions(
+        return getAvailableActionsWithoutFlagFilters(
           EventStatus.Enum.DECLARED,
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
         )
@@ -136,11 +138,21 @@ function getAvailableActions(
   }
 }
 
+export function getAvailableActions(
+  status: EventStatus,
+  flags: Flag[]
+): DisplayableAction[] {
+  return filterActionsByFlags(
+    getAvailableActionsWithoutFlagFilters(status, flags),
+    flags
+  )
+}
+
 export function getAvailableActionsForEvent(
   event: EventIndex
 ): DisplayableAction[] {
   return filterActionsByFlags(
-    getAvailableActions(event.status, event.flags),
+    getAvailableActionsWithoutFlagFilters(event.status, event.flags),
     event.flags
   )
 }
