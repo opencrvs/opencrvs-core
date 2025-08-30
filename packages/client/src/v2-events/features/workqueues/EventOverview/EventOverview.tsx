@@ -210,11 +210,13 @@ function EventOverviewContainer() {
 
   return (
     <EventOverviewProvider locations={locations} users={users}>
-      <DuplicateWarning
-        duplicateTrackingIds={eventIndex.duplicates.map(
-          ({ trackingId }) => trackingId
-        )}
-      />
+      {eventIndex.duplicates.length > 0 && (
+        <DuplicateWarning
+          duplicateTrackingIds={eventIndex.duplicates.map(
+            ({ trackingId }) => trackingId
+          )}
+        />
+      )}
       {fullEvent ? (
         <EventOverviewFull event={fullEvent} onAction={getEventQuery.refetch} />
       ) : (
