@@ -209,6 +209,7 @@ export function getDefaultActionProcedures(
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
       .use(middleware.detectDuplicate)
+      .use(middleware.requireLocationForSystemUserAction)
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user, isDuplicateAction, duplicates } = ctx

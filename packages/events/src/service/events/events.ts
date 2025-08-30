@@ -261,7 +261,8 @@ function buildAction(
     createdByRole: user.role,
     createdByUserType: user.type,
     createdBySignature: user.signature,
-    createdAtLocation: user.primaryOfficeId,
+    createdAtLocation:
+      user.type === 'system' ? input.createdAtLocation : user.primaryOfficeId,
     originalActionId: input.originalActionId
   }
   switch (input.type) {
