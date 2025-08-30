@@ -55,9 +55,9 @@ import {
   findRecordsByQuery,
   getIndexedEvents
 } from '@events/service/indexing/indexing'
-import { declareActionProcedures } from '@events/service/events/actions/declare'
 import { reindex } from '@events/service/events/reindex'
 import { UserContext } from '../../context'
+import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)

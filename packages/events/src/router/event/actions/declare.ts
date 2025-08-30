@@ -8,8 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { TRPCError } from '@trpc/server'
-import { getUUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -23,19 +21,15 @@ import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
 import {
-  getEventById,
   addAction,
   throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
 import {
   ActionProcedure,
+  defaultRequestHandler,
   getDefaultActionProcedures
 } from '@events/router/event/actions'
-import {
-  ActionConfirmationResponse,
-  requestActionConfirmation
-} from '@events/router/event/actions/actionConfirmationRequest'
-import { getEventConfigurations } from '@events/service/config/config'
+import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 
 export function declareActionProcedures(): ActionProcedure {
@@ -56,7 +50,6 @@ export function declareActionProcedures(): ActionProcedure {
       .mutation(async ({ ctx, input }) => {
         const { token, user, isDuplicateAction } = ctx
         const { eventId } = input
-        const actionId = getUUID()
 
         if (isDuplicateAction) {
           return ctx.event
@@ -68,49 +61,17 @@ export function declareActionProcedures(): ActionProcedure {
           ctx.token
         )
 
-        const configs = await getEventConfigurations(token)
-        const event = await getEventById(eventId)
-        const config = configs.find((c) => c.id === event.type)
+        const configs = await getInMemoryEventConfigurations(token)
+
+        const declaredEvent = await defaultRequestHandler(input, user, token)
+
+        const config = configs.find((c) => c.id === declaredEvent.type)
 
         if (!config) {
           throw new Error(
-            `Event configuration not found with type: ${event.type}`
+            `Event configuration not found with type: ${declaredEvent.type}`
           )
         }
-
-        const { responseStatus } = await requestActionConfirmation(
-          input,
-          event,
-          token,
-          actionId
-        )
-
-        // If we get an unexpected failure response, we just return HTTP 500 without saving the
-        if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'Unexpected failure from notification API'
-          })
-        }
-
-        let status: ActionStatus = ActionStatus.Requested
-
-        // If we immediately get a rejected response, we can mark the action as rejected
-        if (responseStatus === ActionConfirmationResponse.Rejected) {
-          status = ActionStatus.Rejected
-        }
-
-        // If we immediately get a success response, we mark the action as succeeded
-        // and also validate the payload received from the notify API
-        if (responseStatus === ActionConfirmationResponse.Success) {
-          status = ActionStatus.Accepted
-        }
-
-        const declaredEvent = await addAction(input, {
-          user,
-          token,
-          status
-        })
 
         const dedupConfig = config.actions.find(
           (action) => action.type === input.type
