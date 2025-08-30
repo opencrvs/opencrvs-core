@@ -128,12 +128,6 @@ function getAvailableActions(
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
     case EventStatus.Enum.REGISTERED: {
-      if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActions(
-          EventStatus.Enum.VALIDATED,
-          flags.filter((flag) => flag !== InherentFlags.REJECTED)
-        )
-      }
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
     case EventStatus.Enum.ARCHIVED: {
