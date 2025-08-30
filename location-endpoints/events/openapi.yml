@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 1771fd1e-90f3-4822-8d37-d2d0646c6102
+                transactionId: f11163f3-0c24-4099-8498-359e762c38b0
                 type: v2.birth
       responses:
         "200":
@@ -518,6 +518,13 @@ paths:
                   format: uuid
                 keepAssignment:
                   type: boolean
+                createdAtLocation:
+                  type: string
+                  nullable: true
+                  format: uuid
+                  description: A valid office location ID. This is required for system users
+                    performing actions. The provided location must be a
+                    leaf-location, i.e. it must not have any children locations.
                 type:
                   type: string
                   enum:
@@ -528,7 +535,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 6b192316-131d-4845-8baf-616291e6110e
+                transactionId: 2adb59b4-6cd9-43a4-bfb8-84914aef9761
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -981,6 +988,13 @@ paths:
                   format: uuid
                 keepAssignment:
                   type: boolean
+                createdAtLocation:
+                  type: string
+                  nullable: true
+                  format: uuid
+                  description: A valid office location ID. This is required for system users
+                    performing actions. The provided location must be a
+                    leaf-location, i.e. it must not have any children locations.
                 type:
                   type: string
                   enum:
@@ -1438,6 +1452,13 @@ paths:
                   format: uuid
                 keepAssignment:
                   type: boolean
+                createdAtLocation:
+                  type: string
+                  nullable: true
+                  format: uuid
+                  description: A valid office location ID. This is required for system users
+                    performing actions. The provided location must be a
+                    leaf-location, i.e. it must not have any children locations.
                 requestId:
                   type: string
                 type:
@@ -1898,6 +1919,13 @@ paths:
                   format: uuid
                 keepAssignment:
                   type: boolean
+                createdAtLocation:
+                  type: string
+                  nullable: true
+                  format: uuid
+                  description: A valid office location ID. This is required for system users
+                    performing actions. The provided location must be a
+                    leaf-location, i.e. it must not have any children locations.
                 requestId:
                   type: string
                 type:
@@ -2395,22 +2423,6 @@ components:
             - label
             - pages
           description: Configuration for a declaration form
-        deduplication:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-              label:
-                $ref: "#/components/schemas/TranslationConfig"
-              query:
-                $ref: "#/components/schemas/Clause"
-            required:
-              - id
-              - label
-              - query
-          default: []
         advancedSearch:
           type: array
           items:
@@ -2724,7 +2736,6 @@ components:
         - label
         - actions
         - declaration
-        - deduplication
         - advancedSearch
     TranslationConfig:
       type: object
@@ -2810,6 +2821,19 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: &a11 []
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
         draft:
           type: boolean
         type:
@@ -2837,6 +2861,110 @@ components:
         - conditionals
         - type
         - review
+    Clause:
+      oneOf:
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - and
+            clauses:
+              type: array
+              items:
+                $ref: "#/components/schemas/Clause"
+          required:
+            - type
+            - clauses
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - or
+            clauses:
+              type: array
+              items:
+                $ref: "#/components/schemas/Clause"
+          required:
+            - type
+            - clauses
+        - type: object
+          properties:
+            fieldId:
+              type: string
+            options:
+              type: object
+              properties:
+                fuzziness:
+                  anyOf:
+                    - type: string
+                    - type: number
+                  default: AUTO:4,7
+                boost:
+                  type: number
+                  default: 1
+              required:
+                - fuzziness
+                - boost
+              default:
+                fuzziness: AUTO:4,7
+                boost: 1
+            type:
+              type: string
+              enum:
+                - fuzzy
+          required:
+            - fieldId
+            - options
+            - type
+        - type: object
+          properties:
+            fieldId:
+              type: string
+            options:
+              type: object
+              properties:
+                boost:
+                  type: number
+                  default: 1
+              required:
+                - boost
+              default:
+                boost: 1
+            type:
+              type: string
+              enum:
+                - strict
+          required:
+            - fieldId
+            - options
+            - type
+        - type: object
+          properties:
+            fieldId:
+              type: string
+            options:
+              type: object
+              properties:
+                pivot:
+                  type: number
+                days:
+                  type: number
+                boost:
+                  type: number
+                  default: 1
+              required:
+                - days
+                - boost
+            type:
+              type: string
+              enum:
+                - dateRange
+          required:
+            - fieldId
+            - options
+            - type
     FieldConfig:
       oneOf:
         - type: object
@@ -4660,10 +4788,12 @@ components:
                 - CHECKBOX
             defaultValue:
               type: boolean
+              default: false
           required:
             - id
             - label
             - type
+            - defaultValue
           description: Boolean checkbox field
         - type: object
           properties:
@@ -6126,6 +6256,19 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
         draft:
           type: boolean
         type:
@@ -6189,6 +6332,19 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
         draft:
           type: boolean
         type:
@@ -6252,6 +6408,19 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
         draft:
           type: boolean
         type:
@@ -6298,6 +6467,19 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
         draft:
           type: boolean
         type:
@@ -6344,6 +6526,19 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
         draft:
           type: boolean
         type:
@@ -6390,6 +6585,19 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
         draft:
           type: boolean
         type:
@@ -6453,6 +6661,19 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
         draft:
           type: boolean
         type:
@@ -6499,6 +6720,19 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
         draft:
           type: boolean
         type:
@@ -6639,6 +6873,19 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
         draft:
           type: boolean
         type:
@@ -6722,6 +6969,19 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
         draft:
           type: boolean
         type:
@@ -6768,6 +7028,19 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
         draft:
           type: boolean
         type:
@@ -6778,134 +7051,6 @@ components:
         - label
         - conditionals
         - type
-    Clause:
-      oneOf:
-        - type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - and
-            clauses:
-              type: array
-              items:
-                $ref: "#/components/schemas/Clause"
-          required:
-            - type
-            - clauses
-        - type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - or
-            clauses:
-              type: array
-              items:
-                $ref: "#/components/schemas/Clause"
-          required:
-            - type
-            - clauses
-        - type: object
-          properties:
-            fieldId:
-              type: string
-            options:
-              type: object
-              properties:
-                fuzziness:
-                  anyOf:
-                    - type: string
-                    - type: number
-                  default: AUTO:4,7
-                boost:
-                  type: number
-                  default: 1
-              required:
-                - fuzziness
-                - boost
-              default: {}
-            type:
-              type: string
-              enum:
-                - fuzzy
-          required:
-            - fieldId
-            - options
-            - type
-        - type: object
-          properties:
-            fieldId:
-              type: string
-            options:
-              type: object
-              properties:
-                boost:
-                  type: number
-                  default: 1
-              required:
-                - boost
-              default: {}
-            type:
-              type: string
-              enum:
-                - strict
-          required:
-            - fieldId
-            - options
-            - type
-        - type: object
-          properties:
-            fieldId:
-              type: string
-            options:
-              type: object
-              properties:
-                days:
-                  type: number
-                origin:
-                  type: string
-                boost:
-                  type: number
-                  default: 1
-              required:
-                - days
-                - origin
-                - boost
-            type:
-              type: string
-              enum:
-                - dateRange
-          required:
-            - fieldId
-            - options
-            - type
-        - type: object
-          properties:
-            fieldId:
-              type: string
-            options:
-              type: object
-              properties:
-                days:
-                  type: number
-                origin:
-                  type: string
-                boost:
-                  type: number
-                  default: 1
-              required:
-                - days
-                - origin
-                - boost
-            type:
-              type: string
-              enum:
-                - dateDistance
-          required:
-            - fieldId
-            - options
-            - type
     error.UNAUTHORIZED:
       type: object
       properties:
