@@ -90,12 +90,9 @@ export function ValueOutput(
     isEmailFieldType(field) ||
     isIdFieldType(field) ||
     isPhoneFieldType(field) ||
-    isTextFieldType(field)
+    isTextFieldType(field) ||
+    isTextAreaFieldType(field)
   ) {
-    return Text.Output({ value: field.value })
-  }
-
-  if (isTextAreaFieldType(field)) {
     return Text.Output({ value: field.value })
   }
 
@@ -340,7 +337,7 @@ export function Output({
 
     return (
       <>
-        <Deleted>{deleted ?? '-'}</Deleted>
+        <Deleted>{deleted || '-'}</Deleted>
         <br />
         <ValueOutput config={field} value={value} />
       </>
