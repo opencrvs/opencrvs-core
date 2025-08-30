@@ -483,10 +483,5 @@ test('a correction request is not allowed if the event is already waiting for co
     client.event.actions.correction.request.request(
       generator.event.actions.correction.request(event.id)
     )
-  ).rejects.toThrow(
-    new TRPCError({
-      code: 'CONFLICT',
-      message: 'Event is waiting for correction'
-    })
-  )
+  ).rejects.toThrowErrorMatchingSnapshot()
 })

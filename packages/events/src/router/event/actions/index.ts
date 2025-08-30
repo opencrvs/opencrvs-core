@@ -44,7 +44,6 @@ import {
   addAsyncRejectAction,
   throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
-import { throwConflictIfWaitingForCorrection } from '@events/service/events/actions/correction'
 import { TrpcUserContext } from '@events/context'
 import {
   ActionConfirmationResponse,
@@ -62,12 +61,10 @@ interface ActionProcedureConfig {
   inputSchema: z.ZodType
   actionConfirmationResponseSchema: z.ZodType | undefined
   meta?: OpenApiMeta
-  allowIfWaitingForCorrection: boolean
 }
 
 const defaultConfig = {
-  actionConfirmationResponseSchema: undefined,
-  allowIfWaitingForCorrection: true
+  actionConfirmationResponseSchema: undefined
 } as const
 
 const ACTION_PROCEDURE_CONFIG = {
@@ -109,13 +106,11 @@ const ACTION_PROCEDURE_CONFIG = {
   },
   [ActionType.PRINT_CERTIFICATE]: {
     ...defaultConfig,
-    inputSchema: PrintCertificateActionInput,
-    allowIfWaitingForCorrection: false
+    inputSchema: PrintCertificateActionInput
   },
   [ActionType.REQUEST_CORRECTION]: {
     ...defaultConfig,
     inputSchema: RequestCorrectionActionInput,
-    allowIfWaitingForCorrection: false,
     meta: {
       openapi: {
         summary: 'Request correction for an event',
@@ -263,11 +258,7 @@ export function getDefaultActionProcedures(
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
-  const {
-    actionConfirmationResponseSchema,
-    inputSchema,
-    allowIfWaitingForCorrection
-  } = actionConfig
+  const { actionConfirmationResponseSchema, inputSchema } = actionConfig
 
   let acceptInputFields = z.object({ actionId: UUID })
 
@@ -297,7 +288,6 @@ export function getDefaultActionProcedures(
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user, isDuplicateAction, duplicates } = ctx
-        const { eventId } = input
 
         if (isDuplicateAction) {
           return ctx.event
@@ -307,12 +297,11 @@ export function getDefaultActionProcedures(
           return duplicates.event
         }
 
-        await throwConflictIfActionNotAllowed(eventId, actionType, ctx.token)
-
-        // Certain actions are not allowed if the event is waiting for correction
-        if (!allowIfWaitingForCorrection) {
-          await throwConflictIfWaitingForCorrection(eventId, token)
-        }
+        await throwConflictIfActionNotAllowed(
+          input.eventId,
+          actionType,
+          ctx.token
+        )
 
         return defaultRequestHandler(
           input,
