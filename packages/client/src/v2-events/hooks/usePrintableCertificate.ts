@@ -10,17 +10,21 @@
  */
 
 import { Location } from '@events/service/locations/locations'
+import { useSelector } from 'react-redux'
 import {
+  ActionDocument,
   ActionType,
   CertificateTemplateConfig,
   EventConfig,
   EventDocument,
   FieldType,
   getCurrentEventState,
+  getUUID,
   isMinioUrl,
   LanguageConfig,
   PrintCertificateAction,
-  User
+  User,
+  UUID
 } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
@@ -29,6 +33,7 @@ import {
   svgToPdfTemplate
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { useEventConfiguration } from '../features/events/useEventConfiguration'
 import { useEvents } from '../features/events/useEvents/useEvents'
 
@@ -80,15 +85,43 @@ export const usePrintableCertificate = ({
     eventConfiguration
   )
   const { getEvent } = useEvents()
+  const userDetails = useSelector(getUserDetails)
 
   const actions = getEvent.getFromCache(event.id).actions
-  const copiesPrintedForTemplate =
-    actions.filter(
-      (action) =>
-        action.type === ActionType.PRINT_CERTIFICATE &&
-        (action as PrintCertificateAction).content?.templateId ===
-          certificateConfig?.id
-    ).length + 1 // +1 for the current print action
+  if (!userDetails) {
+    throw new Error('User details are not available')
+  }
+
+  const userFromUsersList = users.find((user) => user.id === userDetails.id)
+  if (!userFromUsersList) {
+    throw new Error(`User with id ${userDetails.id} not found in users list`)
+  }
+
+  const actionsWithAnOptimisticPrintAction = actions.concat({
+    type: ActionType.PRINT_CERTIFICATE,
+    id: getUUID(),
+    transactionId: getUUID(),
+    createdByUserType: 'user',
+    createdAt: new Date().toISOString(),
+    createdBy: userFromUsersList.id,
+    createdByRole: userFromUsersList.role,
+    status: 'Accepted',
+    declaration: {},
+    annotation: null,
+    originalActionId: null,
+    createdBySignature: userFromUsersList.signature,
+    createdAtLocation: userDetails.primaryOffice.id as UUID,
+    content: {
+      templateId: certificateConfig?.id
+    }
+  } satisfies PrintCertificateAction)
+
+  const copiesPrintedForTemplate = actionsWithAnOptimisticPrintAction.filter(
+    (action) =>
+      action.type === ActionType.PRINT_CERTIFICATE &&
+      (action as PrintCertificateAction).content?.templateId ===
+        certificateConfig?.id
+  ).length
 
   const modifiedMetadata = {
     ...metadata,
@@ -110,6 +143,7 @@ export const usePrintableCertificate = ({
     templateString: certificateConfig.svg,
     $metadata: modifiedMetadata,
     $declaration: declaration,
+    $actions: actionsWithAnOptimisticPrintAction as ActionDocument[],
     locations,
     users,
     language,
@@ -143,6 +177,7 @@ export const usePrintableCertificate = ({
         copiesPrintedForTemplate
       },
       $declaration: declarationWithResolvedImages,
+      $actions: actionsWithAnOptimisticPrintAction as ActionDocument[],
       locations,
       users,
       language,

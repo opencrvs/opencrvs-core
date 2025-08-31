@@ -23,7 +23,9 @@ describe(`Without scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}`, () => {
     const client = createTestClient(user, [RECORD_DECLARE_SCOPE])
     const { user: user2 } = await setupTestCase()
     const client2 = createTestClient(user2, [RECORD_DECLARE_SCOPE])
-    const originalEvent = await client.event.create(generator.event.create())
+    const payload = generator.event.create()
+
+    const originalEvent = await client.event.create(payload)
 
     await client.event.actions.assignment.assign(
       generator.event.actions.assign(originalEvent.id, { assignedTo: user.id })

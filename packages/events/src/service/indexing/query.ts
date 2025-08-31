@@ -23,7 +23,11 @@ import {
 } from '@opencrvs/commons/events'
 import { getOrThrow } from '@opencrvs/commons'
 import { getChildLocations } from '../locations/locations'
-import { encodeFieldId, generateQueryForAddressField } from './utils'
+import {
+  encodeFieldId,
+  generateQueryForAddressField,
+  nameQueryKey
+} from './utils'
 
 /** Convert API date clause format to elastic syntax */
 function dateClauseToElasticQuery(
@@ -88,7 +92,7 @@ function generateQuery(
       if (search.type === 'fuzzy') {
         return {
           match: {
-            [`${esFieldName}.__fullname`]: {
+            [nameQueryKey(esFieldName)]: {
               query: search.term,
               fuzziness: 'AUTO'
             }
@@ -97,7 +101,7 @@ function generateQuery(
       }
       return {
         match: {
-          [`${esFieldName}.__fullname`]: search.term
+          [nameQueryKey(esFieldName)]: search.term
         }
       }
     }

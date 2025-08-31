@@ -215,7 +215,7 @@ export async function seedLocations(token: string) {
   })
 
   if (!res.ok) {
-    raise(await res.json())
+    raise(await res.text())
   }
 
   const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()
@@ -229,66 +229,10 @@ export async function seedLocations(token: string) {
   })
 }
 
-function updateLocationPartOf(partOf: string) {
-  const locationPrefix = 'Location/'
-
-  const parent = partOf.replace(locationPrefix, '')
-
-  if (parent === '0') {
-    return null
-  }
-
-  return parent
-}
-
 function getLocationsByType(type: string) {
   return fetch(`${env.GATEWAY_HOST}/locations?type=${type}&_count=0`, {
     headers: {
       'Content-Type': 'application/fhir+json'
     }
   })
-}
-
-/**
- * NOTE: Seeding locations for v2 should be done after seeding the legacy locations.
- * This is because the v2 locations are created based on the legacy location ids to ensure compatibility.
- */
-export async function seedLocationsForV2Events(token: string) {
-  const locations = (
-    await Promise.all(
-      LOCATION_TYPES.map((type) =>
-        getLocationsByType(type)
-          .then((res) => res.json())
-          .then((bundle: fhir3.Bundle<fhir3.Location>) =>
-            bundleToLocationEntries(bundle).map((location) => ({
-              id: location.id,
-              name: location.name,
-              partOf: location?.partOf?.reference
-                ? updateLocationPartOf(location?.partOf?.reference)
-                : null
-            }))
-          )
-      )
-    )
-  ).flat()
-
-  // NOTE: TRPC expects certain format, which may seem unconventional.
-  const res = await fetch(`${env.GATEWAY_HOST}/events/locations.set`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ json: locations })
-  })
-
-  if (!res.ok) {
-    const msg =
-      'Unable to seed locations for v2 events. Ensure events service is running.'
-    // eslint-disable-next-line no-console
-    console.error(msg)
-    // eslint-disable-next-line no-console
-    console.error(JSON.stringify(await res.json()))
-    raise(msg)
-  }
 }
