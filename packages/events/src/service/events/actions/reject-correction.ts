@@ -13,7 +13,7 @@ import {
   ActionStatus,
   RejectCorrectionActionInput
 } from '@opencrvs/commons/events'
-import { UUID } from '@opencrvs/commons'
+import { TokenWithBearer, UUID } from '@opencrvs/commons'
 import { addAction, getEventById } from '@events/service/events/events'
 import { TrpcUserContext } from '@events/context'
 import { RequestNotFoundError } from './correction'
@@ -27,7 +27,7 @@ export async function rejectCorrection(
   }: {
     eventId: UUID
     user: TrpcUserContext
-    token: string
+    token: TokenWithBearer
   }
 ) {
   const storedEvent = await getEventById(eventId)

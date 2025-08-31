@@ -19,6 +19,7 @@ import {
   getUserId,
   getUserTypeFromToken,
   logger,
+  REINDEX_USER_ID,
   SystemRole,
   TokenUserType,
   TokenWithBearer,
@@ -47,6 +48,18 @@ export const SystemContext = z.object({
 })
 type SystemContext = z.infer<typeof SystemContext>
 
+export const TrpcContext = z.object({
+  token: TokenWithBearer,
+  user: z.union([SystemContext, UserContext])
+})
+
+export type TrpcContext = z.infer<typeof TrpcContext>
+
+/**
+ * Internal user, used to bootstrap the system and then deactivate.
+ */
+const SEEDER_SUPER_ADMIN = 'o.admin'
+
 /**
  * Super admin does not have a primary office. It is the one setting locations.
  * It should be used only once to bootstrap the system. Usage should be limited. Seeing it as 'system' is one way of doing that. (And it also plays well with types)
@@ -55,27 +68,6 @@ const SuperAdminContext = SystemContext.extend({
   role: z.literal('SUPER_ADMIN')
 })
 type SuperAdminContext = z.infer<typeof SuperAdminContext>
-
-export const TrpcContext = z.object({
-  token: TokenWithBearer.optional()
-})
-
-export type TrpcContext = z.infer<typeof TrpcContext>
-export type TrpcContextWithToken = Omit<TrpcContext, 'token'> & {
-  token: TokenWithBearer
-}
-
-export const TrpcContextWithUser = TrpcContext.extend({
-  token: TokenWithBearer,
-  user: z.union([SystemContext, UserContext, SuperAdminContext])
-})
-
-export type TrpcContextWithUser = z.infer<typeof TrpcContextWithUser>
-
-/**
- * Internal user, used to bootstrap the system and then deactivate.
- */
-const SEEDER_SUPER_ADMIN = 'o.admin'
 
 export type TrpcUserContext = SystemContext | UserContext | SuperAdminContext
 
@@ -103,7 +95,7 @@ function normalizeHeaders(
   return headers
 }
 
-export async function resolveUserDetails(
+async function resolveUserDetails(
   token: TokenWithBearer
 ): Promise<TrpcUserContext> {
   let userId: string | undefined
@@ -119,6 +111,15 @@ export async function resolveUserDetails(
   }
 
   try {
+    if (userId === REINDEX_USER_ID) {
+      return SystemContext.parse({
+        type: TokenUserType.Enum.system,
+        id: userId,
+        primaryOfficeId: undefined,
+        role: SystemRole.enum.REINDEX
+      })
+    }
+
     if (userType === TokenUserType.Enum.system) {
       const { type } = await getSystem(env.USER_MANAGEMENT_URL, userId, token)
 
@@ -165,10 +166,20 @@ export async function resolveUserDetails(
   }
 }
 
-export function createContext({ req }: { req: IncomingMessage }) {
+export async function createContext({ req }: { req: IncomingMessage }) {
   const normalizedHeaders = normalizeHeaders(req.headers)
+  let token: TokenWithBearer
 
-  const tokenResult = TokenWithBearer.safeParse(normalizedHeaders.authorization)
+  try {
+    token = TokenWithBearer.parse(normalizedHeaders.authorization)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Authorization token is missing'
+    })
+  }
 
-  return { token: tokenResult.success ? tokenResult.data : undefined }
+  const user = await resolveUserDetails(token)
+  return { token, user }
 }

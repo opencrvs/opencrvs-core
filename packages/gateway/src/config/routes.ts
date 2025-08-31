@@ -126,7 +126,9 @@ export const getRoutes = () => {
         }
       }
     },
-    catchAllProxy.locations,
+    catchAllProxy.getLocations,
+    catchAllProxy.updateLocations,
+    catchAllProxy.createLocations,
     catchAllProxy.locationsSuffix,
 
     catchAllProxy.location,

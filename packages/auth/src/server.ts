@@ -66,6 +66,7 @@ import anonymousTokenHandler, {
   responseSchema
 } from './features/anonymousToken/handler'
 import { Boom, badRequest } from '@hapi/boom'
+import reindexingTokenHandler from './features/reindexToken/handler'
 
 export type AuthServer = {
   server: Hapi.Server
@@ -141,6 +142,21 @@ export async function createServer() {
       description: 'Authenticate an anonymous user',
       notes:
         'Returns a token to be used for endpoints that allow unauthorized access such as certificate verification endpoints',
+      response: {
+        schema: responseSchema
+      }
+    }
+  })
+  // curl -H 'Content-Type: application/json' http://localhost:4040/reindexing-token
+  server.route({
+    method: 'GET',
+    path: '/internal/reindexing-token',
+    handler: reindexingTokenHandler,
+    options: {
+      tags: ['api'],
+      description: 'Create a token for migrations to call reindexing endpoints',
+      notes:
+        'Returns a token to be used for reindexing endpoints. This endpoint should never be called directly by clients.',
       response: {
         schema: responseSchema
       }
@@ -422,8 +438,10 @@ export async function createServer() {
   }
 
   async function start() {
-    await server.start()
+    // Start database before application server.
+    // We have had issues where the database was not ready when the server started which resulted in redis instance being undefined.
     await database.start()
+    await server.start()
     server.log('info', `server started on ${env.AUTH_HOST}:${env.AUTH_PORT}`)
   }
 

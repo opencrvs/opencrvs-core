@@ -52,6 +52,7 @@ export const CheckboxInput: StoryObj<typeof FormFieldGenerator> = {
           {
             id: 'storybook.checkbox',
             type: FieldType.CHECKBOX,
+            defaultValue: false,
             label: {
               id: 'storybook.checkbox.label',
               defaultMessage: 'Is my question true?',

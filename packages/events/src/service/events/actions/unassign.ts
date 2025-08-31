@@ -16,7 +16,7 @@ import {
   findLastAssignmentAction,
   UnassignActionInput
 } from '@opencrvs/commons/events'
-import { inScope, SCOPES, UUID } from '@opencrvs/commons'
+import { inScope, SCOPES, TokenWithBearer, UUID } from '@opencrvs/commons'
 import { addAction, getEventById } from '@events/service/events/events'
 import { setBearerForToken } from '@events/router/middleware'
 import { TrpcUserContext } from '@events/context'
@@ -30,7 +30,7 @@ export async function unassignRecord(
   }: {
     eventId: UUID
     user: TrpcUserContext
-    token: string
+    token: TokenWithBearer
   }
 ) {
   const storedEvent = await getEventById(eventId)

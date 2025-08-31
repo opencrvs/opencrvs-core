@@ -9,14 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import fetch from 'node-fetch'
+
 const EVENTS = process.env.EVENTS_URL || 'http://localhost:5555/'
+const AUTH = process.env.AUTH_URL || 'http://localhost:4040/'
+
+export async function getReindexingToken() {
+  const res = await fetch(
+    new URL('/internal/reindexing-token', AUTH).toString()
+  )
+  const { token } = await res.json()
+  return token as string
+}
 
 /**
  * Streams MongoDB collections to ElasticSearch documents. Useful when the ElasticSearch schema changes.
  */
 const triggerReindex = async () => {
   const response = await fetch(new URL('/events/reindex', EVENTS), {
-    method: 'POST'
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${await getReindexingToken()}`,
+      'Content-Type': 'application/json'
+    }
   })
 
   if (!response.ok) {

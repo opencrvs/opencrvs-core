@@ -10,7 +10,12 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { InherentFlags, UUID, getCurrentEventState } from '@opencrvs/commons'
+import {
+  InherentFlags,
+  TokenWithBearer,
+  UUID,
+  getCurrentEventState
+} from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '../events'
 
@@ -34,11 +39,15 @@ export class RequestNotFoundError extends TRPCError {
  * @param token - The authentication token
  * @throws {TRPCError} When the event is already waiting for correction
  */
-export async function throwConflictIfWaitingForCorrection(eventId: UUID) {
+export async function throwConflictIfWaitingForCorrection(
+  eventId: UUID,
+  token: TokenWithBearer
+) {
   const event = await getEventById(eventId)
 
   const eventConfig = await getEventConfigurationById({
-    eventType: event.type
+    eventType: event.type,
+    token
   })
 
   const eventState = getCurrentEventState(event, eventConfig)

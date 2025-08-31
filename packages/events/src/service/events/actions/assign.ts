@@ -16,6 +16,7 @@ import {
   AssignActionInput,
   findLastAssignmentAction
 } from '@opencrvs/commons/events'
+import { TokenWithBearer } from '@opencrvs/commons'
 import { addAction, getEventById } from '@events/service/events/events'
 import { TrpcUserContext } from '@events/context'
 
@@ -25,7 +26,7 @@ export async function assignRecord({
   input
 }: {
   user: TrpcUserContext
-  token: string
+  token: TokenWithBearer
   input: AssignActionInput
 }) {
   const storedEvent = await getEventById(input.eventId)

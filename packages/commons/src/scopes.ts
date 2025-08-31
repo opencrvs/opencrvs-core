@@ -33,7 +33,7 @@ export const SCOPES = {
   NATIONALID: 'nationalId',
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
-  RECORD_IMPORT: 'record.import',
+
   /**
    * @TODO This is a temporary scope to be used for V2 Events custom events declaration
    */
@@ -137,7 +137,11 @@ export const SCOPES = {
   CONFIG_UPDATE_ALL: 'config.update:all',
 
   // data seeding
-  USER_DATA_SEEDING: 'user.data-seeding'
+  USER_DATA_SEEDING: 'user.data-seeding',
+
+  // systems / integrations
+  RECORD_IMPORT: 'record.import',
+  RECORD_REINDEX: 'record.reindex'
 } as const
 
 // Legacy scopes
@@ -164,7 +168,10 @@ const IntegrationScopes = z.union([
 ])
 
 // Internal operations
-const InternalOperationsScopes = z.literal(SCOPES.RECORD_IMPORT)
+const InternalOperationsScopes = z.union([
+  z.literal(SCOPES.RECORD_REINDEX),
+  z.literal(SCOPES.RECORD_IMPORT)
+])
 
 // Declare
 const DeclareScopes = z.union([

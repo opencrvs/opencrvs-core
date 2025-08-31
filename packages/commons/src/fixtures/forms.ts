@@ -880,6 +880,19 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.field.id.label'
           }
+        },
+        {
+          id: 'senior-pass.recommender',
+          type: 'CHECKBOX',
+          required: true,
+          parent: field('recommender.none'),
+          defaultValue: false,
+          conditionals: [],
+          label: {
+            defaultMessage: 'Does recommender have senior pass?',
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.field.recommender'
+          }
         }
       ]
     },

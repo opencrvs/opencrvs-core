@@ -10,37 +10,37 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { z } from 'zod'
 import { NoResultError } from 'kysely'
+import { z } from 'zod'
+import { TokenUserType, TokenWithBearer, UUID } from '@opencrvs/commons'
 import {
   ActionInputWithType,
   ActionStatus,
+  ActionType,
   ActionUpdate,
+  AsyncRejectActionDocument,
+  DisplayableAction,
   Draft,
+  EventConfig,
   EventDocument,
   EventInput,
+  EventStatus,
   FieldType,
   FieldUpdateValue,
   FileFieldValue,
-  getDeclarationFields,
   getAcceptedActions,
-  AsyncRejectActionDocument,
-  ActionType,
-  isWriteAction,
-  getStatusFromActions,
-  EventConfig,
-  EventStatus,
   getAvailableActionsForEvent,
   getCurrentEventState,
-  DisplayableAction
+  getDeclarationFields,
+  getStatusFromActions,
+  isWriteAction
 } from '@opencrvs/commons/events'
-import { TokenUserType, UUID } from '@opencrvs/commons'
+import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { indexEvent } from '@events/service/indexing/indexing'
-import * as eventsRepo from '@events/storage/postgres/events/events'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
-import { TrpcUserContext } from '@events/context'
+import * as eventsRepo from '@events/storage/postgres/events/events'
 import { getUnreferencedDraftFiles } from '../files/utils'
 
 class EventNotFoundError extends TRPCError {
@@ -78,9 +78,13 @@ function getValidFileValue(
   return validFieldValue.data
 }
 
-async function deleteEventAttachments(token: string, event: EventDocument) {
+async function deleteEventAttachments(
+  token: TokenWithBearer,
+  event: EventDocument
+) {
   const configuration = await getEventConfigurationById({
-    eventType: event.type
+    eventType: event.type,
+    token
   })
 
   const actions = getAcceptedActions(event)
@@ -101,11 +105,13 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
 
 export async function throwConflictIfActionNotAllowed(
   eventId: UUID,
-  actionType: ActionType
+  actionType: ActionType,
+  token: TokenWithBearer
 ) {
   const event = await getEventById(eventId)
   const eventConfig = await getEventConfigurationById({
-    eventType: event.type
+    eventType: event.type,
+    token
   })
   const eventStatus = getStatusFromActions(event.actions)
 
@@ -121,7 +127,10 @@ export async function throwConflictIfActionNotAllowed(
   }
 }
 
-export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
+export async function deleteEvent(
+  eventId: UUID,
+  { token }: { token: TokenWithBearer }
+) {
   const event = await getEventById(eventId)
   const eventStatus = getStatusFromActions(event.actions)
 
@@ -251,13 +260,14 @@ export async function addAction(
   }: {
     eventId: UUID
     user: TrpcUserContext
-    token: string
+    token: TokenWithBearer
     status: ActionStatus
   }
 ): Promise<EventDocument> {
   const event = await getEventById(eventId)
   const configuration = await getEventConfigurationById({
-    eventType: event.type
+    eventType: event.type,
+    token
   })
 
   // @TODO: Check that this works after making sure data incldues only declaration fields.
@@ -278,7 +288,14 @@ export async function addAction(
 
   const content = ('content' in input && input.content) || undefined
 
-  if (input.type === ActionType.ARCHIVE && input.reason.isDuplicate) {
+  const createdAtLocation =
+    user.type === 'system' ? input.createdAtLocation : user.primaryOfficeId
+
+  if (
+    input.type === ActionType.ARCHIVE &&
+    input.reason.isDuplicate &&
+    status === ActionStatus.Accepted
+  ) {
     await eventsRepo.createAction({
       eventId,
       transactionId: input.transactionId,
@@ -291,7 +308,7 @@ export async function addAction(
       createdByRole: user.role,
       createdByUserType: user.type,
       createdBySignature: user.signature,
-      createdAtLocation: user.primaryOfficeId,
+      createdAtLocation,
       originalActionId: input.originalActionId,
       reasonMessage: input.reason.message,
       reasonIsDuplicate: input.reason.isDuplicate
@@ -311,7 +328,7 @@ export async function addAction(
       createdByRole: user.role,
       createdByUserType: user.type,
       createdBySignature: user.signature,
-      createdAtLocation: user.primaryOfficeId,
+      createdAtLocation,
       originalActionId: input.originalActionId,
       assignedTo: user.id
     })
@@ -341,7 +358,7 @@ export async function addAction(
       createdByRole: user.role,
       createdByUserType: user.type,
       createdBySignature: user.signature,
-      createdAtLocation: user.primaryOfficeId,
+      createdAtLocation,
       originalActionId: input.originalActionId,
       requestId: hasRequestId ? input.requestId : undefined,
       reasonIsDuplicate: hasReason
@@ -352,10 +369,12 @@ export async function addAction(
   }
 
   // We want to unassign only if:
+  // - ActionStatus is not requested
   // - Action is a write action, since we dont want to unassign from e.g. READ action
   // - Keep assignment is false
   // - User is not a system user, since system users dont partake in assignment
   const shouldUnassign =
+    status !== ActionStatus.Requested &&
     isWriteAction(input.type) &&
     !input.keepAssignment &&
     user.type !== TokenUserType.enum.system
@@ -408,7 +427,7 @@ type AsyncRejectActionInput = Omit<
   originalActionId: UUID
   createdAtLocation?: UUID
   createdByUserType: TokenUserType
-  token: string
+  token: TokenWithBearer
   eventType: string
 }
 
@@ -421,10 +440,12 @@ export async function addAsyncRejectAction({
   createdByRole,
   createdByUserType,
   createdAtLocation,
-  eventType
+  eventType,
+  token
 }: AsyncRejectActionInput) {
   const configuration = await getEventConfigurationById({
-    eventType
+    eventType,
+    token
   })
 
   await eventsRepo.createAction({

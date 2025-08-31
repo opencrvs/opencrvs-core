@@ -10,7 +10,7 @@
  */
 
 import { joinUrl } from '../url'
-import { User } from '../events'
+import { NameFieldValue } from '../events'
 import { z } from 'zod'
 
 export const TriggerEvent = {
@@ -24,16 +24,8 @@ export const TriggerEvent = {
 
 export type TriggerEvent = (typeof TriggerEvent)[keyof typeof TriggerEvent]
 
-export const FullName = z.object({
-  use: z.string(),
-  family: z.string(),
-  given: z.array(z.string())
-})
-
-export type FullName = z.infer<typeof FullName>
-
 export const Recipient = z.object({
-  name: z.array(FullName),
+  name: NameFieldValue,
   mobile: z.string().optional(),
   email: z.string().optional()
 })
@@ -63,7 +55,11 @@ export const TriggerPayload = {
   }),
   [TriggerEvent.RESET_PASSWORD_BY_ADMIN]: BasePayload.extend({
     temporaryPassword: z.string(),
-    admin: User
+    admin: z.object({
+      id: z.string(),
+      name: NameFieldValue,
+      role: z.string()
+    })
   }),
   [TriggerEvent.TWO_FA]: BasePayload.extend({
     code: z.string()

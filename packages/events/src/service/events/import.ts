@@ -9,12 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { omit } from 'lodash'
-import { EventDocument, getUUID } from '@opencrvs/commons'
+import { EventDocument, getUUID, TokenWithBearer } from '@opencrvs/commons'
 import { upsertEventWithActions } from '@events/storage/postgres/events/import'
 import { getEventConfigurationById } from '../config/config'
 import { indexEvent } from '../indexing/indexing'
 
-export async function importEvent(eventDocument: EventDocument) {
+export async function importEvent(
+  eventDocument: EventDocument,
+  token: TokenWithBearer
+) {
   const transactionId = getUUID()
   const { actions, ...event } = eventDocument
 
@@ -44,7 +47,8 @@ export async function importEvent(eventDocument: EventDocument) {
   )
 
   const config = await getEventConfigurationById({
-    eventType: event.type
+    eventType: event.type,
+    token
   })
   await indexEvent(createdEvent, config)
 

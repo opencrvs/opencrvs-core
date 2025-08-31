@@ -12,11 +12,11 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { User } from '@opencrvs/commons'
-import { router, userProcedure } from '@events/router/trpc'
+import { router, publicProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 
 export const userRouter = router({
-  get: userProcedure
+  get: publicProcedure
     .input(z.string())
     .output(User)
     .query(async (options) => {
@@ -29,7 +29,7 @@ export const userRouter = router({
 
       return user
     }),
-  list: userProcedure
+  list: publicProcedure
     .input(z.array(z.string()))
     .query(async (options) => getUsersById(options.input, options.ctx.token))
 })

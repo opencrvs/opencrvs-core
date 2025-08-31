@@ -12,6 +12,7 @@
 import { SCOPES } from '@opencrvs/commons'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { createTestToken } from '@events/tests/utils'
+import { TrpcContext } from '@events/context'
 import { requiresAnyOfScopes } from '.'
 
 describe('requiresScopes()', () => {
@@ -27,7 +28,7 @@ describe('requiresScopes()', () => {
         token: createTestToken('test-user-id', [SCOPES.RECORD_DECLARE])
       },
       next: vi.fn()
-    } as unknown as MiddlewareOptions
+    } as unknown as MiddlewareOptions<TrpcContext>
 
     await expect(middleware(mockOpts)).rejects.toMatchObject({
       code: 'FORBIDDEN'
@@ -50,7 +51,7 @@ describe('requiresScopes()', () => {
         ])
       },
       next: vi.fn()
-    } as unknown as MiddlewareOptions
+    } as unknown as MiddlewareOptions<TrpcContext>
 
     await middleware(mockOpts)
 

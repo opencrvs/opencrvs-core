@@ -12,7 +12,7 @@ import { Readable, Transform, PassThrough } from 'node:stream'
 import fetch from 'node-fetch'
 import { JsonStreamStringify } from 'json-stream-stringify'
 import { EventDocument } from '@opencrvs/commons/events'
-import { logger } from '@opencrvs/commons'
+import { logger, TokenWithBearer } from '@opencrvs/commons'
 import {
   STREAM_BATCH_SIZE,
   streamEventDocuments
@@ -21,8 +21,10 @@ import { env } from '@events/environment'
 import { ensureIndexExists, indexEventsInBulk } from '../indexing/indexing'
 import { getEventConfigurations } from '../config/config'
 
-async function reindexSearch() {
-  const configurations = await getEventConfigurations()
+import { getInMemoryEventConfigurations } from '../config/config'
+
+async function reindexSearch(token: TokenWithBearer) {
+  const configurations = await getInMemoryEventConfigurations(token)
   let buffer: EventDocument[] = []
 
   async function flush() {
@@ -59,8 +61,8 @@ async function reindexSearch() {
   })
 }
 
-export async function reindex() {
-  const configurations = await getEventConfigurations()
+export async function reindex(token: TokenWithBearer) {
+  const configurations = await getEventConfigurations(token)
   for (const configuration of configurations) {
     logger.info(`Ensuring index exists for: ${configuration.id}`)
     await ensureIndexExists(configuration, { overwrite: true })
@@ -78,7 +80,7 @@ export async function reindex() {
   const eventDocumentStreamForSearch = new PassThrough({ objectMode: true })
   objStream.pipe(eventDocumentStreamForSearch)
 
-  const searchIndexingStream = await reindexSearch()
+  const searchIndexingStream = await reindexSearch(token)
   const searchIndexingPromise = new Promise((resolve, reject) => {
     eventDocumentStreamForSearch
       .pipe(searchIndexingStream)

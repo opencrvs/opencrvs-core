@@ -115,4 +115,26 @@ echo
 sleep 10
 
 yarn dev:secrets:gen
+
+
+# List of directories
+dirs=(
+  "data/elasticsearch"
+  "data/mongo"
+  "data/influxdb"
+  "data/minio"
+  "data/backups"
+  "data/postgres"
+)
+
+for dir in "${dirs[@]}"; do
+  if [ ! -d "$dir" ]; then
+    echo "Creating $dir"
+    mkdir -p "$dir"
+    chmod 775 "$dir"
+  else
+    echo "$dir already exists"
+  fi
+done
+
 concurrently "yarn run start" "yarn run compose:deps"

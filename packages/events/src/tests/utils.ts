@@ -16,7 +16,6 @@ import {
   createPrng,
   EventDocument,
   generateRandomSignature,
-  getUUID,
   Scope,
   SCOPES,
   SystemRole,
@@ -49,7 +48,8 @@ export const UNSTABLE_EVENT_FIELDS = [
   'updatedBy',
   'acceptedAt',
   'dateOfEvent',
-  'registrationNumber'
+  'registrationNumber',
+  'originalActionId'
 ]
 /**u
  * Cleans up unstable fields in data for snapshot testing.
@@ -172,6 +172,7 @@ export const setupTestCase = async (rngSeed?: number) => {
   await seed.locations(generator.locations.set(5))
 
   const locations = await getLocations()
+
   const defaultUser = seed.user(
     generator.user.create({
       primaryOfficeId: locations[0].id
@@ -250,8 +251,7 @@ function actionToClientAction(
       return async (eventId: string) =>
         client.event.actions.register.request(
           generator.event.actions.register(eventId, {
-            keepAssignment: true,
-            registrationNumber: getUUID()
+            keepAssignment: true
           })
         )
     case ActionType.PRINT_CERTIFICATE:

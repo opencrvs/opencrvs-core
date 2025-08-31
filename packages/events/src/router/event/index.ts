@@ -33,15 +33,10 @@ import {
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
-import {
-  userProcedure,
-  router,
-  authorizedProcedure,
-  unauthorizedProcedure
-} from '@events/router/trpc'
+import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
 import {
   getEventConfigurationById,
-  getEventConfigurations
+  getInMemoryEventConfigurations
 } from '@events/service/config/config'
 import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
@@ -75,7 +70,7 @@ const eventConfigGetProcedure: QueryProcedure<{
   meta: OpenApiMeta
   input: void
   output: EventConfig[]
-}> = userProcedure
+}> = publicProcedure
   .meta({
     openapi: {
       summary: 'List event configurations',
@@ -88,15 +83,15 @@ const eventConfigGetProcedure: QueryProcedure<{
   .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
   .input(z.void())
   .output(z.array(EventConfig))
-  .query(async () => {
-    return getEventConfigurations()
+  .query(async (options) => {
+    return getInMemoryEventConfigurations(options.ctx.token)
   })
 
 export const eventRouter = router({
   config: router({
     get: eventConfigGetProcedure
   }),
-  create: authorizedProcedure
+  create: systemProcedure
     .meta({
       openapi: {
         summary: 'Create event',
@@ -117,6 +112,7 @@ export const eventRouter = router({
     .output(EventDocument)
     .mutation(async ({ input, ctx }) => {
       const config = await getEventConfigurationById({
+        token: ctx.token,
         eventType: input.type
       })
 
@@ -127,7 +123,7 @@ export const eventRouter = router({
         config
       })
     }),
-  get: userProcedure
+  get: publicProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .input(UUID)
     .query(async ({ input, ctx }) => {
@@ -149,7 +145,7 @@ export const eventRouter = router({
 
       return updatedEvent
     }),
-  delete: userProcedure
+  delete: publicProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.DELETE]))
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
@@ -158,14 +154,18 @@ export const eventRouter = router({
         return ctx.event
       }
 
-      await throwConflictIfActionNotAllowed(input.eventId, ActionType.DELETE)
+      await throwConflictIfActionNotAllowed(
+        input.eventId,
+        ActionType.DELETE,
+        ctx.token
+      )
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
   draft: router({
-    list: userProcedure.output(z.array(Draft)).query(async (options) => {
+    list: publicProcedure.output(z.array(Draft)).query(async (options) => {
       return getDraftsByUserId(options.ctx.user.id)
     }),
-    create: userProcedure
+    create: publicProcedure
       .input(DraftInput)
       .use(middleware.requireAssignment)
       .output(Draft)
@@ -174,7 +174,7 @@ export const eventRouter = router({
 
         // Consecutive middlewares lose some of the typing.
         const user = UserContext.parse(ctx.user)
-        await throwConflictIfActionNotAllowed(eventId, type)
+        await throwConflictIfActionNotAllowed(eventId, type, ctx.token)
 
         const previousDraft = await draftsRepo.findLatestDraftForAction(
           eventId,
@@ -194,6 +194,7 @@ export const eventRouter = router({
 
         const event = await getEventById(eventId)
         const configuration = await getEventConfigurationById({
+          token: ctx.token,
           eventType: event.type
         })
 
@@ -220,7 +221,7 @@ export const eventRouter = router({
       getDefaultActionProcedures(ActionType.PRINT_CERTIFICATE)
     ),
     assignment: router({
-      assign: userProcedure
+      assign: publicProcedure
         .input(AssignActionInput)
         .use(middleware.validateAction)
         .mutation(async (options) => {
@@ -230,7 +231,7 @@ export const eventRouter = router({
             token: options.ctx.token
           })
         }),
-      unassign: userProcedure
+      unassign: publicProcedure
         .input(UnassignActionInput)
         .use(middleware.validateAction)
         .mutation(async (options) => {
@@ -251,16 +252,16 @@ export const eventRouter = router({
       reject: router(getDefaultActionProcedures(ActionType.REJECT_CORRECTION))
     })
   }),
-  list: authorizedProcedure
+  list: systemProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .output(z.array(EventIndex))
     .query(async ({ ctx }) => {
       const userId = ctx.user.id
-      const eventConfigs = await getEventConfigurations()
+      const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
 
       return getIndexedEvents(userId, eventConfigs)
     }),
-  search: userProcedure
+  search: publicProcedure
     .meta({
       openapi: {
         summary: 'Search for events',
@@ -269,15 +270,8 @@ export const eventRouter = router({
         path: '/events/search'
       }
     })
-    .use(
-      requiresAnyOfScopes(
-        [
-          // @todo: remove legacy scopes once all users are configured with new search scopes
-          SCOPES.RECORDSEARCH
-        ],
-        ['search']
-      )
-    )
+    // @todo: remove legacy scopes once all users are configured with new search scopes
+    .use(requiresAnyOfScopes([], ['search']))
     .input(SearchQuery)
     .output(
       z.object({
@@ -286,7 +280,7 @@ export const eventRouter = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      const eventConfigs = await getEventConfigurations()
+      const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
       const scopes = getScopes({ Authorization: ctx.token })
 
       const searchScope = findScope(scopes, 'search')
@@ -303,7 +297,7 @@ export const eventRouter = router({
         ctx.user.primaryOfficeId
       )
     }),
-  import: authorizedProcedure
+  import: systemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
     .meta({
       openapi: {
@@ -315,9 +309,10 @@ export const eventRouter = router({
     })
     .input(EventDocument)
     .output(EventDocument)
-    .mutation(async ({ input }) => importEvent(input)),
-  reindex: unauthorizedProcedure
+    .mutation(async ({ input, ctx }) => importEvent(input, ctx.token)),
+  reindex: systemProcedure
     .input(z.void())
+    .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
     .output(z.void())
     .meta({
       openapi: {
@@ -328,7 +323,7 @@ export const eventRouter = router({
         tags: ['events']
       }
     })
-    .mutation(async () => {
-      await reindex()
+    .mutation(async ({ ctx }) => {
+      await reindex(ctx.token)
     })
 })
