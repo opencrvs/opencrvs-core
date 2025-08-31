@@ -5,7 +5,6 @@
 -- Dumped from database version 17.5 (Debian 17.5-1.pgdg120+1)
 -- Dumped by pg_dump version 17.5 (Debian 17.5-1.pgdg120+1)
 
-
 -- Started on 2025-08-18 09:50:00 UTC
 
 SET statement_timeout = 0;
@@ -192,7 +191,8 @@ CREATE TABLE app.locations (
     parent_id uuid,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    deleted_at timestamp with time zone
+    deleted_at timestamp with time zone,
+    valid_until timestamp with time zone
 );
 
 

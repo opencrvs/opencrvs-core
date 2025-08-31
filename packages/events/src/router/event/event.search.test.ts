@@ -885,7 +885,7 @@ test('Returns correctly based on registration location even when a parent locati
       ...locations[0],
       id: user.primaryOfficeId,
       name: 'Child location',
-      partOf: parentLocation.id
+      parentId: parentLocation.id
     }
   ]
 
