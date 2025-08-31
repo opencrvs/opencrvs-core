@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { defineConfig } from '../events/defineConfig'
 import {
   defineFormPage,
@@ -33,25 +32,20 @@ const child = defineFormPage({
   title: generateTranslationConfig("Child's details"),
   fields: [
     {
-      id: 'child.firstNames',
-      type: FieldType.TEXT,
+      id: 'child.name',
+      type: FieldType.NAME,
       required: true,
       configuration: { maxLength: 32 },
       hideLabel: true,
-      label: generateTranslationConfig("Child's  first name")
+      label: generateTranslationConfig("Child's name"),
+      validation: []
     },
     {
-      id: 'child.familyName',
-      type: FieldType.TEXT,
-      required: true,
-      configuration: { maxLength: 32 },
-      hideLabel: true,
-      label: generateTranslationConfig("Child's last name")
-    },
-    {
-      id: 'child.DoB',
+      id: 'child.dob',
       type: 'DATE',
       required: true,
+      secured: true,
+      validation: [],
       label: generateTranslationConfig('Date of birth')
     }
   ]
@@ -63,30 +57,31 @@ const mother = defineFormPage({
   title: generateTranslationConfig("Mother's details"),
   fields: [
     {
-      id: 'mother.firstNames',
-      configuration: { maxLength: 32 },
-      type: FieldType.TEXT,
+      id: 'mother.name',
+      type: FieldType.NAME,
       required: true,
-      label: generateTranslationConfig('First name(s)')
+      configuration: { maxLength: 32 },
+      hideLabel: true,
+      label: generateTranslationConfig("Mother's name"),
+      conditionals: [],
+      validation: []
     },
     {
-      id: `mother.familyName`,
-      configuration: { maxLength: 32 },
-      type: FieldType.TEXT,
-      required: true,
-      label: generateTranslationConfig('Last name')
-    },
-    {
-      id: `mother.DoB`,
+      id: 'mother.dob',
       type: 'DATE',
       required: true,
-      label: generateTranslationConfig('Date of birth')
+      secured: true,
+      validation: [],
+      label: generateTranslationConfig('Date of birth'),
+      conditionals: []
     },
     {
-      id: 'mother.identifier',
+      id: 'mother.nid',
       type: FieldType.ID,
       required: true,
-      label: generateTranslationConfig('ID Number')
+      label: generateTranslationConfig('ID Number'),
+      conditionals: [],
+      validation: []
     }
   ]
 })
