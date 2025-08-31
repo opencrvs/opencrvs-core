@@ -14,7 +14,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
   <g clip-path="url(#clip0_5_2)">
     <path d="M583 0H0V842H583V0Z" fill="white" />
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-      <tspan x="62" y="426.352">{{ $lookup $metadata "modifiedAt"}}</tspan>
+      <tspan x="62" y="426.352">{{ $lookup ($action "PRINT_CERTIFICATE") "createdAt" }}</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0em">
       <tspan x="62" y="413.552">Date of certification&#10;</tspan>
