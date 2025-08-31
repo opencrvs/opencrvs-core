@@ -13,7 +13,6 @@ import { IntlShape, useIntl } from 'react-intl'
 import { EventState, FieldConfig, FieldValue } from '@opencrvs/commons/client'
 import { getRegisteredFieldByFieldConfig } from '@client/v2-events/features/events/registered-fields'
 import { useLocations } from './useLocations'
-
 interface RecursiveStringRecord {
   [key: string]: string | undefined | RecursiveStringRecord
 }

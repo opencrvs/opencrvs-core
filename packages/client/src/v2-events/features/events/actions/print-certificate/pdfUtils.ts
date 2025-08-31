@@ -29,7 +29,9 @@ import {
   getMixedPath,
   EventMetadata,
   EventStatus,
-  DEFAULT_DATE_OF_EVENT_PROPERTY
+  DEFAULT_DATE_OF_EVENT_PROPERTY,
+  ActionDocument,
+  ActionStatus
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -208,6 +210,7 @@ export function compileSvg({
   templateString,
   $metadata,
   $declaration,
+  $actions,
   locations,
   users,
   language,
@@ -218,6 +221,7 @@ export function compileSvg({
     modifiedAt: string
     copiesPrintedForTemplate: number | undefined
   }
+  $actions: ActionDocument[]
   $declaration: EventState
   locations: Location[]
   users: User[]
@@ -251,6 +255,43 @@ export function compileSvg({
   }
 
   /**
+   * Handlebars helper: $actions
+   *
+   * Resolves all actions for a specific action type
+   *
+   * @param actionType - The type of action to look up (e.g., "PRINT_CERTIFICATE")
+   * @returns The resolved list of actions
+   *
+   * @example {{ $actions "PRINT_CERTIFICATE" }}
+   */
+  function $actionsFn(actionType: string) {
+    return $actions
+      .filter((a) => a.status === ActionStatus.Accepted)
+      .filter((a) => a.type === actionType)
+  }
+
+  Handlebars.registerHelper('$actions', $actionsFn)
+
+  /**
+   * Handlebars helper: $action
+   *
+   * Finds the latest action data for a specific action type and property path.
+   *
+   * @param actionType - The type of action to look up (e.g., "PRINT_CERTIFICATE")
+   * @returns The resolved value from the action data
+   *
+   * @example {{ $action "PRINT_CERTIFICATE" }}
+   */
+
+  function $action(actionType: string) {
+    return $actions
+      .filter((a) => a.status === ActionStatus.Accepted)
+      .findLast((a) => a.type === actionType)
+  }
+
+  Handlebars.registerHelper('$action', $action)
+
+  /**
    * Handlebars helper: $lookup
    *
    * Resolves a value from the given property path within the combined $state and $declaration objects. useful for extracting specific properties from complex structures like `child.address.other`
@@ -277,7 +318,35 @@ export function compileSvg({
         return getMixedPath(resolvedMetadata, propertyPath)
       }
 
-      return getMixedPath(resolvedDeclaration, propertyPath)
+      if (isEqual(resolvedDeclaration, obj)) {
+        return getMixedPath(resolvedDeclaration, propertyPath)
+      }
+
+      const action = ActionDocument.safeParse(obj)
+      if (action.success) {
+        const resolvedAction = {
+          id: action.data.id,
+          type: action.data.type,
+          createdAt: DateField.stringify(action.data.createdAt, {
+            intl,
+            locations
+          }),
+          createdBy: users.find((user) => user.id === action.data.createdBy),
+          createdByUserType: action.data.createdByUserType,
+          createdBySignature: action.data.createdBySignature,
+          createdAtLocation: LocationSearch.toCertificateVariables(
+            action.data.createdAtLocation,
+            {
+              intl,
+              locations
+            }
+          ),
+          createdByRole: action.data.createdByRole
+        }
+
+        return getMixedPath(resolvedAction, propertyPath)
+      }
+      return obj[propertyPath as keyof typeof obj] ?? ''
     }
     const result = doLookup()
     if (typeof result === 'object') {
@@ -290,6 +359,22 @@ export function compileSvg({
   }
 
   Handlebars.registerHelper('$lookup', $lookup)
+
+  /**
+   * Handlebars helper: $json
+   *
+   * Converts any value to its JSON string representation.
+   *
+   * @param value - The value to stringify
+   * @returns The JSON string representation of the value
+   *
+   * @example {{ $json someObject }}
+   */
+  function $json(value: unknown) {
+    return JSON.stringify(value)
+  }
+
+  Handlebars.registerHelper('$json', $json)
 
   /**
    * Handlebars helper: $intl
