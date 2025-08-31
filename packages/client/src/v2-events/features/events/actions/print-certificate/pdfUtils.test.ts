@@ -13,12 +13,16 @@ import { createIntl } from 'react-intl'
 import createFetchMock from 'vitest-fetch-mock'
 import { ContentSvg } from 'pdfmake/interfaces'
 import {
+  ActionDocument,
   eventQueryDataGenerator,
   tennisClubMembershipEvent,
   User,
   UUID
 } from '@opencrvs/commons/client'
-import { tennisClubMembershipEventIndex } from '../../fixtures'
+import {
+  tennisClubMembershipEventDocument,
+  tennisClubMembershipEventIndex
+} from '../../fixtures'
 import {
   svgToPdfTemplate,
   stringifyEventMetadata,
@@ -154,6 +158,7 @@ function expectRenderOutput(template: string, output: string) {
       modifiedAt: new Date().toISOString(),
       copiesPrintedForTemplate: 2
     },
+    $actions: tennisClubMembershipEventDocument.actions as ActionDocument[],
     $declaration: {
       'applicant.name': {
         firstname: 'John',
@@ -169,6 +174,26 @@ function expectRenderOutput(template: string, output: string) {
 }
 
 describe('SVG compiler', () => {
+  describe('$actions', () => {
+    it('allows you to access full list of actions', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $lookup ($actions "DECLARE") "length" }}</text></svg>',
+        '<svg><text>1</text></svg>'
+      )
+    })
+  })
+  describe('$action', () => {
+    it('can be used to get full action details of the event', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $action "DECLARE" }}</text></svg>',
+        '<svg><text>[object Object]</text></svg>'
+      )
+      expectRenderOutput(
+        '<svg><text>{{ $lookup ($action "DECLARE") "createdAt" }}</text></svg>',
+        '<svg><text>23 January 2025</text></svg>'
+      )
+    })
+  })
   describe('$lookup', () => {
     it('stringifies complex form field values using the stringifier of said form input', () => {
       expectRenderOutput(

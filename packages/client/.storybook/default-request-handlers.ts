@@ -1145,7 +1145,7 @@ export const handlers = {
         data: {
           getUser: {
             id: testDataGenerator().user.id.localRegistrar,
-            userMgntUserID: '679397db138339c63cdc24e1',
+            userMgntUserID: testDataGenerator().user.id.localRegistrar,
             creationDate: '1737725915295',
             username: 'k.mweene',
             practitionerId: '6f672b75-ec29-4bdc-84f6-4cb3ff9bb529',
