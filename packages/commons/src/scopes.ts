@@ -76,8 +76,6 @@ export const SCOPES = {
   RECORD_PRINT_ISSUE_CERTIFIED_COPIES:
     'record.registration-print&issue-certified-copies',
   RECORD_PRINT_CERTIFIED_COPIES: 'record.registration-print-certified-copies', // v1.8
-  RECORD_BULK_PRINT_CERTIFIED_COPIES:
-    'record.registration-bulk-print-certified-copies', // v1.8
   RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES:
     'record.registration-verify-certified-copies', // v1.8
 
@@ -85,12 +83,6 @@ export const SCOPES = {
   RECORD_REGISTRATION_REQUEST_CORRECTION:
     'record.registration-request-correction',
   RECORD_REGISTRATION_CORRECT: 'record.registration-correct',
-  RECORD_REGISTRATION_REQUEST_REVOCATION:
-    'record.registration-request-revocation', // v1.8
-  RECORD_REGISTRATION_REVOKE: 'record.registration-revoke', // v1.8
-  RECORD_REGISTRATION_REQUEST_REINSTATEMENT:
-    'record.registration-request-reinstatement', // v1.8
-  RECORD_REGISTRATION_REINSTATE: 'record.registration-reinstate', // v1.8
   RECORD_CONFIRM_REGISTRATION: 'record.confirm-registration',
   RECORD_REJECT_REGISTRATION: 'record.reject-registration',
 
@@ -104,9 +96,6 @@ export const SCOPES = {
 
   // audit v1.8
   RECORD_READ: 'record.read',
-  RECORD_READ_AUDIT: 'record.read-audit',
-  RECORD_READ_COMMENTS: 'record.read-comments',
-  RECORD_CREATE_COMMENTS: 'record.create-comments',
 
   // profile
   PROFILE_UPDATE: 'profile.update', //v1.8
@@ -206,7 +195,6 @@ const CertifyScopes = z.union([
   z.literal(SCOPES.RECORD_REGISTRATION_PRINT),
   z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
   z.literal(SCOPES.RECORD_PRINT_CERTIFIED_COPIES),
-  z.literal(SCOPES.RECORD_BULK_PRINT_CERTIFIED_COPIES),
   z.literal(SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES)
 ])
 
@@ -214,10 +202,6 @@ const CertifyScopes = z.union([
 const CorrectionScopes = z.union([
   z.literal(SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION),
   z.literal(SCOPES.RECORD_REGISTRATION_CORRECT),
-  z.literal(SCOPES.RECORD_REGISTRATION_REQUEST_REVOCATION),
-  z.literal(SCOPES.RECORD_REGISTRATION_REVOKE),
-  z.literal(SCOPES.RECORD_REGISTRATION_REQUEST_REINSTATEMENT),
-  z.literal(SCOPES.RECORD_REGISTRATION_REINSTATE),
   z.literal(SCOPES.RECORD_CONFIRM_REGISTRATION),
   z.literal(SCOPES.RECORD_REJECT_REGISTRATION)
 ])
@@ -233,12 +217,7 @@ export const SearchScopes = z.union([
 ])
 
 // Audit
-const AuditScopes = z.union([
-  z.literal(SCOPES.RECORD_READ),
-  z.literal(SCOPES.RECORD_READ_AUDIT),
-  z.literal(SCOPES.RECORD_READ_COMMENTS),
-  z.literal(SCOPES.RECORD_CREATE_COMMENTS)
-])
+const AuditScopes = z.literal(SCOPES.RECORD_READ)
 
 // Profile
 const ProfileScopes = z.union([
