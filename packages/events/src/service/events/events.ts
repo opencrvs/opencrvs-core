@@ -247,23 +247,20 @@ export async function deleteUnreferencedFilesFromPreviousDrafts(
 export async function addAction(
   input: ActionInputWithType,
   {
-    eventId,
+    event,
     user,
     token,
-    status
+    status,
+    configuration
   }: {
-    eventId: UUID
+    event: EventDocument
     user: TrpcUserContext
     token: string
     status: ActionStatus
+    configuration: EventConfig
   }
 ): Promise<EventDocument> {
-  const event = await getEventById(eventId)
-  const configuration = await getEventConfigurationById({
-    token,
-    eventType: event.type
-  })
-
+  const eventId = event.id
   // @TODO: Check that this works after making sure data incldues only declaration fields.
   const fieldConfigs = getDeclarationFields(configuration)
   const fileValuesInCurrentAction = extractFileValues(
@@ -389,16 +386,6 @@ export async function addAction(
 
   const updatedEvent = await getEventById(eventId)
 
-  const isDraft =
-    getStatusFromActions(updatedEvent.actions) === EventStatus.enum.CREATED
-
-  // Only send the event to Elasticsearch if it is not a draft and action status is accepted
-  const shouldIndexEvent = !isDraft && status === ActionStatus.Accepted
-
-  if (shouldIndexEvent) {
-    await indexEvent(updatedEvent, configuration)
-  }
-
   const previousDraft = await draftsRepo.findLatestDraftForAction(
     event.id,
     user.id,
@@ -415,6 +402,38 @@ export async function addAction(
       configuration,
       previousDraft
     })
+  }
+
+  return updatedEvent
+}
+
+export async function addActionAndIndexEvent(
+  input: ActionInputWithType,
+  {
+    event,
+    user,
+    token,
+    status,
+    configuration
+  }: {
+    event: EventDocument
+    user: TrpcUserContext
+    token: string
+    status: ActionStatus
+    configuration: EventConfig
+  }
+): Promise<EventDocument> {
+  const updatedEvent = await addAction(input, {
+    event,
+    user,
+    token,
+    status,
+    configuration
+  })
+
+  // Only send the event to Elasticsearch if it is not a draft and action status is accepted
+  if (getStatusFromActions(updatedEvent.actions) !== EventStatus.enum.CREATED) {
+    await indexEvent(updatedEvent, configuration)
   }
 
   return updatedEvent

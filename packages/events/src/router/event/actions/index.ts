@@ -44,6 +44,8 @@ import {
   throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
 import { throwConflictIfWaitingForCorrection } from '@events/service/events/actions/correction'
+import { indexEvent } from '@events/service/indexing/indexing'
+import { getEventConfigurationById } from '@events/service/config/config'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -213,6 +215,11 @@ export function getDefaultActionProcedures(
       .mutation(async ({ ctx, input }) => {
         const { token, user, isDuplicateAction } = ctx
         const { eventId } = input
+        const event = await getEventById(eventId)
+        const configuration = await getEventConfigurationById({
+          token,
+          eventType: event.type
+        })
 
         if (isDuplicateAction) {
           return ctx.event
@@ -226,10 +233,11 @@ export function getDefaultActionProcedures(
         }
 
         const eventWithRequestedAction = await addAction(input, {
-          eventId,
+          event,
           user,
           token,
-          status: ActionStatus.Requested
+          status: ActionStatus.Requested,
+          configuration
         })
 
         const { responseStatus, body } = await requestActionConfirmation(
@@ -278,7 +286,7 @@ export function getDefaultActionProcedures(
           eventWithRequestedAction.actions
         )
 
-        return addAction(
+        const updatedEvent = await addAction(
           {
             ...strippedInput,
             declaration: {},
@@ -286,12 +294,16 @@ export function getDefaultActionProcedures(
             ...parsedBody
           },
           {
-            eventId,
+            event,
             user,
             token,
-            status
+            status,
+            configuration
           }
         )
+
+        await indexEvent(updatedEvent, configuration)
+        return updatedEvent
       }),
 
     accept: systemProcedure
@@ -306,6 +318,10 @@ export function getDefaultActionProcedures(
         const confirmationAction = event.actions.find(
           (a) => a.originalActionId === actionId
         )
+        const configuration = await getEventConfigurationById({
+          token,
+          eventType: event.type
+        })
 
         // Original action is not found
         if (!originalAction) {
@@ -331,10 +347,11 @@ export function getDefaultActionProcedures(
         return addAction(
           { ...input, originalActionId: actionId },
           {
-            eventId,
+            event,
             user,
             token,
-            status: ActionStatus.Accepted
+            status: ActionStatus.Accepted,
+            configuration
           }
         )
       }),

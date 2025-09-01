@@ -42,7 +42,7 @@ import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
 import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
 import {
-  addAction,
+  addActionAndIndexEvent,
   deleteUnreferencedFilesFromPreviousDrafts,
   createEvent,
   deleteEvent,
@@ -128,7 +128,11 @@ export const eventRouter = router({
     .input(UUID)
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
-      const updatedEvent = await addAction(
+      const configuration = await getEventConfigurationById({
+        token: ctx.token,
+        eventType: event.type
+      })
+      const updatedEvent = await addActionAndIndexEvent(
         {
           type: ActionType.READ,
           eventId: event.id,
@@ -136,10 +140,11 @@ export const eventRouter = router({
           declaration: {}
         },
         {
-          eventId: event.id,
+          event,
           user: ctx.user,
           token: ctx.token,
-          status: ActionStatus.Accepted
+          status: ActionStatus.Accepted,
+          configuration
         }
       )
 

@@ -17,9 +17,13 @@ import {
   UnassignActionInput
 } from '@opencrvs/commons/events'
 import { inScope, SCOPES, UUID } from '@opencrvs/commons'
-import { addAction, getEventById } from '@events/service/events/events'
+import {
+  addActionAndIndexEvent,
+  getEventById
+} from '@events/service/events/events'
 import { setBearerForToken } from '@events/router/middleware'
 import { TrpcUserContext } from '@events/context'
+import { getEventConfigurationById } from '@events/service/config/config'
 
 export async function unassignRecord(
   input: UnassignActionInput,
@@ -34,6 +38,11 @@ export async function unassignRecord(
   }
 ) {
   const storedEvent = await getEventById(eventId)
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType: storedEvent.type
+  })
+
   const lastAssignmentAction = findLastAssignmentAction(storedEvent.actions)
 
   if (lastAssignmentAction?.type === ActionType.ASSIGN) {
@@ -48,11 +57,12 @@ export async function unassignRecord(
       })
     }
 
-    return addAction(input, {
-      eventId,
+    return addActionAndIndexEvent(input, {
+      event: storedEvent,
       user,
       token,
-      status: ActionStatus.Accepted
+      status: ActionStatus.Accepted,
+      configuration
     })
   }
 
