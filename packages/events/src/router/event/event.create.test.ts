@@ -14,7 +14,6 @@ import { ActionType, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/events'
 import {
   createSystemTestClient,
   createTestClient,
-  RECORD_DECLARE_SCOPE,
   setupTestCase
 } from '@events/tests/utils'
 
@@ -31,7 +30,9 @@ describe('event.create', () => {
 
     test(`allows access with required scope`, async () => {
       const { user, generator } = await setupTestCase()
-      const client = createTestClient(user, [RECORD_DECLARE_SCOPE])
+      const client = createTestClient(user, [
+        'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+      ])
 
       await expect(
         client.event.create(generator.event.create())

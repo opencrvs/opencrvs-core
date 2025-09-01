@@ -83,14 +83,13 @@ const eventConfigGetProcedure: QueryProcedure<{
     requiresAnyOfScopes(
       [
         SCOPES.RECORD_READ,
-        SCOPES.RECORD_SUBMIT_INCOMPLETE,
         SCOPES.RECORD_SUBMIT_FOR_REVIEW,
         SCOPES.RECORD_REGISTER,
         SCOPES.RECORD_EXPORT_RECORDS,
         SCOPES.CONFIG,
         SCOPES.CONFIG_UPDATE_ALL
       ],
-      ['record.declare']
+      ['record.declare', 'record.notify']
     )
   )
   .input(z.void())

@@ -10,11 +10,7 @@
  */
 import { TRPCError } from '@trpc/server'
 import { ActionType, generateUuid, getUUID, SCOPES } from '@opencrvs/commons'
-import {
-  createTestClient,
-  setupTestCase,
-  TEST_USER_DEFAULT_SCOPES
-} from '@events/tests/utils'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -63,10 +59,7 @@ test('Returns event', async () => {
 
 test('Returns event with all actions', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    ...TEST_USER_DEFAULT_SCOPES,
-    SCOPES.RECORD_SUBMIT_INCOMPLETE
-  ])
+  const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
   await client.event.actions.notify.request(

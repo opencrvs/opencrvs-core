@@ -90,8 +90,6 @@ export function sanitizeForSnapshot(data: unknown, fields: string[]) {
 
 const { createCallerFactory } = t
 
-export const RECORD_DECLARE_SCOPE = `record.declare[event=v2.birth|v2.death|tennis-club-membership]`
-
 export const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
   SCOPES.RECORD_READ,
@@ -103,8 +101,9 @@ export const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_SUBMIT_FOR_UPDATES,
   SCOPES.RECORD_UNASSIGN_OTHERS,
   SCOPES.SEARCH_BIRTH,
-  RECORD_DECLARE_SCOPE,
-  'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]'
+  'record.declare[event=v2.birth|v2.death|tennis-club-membership]',
+  'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
+  'record.notify[event=v2.birth|v2.death|tennis-club-membership]'
 ]
 
 export function createTestToken(

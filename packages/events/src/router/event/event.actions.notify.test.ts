@@ -40,7 +40,7 @@ describe('event.actions.notify', () => {
 
     test(`allows access if required scope is present`, async () => {
       const { user } = await setupTestCase()
-      const client = createTestClient(user, [SCOPES.RECORD_SUBMIT_INCOMPLETE])
+      const client = createTestClient(user)
 
       await expect(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -83,10 +83,7 @@ describe('event.actions.notify', () => {
   // @TODO: In order to test this, we need to add another required field to the form. Bit out of scope. Worked on https://github.com/opencrvs/opencrvs-core/issues/9766
   test.skip(`allows sending partial payload as ${ActionType.NOTIFY} action`, async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user, [
-      SCOPES.RECORD_SUBMIT_INCOMPLETE,
-      'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
-    ])
+    const client = createTestClient(user)
 
     const event = await client.event.create(generator.event.create())
 
@@ -115,10 +112,7 @@ describe('event.actions.notify', () => {
 
   test(`${ActionType.NOTIFY} action fails if payload includes field with unexpected type`, async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user, [
-      SCOPES.RECORD_SUBMIT_INCOMPLETE,
-      'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
-    ])
+    const client = createTestClient(user)
 
     const event = await client.event.create(generator.event.create())
     const payload = {
@@ -139,10 +133,7 @@ describe('event.actions.notify', () => {
 
   test(`${ActionType.NOTIFY} action fails if payload includes field that is not in the declaration`, async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user, [
-      SCOPES.RECORD_SUBMIT_INCOMPLETE,
-      'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
-    ])
+    const client = createTestClient(user)
 
     const event = await client.event.create(generator.event.create())
     const payload = {
@@ -161,10 +152,7 @@ describe('event.actions.notify', () => {
 
   test(`${ActionType.NOTIFY} action does not fail even if invalid value is sent`, async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user, [
-      SCOPES.RECORD_SUBMIT_INCOMPLETE,
-      'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
-    ])
+    const client = createTestClient(user)
 
     const event = await client.event.create(generator.event.create())
     const payload = {
@@ -195,10 +183,7 @@ describe('event.actions.notify', () => {
 
   test(`${ActionType.NOTIFY} is idempotent`, async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user, [
-      SCOPES.RECORD_SUBMIT_INCOMPLETE,
-      'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
-    ])
+    const client = createTestClient(user)
 
     const event = await client.event.create(generator.event.create())
 

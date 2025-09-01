@@ -14,14 +14,12 @@ import {
   ActionStatus,
   ActionType,
   InherentFlags,
-  SCOPES,
   Flag
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import {
   createEvent,
   createTestClient,
-  RECORD_DECLARE_SCOPE,
   setupTestCase
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
@@ -298,10 +296,7 @@ test(`Removes ${InherentFlags.CORRECTION_REQUESTED} flag after ${ActionType.APPR
 
 test(`Adds ${InherentFlags.INCOMPLETE} flag after ${ActionType.NOTIFY} is called`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    SCOPES.RECORD_SUBMIT_INCOMPLETE,
-    RECORD_DECLARE_SCOPE
-  ])
+  const client = createTestClient(user)
 
   const event = await createEvent(client, generator, [])
 
@@ -315,10 +310,7 @@ test(`Adds ${InherentFlags.INCOMPLETE} flag after ${ActionType.NOTIFY} is called
 
 test(`Removes ${InherentFlags.INCOMPLETE} flag after ${ActionType.DECLARE} is called`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    SCOPES.RECORD_SUBMIT_INCOMPLETE,
-    RECORD_DECLARE_SCOPE
-  ])
+  const client = createTestClient(user)
 
   const event = await createEvent(client, generator, [])
 
