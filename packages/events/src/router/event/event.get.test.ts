@@ -20,10 +20,6 @@ import { indexEvent } from '@events/service/indexing/indexing'
 type TestClient = ReturnType<typeof createTestClient>
 type CreatedEvent = Awaited<ReturnType<TestClient['event']['create']>>
 
-vi.mock('@events/service/indexing/indexing', () => ({
-  indexEvent: vi.fn()
-}))
-
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [])
@@ -284,7 +280,7 @@ describe('Event indexing behavior', () => {
       expect(indexEvent).not.toHaveBeenCalled()
     })
 
-    test('does not index on read', async () => {
+    test('does not index before declare', async () => {
       const event = await createEvent()
       await client.event.get(event.id)
       expect(indexEvent).not.toHaveBeenCalled()

@@ -22,6 +22,7 @@ import { mswServer } from './msw'
 import { createDatabase, initializeSchemaAccess, migrate } from './postgres'
 
 vi.mock('@events/storage/mongodb/user-mgnt')
+vi.mock('@events/service/indexing/indexing')
 vi.mock('@events/storage/elasticsearch')
 
 async function resetESServer() {
