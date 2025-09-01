@@ -30,7 +30,8 @@ import {
   SystemVariables,
   InteractiveFieldType,
   FieldReference,
-  getAllUniqueFields
+  getAllUniqueFields,
+  Location
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -79,6 +80,7 @@ type AllProps = {
   isCorrection?: boolean
   systemVariables: SystemVariables
   parentId?: string
+  locations?: Location[]
 } & UsedFormikProps
 
 /**
@@ -191,15 +193,11 @@ export function FormSectionComponent({
   onAllFieldsValidated,
   isCorrection = false,
   systemVariables,
-  parentId
+  parentId,
+  locations
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not -
   useOnlineStatus()
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
   const intl = useIntl()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
@@ -394,7 +392,7 @@ export function FormSectionComponent({
     const hasErrors = fieldErrors && fieldErrors.length > 0
     return (
       isFieldVisible(field, completeForm, {
-        locations: adminStructureLocations
+        locations: locations ?? []
       }) && hasErrors
     )
   })
@@ -413,7 +411,7 @@ export function FormSectionComponent({
       {fieldsWithFormikSeparator.map((field) => {
         if (
           !isFieldVisible(field, completeForm, {
-            locations: adminStructureLocations
+            locations: locations ?? []
           })
         ) {
           return null
@@ -421,7 +419,7 @@ export function FormSectionComponent({
 
         const isDisabled =
           !isFieldEnabled(field, completeForm, {
-            locations: adminStructureLocations
+            locations: locations ?? []
           }) ||
           (isCorrection && field.uncorrectable)
 

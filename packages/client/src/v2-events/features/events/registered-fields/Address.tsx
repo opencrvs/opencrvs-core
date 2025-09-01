@@ -326,6 +326,7 @@ function AddressInput(props: Props) {
       {...otherProps}
       fields={fields}
       initialValues={{ ...normalizedValue, ...derivedAdminLevels }}
+      locations={adminStructureLocations}
       parentId={props.id}
       onChange={handleChange}
     />

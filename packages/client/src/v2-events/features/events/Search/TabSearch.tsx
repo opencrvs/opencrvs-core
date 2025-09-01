@@ -31,6 +31,7 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import {
   getAdvancedSearchFieldErrors,
   resolveAdvancedSearchConfig,
@@ -137,6 +138,8 @@ export function TabSearch({
 }) {
   const intl = useIntl()
   const navigate = useNavigate()
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
 
   const [formValues, setFormValues] = useState<EventState>(fieldValues)
 
@@ -155,6 +158,10 @@ export function TabSearch({
 
   const advancedSearchSections = resolveAdvancedSearchConfig(currentEvent)
 
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
+
   const sections = advancedSearchSections.map((section) => ({
     ...section,
     isExpanded: section.fields.some((field) =>
@@ -168,7 +175,7 @@ export function TabSearch({
     }))
 
   const errors = Object.values(
-    getAdvancedSearchFieldErrors(sections, formValues)
+    getAdvancedSearchFieldErrors(sections, formValues, adminStructureLocations)
   ).flatMap((errObj) => errObj.errors)
 
   const nonEmptyValues = filterEmptyValues(formValues)
