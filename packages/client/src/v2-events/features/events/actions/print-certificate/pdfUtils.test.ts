@@ -13,13 +13,17 @@ import { createIntl } from 'react-intl'
 import createFetchMock from 'vitest-fetch-mock'
 import { ContentSvg } from 'pdfmake/interfaces'
 import {
+  ActionDocument,
   eventQueryDataGenerator,
   tennisClubMembershipEvent,
   User,
   UUID,
   Location
 } from '@opencrvs/commons/client'
-import { tennisClubMembershipEventIndex } from '../../fixtures'
+import {
+  tennisClubMembershipEventDocument,
+  tennisClubMembershipEventIndex
+} from '../../fixtures'
 import {
   svgToPdfTemplate,
   stringifyEventMetadata,
@@ -33,19 +37,22 @@ const locations = [
   {
     id: '35391063-7dca-4e57-abd3-20dcc8538a64' as UUID,
     name: 'HQ Office',
-    partOf: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID,
+    parentId: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID,
+    validUntil: null,
     locationType: 'ADMIN_STRUCTURE'
   },
   {
     id: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID,
     name: 'Embe',
-    partOf: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
+    parentId: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
+    validUntil: null,
     locationType: 'ADMIN_STRUCTURE'
   },
   {
     id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
     name: 'Pualula',
-    partOf: null,
+    parentId: null,
+    validUntil: null,
     locationType: 'ADMIN_STRUCTURE'
   }
 ] as Location[]
@@ -155,6 +162,7 @@ function expectRenderOutput(template: string, output: string) {
       modifiedAt: new Date().toISOString(),
       copiesPrintedForTemplate: 2
     },
+    $actions: tennisClubMembershipEventDocument.actions as ActionDocument[],
     $declaration: {
       'applicant.name': {
         firstname: 'John',
@@ -170,6 +178,26 @@ function expectRenderOutput(template: string, output: string) {
 }
 
 describe('SVG compiler', () => {
+  describe('$actions', () => {
+    it('allows you to access full list of actions', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $lookup ($actions "DECLARE") "length" }}</text></svg>',
+        '<svg><text>1</text></svg>'
+      )
+    })
+  })
+  describe('$action', () => {
+    it('can be used to get full action details of the event', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $action "DECLARE" }}</text></svg>',
+        '<svg><text>[object Object]</text></svg>'
+      )
+      expectRenderOutput(
+        '<svg><text>{{ $lookup ($action "DECLARE") "createdAt" }}</text></svg>',
+        '<svg><text>23 January 2025</text></svg>'
+      )
+    })
+  })
   describe('$lookup', () => {
     it('stringifies complex form field values using the stringifier of said form input', () => {
       expectRenderOutput(

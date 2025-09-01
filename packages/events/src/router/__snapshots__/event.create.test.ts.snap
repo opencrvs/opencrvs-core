@@ -9,7 +9,7 @@ exports[`event can be created and fetched 1`] = `
         "externalId": "<externalId />",
         "id": "<id />",
         "name": "Location name 0",
-        "partOf": null,
+        "parentId": null,
       },
       "createdBy": {
         "id": "<id />",

@@ -17,23 +17,17 @@ import { Locations, NewLocations } from './schema/app/Locations'
 
 const INSERT_MAX_CHUNK_SIZE = 10000
 
-export async function setLocations(locations: NewLocations[]) {
+export async function addLocations(locations: NewLocations[]) {
   const db = getClient()
 
-  await db
-    .updateTable('locations')
-    .set({ deletedAt: sql`now()` })
-    .where('deletedAt', 'is', null)
-    .execute()
-
+  // Insert new locations in chunks to avoid exceeding max query size
   for (const [index, batch] of chunk(
     locations,
     INSERT_MAX_CHUNK_SIZE
   ).entries()) {
     logger.info(
-      `Processing ${(index + 1) * INSERT_MAX_CHUNK_SIZE}/${locations.length} locations`
+      `Processing ${Math.min((index + 1) * INSERT_MAX_CHUNK_SIZE, locations.length)}/${locations.length} locations`
     )
-    // Insert or update the locations in the database
     await db
       .insertInto('locations')
       .values(batch.map((loc) => ({ ...loc, deletedAt: null })))
@@ -48,6 +42,12 @@ export async function setLocations(locations: NewLocations[]) {
       )
       .execute()
   }
+}
+
+export async function setLocations(locations: NewLocations[]) {
+  const db = getClient()
+  await db.deleteFrom('locations').execute()
+  return addLocations(locations)
 }
 
 export async function getLocations() {
@@ -68,7 +68,7 @@ export async function getChildLocations(id: string) {
     WITH RECURSIVE r AS (
       SELECT id, parent_id
       FROM app.locations
-      WHERE id = ${id}
+      WHERE id = ${id} AND deleted_at IS NULL
       UNION ALL
       SELECT l.id, l.parent_id
       FROM app.locations l
@@ -77,7 +77,7 @@ export async function getChildLocations(id: string) {
     SELECT l.*
     FROM app.locations l
     JOIN r ON r.id = l.id
-    WHERE l.id <> ${id};
+    WHERE l.id <> ${id} AND l.deleted_at IS NULL;
   `.execute(db)
   return rows
 }

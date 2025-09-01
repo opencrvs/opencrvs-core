@@ -420,7 +420,7 @@ const IdField = BaseField.extend({
 
 const Checkbox = BaseField.extend({
   type: z.literal(FieldType.CHECKBOX),
-  defaultValue: CheckboxFieldValue.optional()
+  defaultValue: CheckboxFieldValue.default(false)
 }).describe('Boolean checkbox field')
 
 export type Checkbox = z.infer<typeof Checkbox>

@@ -120,6 +120,7 @@ export const CheckboxOutput: Story = {
     field: {
       type: FieldType.CHECKBOX,
       id: 'recommender.none',
+      defaultValue: false,
       label: {
         id: 'recommender.none',
         defaultMessage: 'No recommender',
@@ -136,6 +137,7 @@ export const CheckboxOutputWithUndefinedPreviousValue: Story = {
     field: {
       type: FieldType.CHECKBOX,
       id: 'recommender.none',
+      defaultValue: false,
       label: {
         id: 'recommender.none',
         defaultMessage: 'No recommender',
@@ -152,6 +154,7 @@ export const CheckboxOutputChangedFromUndefinedToTrue: Story = {
     field: {
       type: FieldType.CHECKBOX,
       id: 'recommender.none',
+      defaultValue: false,
       label: {
         id: 'recommender.none',
         defaultMessage: 'No recommender',
@@ -168,6 +171,7 @@ export const CheckboxOutputChangedFromTrueToFalse: Story = {
     field: {
       type: FieldType.CHECKBOX,
       id: 'recommender.none',
+      defaultValue: false,
       label: {
         id: 'recommender.none',
         defaultMessage: 'No recommender',
@@ -184,6 +188,7 @@ export const CheckboxOutputChangedFromFalseToTrue: Story = {
     field: {
       type: FieldType.CHECKBOX,
       id: 'recommender.none',
+      defaultValue: false,
       label: {
         id: 'recommender.none',
         defaultMessage: 'No recommender',

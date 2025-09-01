@@ -47,8 +47,9 @@ test('Creates single location', async () => {
   const locationPayload: Location[] = [
     {
       id: generateUuid(),
-      partOf: null,
+      parentId: null,
       name: 'Location foobar',
+      validUntil: null,
       locationType: 'ADMIN_STRUCTURE'
     }
   ]
@@ -70,8 +71,8 @@ test('Creates multiple locations', async () => {
 
   const locationPayload = generator.locations.set([
     { id: parentId },
-    { partOf: parentId },
-    { partOf: parentId },
+    { parentId: parentId },
+    { parentId: parentId },
     {}
   ])
 

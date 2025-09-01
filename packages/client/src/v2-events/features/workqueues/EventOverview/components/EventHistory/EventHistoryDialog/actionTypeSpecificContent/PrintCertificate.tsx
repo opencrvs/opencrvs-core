@@ -86,7 +86,8 @@ export function PrintCertificate({
         field: {
           id: page.id,
           label: page.title,
-          type: FieldType.CHECKBOX
+          type: FieldType.CHECKBOX,
+          defaultValue: false
         },
         value: annotation[page.id],
         showPreviouslyMissingValuesAsChanged: false

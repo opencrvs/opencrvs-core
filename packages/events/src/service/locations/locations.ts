@@ -12,11 +12,13 @@
 import { z } from 'zod'
 import { UUID } from '@opencrvs/commons'
 import * as locationsRepo from '@events/storage/postgres/events/locations'
+import * as config from '@events/service/config/config'
 
 export const Location = z.object({
   id: UUID,
   name: z.string(),
-  partOf: UUID.nullable(),
+  parentId: UUID.nullable(),
+  validUntil: z.date().nullable(),
   locationType: z
     .enum(['HEALTH_FACILITY', 'CRVS_OFFICE', 'ADMIN_STRUCTURE'])
     .nullable()
@@ -29,24 +31,36 @@ export type Location = z.infer<typeof Location>
  * @param incomingLocations - Locations to be set
  */
 
-export async function setLocations(incomingLocations: Array<Location>) {
+export async function setLocations(locations: Location[]) {
   return locationsRepo.setLocations(
-    incomingLocations.map(({ id, name, partOf, locationType }) => ({
+    locations.map(({ id, name, parentId, validUntil, locationType }) => ({
       id,
       name,
-      parentId: partOf,
+      parentId: parentId,
+      validUntil: validUntil ? validUntil.toISOString() : null,
       locationType
     }))
   )
 }
 
+/**
+ * Syncs locations from V1 to V2 database.
+ * @param incomingLocations - Locations to be set
+ */
+
+export async function syncLocations() {
+  const locations = await config.getLocations()
+  return setLocations(locations)
+}
+
 export const getLocations = async () => {
   const locations = await locationsRepo.getLocations()
 
-  return locations.map(({ id, name, parentId, locationType }) => ({
+  return locations.map(({ id, name, parentId, validUntil, locationType }) => ({
     id,
     name,
-    partOf: parentId,
+    parentId,
+    validUntil: validUntil ? new Date(validUntil) : null,
     locationType
   }))
 }
@@ -54,10 +68,11 @@ export const getLocations = async () => {
 export const getChildLocations = async (parentIdToSearch: string) => {
   const locations = await locationsRepo.getChildLocations(parentIdToSearch)
 
-  return locations.map(({ id, name, parentId, locationType }) => ({
+  return locations.map(({ id, name, parentId, validUntil, locationType }) => ({
     id,
     name,
-    partOf: parentId,
+    validUntil,
+    parentId,
     locationType
   }))
 }

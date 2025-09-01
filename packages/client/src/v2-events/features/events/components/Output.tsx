@@ -44,7 +44,8 @@ import {
   isLocationFieldType,
   FileFieldWithOptionValue,
   EventState,
-  FormConfig
+  FormConfig,
+  FieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -72,6 +73,10 @@ const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
 `
 
+const DeletedEmpty = styled(Deleted)`
+  text-decoration: none;
+`
+
 /**
  *  Used for setting output/read (REVIEW) values for FORM input/write fields (string defaults based on FieldType).
  * For setting default fields for intl object @see setEmptyValuesForFields
@@ -89,12 +94,9 @@ export function ValueOutput(
     isEmailFieldType(field) ||
     isIdFieldType(field) ||
     isPhoneFieldType(field) ||
-    isTextFieldType(field)
+    isTextFieldType(field) ||
+    isTextAreaFieldType(field)
   ) {
-    return Text.Output({ value: field.value })
-  }
-
-  if (isTextAreaFieldType(field)) {
     return Text.Output({ value: field.value })
   }
 
@@ -321,11 +323,19 @@ export function Output({
   }
 
   if (!hasPreviousValue && showPreviouslyMissingValuesAsChanged) {
+    const deleted = ValueOutput({
+      config: { ...field, required: true },
+      value: undefined
+    })
+
     return (
       <>
-        <Deleted>
-          <ValueOutput config={{ ...field, required: true }} value="-" />
-        </Deleted>
+        {deleted ? (
+          <Deleted>{deleted}</Deleted>
+        ) : (
+          // For a deleted 'dash', we dont want to overline the dash
+          <DeletedEmpty>{'-'}</DeletedEmpty>
+        )}
         <br />
         <ValueOutput config={field} value={value} />
       </>

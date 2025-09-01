@@ -93,6 +93,7 @@ services:
       - DOCUMENTS_URL=http://documents:9050
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
       - AUTH_URL=http://auth:4040
+      - CONFIG_URL=http://config:2021
   # User facing services
   workflow:
     image: ghcr.io/opencrvs/ocrvs-workflow:${VERSION}

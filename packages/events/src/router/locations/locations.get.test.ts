@@ -19,8 +19,9 @@ test('Returns single location in right format', async () => {
   const setLocationPayload: Location[] = [
     {
       id: generateUuid(),
-      partOf: null,
+      parentId: null,
       name: 'Location foobar',
+      validUntil: null,
       locationType: 'ADMIN_STRUCTURE'
     }
   ]

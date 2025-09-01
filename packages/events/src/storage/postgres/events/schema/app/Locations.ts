@@ -24,6 +24,7 @@ export default interface LocationsTable {
     LocationType | null,
     LocationType | null
   >
+  validUntil: ColumnType<string | null, string | null, string | null>
 }
 
 export type Locations = Selectable<LocationsTable>

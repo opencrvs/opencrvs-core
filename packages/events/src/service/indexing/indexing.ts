@@ -41,6 +41,7 @@ import {
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
+  NAME_QUERY_KEY,
   removeSecuredFields
 } from './utils'
 import {
@@ -146,7 +147,7 @@ function mapFieldTypeToElasticsearch(
         properties: {
           firstname: { type: 'text', analyzer: 'classic' },
           surname: { type: 'text', analyzer: 'classic' },
-          __fullname: { type: 'text', analyzer: 'classic' }
+          [NAME_QUERY_KEY]: { type: 'text', analyzer: 'classic' }
         }
       }
     case FieldType.FILE_WITH_OPTIONS:
