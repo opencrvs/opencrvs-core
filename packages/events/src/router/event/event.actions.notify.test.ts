@@ -225,8 +225,8 @@ describe('event.actions.notify', () => {
 
       const locationPayload = generator.locations.set([
         { id: parentId },
-        { partOf: parentId },
-        { partOf: parentId }
+        { parentId: parentId },
+        { parentId: parentId }
       ])
 
       await dataSeedingClient.locations.set(locationPayload)
@@ -269,7 +269,7 @@ describe('event.actions.notify', () => {
         })
       ).rejects.toMatchSnapshot()
 
-      const childLocation = locations.find((l) => l.partOf === parentId)
+      const childLocation = locations.find((l) => l.parentId === parentId)
 
       if (!childLocation) {
         throw new Error('Child location not found')
