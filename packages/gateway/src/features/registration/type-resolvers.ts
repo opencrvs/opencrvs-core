@@ -310,7 +310,7 @@ export const typeResolvers: GQLResolver = {
       return (occupationExtension && occupationExtension.valueString) || null
     },
     reasonNotApplying: (person: Patient) => {
-      if (!person.extension || person.active === false) {
+      if (!person.extension || person.active) {
         return null
       }
 
