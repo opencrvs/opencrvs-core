@@ -28,21 +28,16 @@ type RequiredScopes =
 export const ACTION_ALLOWED_SCOPES = {
   [ActionType.READ]: [
     SCOPES.RECORD_READ,
+    // TODO CIHAN: maybe remove submit for review?
     SCOPES.RECORD_SUBMIT_FOR_REVIEW,
     SCOPES.RECORD_REGISTER,
     SCOPES.RECORD_EXPORT_RECORDS
   ],
   [ActionType.CREATE]: [SCOPES.RECORD_SUBMIT_FOR_REVIEW],
   [ActionType.NOTIFY]: [],
-  [ActionType.DECLARE]: [
-    SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-    SCOPES.RECORD_REGISTER
-  ],
+  [ActionType.DECLARE]: [SCOPES.RECORD_REGISTER],
   [ActionType.DELETE]: [],
-  [ActionType.VALIDATE]: [
-    SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-    SCOPES.RECORD_REGISTER
-  ],
+  [ActionType.VALIDATE]: [SCOPES.RECORD_REGISTER],
   [ActionType.REGISTER]: [SCOPES.RECORD_REGISTER],
   [ActionType.PRINT_CERTIFICATE]: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
   [ActionType.REQUEST_CORRECTION]: [
@@ -68,9 +63,9 @@ export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.READ]: ['record.declare', 'record.notify'],
   [ActionType.CREATE]: ['record.declare', 'record.notify'],
   [ActionType.NOTIFY]: ['record.notify'],
-  [ActionType.DECLARE]: ['record.declare'],
+  [ActionType.DECLARE]: ['record.declare', 'record.declared.validate'],
   [ActionType.DELETE]: ['record.declare'],
-  [ActionType.VALIDATE]: [],
+  [ActionType.VALIDATE]: ['record.declared.validate'],
   [ActionType.REGISTER]: [],
   [ActionType.PRINT_CERTIFICATE]: [],
   [ActionType.REQUEST_CORRECTION]: [],

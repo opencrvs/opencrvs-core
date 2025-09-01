@@ -72,6 +72,7 @@ export function useReviewActionConfig({
     } as const
   }
 
+  // TODO CIHAN: fix this
   if (scopes?.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL)) {
     return {
       buttonType: 'positive' as const,

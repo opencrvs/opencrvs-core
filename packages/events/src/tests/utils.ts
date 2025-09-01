@@ -96,14 +96,14 @@ export const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_REGISTER,
   SCOPES.RECORD_REGISTRATION_CORRECT,
   SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-  SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
   SCOPES.RECORD_DECLARATION_ARCHIVE,
   SCOPES.RECORD_SUBMIT_FOR_UPDATES,
   SCOPES.RECORD_UNASSIGN_OTHERS,
   SCOPES.SEARCH_BIRTH,
-  'record.declare[event=v2.birth|v2.death|tennis-club-membership]',
   'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
-  'record.notify[event=v2.birth|v2.death|tennis-club-membership]'
+  'record.declare[event=v2.birth|v2.death|tennis-club-membership]',
+  'record.notify[event=v2.birth|v2.death|tennis-club-membership]',
+  'record.declared.validate[event=v2.birth|v2.death|tennis-club-membership]'
 ]
 
 export function createTestToken(
