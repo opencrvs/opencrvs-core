@@ -464,7 +464,7 @@ function ReviewComponent({
   isCorrection = false,
   isReviewCorrection = false
 }: {
-  children: React.ReactNode
+  children?: React.ReactNode
   formConfig: FormConfig
   form: EventState
   annotation?: EventState

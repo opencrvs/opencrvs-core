@@ -18,7 +18,7 @@ import {
   PageTypes,
   PageConfig,
   DeclarationUpdateActionType,
-  ActionType
+  RegistrationUpdateActionType
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -43,7 +43,7 @@ interface PagesProps {
 
 type DeclarationProps =
   | {
-      actionType: DeclarationUpdateActionType
+      actionType: DeclarationUpdateActionType | RegistrationUpdateActionType
       declaration?: undefined
     }
   | {

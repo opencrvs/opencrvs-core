@@ -31,7 +31,8 @@ import {
   getAvailableActionsForEvent,
   getCurrentEventState,
   ACTION_ALLOWED_SCOPES,
-  hasAnyOfScopes
+  hasAnyOfScopes,
+  RegistrationUpdateActionType
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -53,7 +54,7 @@ import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
  */
 function getPreviousDeclarationActionType(
   actions: Action[],
-  currentActionType: DeclarationUpdateActionType
+  currentActionType: DeclarationUpdateActionType | RegistrationUpdateActionType
 ): DeclarationUpdateActionType | typeof ActionType.NOTIFY | undefined {
   /** NOTE: If event is rejected before registration, there might be previous action of the same type present.
    * Action arrays are intentionally ordered to get the latest prefilled annotation.
@@ -97,7 +98,7 @@ function getPreviousDeclarationActionType(
  * Throws an error if the action is not allowed for the event or if the user does not have permission to perform the action.
  */
 function useActionGuard(
-  actionType: DeclarationUpdateActionType,
+  actionType: DeclarationUpdateActionType | RegistrationUpdateActionType,
   event: EventDocument,
   configuration: EventConfig
 ) {
@@ -138,7 +139,9 @@ function useActionGuard(
 function DeclarationActionComponent({
   children,
   actionType
-}: PropsWithChildren<{ actionType: DeclarationUpdateActionType }>) {
+}: PropsWithChildren<{
+  actionType: DeclarationUpdateActionType | RegistrationUpdateActionType
+}>) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
 
   const events = useEvents()

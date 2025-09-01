@@ -91,23 +91,33 @@ const declarationActionValues = [
   ActionTypes.enum.REGISTER
 ] as const
 
+const registrationActionValues = [
+  ActionTypes.enum.REQUEST_CORRECTION,
+  ActionTypes.enum.APPROVE_CORRECTION,
+  ActionTypes.enum.REJECT_CORRECTION
+] as const
+
 /** Actions which change event data (declaration) before registration / during declaration. */
 export const DeclarationActions = ActionTypes.extract(declarationActionValues)
 export type DeclarationActionType = z.infer<typeof DeclarationActions>
 
-const declarationUpdateActionValues = [
-  ...declarationActionValues,
-  ActionTypes.enum.REQUEST_CORRECTION
-] as const
-
 /** Actions that can modify declaration data. Request can be corrected after declaring it. */
 export const DeclarationUpdateActions = ActionTypes.extract(
-  declarationUpdateActionValues
+  declarationActionValues
 )
 
 export type DeclarationUpdateActionType = z.infer<
   typeof DeclarationUpdateActions
 >
+
+/**
+ * Actions which change event data after registration
+ */
+export const RegistrationActions = ActionTypes.extract(registrationActionValues)
+
+export type RegistrationActionType = z.infer<typeof RegistrationActions>
+
+export type RegistrationUpdateActionType = z.infer<typeof RegistrationActions>
 
 /** Actions which update annotation or status of an event. */
 export const annotationActions = ActionTypes.exclude(declarationActionValues)
