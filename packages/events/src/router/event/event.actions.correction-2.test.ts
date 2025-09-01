@@ -24,7 +24,8 @@ import {
   never,
   not,
   PageTypes,
-  generateTranslationConfig
+  generateTranslationConfig,
+  EventState
 } from '@opencrvs/commons'
 import { v2BirthEvent } from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
@@ -168,7 +169,7 @@ describe('Overwriting parent field', () => {
         return HttpResponse.json([modiedV2BirthEvent])
       }),
       http.post(
-        `${env.COUNTRY_CONFIG_URL}/events/v2-birth/actions/:action`,
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/v2-birth/actions/:action`,
         (ctx) => {
           const payload =
             ctx.params.action === ActionType.REGISTER
@@ -184,18 +185,16 @@ describe('Overwriting parent field', () => {
     const client = createTestClient(user)
     const generator = output.generator
     const declaration = {
-      'child.firstNames': 'John',
-      'child.familyName': 'Doe',
-      'child.DoB': '2020-05-15',
-      'mother.firstNames': 'Jane',
-      'mother.familyName': 'Doe',
-      'mother.DoB': '1990-03-22',
-      'mother.identifier': 'ID123456789',
+      'child.name': { firstname: 'John', surname: 'Doe' },
+      'child.dob': '2020-05-15',
+      'mother.name': { firstname: 'Jane', surname: 'Doe' },
+      'mother.dob': '1990-03-22',
+      'mother.nid': 'ID123456789',
       'informant.relation': 'FATHER',
       'informant.name': { firstname: 'Rok', surname: 'Doe' },
       'informant.dob': '1988-06-12',
       'informant.dobUnknown': false
-    }
+    } satisfies EventState
     let event = await client.event.create(
       generator.event.create({ type: BIRTH_EVENT })
     )

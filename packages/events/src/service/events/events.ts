@@ -282,7 +282,14 @@ export async function addAction(
 
   const content = ('content' in input && input.content) || undefined
 
-  if (input.type === ActionType.ARCHIVE && input.reason.isDuplicate) {
+  const createdAtLocation =
+    user.type === 'system' ? input.createdAtLocation : user.primaryOfficeId
+
+  if (
+    input.type === ActionType.ARCHIVE &&
+    input.reason.isDuplicate &&
+    status === ActionStatus.Accepted
+  ) {
     await eventsRepo.createAction({
       eventId,
       transactionId: input.transactionId,
@@ -295,7 +302,7 @@ export async function addAction(
       createdByRole: user.role,
       createdByUserType: user.type,
       createdBySignature: user.signature,
-      createdAtLocation: user.primaryOfficeId,
+      createdAtLocation,
       originalActionId: input.originalActionId,
       reasonMessage: input.reason.message,
       reasonIsDuplicate: input.reason.isDuplicate
@@ -315,7 +322,7 @@ export async function addAction(
       createdByRole: user.role,
       createdByUserType: user.type,
       createdBySignature: user.signature,
-      createdAtLocation: user.primaryOfficeId,
+      createdAtLocation,
       originalActionId: input.originalActionId,
       assignedTo: user.id
     })
@@ -345,7 +352,7 @@ export async function addAction(
       createdByRole: user.role,
       createdByUserType: user.type,
       createdBySignature: user.signature,
-      createdAtLocation: user.primaryOfficeId,
+      createdAtLocation,
       originalActionId: input.originalActionId,
       requestId: hasRequestId ? input.requestId : undefined,
       reasonIsDuplicate: hasReason
@@ -356,10 +363,12 @@ export async function addAction(
   }
 
   // We want to unassign only if:
+  // - ActionStatus is not requested
   // - Action is a write action, since we dont want to unassign from e.g. READ action
   // - Keep assignment is false
   // - User is not a system user, since system users dont partake in assignment
   const shouldUnassign =
+    status !== ActionStatus.Requested &&
     isWriteAction(input.type) &&
     !input.keepAssignment &&
     user.type !== TokenUserType.enum.system

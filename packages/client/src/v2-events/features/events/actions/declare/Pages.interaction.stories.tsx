@@ -83,7 +83,6 @@ function createDraftHandlers() {
           createdBy: 'test-user',
           createdByUserType: 'user',
           createdByRole: 'test-role',
-          createdAtLocation: 'test-location' as UUID,
           createdAt: new Date().toISOString(),
           status: ActionStatus.Accepted
         }
