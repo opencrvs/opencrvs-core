@@ -72,7 +72,7 @@ interface ComparisonDeclaration {
   }[]
 }
 
-export function SupportingDocumentList({
+function SupportingDocumentList({
   declaration,
   declarationConfig
 }: {
