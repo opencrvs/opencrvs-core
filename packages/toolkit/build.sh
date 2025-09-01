@@ -19,6 +19,8 @@ npx tsc --build
 npx esbuild src/events/index.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external
 mkdir -p ./dist/commons/events
 cp -r ../commons/build/dist/common/events/*.d.ts ./dist/commons/events
+mkdir -p ./dist/commons/events/state
+cp -r ../commons/build/dist/common/events/state/*.d.ts ./dist/commons/events/state
 
 # Build common conditionals
 npx esbuild src/conditionals/index.ts --bundle --format=cjs --outdir=./dist/conditionals --allow-overwrite --packages=external
