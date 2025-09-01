@@ -18,8 +18,9 @@ test('Returns single location in right format', async () => {
   const setLocationPayload = [
     {
       id: generateUuid(),
-      partOf: null,
-      name: 'Location foobar'
+      parentId: null,
+      name: 'Location foobar',
+      validUntil: null
     }
   ]
 
