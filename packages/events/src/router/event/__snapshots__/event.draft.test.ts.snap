@@ -69,6 +69,7 @@ exports[`Delete document references in drafts as side-effect > Delete previous d
   [
     "http://localhost:9050/files/ocrvs/1-4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
     ReadableStream {
+      "constructor": [Function],
       Symbol(kType): "ReadableStream",
       Symbol(kState): {
         "controller": ReadableStreamDefaultController {
@@ -84,24 +85,16 @@ exports[`Delete document references in drafts as side-effect > Delete previous d
             "queueTotalSize": 0,
             "sizeAlgorithm": undefined,
             "started": true,
-            "stream": ReadableStream {
-              Symbol(kType): "ReadableStream",
-              Symbol(kState): [Circular],
-              Symbol(nodejs.webstream.isClosedPromise): {
-                "promise": Promise {},
-                "reject": [Function],
-                "resolve": [Function],
-              },
-              Symbol(nodejs.webstream.controllerErrorFunction): [Function],
-            },
+            "stream": [Circular],
           },
         },
         "disturbed": false,
+        "reader": undefined,
         "state": "closed",
         "storedError": undefined,
-        "stream": undefined,
         "transfer": {
-          "port": undefined,
+          "port1": undefined,
+          "port2": undefined,
           "promise": undefined,
           "writable": undefined,
         },
@@ -117,6 +110,7 @@ exports[`Delete document references in drafts as side-effect > Delete previous d
   [
     "http://localhost:9050/files/ocrvs/2-4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
     ReadableStream {
+      "constructor": [Function],
       Symbol(kType): "ReadableStream",
       Symbol(kState): {
         "controller": ReadableStreamDefaultController {
@@ -132,24 +126,16 @@ exports[`Delete document references in drafts as side-effect > Delete previous d
             "queueTotalSize": 0,
             "sizeAlgorithm": undefined,
             "started": true,
-            "stream": ReadableStream {
-              Symbol(kType): "ReadableStream",
-              Symbol(kState): [Circular],
-              Symbol(nodejs.webstream.isClosedPromise): {
-                "promise": Promise {},
-                "reject": [Function],
-                "resolve": [Function],
-              },
-              Symbol(nodejs.webstream.controllerErrorFunction): [Function],
-            },
+            "stream": [Circular],
           },
         },
         "disturbed": false,
+        "reader": undefined,
         "state": "closed",
         "storedError": undefined,
-        "stream": undefined,
         "transfer": {
-          "port": undefined,
+          "port1": undefined,
+          "port2": undefined,
           "promise": undefined,
           "writable": undefined,
         },
@@ -165,6 +151,7 @@ exports[`Delete document references in drafts as side-effect > Delete previous d
   [
     "http://localhost:9050/files/ocrvs/3-4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
     ReadableStream {
+      "constructor": [Function],
       Symbol(kType): "ReadableStream",
       Symbol(kState): {
         "controller": ReadableStreamDefaultController {
@@ -180,24 +167,16 @@ exports[`Delete document references in drafts as side-effect > Delete previous d
             "queueTotalSize": 0,
             "sizeAlgorithm": undefined,
             "started": true,
-            "stream": ReadableStream {
-              Symbol(kType): "ReadableStream",
-              Symbol(kState): [Circular],
-              Symbol(nodejs.webstream.isClosedPromise): {
-                "promise": Promise {},
-                "reject": [Function],
-                "resolve": [Function],
-              },
-              Symbol(nodejs.webstream.controllerErrorFunction): [Function],
-            },
+            "stream": [Circular],
           },
         },
         "disturbed": false,
+        "reader": undefined,
         "state": "closed",
         "storedError": undefined,
-        "stream": undefined,
         "transfer": {
-          "port": undefined,
+          "port1": undefined,
+          "port2": undefined,
           "promise": undefined,
           "writable": undefined,
         },
@@ -213,6 +192,7 @@ exports[`Delete document references in drafts as side-effect > Delete previous d
   [
     "http://localhost:9050/files/ocrvs/4-4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
     ReadableStream {
+      "constructor": [Function],
       Symbol(kType): "ReadableStream",
       Symbol(kState): {
         "controller": ReadableStreamDefaultController {
@@ -228,24 +208,16 @@ exports[`Delete document references in drafts as side-effect > Delete previous d
             "queueTotalSize": 0,
             "sizeAlgorithm": [Function],
             "started": true,
-            "stream": ReadableStream {
-              Symbol(kType): "ReadableStream",
-              Symbol(kState): [Circular],
-              Symbol(nodejs.webstream.isClosedPromise): {
-                "promise": Promise {},
-                "reject": [Function],
-                "resolve": [Function],
-              },
-              Symbol(nodejs.webstream.controllerErrorFunction): [Function],
-            },
+            "stream": [Circular],
           },
         },
         "disturbed": false,
+        "reader": undefined,
         "state": "readable",
         "storedError": undefined,
-        "stream": undefined,
         "transfer": {
-          "port": undefined,
+          "port1": undefined,
+          "port2": undefined,
           "promise": undefined,
           "writable": undefined,
         },
