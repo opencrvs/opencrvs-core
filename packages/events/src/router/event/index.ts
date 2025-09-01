@@ -19,7 +19,6 @@ import {
   ActionStatus,
   ActionType,
   AssignActionInput,
-  CONFIG_GET_ALLOWED_SCOPES,
   DeleteActionInput,
   Draft,
   DraftInput,
@@ -80,7 +79,20 @@ const eventConfigGetProcedure: QueryProcedure<{
       protect: true
     }
   })
-  .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
+  .use(
+    requiresAnyOfScopes(
+      [
+        SCOPES.RECORD_READ,
+        SCOPES.RECORD_SUBMIT_INCOMPLETE,
+        SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+        SCOPES.RECORD_REGISTER,
+        SCOPES.RECORD_EXPORT_RECORDS,
+        SCOPES.CONFIG,
+        SCOPES.CONFIG_UPDATE_ALL
+      ],
+      ['record.declare']
+    )
+  )
   .input(z.void())
   .output(z.array(EventConfig))
   .query(async (options) => {
@@ -146,7 +158,12 @@ export const eventRouter = router({
       return updatedEvent
     }),
   delete: publicProcedure
-    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.DELETE]))
+    .use(
+      requiresAnyOfScopes(
+        ACTION_ALLOWED_SCOPES[ActionType.DELETE],
+        ACTION_ALLOWED_CONFIGURABLE_SCOPES[ActionType.DELETE]
+      )
+    )
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {

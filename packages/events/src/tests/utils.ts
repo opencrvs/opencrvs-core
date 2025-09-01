@@ -94,7 +94,6 @@ const { createCallerFactory } = t
 export const RECORD_DECLARE_SCOPE = `record.declare[event=${BIRTH_EVENT}|v2.death|tennis-club-membership]`
 
 export const TEST_USER_DEFAULT_SCOPES = [
-  SCOPES.RECORD_DECLARE,
   SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
   SCOPES.RECORD_READ,
   SCOPES.RECORD_REGISTER,
@@ -106,7 +105,8 @@ export const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_UNASSIGN_OTHERS,
   SCOPES.SEARCH_BIRTH,
   RECORD_DECLARE_SCOPE,
-  'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]'
+  'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
+  'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
 ]
 
 export function createTestToken(

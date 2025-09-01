@@ -85,7 +85,7 @@ describe('event.actions.notify', () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, [
       SCOPES.RECORD_SUBMIT_INCOMPLETE,
-      SCOPES.RECORD_DECLARE
+      'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
     ])
 
     const event = await client.event.create(generator.event.create())
@@ -117,7 +117,7 @@ describe('event.actions.notify', () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, [
       SCOPES.RECORD_SUBMIT_INCOMPLETE,
-      SCOPES.RECORD_DECLARE
+      'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
     ])
 
     const event = await client.event.create(generator.event.create())
@@ -141,7 +141,7 @@ describe('event.actions.notify', () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, [
       SCOPES.RECORD_SUBMIT_INCOMPLETE,
-      SCOPES.RECORD_DECLARE
+      'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
     ])
 
     const event = await client.event.create(generator.event.create())
@@ -163,7 +163,7 @@ describe('event.actions.notify', () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, [
       SCOPES.RECORD_SUBMIT_INCOMPLETE,
-      SCOPES.RECORD_DECLARE
+      'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
     ])
 
     const event = await client.event.create(generator.event.create())
@@ -197,7 +197,7 @@ describe('event.actions.notify', () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, [
       SCOPES.RECORD_SUBMIT_INCOMPLETE,
-      SCOPES.RECORD_DECLARE
+      'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
     ])
 
     const event = await client.event.create(generator.event.create())

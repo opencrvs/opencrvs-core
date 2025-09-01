@@ -25,17 +25,6 @@ type RequiredScopes =
   | RequiresNoScope
   | NotAvailableAsAction
 
-export const CONFIG_GET_ALLOWED_SCOPES = [
-  SCOPES.RECORD_DECLARE,
-  SCOPES.RECORD_READ,
-  SCOPES.RECORD_SUBMIT_INCOMPLETE,
-  SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-  SCOPES.RECORD_REGISTER,
-  SCOPES.RECORD_EXPORT_RECORDS,
-  SCOPES.CONFIG,
-  SCOPES.CONFIG_UPDATE_ALL
-] satisfies RequiresAnyOfScopes
-
 export const CONFIG_SEARCH_ALLOWED_SCOPES = [
   SCOPES.SEARCH_BIRTH,
   SCOPES.SEARCH_DEATH,
@@ -47,7 +36,6 @@ export const CONFIG_SEARCH_ALLOWED_SCOPES = [
 
 export const ACTION_ALLOWED_SCOPES = {
   [ActionType.READ]: [
-    SCOPES.RECORD_DECLARE,
     SCOPES.RECORD_READ,
     SCOPES.RECORD_SUBMIT_INCOMPLETE,
     SCOPES.RECORD_SUBMIT_FOR_REVIEW,
@@ -63,7 +51,7 @@ export const ACTION_ALLOWED_SCOPES = {
     SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
     SCOPES.RECORD_REGISTER
   ],
-  [ActionType.DELETE]: [SCOPES.RECORD_DECLARE],
+  [ActionType.DELETE]: [],
   [ActionType.VALIDATE]: [
     SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
     SCOPES.RECORD_REGISTER
@@ -92,7 +80,7 @@ export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.CREATE]: ['record.declare', 'record.notify'],
   [ActionType.NOTIFY]: ['record.notify'],
   [ActionType.DECLARE]: ['record.declare'],
-  [ActionType.DELETE]: [],
+  [ActionType.DELETE]: ['record.declare'],
   [ActionType.VALIDATE]: [],
   [ActionType.REGISTER]: [],
   [ActionType.PRINT_CERTIFICATE]: [],

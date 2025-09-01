@@ -44,8 +44,9 @@ export function useReviewActionConfig({
 
   if (
     incomplete &&
-    scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE) &&
-    scopes.includes(SCOPES.RECORD_DECLARE)
+    scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
+    // TODO CIHAN:
+    // && scopes.includes(SCOPES.RECORD_DECLARE)
   ) {
     return {
       buttonType: 'primary',
@@ -99,7 +100,10 @@ export function useReviewActionConfig({
     } as const
   }
 
-  if (scopes?.includes(SCOPES.RECORD_DECLARE)) {
+  // TODO CIHAN:
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (true) {
+    // if (scopes?.includes(SCOPES.RECORD_DECLARE)) {
     return {
       buttonType: 'positive',
       incomplete,
