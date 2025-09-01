@@ -261,30 +261,14 @@ function getLeafAdministrativeLevel(
 function AddressInput(props: Props) {
   const { onChange, defaultValue, value, ...otherProps } = props
   const { config } = useSelector(getOfflineData)
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
-
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
-
-  const normalizedValue = {
-    ...value,
-    administrativeArea: value?.administrativeArea ?? undefined,
-    streetLevelDetails: value?.streetLevelDetails ?? {}
-  }
-
   const adminStructure = useMemo(
     () => generateAdminStructureFields(appConfigAdminLevels),
     [appConfigAdminLevels]
   )
-
-  const customAddressFields = props.configuration?.streetAddressForm
-
-  const addressFields =
-    Array.isArray(customAddressFields) && customAddressFields.length > 0
-      ? customAddressFields
-      : []
-
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
 
   const adminStructureLocations = useMemo(
     () =>
@@ -293,6 +277,19 @@ function AddressInput(props: Props) {
       ),
     [locations]
   )
+
+  const normalizedValue = {
+    ...value,
+    administrativeArea: value?.administrativeArea ?? undefined,
+    streetLevelDetails: value?.streetLevelDetails ?? {}
+  }
+
+  const customAddressFields = props.configuration?.streetAddressForm
+
+  const addressFields =
+    Array.isArray(customAddressFields) && customAddressFields.length > 0
+      ? customAddressFields
+      : []
 
   const administrativeAreaUUID =
     normalizedValue.administrativeArea || defaultValue?.administrativeArea
@@ -346,19 +343,20 @@ function AddressOutput({
   fields?: Array<AddressFieldIdentifier>
   configuration?: AddressField
 }) {
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+  const { config } = useSelector(getOfflineData)
+
   if (!value) {
     return ''
   }
 
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
   const adminStructureLocations = locations.filter(
     (location) => location.locationType === 'ADMIN_STRUCTURE'
   )
 
   const targetAdminUUID = value.administrativeArea
 
-  const { config } = useSelector(getOfflineData)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
 
