@@ -91,8 +91,7 @@ export function sanitizeForSnapshot(data: unknown, fields: string[]) {
 
 const { createCallerFactory } = t
 
-// TODO CIHAN:
-// Create and use function for constructing these scopes?
+// TODO CIHAN: Create and use function for constructing these scopes?
 export const RECORD_DECLARE_SCOPE = `record.declare[event=${BIRTH_EVENT}|v2.death|tennis-club-membership]`
 
 export const TEST_USER_DEFAULT_SCOPES = [

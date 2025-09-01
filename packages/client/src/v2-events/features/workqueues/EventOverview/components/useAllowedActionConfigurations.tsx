@@ -455,6 +455,8 @@ export function useAllowedActionConfigurations(
 
   const availableEventActions = getAvailableActionsForEvent(event)
 
+  // TODO CIHAN: tänne logiikkaa
+
   const openDraftAction = openDraft ? [openDraft.action.type] : []
 
   const allowedWorkqueueConfigs: ActionMenuItem[] = [
