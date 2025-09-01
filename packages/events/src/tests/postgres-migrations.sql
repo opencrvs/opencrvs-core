@@ -190,7 +190,8 @@ CREATE TABLE app.locations (
     parent_id uuid,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    deleted_at timestamp with time zone
+    deleted_at timestamp with time zone,
+    valid_until timestamp with time zone
 );
 
 

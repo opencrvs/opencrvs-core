@@ -27,19 +27,22 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.READ,
     ActionType.DECLARE,
     ActionType.ARCHIVE,
-    ActionType.REJECT
+    ActionType.REJECT,
+    ActionType.MARK_AS_DUPLICATE
   ],
   [EventStatus.enum.DECLARED]: [
     ActionType.READ,
     ActionType.VALIDATE,
     ActionType.ARCHIVE,
-    ActionType.REJECT
+    ActionType.REJECT,
+    ActionType.MARK_AS_DUPLICATE
   ],
   [EventStatus.enum.VALIDATED]: [
     ActionType.READ,
     ActionType.REGISTER,
     ActionType.ARCHIVE,
-    ActionType.REJECT
+    ActionType.REJECT,
+    ActionType.MARK_AS_DUPLICATE
   ],
   [EventStatus.enum.REGISTERED]: [
     ActionType.READ,
@@ -63,10 +66,14 @@ const ACTION_FILTERS: {
     !flags.includes(InherentFlags.CORRECTION_REQUESTED),
   [ActionType.REQUEST_CORRECTION]: (flags) =>
     !flags.includes(InherentFlags.CORRECTION_REQUESTED),
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: (flags) =>
+    flags.includes(InherentFlags.CORRECTION_REQUESTED),
   [ActionType.APPROVE_CORRECTION]: (flags) =>
     flags.includes(InherentFlags.CORRECTION_REQUESTED),
   [ActionType.REJECT_CORRECTION]: (flags) =>
-    flags.includes(InherentFlags.CORRECTION_REQUESTED)
+    flags.includes(InherentFlags.CORRECTION_REQUESTED),
+  [ActionType.MARK_AS_DUPLICATE]: (flags) =>
+    flags.includes(InherentFlags.POTENTIAL_DUPLICATE)
 }
 
 /**
@@ -88,7 +95,7 @@ function filterActionsByFlags(
  * (NOTIFIED & DECLARED) + REJECTED are an exception to this as we want to allow all the
  * actions available to CREATED minus DELETE plus ARCHIVE
  */
-function getAvailableActions(
+function getAvailableActionsWithoutFlagFilters(
   status: EventStatus,
   flags: Flag[]
 ): DisplayableAction[] {
@@ -98,7 +105,7 @@ function getAvailableActions(
     }
     case EventStatus.Enum.NOTIFIED: {
       if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActions(
+        return getAvailableActionsWithoutFlagFilters(
           EventStatus.Enum.CREATED,
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
         )
@@ -109,7 +116,7 @@ function getAvailableActions(
     }
     case EventStatus.Enum.DECLARED: {
       if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActions(
+        return getAvailableActionsWithoutFlagFilters(
           EventStatus.Enum.CREATED,
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
         )
@@ -120,7 +127,7 @@ function getAvailableActions(
     }
     case EventStatus.Enum.VALIDATED: {
       if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActions(
+        return getAvailableActionsWithoutFlagFilters(
           EventStatus.Enum.DECLARED,
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
         )
@@ -128,12 +135,6 @@ function getAvailableActions(
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
     case EventStatus.Enum.REGISTERED: {
-      if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActions(
-          EventStatus.Enum.VALIDATED,
-          flags.filter((flag) => flag !== InherentFlags.REJECTED)
-        )
-      }
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
     case EventStatus.Enum.ARCHIVED: {
@@ -142,29 +143,21 @@ function getAvailableActions(
   }
 }
 
+export function getAvailableActions(
+  status: EventStatus,
+  flags: Flag[]
+): DisplayableAction[] {
+  return filterActionsByFlags(
+    getAvailableActionsWithoutFlagFilters(status, flags),
+    flags
+  )
+}
+
 export function getAvailableActionsForEvent(
   event: EventIndex
 ): DisplayableAction[] {
-  if (event.flags.includes(InherentFlags.POTENTIAL_DUPLICATE)) {
-    return [ActionType.READ, ActionType.MARK_AS_DUPLICATE, ActionType.ARCHIVE]
-  }
-
-  if (event.flags.includes(InherentFlags.REJECTED)) {
-    return [
-      ActionType.READ,
-      event.status === EventStatus.Enum.VALIDATED
-        ? ActionType.VALIDATE
-        : ActionType.DECLARE,
-      ActionType.ARCHIVE
-    ]
-  } else if (event.status === EventStatus.enum.NOTIFIED) {
-    return [
-      ActionType.READ,
-      ActionType.VALIDATE,
-      ActionType.ARCHIVE,
-      ActionType.REJECT
-    ]
-  }
-
-  return AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
+  return filterActionsByFlags(
+    getAvailableActionsWithoutFlagFilters(event.status, event.flags),
+    event.flags
+  )
 }

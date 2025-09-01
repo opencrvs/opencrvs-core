@@ -11,6 +11,7 @@
 
 import {
   Action,
+  ActionDocument,
   ActionStatus,
   ActionType,
   EventDocument,
@@ -156,7 +157,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       assignedTo: testDataGenerator().user.id.localRegistrar,
       transactionId: 'aasdk342-asdkj3423-kn234k26'
     }
-  ]
+  ] satisfies ActionDocument[]
 }
 
 const correctionRequestAction: Action = {

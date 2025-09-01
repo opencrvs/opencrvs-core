@@ -10,9 +10,6 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { InherentFlags, UUID, getCurrentEventState } from '@opencrvs/commons'
-import { getEventConfigurationById } from '@events/service/config/config'
-import { getEventById } from '../events'
 
 export class RequestNotFoundError extends TRPCError {
   constructor(id: string) {
