@@ -12,14 +12,14 @@
 import React from 'react'
 import { ActionType } from '@opencrvs/commons/client'
 import { DeclarationAction } from '@client/v2-events/features/events/components/Action/DeclarationAction'
-import * as RequestCorrection from '@client/v2-events/features/events/actions/correct/request'
+import { Review } from '@client/v2-events/features/events/actions/correct/review'
 import { ROUTES } from '@client/v2-events/routes'
 
 export const router = {
   path: ROUTES.V2.EVENTS.REVIEW_CORRECTION.REVIEW.path,
   element: (
     <DeclarationAction actionType={ActionType.APPROVE_CORRECTION}>
-      <RequestCorrection.Review />
+      <Review />
     </DeclarationAction>
   )
 }
