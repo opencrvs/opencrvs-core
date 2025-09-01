@@ -13,7 +13,6 @@ import { IntlShape, useIntl } from 'react-intl'
 import { EventState, FieldConfig, FieldValue } from '@opencrvs/commons/client'
 import { getRegisteredFieldByFieldConfig } from '@client/v2-events/features/events/registered-fields'
 import { useLocations } from './useLocations'
-
 interface RecursiveStringRecord {
   [key: string]: string | undefined | RecursiveStringRecord
 }
@@ -23,13 +22,15 @@ type FieldStringifier = (
   value: FieldValue
 ) => string | RecursiveStringRecord
 
-export function stringifySimpleField(value: FieldValue) {
+function stringifySimpleField(value: FieldValue) {
   return !value ? '' : value.toString()
 }
 
-export const formDataStringifierFactory =
-  (stringifier: FieldStringifier) =>
-  (formFields: FieldConfig[], values: EventState): RecursiveStringRecord => {
+function formDataStringifierFactory(stringifier: FieldStringifier) {
+  return function (
+    formFields: FieldConfig[],
+    values: EventState
+  ): RecursiveStringRecord {
     const stringifiedValues: RecursiveStringRecord = {}
 
     for (const [key, value] of Object.entries(values)) {
@@ -42,6 +43,7 @@ export const formDataStringifierFactory =
 
     return stringifiedValues
   }
+}
 
 /**
  *

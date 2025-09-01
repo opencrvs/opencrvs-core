@@ -219,12 +219,8 @@ export const Name = {
     ]
     const order = configuration?.configuration?.order || defaultNameOrder
 
-    return (
-      <>
-        {joinValues(
-          order.map((field) => value?.[field as keyof NameFieldValue])
-        )}
-      </>
+    return joinValues(
+      order.map((field) => value?.[field as keyof NameFieldValue])
     )
   },
   stringify,

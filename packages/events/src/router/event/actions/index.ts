@@ -230,7 +230,7 @@ export function getDefaultActionProcedures(
           token
         )
 
-        // If we get an unexpected failure response, we just return HTTP 500 without saving the
+        // If we get an unexpected failure response, we just return HTTP 500 without saving the action
         if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
