@@ -12,11 +12,15 @@
 import NotificationQueue, {
   NotificationQueueRecord
 } from '@notification/model/notificationQueue'
-import { logger } from '@opencrvs/commons'
-import { notifyCountryConfig } from '@notification/features/sms/service'
+import {
+  logger,
+  TriggerEvent,
+  triggerUserEventNotification
+} from '@opencrvs/commons'
 import { internal, tooManyRequests } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import { getUserDetails } from '@notification/features/utils'
+import { COUNTRY_CONFIG_URL } from '@notification/constants'
 
 interface AllUsersEmailPayloadSchema {
   subject: string
@@ -77,7 +81,7 @@ async function preProcessRequest(request: Hapi.Request) {
     payload.requestId
   )
 
-  if (currentDayRecords > 0) {
+  if (currentDayRecords > 10) {
     throw tooManyRequests('Already sent mails for today')
   }
 }
@@ -97,29 +101,22 @@ async function findOldestNotificationQueueRecord() {
 }
 
 async function dispatch(
-  recipientEmail: string | null,
+  recipientEmail: string,
   record: NotificationQueueRecord
 ) {
-  const filteredRecord = recipientEmail
-    ? record.bcc.filter((item) => item !== recipientEmail)
-    : undefined
-
-  return notifyCountryConfig(
-    {
-      email: 'allUserNotification',
-      sms: 'allUserNotification'
-    },
-    {
-      email: recipientEmail ? recipientEmail : record.bcc[0],
-      bcc: recipientEmail ? filteredRecord : record.bcc.slice(1)
-    },
-    'user',
-    {
+  return await triggerUserEventNotification({
+    event: TriggerEvent.ALL_USER_NOTIFICATION,
+    payload: {
       subject: record.subject,
-      body: record.body
+      body: record.body,
+      recipient: {
+        email: recipientEmail,
+        bcc: record.bcc.filter((item) => item !== recipientEmail)
+      }
     },
-    record.locale
-  )
+    countryConfigUrl: COUNTRY_CONFIG_URL,
+    authHeader: { Authorization: `Bearer ${process.env.AUTH_TOKEN}` }
+  })
 }
 
 async function markQueueRecordFailedWithErrorDetails(
@@ -161,10 +158,14 @@ export async function loopNotificationQueue(server: Hapi.Server) {
       `Notification service: Initiating dispatch of notification emails for ${record.bcc.length} users`
     )
 
-    const res = await dispatch(record.recipientEmail || '', record)
+    if (!record.recipientEmail) {
+      throw new Error('Recipient email is required for all user notification')
+    }
+    const res = await dispatch(record.recipientEmail, record)
 
     if (!res.ok) {
-      const error = await res.json()
+      const error: any = await res.json()
+
       await markQueueRecordFailedWithErrorDetails(record, error)
       server.log(['error', error.error, internal(error.message)])
     } else {
