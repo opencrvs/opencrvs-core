@@ -43,9 +43,24 @@ const triggerReindex = async () => {
   return response
 }
 
+let reindexingAttempts = 0
 async function main() {
-  console.info(`Reindexing search...`)
-  await triggerReindex()
+  console.info(
+    `Reindexing search...${reindexingAttempts === 0 ? '' : ` (attempt ${reindexingAttempts})`}`
+  )
+  try {
+    await triggerReindex()
+  } catch (error) {
+    reindexingAttempts++
+    if (reindexingAttempts > 10) {
+      console.error(
+        `Failed to reindex search after ${reindexingAttempts} attempts. Error: ${error}`
+      )
+      process.exit(1)
+    }
+    setTimeout(main, 5000)
+  }
+
   console.info(`...done reindexing}`)
 }
 
