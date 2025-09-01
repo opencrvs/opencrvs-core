@@ -71,10 +71,10 @@ function getAdminLevelHierarchy(
 
   while (current) {
     collectedLocations.push(current)
-    if (!current.partOf) {
+    if (!current.parentId) {
       break
     }
-    const parentId = current.partOf
+    const parentId = current.parentId
     current = locations.find((l) => l.id === parentId)
   }
 

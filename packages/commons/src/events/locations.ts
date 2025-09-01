@@ -15,10 +15,10 @@ import { z } from 'zod'
 export const Location = z.object({
   id: UUID,
   name: z.string(),
-  partOf: UUID.nullable(),
+  parentId: UUID.nullable(),
+  validUntil: z.date().nullable(),
   locationType: z
     .enum(['HEALTH_FACILITY', 'CRVS_OFFICE', 'ADMIN_STRUCTURE'])
     .nullable()
 })
-
 export type Location = z.infer<typeof Location>

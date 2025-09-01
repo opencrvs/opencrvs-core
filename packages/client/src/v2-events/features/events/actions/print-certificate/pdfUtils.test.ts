@@ -12,13 +12,13 @@
 import { createIntl } from 'react-intl'
 import createFetchMock from 'vitest-fetch-mock'
 import { ContentSvg } from 'pdfmake/interfaces'
+import { Location } from '@events/service/locations/locations'
 import {
   ActionDocument,
   eventQueryDataGenerator,
   tennisClubMembershipEvent,
   User,
-  UUID,
-  Location
+  UUID
 } from '@opencrvs/commons/client'
 import {
   tennisClubMembershipEventDocument,

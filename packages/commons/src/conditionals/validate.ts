@@ -117,7 +117,9 @@ ajv.addKeyword({
 
     const locations = context.rootData.$locations
 
-    return !locations.some((location) => location.partOf === locationToValidate)
+    return !locations.some(
+      (location) => location.parentId === locationToValidate
+    )
   }
 })
 
