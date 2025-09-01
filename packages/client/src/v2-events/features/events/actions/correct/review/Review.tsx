@@ -117,6 +117,11 @@ export function Review() {
           actionConfig.label,
           previousFormValues
         )}
+        /*
+         * @todo isReviewCorrection, onEdit & readyonlyMode needs to be reviewed
+         * as they there seems to be some reduntant ones among them
+         */
+        /* eslint-disable-next-line @typescript-eslint/no-empty-function */
         onEdit={() => {}}
       />
     </FormLayout>
