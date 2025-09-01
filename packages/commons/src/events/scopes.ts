@@ -25,15 +25,6 @@ type RequiredScopes =
   | RequiresNoScope
   | NotAvailableAsAction
 
-export const CONFIG_SEARCH_ALLOWED_SCOPES = [
-  SCOPES.SEARCH_BIRTH,
-  SCOPES.SEARCH_DEATH,
-  SCOPES.SEARCH_MARRIAGE,
-  SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-  SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-  SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
-]
-
 export const ACTION_ALLOWED_SCOPES = {
   [ActionType.READ]: [
     SCOPES.RECORD_READ,
@@ -75,6 +66,8 @@ export const ACTION_ALLOWED_SCOPES = {
   [ActionType.DETECT_DUPLICATE]: []
 } satisfies Record<DisplayableAction, RequiredScopes>
 
+// TODO CIHAN: can we merge this with the ACTION_ALLOWED_SCOPES?
+// TODO CIHAN: define configurable scopes in a better manner?
 export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.READ]: ['record.declare', 'record.notify'],
   [ActionType.CREATE]: ['record.declare', 'record.notify'],
@@ -94,13 +87,6 @@ export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.UNASSIGN]: [],
   [ActionType.DETECT_DUPLICATE]: []
 } satisfies Record<ActionType, ConfigurableScopeType[]>
-
-export const WRITE_ACTION_SCOPES = [
-  ...ACTION_ALLOWED_SCOPES[ActionType.DECLARE],
-  ...ACTION_ALLOWED_SCOPES[ActionType.VALIDATE],
-  ...ACTION_ALLOWED_SCOPES[ActionType.REGISTER],
-  ...ACTION_ALLOWED_SCOPES[ActionType.PRINT_CERTIFICATE]
-]
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
