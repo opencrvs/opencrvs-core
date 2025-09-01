@@ -8,8 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@opencrvs/commons'
+import {
+  findScope,
+  getTokenPayload,
+  hasScope,
+  IAuthHeader,
+  logger,
+  SCOPES
+} from '@opencrvs/commons'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import {
   createFhirPractitioner,
@@ -34,6 +42,22 @@ export default async function createUser(
 ) {
   const user = request.payload as IUser & { password?: string }
   const token = request.headers.authorization
+  const tokenPayload = getTokenPayload(token.split(' ')[1])
+  const creatableRoleIds = findScope(tokenPayload.scope, 'user.create')?.options
+    ?.role
+  const isDataSeeder = hasScope(
+    request.headers as IAuthHeader,
+    SCOPES.USER_DATA_SEEDING
+  )
+
+  // If the allowed roles exist and the payload user's role is not included, block unless data seeder
+  if (
+    Array.isArray(creatableRoleIds) &&
+    !creatableRoleIds.includes(user.role) &&
+    !isDataSeeder
+  ) {
+    throw unauthorized()
+  }
 
   // construct Practitioner resource and save them
   let practitionerId = null
