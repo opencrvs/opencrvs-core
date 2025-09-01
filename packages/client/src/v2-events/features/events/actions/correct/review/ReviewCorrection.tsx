@@ -20,7 +20,7 @@ import { useSelector } from 'react-redux'
 import {
   EventState,
   generateTransactionId,
-  isMetaAction,
+  RequestedCorrectionAction,
   SCOPES
 } from '@opencrvs/commons/client'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
@@ -208,7 +208,13 @@ function RejectModal({
   )
 }
 
-export function ReviewCorrection({ form }: { form: EventState }) {
+export function ReviewCorrection({
+  form,
+  correctionRequestAction
+}: {
+  form: EventState
+  correctionRequestAction: RequestedCorrectionAction
+}) {
   const intl = useIntl()
   const scopes = useSelector(getScope)
   const { getAnnotation } = useActionAnnotation()
@@ -223,13 +229,6 @@ export function ReviewCorrection({ form }: { form: EventState }) {
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
 
-  const writeActions = event.actions.filter(
-    (action) => !isMetaAction(action.type)
-  )
-
-  // latest action should be correction action
-  const lastWriteAction = writeActions[writeActions.length - 1]
-
   const openApproveModal = async () => {
     await openModal((close) => (
       <ApproveModal
@@ -238,7 +237,7 @@ export function ReviewCorrection({ form }: { form: EventState }) {
           events.actions.correction.approve.mutate({
             transactionId: generateTransactionId(),
             eventId,
-            requestId: lastWriteAction.id,
+            requestId: correctionRequestAction.id,
             annotation
           })
           return navigate(
@@ -260,7 +259,7 @@ export function ReviewCorrection({ form }: { form: EventState }) {
           events.actions.correction.reject.mutate({
             transactionId: generateTransactionId(),
             eventId,
-            requestId: lastWriteAction.id,
+            requestId: correctionRequestAction.id,
             annotation,
             reason: { message }
           })
@@ -308,7 +307,7 @@ export function ReviewCorrection({ form }: { form: EventState }) {
     >
       <CorrectionDetails
         annotation={annotation}
-        correctionRequestAction={lastWriteAction}
+        correctionRequestAction={correctionRequestAction}
         event={event}
         form={form}
         requesting={!scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)}

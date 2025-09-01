@@ -71,22 +71,32 @@ function getPreviousDeclarationActionType(
 
   let actionTypes: (DeclarationUpdateActionType | typeof ActionType.NOTIFY)[]
 
-  if (currentActionType === ActionType.DECLARE) {
-    actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
-  }
-
-  // If action type is VALIDATE, we know that the previous declaration action is DECLARE
-  else if (currentActionType === ActionType.VALIDATE) {
-    actionTypes = [ActionType.VALIDATE, ActionType.DECLARE]
-  }
-
-  // If action type is REGISTER, we know that the previous declaration action is VALIDATE
-  else if (currentActionType === ActionType.REGISTER) {
-    actionTypes = [ActionType.VALIDATE]
-  } else {
-    // If action type is REQUEST_CORRECTION, we want to get the 'latest' action type
-    // Check for the most recent action type in order of precedence
-    actionTypes = [ActionType.REGISTER, ActionType.VALIDATE, ActionType.DECLARE]
+  switch (currentActionType) {
+    case ActionType.DECLARE: {
+      actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
+      break
+    }
+    case ActionType.VALIDATE: {
+      actionTypes = [ActionType.VALIDATE, ActionType.DECLARE]
+      break
+    }
+    case ActionType.REGISTER: {
+      actionTypes = [ActionType.VALIDATE]
+      break
+    }
+    case ActionType.REQUEST_CORRECTION: {
+      actionTypes = [ActionType.REGISTER]
+      break
+    }
+    case ActionType.APPROVE_CORRECTION:
+    case ActionType.REJECT_CORRECTION: {
+      actionTypes = [ActionType.REQUEST_CORRECTION]
+      break
+    }
+    default: {
+      const _check: never = currentActionType
+      actionTypes = []
+    }
   }
 
   for (const type of actionTypes) {
