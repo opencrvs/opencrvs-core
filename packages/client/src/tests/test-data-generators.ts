@@ -201,10 +201,6 @@ export function testDataGenerator(rngSeed?: number) {
        */
       localRegistrar: [
         SCOPES.RECORD_READ,
-        // TODO CIHAN: remove these?
-        SCOPES.RECORD_DECLARE_BIRTH,
-        SCOPES.RECORD_DECLARE_DEATH,
-        SCOPES.RECORD_DECLARE_MARRIAGE,
         SCOPES.RECORD_DECLARATION_EDIT,
         SCOPES.RECORD_SUBMIT_FOR_UPDATES,
         SCOPES.RECORD_REVIEW_DUPLICATES,
@@ -235,9 +231,6 @@ export function testDataGenerator(rngSeed?: number) {
       ],
       registrationAgent: [
         SCOPES.RECORD_READ,
-        SCOPES.RECORD_DECLARE_BIRTH,
-        SCOPES.RECORD_DECLARE_DEATH,
-        SCOPES.RECORD_DECLARE_MARRIAGE,
         SCOPES.RECORD_DECLARATION_EDIT,
         SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
         SCOPES.RECORD_SUBMIT_FOR_UPDATES,
@@ -262,9 +255,6 @@ export function testDataGenerator(rngSeed?: number) {
         SCOPES.RECORD_DECLARE
       ],
       fieldAgent: [
-        SCOPES.RECORD_DECLARE_BIRTH,
-        SCOPES.RECORD_DECLARE_DEATH,
-        SCOPES.RECORD_DECLARE_MARRIAGE,
         SCOPES.RECORD_SUBMIT_INCOMPLETE,
         SCOPES.RECORD_SUBMIT_FOR_REVIEW,
         SCOPES.SEARCH_BIRTH,

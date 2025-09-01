@@ -26,8 +26,7 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.fieldAgent'
     },
     scopes: [
-      // new scopes
-      // TODO CIHAN: remove these scopes here and elsewhere?
+      'record.declare[event=v2.birth|v2.death|tennis-club-membership]',
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
