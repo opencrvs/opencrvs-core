@@ -31,11 +31,7 @@ import {
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
-import {
-  formDataStringifierFactory,
-  getFormDataStringifier,
-  stringifySimpleField
-} from '@client/v2-events/hooks/useFormDataStringifier'
+import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
