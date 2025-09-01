@@ -171,7 +171,6 @@ const UnassignScope = z.literal(SCOPES.RECORD_UNASSIGN_OTHERS)
 
 // Validate
 const ValidateScopes = z.union([
-  z.literal(SCOPES.RECORD_SUBMIT_FOR_APPROVAL),
   z.literal(SCOPES.RECORD_SUBMIT_FOR_UPDATES),
   z.literal(SCOPES.RECORD_DECLARATION_EDIT),
   z.literal(SCOPES.RECORD_REVIEW_DUPLICATES),
