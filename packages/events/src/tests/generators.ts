@@ -15,7 +15,8 @@ import {
   UUID,
   TestUserRole
 } from '@opencrvs/commons'
-import { Location, setLocations } from '@events/service/locations/locations'
+import { Location } from '@events/service/locations/locations'
+import { addLocations } from '@events/storage/postgres/events/locations'
 
 interface Name {
   use: string
@@ -55,14 +56,16 @@ export function payloadGenerator(rng: () => number) {
         return Array.from({ length: input }).map((_, i) => ({
           id: getUUID(),
           name: `Location name ${i}`,
-          partOf: null
+          parentId: null,
+          validUntil: null
         }))
       }
 
       return input.map((location, i) => ({
         id: location.id ?? getUUID(),
         name: location.name ?? `Location name ${i}`,
-        partOf: null
+        parentId: location.parentId ?? null,
+        validUntil: null
       }))
     }
   }
@@ -83,7 +86,15 @@ export function seeder() {
       id: getUUID()
     }
   }
-  const seedLocations = async (locations: Location[]) => setLocations(locations)
+  const seedLocations = async (locations: Location[]) =>
+    addLocations(
+      locations.map((location) => ({
+        ...location,
+        validUntil: location.validUntil
+          ? location.validUntil.toISOString()
+          : null
+      }))
+    )
 
   return {
     user: seedUser,

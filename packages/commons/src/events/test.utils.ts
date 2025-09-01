@@ -336,8 +336,7 @@ export function eventPayloadGenerator(rng: () => number) {
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
           createdByUserType: TokenUserType.Enum.user,
-          createdByRole: '@todo',
-          createdAtLocation: '@todo' as UUID
+          createdByRole: '@todo'
         }
       }
 
@@ -894,6 +893,16 @@ export function generateRandomSignature(rng: () => number): string {
   return `/random-bucket/${generateUuid(rng)}.png`
 }
 
+/**
+ * @param overrides - Partial EventIndex object to override the default values.
+ * @param seed - Seed value for the pseudo-random number generator.
+ * @returns A mock EventIndex object with default values for tennis club
+ * membership events.
+ *
+ * N.B. Unless a different seed is provided, the generated values will be
+ * consistent across calls.
+ *
+ */
 export const eventQueryDataGenerator = (
   overrides: Partial<EventIndex> = {},
   seed: number = 1

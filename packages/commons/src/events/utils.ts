@@ -243,7 +243,6 @@ export function createEmptyDraft(
       createdAt: new Date().toISOString(),
       createdByUserType: TokenUserType.Enum.user,
       createdBy: '@todo',
-      createdAtLocation: '00000000-0000-0000-0000-000000000000' as UUID,
       status: ActionStatus.Accepted,
       transactionId: '@todo',
       createdByRole: '@todo'
