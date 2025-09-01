@@ -290,6 +290,11 @@ describe('Event indexing behavior', () => {
   })
 
   describe('Indexing actions', () => {
+    // For declare, indexing is triggered only once.
+    // On the first `addAction` call, the DECLARE action is added with a `Requested` status.
+    // At this point, the record does not yet contain an `Accepted` DECLARE action,
+    // so the record is still considered a draft and is not fully indexed.
+    // Therefore, only a single indexEvent call is expected here.
     test('indexes on declare', async () => {
       const event = await createEvent()
       await declareEvent(event)
@@ -310,7 +315,7 @@ describe('Event indexing behavior', () => {
       const createAction = findCreateAction(event)
       await assignEvent(event, createAction.createdBy)
       await validateEvent(event)
-      expect(indexEvent).toHaveBeenCalledTimes(3) // declare -> assign -> validate
+      expect(indexEvent).toHaveBeenCalledTimes(4) // declare -> assign -> validate
     })
 
     test('indexes on register', async () => {
@@ -318,10 +323,10 @@ describe('Event indexing behavior', () => {
       await declareEvent(event)
       const createAction = findCreateAction(event)
       await assignEvent(event, createAction.createdBy)
-      await validateEvent(event)
+      await validateEvent(event) // called 2 times, for a request action and an accepted action
       await assignEvent(event, createAction.createdBy)
-      await registerEvent(event)
-      expect(indexEvent).toHaveBeenCalledTimes(5) // declare -> assign -> validate -> assign -> register
+      await registerEvent(event) // called 2 times, for a request action and an accepted action
+      expect(indexEvent).toHaveBeenCalledTimes(7) // declare -> assign -> validate -> assign -> register
     })
 
     test('indexes on register (with reads)', async () => {
@@ -330,14 +335,19 @@ describe('Event indexing behavior', () => {
       await client.event.get(event.id)
       const createAction = findCreateAction(event)
       await assignEvent(event, createAction.createdBy)
-      await validateEvent(event)
+      await validateEvent(event) // called 2 times, for a request action and an accepted action
       await client.event.get(event.id)
       await assignEvent(event, createAction.createdBy)
-      await registerEvent(event)
+      await registerEvent(event) // called 2 times, for a request action and an accepted action
       await client.event.get(event.id)
-      expect(indexEvent).toHaveBeenCalledTimes(8) // declare -> view -> assign -> validate -> view -> assign -> register -> view
+      expect(indexEvent).toHaveBeenCalledTimes(10) // declare -> view -> assign -> validate -> view -> assign -> register -> view
     })
 
+    // For notify, indexing is triggered only once.
+    // On the first `addAction` call, the NOTIFY action is added with a `Requested` status.
+    // At this point, the record does not yet contain an `Accepted` NOTIFY action,
+    // so the record is still considered a draft and is not fully indexed.
+    // Therefore, only a single indexEvent call is expected here.
     test('indexes on notify', async () => {
       const notifyClient = createTestClient(user, [
         'record.declaration-submit-incomplete'
@@ -354,8 +364,8 @@ describe('Event indexing behavior', () => {
       await declareEvent(event)
       const createAction = findCreateAction(event)
       await assignEvent(event, createAction.createdBy)
-      await rejectEvent(event)
-      expect(indexEvent).toHaveBeenCalledTimes(3) // declare -> assign -> reject
+      await rejectEvent(event) // called 2 times, for a request action and an accepted action
+      expect(indexEvent).toHaveBeenCalledTimes(4) // declare -> assign -> reject
     })
 
     test('indexes on archive', async () => {
@@ -363,8 +373,8 @@ describe('Event indexing behavior', () => {
       await declareEvent(event)
       const createAction = findCreateAction(event)
       await assignEvent(event, createAction.createdBy)
-      await archiveEvent(event)
-      expect(indexEvent).toHaveBeenCalledTimes(3) // declare -> assign -> archive
+      await archiveEvent(event) // called 2 times, for a request action and an accepted action
+      expect(indexEvent).toHaveBeenCalledTimes(4) // declare -> assign -> archive
     })
 
     test('indexes on printCertificate', async () => {
@@ -372,12 +382,12 @@ describe('Event indexing behavior', () => {
       await declareEvent(event)
       const createAction = findCreateAction(event)
       await assignEvent(event, createAction.createdBy)
-      await validateEvent(event)
+      await validateEvent(event) // called 2 times, for a request action and an accepted action
       await assignEvent(event, createAction.createdBy)
-      await registerEvent(event)
+      await registerEvent(event) // called 2 times, for a request action and an accepted action
       await assignEvent(event, createAction.createdBy)
-      await printCertificate(event)
-      expect(indexEvent).toHaveBeenCalledTimes(7) // declare -> assign -> validate -> assign -> register -> assign -> print
+      await printCertificate(event) // called 2 times, for a request action and an accepted action
+      expect(indexEvent).toHaveBeenCalledTimes(10) // declare -> assign -> validate -> assign -> register -> assign -> print
     })
 
     describe('Correction flow', () => {
@@ -386,12 +396,12 @@ describe('Event indexing behavior', () => {
         await declareEvent(event)
         const createAction = findCreateAction(event)
         await assignEvent(event, createAction.createdBy)
-        await validateEvent(event)
+        await validateEvent(event) // called 2 times, for a request action and an accepted action
         await assignEvent(event, createAction.createdBy)
-        await registerEvent(event)
+        await registerEvent(event) // called 2 times, for a request action and an accepted action
         await assignEvent(event, createAction.createdBy)
-        await correctionRequest(event)
-        expect(indexEvent).toHaveBeenCalledTimes(7) // declare -> assign -> validate -> assign -> register -> assign -> correction-req
+        await correctionRequest(event) // called 2 times, for a request action and an accepted action
+        expect(indexEvent).toHaveBeenCalledTimes(10) // declare -> assign -> validate -> assign -> register -> assign -> correction-req
       })
 
       test('indexes on correction approve', async () => {
@@ -399,17 +409,17 @@ describe('Event indexing behavior', () => {
         await declareEvent(event)
         const createAction = findCreateAction(event)
         await assignEvent(event, createAction.createdBy)
-        await validateEvent(event)
+        await validateEvent(event) // called 2 times, for a request action and an accepted action
         await assignEvent(event, createAction.createdBy)
-        await registerEvent(event)
+        await registerEvent(event) // called 2 times, for a request action and an accepted action
         await assignEvent(event, createAction.createdBy)
-        const correction = await correctionRequest(event)
+        const correction = await correctionRequest(event) // called 2 times, for a request action and an accepted action
         await assignEvent(event, createAction.createdBy)
         await correctionApprove(
           event,
           correction.actions[correction.actions.length - 2].id
-        )
-        expect(indexEvent).toHaveBeenCalledTimes(9) // declare -> assign -> validate -> assign -> register -> assign -> correction-req -> assign -> correction-approve
+        ) // called 2 times, for a request action and an accepted action
+        expect(indexEvent).toHaveBeenCalledTimes(13) // declare -> assign -> validate -> assign -> register -> assign -> correction-req -> assign -> correction-approve
       })
 
       test('indexes on correction reject', async () => {
@@ -417,17 +427,17 @@ describe('Event indexing behavior', () => {
         await declareEvent(event)
         const createAction = findCreateAction(event)
         await assignEvent(event, createAction.createdBy)
-        await validateEvent(event)
+        await validateEvent(event) // called 2 times, for a request action and an accepted action
         await assignEvent(event, createAction.createdBy)
-        await registerEvent(event)
+        await registerEvent(event) // called 2 times, for a request action and an accepted action
         await assignEvent(event, createAction.createdBy)
-        const correction = await correctionRequest(event)
+        const correction = await correctionRequest(event) // called 2 times, for a request action and an accepted action
         await assignEvent(event, createAction.createdBy)
         await correctionReject(
           event,
           correction.actions[correction.actions.length - 2].id
-        )
-        expect(indexEvent).toHaveBeenCalledTimes(9) // declare -> assign -> validate -> assign -> register -> assign -> correction-req -> assign -> correction-reject
+        ) // called 2 times, for a request action and an accepted action
+        expect(indexEvent).toHaveBeenCalledTimes(13) // declare -> assign -> validate -> assign -> register -> assign -> correction-req -> assign -> correction-reject
       })
     })
   })
