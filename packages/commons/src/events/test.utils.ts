@@ -390,7 +390,7 @@ export function eventPayloadGenerator(rng: () => number) {
           const partialDeclaration = omitBy(
             generateActionDeclarationInput(
               tennisClubMembershipEvent,
-              ActionType.DECLARE,
+              ActionType.NOTIFY,
               rng
             ),
             isString

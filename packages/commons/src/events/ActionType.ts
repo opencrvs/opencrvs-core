@@ -88,7 +88,8 @@ export type ClientSpecificAction =
 const declarationActionValues = [
   ActionTypes.enum.DECLARE,
   ActionTypes.enum.VALIDATE,
-  ActionTypes.enum.REGISTER
+  ActionTypes.enum.REGISTER,
+  ActionTypes.enum.NOTIFY
 ] as const
 
 /** Actions which change event data (declaration) before registration / during declaration. */

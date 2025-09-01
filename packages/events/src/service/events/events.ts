@@ -389,9 +389,11 @@ export async function addAction(
 
   const updatedEvent = await getEventById(eventId)
 
-  // Only send the event to Elasticsearch if it is not a draft.
-  const shouldIndexEvent =
-    getStatusFromActions(updatedEvent.actions) !== EventStatus.enum.CREATED
+  const isDraft =
+    getStatusFromActions(updatedEvent.actions) === EventStatus.enum.CREATED
+
+  // Only send the event to Elasticsearch if it is not a draft and action status is accepted
+  const shouldIndexEvent = !isDraft && status === ActionStatus.Accepted
 
   if (shouldIndexEvent) {
     await indexEvent(updatedEvent, configuration)

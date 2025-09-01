@@ -15,6 +15,9 @@ import {
   setupTestCase,
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
+
+vi.mock('@events/service/indexing/indexing')
+
 import { indexEvent } from '@events/service/indexing/indexing'
 
 type TestClient = ReturnType<typeof createTestClient>
@@ -215,9 +218,8 @@ describe('Event indexing behavior', () => {
     )
 
   const findCreateAction = (event: CreatedEvent) =>
-    event.actions.find(
-      (action: { type: string }) => action.type === ActionType.CREATE
-    ) ?? ({} as { createdBy: string })
+    event.actions.find((action) => action.type === ActionType.CREATE) ??
+    ({} as { createdBy: string })
 
   const assignEvent = async (event: CreatedEvent, assignedTo: string) =>
     client.event.actions.assignment.assign({
