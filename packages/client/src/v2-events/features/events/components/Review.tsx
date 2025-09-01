@@ -42,7 +42,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getScope } from '@client/profile/profileSelectors'
-import { ReviewCorrection } from '../actions/correct/request/ReviewCorrection'
+import { ReviewCorrection } from '../actions/correct/review/ReviewCorrection'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
