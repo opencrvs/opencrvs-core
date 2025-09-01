@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 8f15a409-8580-40b6-90e1-ce104f08850c
+                transactionId: 7132897b-6dfd-42bc-96f6-f47c6ac69298
                 type: v2.birth
       responses:
         "200":
@@ -535,7 +535,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 61a852ce-18f6-4db8-bbe1-7c2b38a25ead
+                transactionId: 87592088-6ad4-4179-a78e-4c24aaab5c29
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2222,6 +2222,38 @@ paths:
     post:
       operationId: event-reindex
       summary: Triggers reindexing of search, workqueues and notifies country config
+      tags:
+        - events
+      security:
+        - Authorization: []
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Authorization not provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.UNAUTHORIZED"
+        "403":
+          description: Insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.FORBIDDEN"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+  /sync-locations:
+    post:
+      operationId: locations-sync
+      summary: Sync locations between V1 and V2
       tags:
         - events
       security:
