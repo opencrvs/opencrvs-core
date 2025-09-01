@@ -155,10 +155,11 @@ export function usePermissions() {
     return false
   }
 
-  const canCreateUser = hasAnyScope([
-    SCOPES.USER_CREATE,
-    SCOPES.USER_CREATE_MY_JURISDICTION
-  ])
+  const creatableRoleIds = findScope(userScopes ?? [], 'user.create')?.options
+    ?.role
+  const canCreateUser = Array.isArray(creatableRoleIds)
+    ? creatableRoleIds.length > 0
+    : hasAnyScope([SCOPES.USER_CREATE, SCOPES.USER_CREATE_MY_JURISDICTION])
 
   const canAccessOffice = (office: Pick<Location, 'id'>) => {
     if (!userPrimaryOffice?.id) {
