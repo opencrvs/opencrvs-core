@@ -352,7 +352,7 @@ function useViewableActionConfigurations(
       },
       [ActionType.MARK_AS_DUPLICATE]: {
         label: actionLabels[ActionType.MARK_AS_DUPLICATE],
-        icon: 'PencilLine',
+        icon: 'PencilLine' as const,
         onClick: (workqueue?: string) => {
           clearEphemeralFormState()
           return navigate(
