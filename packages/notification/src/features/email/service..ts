@@ -20,7 +20,10 @@ import {
 import { internal, tooManyRequests } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import { getUserDetails } from '@notification/features/utils'
-import { COUNTRY_CONFIG_URL } from '@notification/constants'
+import {
+  ALL_USER_NOTIFICATION_RETRY_COUNT,
+  COUNTRY_CONFIG_URL
+} from '@notification/constants'
 
 interface AllUsersEmailPayloadSchema {
   subject: string
@@ -89,7 +92,10 @@ async function preProcessRequest(request: Hapi.Request) {
 async function findOldestNotificationQueueRecord() {
   return NotificationQueue.findOne({
     $and: [
-      { status: { $ne: 'success' } },
+      {
+        status: { $ne: 'success' },
+        retryCount: { $lt: ALL_USER_NOTIFICATION_RETRY_COUNT }
+      },
       {
         $or: [
           { error: { $exists: false } },
@@ -131,7 +137,8 @@ async function markQueueRecordFailedWithErrorDetails(
         statusCode: e.statusCode,
         message: e.message,
         error: e.error
-      }
+      },
+      retryCount: record.retryCount + 1
     }
   )
 }
