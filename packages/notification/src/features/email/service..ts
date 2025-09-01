@@ -22,7 +22,8 @@ import * as Hapi from '@hapi/hapi'
 import { getUserDetails } from '@notification/features/utils'
 import {
   ALL_USER_NOTIFICATION_RETRY_COUNT,
-  COUNTRY_CONFIG_URL
+  COUNTRY_CONFIG_URL,
+  DAILY_NOTIFICATION_LIMIT
 } from '@notification/constants'
 
 interface AllUsersEmailPayloadSchema {
@@ -84,7 +85,7 @@ async function preProcessRequest(request: Hapi.Request) {
     payload.requestId
   )
 
-  if (currentDayRecords > 10) {
+  if (currentDayRecords >= DAILY_NOTIFICATION_LIMIT) {
     throw tooManyRequests('Already sent mails for today')
   }
 }
