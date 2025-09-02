@@ -168,6 +168,14 @@ export function useEvents() {
           }
         },
         unassign: useEventAction(trpc.event.actions.assignment.unassign)
+      },
+      duplicate: {
+        markAsDuplicate: useEventAction(
+          trpc.event.actions.duplicate.markAsDuplicate
+        ),
+        markNotDuplicate: useEventAction(
+          trpc.event.actions.duplicate.markNotDuplicate
+        )
       }
     },
     onlineActions: {
