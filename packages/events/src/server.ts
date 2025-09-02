@@ -60,6 +60,12 @@ export function server() {
       return
     }
 
+    if (req.url === '/ping') {
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ status: 'ok' }))
+      return
+    }
+
     // If it's a tRPC request, handle it with the tRPC server
     if (isTrpcRequest(req)) {
       trpcServer(req, res)
