@@ -30,7 +30,6 @@ import {
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
-import { testDataGenerator } from '@client/tests/test-data-generators'
 import { EventOverviewLayout } from '@client/v2-events/layouts'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { setEventData, addLocalEventConfig } from '../../../useEvents/api'
@@ -246,7 +245,7 @@ export const FormFieldParentChildReset: Story = {
           }
         ]
       },
-      initialPath: ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
         eventId: overridenEvent.id
       })
     },
