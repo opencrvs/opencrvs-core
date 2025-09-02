@@ -282,12 +282,12 @@ export const eventRouter = router({
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
       const scopes = getScopes({ Authorization: ctx.token })
-      const isRecordSearch = scopes.includes(SCOPES.RECORDSEARCH)
+      const isRecordSearchSystemClient = scopes.includes(SCOPES.RECORDSEARCH)
       const allAccessForEveryEventType = Object.fromEntries(
         eventConfigs.map(({ id }) => [id, 'all' as const])
       )
 
-      if (isRecordSearch) {
+      if (isRecordSearchSystemClient) {
         return findRecordsByQuery(
           input,
           eventConfigs,
