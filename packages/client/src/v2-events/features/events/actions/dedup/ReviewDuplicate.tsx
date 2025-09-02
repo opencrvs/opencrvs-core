@@ -210,9 +210,9 @@ function ReviewDuplicate() {
         <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
           <ReviewComponent.Body
             readonlyMode
+            banner={<DuplicateForm eventIndex={eventState} />}
             form={eventState.declaration}
             formConfig={formConfig}
-            reviewDuplicate={<DuplicateForm eventIndex={eventState} />}
             reviewFields={fields}
             title={formatMessage(title, eventState.declaration)}
             onEdit={noop}

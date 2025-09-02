@@ -45,6 +45,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { hasFieldChanged, isLastActionCorrectionRequest } from '../utils'
+import { ReviewCorrection } from './ReviewCorrection'
 
 function isRequestCorrectionAction(
   action: Action
@@ -133,6 +134,7 @@ export function Review() {
   return (
     <FormLayout route={ROUTES.V2.EVENTS.CORRECTION}>
       <ReviewComponent.Body
+        banner={<ReviewCorrection form={form} />}
         form={formWithNewValues}
         formConfig={formConfig}
         isCorrection={true}
