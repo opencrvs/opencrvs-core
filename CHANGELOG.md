@@ -32,6 +32,10 @@
 
   - Renamed `COUNTRY_CONFIG_URL` → `COUNTRY_CONFIG_URL_EXTERNAL` in the auth service to make its purpose clearer and more explicit.
 
+### Bug fixes
+
+- Fix informant details not populating in API [#10311](https://github.com/opencrvs/opencrvs-core/issues/10311)
+
 ## [1.8.1](https://github.com/opencrvs/opencrvs-core/compare/v1.8.0...v1.8.1)
 
 ### Bug fixes
