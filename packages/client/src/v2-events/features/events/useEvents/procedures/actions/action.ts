@@ -446,6 +446,7 @@ export function useEventCustomAction(mutationKey: MutationKey) {
 
       return mutation.mutate({
         ...params,
+        eventConfiguration,
         declaration: getCleanedDeclarationDiff(
           eventConfiguration,
           originalDeclaration,

@@ -28,7 +28,6 @@ export interface OnDeclareParams {
   transactionId: string
   annotation?: EventState
   fullEvent?: EventDocument
-  eventConfiguration?: EventConfig
 }
 /**
  * Runs a sequence of actions from declare to register.
@@ -38,6 +37,7 @@ export interface OnDeclareParams {
  */
 export async function registerOnDeclare({
   eventId,
+  eventConfiguration,
   declaration,
   transactionId,
   annotation
@@ -45,15 +45,25 @@ export async function registerOnDeclare({
   eventId: string
   transactionId: string
   declaration: EventState
+  eventConfiguration: EventConfig
   annotation?: EventState
 }) {
-  await trpcClient.event.actions.declare.request.mutate({
+  const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId,
     keepAssignment: true
   })
+
+  const declaredEventIndex = getCurrentEventState(
+    declaredEvent,
+    eventConfiguration
+  )
+
+  if (declaredEventIndex.potentialDuplicates.length > 0) {
+    return declaredEvent
+  }
 
   // update is a patch, no need to send again.
   await trpcClient.event.actions.validate.request.mutate({
@@ -86,16 +96,26 @@ export async function validateOnDeclare(variables: {
   eventId: string
   declaration: EventState
   transactionId: string
+  eventConfiguration: EventConfig
   annotation?: EventState
 }) {
-  const { eventId, declaration, annotation } = variables
-  await trpcClient.event.actions.declare.request.mutate({
+  const { eventId, eventConfiguration, declaration, annotation } = variables
+  const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId: variables.transactionId,
     keepAssignment: true
   })
+
+  const declaredEventIndex = getCurrentEventState(
+    declaredEvent,
+    eventConfiguration
+  )
+
+  if (declaredEventIndex.potentialDuplicates.length > 0) {
+    return declaredEvent
+  }
 
   const latestResponse = await trpcClient.event.actions.validate.request.mutate(
     {
@@ -118,19 +138,30 @@ export async function validateOnDeclare(variables: {
  */
 export async function registerOnValidate(variables: {
   eventId: string
+  eventConfiguration: EventConfig
   declaration: EventState
   transactionId: string
   annotation?: EventState
 }) {
-  const { eventId, declaration, annotation } = variables
+  const { eventId, eventConfiguration, declaration, annotation } = variables
 
-  await trpcClient.event.actions.validate.request.mutate({
-    declaration,
-    annotation,
-    eventId,
-    transactionId: variables.transactionId,
-    keepAssignment: true
-  })
+  const maybeDuplicateEvent =
+    await trpcClient.event.actions.validate.request.mutate({
+      declaration,
+      annotation,
+      eventId,
+      transactionId: variables.transactionId,
+      keepAssignment: true
+    })
+
+  const maybeDuplicateEventIndex = getCurrentEventState(
+    maybeDuplicateEvent,
+    eventConfiguration
+  )
+
+  if (maybeDuplicateEventIndex.potentialDuplicates.length > 0) {
+    return maybeDuplicateEvent
+  }
 
   const latestResponse = await trpcClient.event.actions.register.request.mutate(
     {
@@ -159,9 +190,9 @@ export async function makeCorrectionOnRequest(variables: {
   eventId: string
   declaration: EventState
   transactionId: string
+  eventConfiguration: EventConfig
   annotation?: EventState
   fullEvent?: EventDocument
-  eventConfiguration?: EventConfig
 }) {
   const {
     eventId,
@@ -174,11 +205,6 @@ export async function makeCorrectionOnRequest(variables: {
 
   if (!fullEvent) {
     throw new Error(`full event payload not provided for makeCorrectionRequest`)
-  }
-  if (!eventConfiguration) {
-    throw new Error(
-      `Event configuration not found for event: ${fullEvent.type}`
-    )
   }
   // Let's find the REQUEST_CORRECTION action configuration. Because the annotation passed down here is mixed up
   // with declaration in the REQUEST_CORRECTION page form, we need to cleanup the annotation from declaration
