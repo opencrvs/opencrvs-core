@@ -465,6 +465,25 @@ export function stringifyScope(scope: z.infer<typeof NotifyRecordScope>) {
 
   return `${scope.type}[${options}]`
 }
+
+/**
+ * Extracts authorized event identifiers (e.g. v2.birth, v2.death) from the provided configurable scopes.
+ *
+ * @param scopes - Array of configurable scopes with options
+ * @returns Array of authorized event identifiers
+ */
+export function getAuthorizedEventsFromScopes(scopes: ConfigurableScopes[]) {
+  return scopes
+    .flatMap(({ options }) => {
+      if ('event' in options) {
+        return options.event
+      }
+
+      return undefined
+    })
+    .filter((event) => event !== undefined)
+}
+
 /*
  * @deprecated
  * scopes are configurable so all possible

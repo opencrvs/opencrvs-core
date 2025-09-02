@@ -27,7 +27,10 @@ import {
   InherentFlags,
   ClientSpecificAction,
   workqueueActions,
-  Draft
+  Draft,
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
+  getAuthorizedEventsFromScopes,
+  findScope
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -482,9 +485,29 @@ export function useAllowedActionConfigurations(
     )
     .filter((a) => {
       const requiredScopes = ACTION_ALLOWED_SCOPES[a]
-      return requiredScopes === null
-        ? true
-        : hasAnyOfScopes(scopes, requiredScopes)
+
+      const configuredScopes = ACTION_ALLOWED_CONFIGURABLE_SCOPES[a]
+      if (requiredScopes === null) {
+        return true
+      }
+
+      if (hasAnyOfScopes(scopes, requiredScopes)) {
+        return true
+      }
+
+      if (configuredScopes) {
+        const parsedScopes = configuredScopes
+          .map((scope) => findScope(scopes, scope))
+          .filter((scope) => scope !== undefined)
+
+        const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
+
+        if (authorizedEvents.includes(event.type)) {
+          return true
+        }
+      }
+
+      return false
     })
     // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
     .map((a) => ({ ...config[a], type: a }))

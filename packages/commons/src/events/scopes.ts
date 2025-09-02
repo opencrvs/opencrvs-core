@@ -69,6 +69,7 @@ export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.REGISTER]: [],
   [ActionType.PRINT_CERTIFICATE]: [],
   [ActionType.REQUEST_CORRECTION]: [],
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: [],
   [ActionType.REJECT_CORRECTION]: [],
   [ActionType.APPROVE_CORRECTION]: [],
   [ActionType.MARKED_AS_DUPLICATE]: [],
@@ -77,7 +78,7 @@ export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.ASSIGN]: [],
   [ActionType.UNASSIGN]: [],
   [ActionType.DETECT_DUPLICATE]: []
-} satisfies Record<ActionType, ConfigurableScopeType[]>
+} satisfies Record<DisplayableAction, ConfigurableScopeType[]>
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
