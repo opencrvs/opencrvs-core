@@ -13,6 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   EventConfig,
   FieldType,
@@ -26,6 +27,7 @@ import { Review } from '@client/v2-events/features/events/components/Review'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Address',
@@ -172,6 +174,8 @@ export const AddressReviewInvalid: StoryObj<typeof Review> = {
     layout: 'centered'
   },
   render: function Component() {
+    const { getLocations } = useLocations()
+    const [locations] = getLocations.useSuspenseQuery()
     return (
       <Review.Body
         form={{
@@ -182,6 +186,7 @@ export const AddressReviewInvalid: StoryObj<typeof Review> = {
           } as AddressFieldValue
         }}
         formConfig={declarationForm}
+        locations={locations}
         title="My address form with address output"
         // eslint-disable-next-line no-console
         onEdit={(values) => console.log(values)}
