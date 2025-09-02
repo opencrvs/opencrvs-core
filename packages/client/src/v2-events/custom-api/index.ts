@@ -61,7 +61,6 @@ export async function registerOnDeclare({
     annotation,
     eventId,
     transactionId,
-    duplicates: [],
     keepAssignment: true
   })
 
@@ -104,8 +103,7 @@ export async function validateOnDeclare(variables: {
       declaration: {},
       annotation,
       eventId,
-      transactionId: variables.transactionId,
-      duplicates: []
+      transactionId: variables.transactionId
     }
   )
 
@@ -131,7 +129,6 @@ export async function registerOnValidate(variables: {
     annotation,
     eventId,
     transactionId: variables.transactionId,
-    duplicates: [],
     keepAssignment: true
   })
 

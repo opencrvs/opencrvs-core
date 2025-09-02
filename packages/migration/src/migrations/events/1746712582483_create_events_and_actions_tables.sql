@@ -73,7 +73,7 @@ CREATE TABLE event_actions (
   status action_status NOT NULL,
   transaction_id text NOT NULL,
   UNIQUE (transaction_id, action_type),
-  CHECK (
+  CONSTRAINT event_actions_check CHECK (
     (
       action_type = 'ASSIGN'
       AND assigned_to IS NOT NULL

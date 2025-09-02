@@ -33,3 +33,4 @@ Migration names should describe what the migration does using active, lowercase,
 - Use **snake_case** (`underscores_between_words`)
 - Avoid camelCase or spaces
 - Be specific, avoid vague names like `update_schema`
+- Use named constraints for clarity and traceability (e.g. event_actions_check)

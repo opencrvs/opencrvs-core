@@ -43,7 +43,6 @@ export type ReviewPageConfig = z.infer<typeof DeclarationReviewConfig>
 export const ActionConfigBase = z.object({
   label: TranslationConfig,
   conditionals: z.array(ActionConditional).optional().default([]),
-  deduplication: DeduplicationConfig.optional(),
   draft: z.boolean().optional()
 })
 
@@ -57,33 +56,30 @@ const ReadActionConfig = ActionConfigBase.merge(
 const DeclareConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.DECLARE),
-    review: DeclarationReviewConfig
+    review: DeclarationReviewConfig,
+    deduplication: DeduplicationConfig.optional()
   })
 )
 
 const ValidateConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.VALIDATE),
-    review: DeclarationReviewConfig
+    review: DeclarationReviewConfig,
+    deduplication: DeduplicationConfig.optional()
   })
 )
 
 const RegisterConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.REGISTER),
-    review: DeclarationReviewConfig
+    review: DeclarationReviewConfig,
+    deduplication: DeduplicationConfig.optional()
   })
 )
 
 const RejectDeclarationConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.REJECT)
-  })
-)
-
-const MarkedAsDuplicateConfig = ActionConfigBase.merge(
-  z.object({
-    type: z.literal(ActionType.MARKED_AS_DUPLICATE)
   })
 )
 
@@ -137,7 +133,6 @@ export type AllActionConfigFields =
   | typeof DeclareConfig
   | typeof ValidateConfig
   | typeof RejectDeclarationConfig
-  | typeof MarkedAsDuplicateConfig
   | typeof ArchiveConfig
   | typeof RegisterConfig
   | typeof DeleteConfig
@@ -152,7 +147,6 @@ export type InferredActionConfig =
   | z.infer<typeof DeclareConfig>
   | z.infer<typeof ValidateConfig>
   | z.infer<typeof RejectDeclarationConfig>
-  | z.infer<typeof MarkedAsDuplicateConfig>
   | z.infer<typeof ArchiveConfig>
   | z.infer<typeof RegisterConfig>
   | z.infer<typeof DeleteConfig>
@@ -171,7 +165,6 @@ export const ActionConfig = z
     DeclareConfig.openapi({ ref: 'DeclareActionConfig' }),
     ValidateConfig.openapi({ ref: 'ValidateActionConfig' }),
     RejectDeclarationConfig.openapi({ ref: 'RejectDeclarationActionConfig' }),
-    MarkedAsDuplicateConfig.openapi({ ref: 'MarkedAsDuplicateActionConfig' }),
     ArchiveConfig.openapi({ ref: 'ArchiveActionConfig' }),
     RegisterConfig.openapi({ ref: 'RegisterActionConfig' }),
     DeleteConfig.openapi({ ref: 'DeleteActionConfig' }),

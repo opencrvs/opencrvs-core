@@ -358,7 +358,6 @@ describe('Action updates', () => {
 
     await client.event.actions.validate.request({
       type: ActionType.VALIDATE,
-      duplicates: [],
       declaration: {
         'applicant.dobUnknown': true,
         'applicant.age': 25
@@ -400,7 +399,6 @@ describe('Action updates', () => {
     await client.event.actions.validate.request({
       eventId: originalEvent.id,
       type: ActionType.VALIDATE,
-      duplicates: [],
       declaration: {
         'documents.multiFile': null,
         'documents.singleFile': null
@@ -447,7 +445,6 @@ describe('Action updates', () => {
     await client.event.actions.validate.request({
       eventId: originalEvent.id,
       type: ActionType.VALIDATE,
-      duplicates: [],
       declaration: {
         'documents.multiFile': [],
         'documents.singleFile': null

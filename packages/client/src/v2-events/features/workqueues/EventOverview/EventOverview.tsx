@@ -78,7 +78,7 @@ function EventOverviewFull({
     ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
 
-  const { flags, legalStatuses, ...flattenedEventIndex } = {
+  const { flags, legalStatuses, duplicates, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // drafts should not affect the status of the event
     // so the status and flags are taken from the eventIndex
@@ -146,7 +146,7 @@ function EventOverviewProtected({
     ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
 
-  const { flags, legalStatuses, ...flattenedEventIndex } = {
+  const { flags, legalStatuses, duplicates, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // drafts should not affect the status of the event
     // so the status and flags are taken from the eventIndex

@@ -23,6 +23,7 @@ exports[`Returns events based on the updatedAt column 1`] = `
     },
     "recommender.none": true,
   },
+  "duplicates": [],
   "flags": [],
   "id": "[sanitized]",
   "legalStatuses": {
@@ -69,6 +70,7 @@ exports[`Returns events based on the updatedAt column 2`] = `
     },
     "recommender.none": true,
   },
+  "duplicates": [],
   "flags": [],
   "id": "[sanitized]",
   "legalStatuses": {
@@ -116,6 +118,7 @@ exports[`Returns relevant events in right order 1`] = `
     },
     "recommender.none": true,
   },
+  "duplicates": [],
   "flags": [],
   "id": "[sanitized]",
   "legalStatuses": {
@@ -163,6 +166,7 @@ exports[`Returns relevant events in right order 2`] = `
     },
     "recommender.none": true,
   },
+  "duplicates": [],
   "flags": [
     "pending-certification",
   ],
@@ -302,6 +306,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
       },
       "recommender.none": true,
     },
+    "duplicates": [],
     "flags": [],
     "id": "[sanitized]",
     "legalStatuses": {
@@ -346,6 +351,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
       },
       "recommender.none": true,
     },
+    "duplicates": [],
     "flags": [],
     "id": "[sanitized]",
     "legalStatuses": {
@@ -395,6 +401,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
       },
       "recommender.none": true,
     },
+    "duplicates": [],
     "flags": [],
     "id": "[sanitized]",
     "legalStatuses": {
@@ -439,6 +446,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
       },
       "recommender.none": true,
     },
+    "duplicates": [],
     "flags": [],
     "id": "[sanitized]",
     "legalStatuses": {
@@ -483,6 +491,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
       },
       "recommender.none": true,
     },
+    "duplicates": [],
     "flags": [],
     "id": "[sanitized]",
     "legalStatuses": {
@@ -531,6 +540,7 @@ exports[`User with my-jurisdiction scope can see events from other offices based
     },
     "recommender.none": true,
   },
+  "duplicates": [],
   "flags": [],
   "id": "[sanitized]",
   "legalStatuses": {
@@ -574,6 +584,7 @@ exports[`User with my-jurisdiction scope only sees events created by system user
     },
     "recommender.none": true,
   },
+  "duplicates": [],
   "flags": [
     "incomplete",
   ],
@@ -613,6 +624,7 @@ exports[`User with my-jurisdiction scope only sees events from their primary off
     },
     "recommender.none": true,
   },
+  "duplicates": [],
   "flags": [],
   "id": "[sanitized]",
   "legalStatuses": {
