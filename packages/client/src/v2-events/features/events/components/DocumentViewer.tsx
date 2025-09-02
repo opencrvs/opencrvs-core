@@ -112,12 +112,11 @@ function getFileOptions(
 
 const ResponsiveDocumentViewer = styled.div<{
   showInMobile: boolean
-  isDuplicateComparisonView: boolean
+  comparisonView: boolean
 }>`
-  position: ${({ isDuplicateComparisonView }) =>
-    isDuplicateComparisonView ? 'static' : 'fixed'};
-  width: ${({ isDuplicateComparisonView }) =>
-    isDuplicateComparisonView ? '100%' : 'calc(40% - 24px)'};
+  position: ${({ comparisonView }) => (comparisonView ? 'static' : 'fixed')};
+  width: ${({ comparisonView }) =>
+    comparisonView ? '100%' : 'calc(40% - 24px)'};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: ${({ showInMobile }) => (showInMobile ? 'block' : 'none')};
     margin-bottom: 11px;
@@ -152,14 +151,14 @@ export function DocumentViewer({
   onEdit,
   showInMobile,
   disabled,
-  isDuplicateComparisonView
+  comparisonView
 }: {
   formConfig: FormConfig
   form: EventState
   onEdit: () => void
   showInMobile?: boolean
   disabled?: boolean
-  isDuplicateComparisonView?: boolean
+  comparisonView?: boolean
 }) {
   const intl = useIntl()
 
@@ -167,7 +166,7 @@ export function DocumentViewer({
 
   return (
     <ResponsiveDocumentViewer
-      isDuplicateComparisonView={!!isDuplicateComparisonView}
+      comparisonView={!!comparisonView}
       showInMobile={!!showInMobile}
     >
       <DocumentViewerComponent id="document_section" options={fileOptions}>

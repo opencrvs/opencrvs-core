@@ -306,10 +306,10 @@ export function DuplicateComparison({
                 {originalEvent.trackingId}
               </Text>
               <DocumentViewer
+                comparisonView={true}
                 disabled={false}
                 form={originalEvent.declaration}
                 formConfig={eventConfiguration.declaration}
-                isDuplicateComparisonView={true}
                 showInMobile={false}
                 onEdit={noop}
               />
@@ -325,10 +325,10 @@ export function DuplicateComparison({
                 {potentialDuplicateEvent.trackingId}
               </Text>
               <DocumentViewer
+                comparisonView={true}
                 disabled={false}
                 form={potentialDuplicateEvent.declaration}
                 formConfig={eventConfiguration.declaration}
-                isDuplicateComparisonView={true}
                 showInMobile={false}
                 onEdit={noop}
               />

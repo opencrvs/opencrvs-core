@@ -54,8 +54,6 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
 
   const { title: name } = getEventTitle(configuration, eventIndex)
 
-  configuration.summary.fields
-
   const trackingIds = eventIndex.duplicates
     .map((duplicate) => duplicate.trackingId)
     .join(', ')
