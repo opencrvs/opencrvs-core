@@ -41,10 +41,10 @@ import {
   getEventById,
   addAction,
   addAsyncRejectAction,
-  throwConflictIfActionNotAllowed
+  throwConflictIfActionNotAllowed,
+  ensureEventIndexed
 } from '@events/service/events/events'
 import { throwConflictIfWaitingForCorrection } from '@events/service/events/actions/correction'
-import { indexEvent } from '@events/service/indexing/indexing'
 import { getEventConfigurationById } from '@events/service/config/config'
 import {
   ActionConfirmationResponse,
@@ -302,7 +302,7 @@ export function getDefaultActionProcedures(
           }
         )
 
-        await indexEvent(updatedEvent, configuration)
+        await ensureEventIndexed(updatedEvent, configuration)
         return updatedEvent
       }),
 

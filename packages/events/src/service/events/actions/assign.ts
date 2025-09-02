@@ -16,10 +16,7 @@ import {
   AssignActionInput,
   findLastAssignmentAction
 } from '@opencrvs/commons/events'
-import {
-  addActionAndIndexEvent,
-  getEventById
-} from '@events/service/events/events'
+import { processAction, getEventById } from '@events/service/events/events'
 import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
 
@@ -48,7 +45,7 @@ export async function assignRecord({
     })
   }
 
-  return addActionAndIndexEvent(input, {
+  return processAction(input, {
     event: storedEvent,
     user,
     token,

@@ -17,10 +17,7 @@ import {
   UnassignActionInput
 } from '@opencrvs/commons/events'
 import { inScope, SCOPES, UUID } from '@opencrvs/commons'
-import {
-  addActionAndIndexEvent,
-  getEventById
-} from '@events/service/events/events'
+import { processAction, getEventById } from '@events/service/events/events'
 import { setBearerForToken } from '@events/router/middleware'
 import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -57,7 +54,7 @@ export async function unassignRecord(
       })
     }
 
-    return addActionAndIndexEvent(input, {
+    return processAction(input, {
       event: storedEvent,
       user,
       token,

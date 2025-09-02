@@ -42,7 +42,7 @@ import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
 import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
 import {
-  addActionAndIndexEvent,
+  processAction,
   deleteUnreferencedFilesFromPreviousDrafts,
   createEvent,
   deleteEvent,
@@ -132,7 +132,7 @@ export const eventRouter = router({
         token: ctx.token,
         eventType: event.type
       })
-      const updatedEvent = await addActionAndIndexEvent(
+      const updatedEvent = await processAction(
         {
           type: ActionType.READ,
           eventId: event.id,

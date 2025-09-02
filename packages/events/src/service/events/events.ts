@@ -407,7 +407,20 @@ export async function addAction(
   return updatedEvent
 }
 
-export async function addActionAndIndexEvent(
+function isEventIndexable(event: EventDocument) {
+  return getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
+}
+
+export async function ensureEventIndexed(
+  event: EventDocument,
+  configuration: EventConfig
+) {
+  if (isEventIndexable(event)) {
+    await indexEvent(event, configuration)
+  }
+}
+
+export async function processAction(
   input: ActionInputWithType,
   {
     event,
