@@ -426,6 +426,7 @@ export const tennisClubMembershipEvent = defineConfig({
   declaration: TENNIS_CLUB_DECLARATION_FORM
 })
 
+/** @knipignore */
 export function tennisClubMembershipEventWithDedupCheck(
   ...actionsToCheck: DeclarationActionType[]
 ): EventConfig {
