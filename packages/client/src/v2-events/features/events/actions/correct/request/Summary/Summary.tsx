@@ -24,7 +24,6 @@ import {
   isFieldVisible,
   getDeclarationFields,
   getCurrentEventState,
-  ActionType,
   EventDocument
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -75,10 +74,12 @@ function setEmptyValuesForFields(fields: FieldConfig[]) {
 }
 
 export function Summary() {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.CORRECTION.SUMMARY)
+  const { eventId } = useTypedParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
+  )
 
   const [{ workqueue }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.CORRECTION.SUMMARY
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
   const scopes = useSelector(getScope)
   const [showPrompt, setShowPrompt] = React.useState(false)
@@ -102,7 +103,7 @@ export function Summary() {
 
   const submitCorrection = React.useCallback(() => {
     const formWithOnlyChangedValues = Object.fromEntries(
-      Object.entries(form).filter(([key, value]) => {
+      Object.entries(form).filter(([key]) => {
         const field = fields.find((f) => f.id === key)
         if (!field) {
           return false
@@ -187,7 +188,7 @@ export function Summary() {
               id="back-to-review"
               onClick={() =>
                 navigate(
-                  ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
+                  ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
                     eventId
                   })
                 )
