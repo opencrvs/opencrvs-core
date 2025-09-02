@@ -12,7 +12,7 @@ import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import {
   findScope,
-  getTokenPayload,
+  getScopes,
   hasScope,
   IAuthHeader,
   logger,
@@ -42,9 +42,8 @@ export default async function createUser(
 ) {
   const user = request.payload as IUser & { password?: string }
   const token = request.headers.authorization
-  const tokenPayload = getTokenPayload(token.split(' ')[1])
-  const creatableRoleIds = findScope(tokenPayload.scope, 'user.create')?.options
-    ?.role
+  const scopes = getScopes(request.headers as IAuthHeader)
+  const creatableRoleIds = findScope(scopes, 'user.create')?.options?.role
   const isDataSeeder = hasScope(
     request.headers as IAuthHeader,
     SCOPES.USER_DATA_SEEDING

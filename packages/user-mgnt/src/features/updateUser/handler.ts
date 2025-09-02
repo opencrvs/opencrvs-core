@@ -13,18 +13,15 @@ import {
   logger,
   isBase64FileString,
   triggerUserEventNotification,
-  personNameFromV1ToV2
+  personNameFromV1ToV2,
+  IAuthHeader
 } from '@opencrvs/commons'
 import {
   Practitioner,
   findExtension,
   OPENCRVS_SPECIFICATION_URL
 } from '@opencrvs/commons/types'
-import {
-  findScope,
-  getTokenPayload,
-  SCOPES
-} from '@opencrvs/commons/authentication'
+import { findScope, getScopes, SCOPES } from '@opencrvs/commons/authentication'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import {
   createFhirPractitioner,
@@ -52,9 +49,8 @@ export default async function updateUser(
   if (!existingUser) {
     throw new Error(`No user found by given id: ${user.id}`)
   }
-  const tokenPayload = getTokenPayload(token.split(' ')[1])
-  const editableRoleIds = findScope(tokenPayload.scope, 'user.edit')?.options
-    ?.role
+  const scopes = getScopes(request.headers as IAuthHeader)
+  const editableRoleIds = findScope(scopes, 'user.edit')?.options?.role
 
   if (Array.isArray(editableRoleIds) && !editableRoleIds.includes(user.role)) {
     throw unauthorized()
