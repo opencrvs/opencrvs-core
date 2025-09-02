@@ -31,7 +31,6 @@ import { Review as ReviewComponent } from '@client/v2-events/features/events/com
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { FormHeader } from '@client/v2-events/layouts/form/FormHeader'
-import { findLocalEventIndex } from '../../useEvents/api'
 import { DuplicateForm } from './DuplicateForm'
 import { DuplicateComparison } from './DuplicateComparison'
 
@@ -156,15 +155,13 @@ function ReviewDuplicate() {
   const potentialDuplicates = eventState.duplicates.reduce<
     Record<string, EventIndex>
   >((acc, { id, trackingId }) => {
-    const localEventIndex = findLocalEventIndex(id)
-    if (!localEventIndex) {
-      console.warn(
+    const localEventDocument = events.getEvent.findFromCache(id).data
+    if (!localEventDocument) {
+      throw new Error(
         `Event with id ${id} and trackingId ${trackingId} not found in cache.`
       )
-      navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
-      return acc
     }
-    acc[trackingId] = localEventIndex
+    acc[trackingId] = getCurrentEventState(localEventDocument, configuration)
     return acc
   }, {})
 
