@@ -16,7 +16,9 @@ import {
   Scope,
   SCOPES,
   FieldConfig,
-  EventStatus
+  EventStatus,
+  isActionInScope,
+  ActionType
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -28,7 +30,8 @@ export function useReviewActionConfig({
   annotation,
   reviewFields,
   scopes,
-  status
+  status,
+  eventType
 }: {
   formConfig: DeclarationFormConfig
   declaration: EventState
@@ -36,6 +39,7 @@ export function useReviewActionConfig({
   reviewFields: FieldConfig[]
   scopes?: Scope[]
   status: EventStatus
+  eventType: string
 }) {
   const events = useEvents()
   const incomplete = validationErrorsInActionFormExist({
@@ -45,7 +49,13 @@ export function useReviewActionConfig({
     reviewFields
   })
 
-  if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
+  const userMayRegister = isActionInScope(
+    scopes ?? [],
+    ActionType.REGISTER,
+    eventType
+  )
+
+  if (userMayRegister) {
     return {
       buttonType: 'positive' as const,
       incomplete,
@@ -72,8 +82,13 @@ export function useReviewActionConfig({
     } as const
   }
 
-  // TODO CIHAN: fix this
-  if (scopes?.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL)) {
+  const userMayValidate = isActionInScope(
+    scopes ?? [],
+    ActionType.VALIDATE,
+    eventType
+  )
+
+  if (userMayValidate) {
     return {
       buttonType: 'positive' as const,
       incomplete,

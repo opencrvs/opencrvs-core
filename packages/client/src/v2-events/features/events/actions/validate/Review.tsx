@@ -107,7 +107,8 @@ export function Review() {
     annotation,
     scopes,
     reviewFields: reviewConfig.fields,
-    status: currentEventState.status
+    status: currentEventState.status,
+    eventType: event.type
   })
 
   async function handleEdit({

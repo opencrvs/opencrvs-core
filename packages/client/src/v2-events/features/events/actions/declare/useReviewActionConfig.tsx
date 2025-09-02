@@ -14,8 +14,9 @@ import {
   EventState,
   DeclarationFormConfig,
   Scope,
-  SCOPES,
-  FieldConfig
+  FieldConfig,
+  isActionInScope,
+  ActionType
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -26,13 +27,15 @@ export function useReviewActionConfig({
   declaration,
   annotation,
   reviewFields,
-  scopes
+  scopes,
+  eventType
 }: {
   formConfig: DeclarationFormConfig
   declaration: EventState
   annotation?: EventState
   reviewFields: FieldConfig[]
   scopes?: Scope[]
+  eventType: string
 }) {
   const events = useEvents()
   const incomplete = validationErrorsInActionFormExist({
@@ -42,12 +45,31 @@ export function useReviewActionConfig({
     reviewFields
   })
 
-  if (
-    incomplete &&
-    scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
-    // TODO CIHAN:
-    // && scopes.includes(SCOPES.RECORD_DECLARE)
-  ) {
+  const userMayDeclare = isActionInScope(
+    scopes ?? [],
+    ActionType.DECLARE,
+    eventType
+  )
+
+  const userMayNotify = isActionInScope(
+    scopes ?? [],
+    ActionType.NOTIFY,
+    eventType
+  )
+
+  const userMayValidate = isActionInScope(
+    scopes ?? [],
+    ActionType.VALIDATE,
+    eventType
+  )
+
+  const userMayRegister = isActionInScope(
+    scopes ?? [],
+    ActionType.REGISTER,
+    eventType
+  )
+
+  if (incomplete && userMayNotify && userMayDeclare) {
     return {
       buttonType: 'primary',
       incomplete,
@@ -64,7 +86,7 @@ export function useReviewActionConfig({
     } as const
   }
 
-  if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
+  if (userMayRegister) {
     return {
       buttonType: 'positive' as const,
       incomplete,
@@ -82,8 +104,7 @@ export function useReviewActionConfig({
     } as const
   }
 
-  // TODO CIHAN: fix this
-  if (scopes?.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL)) {
+  if (userMayValidate) {
     return {
       buttonType: 'positive',
       incomplete,
@@ -101,10 +122,7 @@ export function useReviewActionConfig({
     } as const
   }
 
-  // TODO CIHAN:
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (true) {
-    // if (scopes?.includes(SCOPES.RECORD_DECLARE)) {
+  if (userMayDeclare) {
     return {
       buttonType: 'positive',
       incomplete,

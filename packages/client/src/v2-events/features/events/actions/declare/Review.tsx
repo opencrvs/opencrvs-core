@@ -76,6 +76,7 @@ export function Review() {
   const scopes = useSelector(getScope) ?? undefined
 
   const reviewActionConfiguration = useReviewActionConfig({
+    eventType: event.type,
     formConfig,
     declaration: form,
     annotation,

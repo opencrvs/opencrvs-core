@@ -31,7 +31,8 @@ import {
   getAvailableActionsForEvent,
   getCurrentEventState,
   ACTION_ALLOWED_SCOPES,
-  hasAnyOfScopes
+  hasAnyOfScopes,
+  isActionInScope
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -115,10 +116,11 @@ function useActionGuard(
     )
   }
 
-  const requiredScopes = ACTION_ALLOWED_SCOPES[actionType]
-
-  // TODO CIHAN: ota tänne isActionInScope() käyttöön
-  const canUserPerformAction = hasAnyOfScopes(userScopes, requiredScopes)
+  const canUserPerformAction = isActionInScope(
+    userScopes,
+    actionType,
+    event.type
+  )
 
   if (!canUserPerformAction) {
     // If the user cannot perform the action, redirect to the unauthorized page
