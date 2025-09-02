@@ -473,15 +473,19 @@ export function stringifyScope(scope: z.infer<typeof NotifyRecordScope>) {
  * @returns Array of authorized event identifiers
  */
 export function getAuthorizedEventsFromScopes(scopes: ConfigurableScopes[]) {
-  return scopes
-    .flatMap(({ options }) => {
-      if ('event' in options) {
-        return options.event
-      }
+  return (
+    scopes
+      .flatMap(({ options }) => {
+        if ('event' in options) {
+          return options.event
+        }
 
-      return undefined
-    })
-    .filter((event) => event !== undefined)
+        return undefined
+      })
+      .filter((event) => event !== undefined)
+      // remove duplicates
+      .filter((event, index, self) => self.indexOf(event) === index)
+  )
 }
 
 /*

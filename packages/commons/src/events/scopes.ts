@@ -9,7 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { intersection } from 'lodash'
-import { ConfigurableScopeType, Scope, SCOPES } from '../scopes'
+import {
+  ConfigurableScopeType,
+  findScope,
+  getAuthorizedEventsFromScopes,
+  Scope,
+  SCOPES
+} from '../scopes'
 import {
   ClientSpecificAction,
   ActionType,
@@ -82,4 +88,35 @@ export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
+}
+
+export function isActionInScope(
+  scopes: Scope[],
+  action: DisplayableAction,
+  eventType: string
+) {
+  const allowedPlainScopes = ACTION_ALLOWED_SCOPES[action]
+  const allowedConfigurableScopes = ACTION_ALLOWED_CONFIGURABLE_SCOPES[action]
+
+  if (allowedPlainScopes === null) {
+    return true
+  }
+
+  if (hasAnyOfScopes(scopes, allowedPlainScopes)) {
+    return true
+  }
+
+  if (allowedConfigurableScopes.length > 0) {
+    const parsedScopes = allowedConfigurableScopes
+      .map((scope) => findScope(scopes, scope))
+      .filter((scope) => scope !== undefined)
+
+    const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
+
+    if (authorizedEvents.includes(eventType)) {
+      return true
+    }
+  }
+
+  return false
 }

@@ -30,7 +30,9 @@ import {
   Draft,
   ACTION_ALLOWED_CONFIGURABLE_SCOPES,
   getAuthorizedEventsFromScopes,
-  findScope
+  findScope,
+  isActionInScope,
+  getScopes
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -91,13 +93,6 @@ function getAvailableAssignmentActions(
   }
 
   return []
-}
-interface ActionConfig {
-  label: TranslationConfig
-  icon: IconProps['name']
-  onClick: (workqueue?: string) => Promise<void> | void
-  disabled?: boolean
-  hidden?: boolean
 }
 
 export const actionLabels = {
@@ -161,6 +156,14 @@ export const actionLabels = {
   }
 } as const
 
+interface ActionConfig {
+  label: TranslationConfig
+  icon: IconProps['name']
+  onClick: (workqueue?: string) => Promise<void> | void
+  disabled?: boolean
+  hidden?: boolean
+}
+
 interface ActionMenuItem extends ActionConfig {
   type: WorkqueueActionType | ClientSpecificAction
 }
@@ -221,10 +224,12 @@ function useViewableActionConfigurations(
   )
 
   const eventId = event.id
-  const hasScopeForValidate = hasAnyOfScopes(
+  const hasScopeForValidate = isActionInScope(
     authentication.scope,
-    ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
+    ActionType.VALIDATE,
+    event.type
   )
+
   const isRejected = event.flags.includes(InherentFlags.REJECTED)
   const isDeclaredState = event.status === EventStatus.enum.DECLARED
   const isNotifiedState = event.status === EventStatus.enum.NOTIFIED
@@ -481,35 +486,13 @@ export function useAllowedActionConfigurations(
         ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
         workqueueActions.safeParse(action).success
     )
-    .filter((a) => {
-      const requiredScopes = ACTION_ALLOWED_SCOPES[a]
-
-      const configuredScopes = ACTION_ALLOWED_CONFIGURABLE_SCOPES[a]
-      if (requiredScopes === null) {
-        return true
-      }
-
-      if (hasAnyOfScopes(scopes, requiredScopes)) {
-        return true
-      }
-
-      if (configuredScopes.length > 0) {
-        const parsedScopes = configuredScopes
-          .map((scope) => findScope(scopes, scope))
-          .filter((scope) => scope !== undefined)
-
-        const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
-
-        if (authorizedEvents.includes(event.type)) {
-          return true
-        }
-      }
-
-      return false
-    })
+    .filter((a) => isActionInScope(scopes, a, event.type))
     // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
     .map((a) => ({ ...config[a], type: a }))
-    .filter((a: ActionConfig) => !a.hidden)
+    .filter((a: ActionConfig) => {
+      console.log('a', a)
+      return !a.hidden
+    })
 
   // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
   const hasOnlyMetaActions = allowedWorkqueueConfigs.every(({ type }) =>
