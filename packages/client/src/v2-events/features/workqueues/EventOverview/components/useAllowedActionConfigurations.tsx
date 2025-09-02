@@ -218,7 +218,8 @@ function useViewableActionConfigurations(
   )
 
   const eventId = event.id
-  const hasScopeForValidate = isActionInScope(
+
+  const userMayValidate = isActionInScope(
     authentication.scope,
     ActionType.VALIDATE,
     event.type
@@ -230,7 +231,7 @@ function useViewableActionConfigurations(
 
   // Incomplete declarations are always shown as "Review" for the reviewer.
   const isReviewingIncompleteDeclaration =
-    hasScopeForValidate && !isRejected && isNotifiedState
+    userMayValidate && !isRejected && isNotifiedState
 
   // Rejected declarations are always shown as "Review" for the reviewer.
   const isReviewingRejectedDeclaration =
@@ -242,7 +243,13 @@ function useViewableActionConfigurations(
   // By default, field agent has both scopes for incomplete (notify) and complete (declare) actions.
   // As a business rule, for notified event, client hides the declare action if the user has no scope for validate.
   const shouldHideDeclareAction =
-    isNotifiedState && !hasScopeForValidate && !isRejected
+    isNotifiedState && !userMayValidate && !isRejected
+
+  const userMayCorrect = isActionInScope(
+    authentication.scope,
+    ActionType.REQUEST_CORRECTION,
+    event.type
+  )
 
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
@@ -259,7 +266,7 @@ function useViewableActionConfigurations(
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
         icon: 'PushPin' as const,
-        onClick: async (workqueue?: string) => {
+        onClick: async () => {
           const assign = await openAssignModal<boolean>((close) => (
             <AssignModal close={close} />
           ))
@@ -273,11 +280,9 @@ function useViewableActionConfigurations(
           })
         },
         disabled:
-          !isOnline ||
           // User may not assign themselves if record is waiting for correction approval/rejection but user is not allowed to do that
-          (eventIsWaitingForCorrection &&
-            !authentication.scope.includes(SCOPES.RECORD_REGISTRATION_CORRECT)),
-        hidden: isNotifiedState && !isRejected && !hasScopeForValidate
+          !isOnline || (eventIsWaitingForCorrection && !userMayCorrect),
+        hidden: isNotifiedState && !isRejected && !userMayValidate
       },
       [ActionType.UNASSIGN]: {
         label: actionLabels[ActionType.UNASSIGN],
