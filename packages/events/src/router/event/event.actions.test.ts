@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { http, HttpResponse } from 'msw'
 import {
   ActionStatus,
@@ -29,7 +27,6 @@ import {
   createTestClient,
   sanitizeForSnapshot,
   setupTestCase,
-  TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
 import { mswServer } from '../../tests/msw'
@@ -233,7 +230,7 @@ describe('Action drafts', () => {
 
 const multiFileConfig = {
   ...tennisClubMembershipEvent,
-  id: 'multi-file-event',
+  id: 'v2.death', // using existing event type id here, so that the user has the required scope to it
   declaration: {
     label: generateTranslationConfig('File club form'),
     pages: [
@@ -272,13 +269,6 @@ const multiFileConfig = {
   },
   advancedSearch: []
 } satisfies EventConfig
-
-const scopes = [
-  ...TEST_USER_DEFAULT_SCOPES.filter(
-    (scope) => !scope.startsWith('record.declare')
-  ),
-  `record.declare[event=${multiFileConfig.id}]`
-]
 
 describe('Action updates', () => {
   const deleteFileMock = vi.fn()
@@ -359,11 +349,11 @@ describe('Action updates', () => {
       (action) => action.type === ActionType.CREATE
     )
 
-    const assignmentInput = generator.event.actions.assign(originalEvent.id, {
-      assignedTo: createAction[0].createdBy
-    })
-
-    await client.event.actions.assignment.assign(assignmentInput)
+    await client.event.actions.assignment.assign(
+      generator.event.actions.assign(originalEvent.id, {
+        assignedTo: createAction[0].createdBy
+      })
+    )
 
     await client.event.actions.validate.request({
       type: ActionType.VALIDATE,
@@ -377,15 +367,13 @@ describe('Action updates', () => {
     })
 
     const event = await client.event.get(originalEvent.id)
-
     const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
-
     expect(eventState.declaration).toMatchSnapshot()
   })
 
   it('File references are removed with explicit null', async () => {
     const { user } = await setupTestCase()
-    const client = createTestClient(user, scopes)
+    const client = createTestClient(user)
 
     const originalEvent = await client.event.create({
       transactionId: generateTransactionId(),
@@ -431,7 +419,7 @@ describe('Action updates', () => {
 
   it('file with option references are removed with empty array', async () => {
     const { user } = await setupTestCase()
-    const client = createTestClient(user, scopes)
+    const client = createTestClient(user)
 
     const originalEvent = await client.event.create({
       transactionId: generateTransactionId(),

@@ -41,37 +41,9 @@ export const ACTION_ALLOWED_SCOPES = {
   ],
   [ActionType.CREATE]: [SCOPES.RECORD_SUBMIT_FOR_REVIEW],
   [ActionType.NOTIFY]: [],
-  [ActionType.DECLARE]: [SCOPES.RECORD_REGISTER],
+  [ActionType.DECLARE]: [],
   [ActionType.DELETE]: [],
-  [ActionType.VALIDATE]: [SCOPES.RECORD_REGISTER],
-  [ActionType.REGISTER]: [SCOPES.RECORD_REGISTER],
-  [ActionType.PRINT_CERTIFICATE]: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
-  [ActionType.REQUEST_CORRECTION]: [
-    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-    SCOPES.RECORD_REGISTRATION_CORRECT
-  ],
-  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: [
-    SCOPES.RECORD_REGISTRATION_CORRECT
-  ],
-  [ActionType.REJECT_CORRECTION]: [SCOPES.RECORD_REGISTRATION_CORRECT],
-  [ActionType.APPROVE_CORRECTION]: [SCOPES.RECORD_REGISTRATION_CORRECT],
-  [ActionType.MARKED_AS_DUPLICATE]: [SCOPES.RECORD_DECLARATION_ARCHIVE],
-  [ActionType.ARCHIVE]: [SCOPES.RECORD_DECLARATION_ARCHIVE],
-  [ActionType.REJECT]: [SCOPES.RECORD_SUBMIT_FOR_UPDATES],
-  [ActionType.ASSIGN]: null,
-  [ActionType.UNASSIGN]: null,
-  [ActionType.DETECT_DUPLICATE]: []
-} satisfies Record<DisplayableAction, RequiredScopes>
-
-// TODO CIHAN: can we merge this with the ACTION_ALLOWED_SCOPES?
-// TODO CIHAN: define configurable scopes in a better manner?
-export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
-  [ActionType.READ]: ['record.declare', 'record.notify'],
-  [ActionType.CREATE]: ['record.declare', 'record.notify'],
-  [ActionType.NOTIFY]: ['record.notify'],
-  [ActionType.DECLARE]: ['record.declare', 'record.declared.validate'],
-  [ActionType.DELETE]: ['record.declare'],
-  [ActionType.VALIDATE]: ['record.declared.validate'],
+  [ActionType.VALIDATE]: [],
   [ActionType.REGISTER]: [],
   [ActionType.PRINT_CERTIFICATE]: [],
   [ActionType.REQUEST_CORRECTION]: [],
@@ -81,6 +53,37 @@ export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.MARKED_AS_DUPLICATE]: [],
   [ActionType.ARCHIVE]: [],
   [ActionType.REJECT]: [],
+  [ActionType.ASSIGN]: null,
+  [ActionType.UNASSIGN]: null,
+  [ActionType.DETECT_DUPLICATE]: []
+} satisfies Record<DisplayableAction, RequiredScopes>
+
+// TODO CIHAN: can we merge this with the ACTION_ALLOWED_SCOPES?
+export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
+  [ActionType.READ]: ['record.declare', 'record.notify'],
+  [ActionType.CREATE]: ['record.declare', 'record.notify'],
+  [ActionType.NOTIFY]: ['record.notify'],
+  [ActionType.DECLARE]: [
+    'record.declare',
+    'record.declared.validate',
+    'record.register'
+  ],
+  [ActionType.DELETE]: ['record.declare'],
+  [ActionType.VALIDATE]: ['record.declared.validate', 'record.register'],
+  [ActionType.REGISTER]: ['record.register'],
+  [ActionType.PRINT_CERTIFICATE]: ['record.registered.print-certified-copies'],
+  [ActionType.REQUEST_CORRECTION]: [
+    'record.registered.request-correction',
+    'record.registered.correct'
+  ],
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: [
+    'record.registered.correct'
+  ],
+  [ActionType.REJECT_CORRECTION]: ['record.registered.correct'],
+  [ActionType.APPROVE_CORRECTION]: ['record.registered.correct'],
+  [ActionType.MARKED_AS_DUPLICATE]: ['record.declared.archive'],
+  [ActionType.ARCHIVE]: ['record.declared.archive'],
+  [ActionType.REJECT]: ['record.declared.reject'],
   [ActionType.ASSIGN]: [],
   [ActionType.UNASSIGN]: [],
   [ActionType.DETECT_DUPLICATE]: []

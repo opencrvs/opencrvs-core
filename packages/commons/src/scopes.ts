@@ -276,8 +276,9 @@ const LiteralScopes = z.union([
 // Configurable scopes are for example:
 // - user.create[role=first-role|second-role]
 // - record.notify[event=v2.birth]
+// - record.registered.print-certified-copies[event=v2.birth|tennis-club-membership]
 const rawConfigurableScopeRegex =
-  /^([a-zA-Z\.]+)\[((?:\w+=[\w.-]+(?:\|[\w.-]+)*)(?:,[\w]+=[\w.-]+(?:\|[\w.-]+)*)*)\]$/
+  /^([a-zA-Z][a-zA-Z0-9.-]*(?:\.[a-zA-Z0-9.-]+)*)\[((?:\w+=[\w.-]+(?:\|[\w.-]+)*)(?:,[\w]+=[\w.-]+(?:\|[\w.-]+)*)*)\]$/
 
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
 
@@ -302,24 +303,6 @@ const WorkqueueScope = z.object({
   })
 })
 
-const EventScopeBase = z.object({
-  options: z.object({
-    event: z.array(z.string())
-  })
-})
-
-const DeclareRecordScope = EventScopeBase.extend({
-  type: z.literal('record.declare')
-})
-
-const NotifyRecordScope = EventScopeBase.extend({
-  type: z.literal('record.notify')
-})
-
-const ValidateRecordScope = EventScopeBase.extend({
-  type: z.literal('record.declared.validate')
-})
-
 const SearchScope = z.object({
   type: z.literal('search'),
   options: z.object({
@@ -330,14 +313,31 @@ const SearchScope = z.object({
 
 export type SearchScope = z.infer<typeof SearchScope>
 
+// These scopes are used to check if the user has the necessary permissions to perform actions on a record.
+// Each of these is configured with allowed event types (ids), e.g. 'v2.birth', 'v2.death', 'tennis-club-membership'.
+const RecordScope = z.object({
+  type: z.enum([
+    'record.declare',
+    'record.notify',
+    'record.declared.validate',
+    'record.declared.reject',
+    'record.declared.archive',
+    'record.register',
+    'record.registered.print-certified-copies',
+    'record.registered.request-correction',
+    'record.registered.correct'
+  ]),
+  options: z.object({
+    event: z.array(z.string())
+  })
+})
+
 const ConfigurableRawScopes = z.discriminatedUnion('type', [
   SearchScope,
   CreateUserScope,
   EditUserScope,
   WorkqueueScope,
-  NotifyRecordScope,
-  DeclareRecordScope,
-  ValidateRecordScope
+  RecordScope
 ])
 
 type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
@@ -428,6 +428,7 @@ export function parseScope(scope: string) {
   }
 
   const maybeConfigurableScope = rawConfigurableScope.safeParse(scope)
+
   if (!maybeConfigurableScope.success) {
     return
   }
@@ -459,7 +460,7 @@ export function parseScope(scope: string) {
  * })
  * // Returns: "record.notify[event=v2.birth|tennis-club-membership]"
  */
-export function stringifyScope(scope: z.infer<typeof NotifyRecordScope>) {
+export function stringifyScope(scope: z.infer<typeof ConfigurableRawScopes>) {
   const options = Object.entries(scope.options)
     .map(([key, value]) => `${key}=${value.join('|')}`)
     .join(',')

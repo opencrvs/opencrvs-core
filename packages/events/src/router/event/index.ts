@@ -84,12 +84,11 @@ const eventConfigGetProcedure: QueryProcedure<{
       [
         SCOPES.RECORD_READ,
         SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-        SCOPES.RECORD_REGISTER,
         SCOPES.RECORD_EXPORT_RECORDS,
         SCOPES.CONFIG,
         SCOPES.CONFIG_UPDATE_ALL
       ],
-      ['record.declare', 'record.notify']
+      ['record.declare', 'record.notify', 'record.register']
     )
   )
   .input(z.void())
