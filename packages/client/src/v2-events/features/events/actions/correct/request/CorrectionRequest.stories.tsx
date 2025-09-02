@@ -298,18 +298,8 @@ export const Summary: Story = {
 }
 
 export const ReviewCorrection: Story = {
-  loaders: [
-    async () => {
-      window.localStorage.setItem(
-        'opencrvs',
-        generator.user.token.localRegistrar
-      )
-      // Intermittent failures starts to happen when global state gets out of whack.
-      // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
-      await new Promise((resolve) => setTimeout(resolve, 50))
-    }
-  ],
   parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: {
         path: '/',
