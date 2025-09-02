@@ -584,6 +584,7 @@ exports[`User with my-jurisdiction scope only sees events created by system user
     },
     "recommender.none": true,
   },
+  "duplicates": [],
   "flags": [
     "incomplete",
   ],
