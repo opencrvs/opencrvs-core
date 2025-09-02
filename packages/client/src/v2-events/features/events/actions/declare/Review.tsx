@@ -23,6 +23,7 @@ import {
   getActionReview,
   getCurrentEventState,
   getDeclaration,
+  isActionInScope,
   SCOPES
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -173,6 +174,12 @@ export function Review() {
     }
   }
 
+  const canSendIncomplete = isActionInScope(
+    scopes ?? [],
+    ActionType.NOTIFY,
+    event.type
+  )
+
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}
@@ -193,7 +200,7 @@ export function Review() {
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions
-          canSendIncomplete={scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)}
+          canSendIncomplete={canSendIncomplete}
           icon={reviewActionConfiguration.icon}
           incomplete={reviewActionConfiguration.incomplete}
           messages={reviewActionConfiguration.messages}
