@@ -34,7 +34,7 @@ export interface Errors {
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
   values: EventState,
-  locations: Location[]
+  locations?: Location[]
 ) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
     if (
@@ -45,12 +45,14 @@ export function getValidationErrorsForForm(
       return errorsForAllFields
     }
 
+    const context = locations ? { locations } : undefined
+
     return {
       ...errorsForAllFields,
       [field.id]: runFieldValidations({
         field,
         values,
-        context: { locations }
+        context
       })
     }
   }, {})
@@ -58,8 +60,7 @@ export function getValidationErrorsForForm(
 
 export function getStructuralValidationErrorsForForm(
   fields: FieldConfig[],
-  values: EventState,
-  locations: Location[]
+  values: EventState
 ) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
     if (
@@ -74,8 +75,7 @@ export function getStructuralValidationErrorsForForm(
       ...errorsForAllFields,
       [field.id]: runStructuralValidations({
         field,
-        values,
-        context: { locations }
+        values
       })
     }
   }, {})
@@ -86,7 +86,7 @@ export function validationErrorsInActionFormExist({
   form,
   annotation,
   reviewFields = [],
-  locations = []
+  locations
 }: {
   formConfig: FormConfig
   form: EventState
@@ -95,18 +95,15 @@ export function validationErrorsInActionFormExist({
   locations?: Location[]
 }): boolean {
   // We don't want to validate hidden fields
-  const formWithoutHiddenFields = omitHiddenPaginatedFields(formConfig, form, {
-    locations
-  })
+  const formWithoutHiddenFields = omitHiddenPaginatedFields(formConfig, form)
 
   const visibleAnnotationFields = omitHiddenFields(
     reviewFields,
-    annotation ?? {},
-    { locations }
+    annotation ?? {}
   )
 
   const hasValidationErrors = formConfig.pages
-    .filter((page) => isPageVisible(page, form, { locations }))
+    .filter((page) => isPageVisible(page, form))
     .some((page) => {
       const fieldErrors = getValidationErrorsForForm(
         page.fields,
@@ -117,7 +114,7 @@ export function validationErrorsInActionFormExist({
     })
 
   const hasAnnotationValidationErrors = Object.values(
-    getValidationErrorsForForm(reviewFields, visibleAnnotationFields, locations)
+    getValidationErrorsForForm(reviewFields, visibleAnnotationFields)
   ).some((field) => field.errors.length > 0)
 
   return hasValidationErrors || hasAnnotationValidationErrors

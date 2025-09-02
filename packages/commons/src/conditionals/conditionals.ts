@@ -58,7 +58,7 @@ export type FormConditionalParameters = {
   $online: boolean
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   $form: EventState | Record<string, any>
-  $locations: Array<Location>
+  $locations?: Array<Location>
 }
 
 export type ConditionalParameters =

@@ -31,7 +31,6 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
 import {
   getAdvancedSearchFieldErrors,
   resolveAdvancedSearchConfig,
@@ -138,8 +137,6 @@ export function TabSearch({
 }) {
   const intl = useIntl()
   const navigate = useNavigate()
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
 
   const [formValues, setFormValues] = useState<EventState>(fieldValues)
 
@@ -158,10 +155,6 @@ export function TabSearch({
 
   const advancedSearchSections = resolveAdvancedSearchConfig(currentEvent)
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
-
   const sections = advancedSearchSections.map((section) => ({
     ...section,
     isExpanded: section.fields.some((field) =>
@@ -175,7 +168,7 @@ export function TabSearch({
     }))
 
   const errors = Object.values(
-    getAdvancedSearchFieldErrors(sections, formValues, adminStructureLocations)
+    getAdvancedSearchFieldErrors(sections, formValues)
   ).flatMap((errObj) => errObj.errors)
 
   const nonEmptyValues = filterEmptyValues(formValues)
@@ -186,7 +179,7 @@ export function TabSearch({
     const updatedValues = Object.entries(nonEmptyValues).reduce(
       (result, [fieldId, value]) => {
         const field = fields.find((f) => f.id === fieldId)
-        if (!field || !isFieldVisible(field, formValues, { locations: [] })) {
+        if (!field || !isFieldVisible(field, formValues)) {
           return result
         }
         if (field.type === FieldType.NAME && typeof value === 'object') {
@@ -226,7 +219,7 @@ export function TabSearch({
         if (!field) {
           return count
         }
-        if (!isFieldVisible(field, formValues, { locations: [] })) {
+        if (!isFieldVisible(field, formValues)) {
           return count
         }
         return count + countFilledFieldsForInputType(field, val)

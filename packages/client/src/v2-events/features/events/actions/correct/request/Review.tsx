@@ -44,6 +44,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { hasFieldChanged, isLastActionCorrectionRequest } from '../utils'
 
 function isRequestCorrectionAction(
@@ -61,6 +62,8 @@ export function Review() {
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
 
   const event = events.getEvent.getFromCache(eventId)
 
@@ -94,9 +97,14 @@ export function Review() {
     )
   }
 
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
+
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
-    form
+    form,
+    locations: adminStructureLocations
   })
 
   const writeActions: ActionDocument[] = getAcceptedActions(event).filter(
@@ -137,6 +145,7 @@ export function Review() {
         formConfig={formConfig}
         isCorrection={true}
         isReviewCorrection={isReviewCorrection}
+        locations={adminStructureLocations}
         previousFormValues={previousFormValues}
         title={intlWithData.formatMessage(
           actionConfig.label,

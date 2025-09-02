@@ -36,7 +36,8 @@ import {
   isFieldDisplayedOnReview,
   isPageVisible,
   runFieldValidations,
-  SCOPES
+  SCOPES,
+  Location
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
@@ -279,6 +280,7 @@ function FormReview({
   formConfig,
   form,
   previousForm,
+  locations,
   onEdit,
   showPreviouslyMissingValuesAsChanged,
   readonlyMode,
@@ -288,6 +290,7 @@ function FormReview({
   formConfig: FormConfig
   form: EventState
   previousForm: EventState
+  locations?: Location[]
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
   readonlyMode?: boolean
@@ -295,14 +298,8 @@ function FormReview({
   isReviewCorrection?: boolean
 }) {
   const intl = useIntl()
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
   const visiblePages = formConfig.pages.filter((page) =>
-    isPageVisible(page, form, { locations })
-  )
-
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
+    isPageVisible(page, form)
   )
 
   return (
@@ -310,11 +307,7 @@ function FormReview({
       <ReviewContainter>
         {visiblePages.map((page) => {
           const fields = page.fields
-            .filter((field) =>
-              isFieldDisplayedOnReview(field, form, {
-                locations: adminStructureLocations
-              })
-            )
+            .filter((field) => isFieldDisplayedOnReview(field, form))
             .map((field) => {
               const value = form[field.id]
               const previousValue = previousForm[field.id]
@@ -329,10 +322,12 @@ function FormReview({
                 formConfig
               })
 
+              const context = locations ? { locations } : undefined
+
               const error = runFieldValidations({
                 field,
                 values: form,
-                context: { locations: adminStructureLocations }
+                context
               })
 
               const errorDisplay =
@@ -466,6 +461,7 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   form,
+  locations,
   annotation,
   onEdit,
   children,
@@ -479,6 +475,7 @@ function ReviewComponent({
   children: React.ReactNode
   formConfig: FormConfig
   form: EventState
+  locations?: Location[]
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
@@ -524,6 +521,7 @@ function ReviewComponent({
             formConfig={formConfig}
             isCorrection={isCorrection}
             isReviewCorrection={isReviewCorrection}
+            locations={locations}
             previousForm={previousForm}
             readonlyMode={readonlyMode}
             showPreviouslyMissingValuesAsChanged={

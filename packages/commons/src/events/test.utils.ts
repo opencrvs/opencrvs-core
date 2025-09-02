@@ -13,7 +13,6 @@ import { merge, omitBy, isString, omit } from 'lodash'
 import { addDays } from 'date-fns'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID, UUID } from '../uuid'
-import { Location } from './locations'
 import {
   ActionBase,
   ActionDocument,
@@ -221,7 +220,6 @@ export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType,
   rng: () => number,
-  context: { locations: Array<Location> },
   overrides?: Partial<EventState>
 ): EventState {
   const parsed = DeclarationUpdateActions.safeParse(action)
@@ -235,7 +233,7 @@ export function generateActionDeclarationInput(
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
     return {
-      ...omitHiddenPaginatedFields(declarationConfig, declaration, context),
+      ...omitHiddenPaginatedFields(declarationConfig, declaration),
       ...overrides
     }
   }
@@ -263,8 +261,7 @@ export function generateActionAnnotationInput(
 
   const visibleVerificationPageIds = getVisibleVerificationPageIds(
     findRecordActionPages(configuration, action),
-    annotation,
-    { locations: [] }
+    annotation
   )
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
@@ -275,9 +272,7 @@ export function generateActionAnnotationInput(
     {}
   )
 
-  const fieldBasedPayload = omitHiddenFields(annotationFields, annotation, {
-    locations: []
-  })
+  const fieldBasedPayload = omitHiddenFields(annotationFields, annotation)
 
   return {
     ...fieldBasedPayload,
@@ -365,8 +360,7 @@ export function eventPayloadGenerator(rng: () => number) {
           generateActionDeclarationInput(
             tennisClubMembershipEvent,
             ActionType.DECLARE,
-            rng,
-            { locations: [] }
+            rng
           ),
         annotation:
           input.annotation ??
@@ -397,8 +391,7 @@ export function eventPayloadGenerator(rng: () => number) {
             generateActionDeclarationInput(
               tennisClubMembershipEvent,
               ActionType.DECLARE,
-              rng,
-              { locations: [] }
+              rng
             ),
             isString
           )
@@ -431,8 +424,7 @@ export function eventPayloadGenerator(rng: () => number) {
           generateActionDeclarationInput(
             tennisClubMembershipEvent,
             ActionType.VALIDATE,
-            rng,
-            { locations: [] }
+            rng
           ),
         annotation:
           input.annotation ??
@@ -533,8 +525,7 @@ export function eventPayloadGenerator(rng: () => number) {
           generateActionDeclarationInput(
             tennisClubMembershipEvent,
             ActionType.REGISTER,
-            rng,
-            { locations: [] }
+            rng
           ),
         annotation:
           input.annotation ??
@@ -586,8 +577,7 @@ export function eventPayloadGenerator(rng: () => number) {
               generateActionDeclarationInput(
                 tennisClubMembershipEvent,
                 ActionType.REQUEST_CORRECTION,
-                rng,
-                { locations: [] }
+                rng
               ),
               ['applicant.email', 'applicant.image']
             ),
@@ -691,9 +681,6 @@ export function generateActionDocument({
       configuration,
       action,
       rng,
-      {
-        locations: []
-      },
       declarationOverrides
     ),
     annotation: annotation ?? {},

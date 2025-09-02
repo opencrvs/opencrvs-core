@@ -410,8 +410,7 @@ function AddressOutput({
         field.value &&
         isFieldDisplayedOnReview(
           field.field satisfies FieldConfig,
-          updatedValues,
-          { locations: adminStructureLocations }
+          updatedValues
         )
     )
 

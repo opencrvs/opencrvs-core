@@ -23,7 +23,7 @@ export function hasFieldChanged(
   form: EventState,
   previousFormValues: EventState
 ) {
-  const isVisible = isFieldVisible(f, form, { locations: [] })
+  const isVisible = isFieldVisible(f, form)
 
   const prevValue = previousFormValues[f.id]
   const currValue = form[f.id]

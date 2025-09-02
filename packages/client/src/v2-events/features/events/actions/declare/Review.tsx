@@ -44,6 +44,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
@@ -58,6 +59,8 @@ export function Review() {
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const { closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
 
   const event = events.getEvent.getFromCache(eventId)
 
@@ -75,12 +78,17 @@ export function Review() {
 
   const scopes = useSelector(getScope) ?? undefined
 
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
+
   const reviewActionConfiguration = useReviewActionConfig({
     formConfig,
     declaration: form,
     annotation,
     scopes,
-    reviewFields: reviewConfig.fields
+    reviewFields: reviewConfig.fields,
+    locations: adminStructureLocations
   })
 
   async function handleEdit({
@@ -186,6 +194,7 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
+        locations={adminStructureLocations}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
         onAnnotationChange={(values) => setAnnotation(values)}

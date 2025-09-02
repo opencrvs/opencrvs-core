@@ -113,10 +113,8 @@ export function Summary() {
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
-      const wasVisible = isFieldVisible(field, previousFormValues, {
-        locations: []
-      })
-      const isHidden = !isFieldVisible(field, form, { locations: [] })
+      const wasVisible = isFieldVisible(field, previousFormValues)
+      const isHidden = !isFieldVisible(field, form)
       return wasVisible && isHidden
     })
 

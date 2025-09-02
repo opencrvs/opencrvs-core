@@ -124,7 +124,7 @@ function buildCorrectionDetails(
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
   const details: CorrectionDetail[] = correctionFormPages
-    .filter((page) => isPageVisible(page, annotation, { locations: [] }))
+    .filter((page) => isPageVisible(page, annotation))
     .flatMap((page) => {
       if (page.type === PageTypes.enum.VERIFICATION) {
         const value = !!annotation[page.id]
@@ -141,9 +141,7 @@ function buildCorrectionDetails(
       }
 
       return page.fields
-        .filter((f) =>
-          isFieldVisible(f, { ...form, ...annotation }, { locations: [] })
-        )
+        .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
         .map((field) => ({
           label: field.label,
           id: field.id,
@@ -301,9 +299,7 @@ export function CorrectionDetails({
 
       {formConfig.pages.map((page) => {
         const changedFields = page.fields
-          .filter((field) =>
-            isFieldDisplayedOnReview(field, form, { locations: [] })
-          )
+          .filter((field) => isFieldDisplayedOnReview(field, form))
           .filter((f) => hasFieldChanged(f, form, previousFormValues))
           .map((f) => {
             const original = Output({

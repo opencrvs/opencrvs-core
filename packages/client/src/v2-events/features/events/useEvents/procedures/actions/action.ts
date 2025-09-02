@@ -89,8 +89,7 @@ function getCleanedDeclarationDiff(
   if (isEmpty(originalDeclaration)) {
     return omitHiddenPaginatedFields(
       eventConfiguration.declaration,
-      declarationDiff,
-      { locations: [] }
+      declarationDiff
     )
   }
 
@@ -102,8 +101,7 @@ function getCleanedDeclarationDiff(
   // (Ensures we only consider fields relevant to the event configuration)
   const cleanedDeclaration = omitHiddenPaginatedFields(
     eventConfiguration.declaration,
-    merged,
-    { locations: [] }
+    merged
   )
 
   // From the update, keep only fields that are valid in the cleaned declaration
@@ -400,8 +398,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       ? omitHiddenAnnotationFields(
           actionConfiguration,
           originalDeclaration,
-          params.annotation,
-          { locations: [] }
+          params.annotation
         )
       : {}
 

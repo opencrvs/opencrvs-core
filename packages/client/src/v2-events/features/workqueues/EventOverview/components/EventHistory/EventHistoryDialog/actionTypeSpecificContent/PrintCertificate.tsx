@@ -66,7 +66,7 @@ export function PrintCertificate({
   // When we merge phase-3 branch here, we could try refactoring this to be a shared frontend module/function.
   const content = formPages.flatMap((page) => {
     const fields = page.fields
-      .filter((f) => isFieldVisible(f, annotation, { locations: [] }))
+      .filter((f) => isFieldVisible(f, annotation))
       .map((field) => {
         const valueDisplay = Output({
           field,

@@ -56,20 +56,23 @@ function getFieldParams(form: Record<string, unknown> = DEFAULT_FORM) {
       {
         id: 'e15d54b0-8c74-45f0-aa35-e1b0501b38dc' as UUID,
         name: 'Embe',
-        partOf: 'e2e6dfcf-2603-458c-983f-abb1b31a617a' as UUID,
-        locationType: 'ADMIN_STRUCTURE'
+        parentId: 'e2e6dfcf-2603-458c-983f-abb1b31a617a' as UUID,
+        locationType: 'ADMIN_STRUCTURE',
+        validUntil: null
       },
       {
         id: 'e2e6dfcf-2603-458c-983f-abb1b31a617a' as UUID,
         name: 'Irundu',
-        partOf: '7352c963-9427-4a9e-89d2-89e6f2a744b2' as UUID,
-        locationType: 'ADMIN_STRUCTURE'
+        parentId: '7352c963-9427-4a9e-89d2-89e6f2a744b2' as UUID,
+        locationType: 'ADMIN_STRUCTURE',
+        validUntil: null
       },
       {
         id: 'f1e14eed-3420-49df-9e2f-0b362e854cff' as UUID,
         name: 'Afue',
-        partOf: null,
-        locationType: 'ADMIN_STRUCTURE'
+        parentId: null,
+        locationType: 'ADMIN_STRUCTURE',
+        validUntil: null
       }
     ],
     $online: false

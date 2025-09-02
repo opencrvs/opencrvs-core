@@ -132,10 +132,7 @@ export function EventSummary({
     .map(({ id }) => id)
 
   const configuredFields = summary.fields.map((field) => {
-    if (
-      field.conditionals &&
-      !areConditionsMet(field.conditionals, event, { locations: [] })
-    ) {
+    if (field.conditionals && !areConditionsMet(field.conditionals, event)) {
       return null
     }
 

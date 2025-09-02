@@ -30,8 +30,7 @@ import {
   SystemVariables,
   InteractiveFieldType,
   FieldReference,
-  getAllUniqueFields,
-  Location
+  getAllUniqueFields
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -41,7 +40,6 @@ import {
   makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -80,7 +78,6 @@ type AllProps = {
   isCorrection?: boolean
   systemVariables: SystemVariables
   parentId?: string
-  locations?: Location[]
 } & UsedFormikProps
 
 /**
@@ -193,8 +190,7 @@ export function FormSectionComponent({
   onAllFieldsValidated,
   isCorrection = false,
   systemVariables,
-  parentId,
-  locations
+  parentId
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not -
   useOnlineStatus()
@@ -390,11 +386,7 @@ export function FormSectionComponent({
   const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
     const fieldErrors = errors[field.id]?.errors
     const hasErrors = fieldErrors && fieldErrors.length > 0
-    return (
-      isFieldVisible(field, completeForm, {
-        locations: locations ?? []
-      }) && hasErrors
-    )
+    return isFieldVisible(field, completeForm) && hasErrors
   })
 
   useEffect(() => {
@@ -409,18 +401,12 @@ export function FormSectionComponent({
   return (
     <section className={className}>
       {fieldsWithFormikSeparator.map((field) => {
-        if (
-          !isFieldVisible(field, completeForm, {
-            locations: locations ?? []
-          })
-        ) {
+        if (!isFieldVisible(field, completeForm)) {
           return null
         }
 
         const isDisabled =
-          !isFieldEnabled(field, completeForm, {
-            locations: locations ?? []
-          }) ||
+          !isFieldEnabled(field, completeForm) ||
           (isCorrection && field.uncorrectable)
 
         const visibleError = errors[field.id]?.errors[0]?.message

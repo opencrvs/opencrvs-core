@@ -30,7 +30,6 @@ import {
   DeclarationActions,
   writeActions
 } from './ActionType'
-import { Location } from '../events/locations'
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import {
@@ -161,22 +160,17 @@ export function getActionReviewFields(
   return getActionReview(configuration, actionType).fields
 }
 
-export function isPageVisible(
-  page: PageConfig,
-  formValues: ActionUpdate,
-  context: { locations: Array<Location> }
-) {
+export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
   if (!page.conditional) {
     return true
   }
 
-  return isConditionMet(page.conditional, formValues, context)
+  return isConditionMet(page.conditional, formValues)
 }
 
 export function omitHiddenFields<T extends EventState | ActionUpdate>(
   fields: FieldConfig[],
   values: T,
-  context: { locations: Array<Location> },
   visibleVerificationPageIds: string[] = []
 ) {
   return omitBy<T>(values, (_, fieldId) => {
@@ -193,20 +187,19 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
     }
 
     // As long as one of the field configs is visible, the field should be included
-    return fieldConfigs.every((f) => !isFieldVisible(f, values, context))
+    return fieldConfigs.every((f) => !isFieldVisible(f, values))
   })
 }
 
 export function omitHiddenPaginatedFields(
   formConfig: FormConfig,
-  declaration: EventState,
-  context: { locations: Array<Location> }
+  declaration: EventState
 ) {
   const visiblePagesFormFields = formConfig.pages
-    .filter((p) => isPageVisible(p, declaration, context))
+    .filter((p) => isPageVisible(p, declaration))
     .flatMap((p) => p.fields)
 
-  return omitHiddenFields(visiblePagesFormFields, declaration, context)
+  return omitHiddenFields(visiblePagesFormFields, declaration)
 }
 
 /**
@@ -265,33 +258,29 @@ export function isVerificationPage(
 
 export function getVisibleVerificationPageIds(
   pages: PageConfig[],
-  annotation: ActionUpdate,
-  context: { locations: Array<Location> }
+  annotation: ActionUpdate
 ): string[] {
   return pages
     .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, annotation, context))
+    .filter((page) => isPageVisible(page, annotation))
     .map((page) => page.id)
 }
 
 export function getActionVerificationPageIds(
   actionConfig: ActionConfig,
-  annotation: ActionUpdate,
-  context: { locations: Array<Location> }
+  annotation: ActionUpdate
 ): string[] {
   if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
     return getVisibleVerificationPageIds(
       actionConfig.correctionForm.pages,
-      annotation,
-      context
+      annotation
     )
   }
 
   if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
     return getVisibleVerificationPageIds(
       actionConfig.printForm.pages,
-      annotation,
-      context
+      annotation
     )
   }
 
@@ -301,21 +290,18 @@ export function getActionVerificationPageIds(
 export function omitHiddenAnnotationFields(
   actionConfig: ActionConfig,
   declaration: EventState,
-  annotation: ActionUpdate,
-  context: { locations: Array<Location> }
+  annotation: ActionUpdate
 ) {
   const annotationFields = getActionAnnotationFields(actionConfig)
 
   const visibleVerificationPageIds = getActionVerificationPageIds(
     actionConfig,
-    annotation,
-    context
+    annotation
   )
 
   return omitHiddenFields(
     annotationFields,
     { ...declaration, ...annotation },
-    context,
     visibleVerificationPageIds
   )
 }
@@ -633,7 +619,6 @@ export function aggregateActionDeclarations(
 
   return getOnlyVisibleFormValues(
     config.declaration.pages.flatMap(({ fields }) => fields),
-    aggregatedDeclaration,
-    { locations: [] }
+    aggregatedDeclaration
   )
 }

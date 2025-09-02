@@ -15,7 +15,8 @@ import {
   DeclarationFormConfig,
   Scope,
   SCOPES,
-  FieldConfig
+  FieldConfig,
+  Location
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -26,20 +27,23 @@ export function useReviewActionConfig({
   declaration,
   annotation,
   reviewFields,
-  scopes
+  scopes,
+  locations
 }: {
   formConfig: DeclarationFormConfig
   declaration: EventState
   annotation?: EventState
   reviewFields: FieldConfig[]
   scopes?: Scope[]
+  locations: Location[]
 }) {
   const events = useEvents()
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form: declaration,
     annotation,
-    reviewFields
+    reviewFields,
+    locations
   })
 
   if (

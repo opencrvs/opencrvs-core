@@ -111,11 +111,15 @@ ajv.addKeyword({
     _: unknown,
     dataContext?: { rootData: unknown }
   ) {
-    const context = DataContext.parse(dataContext)
+    const context = DataContext.safeParse(dataContext)
+
+    if (!context.success) {
+      throw new Error('Validation context must contain $locations')
+    }
 
     const locationToValidate = data
 
-    const locations = context.rootData.$locations
+    const locations = context.data.rootData.$locations
 
     return !locations.some(
       (location) => location.parentId === locationToValidate
@@ -141,13 +145,11 @@ export function isOnline() {
 
 export function isConditionMet(
   conditional: JSONSchema,
-  values: Record<string, unknown>,
-  context: { locations: Array<Location> }
+  values: Record<string, unknown>
 ) {
   return validate(conditional, {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
-    $locations: context.locations,
     $online: isOnline()
   })
 }
@@ -166,19 +168,17 @@ function getConditionalActionsForField(
 
 export function areConditionsMet(
   conditions: FieldConditional[],
-  values: Record<string, unknown>,
-  context: { locations: Array<Location> }
+  values: Record<string, unknown>
 ) {
   return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values, context)
+    isConditionMet(condition.conditional, values)
   )
 }
 
 function isFieldConditionMet(
   field: FieldConfig,
   form: ActionUpdate | EventState,
-  conditionalType: ConditionalType,
-  context: { locations: Array<Location> }
+  conditionalType: ConditionalType
 ) {
   const hasRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === conditionalType
@@ -193,7 +193,6 @@ function isFieldConditionMet(
     $now: formatISO(new Date(), {
       representation: 'date'
     }),
-    $locations: context.locations,
     $online: isOnline()
   })
 
@@ -202,19 +201,17 @@ function isFieldConditionMet(
 
 export function isFieldVisible(
   field: FieldConfig,
-  form: ActionUpdate | EventState,
-  context: { locations: Array<Location> }
+  form: ActionUpdate | EventState
 ) {
-  return isFieldConditionMet(field, form, ConditionalType.SHOW, context)
+  return isFieldConditionMet(field, form, ConditionalType.SHOW)
 }
 
 export function getOnlyVisibleFormValues(
   field: FieldConfig[],
-  form: EventState,
-  context: { locations: Array<Location> }
+  form: EventState
 ) {
   return field.reduce((acc, f) => {
-    if (isFieldVisible(f, form, context) && form[f.id] !== undefined) {
+    if (isFieldVisible(f, form) && form[f.id] !== undefined) {
       acc[f.id] = form[f.id]
     }
     return acc
@@ -228,21 +225,19 @@ function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
 
 export function isFieldEnabled(
   field: FieldConfig,
-  form: ActionUpdate | EventState,
-  context: { locations: Array<Location> }
+  form: ActionUpdate | EventState
 ) {
-  return isFieldConditionMet(field, form, ConditionalType.ENABLE, context)
+  return isFieldConditionMet(field, form, ConditionalType.ENABLE)
 }
 
 // Fields are displayed on review if both the 'ConditionalType.SHOW' and 'ConditionalType.DISPLAY_ON_REVIEW' conditions are met
 export function isFieldDisplayedOnReview(
   field: FieldConfig,
-  form: ActionUpdate | EventState,
-  context: { locations: Array<Location> }
+  form: ActionUpdate | EventState
 ) {
   return (
-    isFieldVisible(field, form, context) &&
-    isFieldConditionMet(field, form, ConditionalType.DISPLAY_ON_REVIEW, context)
+    isFieldVisible(field, form) &&
+    isFieldConditionMet(field, form, ConditionalType.DISPLAY_ON_REVIEW)
   )
 }
 
@@ -408,15 +403,13 @@ export function validateFieldInput({
 
 export function runStructuralValidations({
   field,
-  values,
-  context
+  values
 }: {
   field: FieldConfig
   values: ActionUpdate
-  context: { locations: Array<Location> }
 }) {
   if (
-    !isFieldVisible(field, values, context) ||
+    !isFieldVisible(field, values) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
     return {
@@ -441,10 +434,10 @@ export function runFieldValidations({
 }: {
   field: FieldConfig
   values: ActionUpdate
-  context: { locations: Array<Location> }
+  context?: { locations: Array<Location> }
 }) {
   if (
-    !isFieldVisible(field, values, context) ||
+    !isFieldVisible(field, values) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
     return {
@@ -455,7 +448,7 @@ export function runFieldValidations({
   const conditionalParameters = {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
-    $locations: context.locations,
+    $locations: context?.locations ?? [],
     $online: isOnline()
   }
 
