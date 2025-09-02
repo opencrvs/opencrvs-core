@@ -31,6 +31,11 @@ import {
   UUID,
   SystemRole
 } from '@opencrvs/commons/client'
+import { SCREEN_LOCK } from '@client/components/ProtectedPage'
+import { storage } from '@client/storage'
+import { removeToken } from '@client/utils/authUtils'
+import { removeUserDetails } from '@client/utils/userUtils'
+import { ROUTES } from './routes'
 
 export function getUsersFullName(
   names: ResolvedUser['name'],
@@ -276,4 +281,13 @@ export function mergeWithoutNullsOrUndefined<T>(
     }
     return undefined
   })
+}
+
+export const logout = async () => {
+  await storage.removeItem(SCREEN_LOCK)
+  await removeToken()
+  await removeUserDetails()
+  window.location.assign(
+    `${window.config.LOGIN_URL}?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
+  )
 }
