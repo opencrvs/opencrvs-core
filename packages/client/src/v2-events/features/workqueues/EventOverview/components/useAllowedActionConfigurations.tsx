@@ -495,7 +495,7 @@ export function useAllowedActionConfigurations(
         return true
       }
 
-      if (configuredScopes) {
+      if (configuredScopes.length > 0) {
         const parsedScopes = configuredScopes
           .map((scope) => findScope(scopes, scope))
           .filter((scope) => scope !== undefined)
