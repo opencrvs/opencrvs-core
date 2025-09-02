@@ -43,7 +43,6 @@ import {
   addAsyncRejectAction,
   throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
-import { throwConflictIfWaitingForCorrection } from '@events/service/events/actions/correction'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -58,14 +57,12 @@ import {
  */
 interface ActionProcedureConfig {
   inputSchema: z.ZodType
-  notifyApiPayloadSchema: z.ZodType | undefined
+  actionConfirmationResponseSchema: z.ZodType | undefined
   meta?: OpenApiMeta
-  allowIfWaitingForCorrection: boolean
 }
 
 const defaultConfig = {
-  notifyApiPayloadSchema: undefined,
-  allowIfWaitingForCorrection: true
+  actionConfirmationResponseSchema: undefined
 } as const
 
 const ACTION_PROCEDURE_CONFIG = {
@@ -92,7 +89,9 @@ const ACTION_PROCEDURE_CONFIG = {
   },
   [ActionType.REGISTER]: {
     ...defaultConfig,
-    notifyApiPayloadSchema: z.object({ registrationNumber: z.string() }),
+    actionConfirmationResponseSchema: z.object({
+      registrationNumber: z.string()
+    }),
     inputSchema: RegisterActionInput
   },
   [ActionType.REJECT]: {
@@ -105,13 +104,11 @@ const ACTION_PROCEDURE_CONFIG = {
   },
   [ActionType.PRINT_CERTIFICATE]: {
     ...defaultConfig,
-    inputSchema: PrintCertificateActionInput,
-    allowIfWaitingForCorrection: false
+    inputSchema: PrintCertificateActionInput
   },
   [ActionType.REQUEST_CORRECTION]: {
     ...defaultConfig,
     inputSchema: RequestCorrectionActionInput,
-    allowIfWaitingForCorrection: false,
     meta: {
       openapi: {
         summary: 'Request correction for an event',
@@ -184,13 +181,14 @@ export function getDefaultActionProcedures(
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
-  const { notifyApiPayloadSchema, inputSchema, allowIfWaitingForCorrection } =
-    actionConfig
+  const { actionConfirmationResponseSchema, inputSchema } = actionConfig
 
   let acceptInputFields = z.object({ actionId: UUID })
 
-  if (notifyApiPayloadSchema) {
-    acceptInputFields = acceptInputFields.merge(notifyApiPayloadSchema)
+  if (actionConfirmationResponseSchema) {
+    acceptInputFields = acceptInputFields.merge(
+      actionConfirmationResponseSchema
+    )
   }
 
   const requireScopesMiddleware = requiresAnyOfScopes(
@@ -212,21 +210,15 @@ export function getDefaultActionProcedures(
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user, isDuplicateAction } = ctx
-        const { eventId } = input
 
         if (isDuplicateAction) {
           return ctx.event
         }
 
-        await throwConflictIfActionNotAllowed(eventId, actionType, ctx.token)
-
-        // Certain actions are not allowed if the event is waiting for correction
-        if (!allowIfWaitingForCorrection) {
-          await throwConflictIfWaitingForCorrection(eventId, token)
-        }
+        await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
 
         const eventWithRequestedAction = await addAction(input, {
-          eventId,
+          eventId: input.eventId,
           user,
           token,
           status: ActionStatus.Requested
@@ -244,6 +236,11 @@ export function getDefaultActionProcedures(
             code: 'INTERNAL_SERVER_ERROR',
             message: 'Unexpected failure from notification API'
           })
+          // For Async flow, we just return the event with the requested action
+        } else if (
+          responseStatus === ActionConfirmationResponse.RequiresProcessing
+        ) {
+          return eventWithRequestedAction
         }
 
         let status: ActionStatus = ActionStatus.Requested
@@ -258,10 +255,9 @@ export function getDefaultActionProcedures(
         // and also validate the payload received from the notify API
         if (responseStatus === ActionConfirmationResponse.Success) {
           status = ActionStatus.Accepted
-
-          if (notifyApiPayloadSchema) {
+          if (actionConfirmationResponseSchema) {
             try {
-              parsedBody = notifyApiPayloadSchema.parse(body)
+              parsedBody = actionConfirmationResponseSchema.parse(body)
             } catch {
               throw new TRPCError({
                 code: 'INTERNAL_SERVER_ERROR',
@@ -270,7 +266,6 @@ export function getDefaultActionProcedures(
             }
           }
         }
-
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { declaration, annotation, ...strippedInput } = input
 
@@ -286,7 +281,7 @@ export function getDefaultActionProcedures(
             ...parsedBody
           },
           {
-            eventId,
+            eventId: input.eventId,
             user,
             token,
             status

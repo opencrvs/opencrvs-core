@@ -9,13 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TRPCError } from '@trpc/server'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { Review } from './Review'
 
-export class RequestNotFoundError extends TRPCError {
-  constructor(id: string) {
-    super({
-      code: 'NOT_FOUND',
-      message: `Correction request not found with ID: ${id}`
-    })
-  }
-}
+const ReviewIndex = withSuspense(Review)
+
+export { ReviewIndex as Review }
