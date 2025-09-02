@@ -220,9 +220,12 @@ function EventOverviewContainer() {
   }
   const assignmentStatus = getAssignmentStatus(eventIndex, authentication.sub)
 
+  const shouldShowFullOverview =
+    fullEvent && assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
+
   return (
     <EventOverviewProvider locations={locations} users={users}>
-      {fullEvent && assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF ? (
+      {shouldShowFullOverview ? (
         <EventOverviewFull event={fullEvent} onAction={getEventQuery.refetch} />
       ) : (
         <EventOverviewProtected
