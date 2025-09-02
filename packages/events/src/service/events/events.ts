@@ -420,6 +420,14 @@ export async function ensureEventIndexed(
   }
 }
 
+/**
+ * Processes an action on an event:
+ *  - Adds the given action to the event
+ *  - Updates the event state accordingly
+ *  - Indexes the event in Elasticsearch if it is no longer a draft
+ *
+ * Returns the updated event document.
+ */
 export async function processAction(
   input: ActionInputWithType,
   {
@@ -444,7 +452,7 @@ export async function processAction(
     configuration
   })
 
-  // Only send the event to Elasticsearch if it is not a draft and action status is accepted
+  // Only send the event to Elasticsearch if it is not a draft
   if (getStatusFromActions(updatedEvent.actions) !== EventStatus.enum.CREATED) {
     await indexEvent(updatedEvent, configuration)
   }

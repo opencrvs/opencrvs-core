@@ -42,7 +42,8 @@ import {
   addAction,
   addAsyncRejectAction,
   throwConflictIfActionNotAllowed,
-  ensureEventIndexed
+  ensureEventIndexed,
+  processAction
 } from '@events/service/events/events'
 import { throwConflictIfWaitingForCorrection } from '@events/service/events/actions/correction'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -344,7 +345,7 @@ export function getDefaultActionProcedures(
           return getEventById(input.eventId)
         }
 
-        return addAction(
+        return processAction(
           { ...input, originalActionId: actionId },
           {
             event,
