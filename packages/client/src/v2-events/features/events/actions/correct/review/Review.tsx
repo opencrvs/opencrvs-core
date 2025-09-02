@@ -14,9 +14,11 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   getDeclaration,
+  isMetaAction,
   deepMerge,
-  RequestedCorrectionAction,
-  getCurrentEventState
+  getCurrentEventState,
+  ActionDocument,
+  getAcceptedActions
 } from '@opencrvs/commons/client'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -52,16 +54,13 @@ export function Review() {
       `Action config for ${ActionType.REQUEST_CORRECTION} was not found. This should never happen`
     )
   }
-
-  const correctionRequestAction = event.actions.find(
-    (action): action is RequestedCorrectionAction =>
-      action.type === ActionType.REQUEST_CORRECTION
+  const writeActions: ActionDocument[] = getAcceptedActions(event).filter(
+    (a) => !isMetaAction(a.type)
   )
+  const correctionRequestAction = writeActions[writeActions.length - 1]
 
-  if (!correctionRequestAction) {
-    throw new Error(
-      'Request correction action not found. This should never happen'
-    )
+  if (correctionRequestAction.type !== ActionType.REQUEST_CORRECTION) {
+    throw new Error('Expected last write action to be REQUEST_CORRECTION')
   }
 
   const formValuesAfterCorrection = deepMerge(
