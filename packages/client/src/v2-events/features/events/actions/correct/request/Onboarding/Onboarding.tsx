@@ -32,7 +32,7 @@ const messages = defineMessages({
 
 export function Onboarding() {
   const { eventId, pageId } = useTypedParams(
-    ROUTES.V2.EVENTS.CORRECTION.ONBOARDING
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
 
   const events = useEvents()
@@ -67,7 +67,7 @@ export function Onboarding() {
   React.useEffect(() => {
     if (!currentPageId) {
       navigate(
-        ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
+        ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
           eventId: event.id
         })
       )
@@ -98,7 +98,7 @@ export function Onboarding() {
         validateBeforeNextPage={true}
         onPageChange={(nextPageId: string) => {
           return navigate(
-            ROUTES.V2.EVENTS.CORRECTION.ONBOARDING.buildPath({
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
               eventId,
               pageId: nextPageId
             })
@@ -106,7 +106,7 @@ export function Onboarding() {
         }}
         onSubmit={() => {
           return navigate(
-            ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({ eventId })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
           )
         }}
       />
