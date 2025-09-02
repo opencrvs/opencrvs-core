@@ -2446,10 +2446,12 @@ components:
               const: CHECKBOX
             defaultValue:
               type: boolean
+              default: false
           required:
             - id
             - label
             - type
+            - defaultValue
           description: Boolean checkbox field
         - type: object
           properties:
