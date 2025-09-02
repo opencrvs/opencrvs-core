@@ -266,17 +266,17 @@ export const eventRouter = router({
 
       return getIndexedEvents(userId, eventConfigs)
     }),
-  search: publicProcedure
+  search: systemProcedure
     .meta({
       openapi: {
         summary: 'Search for events',
-        method: 'GET',
+        method: 'POST',
         tags: ['Search'],
         path: '/events/search'
       }
     })
     // @todo: remove legacy scopes once all users are configured with new search scopes
-    .use(requiresAnyOfScopes([], ['search']))
+    .use(requiresAnyOfScopes([SCOPES.RECORDSEARCH], ['search']))
     .input(SearchQuery)
     .output(
       z.object({
@@ -287,6 +287,19 @@ export const eventRouter = router({
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
       const scopes = getScopes({ Authorization: ctx.token })
+      const isRecordSearchSystemClient = scopes.includes(SCOPES.RECORDSEARCH)
+      const allAccessForEveryEventType = Object.fromEntries(
+        eventConfigs.map(({ id }) => [id, 'all' as const])
+      )
+
+      if (isRecordSearchSystemClient) {
+        return findRecordsByQuery(
+          input,
+          eventConfigs,
+          allAccessForEveryEventType,
+          ctx.user.primaryOfficeId
+        )
+      }
 
       const searchScope = findScope(scopes, 'search')
 
@@ -294,11 +307,10 @@ export const eventRouter = router({
       if (!searchScope) {
         throw new Error('No search scope provided')
       }
-      const searchScopeOptions = searchScope.options
       return findRecordsByQuery(
         input,
         eventConfigs,
-        searchScopeOptions,
+        searchScope.options,
         ctx.user.primaryOfficeId
       )
     }),

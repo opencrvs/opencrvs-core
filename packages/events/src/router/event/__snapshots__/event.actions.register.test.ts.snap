@@ -18,6 +18,6 @@ exports[`Request and confirmation flow > Synchronous confirmation flow > should 
 
 exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-02"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"}]]`;
 
-exports[`can not register an event that is not first declared and validated 1`] = `[TRPCError: Action 'REGISTER' cannot be performed on an event in 'CREATED' state. Available actions: READ, DECLARE, NOTIFY, DELETE.]`;
+exports[`can not register an event that is not first declared and validated 1`] = `[TRPCError: Action 'REGISTER' cannot be performed on an event in 'CREATED' state with [] flags. Available actions: READ, DECLARE, NOTIFY, DELETE.]`;
 
 exports[`when mandatory field is invalid, conditional hidden fields are still skipped 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-1-2024"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-1-2024"}]]`;
