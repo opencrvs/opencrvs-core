@@ -13,7 +13,6 @@ import { waitFor, within, userEvent, expect } from '@storybook/test'
 import { Onboarding as OnboardingIndex } from '@client/v2-events/features/events/actions/correct/request/index'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 
 const generator = testDataGenerator()
@@ -38,7 +37,7 @@ export const Onboarding: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.CORRECTION.ONBOARDING.buildPath({
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
         eventId: tennisClubMembershipEventDocument.id,
         pageId: 'corrector'
       })
