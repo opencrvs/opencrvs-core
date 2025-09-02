@@ -19,7 +19,8 @@ import {
   EventIndex,
   applyDraftToEventIndex,
   deepDropNulls,
-  EventStatus
+  EventStatus,
+  getOrThrow
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -29,9 +30,15 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
+import {
+  AssignmentStatus,
+  getAssignmentStatus,
+  flattenEventIndex,
+  getUsersFullName
+} from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
+import { useAuthentication } from '@client/utils/userUtils'
 import { useDrafts } from '../../drafts/useDrafts'
 import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
@@ -194,6 +201,11 @@ function EventOverviewContainer() {
   const { getEvent } = useEvents()
   const { getUser } = useUsers()
   const users = getUser.getAllCached()
+  const maybeAuth = useAuthentication()
+  const authentication = getOrThrow(
+    maybeAuth,
+    'Authentication is not available but is required'
+  )
 
   const locations = useSelector(getLocations)
 
@@ -206,10 +218,11 @@ function EventOverviewContainer() {
   if (!eventIndex) {
     return
   }
+  const assignmentStatus = getAssignmentStatus(eventIndex, authentication.sub)
 
   return (
     <EventOverviewProvider locations={locations} users={users}>
-      {fullEvent ? (
+      {fullEvent && assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF ? (
         <EventOverviewFull event={fullEvent} onAction={getEventQuery.refetch} />
       ) : (
         <EventOverviewProtected
