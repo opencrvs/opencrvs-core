@@ -44,12 +44,13 @@ export const ACTION_SCOPE_MAP = {
   ],
   [ActionType.REJECT_CORRECTION]: ['record.registered.correct'],
   [ActionType.APPROVE_CORRECTION]: ['record.registered.correct'],
-  [ActionType.MARKED_AS_DUPLICATE]: ['record.declared.archive'],
+  [ActionType.MARK_AS_DUPLICATE]: ['record.declared.review-duplicates'],
+  [ActionType.MARK_NOT_DUPLICATE]: ['record.declared.review-duplicates'],
   [ActionType.ARCHIVE]: ['record.declared.archive'],
   [ActionType.REJECT]: ['record.declared.reject'],
   [ActionType.ASSIGN]: [],
   [ActionType.UNASSIGN]: [],
-  [ActionType.DETECT_DUPLICATE]: []
+  [ActionType.DUPLICATE_DETECTED]: []
 } satisfies Record<DisplayableAction, ConfigurableScopeType[]>
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {

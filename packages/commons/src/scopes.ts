@@ -322,6 +322,7 @@ const RecordScope = z.object({
     'record.declared.validate',
     'record.declared.reject',
     'record.declared.archive',
+    'record.declared.review-duplicates',
     'record.register',
     'record.registered.print-certified-copies',
     'record.registered.request-correction',

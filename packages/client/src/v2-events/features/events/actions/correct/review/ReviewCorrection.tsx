@@ -255,13 +255,13 @@ export function ReviewCorrection({
     await openModal((close) => (
       <RejectModal
         close={close}
-        onSubmit={(message) => {
+        onSubmit={(reason) => {
           events.actions.correction.reject.mutate({
             transactionId: generateTransactionId(),
             eventId,
             requestId: correctionRequestAction.id,
             annotation,
-            reason: { message }
+            content: { reason }
           })
           return navigate(
             ROUTES.V2.EVENTS.OVERVIEW.buildPath(

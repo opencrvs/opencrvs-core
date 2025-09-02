@@ -271,11 +271,12 @@ function actionToClientAction(
         )
 
     case ActionType.NOTIFY:
-    case ActionType.DETECT_DUPLICATE:
+    case ActionType.DUPLICATE_DETECTED:
     case ActionType.APPROVE_CORRECTION:
     case ActionType.ASSIGN:
     case ActionType.UNASSIGN:
-    case ActionType.MARKED_AS_DUPLICATE:
+    case ActionType.MARK_NOT_DUPLICATE:
+    case ActionType.MARK_AS_DUPLICATE:
     case ActionType.REJECT_CORRECTION:
     case ActionType.DELETE:
     case ActionType.READ:

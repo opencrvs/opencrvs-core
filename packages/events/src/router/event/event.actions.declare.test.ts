@@ -8,18 +8,33 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { TRPCError } from '@trpc/server'
+import { http, HttpResponse } from 'msw'
 import {
   ActionStatus,
   ActionType,
   AddressType,
+  createPrng,
+  eventQueryDataGenerator,
   generateActionDeclarationInput,
-  UUID
+  UUID,
+  getCurrentEventState,
+  getUUID,
+  TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import {
+  tennisClubMembershipEvent,
+  tennisClubMembershipEventWithDedupCheck
+} from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { CreatedUser, payloadGenerator } from '@events/tests/generators'
+import {
+  getEventIndexName,
+  getOrCreateClient
+} from '@events/storage/elasticsearch'
+import { encodeEventIndex } from '@events/service/indexing/utils'
+import { mswServer } from '@events/tests/msw'
+import { env } from '@events/environment'
 
 describe('Declare action', () => {
   let user: CreatedUser
@@ -306,4 +321,50 @@ describe('Declare action', () => {
 
     expect(firstResponse).toEqual(secondResponse)
   })
+})
+
+test('deduplication check is performed after declaration', async () => {
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      return HttpResponse.json([
+        tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE),
+        { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+      ])
+    })
+  )
+  const esClient = getOrCreateClient()
+  const prng = createPrng(73)
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const newEvent = await client.event.create(generator.event.create())
+  const existingEventId = getUUID()
+  const declaration = generateActionDeclarationInput(
+    tennisClubMembershipEvent,
+    ActionType.DECLARE,
+    prng
+  )
+  const existingEventIndex = eventQueryDataGenerator({
+    id: existingEventId,
+    declaration
+  })
+
+  await esClient.update({
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    id: existingEventId,
+    body: {
+      doc: encodeEventIndex(existingEventIndex, tennisClubMembershipEvent),
+      doc_as_upsert: true
+    },
+    refresh: 'wait_for'
+  })
+
+  const declaredEvent = await client.event.actions.declare.request(
+    generator.event.actions.declare(newEvent.id, {
+      declaration: existingEventIndex.declaration
+    })
+  )
+  expect(
+    getCurrentEventState(declaredEvent, tennisClubMembershipEvent).duplicates
+  ).toEqual([existingEventId])
 })
