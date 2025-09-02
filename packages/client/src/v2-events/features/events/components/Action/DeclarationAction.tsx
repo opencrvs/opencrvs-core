@@ -30,8 +30,6 @@ import {
   EventConfig,
   getAvailableActionsForEvent,
   getCurrentEventState,
-  ACTION_ALLOWED_SCOPES,
-  hasAnyOfScopes,
   isActionInScope
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'

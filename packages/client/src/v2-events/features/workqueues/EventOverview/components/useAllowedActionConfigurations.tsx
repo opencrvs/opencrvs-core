@@ -18,8 +18,6 @@ import {
   getUUID,
   TranslationConfig,
   SCOPES,
-  ACTION_ALLOWED_SCOPES,
-  hasAnyOfScopes,
   WorkqueueActionType,
   EventStatus,
   isMetaAction,
@@ -28,11 +26,7 @@ import {
   ClientSpecificAction,
   workqueueActions,
   Draft,
-  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
-  getAuthorizedEventsFromScopes,
-  findScope,
-  isActionInScope,
-  getScopes
+  isActionInScope
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'

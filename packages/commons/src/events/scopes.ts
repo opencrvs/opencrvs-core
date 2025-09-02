@@ -13,8 +13,7 @@ import {
   ConfigurableScopeType,
   findScope,
   getAuthorizedEventsFromScopes,
-  Scope,
-  SCOPES
+  Scope
 } from '../scopes'
 import {
   ClientSpecificAction,
@@ -22,43 +21,6 @@ import {
   DisplayableAction
 } from './ActionType'
 
-type RequiresNoScope = null
-type NotAvailableAsAction = [] // pseudo actions
-
-type RequiresAnyOfScopes = [Scope, ...Scope[]]
-type RequiredScopes =
-  | RequiresAnyOfScopes
-  | RequiresNoScope
-  | NotAvailableAsAction
-
-export const ACTION_ALLOWED_SCOPES = {
-  [ActionType.READ]: [
-    SCOPES.RECORD_READ,
-    // TODO CIHAN: maybe remove submit for review?
-    SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-    SCOPES.RECORD_REGISTER,
-    SCOPES.RECORD_EXPORT_RECORDS
-  ],
-  [ActionType.CREATE]: [SCOPES.RECORD_SUBMIT_FOR_REVIEW],
-  [ActionType.NOTIFY]: [],
-  [ActionType.DECLARE]: [],
-  [ActionType.DELETE]: [],
-  [ActionType.VALIDATE]: [],
-  [ActionType.REGISTER]: [],
-  [ActionType.PRINT_CERTIFICATE]: [],
-  [ActionType.REQUEST_CORRECTION]: [],
-  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: [],
-  [ActionType.REJECT_CORRECTION]: [],
-  [ActionType.APPROVE_CORRECTION]: [],
-  [ActionType.MARKED_AS_DUPLICATE]: [],
-  [ActionType.ARCHIVE]: [],
-  [ActionType.REJECT]: [],
-  [ActionType.ASSIGN]: null,
-  [ActionType.UNASSIGN]: null,
-  [ActionType.DETECT_DUPLICATE]: []
-} satisfies Record<DisplayableAction, RequiredScopes>
-
-// TODO CIHAN: can we merge this with the ACTION_ALLOWED_SCOPES?
 export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.READ]: ['record.declare', 'record.notify'],
   [ActionType.CREATE]: ['record.declare', 'record.notify'],
@@ -110,16 +72,7 @@ export function isActionInScope(
   action: DisplayableAction,
   eventType: string
 ) {
-  const allowedPlainScopes = ACTION_ALLOWED_SCOPES[action]
   const allowedConfigurableScopes = ACTION_ALLOWED_CONFIGURABLE_SCOPES[action]
-
-  if (allowedPlainScopes === null) {
-    return true
-  }
-
-  if (hasAnyOfScopes(scopes, allowedPlainScopes)) {
-    return true
-  }
 
   if (allowedConfigurableScopes.length > 0) {
     const parsedScopes = allowedConfigurableScopes

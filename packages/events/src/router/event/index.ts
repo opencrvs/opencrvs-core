@@ -15,7 +15,6 @@ import { QueryProcedure } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
 import {
-  ACTION_ALLOWED_SCOPES,
   ActionStatus,
   ActionType,
   AssignActionInput,
@@ -113,7 +112,7 @@ export const eventRouter = router({
     })
     .use(
       requiresAnyOfScopes(
-        ACTION_ALLOWED_SCOPES[ActionType.CREATE],
+        [SCOPES.RECORD_SUBMIT_FOR_REVIEW], // TODO CIHAN: this scope should maybe be removed?
         ACTION_ALLOWED_CONFIGURABLE_SCOPES[ActionType.CREATE]
       )
     )
@@ -134,7 +133,14 @@ export const eventRouter = router({
       })
     }),
   get: publicProcedure
-    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
+    .use(
+      requiresAnyOfScopes([
+        SCOPES.RECORD_READ,
+        SCOPES.RECORD_SUBMIT_FOR_REVIEW, // TODO CIHAN: this scope should maybe be removed?
+        SCOPES.RECORD_REGISTER,
+        SCOPES.RECORD_EXPORT_RECORDS
+      ])
+    )
     .input(UUID)
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
@@ -158,7 +164,7 @@ export const eventRouter = router({
   delete: publicProcedure
     .use(
       requiresAnyOfScopes(
-        ACTION_ALLOWED_SCOPES[ActionType.DELETE],
+        [],
         ACTION_ALLOWED_CONFIGURABLE_SCOPES[ActionType.DELETE]
       )
     )
@@ -268,7 +274,14 @@ export const eventRouter = router({
     })
   }),
   list: systemProcedure
-    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
+    .use(
+      requiresAnyOfScopes([
+        SCOPES.RECORD_READ,
+        SCOPES.RECORD_SUBMIT_FOR_REVIEW, // TODO CIHAN: this scope should maybe be removed?
+        SCOPES.RECORD_REGISTER,
+        SCOPES.RECORD_EXPORT_RECORDS
+      ])
+    )
     .output(z.array(EventIndex))
     .query(async ({ ctx }) => {
       const userId = ctx.user.id

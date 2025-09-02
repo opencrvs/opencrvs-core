@@ -25,7 +25,6 @@ import {
   PrintCertificateActionInput,
   DeclareActionInput,
   ValidateActionInput,
-  ACTION_ALLOWED_SCOPES,
   ACTION_ALLOWED_CONFIGURABLE_SCOPES,
   RequestCorrectionActionInput,
   ApproveCorrectionActionInput,
@@ -194,7 +193,7 @@ export function getDefaultActionProcedures(
   }
 
   const requireScopesMiddleware = requiresAnyOfScopes(
-    ACTION_ALLOWED_SCOPES[actionType],
+    [],
     ACTION_ALLOWED_CONFIGURABLE_SCOPES[actionType]
   )
 
