@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 95ff72f6-d4c7-4de8-9f60-94c8f5d5a5a2
+                transactionId: 632feb13-c5bd-436b-b7ef-89dc67b13024
                 type: v2.birth
       responses:
         "200":
@@ -535,7 +535,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 91b15fbe-eff0-4814-9214-9a328b63be8a
+                transactionId: 289cbd87-a342-4dd6-9ead-8e8e6501c14c
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1979,65 +1979,64 @@ paths:
               schema:
                 $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
   /events/search:
-    get:
+    post:
       operationId: event-search
       summary: Search for events
       tags:
         - Search
       security:
         - Authorization: []
-      parameters:
-        - in: query
-          name: query
-          schema:
-            allOf:
-              - $ref: "#/components/schemas/QueryType"
-            default:
-              type: and
-              clauses:
-                - eventType: tennis-club-membership
-                  status:
-                    type: anyOf
-                    terms: &a15
-                      - CREATED
-                      - NOTIFIED
-                      - DECLARED
-                      - VALIDATED
-                      - REGISTERED
-                      - ARCHIVED
-                  updatedAt:
-                    type: range
-                    gte: 2025-05-22
-                    lte: 2025-05-29
-                  data: {}
-          required: true
-        - in: query
-          name: limit
-          schema:
-            type: number
-            default: 100
-        - in: query
-          name: offset
-          schema:
-            type: number
-            default: 0
-        - in: query
-          name: sort
-          schema:
-            type: array
-            items:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
               type: object
               properties:
-                field:
-                  type: string
-                direction:
-                  type: string
-                  enum:
-                    - asc
-                    - desc
-                  default: asc
+                query:
+                  allOf:
+                    - $ref: "#/components/schemas/QueryType"
+                  default:
+                    type: and
+                    clauses:
+                      - eventType: tennis-club-membership
+                        status:
+                          type: anyOf
+                          terms: &a15
+                            - CREATED
+                            - NOTIFIED
+                            - DECLARED
+                            - VALIDATED
+                            - REGISTERED
+                            - ARCHIVED
+                        updatedAt:
+                          type: range
+                          gte: 2025-05-22
+                          lte: 2025-05-29
+                        data: {}
+                limit:
+                  type: number
+                  default: 100
+                offset:
+                  type: number
+                  default: 0
+                sort:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      field:
+                        type: string
+                      direction:
+                        type: string
+                        enum:
+                          - asc
+                          - desc
+                        default: asc
+                    required:
+                      - field
               required:
-                - field
+                - query
       responses:
         "200":
           description: Successful response
@@ -2073,12 +2072,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error.FORBIDDEN"
-        "404":
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/error.NOT_FOUND"
         "500":
           description: Internal server error
           content:
@@ -15367,35 +15360,4 @@ components:
         - duplicates
         - flags
         - declaration
-    error.NOT_FOUND:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The error message
-          example: Not found
-        code:
-          type: string
-          description: The error code
-          example: NOT_FOUND
-        issues:
-          type: array
-          items:
-            type: object
-            properties:
-              message:
-                type: string
-            required:
-              - message
-          description: An array of issues that were responsible for the error
-          example: []
-      required:
-        - message
-        - code
-      title: Not found error (404)
-      description: The error information
-      example:
-        code: NOT_FOUND
-        message: Not found
-        issues: []
 
