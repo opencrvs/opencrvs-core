@@ -18,7 +18,10 @@ import {
 import {
   ActionType,
   getDeclaration,
-  getCurrentEventState
+  getCurrentEventState,
+  ActionDocument,
+  getAcceptedActions,
+  isMetaAction
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
@@ -32,7 +35,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { hasFieldChanged } from '../utils'
-import { ReviewCorrection } from './ReviewCorrection'
+import { ReviewCorrection } from '../review/ReviewCorrection'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
@@ -75,6 +78,15 @@ export function Review() {
     )
   }
 
+  const writeActions: ActionDocument[] = getAcceptedActions(event).filter(
+    (a) => !isMetaAction(a.type)
+  )
+  const correctionRequestAction = writeActions[writeActions.length - 1]
+
+  if (correctionRequestAction.type !== ActionType.REQUEST_CORRECTION) {
+    throw new Error('Expected last write action to be REQUEST_CORRECTION')
+  }
+
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form
@@ -83,7 +95,12 @@ export function Review() {
   return (
     <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       <ReviewComponent.Body
-        banner={<ReviewCorrection form={form} />}
+        banner={
+          <ReviewCorrection
+            correctionRequestAction={correctionRequestAction}
+            form={form}
+          />
+        }
         form={form}
         formConfig={formConfig}
         isCorrection={true}
