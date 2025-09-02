@@ -7,3 +7,5 @@ exports[`REQUEST_CORRECTION prevents correcting a field which is configured as u
 exports[`REQUEST_CORRECTION validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-02"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"}]]`;
 
 exports[`REQUEST_CORRECTION when mandatory field is invalid, conditional hidden fields are still skipped 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-1-2024"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-1-2024"}]]`;
+
+exports[`a correction request is not allowed if the event is already waiting for correction 1`] = `[TRPCError: Action 'REQUEST_CORRECTION' cannot be performed on an event in 'REGISTERED' state with [pending-certification, correction-requested] flags. Available actions: READ, APPROVE_CORRECTION, REJECT_CORRECTION, REVIEW_CORRECTION_REQUEST.]`;

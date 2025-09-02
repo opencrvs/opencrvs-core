@@ -16,9 +16,7 @@ import {
   EventConfig,
   isPageVisible,
   PageTypes,
-  PageConfig,
-  DeclarationUpdateActionType,
-  ActionType
+  PageConfig
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -26,6 +24,7 @@ import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/fo
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
+import { AvailableActionTypes } from './Action/DeclarationAction'
 
 interface PagesProps {
   form: EventState
@@ -43,7 +42,7 @@ interface PagesProps {
 
 type DeclarationProps =
   | {
-      actionType: DeclarationUpdateActionType
+      actionType: AvailableActionTypes
       declaration?: undefined
     }
   | {
