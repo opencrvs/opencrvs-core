@@ -11,6 +11,7 @@
  */
 
 import { DateTime } from 'luxon'
+import { TRPCError } from '@trpc/server'
 import {
   ActionStatus,
   ActionType,
@@ -1719,4 +1720,65 @@ test('Returns paginated results when limit and size parameters are provided', as
   })
 
   expect(allResults).toHaveLength(totalNumberOfRecords)
+})
+
+test('System integration with record search scope is allowed to search any records', async () => {
+  const { user, generator, locations } = await setupTestCase(6012)
+  const client = createTestClient(user)
+
+  await createEvent(client, generator, [ActionType.DECLARE])
+
+  // Create another user from a different office
+  const { user: otherUser, generator: otherGen } = await setupTestCase(6013)
+  const userFromOtherOffice = {
+    ...otherUser,
+    primaryOfficeId: locations[1].id // using different location id for a different user
+  }
+
+  const otherClient = createTestClient(userFromOtherOffice)
+
+  // Create an event from another office
+  await createEvent(otherClient, otherGen, [ActionType.DECLARE])
+
+  const recordSearchClient = createSystemTestClient('test-system', [
+    SCOPES.RECORDSEARCH
+  ])
+  const { results } = await recordSearchClient.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP
+        }
+      ]
+    },
+    limit: 10,
+    offset: 0
+  })
+
+  expect(results).toHaveLength(2)
+})
+
+test('System integration without record search scope is not allowed to search any records', async () => {
+  const { user, generator } = await setupTestCase(6012)
+  const client = createTestClient(user)
+
+  await createEvent(client, generator, [ActionType.DECLARE])
+
+  const recordSearchClient = createSystemTestClient('test-system')
+
+  await expect(
+    recordSearchClient.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            eventType: TENNIS_CLUB_MEMBERSHIP
+          }
+        ]
+      },
+      limit: 10,
+      offset: 0
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
