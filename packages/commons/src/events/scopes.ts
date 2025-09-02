@@ -90,6 +90,18 @@ export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
 }
 
+/**
+ * Checks if a given action is allowed for the provided scopes and event type.
+ *
+ * This function determines whether the user, with the given set of scopes, is authorized
+ * to perform the specified action on an event of the given type. It checks both "plain" scopes
+ * (hardcoded, non-configurable) and "configurable" scopes (which may be tied to specific event types).
+ *
+ * @param {Scope[]} scopes - The list of scopes the user possesses.
+ * @param {DisplayableAction} action - The action to check authorization for.
+ * @param {string} eventType - The type of event for which the action is being checked.
+ * @returns {boolean} True if the action is in scope for the user, otherwise false.
+ */
 export function isActionInScope(
   scopes: Scope[],
   action: DisplayableAction,
