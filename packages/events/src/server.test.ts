@@ -104,7 +104,6 @@ test('Server starts up and returns an event based on context dependency values',
     )
   )
 
-  // TODO CIHAN: encode the JWT token again
   const response = await customClient.event.create.mutate(
     {
       transactionId: getUUID(),

@@ -17,7 +17,7 @@ import * as RequestCorrection from '@client/v2-events/features/events/actions/co
 import { ROUTES } from '@client/v2-events/routes'
 
 export const router = {
-  path: ROUTES.V2.EVENTS.CORRECTION.path,
+  path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.path,
   element: (
     <DeclarationAction actionType={ActionType.REQUEST_CORRECTION}>
       <Outlet />
@@ -29,19 +29,19 @@ export const router = {
       element: <RequestCorrection.Onboarding />
     },
     {
-      path: ROUTES.V2.EVENTS.CORRECTION.ONBOARDING.path,
+      path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.path,
       element: <RequestCorrection.Onboarding />
     },
     {
-      path: ROUTES.V2.EVENTS.CORRECTION.PAGES.path,
+      path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.path,
       element: <RequestCorrection.Pages />
     },
     {
-      path: ROUTES.V2.EVENTS.CORRECTION.REVIEW.path,
+      path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.path,
       element: <RequestCorrection.Review />
     },
     {
-      path: ROUTES.V2.EVENTS.CORRECTION.SUMMARY.path,
+      path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.path,
       element: <RequestCorrection.Summary />
     }
   ]

@@ -44,6 +44,16 @@ import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
 
+export type AvailableActionTypes = Extract<
+  ActionType,
+  | 'DECLARE'
+  | 'VALIDATE'
+  | 'REGISTER'
+  | 'REQUEST_CORRECTION'
+  | 'APPROVE_CORRECTION'
+  | 'REJECT_CORRECTION'
+>
+
 /**
  * Business requirement states that annotation must be prefilled from previous action.
  * From architechtual perspective, each action has separate annotation of its own.
@@ -52,7 +62,7 @@ import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
  */
 function getPreviousDeclarationActionType(
   actions: Action[],
-  currentActionType: DeclarationUpdateActionType
+  currentActionType: AvailableActionTypes
 ): DeclarationUpdateActionType | typeof ActionType.NOTIFY | undefined {
   /** NOTE: If event is rejected before registration, there might be previous action of the same type present.
    * Action arrays are intentionally ordered to get the latest prefilled annotation.
@@ -60,22 +70,32 @@ function getPreviousDeclarationActionType(
 
   let actionTypes: (DeclarationUpdateActionType | typeof ActionType.NOTIFY)[]
 
-  if (currentActionType === ActionType.DECLARE) {
-    actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
-  }
-
-  // If action type is VALIDATE, we know that the previous declaration action is DECLARE
-  else if (currentActionType === ActionType.VALIDATE) {
-    actionTypes = [ActionType.VALIDATE, ActionType.DECLARE]
-  }
-
-  // If action type is REGISTER, we know that the previous declaration action is VALIDATE
-  else if (currentActionType === ActionType.REGISTER) {
-    actionTypes = [ActionType.VALIDATE]
-  } else {
-    // If action type is REQUEST_CORRECTION, we want to get the 'latest' action type
-    // Check for the most recent action type in order of precedence
-    actionTypes = [ActionType.REGISTER, ActionType.VALIDATE, ActionType.DECLARE]
+  switch (currentActionType) {
+    case ActionType.DECLARE: {
+      actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
+      break
+    }
+    case ActionType.VALIDATE: {
+      actionTypes = [ActionType.VALIDATE, ActionType.DECLARE]
+      break
+    }
+    case ActionType.REGISTER: {
+      actionTypes = [ActionType.VALIDATE]
+      break
+    }
+    case ActionType.REQUEST_CORRECTION: {
+      actionTypes = [ActionType.REGISTER]
+      break
+    }
+    case ActionType.APPROVE_CORRECTION:
+    case ActionType.REJECT_CORRECTION: {
+      actionTypes = [ActionType.REQUEST_CORRECTION]
+      break
+    }
+    default: {
+      const _check: never = currentActionType
+      actionTypes = []
+    }
   }
 
   for (const type of actionTypes) {
@@ -96,7 +116,7 @@ function getPreviousDeclarationActionType(
  * Throws an error if the action is not allowed for the event or if the user does not have permission to perform the action.
  */
 function useActionGuard(
-  actionType: DeclarationUpdateActionType,
+  actionType: AvailableActionTypes,
   event: EventDocument,
   configuration: EventConfig
 ) {
@@ -139,7 +159,9 @@ function useActionGuard(
 function DeclarationActionComponent({
   children,
   actionType
-}: PropsWithChildren<{ actionType: DeclarationUpdateActionType }>) {
+}: PropsWithChildren<{
+  actionType: AvailableActionTypes
+}>) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
 
   const events = useEvents()

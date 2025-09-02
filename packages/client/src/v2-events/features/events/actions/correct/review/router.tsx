@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import React from 'react'
+import { ActionType } from '@opencrvs/commons/client'
+import { DeclarationAction } from '@client/v2-events/features/events/components/Action/DeclarationAction'
+import { Review } from '@client/v2-events/features/events/actions/correct/review'
 import { ROUTES } from '@client/v2-events/routes'
 
-/**
- * @TODO: Check whether these could be derived dynamically from ROUTES config.
- * We do have the information of which routes have the eventId, so duplicating the information
- * here is not optimal.
- */
-export type AllowedRouteWithEventId =
-  | typeof ROUTES.V2.EVENTS.DECLARE
-  | typeof ROUTES.V2.EVENTS.VALIDATE
-  | typeof ROUTES.V2.EVENTS.REGISTER
-  | typeof ROUTES.V2.EVENTS.PRINT_CERTIFICATE
-  | typeof ROUTES.V2.EVENTS.REQUEST_CORRECTION
-  | typeof ROUTES.V2.EVENTS.REVIEW_CORRECTION
+export const router = {
+  path: ROUTES.V2.EVENTS.REVIEW_CORRECTION.REVIEW.path,
+  element: (
+    <DeclarationAction actionType={ActionType.APPROVE_CORRECTION}>
+      <Review />
+    </DeclarationAction>
+  )
+}

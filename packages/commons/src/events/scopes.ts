@@ -21,7 +21,8 @@ import {
   DisplayableAction
 } from './ActionType'
 
-export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
+// This defines the mapping between event actions and the scopes required to perform them.
+export const ACTION_SCOPE_MAP = {
   [ActionType.READ]: ['record.declare', 'record.notify'],
   [ActionType.CREATE]: ['record.declare', 'record.notify'],
   [ActionType.NOTIFY]: ['record.notify'],
@@ -72,19 +73,18 @@ export function isActionInScope(
   action: DisplayableAction,
   eventType: string
 ) {
-  const allowedConfigurableScopes = ACTION_ALLOWED_CONFIGURABLE_SCOPES[action]
+  const allowedConfigurableScopes = ACTION_SCOPE_MAP[action]
 
-  if (allowedConfigurableScopes.length > 0) {
-    const parsedScopes = allowedConfigurableScopes
-      .map((scope) => findScope(scopes, scope))
-      .filter((scope) => scope !== undefined)
-
-    const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
-
-    if (authorizedEvents.includes(eventType)) {
-      return true
-    }
+  if (!allowedConfigurableScopes.length) {
+    return false
   }
 
-  return false
+  // Find the scopes that are authorized for the given action
+  const parsedScopes = allowedConfigurableScopes
+    .map((scope) => findScope(scopes, scope))
+    .filter((scope) => scope !== undefined)
+
+  // Ensure that the given event type is authorized in the found scopes
+  const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
+  return authorizedEvents.includes(eventType)
 }

@@ -174,10 +174,5 @@ test(`PRINT_CERTIFICATE is not allowed if the event is waiting for correction`, 
     client.event.actions.printCertificate.request(
       generator.event.actions.printCertificate(event.id)
     )
-  ).rejects.toThrow(
-    new TRPCError({
-      code: 'CONFLICT',
-      message: 'Event is waiting for correction'
-    })
-  )
+  ).rejects.toThrowErrorMatchingSnapshot()
 })
