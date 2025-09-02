@@ -117,6 +117,7 @@ function useActionGuard(
 
   const requiredScopes = ACTION_ALLOWED_SCOPES[actionType]
 
+  // TODO CIHAN: ota tänne isActionInScope() käyttöön
   const canUserPerformAction = hasAnyOfScopes(userScopes, requiredScopes)
 
   if (!canUserPerformAction) {

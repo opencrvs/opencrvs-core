@@ -489,10 +489,7 @@ export function useAllowedActionConfigurations(
     .filter((a) => isActionInScope(scopes, a, event.type))
     // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
     .map((a) => ({ ...config[a], type: a }))
-    .filter((a: ActionConfig) => {
-      console.log('a', a)
-      return !a.hidden
-    })
+    .filter((a: ActionConfig) => !a.hidden)
 
   // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
   const hasOnlyMetaActions = allowedWorkqueueConfigs.every(({ type }) =>
