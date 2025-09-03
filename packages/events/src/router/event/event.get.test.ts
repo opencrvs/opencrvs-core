@@ -265,7 +265,7 @@ describe('Event indexing behavior', () => {
   const correctionReject = async (event: CreatedEvent, actionId: string) =>
     client.event.actions.correction.reject.request(
       generator.event.actions.correction.reject(event.id, actionId, {
-        reason: { message: 'No legal proof' }
+        content: { reason: 'No legal proof' }
       })
     )
 

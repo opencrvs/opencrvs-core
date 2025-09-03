@@ -131,9 +131,11 @@ export const detectDuplicate: MiddlewareFunction<
         }
       },
       {
+        event: storedEvent,
         user,
         token,
-        status: ActionStatus.Accepted
+        status: ActionStatus.Accepted,
+        configuration: config
       }
     )
     return next({

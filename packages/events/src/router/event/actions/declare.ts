@@ -20,7 +20,7 @@ import {
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
-import { addAction } from '@events/service/events/events'
+import { addAction, getEventById } from '@events/service/events/events'
 import {
   ActionProcedure,
   defaultRequestHandler,
@@ -52,16 +52,23 @@ export function declareActionProcedures(): ActionProcedure {
         }
 
         const configs = await getInMemoryEventConfigurations(token)
+        const event = await getEventById(input.eventId)
 
-        const declaredEvent = await defaultRequestHandler(input, user, token)
-
-        const config = configs.find((c) => c.id === declaredEvent.type)
+        const config = configs.find((c) => c.id === event.type)
 
         if (!config) {
           throw new Error(
-            `Event configuration not found with type: ${declaredEvent.type}`
+            `Event configuration not found with type: ${event.type}`
           )
         }
+
+        const declaredEvent = await defaultRequestHandler(
+          input,
+          user,
+          token,
+          event,
+          config
+        )
 
         const dedupConfig = config.actions.find(
           (action) => action.type === input.type
@@ -76,6 +83,8 @@ export function declareActionProcedures(): ActionProcedure {
           dedupConfig,
           config
         )
+
+        const updatedEvent = await getEventById(input.eventId)
 
         if (duplicates.length > 0) {
           return addAction(
@@ -92,9 +101,11 @@ export function declareActionProcedures(): ActionProcedure {
               }
             },
             {
+              event: updatedEvent,
               user,
               token,
-              status: ActionStatus.Accepted
+              status: ActionStatus.Accepted,
+              configuration: config
             }
           )
         }
