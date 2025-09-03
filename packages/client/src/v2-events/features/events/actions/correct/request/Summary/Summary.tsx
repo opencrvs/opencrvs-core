@@ -20,13 +20,11 @@ import {
 import {
   FieldConfig,
   generateTransactionId,
-  SCOPES,
   isFieldVisible,
   getDeclarationFields,
   getCurrentEventState,
   EventDocument,
-  ActionType,
-  isActionInScope
+  ActionType
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -44,6 +42,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { hasFieldChanged } from '../../utils'
 import { CorrectionDetails } from './CorrectionDetails'
 
@@ -103,11 +102,8 @@ export function Summary() {
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
 
-  const userMayCorrect = isActionInScope(
-    scopes ?? [],
-    ActionType.APPROVE_CORRECTION,
-    event.type
-  )
+  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const userMayCorrect = isActionAllowed(ActionType.APPROVE_CORRECTION)
 
   const submitCorrection = React.useCallback(() => {
     const formWithOnlyChangedValues = Object.fromEntries(

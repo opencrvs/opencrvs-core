@@ -441,6 +441,23 @@ function useViewableActionConfigurations(
   }
 }
 
+export function useUserAllowedActions(eventType: string) {
+  const scopes = useSelector(getScope) ?? []
+
+  const actions = Object.values(ActionType)
+  const clientSpecificActions = Object.values(ClientSpecificAction)
+
+  const allowedActions = [...actions, ...clientSpecificActions].filter(
+    (action) => isActionInScope(scopes, action, eventType)
+  )
+
+  return {
+    allowedActions,
+    isActionAllowed: (action: ActionType | ClientSpecificAction) =>
+      allowedActions.includes(action)
+  }
+}
+
 /**
  *
  * NOTE: In principle, you should never add new business rules to the `useAction` hook alone. All the actions are validated by the server and their order is enforced.
@@ -452,8 +469,7 @@ export function useAllowedActionConfigurations(
   event: EventIndex,
   authentication: ITokenPayload
 ) {
-  const scopes = useSelector(getScope) ?? []
-
+  const { isActionAllowed } = useUserAllowedActions(event.type)
   const drafts = useDrafts()
 
   const openDraft = drafts
@@ -487,7 +503,7 @@ export function useAllowedActionConfigurations(
         ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
         workqueueActions.safeParse(action).success
     )
-    .filter((a) => isActionInScope(scopes, a, event.type))
+    .filter(isActionAllowed)
     // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
     .map((a) => ({ ...config[a], type: a }))
     .filter((a: ActionConfig) => !a.hidden)

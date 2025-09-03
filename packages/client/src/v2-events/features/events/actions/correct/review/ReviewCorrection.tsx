@@ -21,7 +21,6 @@ import {
   ActionType,
   EventState,
   generateTransactionId,
-  isActionInScope,
   RequestedCorrectionAction
 } from '@opencrvs/commons/client'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
@@ -42,6 +41,7 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { getScope } from '@client/profile/profileSelectors'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 
 const reviewCorrectionMessages = defineMessages({
   actionModalCancel: {
@@ -217,7 +217,6 @@ export function ReviewCorrection({
   correctionRequestAction: RequestedCorrectionAction
 }) {
   const intl = useIntl()
-  const scopes = useSelector(getScope)
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
@@ -227,6 +226,7 @@ export function ReviewCorrection({
 
   const events = useEvents()
   const event = events.getEvent.getFromCache(eventId)
+  const { isActionAllowed } = useUserAllowedActions(event.type)
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
 
@@ -301,12 +301,6 @@ export function ReviewCorrection({
     </Button>
   )
 
-  const userMayCorrect = isActionInScope(
-    scopes ?? [],
-    ActionType.APPROVE_CORRECTION,
-    event.type
-  )
-
   return (
     <Content
       size={ContentSize.LARGE}
@@ -317,7 +311,7 @@ export function ReviewCorrection({
         correctionRequestAction={correctionRequestAction}
         event={event}
         form={form}
-        requesting={!userMayCorrect}
+        requesting={!isActionAllowed(ActionType.APPROVE_CORRECTION)}
       />
       <Row background="white" position="left">
         {rejectButton}

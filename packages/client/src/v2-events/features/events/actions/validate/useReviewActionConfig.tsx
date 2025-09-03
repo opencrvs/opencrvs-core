@@ -14,15 +14,14 @@ import {
   EventState,
   DeclarationFormConfig,
   Scope,
-  SCOPES,
   FieldConfig,
   EventStatus,
-  isActionInScope,
   ActionType
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { reviewMessages } from '@client/v2-events/features/events/actions/messages'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 
 export function useReviewActionConfig({
   formConfig,
@@ -49,13 +48,9 @@ export function useReviewActionConfig({
     reviewFields
   })
 
-  const userMayRegister = isActionInScope(
-    scopes ?? [],
-    ActionType.REGISTER,
-    eventType
-  )
+  const { isActionAllowed } = useUserAllowedActions(eventType)
 
-  if (userMayRegister) {
+  if (isActionAllowed(ActionType.REGISTER)) {
     return {
       buttonType: 'positive' as const,
       incomplete,
@@ -82,13 +77,7 @@ export function useReviewActionConfig({
     } as const
   }
 
-  const userMayValidate = isActionInScope(
-    scopes ?? [],
-    ActionType.VALIDATE,
-    eventType
-  )
-
-  if (userMayValidate) {
+  if (isActionAllowed(ActionType.VALIDATE)) {
     return {
       buttonType: 'positive' as const,
       incomplete,

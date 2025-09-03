@@ -15,29 +15,28 @@ import {
   DeclarationFormConfig,
   Scope,
   FieldConfig,
-  isActionInScope,
   ActionType
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { reviewMessages } from '@client/v2-events/features/events/actions/messages'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 
 export function useReviewActionConfig({
   formConfig,
   declaration,
   annotation,
   reviewFields,
-  scopes,
   eventType
 }: {
   formConfig: DeclarationFormConfig
   declaration: EventState
   annotation?: EventState
   reviewFields: FieldConfig[]
-  scopes?: Scope[]
   eventType: string
 }) {
   const events = useEvents()
+  const { isActionAllowed } = useUserAllowedActions(eventType)
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form: declaration,
@@ -45,29 +44,10 @@ export function useReviewActionConfig({
     reviewFields
   })
 
-  const userMayDeclare = isActionInScope(
-    scopes ?? [],
-    ActionType.DECLARE,
-    eventType
-  )
-
-  const userMayNotify = isActionInScope(
-    scopes ?? [],
-    ActionType.NOTIFY,
-    eventType
-  )
-
-  const userMayValidate = isActionInScope(
-    scopes ?? [],
-    ActionType.VALIDATE,
-    eventType
-  )
-
-  const userMayRegister = isActionInScope(
-    scopes ?? [],
-    ActionType.REGISTER,
-    eventType
-  )
+  const userMayDeclare = isActionAllowed(ActionType.DECLARE)
+  const userMayNotify = isActionAllowed(ActionType.NOTIFY)
+  const userMayValidate = isActionAllowed(ActionType.VALIDATE)
+  const userMayRegister = isActionAllowed(ActionType.REGISTER)
 
   if (incomplete && userMayNotify && userMayDeclare) {
     return {
