@@ -72,12 +72,13 @@ export const ACTION_ALLOWED_SCOPES = {
   ],
   [ActionType.REJECT_CORRECTION]: [SCOPES.RECORD_REGISTRATION_CORRECT],
   [ActionType.APPROVE_CORRECTION]: [SCOPES.RECORD_REGISTRATION_CORRECT],
-  [ActionType.MARKED_AS_DUPLICATE]: [SCOPES.RECORD_DECLARATION_ARCHIVE],
+  [ActionType.MARK_AS_DUPLICATE]: [SCOPES.RECORD_REVIEW_DUPLICATES],
+  [ActionType.MARK_NOT_DUPLICATE]: [SCOPES.RECORD_REVIEW_DUPLICATES],
   [ActionType.ARCHIVE]: [SCOPES.RECORD_DECLARATION_ARCHIVE],
   [ActionType.REJECT]: [SCOPES.RECORD_SUBMIT_FOR_UPDATES],
   [ActionType.ASSIGN]: null,
   [ActionType.UNASSIGN]: null,
-  [ActionType.DETECT_DUPLICATE]: []
+  [ActionType.DUPLICATE_DETECTED]: []
 } satisfies Record<DisplayableAction, RequiredScopes>
 
 export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
@@ -92,12 +93,13 @@ export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.REQUEST_CORRECTION]: [],
   [ActionType.REJECT_CORRECTION]: [],
   [ActionType.APPROVE_CORRECTION]: [],
-  [ActionType.MARKED_AS_DUPLICATE]: [],
+  [ActionType.MARK_NOT_DUPLICATE]: [],
+  [ActionType.MARK_AS_DUPLICATE]: [],
   [ActionType.ARCHIVE]: [],
   [ActionType.REJECT]: [],
   [ActionType.ASSIGN]: [],
   [ActionType.UNASSIGN]: [],
-  [ActionType.DETECT_DUPLICATE]: []
+  [ActionType.DUPLICATE_DETECTED]: []
 } satisfies Record<ActionType, ConfigurableScopeType[]>
 
 export const WRITE_ACTION_SCOPES = [

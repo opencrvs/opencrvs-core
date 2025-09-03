@@ -57,6 +57,7 @@ import {
 } from '@events/service/indexing/indexing'
 import { reindex } from '@events/service/events/reindex'
 import { UserContext } from '../../context'
+import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)
@@ -136,7 +137,6 @@ export const eventRouter = router({
           declaration: {}
         },
         {
-          eventId: event.id,
           user: ctx.user,
           token: ctx.token,
           status: ActionStatus.Accepted
@@ -212,7 +212,7 @@ export const eventRouter = router({
   }),
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
-    declare: router(getDefaultActionProcedures(ActionType.DECLARE)),
+    declare: router(declareActionProcedures()),
     validate: router(getDefaultActionProcedures(ActionType.VALIDATE)),
     reject: router(getDefaultActionProcedures(ActionType.REJECT)),
     archive: router(getDefaultActionProcedures(ActionType.ARCHIVE)),
@@ -236,7 +236,6 @@ export const eventRouter = router({
         .use(middleware.validateAction)
         .mutation(async (options) => {
           return unassignRecord(options.input, {
-            eventId: options.input.eventId,
             user: options.ctx.user,
             token: options.ctx.token
           })

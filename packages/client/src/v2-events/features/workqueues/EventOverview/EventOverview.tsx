@@ -40,6 +40,7 @@ import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEv
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useDrafts } from '../../drafts/useDrafts'
+import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 import { ActionMenu } from './components/ActionMenu'
@@ -85,7 +86,7 @@ function EventOverviewFull({
     ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
 
-  const { flags, legalStatuses, ...flattenedEventIndex } = {
+  const { flags, legalStatuses, duplicates, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // drafts should not affect the status of the event
     // so the status and flags are taken from the eventIndex
@@ -153,7 +154,7 @@ function EventOverviewProtected({
     ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
 
-  const { flags, legalStatuses, ...flattenedEventIndex } = {
+  const { flags, legalStatuses, duplicates, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // drafts should not affect the status of the event
     // so the status and flags are taken from the eventIndex
@@ -225,6 +226,13 @@ function EventOverviewContainer() {
 
   return (
     <EventOverviewProvider locations={locations} users={users}>
+      {eventIndex.duplicates.length > 0 && (
+        <DuplicateWarning
+          duplicateTrackingIds={eventIndex.duplicates.map(
+            ({ trackingId }) => trackingId
+          )}
+        />
+      )}
       {shouldShowFullOverview ? (
         <EventOverviewFull event={fullEvent} onAction={getEventQuery.refetch} />
       ) : (

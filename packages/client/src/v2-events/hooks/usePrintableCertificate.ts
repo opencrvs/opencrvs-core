@@ -144,6 +144,7 @@ export const usePrintableCertificate = ({
     $metadata: modifiedMetadata,
     $declaration: declaration,
     $actions: actionsWithAnOptimisticPrintAction as ActionDocument[],
+    review: true,
     locations,
     users,
     language,
@@ -179,6 +180,7 @@ export const usePrintableCertificate = ({
       $declaration: declarationWithResolvedImages,
       $actions: actionsWithAnOptimisticPrintAction as ActionDocument[],
       locations,
+      review: false,
       users,
       language,
       config

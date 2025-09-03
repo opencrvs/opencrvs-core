@@ -93,7 +93,7 @@ test(`${ActionType.REJECT_CORRECTION} prevents forbidden access if missing requi
       generator.event.actions.correction.reject(
         'registered-event-test-id-12345',
         'request-test-id-12345',
-        { reason: { message: 'No legal proof' } }
+        { content: { reason: 'No legal proof' } }
       )
     )
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -108,7 +108,7 @@ test(`${ActionType.REJECT_CORRECTION} allows access if required scope is present
       generator.event.actions.correction.reject(
         'registered-event-test-id-12345',
         'request-test-id-12345',
-        { reason: { message: 'No legal proof' } }
+        { content: { reason: 'No legal proof' } }
       )
     )
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -439,8 +439,8 @@ test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
     actionId,
     {
       keepAssignment: true,
-      reason: {
-        message: 'no legal proof'
+      content: {
+        reason: 'no legal proof'
       }
     }
   )

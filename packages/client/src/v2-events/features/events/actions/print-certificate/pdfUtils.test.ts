@@ -165,6 +165,7 @@ function expectRenderOutput(template: string, output: string) {
         surname: 'Doe'
       }
     },
+    review: false,
     locations: [],
     users: [],
     language: { lang: 'en', messages: {} },
