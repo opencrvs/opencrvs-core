@@ -19,7 +19,8 @@ import {
   ActionStatus,
   EventState,
   PrintCertificateAction,
-  ActionUpdate
+  ActionUpdate,
+  DuplicateDetectedAction
 } from './ActionDocument'
 import {
   ApproveCorrectionActionInput,
@@ -466,8 +467,7 @@ export function eventPayloadGenerator(rng: () => number) {
             ArchiveActionInput,
             'transactionId' | 'declaration' | 'keepAssignment'
           >
-        > = {},
-        isDuplicate?: boolean
+        > = {}
       ) => ({
         type: ActionType.ARCHIVE,
         transactionId: input.transactionId ?? getUUID(),
@@ -475,9 +475,8 @@ export function eventPayloadGenerator(rng: () => number) {
         annotation: {},
         duplicates: [],
         eventId,
-        reason: {
-          message: `${ActionType.ARCHIVE}`,
-          isDuplicate: isDuplicate ?? false
+        content: {
+          reason: `${ActionType.ARCHIVE}`
         },
         ...input
       }),
@@ -502,7 +501,7 @@ export function eventPayloadGenerator(rng: () => number) {
           ),
         duplicates: [],
         eventId,
-        reason: { message: `${ActionType.REJECT}` },
+        content: { reason: `${ActionType.REJECT}` },
         ...input
       }),
       register: (
@@ -621,7 +620,7 @@ export function eventPayloadGenerator(rng: () => number) {
           input: Partial<
             Pick<
               RejectCorrectionActionInput,
-              'transactionId' | 'annotation' | 'keepAssignment' | 'reason'
+              'transactionId' | 'annotation' | 'keepAssignment' | 'content'
             >
           >
         ) => ({
@@ -638,7 +637,7 @@ export function eventPayloadGenerator(rng: () => number) {
           eventId,
           requestId,
           keepAssignment: input.keepAssignment,
-          reason: input.reason ?? { message: '' }
+          content: input.content ?? { reason: '' }
         })
       }
     }
@@ -692,7 +691,9 @@ export function generateActionDocument({
   switch (action) {
     case ActionType.READ:
       return { ...actionBase, type: action }
-    case ActionType.MARKED_AS_DUPLICATE:
+    case ActionType.MARK_NOT_DUPLICATE:
+      return { ...actionBase, type: action }
+    case ActionType.MARK_AS_DUPLICATE:
       return { ...actionBase, type: action }
     case ActionType.DECLARE:
       return { ...actionBase, type: action }
@@ -703,9 +704,9 @@ export function generateActionDocument({
     case ActionType.VALIDATE:
       return { ...actionBase, type: action }
     case ActionType.ARCHIVE:
-      return { ...actionBase, type: action, reason: { message: 'Archive' } }
+      return { ...actionBase, type: action, content: { reason: 'Archive' } }
     case ActionType.REJECT:
-      return { ...actionBase, type: action, reason: { message: 'Reject' } }
+      return { ...actionBase, type: action, content: { reason: 'Reject' } }
     case ActionType.CREATE:
       return { ...actionBase, type: action }
     case ActionType.NOTIFY:
@@ -725,16 +726,24 @@ export function generateActionDocument({
         ...actionBase,
         requestId: getUUID(),
         type: action,
-        reason: { message: 'Correction rejection' }
+        content: { reason: 'Correction rejection' }
       }
     case ActionType.REGISTER:
       return {
         ...actionBase,
         type: action
       }
-
+    case ActionType.DUPLICATE_DETECTED:
+      return {
+        ...actionBase,
+        type: action,
+        content: {
+          duplicates:
+            (defaults as Partial<DuplicateDetectedAction>).content
+              ?.duplicates ?? []
+        }
+      }
     case ActionType.DELETE:
-    case ActionType.DETECT_DUPLICATE:
     default:
       throw new Error(`Unsupported action type: ${action}`)
   }
@@ -877,7 +886,7 @@ export function generateUuid(rng: () => number = () => 0.1) {
   }) as UUID
 }
 
-function generateTrackingId(rng: () => number): string {
+export function generateTrackingId(rng: () => number): string {
   const uuid = generateUuid(rng).replace(/-/g, '')
   const trackingId = uuid.slice(0, 6).toUpperCase()
   return trackingId
@@ -932,6 +941,7 @@ export const eventQueryDataGenerator = (
     updatedBy: overrides.updatedBy ?? generateUuid(rng),
     updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
     flags: overrides.flags ?? [],
+    duplicates: [],
     legalStatuses: overrides.legalStatuses ?? {},
     declaration: overrides.declaration ?? generateRandomApplicant(rng),
     trackingId: overrides.trackingId ?? generateTrackingId(rng)

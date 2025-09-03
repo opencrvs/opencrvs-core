@@ -154,7 +154,7 @@ export const WithRejectedAction: Story = {
           createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
           createdByRole: 'LOCAL_REGISTRAR',
           declaration: {},
-          reason: { message: 'Archived', isDuplicate: true }
+          content: { reason: 'Archived' }
         }
       ])
     }

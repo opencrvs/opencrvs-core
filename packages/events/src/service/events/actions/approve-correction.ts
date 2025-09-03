@@ -13,7 +13,6 @@ import {
   ActionStatus,
   ApproveCorrectionActionInput
 } from '@opencrvs/commons/events'
-import { UUID } from '@opencrvs/commons'
 import { addAction, getEventById } from '@events/service/events/events'
 import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -22,16 +21,14 @@ import { RequestNotFoundError } from './correction'
 export async function approveCorrection(
   input: ApproveCorrectionActionInput,
   {
-    eventId,
     user,
     token
   }: {
-    eventId: UUID
     user: TrpcUserContext
     token: string
   }
 ) {
-  const storedEvent = await getEventById(eventId)
+  const storedEvent = await getEventById(input.eventId)
   const configuration = await getEventConfigurationById({
     token,
     eventType: storedEvent.type

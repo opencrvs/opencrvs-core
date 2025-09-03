@@ -2,10 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.5 (Debian 17.5-1.pgdg120+1)
--- Dumped by pg_dump version 17.5 (Debian 17.5-1.pgdg120+1)
-
--- Started on 2025-08-18 09:50:00 UTC
+-- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
+-- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -51,9 +49,9 @@ CREATE TYPE app.action_type AS ENUM (
     'DECLARE',
     'VALIDATE',
     'REGISTER',
-    'DETECT_DUPLICATE',
+    'DUPLICATE_DETECTED',
     'REJECT',
-    'MARKED_AS_DUPLICATE',
+    'MARK_AS_DUPLICATE',
     'ARCHIVE',
     'PRINT_CERTIFICATE',
     'REQUEST_CORRECTION',
@@ -62,7 +60,8 @@ CREATE TYPE app.action_type AS ENUM (
     'APPROVE_CORRECTION',
     'READ',
     'ASSIGN',
-    'UNASSIGN'
+    'UNASSIGN',
+    'MARK_NOT_DUPLICATE'
 );
 
 
@@ -131,14 +130,12 @@ CREATE TABLE app.event_actions (
     event_id uuid NOT NULL,
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     original_action_id uuid,
-    reason_is_duplicate boolean,
-    reason_message text,
     registration_number text,
     request_id text,
     status app.action_status NOT NULL,
     transaction_id text NOT NULL,
     content jsonb,
-    CONSTRAINT event_actions_check CHECK ((((action_type = 'ASSIGN'::app.action_type) AND (assigned_to IS NOT NULL)) OR ((action_type = 'UNASSIGN'::app.action_type) AND (assigned_to IS NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Accepted'::app.action_status) AND (registration_number IS NOT NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Requested'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Rejected'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REJECT'::app.action_type) AND ((reason_message IS NULL) OR (reason_message <> ''::text)) AND (reason_is_duplicate IS NOT NULL)) OR ((action_type = 'REJECT_CORRECTION'::app.action_type) AND (request_id IS NOT NULL)) OR ((action_type = 'APPROVE_CORRECTION'::app.action_type) AND (request_id IS NOT NULL)) OR (action_type <> ALL (ARRAY['ASSIGN'::app.action_type, 'UNASSIGN'::app.action_type, 'REGISTER'::app.action_type, 'REJECT'::app.action_type, 'REJECT_CORRECTION'::app.action_type, 'APPROVE_CORRECTION'::app.action_type]))))
+    CONSTRAINT event_actions_check CHECK ((((action_type = 'ASSIGN'::app.action_type) AND (assigned_to IS NOT NULL)) OR ((action_type = 'UNASSIGN'::app.action_type) AND (assigned_to IS NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Accepted'::app.action_status) AND (registration_number IS NOT NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Requested'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Rejected'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REJECT'::app.action_type) AND ((content -> 'reason'::text) IS NOT NULL) AND ((content ->> 'reason'::text) <> ''::text)) OR ((action_type = 'REJECT_CORRECTION'::app.action_type) AND (request_id IS NOT NULL)) OR ((action_type = 'APPROVE_CORRECTION'::app.action_type) AND (request_id IS NOT NULL)) OR (action_type <> ALL (ARRAY['ASSIGN'::app.action_type, 'UNASSIGN'::app.action_type, 'REGISTER'::app.action_type, 'REJECT'::app.action_type, 'REJECT_CORRECTION'::app.action_type, 'APPROVE_CORRECTION'::app.action_type]))))
 );
 
 
@@ -403,9 +400,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.events TO events_app;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 
 
--- Completed on 2025-08-18 09:50:01 UTC
-
 --
 -- PostgreSQL database dump complete
 --
-

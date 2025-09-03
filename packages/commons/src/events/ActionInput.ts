@@ -14,7 +14,8 @@ import { ActionType } from './ActionType'
 import {
   PrintContent as PrintContent,
   ActionUpdate,
-  RejectionReason
+  ReasonContent,
+  PotentialDuplicate
 } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { UUID, getUUID } from '../uuid'
@@ -52,8 +53,7 @@ export type RegisterActionInput = z.infer<typeof RegisterActionInput>
 
 export const ValidateActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.VALIDATE).default(ActionType.VALIDATE),
-    duplicates: z.array(z.string())
+    type: z.literal(ActionType.VALIDATE).default(ActionType.VALIDATE)
   })
 )
 
@@ -95,28 +95,50 @@ export type DeclareActionInput = z.infer<typeof DeclareActionInput>
 export const RejectDeclarationActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.REJECT).default(ActionType.REJECT),
-    reason: RejectionReason
+    content: ReasonContent
   })
 )
 export type RejectDeclarationActionInput = z.infer<
   typeof RejectDeclarationActionInput
 >
 
-export const MarkedAsDuplicateActionInput = BaseActionInput.merge(
+export const DuplicateDetectedActionInput = BaseActionInput.merge(
   z.object({
     type: z
-      .literal(ActionType.MARKED_AS_DUPLICATE)
-      .default(ActionType.MARKED_AS_DUPLICATE)
+      .literal(ActionType.DUPLICATE_DETECTED)
+      .default(ActionType.DUPLICATE_DETECTED),
+    content: z.object({
+      duplicates: z.array(PotentialDuplicate)
+    })
   })
 )
-export type MarkedAsDuplicateActionInput = z.infer<
-  typeof MarkedAsDuplicateActionInput
+
+export const MarkAsDuplicateActionInput = BaseActionInput.merge(
+  z.object({
+    type: z
+      .literal(ActionType.MARK_AS_DUPLICATE)
+      .default(ActionType.MARK_AS_DUPLICATE)
+  })
+)
+export type MarkAsDuplicateActionInput = z.infer<
+  typeof MarkAsDuplicateActionInput
+>
+
+export const MarkNotDuplicateActionInput = BaseActionInput.merge(
+  z.object({
+    type: z
+      .literal(ActionType.MARK_NOT_DUPLICATE)
+      .default(ActionType.MARK_NOT_DUPLICATE)
+  })
+)
+export type MarkNotDuplicateActionInput = z.infer<
+  typeof MarkNotDuplicateActionInput
 >
 
 export const ArchiveActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.ARCHIVE).default(ActionType.ARCHIVE),
-    reason: RejectionReason
+    content: ReasonContent
   })
 )
 export type ArchiveActionInput = z.infer<typeof ArchiveActionInput>
@@ -157,7 +179,7 @@ export const RejectCorrectionActionInput = BaseActionInput.merge(
     type: z
       .literal(ActionType.REJECT_CORRECTION)
       .default(ActionType.REJECT_CORRECTION),
-    reason: RejectionReason
+    content: ReasonContent
   })
 )
 
@@ -207,8 +229,14 @@ export const ActionInput = z
     RejectDeclarationActionInput.openapi({
       ref: 'RejectDeclarationActionInput'
     }),
-    MarkedAsDuplicateActionInput.openapi({
-      ref: 'MarkedAsDuplicateActionInput'
+    DuplicateDetectedActionInput.openapi({
+      ref: 'DuplicateDetectedActionInput'
+    }),
+    MarkAsDuplicateActionInput.openapi({
+      ref: 'MarkAsDuplicateActionInput'
+    }),
+    MarkNotDuplicateActionInput.openapi({
+      ref: 'MarkNotDuplicateActionInput'
     }),
     ArchiveActionInput.openapi({ ref: 'ArchiveActionInput' }),
     AssignActionInput.openapi({ ref: 'AssignActionInput' }),

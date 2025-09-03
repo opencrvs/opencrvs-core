@@ -159,7 +159,7 @@ test('Returns event with all actions', async () => {
       // last action is the assign action and 2nd last is the automatic unassign action
       correctionRequest.actions[correctionRequest.actions.length - 2].id,
       {
-        reason: { message: 'No legal proof' }
+        content: { reason: 'No legal proof' }
       }
     )
   )
