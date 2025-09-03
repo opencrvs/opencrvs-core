@@ -18,10 +18,11 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import {
+  ActionType,
   EventState,
   generateTransactionId,
-  RequestedCorrectionAction,
-  SCOPES
+  isActionInScope,
+  RequestedCorrectionAction
 } from '@opencrvs/commons/client'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import {
@@ -300,6 +301,13 @@ export function ReviewCorrection({
     </Button>
   )
 
+  // TODO CIHAN: refactor this to be a hook, e.g. 'useUserAllowedActions'
+  const userMayCorrect = isActionInScope(
+    scopes ?? [],
+    ActionType.APPROVE_CORRECTION,
+    event.type
+  )
+
   return (
     <Content
       size={ContentSize.LARGE}
@@ -310,7 +318,7 @@ export function ReviewCorrection({
         correctionRequestAction={correctionRequestAction}
         event={event}
         form={form}
-        requesting={!scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)}
+        requesting={!userMayCorrect}
       />
       <Row background="white" position="left">
         {rejectButton}

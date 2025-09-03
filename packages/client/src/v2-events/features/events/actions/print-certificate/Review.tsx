@@ -332,6 +332,7 @@ export function Review() {
             bottomActionButtons={[
               <ProtectedComponent
                 key="edit-record"
+                // TODO CIHAN:
                 scopes={[
                   SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
                   SCOPES.RECORD_REGISTRATION_CORRECT

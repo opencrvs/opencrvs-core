@@ -543,6 +543,7 @@ function ReviewComponent({
             form={form}
             formConfig={formConfig}
             // @todo: ask about this rule
+            // TODO CIHAN:
             showInMobile={
               scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT) ?? false
             }

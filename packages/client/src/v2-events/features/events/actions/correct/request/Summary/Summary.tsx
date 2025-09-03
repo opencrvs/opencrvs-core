@@ -24,7 +24,9 @@ import {
   isFieldVisible,
   getDeclarationFields,
   getCurrentEventState,
-  EventDocument
+  EventDocument,
+  ActionType,
+  isActionInScope
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -101,6 +103,12 @@ export function Summary() {
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
 
+  const userMayCorrect = isActionInScope(
+    scopes ?? [],
+    ActionType.APPROVE_CORRECTION,
+    event.type
+  )
+
   const submitCorrection = React.useCallback(() => {
     const formWithOnlyChangedValues = Object.fromEntries(
       Object.entries(form).filter(([key]) => {
@@ -131,7 +139,8 @@ export function Summary() {
       annotation,
       fullEvent: event
     }
-    if (scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)) {
+
+    if (userMayCorrect) {
       events.customActions.makeCorrectionOnRequest.mutate({
         ...mutationPayload,
         eventConfiguration
@@ -146,13 +155,13 @@ export function Summary() {
     fields,
     eventConfiguration,
     event,
-    scopes,
     events.customActions.makeCorrectionOnRequest,
     events.actions.correction.request,
     eventId,
     annotation,
     previousFormValues,
-    navigate
+    navigate,
+    userMayCorrect
   ])
 
   return (
@@ -175,7 +184,7 @@ export function Summary() {
               onClick={togglePrompt}
             >
               <Check />
-              {scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+              {userMayCorrect
                 ? intl.formatMessage(messages.makeCorrection)
                 : intl.formatMessage(messages.submitCorrectionRequest)}
             </Button>
@@ -203,7 +212,7 @@ export function Summary() {
             editable={true}
             event={event}
             form={form}
-            requesting={!scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)}
+            requesting={!userMayCorrect}
             workqueue={workqueue}
           />
         </Content>
@@ -236,7 +245,7 @@ export function Summary() {
         id="without-correction-for-approval-prompt"
         isOpen={showPrompt}
         title={intl.formatMessage(
-          scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+          userMayCorrect
             ? correctionMessages.correctRecordDialogTitle
             : correctionMessages.correctionApprovalDialogTitle
         )}
@@ -244,7 +253,7 @@ export function Summary() {
       >
         <Text element="p" variant="reg16">
           {intl.formatMessage(
-            scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+            userMayCorrect
               ? correctionMessages.correctRecordDialogDescription
               : correctionMessages.correctionForApprovalDialogDescription
           )}
