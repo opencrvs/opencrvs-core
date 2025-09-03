@@ -25,7 +25,7 @@ type AlwaysAllowed = null
 
 // This defines the mapping between event actions and the scopes required to perform them.
 export const ACTION_SCOPE_MAP = {
-  [ActionType.READ]: ['record.declare', 'record.notify'],
+  [ActionType.READ]: ['record.read'],
   [ActionType.CREATE]: ['record.declare', 'record.notify'],
   [ActionType.NOTIFY]: ['record.notify'],
   [ActionType.DECLARE]: [
@@ -78,10 +78,12 @@ export function isActionInScope(
 ) {
   const allowedConfigurableScopes = ACTION_SCOPE_MAP[action]
 
+  // 'null' means that the action is always allowed
   if (allowedConfigurableScopes === null) {
     return true
   }
 
+  // Empty array means that the action is never allowed
   if (!allowedConfigurableScopes.length) {
     return false
   }

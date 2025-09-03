@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { TRPCError } from '@trpc/server'
-import { ActionType, generateUuid, getUUID, SCOPES } from '@opencrvs/commons'
+import { ActionType, generateUuid, getUUID } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
@@ -21,13 +21,22 @@ test('prevents forbidden access if missing required scope', async () => {
   )
 })
 
-test(`allows access with required scope`, async () => {
+test('allows access if required scope does not have correct event type configured', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_READ])
+  const client = createTestClient(user, [
+    'record.declare[event=tennis-club-membership]',
+    'record.read[event=v2.birth]'
+  ])
 
-  await expect(client.event.get(generateUuid())).rejects.not.toMatchObject(
-    new TRPCError({ code: 'FORBIDDEN' })
-  )
+  await expect(client.event.get(generateUuid())).rejects.toMatchSnapshot()
+})
+
+test('allows access with required scope', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  await expect(client.event.get(event.id)).resolves.not.toThrow()
 })
 
 test(`Returns 404 when not found`, async () => {

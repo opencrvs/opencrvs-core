@@ -91,10 +91,11 @@ export function sanitizeForSnapshot(data: unknown, fields: string[]) {
 const { createCallerFactory } = t
 
 export const TEST_USER_DEFAULT_SCOPES = [
-  SCOPES.RECORD_READ,
+  SCOPES.RECORD_READ, // @TODO: this can be removed after unnecessary .list endpoint is removed
   SCOPES.RECORD_UNASSIGN_OTHERS,
   SCOPES.SEARCH_BIRTH,
   'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
+  'record.read[event=v2.birth|v2.death|tennis-club-membership]',
   'record.notify[event=v2.birth|v2.death|tennis-club-membership]',
   'record.declare[event=v2.birth|v2.death|tennis-club-membership]',
   'record.declared.validate[event=v2.birth|v2.death|tennis-club-membership]',

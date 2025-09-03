@@ -45,6 +45,8 @@ export const SCOPES = {
   RECORD_DECLARE_MARRIAGE_MY_JURISDICTION:
     'record.declare-marriage:my-jurisdiction',
   RECORD_SUBMIT_INCOMPLETE: 'record.declaration-submit-incomplete',
+
+  // @todo: should this record be removed from events v2?
   RECORD_SUBMIT_FOR_REVIEW: 'record.declaration-submit-for-review',
   RECORD_UNASSIGN_OTHERS: 'record.unassign-others',
 
@@ -317,6 +319,7 @@ export type SearchScope = z.infer<typeof SearchScope>
 // Each of these is configured with allowed event types (ids), e.g. 'v2.birth', 'v2.death', 'tennis-club-membership'.
 const RecordScope = z.object({
   type: z.enum([
+    'record.read',
     'record.declare',
     'record.notify',
     'record.declared.validate',

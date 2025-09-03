@@ -11,7 +11,10 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import { QueryProcedure } from '@trpc/server/unstable-core-do-not-import'
+import {
+  QueryProcedure,
+  TRPCError
+} from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
 import {
@@ -113,7 +116,7 @@ export const eventRouter = router({
     })
     .use(
       requiresAnyOfScopes(
-        [SCOPES.RECORD_SUBMIT_FOR_REVIEW], // TODO CIHAN: this scope should maybe be removed?
+        [SCOPES.RECORD_SUBMIT_FOR_REVIEW],
         ACTION_SCOPE_MAP[ActionType.CREATE]
       )
     )
@@ -134,17 +137,15 @@ export const eventRouter = router({
       })
     }),
   get: publicProcedure
-    .use(
-      requiresAnyOfScopes([
-        SCOPES.RECORD_READ,
-        SCOPES.RECORD_SUBMIT_FOR_REVIEW, // TODO CIHAN: this scope should maybe be removed?
-        SCOPES.RECORD_REGISTER,
-        SCOPES.RECORD_EXPORT_RECORDS
-      ])
-    )
+    .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.READ]))
     .input(UUID)
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
+
+      if (!ctx.authorizedEntities?.events?.includes(event.type)) {
+        throw new TRPCError({ code: 'FORBIDDEN' })
+      }
+
       const updatedEvent = await addAction(
         {
           type: ActionType.READ,
@@ -178,9 +179,9 @@ export const eventRouter = router({
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
   draft: router({
-    list: publicProcedure.output(z.array(Draft)).query(async (options) => {
-      return getDraftsByUserId(options.ctx.user.id)
-    }),
+    list: publicProcedure
+      .output(z.array(Draft))
+      .query(async (options) => getDraftsByUserId(options.ctx.user.id)),
     create: publicProcedure
       .input(DraftInput)
       .use(middleware.requireAssignment)
@@ -271,7 +272,7 @@ export const eventRouter = router({
     .use(
       requiresAnyOfScopes([
         SCOPES.RECORD_READ,
-        SCOPES.RECORD_SUBMIT_FOR_REVIEW, // TODO CIHAN: this scope should maybe be removed?
+        SCOPES.RECORD_SUBMIT_FOR_REVIEW,
         SCOPES.RECORD_REGISTER,
         SCOPES.RECORD_EXPORT_RECORDS
       ])
