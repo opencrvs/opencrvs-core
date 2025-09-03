@@ -228,9 +228,10 @@ export function createStoriesFromScenarios(
       // Because Validate, Register and Review correction both have same message ('Review'),
       // We need to consider them as one
       const reviewLikeActions: (keyof typeof expected)[] = [
-        'VALIDATE',
-        'REGISTER',
-        'REVIEW_CORRECTION_REQUEST'
+        ActionType.VALIDATE,
+        ActionType.REGISTER,
+        ClientSpecificAction.REVIEW_CORRECTION_REQUEST,
+        ActionType.MARK_AS_DUPLICATE
       ]
       // Normalize all review-like actions to the **first non-hidden value**
       let normalizedValue: AssertType | undefined
