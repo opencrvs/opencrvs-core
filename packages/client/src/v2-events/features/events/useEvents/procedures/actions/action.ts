@@ -270,6 +270,32 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
   }
 })
 
+setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markAsDuplicate, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.duplicate.markAsDuplicate
+  ),
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
+  meta: {
+    actionType: ActionType.MARK_AS_DUPLICATE
+  }
+})
+
+setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.duplicate.markNotDuplicate
+  ),
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
+  meta: {
+    actionType: ActionType.MARK_AS_DUPLICATE
+  }
+})
+
 type CustomMutationKeys = keyof typeof customApi
 
 export const customMutationKeys = {
