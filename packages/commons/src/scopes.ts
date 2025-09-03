@@ -386,7 +386,7 @@ export function findScope<T extends ConfigurableScopeType>(
   scopes: string[],
   scopeType: T
 ) {
-  const parsedScopes = scopes.map((rawScope) => parseScope(rawScope))
+  const parsedScopes = scopes.map(parseConfigurableScope)
   const searchScopes = parsedScopes.filter((scope) => scope?.type === 'search')
   const otherScopes = parsedScopes.filter((scope) => scope?.type !== 'search')
   const mergedSearchScope = flattenAndMergeScopes(searchScopes)
@@ -420,15 +420,9 @@ function getScopeOptions(rawOptions: string) {
  * parseScope("user.create[role=field-agent|registration-agent]")
  * // Returns: { type: "user.create", options: { role: ["field-agent", "registration-agent"] } }
  */
-export function parseScope(scope: string) {
-  const maybeLiteralScope = LiteralScopes.safeParse(scope)
-  if (maybeLiteralScope.success) {
-    return {
-      type: maybeLiteralScope.data
-    }
-  }
-
+export function parseConfigurableScope(scope: string) {
   const maybeConfigurableScope = rawConfigurableScope.safeParse(scope)
+
   if (!maybeConfigurableScope.success) {
     return
   }
@@ -447,6 +441,18 @@ export function parseScope(scope: string) {
 
   const result = ConfigurableRawScopes.safeParse(parsedScope)
   return result.success ? result.data : undefined
+}
+
+export function parseLiteralScope(scope: string) {
+  const maybeLiteralScope = LiteralScopes.safeParse(scope)
+
+  if (maybeLiteralScope.success) {
+    return {
+      type: maybeLiteralScope.data
+    }
+  }
+
+  return
 }
 
 /**
@@ -497,7 +503,9 @@ export function getAuthorizedEventsFromScopes(scopes: ConfigurableScopes[]) {
  */
 export const scopes: Scope[] = Object.values(SCOPES)
 
-export type ParsedScopes = NonNullable<ReturnType<typeof parseScope>>
+export type ParsedScopes = NonNullable<
+  ReturnType<typeof parseConfigurableScope>
+>
 export type RawScopes = z.infer<typeof LiteralScopes> | (string & {})
 
 // for backwards compatibility

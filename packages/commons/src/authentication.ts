@@ -194,9 +194,6 @@ export function hasScope(authHeader: IAuthHeader, scope: Scope) {
 
 export function inScope(authHeader: IAuthHeader, scopes: Scope[]) {
   const tokenScopes = getScopes(authHeader)
-  // TODO CIHAN: remove this
-  // eslint-disable-next-line no-console
-  console.log('tokenScopes', tokenScopes)
   return scopes.some((scope) => tokenScopes.includes(scope))
 }
 
