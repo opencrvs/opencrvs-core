@@ -186,6 +186,7 @@ export function useEvents() {
       registerOnDeclare: useEventCustomAction('registerOnDeclare'),
       validateOnDeclare: useEventCustomAction('validateOnDeclare'),
       registerOnValidate: useEventCustomAction('registerOnValidate'),
+      archiveOnDuplicate: useEventCustomAction('archiveOnDuplicate'),
       makeCorrectionOnRequest: useEventCustomAction('makeCorrectionOnRequest')
     }
   }

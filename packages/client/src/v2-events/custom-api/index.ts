@@ -16,7 +16,9 @@ import {
   getCurrentEventState,
   omitHiddenAnnotationFields,
   EventDocument,
-  EventConfig
+  EventConfig,
+  ArchiveActionInput,
+  MarkAsDuplicateActionInput
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
 
@@ -35,8 +37,8 @@ export interface CorrectionRequestParams extends CustomMutationParams {
 }
 
 export interface ArchiveOnDuplicateParams extends CustomMutationParams {
-  reason: string
-  duplicateOf?: string
+  content: ArchiveActionInput['content'] &
+    Partial<MarkAsDuplicateActionInput['content']>
 }
 
 /**
@@ -183,20 +185,21 @@ export async function archiveOnDuplicate({
   eventId,
   transactionId,
   declaration,
-  duplicateOf,
-  reason
+  content
 }: ArchiveOnDuplicateParams) {
   await trpcClient.event.actions.duplicate.markAsDuplicate.mutate({
     eventId,
     transactionId,
     declaration,
-    ...(duplicateOf ? { content: { duplicateOf } } : {})
+    ...(content.duplicateOf
+      ? { content: { duplicateOf: content.duplicateOf } }
+      : {})
   })
   return trpcClient.event.actions.archive.request.mutate({
     eventId,
     transactionId,
     declaration,
-    content: { reason }
+    content: { reason: content.reason }
   })
 }
 
