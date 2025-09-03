@@ -149,7 +149,12 @@ export const detectDuplicate: MiddlewareFunction<
         transactionId: input.transactionId,
         eventId: input.eventId,
         declaration: input.declaration,
-        content: { duplicates: duplicates.map((d) => d.event.id) }
+        content: {
+          duplicates: duplicates.map(({ event: { id, trackingId } }) => ({
+            id,
+            trackingId
+          }))
+        }
       },
       {
         user,
@@ -168,7 +173,7 @@ export const detectDuplicate: MiddlewareFunction<
   }
   return next({
     ctx: {
-      duplicatesDetected: false
+      duplicates: { detected: false }
     }
   })
 }

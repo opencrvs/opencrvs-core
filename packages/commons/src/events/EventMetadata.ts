@@ -12,7 +12,7 @@
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
-import { ActionStatus } from './ActionDocument'
+import { ActionStatus, PotentialDuplicate } from './ActionDocument'
 import { UUID } from '../uuid'
 import { CreatedAtLocation } from './CreatedAtLocation'
 
@@ -164,8 +164,10 @@ export const EventMetadata = z.object({
       'System-generated tracking ID used by informants or registrars to look up the event.'
     ),
   potentialDuplicates: z
-    .array(UUID)
-    .describe('List of event IDs that this event could be a duplicate of.'),
+    .array(PotentialDuplicate)
+    .describe(
+      'List of event IDs and their tracking IDs that this event could be a duplicate of.'
+    ),
   flags: z.array(Flag)
 })
 

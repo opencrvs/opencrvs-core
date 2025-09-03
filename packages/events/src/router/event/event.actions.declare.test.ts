@@ -368,5 +368,7 @@ test('deduplication check is performed after declaration', async () => {
   expect(
     getCurrentEventState(declaredEvent, tennisClubMembershipEvent)
       .potentialDuplicates
-  ).toEqual([existingEventId])
+  ).toEqual([
+    { id: existingEventId, trackingId: existingEventIndex.trackingId }
+  ])
 })

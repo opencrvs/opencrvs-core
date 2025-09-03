@@ -893,6 +893,8 @@ test('deduplication check is performed before register when configured', async (
     getCurrentEventState(stillValidated, tennisClubMembershipEvent)
   ).toMatchObject({
     status: 'VALIDATED',
-    potentialDuplicates: [existingEvent.id]
+    potentialDuplicates: [
+      { id: existingEvent.id, trackingId: existingEvent.trackingId }
+    ]
   } satisfies Partial<EventIndex>)
 })

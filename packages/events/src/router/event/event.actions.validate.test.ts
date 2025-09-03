@@ -402,7 +402,9 @@ test('deduplication check is performed before validation when configured', async
     getCurrentEventState(stillDeclaredEvent, tennisClubMembershipEvent)
   ).toMatchObject({
     status: 'DECLARED',
-    potentialDuplicates: [existingEvent.id]
+    potentialDuplicates: [
+      { id: existingEvent.id, trackingId: existingEvent.trackingId }
+    ]
   } satisfies Partial<EventIndex>)
 })
 
@@ -541,7 +543,9 @@ test('deduplication check is not skipped if the event has been marked as not dup
     getCurrentEventState(stillDeclaredEvent, tennisClubMembershipEvent)
   ).toMatchObject({
     status: 'DECLARED',
-    potentialDuplicates: [existingEvent.id]
+    potentialDuplicates: [
+      { id: existingEvent.id, trackingId: existingEvent.trackingId }
+    ]
   })
 })
 

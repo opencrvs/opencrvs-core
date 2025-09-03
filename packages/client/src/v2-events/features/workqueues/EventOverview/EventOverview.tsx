@@ -33,6 +33,7 @@ import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useDrafts } from '../../drafts/useDrafts'
+import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 import { ActionMenu } from './components/ActionMenu'
@@ -211,6 +212,13 @@ function EventOverviewContainer() {
 
   return (
     <EventOverviewProvider locations={locations} users={users}>
+      {eventIndex.duplicates.length > 0 && (
+        <DuplicateWarning
+          duplicateTrackingIds={eventIndex.duplicates.map(
+            ({ trackingId }) => trackingId
+          )}
+        />
+      )}
       {fullEvent ? (
         <EventOverviewFull event={fullEvent} onAction={getEventQuery.refetch} />
       ) : (

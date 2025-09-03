@@ -5,7 +5,7 @@
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first tsnd --respawn -r tsconfig-paths/register src/index.ts",
+    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon -r tsconfig-paths/register src/index.ts",
     "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "yarn test:compilation && vitest run",
     "test:watch": "vitest",
@@ -67,7 +67,6 @@
     "testcontainers": "^10.15.0",
     "ts-jest": "27.1.4",
     "ts-node": "^6.1.1",
-    "ts-node-dev": "^2.0.0",
     "typescript": "5.6.3",
     "vite-tsconfig-paths": "^3.5.0",
     "vitest": "^2.1.5",

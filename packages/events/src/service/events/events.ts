@@ -298,7 +298,6 @@ function buildAction(
     }
     case ActionType.REJECT:
     case ActionType.ARCHIVE:
-    case ActionType.DUPLICATE_DETECTED:
     case ActionType.PRINT_CERTIFICATE:
     case ActionType.READ:
     case ActionType.CREATE:

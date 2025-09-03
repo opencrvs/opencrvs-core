@@ -19,7 +19,8 @@ import {
   ActionStatus,
   EventState,
   PrintCertificateAction,
-  ActionUpdate
+  ActionUpdate,
+  DuplicateDetectedAction
 } from './ActionDocument'
 import {
   ApproveCorrectionActionInput,
@@ -792,9 +793,17 @@ export function generateActionDocument({
         ...actionBase,
         type: action
       }
-
-    case ActionType.DELETE:
     case ActionType.DUPLICATE_DETECTED:
+      return {
+        ...actionBase,
+        type: action,
+        content: {
+          duplicates:
+            (defaults as Partial<DuplicateDetectedAction>).content
+              ?.duplicates ?? []
+        }
+      }
+    case ActionType.DELETE:
     default:
       throw new Error(`Unsupported action type: ${action}`)
   }
@@ -937,7 +946,7 @@ export function generateUuid(rng: () => number = () => 0.1) {
   }) as UUID
 }
 
-function generateTrackingId(rng: () => number): string {
+export function generateTrackingId(rng: () => number): string {
   const uuid = generateUuid(rng).replace(/-/g, '')
   const trackingId = uuid.slice(0, 6).toUpperCase()
   return trackingId
