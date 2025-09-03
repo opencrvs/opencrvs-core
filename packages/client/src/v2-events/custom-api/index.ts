@@ -22,13 +22,18 @@ import { trpcClient } from '@client/v2-events/trpc'
 
 // Defines custom API functions that are not part of the generated API from TRPC.
 
-export interface OnDeclareParams {
+export interface CustomMutationParams {
   eventId: string
   declaration: EventState
   transactionId: string
+  eventConfiguration: EventConfig
   annotation?: EventState
-  fullEvent?: EventDocument
 }
+
+export interface CorrectionRequestParams extends CustomMutationParams {
+  event: EventDocument
+}
+
 /**
  * Runs a sequence of actions from declare to register.
  *
@@ -41,13 +46,7 @@ export async function registerOnDeclare({
   declaration,
   transactionId,
   annotation
-}: {
-  eventId: string
-  transactionId: string
-  declaration: EventState
-  eventConfiguration: EventConfig
-  annotation?: EventState
-}) {
+}: CustomMutationParams) {
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
     declaration,
     annotation,
@@ -92,19 +91,18 @@ export async function registerOnDeclare({
  * Defining the function here, statically allows offline support.
  * Moving the function to one level up will break offline support since the definition needs to be static.
  */
-export async function validateOnDeclare(variables: {
-  eventId: string
-  declaration: EventState
-  transactionId: string
-  eventConfiguration: EventConfig
-  annotation?: EventState
-}) {
-  const { eventId, eventConfiguration, declaration, annotation } = variables
+export async function validateOnDeclare({
+  eventId,
+  transactionId,
+  eventConfiguration,
+  declaration,
+  annotation
+}: CustomMutationParams) {
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
     declaration,
     annotation,
     eventId,
-    transactionId: variables.transactionId,
+    transactionId,
     keepAssignment: true
   })
 
@@ -123,7 +121,7 @@ export async function validateOnDeclare(variables: {
       declaration: {},
       annotation,
       eventId,
-      transactionId: variables.transactionId
+      transactionId
     }
   )
 
@@ -136,21 +134,19 @@ export async function validateOnDeclare(variables: {
  * Defining the function here, statically allows offline support.
  * Moving the function to one level up will break offline support since the definition needs to be static.
  */
-export async function registerOnValidate(variables: {
-  eventId: string
-  eventConfiguration: EventConfig
-  declaration: EventState
-  transactionId: string
-  annotation?: EventState
-}) {
-  const { eventId, eventConfiguration, declaration, annotation } = variables
-
+export async function registerOnValidate({
+  eventId,
+  transactionId,
+  eventConfiguration,
+  declaration,
+  annotation
+}: CustomMutationParams) {
   const maybeDuplicateEvent =
     await trpcClient.event.actions.validate.request.mutate({
       declaration,
       annotation,
       eventId,
-      transactionId: variables.transactionId,
+      transactionId,
       keepAssignment: true
     })
 
@@ -169,7 +165,7 @@ export async function registerOnValidate(variables: {
       declaration: {},
       annotation,
       eventId,
-      transactionId: variables.transactionId
+      transactionId
     }
   )
 
@@ -186,26 +182,14 @@ export async function registerOnValidate(variables: {
  * Defining the function here, statically allows offline support.
  * Moving the function to one level up will break offline support since the definition needs to be static.
  */
-export async function makeCorrectionOnRequest(variables: {
-  eventId: string
-  declaration: EventState
-  transactionId: string
-  eventConfiguration: EventConfig
-  annotation?: EventState
-  fullEvent?: EventDocument
-}) {
-  const {
-    eventId,
-    declaration,
-    annotation: declarationMixedUpAnnotation,
-    transactionId,
-    fullEvent,
-    eventConfiguration
-  } = variables
-
-  if (!fullEvent) {
-    throw new Error(`full event payload not provided for makeCorrectionRequest`)
-  }
+export async function makeCorrectionOnRequest({
+  eventId,
+  declaration,
+  annotation: declarationMixedUpAnnotation,
+  transactionId,
+  event,
+  eventConfiguration
+}: CorrectionRequestParams) {
   // Let's find the REQUEST_CORRECTION action configuration. Because the annotation passed down here is mixed up
   // with declaration in the REQUEST_CORRECTION page form, we need to cleanup the annotation from declaration
   const actionConfiguration = eventConfiguration.actions.find(
@@ -213,7 +197,7 @@ export async function makeCorrectionOnRequest(variables: {
   )
 
   const originalDeclaration = getCurrentEventState(
-    fullEvent,
+    event,
     eventConfiguration
   ).declaration
 

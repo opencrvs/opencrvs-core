@@ -270,12 +270,21 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
   }
 })
 
+type CustomMutationKeys = keyof typeof customApi
+
 export const customMutationKeys = {
   validateOnDeclare: [['validateOnDeclare']],
   registerOnDeclare: [['registerOnDeclare']],
   registerOnValidate: [['registerOnValidate']],
   makeCorrectionOnRequest: [['makeCorrectionOnRequest']]
-} as const
+} satisfies Record<CustomMutationKeys, MutationKey>
+
+interface CustomMutationTypes {
+  validateOnDeclare: customApi.CustomMutationParams
+  registerOnDeclare: customApi.CustomMutationParams
+  registerOnValidate: customApi.CustomMutationParams
+  makeCorrectionOnRequest: customApi.CorrectionRequestParams
+}
 
 queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
   mutationFn: waitUntilEventIsCreated(customApi.validateOnDeclare),
@@ -421,15 +430,18 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   }
 }
 
-export function useEventCustomAction(mutationKey: MutationKey) {
+export function useEventCustomAction<T extends CustomMutationKeys>(
+  mutationName: T
+) {
   const eventConfigurations = useEventConfigurations()
+  const mutationKey = customMutationKeys[mutationName]
   const mutation = useMutation({
     mutationKey: mutationKey,
     ...queryClient.getMutationDefaults(mutationKey)
   })
 
   return {
-    mutate: (params: customApi.OnDeclareParams) => {
+    mutate: (params: Omit<CustomMutationTypes[T], 'eventConfiguration'>) => {
       const localEvent = findLocalEventDocument(params.eventId)
 
       const eventConfiguration = eventConfigurations.find(
@@ -440,9 +452,17 @@ export function useEventCustomAction(mutationKey: MutationKey) {
         throw new Error('Event configuration not found')
       }
 
-      const originalDeclaration = params.fullEvent
-        ? getCurrentEventState(params.fullEvent, eventConfiguration).declaration
-        : {}
+      const originalDeclaration =
+        'event' in params
+          ? getCurrentEventState(
+              /*
+               * typescript is somehow unable to infer the type of params.event to
+               * be EventDocument
+               */
+              params.event as EventDocument,
+              eventConfiguration
+            ).declaration
+          : {}
 
       return mutation.mutate({
         ...params,

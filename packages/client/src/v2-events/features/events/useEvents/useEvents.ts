@@ -18,7 +18,6 @@ import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
 import {
-  customMutationKeys,
   useEventAction,
   useEventCustomAction,
   useIsMutating
@@ -184,18 +183,10 @@ export function useEvents() {
       )
     },
     customActions: {
-      registerOnDeclare: useEventCustomAction([
-        ...customMutationKeys.registerOnDeclare
-      ]),
-      validateOnDeclare: useEventCustomAction([
-        ...customMutationKeys.validateOnDeclare
-      ]),
-      registerOnValidate: useEventCustomAction([
-        ...customMutationKeys.registerOnValidate
-      ]),
-      makeCorrectionOnRequest: useEventCustomAction([
-        ...customMutationKeys.makeCorrectionOnRequest
-      ])
+      registerOnDeclare: useEventCustomAction('registerOnDeclare'),
+      validateOnDeclare: useEventCustomAction('validateOnDeclare'),
+      registerOnValidate: useEventCustomAction('registerOnValidate'),
+      makeCorrectionOnRequest: useEventCustomAction('makeCorrectionOnRequest')
     }
   }
 }

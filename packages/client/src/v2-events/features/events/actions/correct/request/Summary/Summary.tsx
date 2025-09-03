@@ -129,7 +129,7 @@ export function Summary() {
       },
       transactionId: generateTransactionId(),
       annotation,
-      fullEvent: event
+      event
     }
     if (scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)) {
       events.customActions.makeCorrectionOnRequest.mutate(mutationPayload)
