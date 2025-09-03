@@ -6741,8 +6741,16 @@ components:
             duplicates:
               type: array
               items:
-                type: string
-                format: uuid
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  trackingId:
+                    type: string
+                required:
+                  - id
+                  - trackingId
           required:
             - duplicates
       required:
