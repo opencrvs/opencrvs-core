@@ -34,7 +34,8 @@ export const InherentFlags = {
   PENDING_CERTIFICATION: 'pending-certification',
   INCOMPLETE: 'incomplete',
   REJECTED: 'rejected',
-  CORRECTION_REQUESTED: 'correction-requested'
+  CORRECTION_REQUESTED: 'correction-requested',
+  POTENTIAL_DUPLICATE: 'potential-duplicate'
 } as const
 
 export type InherentFlags = (typeof InherentFlags)[keyof typeof InherentFlags]
@@ -162,6 +163,9 @@ export const EventMetadata = z.object({
     .describe(
       'System-generated tracking ID used by informants or registrars to look up the event.'
     ),
+  duplicates: z
+    .array(UUID)
+    .describe('List of event IDs that this event could be a duplicate of.'),
   flags: z.array(Flag)
 })
 

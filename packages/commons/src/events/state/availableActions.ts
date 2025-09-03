@@ -14,9 +14,9 @@ import {
   ClientSpecificAction
 } from '../ActionType'
 import { EventIndex } from '../EventIndex'
-import { EventStatus, InherentFlags } from '../EventMetadata'
+import { EventStatus, Flag, InherentFlags } from '../EventMetadata'
 
-export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
+const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   [EventStatus.enum.CREATED]: [
     ActionType.READ,
     ActionType.DECLARE,
@@ -56,38 +56,103 @@ export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   ]
 } as const satisfies Record<EventStatus, DisplayableAction[]>
 
-export const getAvailableActionsForEvent = (
-  event: EventIndex
-): DisplayableAction[] => {
-  /** Base available actions on previous status if the event is rejected.
-   * 1. This is to ensure that the user can still perform actions on the event after rejection.
-   * 2. In 1.9 we allow rejecting event in rejected state. No filtering of previous actions needed.
-   */
-  if (event.flags.includes(InherentFlags.REJECTED)) {
-    const createdWithoutDelete = AVAILABLE_ACTIONS_BY_EVENT_STATUS[
-      EventStatus.enum.CREATED
-    ].filter((action) => action !== ActionType.DELETE)
+const ACTION_FILTERS: {
+  [K in DisplayableAction]?: (flags: Flag[]) => boolean
+} = {
+  [ActionType.PRINT_CERTIFICATE]: (flags) =>
+    !flags.includes(InherentFlags.CORRECTION_REQUESTED),
+  [ActionType.REQUEST_CORRECTION]: (flags) =>
+    !flags.includes(InherentFlags.CORRECTION_REQUESTED),
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: (flags) =>
+    flags.includes(InherentFlags.CORRECTION_REQUESTED),
+  [ActionType.APPROVE_CORRECTION]: (flags) =>
+    flags.includes(InherentFlags.CORRECTION_REQUESTED),
+  [ActionType.REJECT_CORRECTION]: (flags) =>
+    flags.includes(InherentFlags.CORRECTION_REQUESTED)
+}
 
-    const rejectedBeforeValidated = [
-      ...createdWithoutDelete,
-      ActionType.ARCHIVE
-    ]
+/**
+ * Filters actions based on flags
+ * Some actions can be performed only if certain flags are
+ * present and others only if certain flags are absent
+ */
+function filterActionsByFlags(
+  actions: DisplayableAction[],
+  flags: Flag[]
+): DisplayableAction[] {
+  return actions.filter((action) => ACTION_FILTERS[action]?.(flags) ?? true)
+}
 
-    switch (event.status) {
-      case EventStatus.Enum.ARCHIVED:
-        return AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
-      case EventStatus.Enum.CREATED:
-        return AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
-      case EventStatus.Enum.NOTIFIED:
-        return rejectedBeforeValidated
-      case EventStatus.Enum.DECLARED:
-        return rejectedBeforeValidated
-      case EventStatus.Enum.VALIDATED:
-        return AVAILABLE_ACTIONS_BY_EVENT_STATUS[EventStatus.Enum.DECLARED]
-      case EventStatus.Enum.REGISTERED:
-        return AVAILABLE_ACTIONS_BY_EVENT_STATUS[EventStatus.Enum.VALIDATED]
+/**
+ * Bases available actions on previous status without the REJECTED flag if the current flags contain REJECTED.
+ * 1. This is to ensure that the user can still perform actions on the event after rejection.
+ * 2. In 1.9 we allow rejecting event in rejected state. No filtering of previous actions needed.
+ * (NOTIFIED & DECLARED) + REJECTED are an exception to this as we want to allow all the
+ * actions available to CREATED minus DELETE plus ARCHIVE
+ */
+function getAvailableActionsWithoutFlagFilters(
+  status: EventStatus,
+  flags: Flag[]
+): DisplayableAction[] {
+  switch (status) {
+    case EventStatus.Enum.CREATED: {
+      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
+    }
+    case EventStatus.Enum.NOTIFIED: {
+      if (flags.includes(InherentFlags.REJECTED)) {
+        return getAvailableActionsWithoutFlagFilters(
+          EventStatus.Enum.CREATED,
+          flags.filter((flag) => flag !== InherentFlags.REJECTED)
+        )
+          .filter((action) => action !== ActionType.DELETE)
+          .concat(ActionType.ARCHIVE)
+      }
+      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
+    }
+    case EventStatus.Enum.DECLARED: {
+      if (flags.includes(InherentFlags.REJECTED)) {
+        return getAvailableActionsWithoutFlagFilters(
+          EventStatus.Enum.CREATED,
+          flags.filter((flag) => flag !== InherentFlags.REJECTED)
+        )
+          .filter((action) => action !== ActionType.DELETE)
+          .concat(ActionType.ARCHIVE)
+      }
+      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
+    }
+    case EventStatus.Enum.VALIDATED: {
+      if (flags.includes(InherentFlags.REJECTED)) {
+        return getAvailableActionsWithoutFlagFilters(
+          EventStatus.Enum.DECLARED,
+          flags.filter((flag) => flag !== InherentFlags.REJECTED)
+        )
+      }
+      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
+    }
+    case EventStatus.Enum.REGISTERED: {
+      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
+    }
+    case EventStatus.Enum.ARCHIVED: {
+      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
   }
+}
 
-  return AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
+export function getAvailableActions(
+  status: EventStatus,
+  flags: Flag[]
+): DisplayableAction[] {
+  return filterActionsByFlags(
+    getAvailableActionsWithoutFlagFilters(status, flags),
+    flags
+  )
+}
+
+export function getAvailableActionsForEvent(
+  event: EventIndex
+): DisplayableAction[] {
+  return filterActionsByFlags(
+    getAvailableActionsWithoutFlagFilters(event.status, event.flags),
+    event.flags
+  )
 }

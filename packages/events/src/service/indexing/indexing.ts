@@ -270,7 +270,8 @@ export async function createIndex(
               }
             }
           },
-          flags: { type: 'keyword' }
+          flags: { type: 'keyword' },
+          duplicates: { type: 'keyword' }
         } satisfies EventIndexMapping
       }
     }

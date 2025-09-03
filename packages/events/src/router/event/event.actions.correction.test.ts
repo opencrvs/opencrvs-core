@@ -93,7 +93,7 @@ test(`${ActionType.REJECT_CORRECTION} prevents forbidden access if missing requi
       generator.event.actions.correction.reject(
         'registered-event-test-id-12345',
         'request-test-id-12345',
-        { reason: { message: 'No legal proof' } }
+        { content: { reason: 'No legal proof' } }
       )
     )
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -108,7 +108,7 @@ test(`${ActionType.REJECT_CORRECTION} allows access if required scope is present
       generator.event.actions.correction.reject(
         'registered-event-test-id-12345',
         'request-test-id-12345',
-        { reason: { message: 'No legal proof' } }
+        { content: { reason: 'No legal proof' } }
       )
     )
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -439,8 +439,8 @@ test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
     actionId,
     {
       keepAssignment: true,
-      reason: {
-        message: 'no legal proof'
+      content: {
+        reason: 'no legal proof'
       }
     }
   )
@@ -483,10 +483,5 @@ test('a correction request is not allowed if the event is already waiting for co
     client.event.actions.correction.request.request(
       generator.event.actions.correction.request(event.id)
     )
-  ).rejects.toThrow(
-    new TRPCError({
-      code: 'CONFLICT',
-      message: 'Event is waiting for correction'
-    })
-  )
+  ).rejects.toThrowErrorMatchingSnapshot()
 })
