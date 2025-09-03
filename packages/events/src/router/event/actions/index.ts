@@ -201,8 +201,9 @@ export async function defaultRequestHandler(
       code: 'INTERNAL_SERVER_ERROR',
       message: 'Unexpected failure from notification API'
     })
-    // For Async flow, we just return the event with the requested action
+    // For Async flow, we just return the event with the requested action and ensure it is indexed
   } else if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
+    await ensureEventIndexed(eventWithRequestedAction, configuration)
     return eventWithRequestedAction
   }
 
