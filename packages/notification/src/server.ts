@@ -20,7 +20,7 @@ import getPlugins from '@notification/config/plugins'
 import { readFileSync } from 'fs'
 import getRoutes from '@notification/config/routes'
 import * as database from '@notification/database'
-import { loopNotificationQueue } from './features/email/service.'
+import { loopNotificationQueue } from './features/email/service'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
