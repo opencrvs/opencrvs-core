@@ -41,6 +41,14 @@ export interface ArchiveOnDuplicateParams extends CustomMutationParams {
     Partial<MarkAsDuplicateActionInput['content']>
 }
 
+function hasPotentialDuplicates(
+  event: EventDocument,
+  eventConfiguration: EventConfig
+) {
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
+  return eventIndex.potentialDuplicates.length > 0
+}
+
 /**
  * Runs a sequence of actions from declare to register.
  *
@@ -62,23 +70,24 @@ export async function registerOnDeclare({
     keepAssignment: true
   })
 
-  const declaredEventIndex = getCurrentEventState(
-    declaredEvent,
-    eventConfiguration
-  )
-
-  if (declaredEventIndex.potentialDuplicates.length > 0) {
+  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
     return declaredEvent
   }
 
   // update is a patch, no need to send again.
-  await trpcClient.event.actions.validate.request.mutate({
-    declaration: {},
-    annotation,
-    eventId,
-    transactionId,
-    keepAssignment: true
-  })
+  const validatedEvent = await trpcClient.event.actions.validate.request.mutate(
+    {
+      declaration: {},
+      annotation,
+      eventId,
+      transactionId,
+      keepAssignment: true
+    }
+  )
+
+  if (hasPotentialDuplicates(validatedEvent, eventConfiguration)) {
+    return validatedEvent
+  }
 
   const latestResponse = await trpcClient.event.actions.register.request.mutate(
     {
@@ -113,12 +122,7 @@ export async function validateOnDeclare({
     keepAssignment: true
   })
 
-  const declaredEventIndex = getCurrentEventState(
-    declaredEvent,
-    eventConfiguration
-  )
-
-  if (declaredEventIndex.potentialDuplicates.length > 0) {
+  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
     return declaredEvent
   }
 
@@ -157,12 +161,7 @@ export async function registerOnValidate({
       keepAssignment: true
     })
 
-  const maybeDuplicateEventIndex = getCurrentEventState(
-    maybeDuplicateEvent,
-    eventConfiguration
-  )
-
-  if (maybeDuplicateEventIndex.potentialDuplicates.length > 0) {
+  if (hasPotentialDuplicates(maybeDuplicateEvent, eventConfiguration)) {
     return maybeDuplicateEvent
   }
 
@@ -191,6 +190,7 @@ export async function archiveOnDuplicate({
     eventId,
     transactionId,
     declaration,
+    keepAssignment: true,
     ...(content.duplicateOf
       ? { content: { duplicateOf: content.duplicateOf } }
       : {})
