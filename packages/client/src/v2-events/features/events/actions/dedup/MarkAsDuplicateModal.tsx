@@ -38,7 +38,7 @@ export function MarkAsDuplicateModal({
   duplicates,
   originalTrackingId
 }: {
-  close: (result: boolean) => void
+  close: (selectedTrackingId?: string) => void
   duplicates: PotentialDuplicate[]
   originalTrackingId: string
 }) {
@@ -60,7 +60,7 @@ export function MarkAsDuplicateModal({
           key="cancel"
           id="modal_cancel"
           type="tertiary"
-          onClick={() => close(false)}
+          onClick={() => close()}
         >
           {intl.formatMessage(buttonMessages.cancel)}
         </Button>,
@@ -69,12 +69,12 @@ export function MarkAsDuplicateModal({
           disabled={!(Boolean(selectedTrackingId) && Boolean(comment))}
           id="mark-as-duplicate-button"
           type="negative"
-          onClick={() => close(true)}
+          onClick={() => close(selectedTrackingId)}
         >
           {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
         </Button>
       ]}
-      handleClose={() => close(false)}
+      handleClose={() => close()}
       show={true}
       title={intl.formatMessage(
         duplicateMessages.markAsDuplicateConfirmationTitle,

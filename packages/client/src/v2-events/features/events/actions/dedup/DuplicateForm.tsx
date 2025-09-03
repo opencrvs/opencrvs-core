@@ -20,9 +20,10 @@ import {
 import { Content } from '@opencrvs/components/lib/Content'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { EventIndex } from '@opencrvs/commons/client'
+import { EventIndex, EventStatus, getUUID } from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes/routes'
+import { trpcClient } from '@client/v2-events/trpc'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { useEventTitle } from '../../useEvents/useEventTitle'
 import { duplicateMessages } from './ReviewDuplicate'
@@ -54,7 +55,7 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
 
   const { title: name } = getEventTitle(configuration, eventIndex)
 
-  const trackingIds = eventIndex.duplicates
+  const trackingIds = eventIndex.potentialDuplicates
     .map((duplicate) => duplicate.trackingId)
     .join(', ')
 
@@ -73,11 +74,16 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
           />
         ))
         if (marAsNotDuplicate) {
-          alert('Marked as not a duplicate')
-          if (slug) {
-            navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
+          await trpcClient.event.actions.duplicate.markNotDuplicate.mutate({
+            transactionId: getUUID(),
+            eventId: eventIndex.id,
+            keepAssignment: true
+          })
+
+          if (eventIndex.status === EventStatus.Values.DECLARED) {
+            navigate(ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId }))
           } else {
-            navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+            navigate(ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId }))
           }
         }
       }}
@@ -94,16 +100,35 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
       id="mark-as-duplicate"
       type="negative"
       onClick={async () => {
-        const marAsDuplicate = await openModal<boolean>((close) => (
-          <MarkAsDuplicateModal
-            close={close}
-            duplicates={eventIndex.duplicates}
-            originalTrackingId={eventIndex.trackingId}
-          />
-        ))
-        if (marAsDuplicate) {
-          alert('Marked as a duplicate')
-          navigate(ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }))
+        const duplicateTrackingId = await openModal<string | undefined>(
+          (close) => (
+            <MarkAsDuplicateModal
+              close={close}
+              duplicates={eventIndex.potentialDuplicates}
+              originalTrackingId={eventIndex.trackingId}
+            />
+          )
+        )
+        if (duplicateTrackingId) {
+          const duplicateId = eventIndex.potentialDuplicates.find(
+            ({ trackingId }) => trackingId === duplicateTrackingId
+          )?.id
+          if (!duplicateId) {
+            throw new Error(
+              `Id not found for tracking id ${duplicateTrackingId}. Should never happen.`
+            )
+          }
+          await trpcClient.event.actions.duplicate.markAsDuplicate.mutate({
+            content: { duplicateOf: duplicateId },
+            transactionId: getUUID(),
+            eventId: eventIndex.id
+          })
+
+          if (slug) {
+            navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
+          } else {
+            navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+          }
         }
       }}
     >

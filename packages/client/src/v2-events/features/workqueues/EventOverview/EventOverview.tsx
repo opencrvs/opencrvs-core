@@ -212,9 +212,9 @@ function EventOverviewContainer() {
 
   return (
     <EventOverviewProvider locations={locations} users={users}>
-      {eventIndex.duplicates.length > 0 && (
+      {eventIndex.potentialDuplicates.length > 0 && (
         <DuplicateWarning
-          duplicateTrackingIds={eventIndex.duplicates.map(
+          duplicateTrackingIds={eventIndex.potentialDuplicates.map(
             ({ trackingId }) => trackingId
           )}
         />
