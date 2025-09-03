@@ -26,7 +26,7 @@ const testCases = [
     address: {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa'
+      administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID
     },
     success: true
   },

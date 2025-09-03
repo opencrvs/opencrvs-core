@@ -19,7 +19,8 @@ import {
   tennisClubMembershipEvent,
   AddressFieldValue,
   AddressType,
-  getDeclaration
+  getDeclaration,
+  UUID
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Review } from '@client/v2-events/features/events/components/Review'
@@ -96,7 +97,8 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
             defaultValue: {
               country: 'FAR',
               addressType: AddressType.DOMESTIC,
-              administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa'
+              administrativeArea:
+                '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID as UUID
             },
             configuration: {
               streetAddressForm: [
@@ -181,7 +183,7 @@ export const AddressReviewInvalid: StoryObj<typeof Review> = {
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+            administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
           } as AddressFieldValue
         }}
         formConfig={declarationForm}
@@ -226,7 +228,7 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+            administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
             streetLevelDetails: {
               town: 'Example Town',
               residentialArea: 'Example Residential Area',
@@ -241,7 +243,7 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+            administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
             streetLevelDetails: {
               town: 'Example Village'
             }
@@ -269,7 +271,7 @@ export const AddressInCopy: StoryObj<typeof Review> = {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
         streetLevelDetails: {
           town: 'Example Town',
           residentialArea: 'Example Residential Area',

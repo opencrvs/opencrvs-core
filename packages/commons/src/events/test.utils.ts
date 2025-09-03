@@ -167,7 +167,7 @@ export function mapFieldTypeToMockValue(
       return {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
         streetLevelDetails: {
           town: 'Example Town',
           residentialArea: 'Example Residential Area',
