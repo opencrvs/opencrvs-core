@@ -136,7 +136,12 @@ const MarkNotDuplicateAction = ActionBase.merge(
 
 const MarkAsDuplicateAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.MARK_AS_DUPLICATE)
+    type: z.literal(ActionType.MARK_AS_DUPLICATE),
+    content: z
+      .object({
+        duplicateOf: UUID
+      })
+      .optional()
   })
 )
 
