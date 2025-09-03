@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 83ea21d7-be33-4d21-94ff-cd31ad0b0a30
+                transactionId: 2f1306be-6014-43fc-8691-db52bc67b78c
                 type: v2.birth
       responses:
         "200":
@@ -535,7 +535,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 3f03834d-bec4-40f9-abdb-5d1f50120e68
+                transactionId: 44f79e81-1fac-4156-88fb-d1b5099692f5
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1933,23 +1933,20 @@ paths:
                   enum:
                     - REJECT_CORRECTION
                   default: REJECT_CORRECTION
-                reason:
+                content:
                   type: object
                   properties:
-                    message:
+                    reason:
                       type: string
                       minLength: 1
                       description: Message describing reason for rejection or archiving
-                    isDuplicate:
-                      type: boolean
-                      description: If a declaration is duplicated
                   required:
-                    - message
+                    - reason
               required:
                 - eventId
                 - transactionId
                 - requestId
-                - reason
+                - content
       responses:
         "200":
           description: Successful response
@@ -1982,65 +1979,64 @@ paths:
               schema:
                 $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
   /events/search:
-    get:
+    post:
       operationId: event-search
       summary: Search for events
       tags:
         - Search
       security:
         - Authorization: []
-      parameters:
-        - in: query
-          name: query
-          schema:
-            allOf:
-              - $ref: "#/components/schemas/QueryType"
-            default:
-              type: and
-              clauses:
-                - eventType: tennis-club-membership
-                  status:
-                    type: anyOf
-                    terms: &a15
-                      - CREATED
-                      - NOTIFIED
-                      - DECLARED
-                      - VALIDATED
-                      - REGISTERED
-                      - ARCHIVED
-                  updatedAt:
-                    type: range
-                    gte: 2025-05-22
-                    lte: 2025-05-29
-                  data: {}
-          required: true
-        - in: query
-          name: limit
-          schema:
-            type: number
-            default: 100
-        - in: query
-          name: offset
-          schema:
-            type: number
-            default: 0
-        - in: query
-          name: sort
-          schema:
-            type: array
-            items:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
               type: object
               properties:
-                field:
-                  type: string
-                direction:
-                  type: string
-                  enum:
-                    - asc
-                    - desc
-                  default: asc
+                query:
+                  allOf:
+                    - $ref: "#/components/schemas/QueryType"
+                  default:
+                    type: and
+                    clauses:
+                      - eventType: tennis-club-membership
+                        status:
+                          type: anyOf
+                          terms: &a15
+                            - CREATED
+                            - NOTIFIED
+                            - DECLARED
+                            - VALIDATED
+                            - REGISTERED
+                            - ARCHIVED
+                        updatedAt:
+                          type: range
+                          gte: 2025-05-22
+                          lte: 2025-05-29
+                        data: {}
+                limit:
+                  type: number
+                  default: 100
+                offset:
+                  type: number
+                  default: 0
+                sort:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      field:
+                        type: string
+                      direction:
+                        type: string
+                        enum:
+                          - asc
+                          - desc
+                        default: asc
+                    required:
+                      - field
               required:
-                - field
+                - query
       responses:
         "200":
           description: Successful response
@@ -2076,12 +2072,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error.FORBIDDEN"
-        "404":
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/error.NOT_FOUND"
         "500":
           description: Internal server error
           content:
@@ -2762,7 +2752,6 @@ components:
         - $ref: "#/components/schemas/DeclareActionConfig"
         - $ref: "#/components/schemas/ValidateActionConfig"
         - $ref: "#/components/schemas/RejectDeclarationActionConfig"
-        - $ref: "#/components/schemas/MarkedAsDuplicateActionConfig"
         - $ref: "#/components/schemas/ArchiveActionConfig"
         - $ref: "#/components/schemas/RegisterActionConfig"
         - $ref: "#/components/schemas/DeleteActionConfig"
@@ -2777,7 +2766,6 @@ components:
           DECLARE: "#/components/schemas/DeclareActionConfig"
           VALIDATE: "#/components/schemas/ValidateActionConfig"
           REJECT: "#/components/schemas/RejectDeclarationActionConfig"
-          MARKED_AS_DUPLICATE: "#/components/schemas/MarkedAsDuplicateActionConfig"
           ARCHIVE: "#/components/schemas/ArchiveActionConfig"
           REGISTER: "#/components/schemas/RegisterActionConfig"
           DELETE: "#/components/schemas/DeleteActionConfig"
@@ -2821,19 +2809,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: &a11 []
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -2861,110 +2836,6 @@ components:
         - conditionals
         - type
         - review
-    Clause:
-      oneOf:
-        - type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - and
-            clauses:
-              type: array
-              items:
-                $ref: "#/components/schemas/Clause"
-          required:
-            - type
-            - clauses
-        - type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - or
-            clauses:
-              type: array
-              items:
-                $ref: "#/components/schemas/Clause"
-          required:
-            - type
-            - clauses
-        - type: object
-          properties:
-            fieldId:
-              type: string
-            options:
-              type: object
-              properties:
-                fuzziness:
-                  anyOf:
-                    - type: string
-                    - type: number
-                  default: AUTO:4,7
-                boost:
-                  type: number
-                  default: 1
-              required:
-                - fuzziness
-                - boost
-              default:
-                fuzziness: AUTO:4,7
-                boost: 1
-            type:
-              type: string
-              enum:
-                - fuzzy
-          required:
-            - fieldId
-            - options
-            - type
-        - type: object
-          properties:
-            fieldId:
-              type: string
-            options:
-              type: object
-              properties:
-                boost:
-                  type: number
-                  default: 1
-              required:
-                - boost
-              default:
-                boost: 1
-            type:
-              type: string
-              enum:
-                - strict
-          required:
-            - fieldId
-            - options
-            - type
-        - type: object
-          properties:
-            fieldId:
-              type: string
-            options:
-              type: object
-              properties:
-                pivot:
-                  type: number
-                days:
-                  type: number
-                boost:
-                  type: number
-                  default: 1
-              required:
-                - days
-                - boost
-            type:
-              type: string
-              enum:
-                - dateRange
-          required:
-            - fieldId
-            - options
-            - type
     FieldConfig:
       oneOf:
         - type: object
@@ -6256,19 +6127,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -6291,11 +6149,128 @@ components:
             - title
             - fields
           description: Configuration for **declaration** review page.
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
       required:
         - label
         - conditionals
         - type
         - review
+    Clause:
+      oneOf:
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - and
+            clauses:
+              type: array
+              items:
+                $ref: "#/components/schemas/Clause"
+          required:
+            - type
+            - clauses
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - or
+            clauses:
+              type: array
+              items:
+                $ref: "#/components/schemas/Clause"
+          required:
+            - type
+            - clauses
+        - type: object
+          properties:
+            fieldId:
+              type: string
+            options:
+              type: object
+              properties:
+                fuzziness:
+                  anyOf:
+                    - type: string
+                    - type: number
+                  default: AUTO:4,7
+                boost:
+                  type: number
+                  default: 1
+              required:
+                - fuzziness
+                - boost
+              default:
+                fuzziness: AUTO:4,7
+                boost: 1
+            type:
+              type: string
+              enum:
+                - fuzzy
+          required:
+            - fieldId
+            - options
+            - type
+        - type: object
+          properties:
+            fieldId:
+              type: string
+            options:
+              type: object
+              properties:
+                boost:
+                  type: number
+                  default: 1
+              required:
+                - boost
+              default:
+                boost: 1
+            type:
+              type: string
+              enum:
+                - strict
+          required:
+            - fieldId
+            - options
+            - type
+        - type: object
+          properties:
+            fieldId:
+              type: string
+            options:
+              type: object
+              properties:
+                pivot:
+                  type: number
+                days:
+                  type: number
+                boost:
+                  type: number
+                  default: 1
+              required:
+                - days
+                - boost
+            type:
+              type: string
+              enum:
+                - dateRange
+          required:
+            - fieldId
+            - options
+            - type
     ValidateActionConfig:
       type: object
       properties:
@@ -6332,19 +6307,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -6367,6 +6329,19 @@ components:
             - title
             - fields
           description: Configuration for **declaration** review page.
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
       required:
         - label
         - conditionals
@@ -6408,84 +6383,12 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
           type: string
           enum:
             - REJECT
-      required:
-        - label
-        - conditionals
-        - type
-    MarkedAsDuplicateActionConfig:
-      type: object
-      properties:
-        label:
-          $ref: "#/components/schemas/TranslationConfig"
-        conditionals:
-          type: array
-          items:
-            oneOf:
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - SHOW
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                description: If 'SHOW' conditional is defined, the component is shown to the
-                  user only if the condition is met
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - ENABLE
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                description: If 'ENABLE' conditional is defined, the component is enabled only
-                  if the condition is met
-          default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
-        draft:
-          type: boolean
-        type:
-          type: string
-          enum:
-            - MARKED_AS_DUPLICATE
       required:
         - label
         - conditionals
@@ -6526,19 +6429,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -6585,19 +6475,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -6620,6 +6497,19 @@ components:
             - title
             - fields
           description: Configuration for **declaration** review page.
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
       required:
         - label
         - conditionals
@@ -6661,19 +6551,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -6720,19 +6597,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -6873,19 +6737,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -6969,19 +6820,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -7028,19 +6866,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -7224,6 +7049,8 @@ components:
         - $ref: "#/components/schemas/CreatedAction"
         - $ref: "#/components/schemas/ValidateAction"
         - $ref: "#/components/schemas/RejectAction"
+        - $ref: "#/components/schemas/DuplicateDetectedAction"
+        - $ref: "#/components/schemas/MarkNotDuplicateAction"
         - $ref: "#/components/schemas/MarkAsDuplicateAction"
         - $ref: "#/components/schemas/ArchiveAction"
         - $ref: "#/components/schemas/NotifiedAction"
@@ -7242,7 +7069,9 @@ components:
           CREATE: "#/components/schemas/CreatedAction"
           VALIDATE: "#/components/schemas/ValidateAction"
           REJECT: "#/components/schemas/RejectAction"
-          MARKED_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateAction"
+          DUPLICATE_DETECTED: "#/components/schemas/DuplicateDetectedAction"
+          MARK_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateAction"
+          MARK_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateAction"
           ARCHIVE: "#/components/schemas/ArchiveAction"
           NOTIFY: "#/components/schemas/NotifiedAction"
           REGISTER: "#/components/schemas/RegisterAction"
@@ -8573,18 +8402,15 @@ components:
           type: string
           enum:
             - REJECT
-        reason:
+        content:
           type: object
           properties:
-            message:
+            reason:
               type: string
               minLength: 1
               description: Message describing reason for rejection or archiving
-            isDuplicate:
-              type: boolean
-              description: If a declaration is duplicated
           required:
-            - message
+            - reason
       required:
         - id
         - transactionId
@@ -8595,7 +8421,902 @@ components:
         - declaration
         - status
         - type
-        - reason
+        - content
+    DuplicateDetectedAction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        transactionId:
+          type: string
+        createdByUserType:
+          type: string
+          enum: *a12
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        createdBySignature:
+          type: string
+          nullable: true
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  path:
+                    type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - path
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - path
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
+        annotation:
+          type: object
+          nullable: true
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  path:
+                    type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - path
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - path
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
+        status:
+          type: string
+          enum: *a14
+        originalActionId:
+          type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
+        type:
+          type: string
+          enum:
+            - DUPLICATE_DETECTED
+        content:
+          type: object
+          properties:
+            duplicates:
+              type: array
+              items:
+                type: string
+                format: uuid
+          required:
+            - duplicates
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - status
+        - type
+        - content
+    MarkNotDuplicateAction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        transactionId:
+          type: string
+        createdByUserType:
+          type: string
+          enum: *a12
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        createdBySignature:
+          type: string
+          nullable: true
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  path:
+                    type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - path
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - path
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
+        annotation:
+          type: object
+          nullable: true
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  path:
+                    type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - path
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - path
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
+        status:
+          type: string
+          enum: *a14
+        originalActionId:
+          type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
+        type:
+          type: string
+          enum:
+            - MARK_NOT_DUPLICATE
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - status
+        - type
     MarkAsDuplicateAction:
       type: object
       properties:
@@ -9027,7 +9748,7 @@ components:
         type:
           type: string
           enum:
-            - MARKED_AS_DUPLICATE
+            - MARK_AS_DUPLICATE
       required:
         - id
         - transactionId
@@ -9470,18 +10191,15 @@ components:
           type: string
           enum:
             - ARCHIVE
-        reason:
+        content:
           type: object
           properties:
-            message:
+            reason:
               type: string
               minLength: 1
               description: Message describing reason for rejection or archiving
-            isDuplicate:
-              type: boolean
-              description: If a declaration is duplicated
           required:
-            - message
+            - reason
       required:
         - id
         - transactionId
@@ -9492,7 +10210,7 @@ components:
         - declaration
         - status
         - type
-        - reason
+        - content
     NotifiedAction:
       type: object
       properties:
@@ -12587,18 +13305,15 @@ components:
             - REJECT_CORRECTION
         requestId:
           type: string
-        reason:
+        content:
           type: object
           properties:
-            message:
+            reason:
               type: string
               minLength: 1
               description: Message describing reason for rejection or archiving
-            isDuplicate:
-              type: boolean
-              description: If a declaration is duplicated
           required:
-            - message
+            - reason
       required:
         - id
         - transactionId
@@ -12610,7 +13325,7 @@ components:
         - status
         - type
         - requestId
-        - reason
+        - content
     UnassignedAction:
       type: object
       properties:
@@ -14183,25 +14898,27 @@ components:
           items:
             anyOf:
               - type: string
-                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
                   - pending-certification
                   - incomplete
                   - rejected
                   - correction-requested
+                  - potential-duplicate
         noneOf:
           type: array
           items:
             anyOf:
               - type: string
-                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
                   - pending-certification
                   - incomplete
                   - rejected
                   - correction-requested
+                  - potential-duplicate
     QueryInput:
       anyOf:
         - oneOf:
@@ -14417,18 +15134,25 @@ components:
           type: string
           description: System-generated tracking ID used by informants or registrars to
             look up the event.
+        duplicates:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: List of event IDs that this event could be a duplicate of.
         flags:
           type: array
           items:
             anyOf:
               - type: string
-                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
                   - pending-certification
                   - incomplete
                   - rejected
                   - correction-requested
+                  - potential-duplicate
         declaration:
           type: object
           additionalProperties:
@@ -14633,37 +15357,7 @@ components:
         - updatedByUserRole
         - updatedAt
         - trackingId
+        - duplicates
         - flags
         - declaration
-    error.NOT_FOUND:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The error message
-          example: Not found
-        code:
-          type: string
-          description: The error code
-          example: NOT_FOUND
-        issues:
-          type: array
-          items:
-            type: object
-            properties:
-              message:
-                type: string
-            required:
-              - message
-          description: An array of issues that were responsible for the error
-          example: []
-      required:
-        - message
-        - code
-      title: Not found error (404)
-      description: The error information
-      example:
-        code: NOT_FOUND
-        message: Not found
-        issues: []
 
