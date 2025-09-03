@@ -152,7 +152,7 @@ function ReviewDuplicate() {
 
   const eventState = getCurrentEventState(event, configuration)
 
-  const potentialDuplicates = eventState.duplicates.reduce<
+  const potentialDuplicates = eventState.potentialDuplicates.reduce<
     Record<string, EventIndex>
   >((acc, { id, trackingId }) => {
     const localEventDocument = events.getEvent.findFromCache(id).data
@@ -172,7 +172,7 @@ function ReviewDuplicate() {
       color: 'red',
       icon: <Icon color="red" name="WarningCircle" size="medium" />
     },
-    ...eventState.duplicates.map(({ trackingId }) => ({
+    ...eventState.potentialDuplicates.map(({ trackingId }) => ({
       id: trackingId,
       title: trackingId
     }))

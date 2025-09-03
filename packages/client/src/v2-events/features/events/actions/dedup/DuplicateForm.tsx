@@ -54,7 +54,7 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
 
   const { title: name } = getEventTitle(configuration, eventIndex)
 
-  const trackingIds = eventIndex.duplicates
+  const trackingIds = eventIndex.potentialDuplicates
     .map((duplicate) => duplicate.trackingId)
     .join(', ')
 
@@ -97,7 +97,7 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
         const marAsDuplicate = await openModal<boolean>((close) => (
           <MarkAsDuplicateModal
             close={close}
-            duplicates={eventIndex.duplicates}
+            duplicates={eventIndex.potentialDuplicates}
             originalTrackingId={eventIndex.trackingId}
           />
         ))

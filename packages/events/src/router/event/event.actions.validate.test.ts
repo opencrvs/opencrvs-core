@@ -447,7 +447,7 @@ test('deduplication check is skipped if the event has been marked as not duplica
   expect(
     getCurrentEventState(declaredDuplicateEvent, tennisClubMembershipEvent)
       .potentialDuplicates
-  ).toEqual([existingEvent.id])
+  ).toEqual([{ id: existingEvent.id, trackingId: existingEvent.trackingId }])
 
   await client.event.actions.assignment.assign(
     generator.event.actions.assign(duplicateEvent.id, {
@@ -513,7 +513,7 @@ test('deduplication check is not skipped if the event has been marked as not dup
   expect(
     getCurrentEventState(declaredDuplicateEvent, tennisClubMembershipEvent)
       .potentialDuplicates
-  ).toEqual([existingEvent.id])
+  ).toEqual([{ id: existingEvent.id, trackingId: existingEvent.trackingId }])
 
   await client.event.actions.assignment.assign(
     generator.event.actions.assign(duplicateEvent.id, {
