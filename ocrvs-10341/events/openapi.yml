@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 7b2239a2-49ff-46b6-bf92-0ef41d31a84d
+                transactionId: 9c486425-68e9-4e2c-a3cb-8afa8fb1dcc2
                 type: v2.birth
       responses:
         "200":
@@ -535,7 +535,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 80af68d1-0fff-4cc7-97c9-d481de1cc4e8
+                transactionId: c13a59bb-4e29-493f-8cd5-e080ec05276c
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2912,6 +2912,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3109,6 +3114,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3212,6 +3222,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3310,6 +3325,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3414,6 +3434,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3508,6 +3533,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3601,6 +3631,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3711,6 +3746,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3815,6 +3855,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3924,6 +3969,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4037,6 +4087,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4139,6 +4194,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4225,6 +4285,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4327,6 +4392,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4481,6 +4551,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             defaultValue:
               type: string
               minLength: 1
@@ -4567,6 +4642,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             defaultValue:
               type: string
               minLength: 1
@@ -4653,6 +4733,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4740,6 +4825,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4872,6 +4962,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4958,6 +5053,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5065,6 +5165,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5147,6 +5252,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5244,6 +5354,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5330,6 +5445,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5416,6 +5536,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5524,6 +5649,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5617,6 +5747,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5754,6 +5889,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5866,6 +6006,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5967,6 +6112,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
