@@ -276,6 +276,7 @@ export const customMutationKeys = {
   validateOnDeclare: [['validateOnDeclare']],
   registerOnDeclare: [['registerOnDeclare']],
   registerOnValidate: [['registerOnValidate']],
+  archiveOnDuplicate: [['archiveOnDuplicate']],
   makeCorrectionOnRequest: [['makeCorrectionOnRequest']]
 } satisfies Record<CustomMutationKeys, MutationKey>
 
@@ -283,6 +284,7 @@ interface CustomMutationTypes {
   validateOnDeclare: customApi.CustomMutationParams
   registerOnDeclare: customApi.CustomMutationParams
   registerOnValidate: customApi.CustomMutationParams
+  archiveOnDuplicate: customApi.ArchiveOnDuplicateParams
   makeCorrectionOnRequest: customApi.CorrectionRequestParams
 }
 
@@ -309,7 +311,7 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
 })
 
 queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
-  mutationFn: waitUntilEventIsCreated(customApi.registerOnValidate),
+  mutationFn: customApi.registerOnValidate,
   retry: retryUnlessConflict,
   retryDelay,
   onSuccess: updateLocalEvent,
@@ -319,8 +321,19 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
   }
 })
 
+queryClient.setMutationDefaults(customMutationKeys.archiveOnDuplicate, {
+  mutationFn: customApi.archiveOnDuplicate,
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
+  meta: {
+    actionType: ActionType.MARK_AS_DUPLICATE
+  }
+})
+
 queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
-  mutationFn: waitUntilEventIsCreated(customApi.makeCorrectionOnRequest),
+  mutationFn: customApi.makeCorrectionOnRequest,
   retry: retryUnlessConflict,
   retryDelay,
   onSuccess: updateLocalEvent,

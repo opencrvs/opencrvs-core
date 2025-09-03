@@ -34,6 +34,11 @@ export interface CorrectionRequestParams extends CustomMutationParams {
   event: EventDocument
 }
 
+export interface ArchiveOnDuplicateParams extends CustomMutationParams {
+  reason: string
+  duplicateOf?: string
+}
+
 /**
  * Runs a sequence of actions from declare to register.
  *
@@ -170,6 +175,29 @@ export async function registerOnValidate({
   )
 
   return latestResponse
+}
+/**
+ * Runs markAsDuplicate and then archive on sequence.
+ */
+export async function archiveOnDuplicate({
+  eventId,
+  transactionId,
+  declaration,
+  duplicateOf,
+  reason
+}: ArchiveOnDuplicateParams) {
+  await trpcClient.event.actions.duplicate.markAsDuplicate.mutate({
+    eventId,
+    transactionId,
+    declaration,
+    ...(duplicateOf ? { content: { duplicateOf } } : {})
+  })
+  return trpcClient.event.actions.archive.request.mutate({
+    eventId,
+    transactionId,
+    declaration,
+    content: { reason }
+  })
 }
 
 /**
