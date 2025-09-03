@@ -11,8 +11,17 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import { QueryType, SearchQuery, UUID, getUUID } from '@opencrvs/commons/client'
+import {
+  QueryType,
+  SearchQuery,
+  UUID,
+  getCurrentEventState,
+  applyDraftToEventIndex,
+  getUUID
+} from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
+import { useDrafts } from '../../drafts/useDrafts'
+import { useEventConfiguration } from '../useEventConfiguration'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
@@ -33,6 +42,8 @@ export function useEvents() {
   const getEvent = useGetEvent()
   const getEvents = useGetEvents()
   const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
+  const { getRemoteDraftByEventId } = useDrafts()
+
   return {
     createEvent: useCreateEvent,
     /** Returns an event with full history. If you only need the state of the event, use getEventState. */
@@ -71,6 +82,10 @@ export function useEvents() {
     },
     searchEventById: {
       useQuery: (id: string) => {
+        const event = getEvent.viewEvent(id)
+        const { eventConfiguration: configuration } = useEventConfiguration(
+          event.type
+        )
         const query = {
           type: 'and',
           clauses: [{ id }]
@@ -85,13 +100,29 @@ export function useEvents() {
           staleTime: 0,
           refetchOnMount: 'always',
           queryFn: async (...args) => {
+            // First, check the draft list for a matching event
+            const draft = getRemoteDraftByEventId(id)
+
+            // If a draft is found, reshape it and return
+            if (draft) {
+              const eventState = getCurrentEventState(event, configuration)
+              // The draft needs to be reshaped to match the elasticsearch data shape
+              return {
+                results: [
+                  applyDraftToEventIndex(eventState, draft, configuration)
+                ],
+                total: 1
+              }
+            }
+
+            // If no draft is found, fall back to the original elasticsearch query
             const queryFn = options.queryFn
             if (!queryFn) {
               throw new Error('Query function is not defined')
             }
             const res = await queryFn(...args)
             if (res.total === 0) {
-              throw new Error(`No event found with id: ${id}`)
+              throw new Error(`No event or draft found with id: ${id}`)
             }
             return res
           },
@@ -102,6 +133,10 @@ export function useEvents() {
         })
       },
       useSuspenseQuery: (id: string) => {
+        const event = getEvent.viewEvent(id)
+        const { eventConfiguration: configuration } = useEventConfiguration(
+          event.type
+        )
         const query = {
           type: 'and',
           clauses: [{ id }]
@@ -113,13 +148,29 @@ export function useEvents() {
           ...options,
           queryKey: trpc.event.search.queryKey({ query }),
           queryFn: async (...args) => {
+            // First, check the draft list for a matching event
+            const draft = getRemoteDraftByEventId(id)
+
+            // If a draft is found, reshape it and return
+            if (draft) {
+              const eventState = getCurrentEventState(event, configuration)
+              // The draft needs to be reshaped to match the elasticsearch data shape
+              return {
+                results: [
+                  applyDraftToEventIndex(eventState, draft, configuration)
+                ],
+                total: 1
+              }
+            }
+
+            // If no draft is found, fall back to the original elasticsearch query
             const queryFn = options.queryFn
             if (!queryFn) {
               throw new Error('Query function is not defined')
             }
             const res = await queryFn(...args)
             if (res.total === 0) {
-              throw new Error(`No event found with id: ${id}`)
+              throw new Error(`No event or draft found with id: ${id}`)
             }
             return res
           },
