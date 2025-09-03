@@ -21,6 +21,8 @@ import {
   DisplayableAction
 } from './ActionType'
 
+type AlwaysAllowed = null
+
 // This defines the mapping between event actions and the scopes required to perform them.
 export const ACTION_SCOPE_MAP = {
   [ActionType.READ]: ['record.declare', 'record.notify'],
@@ -48,10 +50,10 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.MARK_NOT_DUPLICATE]: ['record.declared.review-duplicates'],
   [ActionType.ARCHIVE]: ['record.declared.archive'],
   [ActionType.REJECT]: ['record.declared.reject'],
-  [ActionType.ASSIGN]: [],
-  [ActionType.UNASSIGN]: [],
+  [ActionType.ASSIGN]: null,
+  [ActionType.UNASSIGN]: null,
   [ActionType.DUPLICATE_DETECTED]: []
-} satisfies Record<DisplayableAction, ConfigurableScopeType[]>
+} satisfies Record<DisplayableAction, ConfigurableScopeType[] | AlwaysAllowed>
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
@@ -75,6 +77,10 @@ export function isActionInScope(
   eventType: string
 ) {
   const allowedConfigurableScopes = ACTION_SCOPE_MAP[action]
+
+  if (allowedConfigurableScopes === null) {
+    return true
+  }
 
   if (!allowedConfigurableScopes.length) {
     return false

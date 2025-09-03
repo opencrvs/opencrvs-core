@@ -421,13 +421,6 @@ function getScopeOptions(rawOptions: string) {
  * // Returns: { type: "user.create", options: { role: ["field-agent", "registration-agent"] } }
  */
 export function parseScope(scope: string) {
-  const maybeLiteralScope = LiteralScopes.safeParse(scope)
-  if (maybeLiteralScope.success) {
-    return {
-      type: maybeLiteralScope.data
-    }
-  }
-
   const maybeConfigurableScope = rawConfigurableScope.safeParse(scope)
 
   if (!maybeConfigurableScope.success) {
@@ -479,7 +472,7 @@ export function getAuthorizedEventsFromScopes(scopes: ConfigurableScopes[]) {
   return (
     scopes
       .flatMap(({ options }) => {
-        if ('event' in options) {
+        if (options && 'event' in options) {
           return options.event
         }
 
