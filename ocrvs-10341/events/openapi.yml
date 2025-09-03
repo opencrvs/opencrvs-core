@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 0f70f1ad-ddc7-4d4e-99da-61b54beeb3ac
+                transactionId: fedd1ed6-20ee-4bd2-843a-857b5c221ad8
                 type: v2.birth
       responses:
         "200":
@@ -535,7 +535,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 681d86d1-4e86-4703-9379-a273f5d18eb4
+                transactionId: c10997c4-b23d-4afd-924a-30683f068945
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9010,8 +9010,16 @@ components:
             duplicates:
               type: array
               items:
-                type: string
-                format: uuid
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  trackingId:
+                    type: string
+                required:
+                  - id
+                  - trackingId
           required:
             - duplicates
       required:
@@ -15287,9 +15295,18 @@ components:
         duplicates:
           type: array
           items:
-            type: string
-            format: uuid
-          description: List of event IDs that this event could be a duplicate of.
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              trackingId:
+                type: string
+            required:
+              - id
+              - trackingId
+          description: List of event IDs and their tracking IDs that this event could be a
+            duplicate of.
         flags:
           type: array
           items:
