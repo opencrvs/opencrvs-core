@@ -42,8 +42,9 @@ describe('findScope()', () => {
 })
 
 describe('parseScope()', () => {
-  it('should not be able to parse a literal scope', () => {
-    expect(parseScope(SCOPES.USER_CREATE)).toEqual(undefined)
+  it('should successfully parse a literal scope', () => {
+    const result = parseScope(SCOPES.USER_CREATE)
+    expect(result).toEqual({ type: 'user.create:all' })
   })
 
   it('should successfully parse a configurable scope', () => {
