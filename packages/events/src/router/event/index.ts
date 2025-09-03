@@ -57,6 +57,7 @@ import {
 } from '@events/service/indexing/indexing'
 import { reindex } from '@events/service/events/reindex'
 import { UserContext } from '../../context'
+import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)
@@ -136,7 +137,6 @@ export const eventRouter = router({
           declaration: {}
         },
         {
-          eventId: event.id,
           user: ctx.user,
           token: ctx.token,
           status: ActionStatus.Accepted
@@ -212,7 +212,7 @@ export const eventRouter = router({
   }),
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
-    declare: router(getDefaultActionProcedures(ActionType.DECLARE)),
+    declare: router(declareActionProcedures()),
     validate: router(getDefaultActionProcedures(ActionType.VALIDATE)),
     reject: router(getDefaultActionProcedures(ActionType.REJECT)),
     archive: router(getDefaultActionProcedures(ActionType.ARCHIVE)),
@@ -236,7 +236,6 @@ export const eventRouter = router({
         .use(middleware.validateAction)
         .mutation(async (options) => {
           return unassignRecord(options.input, {
-            eventId: options.input.eventId,
             user: options.ctx.user,
             token: options.ctx.token
           })
@@ -261,17 +260,17 @@ export const eventRouter = router({
 
       return getIndexedEvents(userId, eventConfigs)
     }),
-  search: publicProcedure
+  search: systemProcedure
     .meta({
       openapi: {
         summary: 'Search for events',
-        method: 'GET',
+        method: 'POST',
         tags: ['Search'],
         path: '/events/search'
       }
     })
     // @todo: remove legacy scopes once all users are configured with new search scopes
-    .use(requiresAnyOfScopes([], ['search']))
+    .use(requiresAnyOfScopes([SCOPES.RECORDSEARCH], ['search']))
     .input(SearchQuery)
     .output(
       z.object({
@@ -282,6 +281,19 @@ export const eventRouter = router({
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
       const scopes = getScopes({ Authorization: ctx.token })
+      const isRecordSearchSystemClient = scopes.includes(SCOPES.RECORDSEARCH)
+      const allAccessForEveryEventType = Object.fromEntries(
+        eventConfigs.map(({ id }) => [id, 'all' as const])
+      )
+
+      if (isRecordSearchSystemClient) {
+        return findRecordsByQuery(
+          input,
+          eventConfigs,
+          allAccessForEveryEventType,
+          ctx.user.primaryOfficeId
+        )
+      }
 
       const searchScope = findScope(scopes, 'search')
 
@@ -289,11 +301,10 @@ export const eventRouter = router({
       if (!searchScope) {
         throw new Error('No search scope provided')
       }
-      const searchScopeOptions = searchScope.options
       return findRecordsByQuery(
         input,
         eventConfigs,
-        searchScopeOptions,
+        searchScope.options,
         ctx.user.primaryOfficeId
       )
     }),

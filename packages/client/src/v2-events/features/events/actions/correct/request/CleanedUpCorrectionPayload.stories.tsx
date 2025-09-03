@@ -257,7 +257,7 @@ export const CleanedUpCorrectionPayload: Story = {
           }
         ]
       },
-      initialPath: ROUTES.V2.EVENTS.CORRECTION.SUMMARY.buildPath({
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({
         eventId: overriddenEvent.id
       })
     },

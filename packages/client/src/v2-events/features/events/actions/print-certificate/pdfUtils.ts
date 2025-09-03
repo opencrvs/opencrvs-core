@@ -213,6 +213,7 @@ export function compileSvg({
   $actions,
   locations,
   users,
+  review,
   language,
   config
 }: {
@@ -225,6 +226,11 @@ export function compileSvg({
   $declaration: EventState
   locations: Location[]
   users: User[]
+  /**
+   * Indicates whether certificate is reviewed or actually printed
+   * in V1 "preview" was used. In V2, "review" is used to remain consistent with action terminology (review of print action rather than preview of certificate).
+   */
+  review: boolean
   language: LanguageConfig
   config: EventConfig
 }): string {
@@ -545,6 +551,7 @@ export function compileSvg({
   const data = {
     $declaration: resolvedDeclaration,
     $metadata,
+    $review: review,
     $references: {
       locations,
       users

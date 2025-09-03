@@ -13,6 +13,11 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
 <svg width="583" height="842" viewBox="0 0 583 842" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <g clip-path="url(#clip0_5_2)">
     <path d="M583 0H0V842H583V0Z" fill="white" />
+    {{#if $review }}
+    <text fill="#FF0000" xml:space="preserve" style="white-space: pre;" font-weight="bold" font-family="Arial" font-size="30" transform="rotate(30, 300, 50)">
+      <tspan x="300" y="50">REVIEW MODE</tspan>
+    </text>
+    {{/if}}
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
       <tspan x="62" y="426.352">{{ $lookup ($action "PRINT_CERTIFICATE") "createdAt" }}</tspan>
     </text>

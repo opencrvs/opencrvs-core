@@ -14,7 +14,6 @@ import { DateTime } from 'luxon'
 import {
   EventIndex,
   DeduplicationConfig,
-  Clause,
   ClauseOutput,
   FieldValue,
   EventConfig,
@@ -177,7 +176,7 @@ export async function searchForDuplicates(
   eventConfig: EventConfig
 ): Promise<{ score: number; event: EventIndex }[]> {
   const esClient = getOrCreateClient()
-  const query = Clause.parse(configuration.query)
+  const query = configuration.query
 
   const esQuery = generateElasticsearchQuery(
     encodeEventIndex(eventIndex, eventConfig),
