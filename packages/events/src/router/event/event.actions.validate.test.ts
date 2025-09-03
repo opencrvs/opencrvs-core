@@ -32,6 +32,8 @@ import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 
+/* eslint-disable max-lines */
+
 test(`prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [])
