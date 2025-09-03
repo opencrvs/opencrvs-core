@@ -721,6 +721,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: ADDRESS
@@ -912,6 +917,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: TEXT
@@ -1014,6 +1024,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: NUMBER
@@ -1111,6 +1126,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: TEXTAREA
@@ -1214,6 +1234,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: DATE
@@ -1306,6 +1331,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: TIME
@@ -1397,6 +1427,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: DATE_RANGE
@@ -1505,6 +1540,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: SELECT_DATE_RANGE
@@ -1612,6 +1652,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: PARAGRAPH
@@ -1721,6 +1766,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: RADIO_GROUP
@@ -1832,6 +1882,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: BULLET_LIST
@@ -1933,6 +1988,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: PAGE_HEADER
@@ -2018,6 +2078,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: SELECT
@@ -2118,6 +2183,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: NAME
@@ -2271,6 +2341,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             defaultValue:
               type: string
               minLength: 1
@@ -2356,6 +2431,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             defaultValue:
               type: string
               minLength: 1
@@ -2441,6 +2521,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: CHECKBOX
@@ -2527,6 +2612,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: FILE
@@ -2659,6 +2749,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: COUNTRY
@@ -2744,6 +2839,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: ADMINISTRATIVE_AREA
@@ -2850,6 +2950,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: DIVIDER
@@ -2931,6 +3036,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: LOCATION
@@ -3027,6 +3137,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: FACILITY
@@ -3112,6 +3227,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: OFFICE
@@ -3197,6 +3317,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: SIGNATURE
@@ -3303,6 +3428,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: EMAIL
@@ -3395,6 +3525,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: FILE_WITH_OPTIONS
@@ -3530,6 +3665,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: DATA
@@ -3641,6 +3781,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: BUTTON
@@ -3740,6 +3885,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               const: HTTP
@@ -6591,8 +6741,16 @@ components:
             duplicates:
               type: array
               items:
-                type: string
-                format: uuid
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  trackingId:
+                    type: string
+                required:
+                  - id
+                  - trackingId
           required:
             - duplicates
       required:
