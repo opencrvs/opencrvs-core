@@ -35,13 +35,11 @@ import {
   FormConfig,
   isFieldDisplayedOnReview,
   isPageVisible,
-  runFieldValidations,
-  SCOPES
+  runFieldValidations
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { getScope } from '@client/profile/profileSelectors'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -484,7 +482,6 @@ function ReviewComponent({
   isCorrection?: boolean
   correctionReview?: React.ReactNode
 }) {
-  const scopes = useSelector(getScope)
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
   const isReviewCorrection = Boolean(correctionReview)
@@ -542,11 +539,6 @@ function ReviewComponent({
             disabled={readonlyMode || isCorrection || isReviewCorrection}
             form={form}
             formConfig={formConfig}
-            // @todo: ask about this rule
-            // TODO CIHAN:
-            showInMobile={
-              scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT) ?? false
-            }
             onEdit={() =>
               onEdit({ pageId: pageIdsWithFile[0], confirmation: true })
             }

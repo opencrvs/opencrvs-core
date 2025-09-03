@@ -20,13 +20,15 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import ReactTooltip from 'react-tooltip'
 import toast from 'react-hot-toast'
+import { useSelector } from 'react-redux'
 import {
   ActionType,
   EventConfig,
   getOrThrow,
   getAcceptedActions,
   SCOPES,
-  SystemRole
+  SystemRole,
+  isActionInScope
 } from '@opencrvs/commons/client'
 import {
   Box,
@@ -54,6 +56,7 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useOnlineStatus } from '@client/utils'
+import { getScope } from '@client/profile/profileSelectors'
 
 const CertificateContainer = styled.div`
   svg {
@@ -150,6 +153,7 @@ function getPrintForm(configuration: EventConfig) {
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW)
+  const scopes = useSelector(getScope)
   const [{ templateId, workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW
   )
@@ -305,6 +309,24 @@ export function Review() {
     }
   }
 
+  // Display make correction button only if the user has permission to correct or request correction
+  const userMayCorrect =
+    isActionInScope(
+      scopes ?? [],
+      ActionType.REQUEST_CORRECTION,
+      fullEvent.type
+    ) ||
+    isActionInScope(scopes ?? [], ActionType.APPROVE_CORRECTION, fullEvent.type)
+
+  const makeCorrectionButton = userMayCorrect ? (
+    <Button fullWidth size="large" type="negative" onClick={handleCorrection}>
+      <Icon name="X" size="medium" />
+      {intl.formatMessage(messages.makeCorrection)}
+    </Button>
+  ) : (
+    <></>
+  )
+
   return (
     <FormLayout
       appbarIcon={<Print />}
@@ -330,24 +352,7 @@ export function Review() {
           <Content
             showTitleOnMobile
             bottomActionButtons={[
-              <ProtectedComponent
-                key="edit-record"
-                // TODO CIHAN:
-                scopes={[
-                  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-                  SCOPES.RECORD_REGISTRATION_CORRECT
-                ]}
-              >
-                <Button
-                  fullWidth
-                  size="large"
-                  type="negative"
-                  onClick={handleCorrection}
-                >
-                  <Icon name="X" size="medium" />
-                  {intl.formatMessage(messages.makeCorrection)}
-                </Button>
-              </ProtectedComponent>,
+              makeCorrectionButton,
               <TooltipContainer
                 key="confirm-and-print"
                 data-tip

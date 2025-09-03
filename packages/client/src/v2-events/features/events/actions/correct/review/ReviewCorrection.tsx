@@ -301,7 +301,6 @@ export function ReviewCorrection({
     </Button>
   )
 
-  // TODO CIHAN: refactor this to be a hook, e.g. 'useUserAllowedActions'
   const userMayCorrect = isActionInScope(
     scopes ?? [],
     ActionType.APPROVE_CORRECTION,
