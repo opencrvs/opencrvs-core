@@ -19,15 +19,17 @@ export const TriggerEvent = {
   USERNAME_REMINDER: 'username-reminder',
   RESET_PASSWORD: 'reset-password',
   RESET_PASSWORD_BY_ADMIN: 'reset-password-by-admin',
-  TWO_FA: '2fa'
+  TWO_FA: '2fa',
+  ALL_USER_NOTIFICATION: 'all-user-notification'
 } as const
 
 export type TriggerEvent = (typeof TriggerEvent)[keyof typeof TriggerEvent]
 
 export const Recipient = z.object({
-  name: NameFieldValue,
+  name: NameFieldValue.optional(),
   mobile: z.string().optional(),
-  email: z.string().optional()
+  email: z.string().optional(),
+  bcc: z.array(z.string()).optional()
 })
 
 export type Recipient = z.infer<typeof Recipient>
@@ -63,6 +65,10 @@ export const TriggerPayload = {
   }),
   [TriggerEvent.TWO_FA]: BasePayload.extend({
     code: z.string()
+  }),
+  [TriggerEvent.ALL_USER_NOTIFICATION]: BasePayload.extend({
+    subject: z.string(),
+    body: z.string()
   })
 } as const
 
