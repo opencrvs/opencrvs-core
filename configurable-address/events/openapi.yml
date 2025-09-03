@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 213c835f-9bd6-46c4-8b4a-e9aeb1acee67
+                transactionId: bb6c3a10-2d06-4f02-86c3-5847b12fafe2
                 type: v2.birth
       responses:
         "200":
@@ -395,7 +395,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: e06a639d-44f5-4731-b502-8f661e0472c0
+                transactionId: 76dcaa1a-340b-42e9-bb81-72d829cf4ba4
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2539,8 +2539,24 @@ components:
                     - DOMESTIC
                     - INTERNATIONAL
                 administrativeArea:
-                  type: string
-                  format: uuid
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: object
+                      properties:
+                        $userField:
+                          type: string
+                          enum:
+                            - id
+                            - name
+                            - role
+                            - signature
+                            - avatar
+                            - primaryOfficeId
+                        $location:
+                          type: string
+                      required:
+                        - $userField
                 streetLevelDetails:
                   type: object
                   additionalProperties:

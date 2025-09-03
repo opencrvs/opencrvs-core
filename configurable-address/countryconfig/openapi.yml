@@ -903,8 +903,24 @@ components:
                     - DOMESTIC
                     - INTERNATIONAL
                 administrativeArea:
-                  type: string
-                  format: uuid
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: object
+                      properties:
+                        $userField:
+                          type: string
+                          enum:
+                            - id
+                            - name
+                            - role
+                            - signature
+                            - avatar
+                            - primaryOfficeId
+                        $location:
+                          type: string
+                      required:
+                        - $userField
                 streetLevelDetails:
                   type: object
                   additionalProperties:
