@@ -117,6 +117,12 @@ async function dispatch(
       subject: record.subject,
       body: record.body,
       recipient: {
+        /**
+         * Email delivery rules:
+         * - Sender → defined in CountryConfig
+         * - Recipient → the logged-in user's email
+         * - BCC → all other users' email addresses in the system
+         */
         email: recipientEmail,
         bcc: record.bcc.filter((item) => item !== recipientEmail)
       }
