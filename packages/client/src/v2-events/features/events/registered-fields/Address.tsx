@@ -361,10 +361,6 @@ function AddressOutput({
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
 
-  const location = targetAdminUUID?.toString()
-    ? adminStructureLocations.find((l) => l.id === targetAdminUUID.toString())
-    : null
-
   const adminLevels = getAdminLevelHierarchy(
     targetAdminUUID,
     adminStructureLocations,

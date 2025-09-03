@@ -143,7 +143,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
           getValidationErrorsForForm(
             fields,
             makeFormikFieldIdsOpenCRVSCompatible(values),
-            locations
+            locations ?? []
           )
         }
         validateOnMount={true}

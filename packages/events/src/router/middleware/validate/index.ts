@@ -50,6 +50,7 @@ import { getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
 import { isLeafLocation } from '@events/storage/postgres/events/locations'
+import { getLocations } from '@events/service/locations/locations'
 import {
   getInvalidUpdateKeys,
   getVerificationPageErrors,
@@ -113,7 +114,8 @@ function validateDeclarationUpdateAction({
   event,
   actionType,
   declarationUpdate,
-  annotation
+  annotation,
+  context
 }: {
   eventConfig: EventConfig
   event: EventDocument
@@ -121,6 +123,7 @@ function validateDeclarationUpdateAction({
   declarationUpdate: ActionUpdate
   // @TODO: annotation is always specific to action. Is there ever a need for null?
   annotation?: ActionUpdate
+  context: { locations: Array<Location> }
 }) {
   /*
    * Declaration allows partial updates. Updates are validated against primitive types (zod) and field based custom validators (JSON schema).
@@ -163,7 +166,8 @@ function validateDeclarationUpdateAction({
   const declarationErrors = getFieldErrors(
     allVisiblePageFields,
     cleanedDeclaration,
-    {}
+    {},
+    context
   )
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
@@ -341,6 +345,11 @@ export const validateAction: MiddlewareFunction<
 > = async ({ input, next, ctx }) => {
   const actionType = input.type
 
+  const locations = await getLocations()
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
+
   const event = await getEventById(input.eventId)
   const eventConfig = await getEventConfigurationById({
     token: ctx.token,
@@ -384,7 +393,8 @@ export const validateAction: MiddlewareFunction<
       event,
       declarationUpdate: input.declaration,
       annotation: input.annotation,
-      actionType: declarationUpdateAction.data
+      actionType: declarationUpdateAction.data,
+      context: { locations: adminStructureLocations }
     })
 
     throwWhenNotEmpty(errors)
