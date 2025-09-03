@@ -782,6 +782,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
         {
           id: 'applicant.dob',
           type: FieldType.DATE,
+          analytics: true,
           required: true,
           validation: [
             {
@@ -824,6 +825,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
         {
           id: 'applicant.age',
           type: FieldType.NUMBER,
+          analytics: true,
           required: true,
           label: {
             defaultMessage: 'Age of tennis-member',
