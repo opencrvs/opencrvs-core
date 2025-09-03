@@ -16,7 +16,8 @@ import {
   ActionDocument,
   ActionStatus,
   ActionUpdate,
-  EventState
+  EventState,
+  PotentialDuplicate
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
@@ -162,8 +163,10 @@ export function resolveDateOfEvent(
   return parsedDate.success ? parsedDate.data : undefined
 }
 
-function extractDuplicatesFromActions(actions: Action[]) {
-  return actions.reduce<UUID[]>((duplicates, action) => {
+export function extractDuplicatesFromActions(
+  actions: Action[]
+): PotentialDuplicate[] {
+  return actions.reduce<PotentialDuplicate[]>((duplicates, action) => {
     if (action.type === ActionType.DUPLICATE_DETECTED) {
       duplicates = action.content.duplicates
     }
