@@ -421,8 +421,14 @@ function getScopeOptions(rawOptions: string) {
  * // Returns: { type: "user.create", options: { role: ["field-agent", "registration-agent"] } }
  */
 export function parseScope(scope: string) {
-  const maybeConfigurableScope = rawConfigurableScope.safeParse(scope)
+  const maybeLiteralScope = LiteralScopes.safeParse(scope)
+  if (maybeLiteralScope.success) {
+    return {
+      type: maybeLiteralScope.data
+    }
+  }
 
+  const maybeConfigurableScope = rawConfigurableScope.safeParse(scope)
   if (!maybeConfigurableScope.success) {
     return
   }
