@@ -46,6 +46,7 @@ import { SettingsPage } from '@client/v2-events/features/settings/Settings'
 import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { SearchLayout } from '../layouts/search'
 import { useWorkqueues } from '../hooks/useWorkqueue'
+import { ReviewDuplicateIndex } from '../features/events/actions/dedup/ReviewDuplicate'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
@@ -188,6 +189,10 @@ export const routesConfig = {
           element: <Register.Review />
         }
       ]
+    },
+    {
+      path: ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.path,
+      element: <ReviewDuplicateIndex />
     },
     {
       path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.path,

@@ -110,9 +110,13 @@ function getFileOptions(
   return selectableOptions
 }
 
-const ResponsiveDocumentViewer = styled.div<{ showInMobile: boolean }>`
-  position: fixed;
-  width: calc(40% - 24px);
+const ResponsiveDocumentViewer = styled.div<{
+  showInMobile: boolean
+  comparisonView: boolean
+}>`
+  position: ${({ comparisonView }) => (comparisonView ? 'static' : 'fixed')};
+  width: ${({ comparisonView }) =>
+    comparisonView ? '100%' : 'calc(40% - 24px)'};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: ${({ showInMobile }) => (showInMobile ? 'block' : 'none')};
     margin-bottom: 11px;
@@ -146,20 +150,25 @@ export function DocumentViewer({
   formConfig,
   onEdit,
   showInMobile,
-  disabled
+  disabled,
+  comparisonView
 }: {
   formConfig: FormConfig
   form: EventState
   onEdit: () => void
   showInMobile?: boolean
   disabled?: boolean
+  comparisonView?: boolean
 }) {
   const intl = useIntl()
 
   const fileOptions = getFileOptions(form, formConfig, intl)
 
   return (
-    <ResponsiveDocumentViewer showInMobile={!!showInMobile}>
+    <ResponsiveDocumentViewer
+      comparisonView={!!comparisonView}
+      showInMobile={!!showInMobile}
+    >
       <DocumentViewerComponent id="document_section" options={fileOptions}>
         {fileOptions.length === 0 && (
           <ZeroDocument id={`zero_document`}>

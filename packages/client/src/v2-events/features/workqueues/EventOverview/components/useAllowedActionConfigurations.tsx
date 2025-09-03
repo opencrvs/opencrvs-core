@@ -127,6 +127,11 @@ export const actionLabels = {
     description: 'Label for review record button in dropdown menu',
     id: 'v2.event.birth.action.register.label'
   },
+  [ActionType.MARK_AS_DUPLICATE]: {
+    defaultMessage: 'Review',
+    description: 'Label for review potential duplicate button in dropdown menu',
+    id: 'v2.event.birth.action.mark-as-duplicate.label'
+  },
   [ActionType.PRINT_CERTIFICATE]: {
     defaultMessage: 'Print',
     description:
@@ -354,6 +359,20 @@ function useViewableActionConfigurations(
           clearEphemeralFormState()
           return navigate(
             ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
+              { eventId },
+              { workqueue }
+            )
+          )
+        },
+        disabled: !isDownloadedAndAssignedToUser
+      },
+      [ActionType.MARK_AS_DUPLICATE]: {
+        label: actionLabels[ActionType.MARK_AS_DUPLICATE],
+        icon: 'PencilLine' as const,
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
+            ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.buildPath(
               { eventId },
               { workqueue }
             )

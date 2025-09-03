@@ -119,14 +119,21 @@ const RejectAction = ActionBase.merge(
   })
 )
 
-const DuplicateDetectedAction = ActionBase.merge(
+export const PotentialDuplicate = z.object({
+  id: UUID,
+  trackingId: z.string()
+})
+export type PotentialDuplicate = z.infer<typeof PotentialDuplicate>
+
+export const DuplicateDetectedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.DUPLICATE_DETECTED),
     content: z.object({
-      duplicates: z.array(UUID)
+      duplicates: z.array(PotentialDuplicate)
     })
   })
 )
+export type DuplicateDetectedAction = z.infer<typeof DuplicateDetectedAction>
 
 const MarkNotDuplicateAction = ActionBase.merge(
   z.object({

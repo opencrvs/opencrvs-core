@@ -71,7 +71,7 @@ export function Review() {
   return (
     <FormLayout route={ROUTES.V2.EVENTS.REVIEW_CORRECTION}>
       <ReviewComponent.Body
-        correctionReview={
+        banner={
           <ReviewCorrection
             correctionRequestAction={correctionRequestAction}
             form={formValuesAfterCorrection}
@@ -80,6 +80,7 @@ export function Review() {
         form={formValuesAfterCorrection}
         formConfig={formConfig}
         isCorrection={true}
+        isReviewCorrection={true}
         previousFormValues={formValuesBeforeCorrection}
         title={intlWithData.formatMessage(
           actionConfig.label,
