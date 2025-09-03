@@ -32,6 +32,8 @@ import {
   HttpFieldValue
 } from './CompositeFieldValue'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { UUID } from '../uuid'
+import { SerializedUserField } from './serializers/user/serializer'
 extendZodWithOpenApi(z)
 
 const FieldId = z.string().describe('Unique identifier for the field')
@@ -507,6 +509,10 @@ const Office = BaseField.extend({
 
 export type Office = z.infer<typeof Office>
 
+const DefaultAddressFieldValue = AddressFieldValue.extend({
+  administrativeArea: z.union([UUID, SerializedUserField]).optional()
+})
+
 const Address = BaseField.extend({
   type: z.literal(FieldType.ADDRESS),
   configuration: z
@@ -528,7 +534,7 @@ const Address = BaseField.extend({
         .optional()
     })
     .optional(),
-  defaultValue: AddressFieldValue.optional()
+  defaultValue: DefaultAddressFieldValue.optional()
 }).describe('Address input field – a combination of location and text fields')
 
 export const DataEntry = z.union([

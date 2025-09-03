@@ -35,6 +35,7 @@ import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStrin
 import { getOfflineData } from '@client/offline/selectors'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { IAdminStructureItem } from '@client/utils/referenceApi'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -263,6 +264,7 @@ function AddressInput(props: Props) {
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
+  const userDetails = useSelector(getUserDetails)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
   const adminStructure = useMemo(
@@ -290,17 +292,38 @@ function AddressInput(props: Props) {
     Array.isArray(customAddressFields) && customAddressFields.length > 0
       ? customAddressFields
       : []
+  const defaultAdmininstratitveArea = defaultValue?.administrativeArea
 
-  const administrativeAreaUUID =
-    normalizedValue.administrativeArea || defaultValue?.administrativeArea
+  const resolveDefaultAdmininstratitveArea = (
+    DefualtValue: typeof defaultAdmininstratitveArea
+  ) => {
+    if (!DefualtValue) {
+      return undefined
+    }
+    if (typeof DefualtValue === 'string') {
+      return DefualtValue
+    }
+    if (DefualtValue.$location) {
+      const locationId = userDetails?.primaryOffice.id
 
+      const hierarchy = getAdminLevelHierarchy(
+        locationId,
+        locations,
+        adminLevelIds
+      )
+
+      return hierarchy[DefualtValue.$location]
+    }
+  }
+
+  const target = resolveDefaultAdmininstratitveArea(defaultAdmininstratitveArea)
   const derivedAdminLevels = useMemo(() => {
     return getAdminLevelHierarchy(
-      administrativeAreaUUID,
+      target,
       adminStructureLocations,
       adminLevelIds
     )
-  }, [administrativeAreaUUID, adminStructureLocations, adminLevelIds])
+  }, [target, adminStructureLocations, adminLevelIds])
 
   const fields = [COUNTRY_FIELD, ...adminStructure, ...addressFields]
 

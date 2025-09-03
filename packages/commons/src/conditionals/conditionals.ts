@@ -184,7 +184,12 @@ export const user = Object.assign(userSerializer, {
         }
       },
       required: ['$online']
-    })
+    }),
+  locationLevel: (adminLevelId: string) => ({
+    $user: {
+      $location: adminLevelId
+    }
+  })
 })
 
 /**
