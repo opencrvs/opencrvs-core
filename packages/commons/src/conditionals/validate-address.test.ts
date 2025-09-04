@@ -12,6 +12,7 @@
 import { FieldType } from '../events/FieldType'
 import { AddressType } from '../events/CompositeFieldValue'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
+import { UUID } from '../uuid'
 
 const testCases = [
   {
