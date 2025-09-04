@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useMemo } from 'react'
+import React from 'react'
 import { IntlShape } from 'react-intl'
 import { Location } from '@events/service/locations/locations'
 import { useSelector } from 'react-redux'
@@ -27,7 +27,8 @@ import {
   AddressType,
   isFieldDisplayedOnReview,
   AddressField,
-  AdministrativeArea
+  AdministrativeArea,
+  DefaultAddressFieldValue
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -48,6 +49,79 @@ type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
   value?: AddressFieldValue
   configuration?: AddressField['configuration']
 }
+
+const COUNTRY_FIELD = {
+  id: 'country',
+  conditionals: [],
+  required: true,
+  label: {
+    id: 'v2.field.address.country.label',
+    defaultMessage: 'Country',
+    description: 'This is the label for the field'
+  },
+  type: FieldType.COUNTRY
+} as const satisfies FieldConfigWithoutAddress
+
+const ADDRESS_TYPE_FIELD = {
+  id: 'addressType',
+  conditionals: [
+    {
+      type: ConditionalType.SHOW,
+      conditional: not(alwaysTrue())
+    }
+  ],
+  label: {
+    defaultMessage: '',
+    description: 'empty string',
+    id: 'v2.messages.emptyString'
+  },
+  type: FieldType.TEXT
+} as const satisfies FieldConfigWithoutAddress
+
+const ADMINISTRATIVE_AREA_FIELD = {
+  id: 'administrativeArea',
+  conditionals: [
+    {
+      type: ConditionalType.SHOW,
+      conditional: not(alwaysTrue())
+    }
+  ],
+  label: {
+    defaultMessage: '',
+    description: 'empty string',
+    id: 'v2.messages.emptyString'
+  },
+  type: FieldType.TEXT
+} as const satisfies FieldConfigWithoutAddress
+
+const STREET_LEVEL_DETAILS_FIELD = {
+  id: 'streetLevelDetails',
+  conditionals: [
+    {
+      type: ConditionalType.SHOW,
+      conditional: not(alwaysTrue())
+    }
+  ],
+  label: {
+    defaultMessage: '',
+    description: 'empty string',
+    id: 'v2.messages.emptyString'
+  },
+  type: FieldType.TEXT
+} as const satisfies FieldConfigWithoutAddress
+
+const ALL_ADDRESS_FIELDS = [
+  COUNTRY_FIELD,
+  ADDRESS_TYPE_FIELD,
+  ADMINISTRATIVE_AREA_FIELD,
+  STREET_LEVEL_DETAILS_FIELD
+]
+
+const ALL_ADDRESS_INPUT_FIELDS = [
+  COUNTRY_FIELD
+] satisfies Array<FieldConfigWithoutAddress>
+
+type AddressFieldIdentifier = (typeof ALL_ADDRESS_FIELDS)[number]['id']
 
 function isDomesticAddress() {
   return and(
@@ -142,79 +216,6 @@ function generateAdminStructureFields(
   })
 }
 
-const COUNTRY_FIELD = {
-  id: 'country',
-  conditionals: [],
-  required: true,
-  label: {
-    id: 'v2.field.address.country.label',
-    defaultMessage: 'Country',
-    description: 'This is the label for the field'
-  },
-  type: FieldType.COUNTRY
-} as const satisfies FieldConfigWithoutAddress
-
-const ADDRESS_TYPE_FIELD = {
-  id: 'addressType',
-  conditionals: [
-    {
-      type: ConditionalType.SHOW,
-      conditional: not(alwaysTrue())
-    }
-  ],
-  label: {
-    defaultMessage: '',
-    description: 'empty string',
-    id: 'v2.messages.emptyString'
-  },
-  type: FieldType.TEXT
-} as const satisfies FieldConfigWithoutAddress
-
-const ADMINISTRATIVE_AREA_FIELD = {
-  id: 'administrativeArea',
-  conditionals: [
-    {
-      type: ConditionalType.SHOW,
-      conditional: not(alwaysTrue())
-    }
-  ],
-  label: {
-    defaultMessage: '',
-    description: 'empty string',
-    id: 'v2.messages.emptyString'
-  },
-  type: FieldType.TEXT
-} as const satisfies FieldConfigWithoutAddress
-
-const STREET_LEVEL_DETAILS_FIELD = {
-  id: 'streetLevelDetails',
-  conditionals: [
-    {
-      type: ConditionalType.SHOW,
-      conditional: not(alwaysTrue())
-    }
-  ],
-  label: {
-    defaultMessage: '',
-    description: 'empty string',
-    id: 'v2.messages.emptyString'
-  },
-  type: FieldType.TEXT
-} as const satisfies FieldConfigWithoutAddress
-
-const ALL_ADDRESS_FIELDS = [
-  COUNTRY_FIELD,
-  ADDRESS_TYPE_FIELD,
-  ADMINISTRATIVE_AREA_FIELD,
-  STREET_LEVEL_DETAILS_FIELD
-]
-
-const ALL_ADDRESS_INPUT_FIELDS = [
-  COUNTRY_FIELD
-] satisfies Array<FieldConfigWithoutAddress>
-
-type AddressFieldIdentifier = (typeof ALL_ADDRESS_FIELDS)[number]['id']
-
 function extractAddressLines(
   obj: Partial<AddressFieldValue>,
   adminLevelIds: string[]
@@ -267,43 +268,27 @@ function AddressInput(props: Props) {
   const userDetails = useSelector(getUserDetails)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
-  const adminStructure = useMemo(
-    () => generateAdminStructureFields(appConfigAdminLevels),
-    [appConfigAdminLevels]
-  )
-
-  const adminStructureLocations = useMemo(
-    () =>
-      locations.filter(
-        (location) => location.locationType === 'ADMIN_STRUCTURE'
-      ),
-    [locations]
-  )
-
-  const normalizedValue = {
-    ...value,
-    administrativeArea: value?.administrativeArea ?? undefined,
-    streetLevelDetails: value?.streetLevelDetails ?? {}
-  }
-
+  const adminStructure = generateAdminStructureFields(appConfigAdminLevels)
   const customAddressFields = props.configuration?.streetAddressForm
 
-  const addressFields =
-    Array.isArray(customAddressFields) && customAddressFields.length > 0
-      ? customAddressFields
-      : []
-  const defaultAdmininstratitveArea = defaultValue?.administrativeArea
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
 
-  const resolveDefaultAdmininstratitveArea = (
-    DefualtValue: typeof defaultAdmininstratitveArea
+  const administrativeArea = value?.administrativeArea
+
+  const resolveAdministratitveArea = (
+    adminArea:
+      | AddressFieldValue['administrativeArea']
+      | DefaultAddressFieldValue['administrativeArea']
   ) => {
-    if (!DefualtValue) {
+    if (!adminArea) {
       return undefined
     }
-    if (typeof DefualtValue === 'string') {
-      return DefualtValue
+    if (typeof adminArea === 'string') {
+      return adminArea
     }
-    if (DefualtValue.$location) {
+    if (adminArea.$location) {
       const locationId = userDetails?.primaryOffice.id
 
       const hierarchy = getAdminLevelHierarchy(
@@ -312,18 +297,33 @@ function AddressInput(props: Props) {
         adminLevelIds
       )
 
-      return hierarchy[DefualtValue.$location]
+      return hierarchy[adminArea.$location]
     }
   }
 
-  const target = resolveDefaultAdmininstratitveArea(defaultAdmininstratitveArea)
-  const derivedAdminLevels = useMemo(() => {
-    return getAdminLevelHierarchy(
-      target,
-      adminStructureLocations,
-      adminLevelIds
-    )
-  }, [target, adminStructureLocations, adminLevelIds])
+  const resolvedAdministrativeArea =
+    resolveAdministratitveArea(administrativeArea)
+
+  if (value) {
+    value.administrativeArea = resolvedAdministrativeArea
+  }
+
+  const resolvedValue = {
+    ...value,
+    ...value?.streetLevelDetails,
+    administrativeArea: resolvedAdministrativeArea
+  }
+
+  const addressFields =
+    Array.isArray(customAddressFields) && customAddressFields.length > 0
+      ? customAddressFields
+      : []
+
+  const derivedAdminLevels = getAdminLevelHierarchy(
+    resolvedAdministrativeArea,
+    adminStructureLocations,
+    adminLevelIds
+  )
 
   const fields = [COUNTRY_FIELD, ...adminStructure, ...addressFields]
 
@@ -348,7 +348,7 @@ function AddressInput(props: Props) {
     <FormFieldGenerator
       {...otherProps}
       fields={fields}
-      initialValues={{ ...normalizedValue, ...derivedAdminLevels }}
+      initialValues={{ ...resolvedValue, ...derivedAdminLevels }}
       locations={adminStructureLocations}
       parentId={props.id}
       onChange={handleChange}
@@ -370,35 +370,33 @@ function AddressOutput({
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
   const { config } = useSelector(getOfflineData)
+  const customAddressFields = configuration?.configuration
+    ?.streetAddressForm as FieldConfigWithoutAddress[]
+  const appConfigAdminLevels = config.ADMIN_STRUCTURE
 
   if (!value) {
     return ''
   }
 
+  const administrativeArea = value.administrativeArea
   const adminStructureLocations = locations.filter(
     (location) => location.locationType === 'ADMIN_STRUCTURE'
   )
 
-  const targetAdminUUID = value.administrativeArea
-
-  const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
 
   const adminLevels = getAdminLevelHierarchy(
-    targetAdminUUID,
+    administrativeArea,
     adminStructureLocations,
     adminLevelIds
   )
 
-  const updatedValues = {
+  const addressValues = {
     ...value,
     ...adminLevels
   }
 
   const adminStructure = generateAdminStructureFields(appConfigAdminLevels)
-
-  const customAddressFields = configuration?.configuration
-    ?.streetAddressForm as FieldConfigWithoutAddress[]
 
   const addressFields =
     Array.isArray(customAddressFields) && customAddressFields.length > 0
@@ -417,19 +415,19 @@ function AddressOutput({
     }
   }
 
-  const flatValues = flattenAddressObject(updatedValues)
+  const flattenedAddressValues = flattenAddressObject(addressValues)
 
   const fieldsToShow = [COUNTRY_FIELD, ...adminStructure, ...addressFields]
     .map((field) => ({
       field,
-      value: flatValues[field.id]
+      value: flattenedAddressValues[field.id]
     }))
     .filter(
       (field) =>
         field.value &&
         isFieldDisplayedOnReview(
           field.field satisfies FieldConfig,
-          updatedValues
+          addressValues
         )
     )
 

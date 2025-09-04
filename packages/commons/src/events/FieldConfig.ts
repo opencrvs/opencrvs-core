@@ -516,9 +516,11 @@ const Office = BaseField.extend({
 
 export type Office = z.infer<typeof Office>
 
-const DefaultAddressFieldValue = AddressFieldValue.extend({
+export const DefaultAddressFieldValue = AddressFieldValue.extend({
   administrativeArea: z.union([UUID, SerializedUserField]).optional()
 })
+
+export type DefaultAddressFieldValue = z.infer<typeof DefaultAddressFieldValue>
 
 const Address = BaseField.extend({
   type: z.literal(FieldType.ADDRESS),
