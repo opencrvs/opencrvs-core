@@ -114,7 +114,7 @@ export const detectDuplicate: MiddlewareFunction<
   )
 
   const isMarkedAsNotDuplicate = storedEvent.actions.reduce((acc, action) => {
-    if (action.type === ActionType.MARK_NOT_DUPLICATE) {
+    if (action.type === ActionType.MARK_AS_NOT_DUPLICATE) {
       return true
     }
     if (action.type === ActionType.DUPLICATE_DETECTED) {

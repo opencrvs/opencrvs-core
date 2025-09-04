@@ -680,7 +680,7 @@ export function eventPayloadGenerator(rng: () => number) {
             >
           > = {}
         ) => ({
-          type: ActionType.MARK_NOT_DUPLICATE,
+          type: ActionType.MARK_AS_NOT_DUPLICATE,
           transactionId: input.transactionId ?? getUUID(),
           declaration:
             input.declaration ??
@@ -751,7 +751,7 @@ export function generateActionDocument({
   switch (action) {
     case ActionType.READ:
       return { ...actionBase, type: action }
-    case ActionType.MARK_NOT_DUPLICATE:
+    case ActionType.MARK_AS_NOT_DUPLICATE:
       return { ...actionBase, type: action }
     case ActionType.MARK_AS_DUPLICATE:
       return { ...actionBase, type: action, content: undefined }

@@ -429,7 +429,7 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
     ).toContain(InherentFlags.POTENTIAL_DUPLICATE)
   })
 
-  test(`Removes the flag after ${ActionType.MARK_NOT_DUPLICATE}`, async () => {
+  test(`Removes the flag after ${ActionType.MARK_AS_NOT_DUPLICATE}`, async () => {
     const [duplicateEvent, client, generator] = await createDuplicateEvent()
 
     const event = await client.event.actions.duplicate.markNotDuplicate(

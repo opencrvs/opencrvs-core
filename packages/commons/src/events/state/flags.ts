@@ -60,7 +60,7 @@ function isPotentialDuplicate(actions: Action[]): boolean {
       return true
     }
     if (
-      type === ActionType.MARK_NOT_DUPLICATE ||
+      type === ActionType.MARK_AS_NOT_DUPLICATE ||
       type === ActionType.MARK_AS_DUPLICATE
     ) {
       return false
