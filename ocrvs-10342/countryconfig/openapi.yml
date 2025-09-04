@@ -43,7 +43,7 @@ paths:
               - DUPLICATE_DETECTED
               - REJECT
               - MARK_AS_DUPLICATE
-              - MARK_NOT_DUPLICATE
+              - MARK_AS_NOT_DUPLICATE
               - ARCHIVE
               - PRINT_CERTIFICATE
               - REQUEST_CORRECTION
@@ -4866,7 +4866,7 @@ components:
           VALIDATE: "#/components/schemas/ValidateAction"
           REJECT: "#/components/schemas/RejectAction"
           DUPLICATE_DETECTED: "#/components/schemas/DuplicateDetectedAction"
-          MARK_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateAction"
+          MARK_AS_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateAction"
           MARK_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateAction"
           ARCHIVE: "#/components/schemas/ArchiveAction"
           NOTIFY: "#/components/schemas/NotifiedAction"
@@ -7216,7 +7216,7 @@ components:
             or accepted by 3rd party integration.
         type:
           type: string
-          const: MARK_NOT_DUPLICATE
+          const: MARK_AS_NOT_DUPLICATE
       required:
         - id
         - transactionId
@@ -7680,6 +7680,14 @@ components:
         type:
           type: string
           const: MARK_AS_DUPLICATE
+        content:
+          type: object
+          properties:
+            duplicateOf:
+              type: string
+              format: uuid
+          required:
+            - duplicateOf
       required:
         - id
         - transactionId
