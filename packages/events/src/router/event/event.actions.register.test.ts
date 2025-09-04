@@ -49,7 +49,7 @@ test('prevents forbidden access if missing required scope', async () => {
 test(`allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.register[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.register[event=birth|death|tennis-club-membership]'
   ])
 
   await expect(
