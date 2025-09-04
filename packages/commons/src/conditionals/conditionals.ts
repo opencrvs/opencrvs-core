@@ -22,10 +22,29 @@ export type JSONSchema = {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+function removeIds(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(removeIds)
+  } else if (obj !== null && typeof obj === 'object') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const newObj: any = {}
+    for (const key of Object.keys(obj)) {
+      if (key === '$id') {
+        continue // skip $id
+      }
+      newObj[key] = removeIds(obj[key])
+    }
+    return newObj
+  }
+  return obj
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function defineConditional(schema: any) {
+  const schemaWithooutIDRef = removeIds(schema)
   return {
-    $id: `https://opencrvs.org/conditionals/${objectHash.sha1(schema)}`,
-    ...schema
+    $id: `https://opencrvs.org/conditionals/${objectHash.sha1(schemaWithooutIDRef)}`,
+    ...schemaWithooutIDRef
   } as JSONSchema
 }
 
