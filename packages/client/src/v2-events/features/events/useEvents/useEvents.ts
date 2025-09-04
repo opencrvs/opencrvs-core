@@ -13,6 +13,7 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
 import { QueryType, SearchQuery, UUID, getUUID } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
+import { prefetchPotentialDuplicates } from '../actions/dedup/getDuplicates'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
@@ -159,11 +160,12 @@ export function useEvents() {
             /**This makes sure all the files and users referenced in the event document is prefetched to be used even in offline */
             await refetchEvent()
 
-            return assignMutation.mutate({
+            await assignMutation.mutateAsync({
               eventId,
               transactionId: getUUID(),
               assignedTo
             })
+            await prefetchPotentialDuplicates(eventId)
           }
         },
         unassign: useEventAction(trpc.event.actions.assignment.unassign)
