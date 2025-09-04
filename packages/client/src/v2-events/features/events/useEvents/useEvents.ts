@@ -83,7 +83,10 @@ export function useEvents() {
     },
     searchEventById: {
       useQuery: (id: string) => {
-        const event = getEvent.viewEvent(id)
+        const event = getEvent.findFromCache(id).data
+        if (!event) {
+          throw new Error(`No event or draft cached: ${id}`)
+        }
         const { eventConfiguration: configuration } = useEventConfiguration(
           event.type
         )
