@@ -33,9 +33,20 @@ export async function addLocations(locations: NewLocations[]) {
       .values(batch.map((loc) => ({ ...loc, deletedAt: null })))
       .onConflict((oc) =>
         oc.column('id').doUpdateSet({
-          name: (eb) => eb.ref('excluded.name'),
+          name: () =>
+            sql`CASE
+             WHEN excluded.name IS NOT NULL
+             THEN excluded.name
+             ELSE locations.name
+           END`,
           parentId: (eb) => eb.ref('excluded.parentId'),
           updatedAt: () => sql`now()`,
+          validUntil: () =>
+            sql`CASE
+             WHEN excluded.valid_until IS NOT NULL
+             THEN excluded.valid_until
+             ELSE locations.valid_until
+           END`,
           deletedAt: null
         })
       )
@@ -44,8 +55,6 @@ export async function addLocations(locations: NewLocations[]) {
 }
 
 export async function setLocations(locations: NewLocations[]) {
-  const db = getClient()
-  await db.deleteFrom('locations').execute()
   return addLocations(locations)
 }
 
