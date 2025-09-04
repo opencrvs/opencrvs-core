@@ -52,7 +52,7 @@ async function main() {
     await triggerReindex()
   } catch (error) {
     reindexingAttempts++
-    if (reindexingAttempts > 10) {
+    if (reindexingAttempts > 30) {
       console.error(
         `Failed to reindex search after ${reindexingAttempts} attempts. Error: ${error}`
       )
