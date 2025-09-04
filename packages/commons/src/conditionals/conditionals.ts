@@ -14,6 +14,7 @@ import { EventState } from '../events/ActionDocument'
 import { ITokenPayload as TokenPayload, Scope } from '../authentication'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { userSerializer } from '../events/serializers/user/serializer'
+import { omitKeyDeep } from '../utils'
 
 /** @knipignore */
 export type JSONSchema = {
@@ -22,26 +23,12 @@ export type JSONSchema = {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function removeIds(obj: any): any {
-  if (Array.isArray(obj)) {
-    return obj.map(removeIds)
-  } else if (obj !== null && typeof obj === 'object') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const newObj: any = {}
-    for (const key of Object.keys(obj)) {
-      if (key === '$id') {
-        continue // skip $id
-      }
-      newObj[key] = removeIds(obj[key])
-    }
-    return newObj
-  }
-  return obj
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function defineConditional(schema: any) {
-  const schemaWithooutIDRef = removeIds(schema)
+  // The same conditional schema may appear multiple times in the final schema.
+  // This causes duplicate $id values (since the hash is identical), and Ajv
+  // throws a `resolves to more than one schema` error.
+  // To avoid this, we only keep $id at the top level and remove it from all nested schemas.
+  const schemaWithooutIDRef = omitKeyDeep(schema, '$id')
   return {
     $id: `https://opencrvs.org/conditionals/${objectHash.sha1(schemaWithooutIDRef)}`,
     ...schemaWithooutIDRef
