@@ -10,18 +10,25 @@
  */
 
 import { trpcClient } from '@client/v2-events/trpc'
-import { setEventListData } from '../../useEvents/api'
+import { cacheFiles } from '@client/v2-events/features/files/cache'
+import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+import { setEventData } from '../../useEvents/api'
 
 export async function prefetchPotentialDuplicates(eventId: string) {
   const potentialDuplicates = await trpcClient.event.getDuplicates.query({
     eventId
   })
 
-  potentialDuplicates.forEach((potentialDuplicateIndex) => {
-    setEventListData((eventIndices) =>
-      eventIndices
-        ?.filter(({ id }) => id !== potentialDuplicateIndex.id)
-        .concat(potentialDuplicateIndex)
+  await Promise.all(
+    potentialDuplicates.map(async (eventDocument) =>
+      Promise.all([
+        cacheFiles(eventDocument),
+        cacheUsersFromEventDocument(eventDocument)
+      ])
     )
+  )
+
+  potentialDuplicates.forEach((potentialDuplicate) => {
+    setEventData(potentialDuplicate.id, potentialDuplicate)
   })
 }

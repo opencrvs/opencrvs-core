@@ -22,7 +22,6 @@ import {
 } from '@client/v2-events/trpc'
 import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
 import { updateLocalEventIndex } from '../api'
-import { prefetchPotentialDuplicates } from '../../actions/dedup/getDuplicates'
 import { setQueryDefaults } from './utils'
 
 /*
@@ -60,8 +59,7 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
 
     await Promise.all([
       cacheFiles(eventDocument),
-      cacheUsersFromEventDocument(eventDocument),
-      prefetchPotentialDuplicates(eventDocument.id)
+      cacheUsersFromEventDocument(eventDocument)
     ])
 
     updateLocalEventIndex(eventDocument.id, eventDocument)
