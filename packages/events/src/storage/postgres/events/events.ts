@@ -10,14 +10,18 @@
  */
 
 import { Kysely, sql } from 'kysely'
+import { DateTime } from 'luxon'
 import {
   ActionStatus,
   ActionType,
   EventDocument,
+  getUUID,
   UUID
 } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { dropNulls } from '../drop-nulls'
+import { buildAction } from '../../../service/events/events'
+import { TrpcUserContext } from '../../../context'
 import { EventActions, NewEventActions } from './schema/app/EventActions'
 import { Events, NewEvents } from './schema/app/Events'
 import Schema from './schema/Database'
@@ -290,5 +294,99 @@ export const getOrCreateEventAndAssign = async (
 
   return db.transaction().execute(async (trx) => {
     return getOrCreateEventAndAssignInTrx(input, trx)
+  })
+}
+
+/**
+ *
+ * Creates multiple actions in one query.
+ * Useful for reducing the number of database round trips (e.g. marking multiple events as read)
+ */
+async function createActionsInTrx(
+  actions: NewEventActions[],
+  trx: Kysely<Schema>
+) {
+  if (actions.length === 0) {
+    return
+  }
+
+  await trx
+    .insertInto('eventActions')
+    .values(actions)
+    .onConflict((oc) =>
+      oc.columns(['transactionId', 'actionType', 'status']).doNothing()
+    )
+    .execute()
+}
+
+/**
+ *
+ * @returns all events with the given ids in one query.
+ */
+async function getEventsByIdsInTrx(
+  trx: Kysely<Schema>,
+  eventIds: UUID[]
+): Promise<EventDocument[]> {
+  const events = (await trx
+    .selectFrom('events')
+    .selectAll('events')
+    .select(() =>
+      sql`json_agg(
+      jsonb_strip_nulls(to_jsonb(${sql.ref('eventActions')}))
+      ORDER BY
+        CASE WHEN ${sql.ref('eventActions.actionType')} = 'CREATE' THEN 0 ELSE 1 END,
+        ${sql.ref('eventActions.createdAt')}
+    )`.as('actions')
+    )
+    .leftJoin('eventActions', 'eventActions.eventId', 'events.id')
+    .where('events.id', 'in', eventIds)
+    .groupBy('events.id')
+    .orderBy('events.id')
+    // We parse on the next step so casting mistakes will be caught immediately.
+    .execute()) as (Events & { actions: EventActions[] })[]
+
+  return events.map((event) =>
+    EventDocument.parse({
+      ...event,
+      type: event.eventType,
+      actions: event.actions.map(({ actionType, createdAt, ...rest }) => {
+        return {
+          ...rest,
+          type: actionType,
+          // turns db format +00 to Z format
+          createdAt: DateTime.fromISO(createdAt).toISO()
+        }
+      })
+    })
+  )
+}
+
+/**
+ *
+ * @param eventIds array of event IDs to fetch
+ * @returns Get events while adding READ action for each of them.
+ */
+export async function getEventsAuditTrailed(
+  user: TrpcUserContext,
+  eventIds: UUID[]
+) {
+  const readActions = eventIds.map((eventId) =>
+    buildAction(
+      {
+        type: ActionType.READ,
+        declaration: {},
+        eventId,
+        transactionId: getUUID()
+      },
+      ActionStatus.Accepted,
+      user
+    )
+  )
+
+  const db = getClient()
+  return db.transaction().execute(async (trx) => {
+    await createActionsInTrx(readActions, trx)
+
+    return getEventsByIdsInTrx(trx, eventIds)
   })
 }

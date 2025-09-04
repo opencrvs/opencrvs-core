@@ -25,8 +25,7 @@ import {
   PrintCertificateActionInput,
   DeclareActionInput,
   ValidateActionInput,
-  ACTION_ALLOWED_SCOPES,
-  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
+  ACTION_SCOPE_MAP,
   RequestCorrectionActionInput,
   ApproveCorrectionActionInput,
   RejectCorrectionActionInput,
@@ -153,7 +152,7 @@ const ACTION_PROCEDURE_CONFIG = {
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
 
-export type ActionProcedure = {
+type ActionProcedure = {
   request: MutationProcedure<{
     input: ActionInput
     output: EventDocument
@@ -276,8 +275,8 @@ export function getDefaultActionProcedures(
   }
 
   const requireScopesMiddleware = requiresAnyOfScopes(
-    ACTION_ALLOWED_SCOPES[actionType],
-    ACTION_ALLOWED_CONFIGURABLE_SCOPES[actionType]
+    [],
+    ACTION_SCOPE_MAP[actionType]
   )
 
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}

@@ -8,6 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import {
+  ActionStatus,
+  MarkAsDuplicateActionInput
+} from '@opencrvs/commons/events'
+import { addAction } from '@events/service/events/events'
+import { TrpcUserContext } from '@events/context'
 
-export const TENNIS_CLUB_MEMBERSHIP = 'tennis-club-membership'
-export const BIRTH_EVENT = 'v2.birth'
+export async function markAsDuplicate(
+  input: MarkAsDuplicateActionInput,
+  user: TrpcUserContext,
+  token: string
+) {
+  return addAction(input, {
+    user,
+    token,
+    status: ActionStatus.Accepted
+  })
+}

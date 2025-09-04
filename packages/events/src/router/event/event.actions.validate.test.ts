@@ -17,10 +17,11 @@ import {
   AddressType,
   createPrng,
   EventStatus,
+  EventIndex,
   generateActionDeclarationInput,
   getCurrentEventState,
   getUUID,
-  SCOPES
+  NameFieldValue
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -30,7 +31,9 @@ import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 
-test(`prevents forbidden access if missing required scope`, async () => {
+/* eslint-disable max-lines */
+
+test('prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [])
 
@@ -41,9 +44,9 @@ test(`prevents forbidden access if missing required scope`, async () => {
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`allows access if required scope is present`, async () => {
+test('allows access if required scope is present', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_SUBMIT_FOR_APPROVAL])
+  const client = createTestClient(user)
 
   await expect(
     client.event.actions.validate.request(
@@ -355,8 +358,7 @@ test('deduplication check is performed before validation when configured', async
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
       return HttpResponse.json([
-        tennisClubMembershipEventWithDedupCheck(ActionType.VALIDATE),
-        { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+        tennisClubMembershipEventWithDedupCheck(ActionType.VALIDATE)
       ])
     })
   )
@@ -398,7 +400,148 @@ test('deduplication check is performed before validation when configured', async
     getCurrentEventState(stillDeclaredEvent, tennisClubMembershipEvent)
   ).toMatchObject({
     status: 'DECLARED',
-    duplicates: [{ id: existingEvent.id, trackingId: existingEvent.trackingId }]
+    potentialDuplicates: [
+      { id: existingEvent.id, trackingId: existingEvent.trackingId }
+    ]
+  } satisfies Partial<EventIndex>)
+})
+
+test('deduplication check is skipped if the event has been marked as not duplicate and data has not changed', async () => {
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      return HttpResponse.json([
+        tennisClubMembershipEventWithDedupCheck(
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        )
+      ])
+    })
+  )
+  const prng = createPrng(73)
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const existingEvent = await client.event.create(generator.event.create())
+  const declaration = generateActionDeclarationInput(
+    tennisClubMembershipEvent,
+    ActionType.DECLARE,
+    prng
+  )
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(existingEvent.id, {
+      declaration
+    })
+  )
+
+  const duplicateEvent = await client.event.create(generator.event.create())
+  const declaredDuplicateEvent = await client.event.actions.declare.request(
+    generator.event.actions.declare(duplicateEvent.id, {
+      declaration
+    })
+  )
+
+  expect(
+    getCurrentEventState(declaredDuplicateEvent, tennisClubMembershipEvent)
+      .potentialDuplicates
+  ).toEqual([{ id: existingEvent.id, trackingId: existingEvent.trackingId }])
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(duplicateEvent.id, {
+      assignedTo: user.id
+    })
+  )
+  await client.event.actions.duplicate.markNotDuplicate(
+    generator.event.actions.duplicate.markNotDuplicate(duplicateEvent.id, {
+      declaration,
+      keepAssignment: true
+    })
+  )
+  const validatedEvent = await client.event.actions.validate.request(
+    generator.event.actions.validate(duplicateEvent.id, {
+      declaration
+    })
+  )
+
+  expect(
+    getCurrentEventState(validatedEvent, tennisClubMembershipEvent)
+  ).toMatchObject({
+    status: 'VALIDATED',
+    potentialDuplicates: []
+  })
+})
+
+test('deduplication check is not skipped if the event has been marked as not duplicate but data has changed', async () => {
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      return HttpResponse.json([
+        tennisClubMembershipEventWithDedupCheck(
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        )
+      ])
+    })
+  )
+  const prng = createPrng(73)
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const existingEvent = await client.event.create(generator.event.create())
+  const declaration = generateActionDeclarationInput(
+    tennisClubMembershipEvent,
+    ActionType.DECLARE,
+    prng
+  )
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(existingEvent.id, {
+      declaration
+    })
+  )
+
+  const duplicateEvent = await client.event.create(generator.event.create())
+  const declaredDuplicateEvent = await client.event.actions.declare.request(
+    generator.event.actions.declare(duplicateEvent.id, {
+      declaration
+    })
+  )
+
+  expect(
+    getCurrentEventState(declaredDuplicateEvent, tennisClubMembershipEvent)
+      .potentialDuplicates
+  ).toEqual([{ id: existingEvent.id, trackingId: existingEvent.trackingId }])
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(duplicateEvent.id, {
+      assignedTo: user.id
+    })
+  )
+  await client.event.actions.duplicate.markNotDuplicate(
+    generator.event.actions.duplicate.markNotDuplicate(duplicateEvent.id, {
+      declaration,
+      keepAssignment: true
+    })
+  )
+  const previousName = declaration['applicant.name'] as NameFieldValue
+  const stillDeclaredEvent = await client.event.actions.validate.request(
+    generator.event.actions.validate(duplicateEvent.id, {
+      declaration: {
+        ...declaration,
+        'applicant.name': {
+          ...previousName,
+          firstname: `${previousName.firstname}2`
+        }
+      }
+    })
+  )
+
+  expect(
+    getCurrentEventState(stillDeclaredEvent, tennisClubMembershipEvent)
+  ).toMatchObject({
+    status: 'DECLARED',
+    potentialDuplicates: [
+      { id: existingEvent.id, trackingId: existingEvent.trackingId }
+    ]
   })
 })
 

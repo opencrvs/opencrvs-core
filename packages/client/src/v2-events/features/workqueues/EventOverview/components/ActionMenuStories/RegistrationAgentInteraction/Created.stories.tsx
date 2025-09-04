@@ -26,7 +26,7 @@ export default {
   title: 'ActionMenu/RegistrationAgent/Created'
 } as Meta<typeof ActionMenu>
 
-const craetedScenariosForRegistrationAgent: Scenario[] = [
+const createdScenariosForRegistrationAgent: Scenario[] = [
   {
     name: 'AssignedToSelf',
     recordDownloaded: true,
@@ -41,7 +41,7 @@ const craetedScenariosForRegistrationAgent: Scenario[] = [
 ]
 
 const stories = createStoriesFromScenarios(
-  craetedScenariosForRegistrationAgent,
+  createdScenariosForRegistrationAgent,
   UserRoles.REGISTRATION_AGENT
 )
 

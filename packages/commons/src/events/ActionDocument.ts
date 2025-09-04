@@ -137,13 +137,18 @@ export type DuplicateDetectedAction = z.infer<typeof DuplicateDetectedAction>
 
 const MarkNotDuplicateAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.MARK_NOT_DUPLICATE)
+    type: z.literal(ActionType.MARK_AS_NOT_DUPLICATE)
   })
 )
 
 const MarkAsDuplicateAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.MARK_AS_DUPLICATE)
+    type: z.literal(ActionType.MARK_AS_DUPLICATE),
+    content: z
+      .object({
+        duplicateOf: UUID
+      })
+      .optional()
   })
 )
 
