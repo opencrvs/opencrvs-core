@@ -46,8 +46,6 @@ export function MarkAsDuplicateModal({
   const [selectedTrackingId, setSelectedTrackingId] = React.useState('')
   const [comment, setComment] = React.useState('')
 
-  const trackingIds = duplicates.map(({ trackingId }) => trackingId).join(', ')
-
   const handleCommentChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -88,34 +86,32 @@ export function MarkAsDuplicateModal({
       width={840}
     >
       {
-        <>
-          <Stack alignItems="stretch" direction="column" gap={10}>
-            <Text element="span" variant="reg18">
-              {intl.formatMessage(duplicateMessages.duplicateDropdownMessage)}
-            </Text>
-            <Select
-              id="selectTrackingId"
-              isDisabled={false}
-              options={duplicates.map(({ trackingId }) => ({
-                value: trackingId,
-                label: trackingId
-              }))}
-              value={selectedTrackingId}
-              onChange={(val: string) => {
-                setSelectedTrackingId(val)
-              }}
-            />
-            <StyledText element="span" variant="reg18">
-              {intl.formatMessage(duplicateMessages.markAsDuplicateReason)}
-            </StyledText>
-            <StyledTextArea
-              id="describe-reason"
-              {...{
-                onChange: handleCommentChange
-              }}
-            />
-          </Stack>
-        </>
+        <Stack alignItems="stretch" direction="column" gap={10}>
+          <Text element="span" variant="reg18">
+            {intl.formatMessage(duplicateMessages.duplicateDropdownMessage)}
+          </Text>
+          <Select
+            id="selectTrackingId"
+            isDisabled={false}
+            options={duplicates.map(({ trackingId }) => ({
+              value: trackingId,
+              label: trackingId
+            }))}
+            value={selectedTrackingId}
+            onChange={(val: string) => {
+              setSelectedTrackingId(val)
+            }}
+          />
+          <StyledText element="span" variant="reg18">
+            {intl.formatMessage(duplicateMessages.markAsDuplicateReason)}
+          </StyledText>
+          <StyledTextArea
+            id="describe-reason"
+            {...{
+              onChange: handleCommentChange
+            }}
+          />
+        </Stack>
       }
     </ResponsiveModal>
   )
