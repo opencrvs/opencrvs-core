@@ -20,6 +20,7 @@ import {
 
 import {
   findLocalEventConfig,
+  setEventData,
   setEventListData
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
@@ -71,5 +72,45 @@ export function updateEventOptimistically<T extends ActionInput>(
         ?.filter((ei) => ei.id !== optimisticEvent.id)
         .concat(getCurrentEventState(optimisticEvent, eventConfig))
     )
+  }
+}
+
+export function addMarkAsNotDuplicateActionOptimistically<
+  T extends ActionInput
+>(actionType: typeof ActionType.MARK_NOT_DUPLICATE) {
+  return (variables: T) => {
+    const localEvent = queryClient.getQueryData(
+      trpcOptionsProxy.event.get.queryKey(variables.eventId)
+    )
+
+    if (!localEvent) {
+      return
+    }
+
+    const optimisticEvent: EventDocument = {
+      ...localEvent,
+      actions: [
+        ...localEvent.actions,
+        {
+          id: createTemporaryId(),
+          type: actionType,
+          /*
+           * These need to be casted or otherwise branded
+           * types like FullDocumentPath causes an error here.
+           * This is because we are effectively trying to force an input type to an output type
+           */
+          declaration: (variables.declaration ||
+            {}) as ActionDocument['declaration'],
+          createdAt: new Date().toISOString(),
+          createdByUserType: 'user',
+          createdBy: '@todo',
+          createdAtLocation: '@todo' as UUID,
+          status: ActionStatus.Accepted,
+          transactionId: variables.transactionId,
+          createdByRole: '@todo'
+        }
+      ]
+    }
+    setEventData(optimisticEvent.id, optimisticEvent)
   }
 }

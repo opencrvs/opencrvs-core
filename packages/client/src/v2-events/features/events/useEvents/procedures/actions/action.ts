@@ -38,7 +38,10 @@ import {
   onAssign,
   updateLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
-import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
+import {
+  addMarkAsNotDuplicateActionOptimistically,
+  updateEventOptimistically
+} from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   createEventActionMutationFn,
   MutationType,
@@ -289,10 +292,13 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
+  onMutate: addMarkAsNotDuplicateActionOptimistically(
+    ActionType.MARK_NOT_DUPLICATE
+  ),
   onSuccess: updateLocalEvent,
   onError: errorToastOnConflict,
   meta: {
-    actionType: ActionType.MARK_AS_DUPLICATE
+    actionType: ActionType.MARK_NOT_DUPLICATE
   }
 })
 

@@ -23,9 +23,9 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { EventIndex, EventStatus, getUUID } from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes/routes'
-import { trpcClient } from '@client/v2-events/trpc'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { useEventTitle } from '../../useEvents/useEventTitle'
+import { useEvents } from '../../useEvents/useEvents'
 import { duplicateMessages } from './ReviewDuplicate'
 import { MarkAsNotDuplicateModal } from './MarkAsNotDuplicateModal'
 import { MarkAsDuplicateModal } from './MarkAsDuplicateModal'
@@ -43,6 +43,8 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
   )
 
   const intl = useIntl()
+
+  const { actions } = useEvents()
 
   const navigate = useNavigate()
   const { getEventTitle } = useEventTitle()
@@ -74,7 +76,7 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
           />
         ))
         if (marAsNotDuplicate) {
-          await trpcClient.event.actions.duplicate.markNotDuplicate.mutate({
+          actions.duplicate.markNotDuplicate.mutate({
             transactionId: getUUID(),
             eventId: eventIndex.id,
             keepAssignment: true
@@ -118,7 +120,7 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
               `Id not found for tracking id ${duplicateTrackingId}. Should never happen.`
             )
           }
-          await trpcClient.event.actions.duplicate.markAsDuplicate.mutate({
+          actions.duplicate.markAsDuplicate.mutate({
             content: { duplicateOf: duplicateId },
             transactionId: getUUID(),
             eventId: eventIndex.id
