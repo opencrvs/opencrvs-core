@@ -47,15 +47,23 @@ export function generateElasticsearchQuery(
   eventConfig: EventConfig
 ): elasticsearch.estypes.QueryDslQueryContainer | null {
   if (queryInput.type === 'and') {
+    const resolvedQueries = queryInput.clauses.map((clause) => {
+      return generateElasticsearchQuery(eventIndex, clause, eventConfig)
+    })
+
+    /*
+     * This ensures that if any of values referenced in the query are missing,
+     * the query is skipped
+     */
+    if (resolvedQueries.some((q) => q === null)) {
+      return null
+    }
+
     return {
       bool: {
-        must: queryInput.clauses
-          .map((clause) => {
-            return generateElasticsearchQuery(eventIndex, clause, eventConfig)
-          })
-          .filter(
-            (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
-          ),
+        must: resolvedQueries.filter(
+          (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
+        ),
         should: undefined
       }
     }
