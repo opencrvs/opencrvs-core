@@ -2162,6 +2162,7 @@ export const handlers = {
         certificates: [
           {
             id: 'tennis-club-membership-certificate',
+            isV2Template: true,
             event: TENNIS_CLUB_MEMBERSHIP,
             label: {
               id: 'certificates.tennis-club-membership.certificate.copy',
@@ -2187,6 +2188,7 @@ export const handlers = {
           },
           {
             id: 'tennis-club-membership-certified-certificate',
+            isV2Template: true,
             event: TENNIS_CLUB_MEMBERSHIP,
             label: {
               id: 'certificates.tennis-club-membership.certificate.certified-copy',

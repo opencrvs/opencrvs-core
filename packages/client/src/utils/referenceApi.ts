@@ -81,6 +81,10 @@ interface ILoginBackground {
 export interface ICertificateConfigData {
   id: string
   event: EventType
+  // This is a temporary field to indicate that the certificate is a v2 template.
+  // As the templates are assigned to event types per id, we would not be able to define separate templates for v1 and v2 'birth' or 'death' events without this.
+  // After v1 is phased out, this field can be removed.
+  isV2Template?: boolean
   label: {
     id: string
     defaultMessage: string
