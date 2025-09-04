@@ -14,6 +14,7 @@ import * as jwt from 'jsonwebtoken'
 import {
   ActionType,
   createPrng,
+  EventConfig,
   EventDocument,
   generateRandomSignature,
   Scope,
@@ -91,18 +92,20 @@ export function sanitizeForSnapshot(data: unknown, fields: string[]) {
 const { createCallerFactory } = t
 
 export const TEST_USER_DEFAULT_SCOPES = [
-  SCOPES.RECORD_DECLARE,
-  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
-  SCOPES.RECORD_READ,
-  SCOPES.RECORD_REGISTER,
-  SCOPES.RECORD_REGISTRATION_CORRECT,
-  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-  SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-  SCOPES.RECORD_DECLARATION_ARCHIVE,
-  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+  SCOPES.RECORD_READ, // @TODO: this can be removed after unnecessary .list endpoint is removed
   SCOPES.RECORD_UNASSIGN_OTHERS,
   SCOPES.SEARCH_BIRTH,
-  'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]'
+  'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
+  'record.read[event=v2.birth|v2.death|tennis-club-membership]',
+  'record.notify[event=v2.birth|v2.death|tennis-club-membership]',
+  'record.declare[event=v2.birth|v2.death|tennis-club-membership]',
+  'record.declared.validate[event=v2.birth|v2.death|tennis-club-membership]',
+  'record.declared.reject[event=v2.birth|v2.death|tennis-club-membership]',
+  'record.declared.archive[event=v2.birth|v2.death|tennis-club-membership]',
+  'record.register[event=v2.birth|v2.death|tennis-club-membership]',
+  'record.registered.print-certified-copies[event=v2.birth|v2.death|tennis-club-membership]',
+  'record.registered.request-correction[event=v2.birth|v2.death|tennis-club-membership]',
+  'record.registered.correct[event=v2.birth|v2.death|tennis-club-membership]'
 ]
 
 export function createTestToken(
@@ -163,9 +166,12 @@ export function createTestClient(
 /**
  *  Setup for test cases. Creates a user and locations in the database, and provides relevant client instances and seeders.
  */
-export const setupTestCase = async (rngSeed?: number) => {
+export const setupTestCase = async (
+  rngSeed?: number,
+  configuration?: EventConfig
+) => {
   const rng = createPrng(rngSeed ?? 101)
-  const generator = payloadGenerator(rng)
+  const generator = payloadGenerator(rng, configuration)
   const eventsDb = getClient()
 
   const seed = seeder()
