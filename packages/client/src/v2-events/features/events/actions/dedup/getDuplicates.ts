@@ -19,15 +19,12 @@ export async function prefetchPotentialDuplicates(eventId: string) {
     eventId
   })
 
-  await Promise.all(
-    potentialDuplicates.map(async (eventDocument) =>
-      Promise.all([
-        cacheFiles(eventDocument),
-        cacheUsersFromEventDocument(eventDocument)
-      ])
-    )
-  )
-
+  for (const eventDocument of potentialDuplicates) {
+    await Promise.all([
+      cacheFiles(eventDocument),
+      cacheUsersFromEventDocument(eventDocument)
+    ])
+  }
   potentialDuplicates.forEach((potentialDuplicate) => {
     setEventData(potentialDuplicate.id, potentialDuplicate)
   })
