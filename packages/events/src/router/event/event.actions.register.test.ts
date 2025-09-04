@@ -22,8 +22,7 @@ import {
   generateRegistrationNumber,
   getCurrentEventState,
   getOrThrow,
-  getUUID,
-  SCOPES
+  getUUID
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -50,7 +49,9 @@ test('prevents forbidden access if missing required scope', async () => {
 
 test(`allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_REGISTER])
+  const client = createTestClient(user, [
+    'record.register[event=v2.birth|v2.death|tennis-club-membership]'
+  ])
 
   await expect(
     client.event.actions.register.request(
@@ -840,8 +841,7 @@ test('deduplication check is performed before register when configured', async (
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
       return HttpResponse.json([
-        tennisClubMembershipEventWithDedupCheck(ActionType.REGISTER),
-        { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+        tennisClubMembershipEventWithDedupCheck(ActionType.REGISTER)
       ])
     })
   )

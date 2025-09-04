@@ -99,11 +99,9 @@ test('Server starts up and returns an event based on context dependency values',
   }
 
   mswServer.use(
-    http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
-      return HttpResponse.json({
-        ...mockUserResponse
-      })
-    })
+    http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () =>
+      HttpResponse.json(mockUserResponse)
+    )
   )
 
   const response = await customClient.event.create.mutate(

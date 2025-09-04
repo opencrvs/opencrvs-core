@@ -16,14 +16,12 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { useSelector } from 'react-redux'
 import {
   ActionType,
   EventStatus,
   getActionReview,
   getCurrentEventState,
-  getDeclaration,
-  SCOPES
+  getDeclaration
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -40,10 +38,10 @@ import {
 import { FormLayout } from '@client/v2-events/layouts'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
@@ -73,13 +71,13 @@ export function Review() {
   const { setAnnotation, getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
 
-  const scopes = useSelector(getScope) ?? undefined
+  const { isActionAllowed } = useUserAllowedActions(event.type)
 
   const reviewActionConfiguration = useReviewActionConfig({
+    eventType: event.type,
     formConfig,
     declaration: form,
     annotation,
-    scopes,
     reviewFields: reviewConfig.fields
   })
 
@@ -201,7 +199,7 @@ export function Review() {
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions
-          canSendIncomplete={scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)}
+          canSendIncomplete={isActionAllowed(ActionType.NOTIFY)}
           icon={reviewActionConfiguration.icon}
           incomplete={reviewActionConfiguration.incomplete}
           messages={reviewActionConfiguration.messages}

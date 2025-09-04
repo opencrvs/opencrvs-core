@@ -21,8 +21,7 @@ import {
   generateActionDeclarationInput,
   getCurrentEventState,
   getUUID,
-  NameFieldValue,
-  SCOPES
+  NameFieldValue
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -34,7 +33,7 @@ import { env } from '@events/environment'
 
 /* eslint-disable max-lines */
 
-test(`prevents forbidden access if missing required scope`, async () => {
+test('prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [])
 
@@ -45,9 +44,9 @@ test(`prevents forbidden access if missing required scope`, async () => {
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`allows access if required scope is present`, async () => {
+test('allows access if required scope is present', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_SUBMIT_FOR_APPROVAL])
+  const client = createTestClient(user)
 
   await expect(
     client.event.actions.validate.request(
@@ -359,8 +358,7 @@ test('deduplication check is performed before validation when configured', async
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
       return HttpResponse.json([
-        tennisClubMembershipEventWithDedupCheck(ActionType.VALIDATE),
-        { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+        tennisClubMembershipEventWithDedupCheck(ActionType.VALIDATE)
       ])
     })
   )
@@ -415,8 +413,7 @@ test('deduplication check is skipped if the event has been marked as not duplica
         tennisClubMembershipEventWithDedupCheck(
           ActionType.DECLARE,
           ActionType.VALIDATE
-        ),
-        { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+        )
       ])
     })
   )
@@ -481,8 +478,7 @@ test('deduplication check is not skipped if the event has been marked as not dup
         tennisClubMembershipEventWithDedupCheck(
           ActionType.DECLARE,
           ActionType.VALIDATE
-        ),
-        { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+        )
       ])
     })
   )

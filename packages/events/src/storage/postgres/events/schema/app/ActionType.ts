@@ -20,6 +20,6 @@ type ActionType =
   | 'READ'
   | 'ASSIGN'
   | 'UNASSIGN'
-  | 'MARK_NOT_DUPLICATE'
+  | 'MARK_AS_NOT_DUPLICATE'
 
 export default ActionType
