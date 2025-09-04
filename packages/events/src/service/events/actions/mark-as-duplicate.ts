@@ -14,7 +14,7 @@ import {
   EventDocument,
   MarkAsDuplicateActionInput
 } from '@opencrvs/commons/events'
-import { addAction } from '@events/service/events/events'
+import { processAction } from '@events/service/events/events'
 import { TrpcUserContext } from '@events/context'
 
 export async function markAsDuplicate(
@@ -24,7 +24,7 @@ export async function markAsDuplicate(
   token: string,
   configuration: EventConfig
 ) {
-  return addAction(input, {
+  return processAction(input, {
     event,
     user,
     token,

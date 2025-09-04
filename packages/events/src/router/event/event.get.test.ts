@@ -341,9 +341,7 @@ describe('Event indexing behavior', () => {
     })
 
     test('indexes on notify', async () => {
-      const notifyClient = createTestClient(user, [
-        'record.declaration-submit-incomplete'
-      ])
+      const notifyClient = createTestClient(user)
       const event = await notifyClient.event.create(generator.event.create())
       await notifyClient.event.actions.notify.request(
         generator.event.actions.notify(event.id)

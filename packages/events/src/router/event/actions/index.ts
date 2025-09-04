@@ -234,7 +234,7 @@ export async function defaultRequestHandler(
 
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
 
-  const updatedEvent = await addAction(
+  const updatedEvent = await processAction(
     {
       ...strippedInput,
       declaration: {},
@@ -244,7 +244,6 @@ export async function defaultRequestHandler(
     { event, user, token, status, configuration }
   )
 
-  await ensureEventIndexed(updatedEvent, configuration)
   return updatedEvent
 }
 

@@ -19,7 +19,7 @@ import {
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
-import { addAction, getEventById } from '@events/service/events/events'
+import { getEventById, processAction } from '@events/service/events/events'
 import {
   defaultRequestHandler,
   getDefaultActionProcedures
@@ -85,7 +85,7 @@ export function declareActionProcedures() {
         const updatedEvent = await getEventById(input.eventId)
 
         if (duplicates.length > 0) {
-          return addAction(
+          return processAction(
             {
               type: ActionType.DUPLICATE_DETECTED,
               transactionId: input.transactionId,

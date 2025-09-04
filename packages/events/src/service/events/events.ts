@@ -315,6 +315,19 @@ export function buildAction(
   }
 }
 
+/**
+ * Persists a new action for an event in the database.
+ *
+ * @param input - The action payload including type and related data.
+ * @param options - Context for the action being added.
+ * @param options.event - The event document the action belongs to.
+ * @param options.user - The user performing the action.
+ * @param options.token - Authentication token of the user.
+ * @param options.status - The resulting status of the action e.g - Accepted, Requested.
+ * @param options.configuration - Event configuration.
+ *
+ * @returns The updated event document with the new action included.
+ */
 export async function addAction(
   input: ActionInputWithType,
   {
@@ -417,6 +430,7 @@ export async function ensureEventIndexed(
  * Processes an action on an event:
  *  - Adds the given action to the event
  *  - Updates the event state accordingly
+ *  - Record an event in the database
  *  - Indexes the event in Elasticsearch if it is no longer a draft
  *
  * Returns the updated event document.

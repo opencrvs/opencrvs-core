@@ -25,7 +25,7 @@ import { getUUID } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
-import { addAction, getEventById } from '@events/service/events/events'
+import { processAction, getEventById } from '@events/service/events/events'
 
 function requiresDedupCheck(
   input: ActionInputWithType
@@ -143,7 +143,7 @@ export const detectDuplicate: MiddlewareFunction<
   )
 
   if (duplicates.length > 0) {
-    const event = await addAction(
+    const event = await processAction(
       {
         type: ActionType.DUPLICATE_DETECTED,
         transactionId: input.transactionId,
