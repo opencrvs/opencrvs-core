@@ -21,6 +21,7 @@ import {
 } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
 import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { getActionTypeSpecificContent } from './actionTypeSpecificContent'
 
 export const eventHistoryStatusMessage = {
@@ -44,6 +45,11 @@ const messages = defineMessages({
     defaultMessage: 'Reason',
     description: 'Label for rejection correction reason',
     id: 'v2.constants.reason'
+  },
+  duplicateOf: {
+    defaultMessage: 'Duplicate of',
+    description: 'table header for `duplicate of` in record audit',
+    id: 'v2constants.duplicateOf'
   }
 })
 
@@ -70,6 +76,21 @@ function prepareReason(history: ActionDocument) {
   return reason
 }
 
+function prepareDuplicateOf(
+  history: ActionDocument,
+  events: ReturnType<typeof useEvents>
+) {
+  if (history.type === ActionType.MARK_AS_DUPLICATE) {
+    const duplicateOf = history.content?.duplicateOf
+    if (duplicateOf) {
+      const localEventDocument = events.getEvent.findFromCache(duplicateOf).data
+      return localEventDocument?.trackingId ?? null
+    }
+  }
+
+  return null
+}
+
 /**
  * Detailed view of single Action, showing the history of the event.
  */
@@ -90,9 +111,11 @@ export function EventHistoryDialog({
   const title = intl.formatMessage(eventHistoryStatusMessage, {
     status: getActionTypeForHistory(history, action)
   })
+  const events = useEvents()
 
   const comments = prepareComments(action)
   const reason = prepareReason(action)
+  const duplicateOf = prepareDuplicateOf(action, events)
 
   return (
     <ResponsiveModal
@@ -119,6 +142,23 @@ export function EventHistoryDialog({
           )}
         </Text>
       </Stack>
+      {Boolean(duplicateOf) && (
+        <Table
+          columns={[
+            {
+              key: 'duplicateOf',
+              label: intl.formatMessage(messages.duplicateOf),
+              width: 100
+            }
+          ]}
+          content={[
+            {
+              duplicateOf: duplicateOf
+            }
+          ]}
+          noResultText=" "
+        />
+      )}
       {comments.length > 0 && (
         <Table
           columns={[
