@@ -47,6 +47,7 @@ export const useCertificateTemplateSelectorFieldConfig = (
     )?.id,
     options: certificateTemplates
       .filter((x) => x.event === eventType)
+      .filter((x) => x.isV2Template)
       .filter(
         (template) =>
           !template.conditionals ||
