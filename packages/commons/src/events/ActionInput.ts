@@ -117,7 +117,12 @@ export const MarkAsDuplicateActionInput = BaseActionInput.merge(
   z.object({
     type: z
       .literal(ActionType.MARK_AS_DUPLICATE)
-      .default(ActionType.MARK_AS_DUPLICATE)
+      .default(ActionType.MARK_AS_DUPLICATE),
+    content: z
+      .object({
+        duplicateOf: UUID
+      })
+      .optional()
   })
 )
 export type MarkAsDuplicateActionInput = z.infer<
@@ -127,8 +132,8 @@ export type MarkAsDuplicateActionInput = z.infer<
 export const MarkNotDuplicateActionInput = BaseActionInput.merge(
   z.object({
     type: z
-      .literal(ActionType.MARK_NOT_DUPLICATE)
-      .default(ActionType.MARK_NOT_DUPLICATE)
+      .literal(ActionType.MARK_AS_NOT_DUPLICATE)
+      .default(ActionType.MARK_AS_NOT_DUPLICATE)
   })
 )
 export type MarkNotDuplicateActionInput = z.infer<

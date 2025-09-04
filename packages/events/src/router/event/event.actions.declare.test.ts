@@ -327,8 +327,7 @@ test('deduplication check is performed after declaration', async () => {
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
       return HttpResponse.json([
-        tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE),
-        { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+        tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
       ])
     })
   )
@@ -365,7 +364,8 @@ test('deduplication check is performed after declaration', async () => {
     })
   )
   expect(
-    getCurrentEventState(declaredEvent, tennisClubMembershipEvent).duplicates
+    getCurrentEventState(declaredEvent, tennisClubMembershipEvent)
+      .potentialDuplicates
   ).toEqual([
     { id: existingEventId, trackingId: existingEventIndex.trackingId }
   ])

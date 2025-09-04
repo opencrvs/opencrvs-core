@@ -27,6 +27,8 @@ import {
   ArchiveActionInput,
   AssignActionInput,
   DeclareActionInput,
+  MarkAsDuplicateActionInput,
+  MarkNotDuplicateActionInput,
   NotifyActionInput,
   RegisterActionInput,
   RejectCorrectionActionInput,
@@ -634,6 +636,64 @@ export function eventPayloadGenerator(
           keepAssignment: input.keepAssignment,
           content: input.content ?? { reason: '' }
         })
+      },
+      duplicate: {
+        markAsDuplicate: (
+          eventId: string,
+          input: Partial<
+            Pick<
+              MarkAsDuplicateActionInput,
+              'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+            >
+          > = {}
+        ) => ({
+          type: ActionType.MARK_AS_DUPLICATE,
+          transactionId: input.transactionId ?? getUUID(),
+          declaration:
+            input.declaration ??
+            generateActionDeclarationInput(
+              tennisClubMembershipEvent,
+              ActionType.REGISTER,
+              rng
+            ),
+          annotation:
+            input.annotation ??
+            generateActionAnnotationInput(
+              tennisClubMembershipEvent,
+              ActionType.REGISTER,
+              rng
+            ),
+          eventId,
+          keepAssignment: input.keepAssignment
+        }),
+        markNotDuplicate: (
+          eventId: string,
+          input: Partial<
+            Pick<
+              MarkNotDuplicateActionInput,
+              'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+            >
+          > = {}
+        ) => ({
+          type: ActionType.MARK_AS_NOT_DUPLICATE,
+          transactionId: input.transactionId ?? getUUID(),
+          declaration:
+            input.declaration ??
+            generateActionDeclarationInput(
+              tennisClubMembershipEvent,
+              ActionType.REGISTER,
+              rng
+            ),
+          annotation:
+            input.annotation ??
+            generateActionAnnotationInput(
+              tennisClubMembershipEvent,
+              ActionType.REGISTER,
+              rng
+            ),
+          eventId,
+          keepAssignment: input.keepAssignment
+        })
       }
     }
   }
@@ -686,10 +746,10 @@ export function generateActionDocument({
   switch (action) {
     case ActionType.READ:
       return { ...actionBase, type: action }
-    case ActionType.MARK_NOT_DUPLICATE:
+    case ActionType.MARK_AS_NOT_DUPLICATE:
       return { ...actionBase, type: action }
     case ActionType.MARK_AS_DUPLICATE:
-      return { ...actionBase, type: action }
+      return { ...actionBase, type: action, content: undefined }
     case ActionType.DECLARE:
       return { ...actionBase, type: action }
     case ActionType.UNASSIGN:
@@ -936,7 +996,7 @@ export const eventQueryDataGenerator = (
     updatedBy: overrides.updatedBy ?? generateUuid(rng),
     updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
     flags: overrides.flags ?? [],
-    duplicates: [],
+    potentialDuplicates: [],
     legalStatuses: overrides.legalStatuses ?? {},
     declaration: overrides.declaration ?? generateRandomApplicant(rng),
     trackingId: overrides.trackingId ?? generateTrackingId(rng)

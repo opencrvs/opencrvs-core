@@ -14,8 +14,15 @@ import {
   ActionStatus,
   ActionType,
   InherentFlags,
-  Flag
+  Flag,
+  getCurrentEventState,
+  createPrng,
+  generateActionDeclarationInput
 } from '@opencrvs/commons'
+import {
+  tennisClubMembershipEvent,
+  tennisClubMembershipEventWithDedupCheck
+} from '@opencrvs/commons/fixtures'
 import { env } from '@events/environment'
 import {
   createEvent,
@@ -366,4 +373,74 @@ test(`Removes ${InherentFlags.REJECTED} flag after ${ActionType.DECLARE} is call
 
   const index = await client.event.list()
   expect(index[0].flags).not.toContain(InherentFlags.REJECTED)
+})
+
+suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
+  beforeEach(() => {
+    mswServer.use(
+      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+        return HttpResponse.json([
+          tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
+        ])
+      })
+    )
+  })
+
+  async function createDuplicateEvent() {
+    const prng = createPrng(73)
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+
+    const existingEvent = await client.event.create(generator.event.create())
+    const declaration = generateActionDeclarationInput(
+      tennisClubMembershipEvent,
+      ActionType.DECLARE,
+      prng
+    )
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(existingEvent.id, {
+        declaration
+      })
+    )
+
+    const duplicateEvent = await client.event.create(generator.event.create())
+    const declaredDuplicateEvent = await client.event.actions.declare.request(
+      generator.event.actions.declare(duplicateEvent.id, {
+        declaration
+      })
+    )
+
+    return [declaredDuplicateEvent, client, generator] as const
+  }
+
+  test(`Adds the flag after ${ActionType.DECLARE} if duplicates are detected`, async () => {
+    const [duplicateEvent] = await createDuplicateEvent()
+
+    expect(
+      getCurrentEventState(duplicateEvent, tennisClubMembershipEvent).flags
+    ).toContain(InherentFlags.POTENTIAL_DUPLICATE)
+  })
+
+  test(`Removes the flag after ${ActionType.MARK_AS_NOT_DUPLICATE}`, async () => {
+    const [duplicateEvent, client, generator] = await createDuplicateEvent()
+
+    const event = await client.event.actions.duplicate.markNotDuplicate(
+      generator.event.actions.duplicate.markNotDuplicate(duplicateEvent.id)
+    )
+    expect(
+      getCurrentEventState(event, tennisClubMembershipEvent).flags
+    ).not.toContain(InherentFlags.POTENTIAL_DUPLICATE)
+  })
+
+  test(`Removes the flag after ${ActionType.MARK_AS_DUPLICATE}`, async () => {
+    const [duplicateEvent, client, generator] = await createDuplicateEvent()
+
+    const event = await client.event.actions.duplicate.markAsDuplicate(
+      generator.event.actions.duplicate.markAsDuplicate(duplicateEvent.id)
+    )
+    expect(
+      getCurrentEventState(event, tennisClubMembershipEvent).flags
+    ).not.toContain(InherentFlags.POTENTIAL_DUPLICATE)
+  })
 })
