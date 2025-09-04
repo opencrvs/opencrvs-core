@@ -11,6 +11,7 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
+import { flatten } from 'lodash'
 import { ResponsiveModal, Stack, Table } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
@@ -49,7 +50,7 @@ const messages = defineMessages({
   duplicateOf: {
     defaultMessage: 'Duplicate of',
     description: 'table header for `duplicate of` in record audit',
-    id: 'v2constants.duplicateOf'
+    id: 'v2.constants.duplicateOf'
   }
 })
 
@@ -78,13 +79,24 @@ function prepareReason(history: ActionDocument) {
 
 function prepareDuplicateOf(
   history: ActionDocument,
-  events: ReturnType<typeof useEvents>
+  fullHistory: ActionDocument[]
 ) {
   if (history.type === ActionType.MARK_AS_DUPLICATE) {
     const duplicateOf = history.content?.duplicateOf
     if (duplicateOf) {
-      const localEventDocument = events.getEvent.findFromCache(duplicateOf).data
-      return localEventDocument?.trackingId ?? null
+      const duplicateDetectedActions = fullHistory.filter(
+        (action) => action.type === ActionType.DUPLICATE_DETECTED
+      )
+      // Array<{id: UUID, trackingId: string}>
+      const allDuplicatesDetectedFlattened = flatten(
+        duplicateDetectedActions.map((action) => action.content.duplicates)
+      )
+
+      return (
+        allDuplicatesDetectedFlattened.find(
+          (duplicate) => duplicate.id === duplicateOf
+        )?.trackingId ?? null
+      )
     }
   }
 
@@ -115,7 +127,7 @@ export function EventHistoryDialog({
 
   const comments = prepareComments(action)
   const reason = prepareReason(action)
-  const duplicateOf = prepareDuplicateOf(action, events)
+  const duplicateOf = prepareDuplicateOf(action, history)
 
   return (
     <ResponsiveModal
