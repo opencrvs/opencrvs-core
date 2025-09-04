@@ -22,6 +22,7 @@ import {
 import { useTRPC } from '@client/v2-events/trpc'
 import { useDrafts } from '../../drafts/useDrafts'
 import { useEventConfiguration } from '../useEventConfiguration'
+import { prefetchPotentialDuplicates } from '../actions/dedup/getDuplicates'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
@@ -211,11 +212,12 @@ export function useEvents() {
             /**This makes sure all the files and users referenced in the event document is prefetched to be used even in offline */
             await refetchEvent()
 
-            return assignMutation.mutate({
+            await assignMutation.mutateAsync({
               eventId,
               transactionId: getUUID(),
               assignedTo
             })
+            await prefetchPotentialDuplicates(eventId)
           }
         },
         unassign: useEventAction(trpc.event.actions.assignment.unassign)

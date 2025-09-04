@@ -57,7 +57,6 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
 
     const eventDocument = EventDocument.parse(response)
 
-    // ToDo: Precache potential duplicates
     await Promise.all([
       cacheFiles(eventDocument),
       cacheUsersFromEventDocument(eventDocument)
