@@ -281,15 +281,18 @@ export function generateActionAnnotationInput(
   }
 }
 
-export function eventPayloadGenerator(rng: () => number) {
+export function eventPayloadGenerator(
+  rng: () => number,
+  configuration: EventConfig = tennisClubMembershipEvent
+) {
   return {
     create: (input: Partial<EventInput> = {}) => ({
       transactionId: input.transactionId ?? getUUID(),
-      type: input.type ?? TENNIS_CLUB_MEMBERSHIP
+      type: input.type ?? configuration.id
     }),
     patch: (id: string, input: Partial<EventInput> = {}) => ({
       transactionId: input.transactionId ?? getUUID(),
-      type: input.type ?? TENNIS_CLUB_MEMBERSHIP,
+      type: input.type ?? configuration.id,
       id
     }),
     draft: (
@@ -359,17 +362,13 @@ export function eventPayloadGenerator(rng: () => number) {
         declaration:
           input.declaration ??
           generateActionDeclarationInput(
-            tennisClubMembershipEvent,
+            configuration,
             ActionType.DECLARE,
             rng
           ),
         annotation:
           input.annotation ??
-          generateActionAnnotationInput(
-            tennisClubMembershipEvent,
-            ActionType.DECLARE,
-            rng
-          ),
+          generateActionAnnotationInput(configuration, ActionType.DECLARE, rng),
         eventId,
         ...input
       }),
@@ -390,7 +389,7 @@ export function eventPayloadGenerator(rng: () => number) {
           // Remove some fields to simulate incomplete data
           const partialDeclaration = omitBy(
             generateActionDeclarationInput(
-              tennisClubMembershipEvent,
+              configuration,
               ActionType.DECLARE,
               rng
             ),
@@ -423,14 +422,14 @@ export function eventPayloadGenerator(rng: () => number) {
         declaration:
           input.declaration ??
           generateActionDeclarationInput(
-            tennisClubMembershipEvent,
+            configuration,
             ActionType.VALIDATE,
             rng
           ),
         annotation:
           input.annotation ??
           generateActionAnnotationInput(
-            tennisClubMembershipEvent,
+            configuration,
             ActionType.VALIDATE,
             rng
           ),
@@ -494,11 +493,7 @@ export function eventPayloadGenerator(rng: () => number) {
         declaration: {},
         annotation:
           input.annotation ??
-          generateActionAnnotationInput(
-            tennisClubMembershipEvent,
-            ActionType.REJECT,
-            rng
-          ),
+          generateActionAnnotationInput(configuration, ActionType.REJECT, rng),
         duplicates: [],
         eventId,
         content: { reason: `${ActionType.REJECT}` },
@@ -522,14 +517,14 @@ export function eventPayloadGenerator(rng: () => number) {
         declaration:
           input.declaration ??
           generateActionDeclarationInput(
-            tennisClubMembershipEvent,
+            configuration,
             ActionType.REGISTER,
             rng
           ),
         annotation:
           input.annotation ??
           generateActionAnnotationInput(
-            tennisClubMembershipEvent,
+            configuration,
             ActionType.REGISTER,
             rng
           ),
@@ -551,7 +546,7 @@ export function eventPayloadGenerator(rng: () => number) {
         annotation:
           input.annotation ??
           generateActionAnnotationInput(
-            tennisClubMembershipEvent,
+            configuration,
             ActionType.PRINT_CERTIFICATE,
             rng
           ),
@@ -574,7 +569,7 @@ export function eventPayloadGenerator(rng: () => number) {
             input.declaration ??
             omit(
               generateActionDeclarationInput(
-                tennisClubMembershipEvent,
+                configuration,
                 ActionType.REQUEST_CORRECTION,
                 rng
               ),
@@ -583,7 +578,7 @@ export function eventPayloadGenerator(rng: () => number) {
           annotation:
             input.annotation ??
             generateActionAnnotationInput(
-              tennisClubMembershipEvent,
+              configuration,
               ActionType.REQUEST_CORRECTION,
               rng
             ),
@@ -606,7 +601,7 @@ export function eventPayloadGenerator(rng: () => number) {
           annotation:
             input.annotation ??
             generateActionAnnotationInput(
-              tennisClubMembershipEvent,
+              configuration,
               ActionType.APPROVE_CORRECTION,
               rng
             ),
@@ -630,7 +625,7 @@ export function eventPayloadGenerator(rng: () => number) {
           annotation:
             input.annotation ??
             generateActionAnnotationInput(
-              tennisClubMembershipEvent,
+              configuration,
               ActionType.REJECT_CORRECTION,
               rng
             ),

@@ -32,6 +32,7 @@ import {
   ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
+import { EventIdParam } from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
 import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
 import {
@@ -57,6 +58,7 @@ import {
 } from '@events/service/indexing/indexing'
 import { reindex } from '@events/service/events/reindex'
 import { UserContext } from '../../context'
+import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 
@@ -144,6 +146,15 @@ export const eventRouter = router({
       )
 
       return updatedEvent
+    }),
+  getDuplicates: publicProcedure
+    .use(requiresAnyOfScopes([SCOPES.RECORD_REVIEW_DUPLICATES]))
+    .input(EventIdParam)
+    .use(middleware.requireAssignment)
+    .query(async ({ input, ctx }) => {
+      const event = await getEventById(input.eventId)
+
+      return getDuplicateEvents(event, ctx)
     }),
   delete: publicProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.DELETE]))

@@ -14,6 +14,7 @@ import * as jwt from 'jsonwebtoken'
 import {
   ActionType,
   createPrng,
+  EventConfig,
   EventDocument,
   generateRandomSignature,
   Scope,
@@ -163,9 +164,12 @@ export function createTestClient(
 /**
  *  Setup for test cases. Creates a user and locations in the database, and provides relevant client instances and seeders.
  */
-export const setupTestCase = async (rngSeed?: number) => {
+export const setupTestCase = async (
+  rngSeed?: number,
+  configuration?: EventConfig
+) => {
   const rng = createPrng(rngSeed ?? 101)
-  const generator = payloadGenerator(rng)
+  const generator = payloadGenerator(rng, configuration)
   const eventsDb = getClient()
 
   const seed = seeder()
