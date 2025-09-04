@@ -14,7 +14,6 @@ import {
   ActionStatus,
   ActionType,
   InherentFlags,
-  SCOPES,
   Flag,
   getCurrentEventState,
   createPrng,
@@ -304,10 +303,7 @@ test(`Removes ${InherentFlags.CORRECTION_REQUESTED} flag after ${ActionType.APPR
 
 test(`Adds ${InherentFlags.INCOMPLETE} flag after ${ActionType.NOTIFY} is called`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    SCOPES.RECORD_SUBMIT_INCOMPLETE,
-    SCOPES.RECORD_DECLARE
-  ])
+  const client = createTestClient(user)
 
   const event = await createEvent(client, generator, [])
 
@@ -321,10 +317,7 @@ test(`Adds ${InherentFlags.INCOMPLETE} flag after ${ActionType.NOTIFY} is called
 
 test(`Removes ${InherentFlags.INCOMPLETE} flag after ${ActionType.DECLARE} is called`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    SCOPES.RECORD_SUBMIT_INCOMPLETE,
-    SCOPES.RECORD_DECLARE
-  ])
+  const client = createTestClient(user)
 
   const event = await createEvent(client, generator, [])
 

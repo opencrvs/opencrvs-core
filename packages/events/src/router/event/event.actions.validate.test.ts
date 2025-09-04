@@ -21,8 +21,7 @@ import {
   generateActionDeclarationInput,
   getCurrentEventState,
   getUUID,
-  NameFieldValue,
-  SCOPES
+  NameFieldValue
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -34,7 +33,7 @@ import { env } from '@events/environment'
 
 /* eslint-disable max-lines */
 
-test(`prevents forbidden access if missing required scope`, async () => {
+test('prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [])
 
@@ -45,9 +44,9 @@ test(`prevents forbidden access if missing required scope`, async () => {
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`allows access if required scope is present`, async () => {
+test('allows access if required scope is present', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_SUBMIT_FOR_APPROVAL])
+  const client = createTestClient(user)
 
   await expect(
     client.event.actions.validate.request(

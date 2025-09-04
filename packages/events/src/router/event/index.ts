@@ -11,15 +11,16 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import { QueryProcedure } from '@trpc/server/unstable-core-do-not-import'
+import {
+  QueryProcedure,
+  TRPCError
+} from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
 import {
-  ACTION_ALLOWED_SCOPES,
   ActionStatus,
   ActionType,
   AssignActionInput,
-  CONFIG_GET_ALLOWED_SCOPES,
   DeleteActionInput,
   Draft,
   DraftInput,
@@ -29,7 +30,7 @@ import {
   EventInput,
   SearchQuery,
   UnassignActionInput,
-  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
+  ACTION_SCOPE_MAP,
   MarkAsDuplicateActionInput,
   MarkNotDuplicateActionInput
 } from '@opencrvs/commons/events'
@@ -87,7 +88,18 @@ const eventConfigGetProcedure: QueryProcedure<{
       protect: true
     }
   })
-  .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
+  .use(
+    requiresAnyOfScopes(
+      [
+        SCOPES.RECORD_READ,
+        SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+        SCOPES.RECORD_EXPORT_RECORDS,
+        SCOPES.CONFIG,
+        SCOPES.CONFIG_UPDATE_ALL
+      ],
+      ['record.declare', 'record.notify', 'record.register']
+    )
+  )
   .input(z.void())
   .output(z.array(EventConfig))
   .query(async (options) => {
@@ -110,8 +122,8 @@ export const eventRouter = router({
     })
     .use(
       requiresAnyOfScopes(
-        ACTION_ALLOWED_SCOPES[ActionType.CREATE],
-        ACTION_ALLOWED_CONFIGURABLE_SCOPES[ActionType.CREATE]
+        [SCOPES.RECORD_SUBMIT_FOR_REVIEW],
+        ACTION_SCOPE_MAP[ActionType.CREATE]
       )
     )
     .input(EventInput)
@@ -131,10 +143,15 @@ export const eventRouter = router({
       })
     }),
   get: publicProcedure
-    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
+    .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.READ]))
     .input(UUID)
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
+
+      if (!ctx.authorizedEntities?.events?.includes(event.type)) {
+        throw new TRPCError({ code: 'FORBIDDEN' })
+      }
+
       const updatedEvent = await addAction(
         {
           type: ActionType.READ,
@@ -161,7 +178,7 @@ export const eventRouter = router({
       return getDuplicateEvents(event, ctx)
     }),
   delete: publicProcedure
-    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.DELETE]))
+    .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.DELETE]))
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
@@ -177,9 +194,9 @@ export const eventRouter = router({
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
   draft: router({
-    list: publicProcedure.output(z.array(Draft)).query(async (options) => {
-      return getDraftsByUserId(options.ctx.user.id)
-    }),
+    list: publicProcedure
+      .output(z.array(Draft))
+      .query(async (options) => getDraftsByUserId(options.ctx.user.id)),
     create: publicProcedure
       .input(DraftInput)
       .use(middleware.requireAssignment)
@@ -289,7 +306,14 @@ export const eventRouter = router({
     })
   }),
   list: systemProcedure
-    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
+    .use(
+      requiresAnyOfScopes([
+        SCOPES.RECORD_READ,
+        SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+        SCOPES.RECORD_REGISTER,
+        SCOPES.RECORD_EXPORT_RECORDS
+      ])
+    )
     .output(z.array(EventIndex))
     .query(async ({ ctx }) => {
       const userId = ctx.user.id
