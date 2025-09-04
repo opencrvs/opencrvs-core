@@ -11,7 +11,7 @@
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@opencrvs/commons'
 import * as Joi from 'joi'
-import { sendAllUserEmails } from './service.'
+import { sendAllUserEmails } from './service'
 
 export async function allUsersEmailHandler(
   request: Hapi.Request,

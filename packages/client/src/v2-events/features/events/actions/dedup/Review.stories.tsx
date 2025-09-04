@@ -12,6 +12,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { AppRouter } from '@events/router'
+import { userEvent, within } from '@storybook/test'
 import {
   ActionType,
   createPrng,
@@ -126,5 +127,26 @@ export const ReviewDuplicate: Story = {
     offline: {
       events: [mockOriginalEvent, mockDuplicateEvent]
     }
+  }
+}
+
+export const ReviewComparison: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.buildPath({
+        eventId: mockOriginalEvent.id
+      })
+    },
+    offline: {
+      events: [mockOriginalEvent, mockDuplicateEvent]
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const comparisonTab = await canvas.findByRole('button', {
+      name: /243D49/i
+    })
+    await userEvent.click(comparisonTab)
   }
 }

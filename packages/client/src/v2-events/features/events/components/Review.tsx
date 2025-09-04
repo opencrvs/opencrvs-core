@@ -461,7 +461,7 @@ function ReviewComponent({
   readonlyMode,
   reviewFields,
   isCorrection = false,
-  correctionReview,
+  isReviewCorrection = false,
   banner
 }: {
   children?: React.ReactNode
@@ -483,13 +483,12 @@ function ReviewComponent({
   onAnnotationChange?: (values: EventState) => void
   readonlyMode?: boolean
   isCorrection?: boolean
-  correctionReview?: React.ReactNode
+  isReviewCorrection?: boolean
   banner?: React.ReactNode
 }) {
   const scopes = useSelector(getScope)
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
-  const isReviewCorrection = Boolean(correctionReview)
 
   const pageIdsWithFile = formConfig.pages
     .filter(({ fields }) =>
