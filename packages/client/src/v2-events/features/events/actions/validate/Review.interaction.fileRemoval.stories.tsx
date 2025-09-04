@@ -12,7 +12,6 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { userEvent, within, expect, waitFor } from '@storybook/test'
-import * as selectEvent from 'react-select-event'
 import {
   ActionType,
   tennisClubMembershipEvent,
@@ -264,7 +263,7 @@ export const RemovingExistingSignatureSendsNull: Story = {
 
 const multiFileConfig = {
   ...tennisClubMembershipEvent,
-  id: 'multi-file-event',
+  id: 'v2.death', // Use an existing event type id here, so that the user has the required scope to it
   declaration: {
     label: generateTranslationConfig('File club form'),
     pages: [

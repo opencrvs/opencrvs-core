@@ -26,7 +26,7 @@ export default {
   title: 'ActionMenu/LocalRegistrar/Created'
 } as Meta<typeof ActionMenu>
 
-const craetedScenariosForLocalRegistrar: Scenario[] = [
+const createdScenariosForLocalRegistrar: Scenario[] = [
   {
     name: 'AssignedToSelf',
     recordDownloaded: true,
@@ -41,7 +41,7 @@ const craetedScenariosForLocalRegistrar: Scenario[] = [
 ]
 
 const stories = createStoriesFromScenarios(
-  craetedScenariosForLocalRegistrar,
+  createdScenariosForLocalRegistrar,
   UserRoles.LOCAL_REGISTRAR
 )
 

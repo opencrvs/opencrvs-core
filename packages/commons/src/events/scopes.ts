@@ -9,106 +9,91 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { intersection } from 'lodash'
-import { ConfigurableScopeType, Scope, SCOPES } from '../scopes'
+import {
+  ConfigurableScopeType,
+  findScope,
+  getAuthorizedEventsFromScopes,
+  Scope
+} from '../scopes'
 import {
   ClientSpecificAction,
   ActionType,
   DisplayableAction
 } from './ActionType'
 
-type RequiresNoScope = null
-type NotAvailableAsAction = [] // pseudo actions
+type AlwaysAllowed = null
 
-type RequiresAnyOfScopes = [Scope, ...Scope[]]
-type RequiredScopes =
-  | RequiresAnyOfScopes
-  | RequiresNoScope
-  | NotAvailableAsAction
-
-export const CONFIG_GET_ALLOWED_SCOPES = [
-  SCOPES.RECORD_DECLARE,
-  SCOPES.RECORD_READ,
-  SCOPES.RECORD_SUBMIT_INCOMPLETE,
-  SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-  SCOPES.RECORD_REGISTER,
-  SCOPES.RECORD_EXPORT_RECORDS,
-  SCOPES.CONFIG,
-  SCOPES.CONFIG_UPDATE_ALL
-] satisfies RequiresAnyOfScopes
-
-export const ACTION_ALLOWED_SCOPES = {
-  [ActionType.READ]: [
-    SCOPES.RECORD_DECLARE,
-    SCOPES.RECORD_READ,
-    SCOPES.RECORD_SUBMIT_INCOMPLETE,
-    SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-    SCOPES.RECORD_REGISTER,
-    SCOPES.RECORD_EXPORT_RECORDS
-  ],
-  [ActionType.CREATE]: [
-    SCOPES.RECORD_DECLARE,
-    SCOPES.RECORD_SUBMIT_INCOMPLETE,
-    SCOPES.RECORD_SUBMIT_FOR_REVIEW
-  ],
-  [ActionType.NOTIFY]: [SCOPES.RECORD_SUBMIT_INCOMPLETE],
+// This defines the mapping between event actions and the scopes required to perform them.
+export const ACTION_SCOPE_MAP = {
+  [ActionType.READ]: ['record.read'],
+  [ActionType.CREATE]: ['record.declare', 'record.notify'],
+  [ActionType.NOTIFY]: ['record.notify'],
   [ActionType.DECLARE]: [
-    SCOPES.RECORD_DECLARE,
-    SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-    SCOPES.RECORD_REGISTER
+    'record.declare',
+    'record.declared.validate',
+    'record.register'
   ],
-  [ActionType.DELETE]: [SCOPES.RECORD_DECLARE],
-  [ActionType.VALIDATE]: [
-    SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-    SCOPES.RECORD_REGISTER
-  ],
-  [ActionType.REGISTER]: [SCOPES.RECORD_REGISTER],
-  [ActionType.PRINT_CERTIFICATE]: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
+  [ActionType.DELETE]: ['record.declare'],
+  [ActionType.VALIDATE]: ['record.declared.validate', 'record.register'],
+  [ActionType.REGISTER]: ['record.register'],
+  [ActionType.PRINT_CERTIFICATE]: ['record.registered.print-certified-copies'],
   [ActionType.REQUEST_CORRECTION]: [
-    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-    SCOPES.RECORD_REGISTRATION_CORRECT
+    'record.registered.request-correction',
+    'record.registered.correct'
   ],
   [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: [
-    SCOPES.RECORD_REGISTRATION_CORRECT
+    'record.registered.correct'
   ],
-  [ActionType.REJECT_CORRECTION]: [SCOPES.RECORD_REGISTRATION_CORRECT],
-  [ActionType.APPROVE_CORRECTION]: [SCOPES.RECORD_REGISTRATION_CORRECT],
-  [ActionType.MARK_AS_DUPLICATE]: [SCOPES.RECORD_REVIEW_DUPLICATES],
-  [ActionType.MARK_NOT_DUPLICATE]: [SCOPES.RECORD_REVIEW_DUPLICATES],
-  [ActionType.ARCHIVE]: [SCOPES.RECORD_DECLARATION_ARCHIVE],
-  [ActionType.REJECT]: [SCOPES.RECORD_SUBMIT_FOR_UPDATES],
+  [ActionType.REJECT_CORRECTION]: ['record.registered.correct'],
+  [ActionType.APPROVE_CORRECTION]: ['record.registered.correct'],
+  [ActionType.MARK_AS_DUPLICATE]: ['record.declared.review-duplicates'],
+  [ActionType.MARK_NOT_DUPLICATE]: ['record.declared.review-duplicates'],
+  [ActionType.ARCHIVE]: ['record.declared.archive'],
+  [ActionType.REJECT]: ['record.declared.reject'],
   [ActionType.ASSIGN]: null,
   [ActionType.UNASSIGN]: null,
   [ActionType.DUPLICATE_DETECTED]: []
-} satisfies Record<DisplayableAction, RequiredScopes>
-
-export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
-  [ActionType.READ]: [],
-  [ActionType.CREATE]: ['record.notify'],
-  [ActionType.NOTIFY]: ['record.notify'],
-  [ActionType.DECLARE]: [],
-  [ActionType.DELETE]: [],
-  [ActionType.VALIDATE]: [],
-  [ActionType.REGISTER]: [],
-  [ActionType.PRINT_CERTIFICATE]: [],
-  [ActionType.REQUEST_CORRECTION]: [],
-  [ActionType.REJECT_CORRECTION]: [],
-  [ActionType.APPROVE_CORRECTION]: [],
-  [ActionType.MARK_NOT_DUPLICATE]: [],
-  [ActionType.MARK_AS_DUPLICATE]: [],
-  [ActionType.ARCHIVE]: [],
-  [ActionType.REJECT]: [],
-  [ActionType.ASSIGN]: [],
-  [ActionType.UNASSIGN]: [],
-  [ActionType.DUPLICATE_DETECTED]: []
-} satisfies Record<ActionType, ConfigurableScopeType[]>
-
-export const WRITE_ACTION_SCOPES = [
-  ...ACTION_ALLOWED_SCOPES[ActionType.DECLARE],
-  ...ACTION_ALLOWED_SCOPES[ActionType.VALIDATE],
-  ...ACTION_ALLOWED_SCOPES[ActionType.REGISTER],
-  ...ACTION_ALLOWED_SCOPES[ActionType.PRINT_CERTIFICATE]
-]
+} satisfies Record<DisplayableAction, ConfigurableScopeType[] | AlwaysAllowed>
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
+}
+
+/**
+ * Checks if a given action is allowed for the provided scopes and event type.
+ *
+ * This function determines whether the user, with the given set of scopes, is authorized
+ * to perform the specified action on an event of the given type. It checks both "plain" scopes
+ * (hardcoded, non-configurable) and "configurable" scopes (which may be tied to specific event types).
+ *
+ * @param {Scope[]} scopes - The list of scopes the user possesses.
+ * @param {DisplayableAction} action - The action to check authorization for.
+ * @param {string} eventType - The type of event for which the action is being checked.
+ * @returns {boolean} True if the action is in scope for the user, otherwise false.
+ */
+export function isActionInScope(
+  scopes: Scope[],
+  action: DisplayableAction,
+  eventType: string
+) {
+  const allowedConfigurableScopes = ACTION_SCOPE_MAP[action]
+
+  // 'null' means that the action is always allowed
+  if (allowedConfigurableScopes === null) {
+    return true
+  }
+
+  // Empty array means that the action is never allowed
+  if (!allowedConfigurableScopes.length) {
+    return false
+  }
+
+  // Find the scopes that are authorized for the given action
+  const parsedScopes = allowedConfigurableScopes
+    .map((scope) => findScope(scopes, scope))
+    .filter((scope) => scope !== undefined)
+
+  // Ensure that the given event type is authorized in the found scopes
+  const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
+  return authorizedEvents.includes(eventType)
 }

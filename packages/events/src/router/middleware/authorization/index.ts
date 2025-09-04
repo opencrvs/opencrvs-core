@@ -29,7 +29,8 @@ import {
   IAuthHeader,
   UUID,
   EventDocument,
-  ConfigurableScopes
+  ConfigurableScopes,
+  getAuthorizedEventsFromScopes
 } from '@opencrvs/commons'
 import { getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
@@ -40,27 +41,18 @@ import { TrpcContext } from '@events/context'
  */
 export function setBearerForToken(token: string) {
   const bearer = 'Bearer'
-
   return token.startsWith(bearer) ? token : `${bearer} ${token}`
 }
 
 /**
- * Extracts authorized events from the found configurable scopes.
+ * Extracts authorized entities from the provided configurable scopes.
  * Currently supports event types, but more options can be added in the future.
  *
  * @param scopes - Array of configurable scopes with options
- * @returns Object containing authorized events
+ * @returns Object containing authorized entities (currently events)
  */
 function getAuthorizedEntitiesFromScopes(scopes: ConfigurableScopes[]) {
-  const authorizedEvents = scopes
-    .flatMap(({ options }) => {
-      if ('event' in options) {
-        return options.event
-      }
-
-      return undefined
-    })
-    .filter((event) => event !== undefined)
+  const authorizedEvents = getAuthorizedEventsFromScopes(scopes)
 
   return {
     ...(authorizedEvents.length > 0 && { events: authorizedEvents })
