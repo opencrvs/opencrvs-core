@@ -13,7 +13,8 @@ import {
   getUUID,
   eventPayloadGenerator,
   UUID,
-  TestUserRole
+  TestUserRole,
+  EventConfig
 } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
 import { addLocations } from '@events/storage/postgres/events/locations'
@@ -40,7 +41,10 @@ interface CreateUser {
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
  */
-export function payloadGenerator(rng: () => number) {
+export function payloadGenerator(
+  rng: () => number,
+  configuration?: EventConfig
+) {
   const user = {
     create: (input: CreateUser) => ({
       role: input.role ?? ('REGISTRATION_AGENT' as TestUserRole),
@@ -70,7 +74,7 @@ export function payloadGenerator(rng: () => number) {
     }
   }
 
-  return { event: eventPayloadGenerator(rng), locations, user }
+  return { event: eventPayloadGenerator(rng, configuration), locations, user }
 }
 
 /**

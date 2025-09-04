@@ -243,7 +243,7 @@ export async function deleteUnreferencedFilesFromPreviousDrafts(
   }
 }
 
-function buildAction(
+export function buildAction(
   input: ActionInputWithType,
   status: ActionStatus,
   user: TrpcUserContext
