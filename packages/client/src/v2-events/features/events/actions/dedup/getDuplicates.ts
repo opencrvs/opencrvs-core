@@ -24,8 +24,6 @@ export async function prefetchPotentialDuplicates(eventId: string) {
       cacheFiles(eventDocument),
       cacheUsersFromEventDocument(eventDocument)
     ])
+    setEventData(eventDocument.id, eventDocument)
   }
-  potentialDuplicates.forEach((potentialDuplicate) => {
-    setEventData(potentialDuplicate.id, potentialDuplicate)
-  })
 }
