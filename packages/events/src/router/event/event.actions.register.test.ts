@@ -17,6 +17,7 @@ import {
   ActionType,
   AddressType,
   createPrng,
+  EventIndex,
   generateActionDeclarationInput,
   generateRegistrationNumber,
   getCurrentEventState,
@@ -840,8 +841,7 @@ test('deduplication check is performed before register when configured', async (
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
       return HttpResponse.json([
-        tennisClubMembershipEventWithDedupCheck(ActionType.REGISTER),
-        { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+        tennisClubMembershipEventWithDedupCheck(ActionType.REGISTER)
       ])
     })
   )
@@ -893,6 +893,8 @@ test('deduplication check is performed before register when configured', async (
     getCurrentEventState(stillValidated, tennisClubMembershipEvent)
   ).toMatchObject({
     status: 'VALIDATED',
-    duplicates: [{ id: existingEvent.id, trackingId: existingEvent.trackingId }]
-  })
+    potentialDuplicates: [
+      { id: existingEvent.id, trackingId: existingEvent.trackingId }
+    ]
+  } satisfies Partial<EventIndex>)
 })

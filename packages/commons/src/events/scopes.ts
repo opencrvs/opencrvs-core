@@ -47,7 +47,7 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.REJECT_CORRECTION]: ['record.registered.correct'],
   [ActionType.APPROVE_CORRECTION]: ['record.registered.correct'],
   [ActionType.MARK_AS_DUPLICATE]: ['record.declared.review-duplicates'],
-  [ActionType.MARK_NOT_DUPLICATE]: ['record.declared.review-duplicates'],
+  [ActionType.MARK_AS_NOT_DUPLICATE]: ['record.declared.review-duplicates'],
   [ActionType.ARCHIVE]: ['record.declared.archive'],
   [ActionType.REJECT]: ['record.declared.reject'],
   [ActionType.ASSIGN]: null,

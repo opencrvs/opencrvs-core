@@ -30,7 +30,9 @@ import {
   EventInput,
   SearchQuery,
   UnassignActionInput,
-  ACTION_SCOPE_MAP
+  ACTION_SCOPE_MAP,
+  MarkAsDuplicateActionInput,
+  MarkNotDuplicateActionInput
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { EventIdParam } from '@events/router/middleware'
@@ -58,6 +60,8 @@ import {
   getIndexedEvents
 } from '@events/service/indexing/indexing'
 import { reindex } from '@events/service/events/reindex'
+import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
+import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
 import { UserContext } from '../../context'
 import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
@@ -277,6 +281,28 @@ export const eventRouter = router({
         getDefaultActionProcedures(ActionType.APPROVE_CORRECTION)
       ),
       reject: router(getDefaultActionProcedures(ActionType.REJECT_CORRECTION))
+    }),
+    duplicate: router({
+      markAsDuplicate: publicProcedure
+        .input(MarkAsDuplicateActionInput)
+        .use(middleware.validateAction)
+        .mutation(async (options) => {
+          return markAsDuplicate(
+            options.input,
+            options.ctx.user,
+            options.ctx.token
+          )
+        }),
+      markNotDuplicate: publicProcedure
+        .input(MarkNotDuplicateActionInput)
+        .use(middleware.validateAction)
+        .mutation(async (options) => {
+          return markNotDuplicate(
+            options.input,
+            options.ctx.user,
+            options.ctx.token
+          )
+        })
     })
   }),
   list: systemProcedure

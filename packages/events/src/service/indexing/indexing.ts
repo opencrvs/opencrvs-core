@@ -271,7 +271,7 @@ export async function createIndex(
             }
           },
           flags: { type: 'keyword' },
-          duplicates: {
+          potentialDuplicates: {
             type: 'object',
             properties: {
               id: { type: 'keyword' },

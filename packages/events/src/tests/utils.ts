@@ -280,7 +280,7 @@ function actionToClientAction(
     case ActionType.APPROVE_CORRECTION:
     case ActionType.ASSIGN:
     case ActionType.UNASSIGN:
-    case ActionType.MARK_NOT_DUPLICATE:
+    case ActionType.MARK_AS_NOT_DUPLICATE:
     case ActionType.MARK_AS_DUPLICATE:
     case ActionType.REJECT_CORRECTION:
     case ActionType.DELETE:
