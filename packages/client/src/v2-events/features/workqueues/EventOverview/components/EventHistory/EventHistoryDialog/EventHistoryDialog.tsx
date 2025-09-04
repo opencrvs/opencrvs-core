@@ -18,7 +18,8 @@ import {
   ActionDocument,
   ActionType,
   EventDocument,
-  getAcceptedActions
+  getAcceptedActions,
+  UUID
 } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
 import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
@@ -87,10 +88,9 @@ function prepareDuplicateOf(
       const duplicateDetectedActions = fullHistory.filter(
         (action) => action.type === ActionType.DUPLICATE_DETECTED
       )
-      // Array<{id: UUID, trackingId: string}>
       const allDuplicatesDetectedFlattened = flatten(
         duplicateDetectedActions.map((action) => action.content.duplicates)
-      )
+      ) satisfies Array<{ id: UUID; trackingId: string }>
 
       return (
         allDuplicatesDetectedFlattened.find(
