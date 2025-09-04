@@ -10,19 +10,25 @@
  */
 import {
   ActionStatus,
+  EventConfig,
+  EventDocument,
   MarkNotDuplicateActionInput
 } from '@opencrvs/commons/events'
 import { addAction } from '@events/service/events/events'
 import { TrpcUserContext } from '@events/context'
 
 export async function markNotDuplicate(
+  event: EventDocument,
   input: MarkNotDuplicateActionInput,
   user: TrpcUserContext,
-  token: string
+  token: string,
+  configuration: EventConfig
 ) {
   return addAction(input, {
+    event,
     user,
     token,
-    status: ActionStatus.Accepted
+    status: ActionStatus.Accepted,
+    configuration
   })
 }

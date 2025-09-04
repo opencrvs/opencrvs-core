@@ -293,20 +293,34 @@ export const eventRouter = router({
         .input(MarkAsDuplicateActionInput)
         .use(middleware.validateAction)
         .mutation(async (options) => {
+          const event = await getEventById(options.input.eventId)
+          const configuration = await getEventConfigurationById({
+            token: options.ctx.token,
+            eventType: event.type
+          })
           return markAsDuplicate(
+            event,
             options.input,
             options.ctx.user,
-            options.ctx.token
+            options.ctx.token,
+            configuration
           )
         }),
       markNotDuplicate: publicProcedure
         .input(MarkNotDuplicateActionInput)
         .use(middleware.validateAction)
         .mutation(async (options) => {
+          const event = await getEventById(options.input.eventId)
+          const configuration = await getEventConfigurationById({
+            token: options.ctx.token,
+            eventType: event.type
+          })
           return markNotDuplicate(
+            event,
             options.input,
             options.ctx.user,
-            options.ctx.token
+            options.ctx.token,
+            configuration
           )
         })
     })

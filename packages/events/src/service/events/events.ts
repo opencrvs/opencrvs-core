@@ -446,10 +446,7 @@ export async function processAction(
   })
 
   // Only send the event to Elasticsearch if it is not a draft
-  if (getStatusFromActions(updatedEvent.actions) !== EventStatus.enum.CREATED) {
-    await indexEvent(updatedEvent, configuration)
-  }
-
+  await ensureEventIndexed(updatedEvent, configuration)
   return updatedEvent
 }
 
