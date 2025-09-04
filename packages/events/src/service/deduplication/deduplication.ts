@@ -22,13 +22,9 @@ import {
   FieldType,
   extractDuplicatesFromActions,
   EventDocument,
-  ActionType,
-  generateUuid,
-  UUID,
-  ActionStatus,
   getCurrentEventState
 } from '@opencrvs/commons/events'
-import { getUUID, logger } from '@opencrvs/commons'
+import { logger } from '@opencrvs/commons'
 import {
   getOrCreateClient,
   getEventIndexName
@@ -41,8 +37,7 @@ import {
   encodeFieldId,
   nameQueryKey
 } from '@events/service/indexing/utils'
-import { buildAction } from '../events/events'
-import { TrpcContext, TrpcUserContext } from '../../context'
+import { TrpcContext } from '../../context'
 import { getEventsAuditTrailed } from '../../storage/postgres/events/events'
 import { getEventConfigurationById } from '../config/config'
 

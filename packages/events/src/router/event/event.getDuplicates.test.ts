@@ -10,12 +10,7 @@
  */
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
-import {
-  ActionType,
-  EventDocument,
-  generateUuid,
-  SCOPES
-} from '@opencrvs/commons'
+import { ActionType, generateUuid, SCOPES } from '@opencrvs/commons'
 import { tennisClubMembershipEventWithDedupCheck } from '@opencrvs/commons/fixtures'
 import {
   createTestClient,
@@ -70,7 +65,7 @@ test('Allows access with assignment and right scope', async () => {
   ).resolves.toEqual([])
 })
 
-test.only('Returns single duplicate when found', async () => {
+test('Returns single duplicate when found', async () => {
   const tennisClubMembershipWithDedupCheckConfig =
     tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
 

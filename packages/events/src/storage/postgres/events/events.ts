@@ -11,7 +11,6 @@
 
 import { Kysely, sql } from 'kysely'
 import { DateTime } from 'luxon'
-import z from 'zod'
 import {
   ActionStatus,
   ActionType,
@@ -23,10 +22,7 @@ import { getClient } from '@events/storage/postgres/events'
 import { dropNulls } from '../drop-nulls'
 import { buildAction } from '../../../service/events/events'
 import { TrpcUserContext } from '../../../context'
-import EventActionsTable, {
-  EventActions,
-  NewEventActions
-} from './schema/app/EventActions'
+import { EventActions, NewEventActions } from './schema/app/EventActions'
 import { Events, NewEvents } from './schema/app/Events'
 import Schema from './schema/Database'
 
