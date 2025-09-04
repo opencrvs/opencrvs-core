@@ -94,7 +94,7 @@ const recommenderOtherThanClubMembers = and(
 
 const overriddenEventConfig = {
   ...tennisClubMembershipEvent,
-  id: 'v2.death', // use an existing event id, so that permissions to it are in scopes
+  id: 'death', // use an existing event id, so that permissions to it are in scopes
   declaration: defineDeclarationForm({
     ...tennisClubMembershipEvent.declaration,
     pages: [

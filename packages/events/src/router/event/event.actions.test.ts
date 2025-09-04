@@ -230,7 +230,7 @@ describe('Action drafts', () => {
 
 const multiFileConfig = {
   ...tennisClubMembershipEvent,
-  id: 'v2.death', // using existing event type id here, so that the user has the required scope to it
+  id: 'death', // using existing event type id here, so that the user has the required scope to it
   declaration: {
     label: generateTranslationConfig('File club form'),
     pages: [
