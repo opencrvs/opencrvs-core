@@ -359,8 +359,7 @@ test('deduplication check is performed before validation when configured', async
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
       return HttpResponse.json([
-        tennisClubMembershipEventWithDedupCheck(ActionType.VALIDATE),
-        { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+        tennisClubMembershipEventWithDedupCheck(ActionType.VALIDATE)
       ])
     })
   )
@@ -415,8 +414,7 @@ test('deduplication check is skipped if the event has been marked as not duplica
         tennisClubMembershipEventWithDedupCheck(
           ActionType.DECLARE,
           ActionType.VALIDATE
-        ),
-        { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+        )
       ])
     })
   )
@@ -481,8 +479,7 @@ test('deduplication check is not skipped if the event has been marked as not dup
         tennisClubMembershipEventWithDedupCheck(
           ActionType.DECLARE,
           ActionType.VALIDATE
-        ),
-        { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+        )
       ])
     })
   )

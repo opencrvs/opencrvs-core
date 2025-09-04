@@ -387,8 +387,7 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
         return HttpResponse.json([
-          tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE),
-          { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+          tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
         ])
       })
     )

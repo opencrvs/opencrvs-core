@@ -840,8 +840,7 @@ test('deduplication check is performed before register when configured', async (
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
       return HttpResponse.json([
-        tennisClubMembershipEventWithDedupCheck(ActionType.REGISTER),
-        { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+        tennisClubMembershipEventWithDedupCheck(ActionType.REGISTER)
       ])
     })
   )
