@@ -18,6 +18,8 @@ import {
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
 
+// misc change
+
 export function RequestCorrection({
   action,
   fullEvent
