@@ -148,7 +148,7 @@ const ACTION_PROCEDURE_CONFIG = {
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
 
-export type ActionProcedure = {
+type ActionProcedure = {
   request: MutationProcedure<{
     input: ActionInput
     output: EventDocument

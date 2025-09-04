@@ -12,6 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
+import z from 'zod'
 import {
   ActionDocument,
   ActionInputWithType,
@@ -178,12 +179,14 @@ export const eventTypeAuthorization: MiddlewareFunction<
   return next()
 }
 
+export const EventIdParam = z.object({ eventId: UUID })
+export type EventIdParam = z.infer<typeof EventIdParam>
 export const requireAssignment: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
   TrpcContext,
   TrpcContext & { isDuplicateAction?: boolean; event: EventDocument },
-  ActionInputWithType | DeleteActionInput
+  ActionInputWithType | DeleteActionInput | EventIdParam
 > = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
   const { user } = ctx
