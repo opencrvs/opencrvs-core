@@ -11,7 +11,7 @@
 
 import {
   FullDocumentPath,
-  FullDocumentURL,
+  FullDocumentUrl,
   joinValues
 } from '@opencrvs/commons/client'
 
@@ -26,11 +26,11 @@ export function getFullDocumentPath(filename: string): FullDocumentPath {
  * Files are stored in MinIO. Files should be accessed via unsigned URLs, utilizing browser cache and aggressively precaching them.
  * @returns unsigned URL to the file in MinIO. Assumes file has been cached.
  */
-export function getUnsignedFileUrl(path: FullDocumentPath): FullDocumentURL {
+export function getUnsignedFileUrl(path: FullDocumentPath): FullDocumentUrl {
   return new URL(
     path,
     window.config.MINIO_BASE_URL
-  ).toString() as FullDocumentURL
+  ).toString() as FullDocumentUrl
 }
 
 /**

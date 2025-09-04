@@ -22,6 +22,7 @@ import {
 
 export type EncodedEventIndex = EventIndex
 export const FIELD_ID_SEPARATOR = '____'
+export const NAME_QUERY_KEY = '__fullname'
 
 export function encodeFieldId(fieldId: string) {
   return fieldId.replaceAll('.', FIELD_ID_SEPARATOR)
@@ -31,13 +32,9 @@ function decodeFieldId(fieldId: string) {
   return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
 }
 
-type IndexedNameFieldValue = BaseNameFieldValue & {
-  __fullname?: string
+type IndexedNameFieldValue = NameFieldValue & {
+  [NAME_QUERY_KEY]?: string
 }
-
-type BaseNameFieldValue = Exclude<NameFieldValue, undefined>
-
-export const DEFAULT_SIZE = 10000
 
 function addIndexFieldsToValue(
   eventConfig: EventConfig,
@@ -49,7 +46,7 @@ function addIndexFieldsToValue(
   if (isNameFieldType(field)) {
     return {
       ...field.value,
-      __fullname: Object.values(field.value).join(' ')
+      [NAME_QUERY_KEY]: Object.values(field.value).join(' ')
     } satisfies IndexedNameFieldValue
   }
 
@@ -78,8 +75,8 @@ function isIndexedNameFieldValue(
   return (
     typeof value === 'object' &&
     value !== null &&
-    '__fullname' in value &&
-    typeof (value as IndexedNameFieldValue).__fullname === 'string'
+    NAME_QUERY_KEY in value &&
+    typeof value[NAME_QUERY_KEY] === 'string'
   )
 }
 
@@ -91,7 +88,7 @@ function stripIndexFieldsFromValue(
   const field = { config: getDeclarationFieldById(eventConfig, fieldId), value }
 
   if (isIndexedNameFieldValue(field.value)) {
-    return _.omit(field.value, ['__fullname'])
+    return _.omit(field.value, [NAME_QUERY_KEY])
   }
 
   return value
@@ -136,25 +133,8 @@ export function declarationReference(fieldName: string) {
   return `declaration.${fieldName}`
 }
 
-// Build map of fieldId -> alternateFieldIds[]
-export function getAlternateFieldMap(
-  eventConfigs: EventConfig[]
-): Record<string, string[]> {
-  const alternateFieldMap: Record<string, string[]> = {}
-  eventConfigs.forEach((eventConfig) => {
-    eventConfig.advancedSearch.forEach((section) => {
-      section.fields.forEach((field) => {
-        if (
-          'alternateFieldIds' in field &&
-          Array.isArray(field.alternateFieldIds) &&
-          field.alternateFieldIds.length > 0
-        ) {
-          alternateFieldMap[field.fieldId] = field.alternateFieldIds
-        }
-      })
-    })
-  })
-  return alternateFieldMap
+export function nameQueryKey(fieldName: string) {
+  return `${fieldName}.${NAME_QUERY_KEY}`
 }
 
 export function generateQueryForAddressField(

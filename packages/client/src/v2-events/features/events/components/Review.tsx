@@ -42,7 +42,6 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getScope } from '@client/profile/profileSelectors'
-import { ReviewCorrection } from '../actions/correct/request/ReviewCorrection'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -308,11 +307,14 @@ function FormReview({
               const value = form[field.id]
               const previousValue = previousForm[field.id]
 
+              // previousForm, formConfig are used to find previous values with the same label if required
               const valueDisplay = Output({
                 field,
                 previousValue,
                 showPreviouslyMissingValuesAsChanged,
-                value
+                value,
+                previousForm,
+                formConfig
               })
 
               const error = runFieldValidations({
@@ -459,9 +461,9 @@ function ReviewComponent({
   readonlyMode,
   reviewFields,
   isCorrection = false,
-  isReviewCorrection = false
+  correctionReview
 }: {
-  children: React.ReactNode
+  children?: React.ReactNode
   formConfig: FormConfig
   form: EventState
   annotation?: EventState
@@ -480,11 +482,12 @@ function ReviewComponent({
   onAnnotationChange?: (values: EventState) => void
   readonlyMode?: boolean
   isCorrection?: boolean
-  isReviewCorrection?: boolean
+  correctionReview?: React.ReactNode
 }) {
   const scopes = useSelector(getScope)
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
+  const isReviewCorrection = Boolean(correctionReview)
 
   const pageIdsWithFile = formConfig.pages
     .filter(({ fields }) =>
@@ -501,7 +504,7 @@ function ReviewComponent({
   return (
     <Row>
       <LeftColumn>
-        {isReviewCorrection && <ReviewCorrection form={form} />}
+        {correctionReview}
         <Card>
           <ReviewHeader title={title} />
           <FormReview
@@ -536,7 +539,7 @@ function ReviewComponent({
       {pageIdsWithFile.length > 0 && (
         <RightColumn>
           <DocumentViewer
-            disabled={readonlyMode}
+            disabled={readonlyMode || isCorrection || isReviewCorrection}
             form={form}
             formConfig={formConfig}
             // @todo: ask about this rule

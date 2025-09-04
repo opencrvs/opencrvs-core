@@ -17,8 +17,7 @@ import {
   ActionType,
   generateActionDocument,
   generateEventDocument,
-  tennisClubMembershipEvent,
-  UUID
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import {
   tennisClubMembershipEventIndex,

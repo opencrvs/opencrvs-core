@@ -24,7 +24,7 @@ import {
   isFieldVisible,
   getDeclarationFields,
   getCurrentEventState,
-  ActionType
+  EventDocument
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -74,20 +74,22 @@ function setEmptyValuesForFields(fields: FieldConfig[]) {
 }
 
 export function Summary() {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.CORRECTION.SUMMARY)
+  const { eventId } = useTypedParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
+  )
 
   const [{ workqueue }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.CORRECTION.SUMMARY
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
   const scopes = useSelector(getScope)
   const [showPrompt, setShowPrompt] = React.useState(false)
   const togglePrompt = () => setShowPrompt(!showPrompt)
-  const { goToHome } = useEventFormNavigation()
+  const eventFormNavigation = useEventFormNavigation()
   const navigate = useNavigate()
   const intl = useIntl()
 
   const events = useEvents()
-  const event = events.getEvent.getFromCache(eventId)
+  const event: EventDocument = events.getEvent.getFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
 
@@ -101,7 +103,7 @@ export function Summary() {
 
   const submitCorrection = React.useCallback(() => {
     const formWithOnlyChangedValues = Object.fromEntries(
-      Object.entries(form).filter(([key, value]) => {
+      Object.entries(form).filter(([key]) => {
         const field = fields.find((f) => f.id === key)
         if (!field) {
           return false
@@ -126,12 +128,12 @@ export function Summary() {
         ...nullifiedHiddenValues
       },
       transactionId: generateTransactionId(),
-      annotation
+      annotation,
+      fullEvent: event
     }
     if (scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)) {
       events.customActions.makeCorrectionOnRequest.mutate({
         ...mutationPayload,
-        fullEvent: event,
         eventConfiguration
       })
     } else {
@@ -142,8 +144,8 @@ export function Summary() {
   }, [
     form,
     fields,
-    event,
     eventConfiguration,
+    event,
     scopes,
     events.customActions.makeCorrectionOnRequest,
     events.actions.correction.request,
@@ -158,7 +160,7 @@ export function Summary() {
       <ActionPageLight
         hideBackground
         goBack={() => navigate(-1)}
-        goHome={goToHome}
+        goHome={() => eventFormNavigation.closeActionView()}
         id="corrector_form"
         title={intl.formatMessage(correctionMessages.title)}
       >
@@ -166,6 +168,7 @@ export function Summary() {
           bottomActionButtons={[
             <Button
               key="make-correction"
+              fullWidth
               id="make-correction"
               size="large"
               type="primary"
@@ -185,7 +188,7 @@ export function Summary() {
               id="back-to-review"
               onClick={() =>
                 navigate(
-                  ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
+                  ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
                     eventId
                   })
                 )

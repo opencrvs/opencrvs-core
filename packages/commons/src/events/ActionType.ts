@@ -24,9 +24,10 @@ export const ActionType = {
   VALIDATE: 'VALIDATE',
   REGISTER: 'REGISTER',
   // Declaration system actions. Non-configurable.
-  DETECT_DUPLICATE: 'DETECT_DUPLICATE',
+  DUPLICATE_DETECTED: 'DUPLICATE_DETECTED',
   REJECT: 'REJECT', // REJECT_DECLARATION
-  MARKED_AS_DUPLICATE: 'MARKED_AS_DUPLICATE', // MARK_AS_DUPLICATE
+  MARK_AS_DUPLICATE: 'MARK_AS_DUPLICATE',
+  MARK_NOT_DUPLICATE: 'MARK_NOT_DUPLICATE',
   ARCHIVE: 'ARCHIVE',
   // Record actions
   PRINT_CERTIFICATE: 'PRINT_CERTIFICATE',
@@ -62,9 +63,10 @@ export const ActionTypes = z.enum([
   'DECLARE',
   'VALIDATE',
   'REGISTER',
-  'DETECT_DUPLICATE',
+  'DUPLICATE_DETECTED',
   'REJECT',
-  'MARKED_AS_DUPLICATE',
+  'MARK_AS_DUPLICATE',
+  'MARK_NOT_DUPLICATE',
   'ARCHIVE',
   'PRINT_CERTIFICATE',
   'REQUEST_CORRECTION',
@@ -75,12 +77,15 @@ export const ActionTypes = z.enum([
   'UNASSIGN'
 ])
 
-export const ExclusiveActions = {
+/**
+ * Non-persisted actions that are used in the client to control the UI.
+ */
+export const ClientSpecificAction = {
   REVIEW_CORRECTION_REQUEST: 'REVIEW_CORRECTION_REQUEST'
 } as const
 
-export type ExclusiveActionTypes =
-  (typeof ExclusiveActions)[keyof typeof ExclusiveActions]
+export type ClientSpecificAction =
+  (typeof ClientSpecificAction)[keyof typeof ClientSpecificAction]
 
 const declarationActionValues = [
   ActionTypes.enum.DECLARE,
@@ -122,23 +127,23 @@ export const writeActions = ActionTypes.exclude([
 export const workqueueActions = ActionTypes.exclude([
   ActionType.CREATE,
   ActionType.NOTIFY,
-  ActionType.DETECT_DUPLICATE,
+  ActionType.DUPLICATE_DETECTED,
   ActionType.REJECT,
-  ActionType.MARKED_AS_DUPLICATE,
-  ActionType.ARCHIVE,
+  ActionType.MARK_NOT_DUPLICATE,
+  ActionType.MARK_AS_DUPLICATE,
   ActionType.REJECT_CORRECTION,
   ActionType.APPROVE_CORRECTION
 ])
 
 export type WorkqueueActionType = z.infer<typeof workqueueActions>
-export type DisplayableAction = ActionType | ExclusiveActionTypes
+export type DisplayableAction = ActionType | ClientSpecificAction
 
-const META_ACTIONS: ActionType[] = [
+const META_ACTIONS: DisplayableAction[] = [
   ActionType.ASSIGN,
   ActionType.UNASSIGN,
   ActionType.READ
 ]
 
-export function isMetaAction(actionType: ActionType) {
+export function isMetaAction(actionType: DisplayableAction) {
   return META_ACTIONS.includes(actionType)
 }

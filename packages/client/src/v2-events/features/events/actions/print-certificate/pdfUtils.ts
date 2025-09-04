@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,12 +9,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  IntlShape,
-  MessageDescriptor,
-  createIntl,
-  createIntlCache
-} from 'react-intl'
+/* eslint-disable no-console */
+import { IntlShape, createIntl, createIntlCache } from 'react-intl'
 import Handlebars from 'handlebars'
 import htmlToPdfmake from 'html-to-pdfmake'
 import type {
@@ -28,12 +25,13 @@ import {
   EventState,
   User,
   LanguageConfig,
-  FieldValue,
   EventConfig,
   getMixedPath,
   EventMetadata,
   EventStatus,
-  DEFAULT_DATE_OF_EVENT_PROPERTY
+  DEFAULT_DATE_OF_EVENT_PROPERTY,
+  ActionDocument,
+  ActionStatus
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -75,26 +73,51 @@ export const stringifyEventMetadata = ({
   locations,
   users
 }: {
-  metadata: NonNullable<EventMetadata & { modifiedAt: string }>
+  metadata: NonNullable<
+    EventMetadata & {
+      modifiedAt: string
+      copiesPrintedForTemplate: number | undefined
+    }
+  >
   intl: IntlShape
   locations: Location[]
   users: User[]
 }) => {
   return {
-    modifiedAt: DateField.stringify(intl, metadata.modifiedAt),
+    modifiedAt: DateField.toCertificateVariables(metadata.modifiedAt, {
+      intl,
+      locations
+    }),
     assignedTo: findUserById(metadata.assignedTo ?? '', users),
     // @TODO: DATE_OF_EVENT config needs to be defined some other way and bake it in.
     dateOfEvent: metadata.dateOfEvent
-      ? DateField.stringify(intl, metadata.dateOfEvent)
-      : DateField.stringify(intl, metadata[DEFAULT_DATE_OF_EVENT_PROPERTY]),
-    createdAt: DateField.stringify(intl, metadata.createdAt),
-    createdBy: findUserById(metadata.createdBy, users),
-    createdAtLocation: LocationSearch.stringify(
+      ? DateField.toCertificateVariables(metadata.dateOfEvent, {
+          intl,
+          locations
+        })
+      : DateField.toCertificateVariables(
+          metadata[DEFAULT_DATE_OF_EVENT_PROPERTY],
+          {
+            intl,
+            locations
+          }
+        ),
+    createdAt: DateField.toCertificateVariables(metadata.createdAt, {
       intl,
-      locations,
-      metadata.createdAtLocation
+      locations
+    }),
+    createdBy: findUserById(metadata.createdBy, users),
+    createdAtLocation: LocationSearch.toCertificateVariables(
+      metadata.createdAtLocation,
+      {
+        intl,
+        locations
+      }
     ),
-    updatedAt: DateField.stringify(intl, metadata.updatedAt),
+    updatedAt: DateField.toCertificateVariables(metadata.updatedAt, {
+      intl,
+      locations
+    }),
     updatedBy: metadata.updatedBy
       ? findUserById(metadata.updatedBy, users)
       : '',
@@ -103,31 +126,32 @@ export const stringifyEventMetadata = ({
     trackingId: metadata.trackingId,
     status: EventStatus.enum.REGISTERED,
     updatedByUserRole: metadata.updatedByUserRole,
-    updatedAtLocation: LocationSearch.stringify(
-      intl,
-      locations,
-      metadata.updatedAtLocation
+    updatedAtLocation: LocationSearch.toCertificateVariables(
+      metadata.updatedAtLocation,
+      {
+        intl,
+        locations
+      }
     ),
     flags: [],
     legalStatuses: {
       [EventStatus.enum.DECLARED]: metadata.legalStatuses.DECLARED
         ? {
-            createdAt: DateField.stringify(
-              intl,
-              metadata.legalStatuses.DECLARED.createdAt
+            createdAt: DateField.toCertificateVariables(
+              metadata.legalStatuses.DECLARED.createdAt,
+              { intl, locations }
             ),
             createdBy: findUserById(
               metadata.legalStatuses.DECLARED.createdBy,
               users
             ),
-            createdAtLocation: LocationSearch.stringify(
-              intl,
-              locations,
-              metadata.legalStatuses.DECLARED.createdAtLocation
+            createdAtLocation: LocationSearch.toCertificateVariables(
+              metadata.legalStatuses.DECLARED.createdAtLocation,
+              { intl, locations }
             ),
-            acceptedAt: DateField.stringify(
-              intl,
-              metadata.legalStatuses.DECLARED.acceptedAt
+            acceptedAt: DateField.toCertificateVariables(
+              metadata.legalStatuses.DECLARED.acceptedAt,
+              { intl, locations }
             ),
             createdByRole: metadata.legalStatuses.DECLARED.createdByRole,
             createdBySignature:
@@ -136,22 +160,21 @@ export const stringifyEventMetadata = ({
         : null,
       [EventStatus.enum.REGISTERED]: metadata.legalStatuses.REGISTERED
         ? {
-            createdAt: DateField.stringify(
-              intl,
-              metadata.legalStatuses.REGISTERED.createdAt
+            createdAt: DateField.toCertificateVariables(
+              metadata.legalStatuses.REGISTERED.createdAt,
+              { intl, locations }
             ),
             createdBy: findUserById(
               metadata.legalStatuses.REGISTERED.createdBy,
               users
             ),
-            createdAtLocation: LocationSearch.stringify(
-              intl,
-              locations,
-              metadata.legalStatuses.REGISTERED.createdAtLocation
+            createdAtLocation: LocationSearch.toCertificateVariables(
+              metadata.legalStatuses.REGISTERED.createdAtLocation,
+              { intl, locations }
             ),
-            acceptedAt: DateField.stringify(
-              intl,
-              metadata.legalStatuses.REGISTERED.acceptedAt
+            acceptedAt: DateField.toCertificateVariables(
+              metadata.legalStatuses.REGISTERED.acceptedAt,
+              { intl, locations }
             ),
             createdByRole: metadata.legalStatuses.REGISTERED.createdByRole,
             registrationNumber:
@@ -165,7 +188,8 @@ export const stringifyEventMetadata = ({
               : undefined
           }
         : null
-    }
+    },
+    copiesPrintedForTemplate: metadata.copiesPrintedForTemplate
   }
 }
 
@@ -180,65 +204,33 @@ const certificateBaseTemplate = {
   fonts: {}
 }
 
-function isMessageDescriptor(obj: unknown): obj is MessageDescriptor {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    'id' in obj &&
-    'defaultMessage' in obj &&
-    typeof (obj as MessageDescriptor).id === 'string' &&
-    typeof (obj as MessageDescriptor).defaultMessage === 'string'
-  )
-}
-
-function formatAllNonStringValues(
-  templateData: EventState,
-  intl: IntlShape
-): EventState {
-  const formattedData: EventState = {}
-
-  for (const key of Object.keys(templateData)) {
-    const value = templateData[key]
-
-    if (isMessageDescriptor(value)) {
-      formattedData[key] = intl.formatMessage(value)
-    } else if (Array.isArray(value)) {
-      // Address field: country label is a MessageDescriptor but others are strings
-      formattedData[key] = value
-        .filter(Boolean)
-        .map((item) =>
-          isMessageDescriptor(item) ? intl.formatMessage(item) : item
-        )
-        .join(', ')
-    } else if (typeof value === 'object' && value !== null) {
-      formattedData[key] = formatAllNonStringValues(
-        value satisfies EventState,
-        intl
-      ) as FieldValue
-    } else {
-      formattedData[key] = String(value)
-    }
-  }
-
-  return formattedData
-}
-
 const cache = createIntlCache()
 
 export function compileSvg({
   templateString,
   $metadata,
   $declaration,
+  $actions,
   locations,
   users,
+  review,
   language,
   config
 }: {
   templateString: string
-  $metadata: EventMetadata & { modifiedAt: string }
+  $metadata: EventMetadata & {
+    modifiedAt: string
+    copiesPrintedForTemplate: number | undefined
+  }
+  $actions: ActionDocument[]
   $declaration: EventState
   locations: Location[]
   users: User[]
+  /**
+   * Indicates whether certificate is reviewed or actually printed
+   * in V1 "preview" was used. In V2, "review" is used to remain consistent with action terminology (review of print action rather than preview of certificate).
+   */
+  review: boolean
   language: LanguageConfig
   config: EventConfig
 }): string {
@@ -252,6 +244,10 @@ export function compileSvg({
 
   const customHelpers = getHandlebarHelpers()
 
+  const stringifyDeclaration = getFormDataStringifier(intl, locations)
+  const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
+  const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
+
   for (const helperName of Object.keys(customHelpers)) {
     /*
      * Note for anyone adding new context variables to handlebar helpers:
@@ -263,6 +259,43 @@ export function compileSvg({
     const helper = customHelpers[helperName]({ intl })
     Handlebars.registerHelper(helperName, helper)
   }
+
+  /**
+   * Handlebars helper: $actions
+   *
+   * Resolves all actions for a specific action type
+   *
+   * @param actionType - The type of action to look up (e.g., "PRINT_CERTIFICATE")
+   * @returns The resolved list of actions
+   *
+   * @example {{ $actions "PRINT_CERTIFICATE" }}
+   */
+  function $actionsFn(actionType: string) {
+    return $actions
+      .filter((a) => a.status === ActionStatus.Accepted)
+      .filter((a) => a.type === actionType)
+  }
+
+  Handlebars.registerHelper('$actions', $actionsFn)
+
+  /**
+   * Handlebars helper: $action
+   *
+   * Finds the latest action data for a specific action type and property path.
+   *
+   * @param actionType - The type of action to look up (e.g., "PRINT_CERTIFICATE")
+   * @returns The resolved value from the action data
+   *
+   * @example {{ $action "PRINT_CERTIFICATE" }}
+   */
+
+  function $action(actionType: string) {
+    return $actions
+      .filter((a) => a.status === ActionStatus.Accepted)
+      .findLast((a) => a.type === actionType)
+  }
+
+  Handlebars.registerHelper('$action', $action)
 
   /**
    * Handlebars helper: $lookup
@@ -279,24 +312,75 @@ export function compileSvg({
    * @example { 'informant.address': { 'other': { 'district': 'quix' } } } // $lookup 'informant.address.other.district' => 'quix'
    */
   function $lookup(obj: EventMetadata | EventState, propertyPath: string) {
-    const stringifyDeclaration = getFormDataStringifier(intl, locations)
-    const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
-    const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
+    function doLookup() {
+      const resolvedMetadata = stringifyEventMetadata({
+        metadata: $metadata,
+        intl,
+        locations,
+        users
+      })
 
-    const resolvedMetadata = stringifyEventMetadata({
-      metadata: $metadata,
-      intl,
-      locations,
-      users
-    })
+      if (isEqual($metadata, obj)) {
+        return getMixedPath(resolvedMetadata, propertyPath)
+      }
 
-    if (isEqual($metadata, obj)) {
-      return getMixedPath(resolvedMetadata, propertyPath)
+      if (isEqual(resolvedDeclaration, obj)) {
+        return getMixedPath(resolvedDeclaration, propertyPath)
+      }
+
+      const action = ActionDocument.safeParse(obj)
+      if (action.success) {
+        const resolvedAction = {
+          id: action.data.id,
+          type: action.data.type,
+          createdAt: DateField.stringify(action.data.createdAt, {
+            intl,
+            locations
+          }),
+          createdBy: users.find((user) => user.id === action.data.createdBy),
+          createdByUserType: action.data.createdByUserType,
+          createdBySignature: action.data.createdBySignature,
+          createdAtLocation: LocationSearch.toCertificateVariables(
+            action.data.createdAtLocation,
+            {
+              intl,
+              locations
+            }
+          ),
+          createdByRole: action.data.createdByRole
+        }
+
+        return getMixedPath(resolvedAction, propertyPath)
+      }
+      return obj[propertyPath as keyof typeof obj] ?? ''
     }
-    return getMixedPath(resolvedDeclaration, propertyPath)
+    const result = doLookup()
+    if (typeof result === 'object') {
+      return {
+        ...result,
+        toString: () => JSON.stringify(result)
+      }
+    }
+    return result
   }
 
   Handlebars.registerHelper('$lookup', $lookup)
+
+  /**
+   * Handlebars helper: $json
+   *
+   * Converts any value to its JSON string representation.
+   *
+   * @param value - The value to stringify
+   * @returns The JSON string representation of the value
+   *
+   * @example {{ $json someObject }}
+   */
+  function $json(value: unknown) {
+    return JSON.stringify(value)
+  }
+
+  Handlebars.registerHelper('$json', $json)
 
   /**
    * Handlebars helper: $intl
@@ -330,12 +414,64 @@ export function compileSvg({
         return ''
       }
 
-      const id = idParts.map((part) => String(part).toLowerCase()).join('.')
+      // NOTE: If you are having issues with casing mismatch, please ensure that you are using lookup helper rather than $lookup. Former returns actual values, latter stringified ones.
+      const id = idParts.map((part) => part?.toString().toLowerCase()).join('.')
 
       return intl.formatMessage({
         id,
         defaultMessage: 'Missing translation for ' + id
       })
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
+  )
+
+  /**
+   * Handlebars helper: $intlWithParams
+   *
+   * Usage example in SVG template:
+   *   <tspan>{{ $intlWithParams 'constants.greeting' 'name' (lookup $declaration "child.name") }}</tspan>
+   * This helper allows for dynamic translation with parameters.
+   * It takes a translation ID as the first argument, followed by pairs of parameter names and values.
+   * The last argument is the Handlebars options object.
+   * It constructs a params object from the pairs and uses `intl.formatMessage`
+   * to fetch the localized translation with the provided parameters.
+   * If any parameter is undefined, it returns an empty string to prevent rendering issues.
+   * If the translation for the constructed ID is missing,
+   * it falls back to showing: 'Missing translation for [id]'.
+   * This is especially useful in templates where dynamic values
+   * (like names, dates, etc.)
+   * need to be translated using i18n keys with parameters.
+   */
+
+  Handlebars.registerHelper(
+    '$intlWithParams',
+
+    function (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      this: any,
+      ...args: [...(string | undefined)[], Handlebars.HelperOptions]
+    ) {
+      const id = args[0] as string
+      const paramPairs = args.slice(1, -1)
+
+      // Build params object from pairs
+      const params: Record<string, unknown> = {}
+      for (let i = 0; i < paramPairs.length; i += 2) {
+        const key = paramPairs[i] as string | undefined
+        const value = paramPairs[i + 1]
+        if (key == undefined || value == undefined) {
+          return ''
+        }
+        params[key] = value
+      }
+
+      return intl.formatMessage(
+        {
+          id,
+          defaultMessage: 'Missing translation for ' + id
+        },
+        params as Record<string, string | number | boolean>
+      )
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
   )
@@ -411,11 +547,11 @@ export function compileSvg({
   )
 
   const template = Handlebars.compile(templateString)
-  const printableDeclaration = formatAllNonStringValues($declaration, intl)
 
   const data = {
-    $declaration: printableDeclaration,
+    $declaration: resolvedDeclaration,
     $metadata,
+    $review: review,
     $references: {
       locations,
       users
@@ -465,6 +601,13 @@ async function downloadAndEmbedImages(svgString: string): Promise<string> {
       if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
         const response = await fetch(href)
         const blob = await response.blob()
+
+        if (!response.ok) {
+          console.error('Failed to fetch image:', href)
+          console.error(
+            'Ensure the URL is correct and image is requested before cache is cleaned.'
+          )
+        }
 
         const base64 = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader()
@@ -573,7 +716,7 @@ interface PdfTemplate {
   fonts: Record<string, TFontFamilyTypes>
 }
 
-function createPDF(template: PdfTemplate): pdfMake.TCreatedPdf {
+function createPdf(template: PdfTemplate): pdfMake.TCreatedPdf {
   return pdfMake.createPdf(template.definition, undefined, template.fonts)
 }
 
@@ -581,7 +724,7 @@ export function printAndDownloadPdf(
   template: PdfTemplate,
   declarationId: string
 ) {
-  const pdf = createPDF(template)
+  const pdf = createPdf(template)
   if (isMobileDevice()) {
     pdf.download(`${declarationId}`)
   } else {

@@ -20,7 +20,7 @@ import { useSelector } from 'react-redux'
 import {
   EventState,
   generateTransactionId,
-  isMetaAction,
+  RequestedCorrectionAction,
   SCOPES
 } from '@opencrvs/commons/client'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
@@ -40,7 +40,7 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { getScope } from '@client/profile/profileSelectors'
-import { CorrectionDetails } from './Summary/CorrectionDetails'
+import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
 
 const reviewCorrectionMessages = defineMessages({
   actionModalCancel: {
@@ -51,7 +51,7 @@ const reviewCorrectionMessages = defineMessages({
   actionModalDescription: {
     id: 'v2.actionModal.description',
     defaultMessage:
-      'The declarant will be notified of this action and a record of this decision will be recorded',
+      'The informant will be notified of this decision and a record of this decision will be recorded',
     description: 'The description for action modal'
   },
   approveCorrection: {
@@ -208,27 +208,26 @@ function RejectModal({
   )
 }
 
-export function ReviewCorrection({ form }: { form: EventState }) {
+export function ReviewCorrection({
+  form,
+  correctionRequestAction
+}: {
+  form: EventState
+  correctionRequestAction: RequestedCorrectionAction
+}) {
   const intl = useIntl()
   const scopes = useSelector(getScope)
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.CORRECTION.REVIEW)
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
   const [searchParams] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.CORRECTION.REVIEW
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW
   )
 
   const events = useEvents()
   const event = events.getEvent.getFromCache(eventId)
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
-
-  const writeActions = event.actions.filter(
-    (action) => !isMetaAction(action.type)
-  )
-
-  // latest action should be correction action
-  const lastWriteAction = writeActions[writeActions.length - 1]
 
   const openApproveModal = async () => {
     await openModal((close) => (
@@ -238,7 +237,7 @@ export function ReviewCorrection({ form }: { form: EventState }) {
           events.actions.correction.approve.mutate({
             transactionId: generateTransactionId(),
             eventId,
-            requestId: lastWriteAction.id,
+            requestId: correctionRequestAction.id,
             annotation
           })
           return navigate(
@@ -256,13 +255,13 @@ export function ReviewCorrection({ form }: { form: EventState }) {
     await openModal((close) => (
       <RejectModal
         close={close}
-        onSubmit={(message) => {
+        onSubmit={(reason) => {
           events.actions.correction.reject.mutate({
             transactionId: generateTransactionId(),
             eventId,
-            requestId: lastWriteAction.id,
+            requestId: correctionRequestAction.id,
             annotation,
-            reason: { message }
+            content: { reason }
           })
           return navigate(
             ROUTES.V2.EVENTS.OVERVIEW.buildPath(
@@ -308,6 +307,7 @@ export function ReviewCorrection({ form }: { form: EventState }) {
     >
       <CorrectionDetails
         annotation={annotation}
+        correctionRequestAction={correctionRequestAction}
         event={event}
         form={form}
         requesting={!scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)}

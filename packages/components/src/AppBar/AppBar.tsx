@@ -38,6 +38,25 @@ const Left = styled.div`
 
 const Center = styled.div``
 
+const MobileLeft = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  grid-column: 1;
+  overflow: hidden;
+  min-width: 0;
+`
+
+const MobileCenter = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+  gap: 16px;
+  grid-column: 1;
+`
+
 const Actions = styled.div<{ $flex?: '1' | 'none' }>`
   display: flex;
   gap: 8px;
@@ -51,11 +70,13 @@ const Title = styled(Text)`
   overflow: hidden;
   text-overflow: ellipsis;
   height: 25px;
+  min-width: 0;
 `
 
 type IProps = {
   mobileLeft?: React.ReactNode
   mobileTitle?: React.ReactNode
+  mobileCenter?: React.ReactNode
   mobileRight?: React.ReactNode
   desktopLeft?: React.ReactNode
   desktopTitle?: React.ReactNode
@@ -94,14 +115,18 @@ export const AppBar = (props: IAppBarProps) => {
   } else {
     return (
       <AppBarWrapper id={props.id} className={props.className}>
-        <Left>
+        <MobileLeft>
           {props.mobileLeft && <Stack>{props.mobileLeft}</Stack>}
           {props.mobileTitle && (
             <Title variant="h4" element="h1">
               {props.mobileTitle}
             </Title>
           )}
-        </Left>
+        </MobileLeft>
+
+        {!props.mobileTitle && (
+          <MobileCenter>{props.mobileCenter}</MobileCenter>
+        )}
 
         {props.mobileRight && (
           <Actions $flex="none">{props.mobileRight}</Actions>

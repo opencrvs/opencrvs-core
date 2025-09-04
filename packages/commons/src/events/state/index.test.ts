@@ -15,7 +15,7 @@ import { getUUID, UUID } from '../../uuid'
 import { ActionStatus } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { AddressType } from '../CompositeFieldValue'
-import { EventStatus } from '../EventMetadata'
+import { EventStatus, InherentFlags } from '../EventMetadata'
 import { generateActionDocument, generateEventDocument } from '../test.utils'
 import { EventIndex } from '../EventIndex'
 import { TENNIS_CLUB_MEMBERSHIP } from '../Constants'
@@ -298,7 +298,8 @@ describe('getCurrentEventState()', () => {
       updatedAtLocation: registerRequestAction.createdAtLocation,
       declaration: deepDropNulls(declareRequestAction.declaration),
       dateOfEvent: event.createdAt.split('T')[0],
-      flags: [],
+      flags: [InherentFlags.PENDING_CERTIFICATION],
+      duplicates: [],
       legalStatuses: {
         [EventStatus.enum.DECLARED]: {
           createdAt: declareRequestAction.createdAt,
@@ -417,7 +418,8 @@ describe('getCurrentEventState()', () => {
       updatedAtLocation: registerAcceptAction.createdAtLocation,
       declaration: deepDropNulls(declareAcceptAction.declaration),
       dateOfEvent: event.createdAt.split('T')[0],
-      flags: [],
+      flags: [InherentFlags.PENDING_CERTIFICATION],
+      duplicates: [],
       legalStatuses: {
         [EventStatus.enum.DECLARED]: {
           createdAt: declareAcceptAction.createdAt,
@@ -441,6 +443,94 @@ describe('getCurrentEventState()', () => {
         }
       }
     } satisfies EventIndex)
+  })
+
+  test('Flags are correctly set', () => {
+    const event1 = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        ActionType.CREATE,
+        ActionType.DECLARE,
+        ActionType.REGISTER,
+        ActionType.REQUEST_CORRECTION
+      ]
+    })
+
+    expect(
+      getCurrentEventState(event1, tennisClubMembershipEvent).flags
+    ).toEqual([
+      InherentFlags.PENDING_CERTIFICATION,
+      InherentFlags.CORRECTION_REQUESTED
+    ])
+
+    const event2 = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
+    })
+
+    expect(
+      getCurrentEventState(event2, tennisClubMembershipEvent).flags
+    ).toEqual([InherentFlags.PENDING_CERTIFICATION])
+
+    const event3 = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        ActionType.CREATE,
+        ActionType.DECLARE,
+        ActionType.REGISTER,
+        ActionType.PRINT_CERTIFICATE
+      ]
+    })
+
+    expect(
+      getCurrentEventState(event3, tennisClubMembershipEvent).flags.length
+    ).toEqual(0)
+  })
+
+  test('Filter hidden fields while getting current event state', () => {
+    // case 1: dobUnknown = false → keep dob, drop age
+    const event1 = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        ActionType.CREATE,
+        ActionType.DECLARE,
+        ActionType.REGISTER,
+        ActionType.REQUEST_CORRECTION
+      ],
+      declarationOverrides: {
+        'applicant.dobUnknown': false,
+        'applicant.age': 20,
+        'applicant.dob': '2000-01-01'
+      }
+    })
+
+    const eventState1 = getCurrentEventState(event1, tennisClubMembershipEvent)
+
+    expect(eventState1.declaration['applicant.dobUnknown']).toBe(false)
+    expect(eventState1.declaration['applicant.dob']).toBe('2000-01-01')
+    expect(eventState1.declaration['applicant.age']).toBe(undefined)
+
+    // case 2: dobUnknown = true → keep age, drop dob
+    const event2 = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        ActionType.CREATE,
+        ActionType.DECLARE,
+        ActionType.REGISTER,
+        ActionType.REQUEST_CORRECTION
+      ],
+      declarationOverrides: {
+        'applicant.dobUnknown': true,
+        'applicant.age': 20,
+        'applicant.dob': '2000-01-01'
+      }
+    })
+
+    const eventState2 = getCurrentEventState(event2, tennisClubMembershipEvent)
+
+    expect(eventState2.declaration['applicant.dobUnknown']).toBe(true)
+    expect(eventState2.declaration['applicant.dob']).toBe(undefined)
+    expect(eventState2.declaration['applicant.age']).toBe(20)
   })
 })
 
@@ -468,7 +558,12 @@ describe('correction requests', () => {
             transactionId: getUUID()
           },
           {
-            declaration: { name: 'John Doe' },
+            declaration: {
+              'applicant.name': {
+                firstname: 'John',
+                surname: 'Doe'
+              }
+            },
             type: 'DECLARE',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
@@ -494,7 +589,12 @@ describe('correction requests', () => {
             transactionId: getUUID()
           },
           {
-            declaration: { name: 'Doe John' },
+            declaration: {
+              'applicant.name': {
+                firstname: 'Doe',
+                surname: 'John'
+              }
+            },
             type: 'REQUEST_CORRECTION',
             createdByUserType: TokenUserType.Enum.user,
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
@@ -511,7 +611,13 @@ describe('correction requests', () => {
       tennisClubMembershipEvent
     )
 
-    expect(state.declaration.name).toBe('John Doe')
+    const applicantName = state.declaration['applicant.name'] as {
+      firstname: string
+      surname: string
+    }
+
+    expect(applicantName.firstname).toBe('John')
+    expect(applicantName.surname).toBe('Doe')
   })
   test('proposed correction data is applied after the correction request is approved', () => {
     const state = getCurrentEventState(
@@ -536,7 +642,12 @@ describe('correction requests', () => {
             transactionId: getUUID()
           },
           {
-            declaration: { name: 'John Doe' },
+            declaration: {
+              'applicant.name': {
+                firstname: 'John',
+                surname: 'Doe'
+              }
+            },
             type: 'DECLARE',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
@@ -562,7 +673,12 @@ describe('correction requests', () => {
             transactionId: getUUID()
           },
           {
-            declaration: { name: 'Doe John' },
+            declaration: {
+              'applicant.name': {
+                firstname: 'Doe',
+                surname: 'John'
+              }
+            },
             type: 'REQUEST_CORRECTION',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
@@ -593,7 +709,13 @@ describe('correction requests', () => {
       tennisClubMembershipEvent
     )
 
-    expect(state.declaration.name).toBe('Doe John')
+    const applicantName = state.declaration['applicant.name'] as {
+      firstname: string
+      surname: string
+    }
+
+    expect(applicantName.firstname).toBe('Doe')
+    expect(applicantName.surname).toBe('John')
   })
 })
 

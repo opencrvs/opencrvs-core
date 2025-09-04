@@ -21,16 +21,16 @@ import {
 } from '@opencrvs/commons/client'
 import { Print } from '@opencrvs/components/lib/icons'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
-import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { ROUTES } from '@client/v2-events/routes'
-import { FormLayout } from '@client/v2-events/layouts'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import {
   CERT_TEMPLATE_ID,
   useCertificateTemplateSelectorFieldConfig
 } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { FormLayout } from '@client/v2-events/layouts'
+import { ROUTES } from '@client/v2-events/routes'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -50,7 +50,9 @@ export function Pages() {
   )
   const eventIndex = getCurrentEventState(event, configuration)
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
-    event.type
+    event.type,
+    eventIndex.declaration,
+    event
   )
 
   const formPages = getPrintCertificatePages(configuration)

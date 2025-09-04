@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
+import {
+  MiddlewareFunction,
+  TRPCError
+} from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import {
   ActionType,
@@ -32,18 +35,20 @@ import {
   deepDropNulls,
   omitHiddenFields,
   EventState,
-  Inferred,
+  FieldConfig,
   isFieldVisible,
   errorMessages,
   runFieldValidations,
   ActionInputWithType,
   ApproveCorrectionActionInput,
-  RejectCorrectionActionInput
+  RejectCorrectionActionInput,
+  runStructuralValidations
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
+import { isLeafLocation } from '@events/storage/postgres/events/locations'
 import {
   getInvalidUpdateKeys,
   getVerificationPageErrors,
@@ -51,7 +56,7 @@ import {
 } from './utils'
 
 export function getFieldErrors(
-  fields: Inferred[],
+  fields: FieldConfig[],
   data: ActionUpdate,
   declaration: EventState = {}
 ) {
@@ -233,7 +238,7 @@ function validateNotifyAction({
         }
       }
 
-      const fieldErrors = runFieldValidations({
+      const fieldErrors = runStructuralValidations({
         field,
         values: annotation
       })
@@ -258,7 +263,7 @@ function validateNotifyAction({
         }
       }
 
-      const fieldErrors = runFieldValidations({
+      const fieldErrors = runStructuralValidations({
         field: { ...field, required: false },
         values: declaration
       })
@@ -392,4 +397,45 @@ export const validateAction: MiddlewareFunction<
   }
 
   throw new Error('Trying to validate unsupported action type')
+}
+
+// When performing actions via REST API, we need to ensure that a valid 'createdAtLocation' is provided in the payload.
+// For normal users, the createdAtLocation is resolved on the backend from the user's primaryOfficeId.
+export const requireLocationForSystemUserAction: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  ActionInputWithType
+> = async ({ input, next, ctx }) => {
+  const { user } = ctx
+
+  if (user.type !== 'system') {
+    if (input.createdAtLocation) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'createdAtLocation is not allowed for non-system users'
+      })
+    }
+
+    return next()
+  }
+
+  if (!input.createdAtLocation) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'createdAtLocation is required and must be a valid office id'
+    })
+  }
+
+  // Ensure given location is a leaf location, i.e. an office location
+  const isLeaf = await isLeafLocation(input.createdAtLocation)
+  if (!isLeaf) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'createdAtLocation must be an office location'
+    })
+  }
+
+  return next()
 }

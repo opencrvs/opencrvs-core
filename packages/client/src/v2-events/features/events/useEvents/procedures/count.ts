@@ -21,16 +21,18 @@ export function useGetEventCounts() {
       return useQuery({
         ...trpc.workqueue.count.queryOptions(query),
         queryKey: trpc.workqueue.count.queryKey(query),
-        refetchOnMount: true,
-        staleTime: 0
+        refetchOnMount: 'always',
+        staleTime: 0,
+        refetchInterval: 20000
       })
     },
     useSuspenseQuery: (queries: WorkqueueCountInput) => {
       return useSuspenseQuery({
         ...trpc.workqueue.count.queryOptions(queries),
         queryKey: trpc.workqueue.count.queryKey(queries),
-        refetchOnMount: true,
-        staleTime: 0
+        refetchOnMount: 'always',
+        staleTime: 0,
+        refetchInterval: 20000
       }).data
     }
   }

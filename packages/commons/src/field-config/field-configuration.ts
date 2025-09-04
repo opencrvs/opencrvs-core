@@ -20,8 +20,6 @@ export function createFieldConfig(
   fieldId: string,
   options: {
     options?: SelectOption[]
-    excludeInSearchQuery?: boolean
-    alternateFieldIds?: string[]
     conditionals?: FieldConditional[]
     validations?: ValidationConfig[]
     searchCriteriaLabelPrefix?: TranslationConfig

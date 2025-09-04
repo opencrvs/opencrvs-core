@@ -82,7 +82,7 @@ export const PrintButton = {
       (cert) => cert.id === template
     )
 
-    const { handleCertify } = usePrintableCertificate({
+    const { preparePdfCertificate } = usePrintableCertificate({
       event,
       config: eventConfiguration,
       locations,
@@ -95,10 +95,13 @@ export const PrintButton = {
       if (!certificateConfig || !language) {
         return
       }
-      if (!handleCertify) {
+      if (!preparePdfCertificate) {
         return
       }
-      await handleCertify(event)
+      // Follow the new print flow: prepare first, then mutate, then print in the prepared window
+      const openPreparedPdf = await preparePdfCertificate(event)
+      // Defer recording print action to the dedicated review flow; button just opens prepared PDF
+      openPreparedPdf()
       // Notify form that print action has occurred to satisfy required validation if needed
       if (typeof onChange === 'function') {
         onChange(new Date().toISOString())

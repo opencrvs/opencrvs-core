@@ -17,7 +17,9 @@ import {
   ActionBase,
   ActionDocument,
   ActionStatus,
-  EventState
+  EventState,
+  PrintCertificateAction,
+  ActionUpdate
 } from './ActionDocument'
 import {
   ApproveCorrectionActionInput,
@@ -54,7 +56,11 @@ import { EventStatus } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 import { FieldType } from './FieldType'
-import { AddressType, FileFieldValue } from './CompositeFieldValue'
+import {
+  AddressType,
+  FileFieldValue,
+  HttpFieldValue
+} from './CompositeFieldValue'
 import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import { z } from 'zod'
@@ -153,6 +159,8 @@ export function mapFieldTypeToMockValue(
       return generateRandomName(rng)
     case FieldType.NUMBER:
       return 19
+    case FieldType.BUTTON:
+      return 1
     case FieldType.EMAIL:
       return 'test@opencrvs.org'
     case FieldType.ADDRESS:
@@ -188,6 +196,12 @@ export function mapFieldTypeToMockValue(
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue
+    case FieldType.HTTP:
+      return {
+        error: null,
+        data: { nid: '1234567890' },
+        loading: false
+      } satisfies HttpFieldValue
     case FieldType.FILE_WITH_OPTIONS:
     case FieldType.DATA:
       return undefined
@@ -207,7 +221,8 @@ function fieldConfigsToActionPayload(fields: FieldConfig[], rng: () => number) {
 export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType,
-  rng: () => number
+  rng: () => number,
+  overrides?: Partial<EventState>
 ): EventState {
   const parsed = DeclarationUpdateActions.safeParse(action)
   if (parsed.success) {
@@ -219,7 +234,10 @@ export function generateActionDeclarationInput(
 
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
-    return omitHiddenPaginatedFields(declarationConfig, declaration)
+    return {
+      ...omitHiddenPaginatedFields(declarationConfig, declaration),
+      ...overrides
+    }
   }
 
   // eslint-disable-next-line no-console
@@ -279,51 +297,54 @@ export function eventPayloadGenerator(rng: () => number) {
       {
         eventId,
         actionType,
-        annotation
+        annotation,
+        omitFields = []
       }: {
         eventId: UUID
-        actionType: ActionType
+        actionType: Draft['action']['type']
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         annotation?: Record<string, any>
+        omitFields?: string[] // list of declaration fields to exclude
       },
       input: Partial<Draft> = {}
-    ): Draft =>
-      merge(
-        {
-          id: getUUID(),
-          eventId,
-          createdAt: new Date().toISOString(),
+    ): Draft => {
+      const base: Draft = {
+        id: getUUID(),
+        eventId,
+        createdAt: new Date().toISOString(),
+        transactionId: getUUID(),
+        action: {
           transactionId: getUUID(),
-          action: {
-            transactionId: getUUID(),
-            type: actionType,
-            status: ActionStatus.Accepted,
-            declaration: {
-              'applicant.name': {
-                firstname: 'Max',
-                surname: 'McLaren'
-              },
-              'applicant.dob': '2020-01-02',
-              'applicant.image': {
-                path: '/ocrvs/e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png',
-                originalFilename: 'Screenshot.png',
-                type: 'image/png'
-              }
+          type: actionType,
+          status: ActionStatus.Accepted,
+          declaration: {
+            'applicant.name': {
+              firstname: 'Max',
+              surname: 'McLaren'
             },
-            annotation: {
-              'correction.requester.relationship': 'ANOTHER_AGENT',
-              'correction.request.reason': "Child's name was incorrect",
-              ...annotation
-            },
-            createdAt: new Date().toISOString(),
-            createdBy: '@todo',
-            createdByUserType: TokenUserType.Enum.user,
-            createdByRole: '@todo',
-            createdAtLocation: '@todo' as UUID
-          }
-        } satisfies Draft,
-        input
-      ),
+            'applicant.dob': '2020-01-02',
+            'applicant.image': {
+              path: '/ocrvs/e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png',
+              originalFilename: 'Screenshot.png',
+              type: 'image/png'
+            }
+          },
+          annotation: {
+            'correction.requester.relationship': 'ANOTHER_AGENT',
+            'correction.request.reason': "Child's name was incorrect",
+            'identity-check': true,
+            ...annotation
+          },
+          createdAt: new Date().toISOString(),
+          createdBy: '@todo',
+          createdByUserType: TokenUserType.Enum.user,
+          createdByRole: '@todo'
+        }
+      }
+
+      base.action.declaration = omit(base.action.declaration, omitFields)
+      return merge(base, input)
+    },
     actions: {
       declare: (
         eventId: string,
@@ -447,19 +468,16 @@ export function eventPayloadGenerator(rng: () => number) {
             ArchiveActionInput,
             'transactionId' | 'declaration' | 'keepAssignment'
           >
-        > = {},
-        isDuplicate?: boolean
+        > = {}
       ) => ({
         type: ActionType.ARCHIVE,
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
-        // @TODO: Check whether generator is needed?
         annotation: {},
         duplicates: [],
         eventId,
-        reason: {
-          message: `${ActionType.ARCHIVE}`,
-          isDuplicate: isDuplicate ?? false
+        content: {
+          reason: `${ActionType.ARCHIVE}`
         },
         ...input
       }),
@@ -484,7 +502,7 @@ export function eventPayloadGenerator(rng: () => number) {
           ),
         duplicates: [],
         eventId,
-        reason: { message: `${ActionType.REJECT}` },
+        content: { reason: `${ActionType.REJECT}` },
         ...input
       }),
       register: (
@@ -561,7 +579,7 @@ export function eventPayloadGenerator(rng: () => number) {
                 ActionType.REQUEST_CORRECTION,
                 rng
               ),
-              ['applicant.email']
+              ['applicant.email', 'applicant.image']
             ),
           annotation:
             input.annotation ??
@@ -603,7 +621,7 @@ export function eventPayloadGenerator(rng: () => number) {
           input: Partial<
             Pick<
               RejectCorrectionActionInput,
-              'transactionId' | 'annotation' | 'keepAssignment' | 'reason'
+              'transactionId' | 'annotation' | 'keepAssignment' | 'content'
             >
           >
         ) => ({
@@ -620,7 +638,7 @@ export function eventPayloadGenerator(rng: () => number) {
           eventId,
           requestId,
           keepAssignment: input.keepAssignment,
-          reason: input.reason ?? { message: '' }
+          content: input.content ?? { reason: '' }
         })
       }
     }
@@ -632,7 +650,9 @@ export function generateActionDocument({
   action,
   rng = () => 0.1,
   defaults = {},
-  user = {}
+  user = {},
+  annotation,
+  declarationOverrides
 }: {
   configuration: EventConfig
   action: ActionType
@@ -644,6 +664,8 @@ export function generateActionDocument({
     role: TestUserRole
     id: string
   }>
+  annotation?: ActionUpdate
+  declarationOverrides?: Partial<EventState>
 }): ActionDocument {
   const actionBase = {
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
@@ -655,8 +677,13 @@ export function generateActionDocument({
     id: getUUID(),
     createdAtLocation:
       user.primaryOfficeId ?? ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID),
-    declaration: generateActionDeclarationInput(configuration, action, rng),
-    annotation: {},
+    declaration: generateActionDeclarationInput(
+      configuration,
+      action,
+      rng,
+      declarationOverrides
+    ),
+    annotation: annotation ?? {},
     status: ActionStatus.Accepted,
     transactionId: getUUID(),
     ...defaults
@@ -665,7 +692,9 @@ export function generateActionDocument({
   switch (action) {
     case ActionType.READ:
       return { ...actionBase, type: action }
-    case ActionType.MARKED_AS_DUPLICATE:
+    case ActionType.MARK_NOT_DUPLICATE:
+      return { ...actionBase, type: action }
+    case ActionType.MARK_AS_DUPLICATE:
       return { ...actionBase, type: action }
     case ActionType.DECLARE:
       return { ...actionBase, type: action }
@@ -676,15 +705,19 @@ export function generateActionDocument({
     case ActionType.VALIDATE:
       return { ...actionBase, type: action }
     case ActionType.ARCHIVE:
-      return { ...actionBase, type: action, reason: { message: 'Archive' } }
+      return { ...actionBase, type: action, content: { reason: 'Archive' } }
     case ActionType.REJECT:
-      return { ...actionBase, type: action, reason: { message: 'Reject' } }
+      return { ...actionBase, type: action, content: { reason: 'Reject' } }
     case ActionType.CREATE:
       return { ...actionBase, type: action }
     case ActionType.NOTIFY:
       return { ...actionBase, type: action }
     case ActionType.PRINT_CERTIFICATE:
-      return { ...actionBase, type: action }
+      return {
+        ...actionBase,
+        type: action,
+        content: (defaults as Partial<PrintCertificateAction>).content
+      }
     case ActionType.REQUEST_CORRECTION:
       return { ...actionBase, type: action }
     case ActionType.APPROVE_CORRECTION:
@@ -694,7 +727,7 @@ export function generateActionDocument({
         ...actionBase,
         requestId: getUUID(),
         type: action,
-        reason: { message: 'Correction rejection' }
+        content: { reason: 'Correction rejection' }
       }
     case ActionType.REGISTER:
       return {
@@ -703,7 +736,7 @@ export function generateActionDocument({
       }
 
     case ActionType.DELETE:
-    case ActionType.DETECT_DUPLICATE:
+    case ActionType.DUPLICATE_DETECTED:
     default:
       throw new Error(`Unsupported action type: ${action}`)
   }
@@ -713,7 +746,8 @@ export function generateEventDocument({
   configuration,
   actions,
   rng = () => 0.1,
-  user
+  user,
+  declarationOverrides
 }: {
   configuration: EventConfig
   actions: ActionType[]
@@ -724,12 +758,22 @@ export function generateEventDocument({
     role: TestUserRole
     id: string
   }>
+  /**
+   * Overrides for default event state
+   */
+  declarationOverrides?: Partial<EventState>
 }): EventDocument {
   return {
     trackingId: getUUID(),
     type: configuration.id,
     actions: actions.map((action) =>
-      generateActionDocument({ configuration, action, rng, user })
+      generateActionDocument({
+        configuration,
+        action,
+        rng,
+        user,
+        declarationOverrides
+      })
     ),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
@@ -751,12 +795,14 @@ export function generateEventDraftDocument({
   actionType: ActionType
   rng?: () => number
   declaration?: EventState
+  annotation?: EventState
 }): Draft {
   const action = generateActionDocument({
     configuration: tennisClubMembershipEvent,
     action: actionType,
     rng
   })
+
   return {
     id: getUUID(),
     transactionId: getUUID(),
@@ -765,7 +811,8 @@ export function generateEventDraftDocument({
       declaration: {
         ...action.declaration,
         ...declaration
-      }
+      },
+      annotation: action.annotation
     },
     createdAt: new Date().toISOString(),
     eventId
@@ -848,6 +895,16 @@ export function generateRandomSignature(rng: () => number): string {
   return `/random-bucket/${generateUuid(rng)}.png`
 }
 
+/**
+ * @param overrides - Partial EventIndex object to override the default values.
+ * @param seed - Seed value for the pseudo-random number generator.
+ * @returns A mock EventIndex object with default values for tennis club
+ * membership events.
+ *
+ * N.B. Unless a different seed is provided, the generated values will be
+ * consistent across calls.
+ *
+ */
 export const eventQueryDataGenerator = (
   overrides: Partial<EventIndex> = {},
   seed: number = 1
@@ -876,7 +933,8 @@ export const eventQueryDataGenerator = (
     assignedTo: overrides.assignedTo ?? null,
     updatedBy: overrides.updatedBy ?? generateUuid(rng),
     updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
-    flags: [],
+    flags: overrides.flags ?? [],
+    duplicates: [],
     legalStatuses: overrides.legalStatuses ?? {},
     declaration: overrides.declaration ?? generateRandomApplicant(rng),
     trackingId: overrides.trackingId ?? generateTrackingId(rng)
@@ -914,7 +972,12 @@ export const generateWorkqueues = (
         type: 'and',
         clauses: [{ eventType: tennisClubMembershipEvent.id }]
       },
-      actions: [],
+      actions: [
+        {
+          type: 'DEFAULT',
+          conditionals: []
+        }
+      ],
       icon: 'Draft'
     }
   ])

@@ -14,7 +14,8 @@
     "./fixtures": "./build/dist/common/fixtures.js",
     "./assignment": "./build/dist/common/assignment.js",
     "./client": "./build/dist/esm/client.js",
-    "./events": "./build/dist/common/events/index.js"
+    "./events": "./build/dist/common/events/index.js",
+    "./events/deduplication": "./build/dist/common/events/deduplication.js"
   },
   "scripts": {
     "start": "yarn build:watch",
@@ -23,10 +24,8 @@
     "test:compilation": "tsc --noEmit",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "postinstall": "yarn build",
-    "build:default": "tsc --project tsconfig.build.json",
-    "build:esm": "tsc --project tsconfig.esm.build.json",
-    "build": "yarn build:default && yarn build:esm",
-    "build:watch": "concurrently \"tsc --watch --project tsconfig.build.json\" \"tsc --watch --project tsconfig.esm.build.json\"",
+    "build": "yarn tsc -b tsconfig.build.json",
+    "build:watch": "yarn tsc -b --watch --preserveWatchOutput tsconfig.build.json",
     "build:clean": "rm -rf build"
   },
   "private": true,
@@ -47,6 +46,7 @@
     "jwt-decode": "^3.0.0",
     "lodash": "^4.17.10",
     "node-fetch": "^2.6.7",
+    "object-hash": "^3.0.0",
     "pino": "^7.0.0",
     "pkg-up": "^3.1.0",
     "typescript": "5.6.3",
@@ -56,6 +56,7 @@
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.9",
+    "@types/object-hash": "^3.0.6",
     "@typescript-eslint/eslint-plugin": "8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "eslint": "^9.23.0",
@@ -76,7 +77,13 @@
   },
   "jest": {
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig-tests.json",
+          "isolatedModules": true
+        }
+      ]
     },
     "coverageReporters": [
       "json",

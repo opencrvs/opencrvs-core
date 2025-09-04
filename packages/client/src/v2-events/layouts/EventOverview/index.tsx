@@ -10,15 +10,10 @@
  */
 
 import React from 'react'
-
-import { noop } from 'lodash'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import {
-  applyDraftsToEventIndex,
-  deepDropNulls
-} from '@opencrvs/commons/client'
+import { applyDraftToEventIndex, deepDropNulls } from '@opencrvs/commons/client'
 import {
   AppBar,
   Button,
@@ -38,8 +33,10 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/components/ActionMenu'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { flattenEventIndex } from '@client/v2-events/utils'
+import { CoreWorkqueues, flattenEventIndex } from '@client/v2-events/utils'
 import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
+import { DownloadButton } from '@client/v2-events/components/DownloadButton'
+import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { Sidebar } from '../sidebar/Sidebar'
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
@@ -61,36 +58,26 @@ export function EventOverviewLayout({
 }) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
   const { searchEventById } = useEvents()
-  const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts(eventId)
+  const { getRemoteDraftByEventId } = useDrafts()
+  const draft = getRemoteDraftByEventId(eventId)
   const allEvents = useEventConfigurations()
   const navigate = useNavigate()
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
+  const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
   const eventResults = searchEventById.useSuspenseQuery(eventId)
 
-  if (eventResults.length === 0) {
+  if (eventResults.total === 0) {
     throw new Error(`Event details with id ${eventId} not found`)
   }
 
-  const eventIndex = eventResults[0]
+  const eventIndex = eventResults.results[0]
 
   const { eventConfiguration } = useEventConfiguration(eventIndex.type)
-
-  const advancedSearchEvents = allEvents.filter(
-    (e) => e.advancedSearch.length > 0
-  )
-
-  const advancedSearchNavigationList: INavigationType[] = [
-    {
-      label: intl.formatMessage(messages.header),
-      id: 'advanced-search',
-      onClick: () => {
-        navigate(ROUTES.V2.ADVANCED_SEARCH.path)
-      }
-    }
-  ]
+  const eventIndexWithDraftApplied = draft
+    ? applyDraftToEventIndex(eventIndex, draft, eventConfiguration)
+    : eventIndex
 
   return (
     <Frame
@@ -115,15 +102,22 @@ export function EventOverviewLayout({
               <BackArrow />
             </Button>
           }
-          mobileRight={<ActionMenu eventId={eventId} />}
-          mobileTitle={flattenedIntl.formatMessage(
-            eventConfiguration.title,
-            flattenEventIndex(
-              deepDropNulls(
-                applyDraftsToEventIndex(eventIndex, drafts, eventConfiguration)
-              )
-            )
-          )}
+          mobileRight={
+            <>
+              <ActionMenu eventId={eventId} />
+              <DownloadButton
+                key={`DownloadButton-${eventId}`}
+                event={eventIndexWithDraftApplied}
+                isDraft={slug === CoreWorkqueues.DRAFT}
+              />
+            </>
+          }
+          mobileTitle={
+            flattenedIntl.formatMessage(
+              eventConfiguration.title,
+              flattenEventIndex(deepDropNulls(eventIndexWithDraftApplied))
+            ) || intl.formatMessage(recordAuditMessages.noName)
+          }
         />
       }
       navigation={<Sidebar />}

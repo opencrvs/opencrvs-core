@@ -16,6 +16,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import {
+  ActionType,
   getCurrentEventState,
   getDeclarationPages
 } from '@opencrvs/commons/client'
@@ -41,7 +42,7 @@ export function Pages() {
   const { formValues: form } = useSubscribeEventFormData()
   const navigate = useNavigate()
   const drafts = useDrafts()
-  const { modal, redirectToOrigin } = useEventFormNavigation()
+  const { modal, closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
   const event = events.getEvent.getFromCache(eventId)
@@ -76,13 +77,13 @@ export function Pages() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          redirectToOrigin(searchParams.workqueue)
+          closeActionView(searchParams.workqueue)
         })
       }
     >
       {modal}
       <PagesComponent
-        declaration={eventIndex.declaration}
+        actionType={ActionType.VALIDATE}
         eventConfig={configuration}
         form={form}
         formPages={formPages}

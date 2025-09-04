@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { User } from '../../User'
 import { z } from 'zod'
-import { UserWithPrimaryOffice } from './deserializer'
 
 export const SerializedUserField = z.object({
   $userField: z.enum([
@@ -25,9 +25,7 @@ export const SerializedUserField = z.object({
 
 export type SerializedUserField = z.infer<typeof SerializedUserField>
 
-export function userSerializer(
-  userField: keyof UserWithPrimaryOffice
-): SerializedUserField {
+export function userSerializer(userField: keyof User): SerializedUserField {
   return {
     $userField: userField
   }

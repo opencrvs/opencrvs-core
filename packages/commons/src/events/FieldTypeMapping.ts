@@ -40,7 +40,9 @@ import {
   DateRangeField,
   SelectDateRangeField,
   TimeField,
-  PrintButton
+  PrintButton,
+  HttpField,
+  ButtonField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -55,7 +57,8 @@ import {
   DataFieldValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
-  TimeValue
+  TimeValue,
+  ButtonFieldValue
 } from './FieldValue'
 
 import { FullDocumentPath } from '../documents'
@@ -67,7 +70,8 @@ import {
   FileFieldWithOptionValue,
   AddressType,
   NameFieldValue,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  HttpFieldUpdateValue
 } from './CompositeFieldValue'
 
 /**
@@ -149,6 +153,12 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.PRINT_BUTTON:
       schema = TextValue
       break
+    case FieldType.BUTTON:
+      schema = ButtonFieldValue
+      break
+    case FieldType.HTTP:
+      schema = HttpFieldUpdateValue
+      break
   }
 
   return required ? schema : schema.nullish()
@@ -195,6 +205,8 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.DATA:
     case FieldType.NAME:
     case FieldType.PHONE:
+    case FieldType.BUTTON:
+    case FieldType.HTTP:
     case FieldType.ID:
       return null
     case FieldType.ADDRESS:
@@ -329,7 +341,6 @@ export const isFileFieldType = (field: {
   config: FieldConfig
   value: FieldValue
 }): field is { value: FileFieldValue; config: File } => {
-  // @TODO?
   return field.config.type === FieldType.FILE
 }
 
@@ -433,6 +444,19 @@ export const isPrintButtonFieldType = (field: {
 }): field is { value: undefined; config: PrintButton } => {
   return field.config.type === FieldType.PRINT_BUTTON
 }
+export const isButtonFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: ButtonField } => {
+  return field.config.type === FieldType.BUTTON
+}
+
+export const isHttpFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: HttpField } => {
+  return field.config.type === FieldType.HTTP
+}
 
 export type NonInteractiveFieldType =
   | Divider
@@ -453,6 +477,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.PARAGRAPH ||
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
-    field.type === FieldType.PRINT_BUTTON
+    field.type === FieldType.PRINT_BUTTON ||
+    field.type === FieldType.HTTP
   )
 }

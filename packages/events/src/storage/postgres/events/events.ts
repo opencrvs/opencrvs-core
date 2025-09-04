@@ -22,20 +22,17 @@ import { EventActions, NewEventActions } from './schema/app/EventActions'
 import { Events, NewEvents } from './schema/app/Events'
 import Schema from './schema/Database'
 
+export const STREAM_BATCH_SIZE = 1000
+
 function toEventDocument(
   { eventType, ...event }: Events,
   actions: EventActions[]
 ) {
-  const notNullActions = actions.map(
-    ({ actionType, reasonIsDuplicate, reasonMessage, ...action }) =>
-      dropNulls({
-        ...action,
-        type: actionType,
-        reason: (reasonIsDuplicate || reasonMessage) && {
-          isDuplicate: reasonIsDuplicate,
-          message: reasonMessage
-        }
-      })
+  const notNullActions = actions.map(({ actionType, ...action }) =>
+    dropNulls({
+      ...action,
+      type: actionType
+    })
   )
 
   return EventDocument.parse({
@@ -64,6 +61,50 @@ export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
     .execute()
 
   return toEventDocument(event, actions)
+}
+
+async function* processBatch(batch: Events[]) {
+  const db = getClient()
+  const ids = batch.map((event) => event.id)
+  const actions = await db
+    .selectFrom('eventActions')
+    .selectAll()
+    .where('eventId', 'in', ids)
+    .execute()
+
+  const byEventId = actions.reduce<Record<string, EventActions[] | undefined>>(
+    (actionsByEventId, action) => ({
+      ...actionsByEventId,
+      [action.eventId]: (actionsByEventId[action.eventId] || []).concat(action)
+    }),
+    {}
+  )
+
+  for (const event of batch) {
+    yield toEventDocument(event, byEventId[event.id] ?? [])
+  }
+}
+
+/*
+ * Returns a stream of events directly from Postgres.
+ * Useful for cases where you want every event to be processed in bulk,
+ * for example, reindexing to ElasticSearch.
+ */
+export async function* streamEventDocuments() {
+  const db = getClient()
+  const eventsStream = db.selectFrom('events').selectAll().stream()
+  let batch: Events[] = []
+
+  for await (const row of eventsStream) {
+    batch.push(row)
+    if (batch.length === STREAM_BATCH_SIZE) {
+      yield* processBatch(batch)
+      batch = []
+    }
+  }
+  if (batch.length) {
+    yield* processBatch(batch)
+  }
 }
 
 export const getEventById = async (id: UUID) => {
@@ -103,7 +144,7 @@ export async function createEventInTrx(event: NewEvents, trx: Kysely<Schema>) {
 
 /**
  * Creates a new action in the event_actions table
- * @idempotent with `transactionId, actionType`
+ * @idempotent with `transactionId, actionType, status`
  * @returns action id
  */
 export async function createActionInTrx(
@@ -113,7 +154,9 @@ export async function createActionInTrx(
   await trx
     .insertInto('eventActions')
     .values(action)
-    .onConflict((oc) => oc.columns(['transactionId', 'actionType']).doNothing())
+    .onConflict((oc) =>
+      oc.columns(['transactionId', 'actionType', 'status']).doNothing()
+    )
     .execute()
 
   return trx
@@ -121,6 +164,7 @@ export async function createActionInTrx(
     .select('id')
     .where('transactionId', '=', action.transactionId)
     .where('actionType', '=', action.actionType)
+    .where('status', '=', action.status)
     .executeTakeFirstOrThrow()
 }
 
@@ -164,9 +208,7 @@ async function getOrCreateEventInTrx(
       createdByRole: input.createdByRole,
       createdByUserType: input.createdByUserType,
       createdBySignature: input.createdBySignature,
-      createdAtLocation: input.createdAtLocation,
-      reasonIsDuplicate: input.reasonIsDuplicate,
-      reasonMessage: input.reasonMessage
+      createdAtLocation: input.createdAtLocation
     },
     trx
   )
@@ -207,9 +249,7 @@ async function getOrCreateEventAndAssignInTrx(
       createdByRole: input.createdByRole,
       createdByUserType: input.createdByUserType,
       createdBySignature: input.createdBySignature,
-      createdAtLocation: input.createdAtLocation,
-      reasonIsDuplicate: input.reasonIsDuplicate,
-      reasonMessage: input.reasonMessage
+      createdAtLocation: input.createdAtLocation
     },
     trx
   )
@@ -225,9 +265,7 @@ async function getOrCreateEventAndAssignInTrx(
       createdByUserType: input.createdByUserType,
       createdBySignature: input.createdBySignature,
       createdAtLocation: input.createdAtLocation,
-      assignedTo: input.createdBy,
-      reasonIsDuplicate: input.reasonIsDuplicate,
-      reasonMessage: input.reasonMessage
+      assignedTo: input.createdBy
     },
     trx
   )

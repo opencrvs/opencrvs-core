@@ -18,7 +18,8 @@ import {
   createStoriesFromScenarios,
   AssertType,
   Scenario,
-  UserRoles
+  UserRoles,
+  REJECTED_DECLARE_AS_REVIEW
 } from '../ActionMenu.common'
 
 export default {
@@ -41,7 +42,8 @@ const rejectedScenariosForLocalRegistrar: Scenario[] = [
       ...getHiddenActions(),
       [ActionType.ASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED
+      [REJECTED_DECLARE_AS_REVIEW]: AssertType.DISABLED,
+      [ActionType.ARCHIVE]: AssertType.DISABLED
     }
   },
   {
@@ -57,7 +59,8 @@ const rejectedScenariosForLocalRegistrar: Scenario[] = [
       ...getHiddenActions(),
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.ENABLED
+      [REJECTED_DECLARE_AS_REVIEW]: AssertType.ENABLED,
+      [ActionType.ARCHIVE]: AssertType.ENABLED
     }
   },
   {
@@ -73,7 +76,8 @@ const rejectedScenariosForLocalRegistrar: Scenario[] = [
       ...getHiddenActions(),
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.DISABLED
+      [REJECTED_DECLARE_AS_REVIEW]: AssertType.DISABLED,
+      [ActionType.ARCHIVE]: AssertType.DISABLED
     }
   }
 ]

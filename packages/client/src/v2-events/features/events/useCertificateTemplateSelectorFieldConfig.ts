@@ -9,14 +9,30 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FieldConfig, FieldType } from '@opencrvs/commons/client'
+import formatISO from 'date-fns/formatISO'
+import {
+  areCertificateConditionsMet,
+  EventDocument,
+  EventState,
+  FieldConfig,
+  FieldType
+} from '@opencrvs/commons/client'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
 export const CERT_TEMPLATE_ID = 'certificateTemplateId'
 export const useCertificateTemplateSelectorFieldConfig = (
-  eventType: string
+  eventType: string,
+  declaration: EventState,
+  event: EventDocument
 ): FieldConfig => {
   const { certificateTemplates } = useAppConfig()
+
+  const declarationWithEventMetadata = {
+    $form: declaration,
+    $event: event,
+    $now: formatISO(new Date(), { representation: 'date' })
+  }
+
   return {
     id: CERT_TEMPLATE_ID,
     type: FieldType.SELECT,
@@ -31,6 +47,14 @@ export const useCertificateTemplateSelectorFieldConfig = (
     )?.id,
     options: certificateTemplates
       .filter((x) => x.event === eventType)
+      .filter(
+        (template) =>
+          !template.conditionals ||
+          areCertificateConditionsMet(
+            template.conditionals,
+            declarationWithEventMetadata
+          )
+      )
       .map((x) => ({ label: x.label, value: x.id }))
   }
 }

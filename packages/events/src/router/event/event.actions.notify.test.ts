@@ -11,7 +11,9 @@
 
 import { TRPCError } from '@trpc/server'
 import {
+  ActionStatus,
   ActionType,
+  generateUuid,
   getAcceptedActions,
   getUUID,
   SCOPES,
@@ -22,6 +24,7 @@ import {
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
+import { getLocations } from '@events/storage/postgres/events/locations'
 
 describe('event.actions.notify', () => {
   describe('authorization', () => {
@@ -128,7 +131,6 @@ describe('event.actions.notify', () => {
       }
     }
 
-    // @TODO:  the error seems quite verbose. Check what causes it and if we can improve it
     await expect(
       // @ts-expect-error -- Intentionally passing incorrect type
       client.event.actions.notify.request(payload)
@@ -157,7 +159,7 @@ describe('event.actions.notify', () => {
     ).rejects.toMatchSnapshot()
   })
 
-  test(`${ActionType.NOTIFY} action fails if invalid value is sent`, async () => {
+  test(`${ActionType.NOTIFY} action does not fail even if invalid value is sent`, async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, [
       SCOPES.RECORD_SUBMIT_INCOMPLETE,
@@ -170,14 +172,25 @@ describe('event.actions.notify', () => {
       eventId: event.id,
       transactionId: getUUID(),
       declaration: {
-        // applicant.dob can not be in the future
+        // applicant.dob can not be in the future in actions other than `NOTIFY`
         'applicant.dob': '2050-01-01'
       }
     }
 
-    await expect(
-      client.event.actions.notify.request(payload)
-    ).rejects.toMatchSnapshot()
+    const fetchedEvent = await client.event.actions.notify.request(payload)
+    expect(fetchedEvent.actions).toEqual([
+      expect.objectContaining({ type: ActionType.CREATE }),
+      expect.objectContaining({ type: ActionType.ASSIGN }),
+      expect.objectContaining({
+        type: ActionType.NOTIFY,
+        status: ActionStatus.Requested
+      }),
+      expect.objectContaining({
+        type: ActionType.NOTIFY,
+        status: ActionStatus.Accepted
+      }),
+      expect.objectContaining({ type: ActionType.UNASSIGN })
+    ])
   })
 
   test(`${ActionType.NOTIFY} is idempotent`, async () => {
@@ -201,6 +214,76 @@ describe('event.actions.notify', () => {
   })
 
   describe('system user', () => {
+    test('should require createdAtLocation for system user', async () => {
+      const { user, generator, rng } = await setupTestCase()
+
+      const dataSeedingClient = createTestClient(user, [
+        SCOPES.USER_DATA_SEEDING
+      ])
+
+      const parentId = generateUuid(rng)
+
+      const locationPayload = generator.locations.set([
+        { id: parentId },
+        { parentId: parentId },
+        { parentId: parentId }
+      ])
+
+      await dataSeedingClient.locations.set(locationPayload)
+
+      const locations = await dataSeedingClient.locations.get()
+
+      const client = createSystemTestClient('test-system', [
+        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+      ])
+
+      const event = await client.event.create(generator.event.create())
+
+      const payload = generator.event.actions.notify(event.id)
+
+      // Should throw error since createdAtLocation is not given
+      await expect(
+        client.event.actions.notify.request(payload)
+      ).rejects.toMatchSnapshot()
+
+      // Should throw error since given createdAtLocation is not an uuid
+      await expect(
+        client.event.actions.notify.request({
+          ...payload,
+          createdAtLocation: 'foobar'
+        })
+      ).rejects.toMatchSnapshot()
+
+      // Should throw error since given createdAtLocation is not a valid location
+      await expect(
+        client.event.actions.notify.request({
+          ...payload,
+          createdAtLocation: getUUID()
+        })
+      ).rejects.toMatchSnapshot()
+
+      await expect(
+        client.event.actions.notify.request({
+          ...payload,
+          createdAtLocation: parentId
+        })
+      ).rejects.toMatchSnapshot()
+
+      const childLocation = locations.find((l) => l.parentId === parentId)
+
+      if (!childLocation) {
+        throw new Error('Child location not found')
+      }
+
+      // should succeed, since it is a valid location id
+      await expect(
+        client.event.actions.notify.request({
+          ...payload,
+          createdAtLocation: childLocation.id
+        })
+      ).resolves.not.toThrow()
+    })
+
     test('should not require assignment or create unassign action for system user', async () => {
       const { generator } = await setupTestCase()
 
@@ -214,18 +297,28 @@ describe('event.actions.notify', () => {
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
-      await client.event.actions.notify.request(
-        generator.event.actions.notify(event.id)
-      )
+      const locations = await getLocations()
+
+      await client.event.actions.notify.request({
+        ...generator.event.actions.notify(event.id),
+        createdAtLocation: locations[3].id
+      })
 
       const { user } = await setupTestCase()
       client = createTestClient(user)
 
       const fetchedEvent = await client.event.get(event.id)
-      expect(fetchedEvent.actions.length).toEqual(3)
+      expect(fetchedEvent.actions.length).toEqual(4)
       expect(fetchedEvent.actions).toEqual([
         expect.objectContaining({ type: ActionType.CREATE }),
-        expect.objectContaining({ type: ActionType.NOTIFY }),
+        expect.objectContaining({
+          type: ActionType.NOTIFY,
+          status: ActionStatus.Requested
+        }),
+        expect.objectContaining({
+          type: ActionType.NOTIFY,
+          status: ActionStatus.Accepted
+        }),
         expect.objectContaining({ type: ActionType.READ })
       ])
     })

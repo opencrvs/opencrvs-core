@@ -8,8 +8,6 @@ import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely'
 export default interface LocationsTable {
   id: ColumnType<UUID, UUID, UUID>
 
-  externalId: ColumnType<string | null, string | null, string | null>
-
   name: ColumnType<string, string, string>
 
   parentId: ColumnType<UUID | null, UUID | null, UUID | null>
@@ -19,6 +17,8 @@ export default interface LocationsTable {
   updatedAt: ColumnType<string, string | undefined, string>
 
   deletedAt: ColumnType<string | null, string | null, string | null>
+
+  validUntil: ColumnType<string | null, string | null, string | null>
 }
 
 export type Locations = Selectable<LocationsTable>

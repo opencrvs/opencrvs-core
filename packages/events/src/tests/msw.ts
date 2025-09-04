@@ -41,7 +41,7 @@ const handlers = [
     return HttpResponse.json({ ok: true })
   }),
   http.post(
-    `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/:action`,
+    `${env.COUNTRY_CONFIG_URL}/trigger/events/:event/actions/:action`,
     (ctx) => {
       const payload =
         ctx.params.action === ActionType.REGISTER

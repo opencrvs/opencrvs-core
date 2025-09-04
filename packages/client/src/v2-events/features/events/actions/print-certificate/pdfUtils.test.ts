@@ -12,8 +12,22 @@
 import { createIntl } from 'react-intl'
 import createFetchMock from 'vitest-fetch-mock'
 import { ContentSvg } from 'pdfmake/interfaces'
-import { eventQueryDataGenerator, User, UUID } from '@opencrvs/commons/client'
-import { svgToPdfTemplate, stringifyEventMetadata } from './pdfUtils'
+import {
+  ActionDocument,
+  eventQueryDataGenerator,
+  tennisClubMembershipEvent,
+  User,
+  UUID
+} from '@opencrvs/commons/client'
+import {
+  tennisClubMembershipEventDocument,
+  tennisClubMembershipEventIndex
+} from '../../fixtures'
+import {
+  svgToPdfTemplate,
+  stringifyEventMetadata,
+  compileSvg
+} from './pdfUtils'
 
 const fetch = createFetchMock(vi)
 fetch.enableMocks()
@@ -21,21 +35,21 @@ fetch.enableMocks()
 const locations = [
   {
     id: '35391063-7dca-4e57-abd3-20dcc8538a64' as UUID,
-    externalId: '2OKicPQMNI',
     name: 'HQ Office',
-    partOf: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID
+    parentId: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID,
+    validUntil: null
   },
   {
     id: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID,
-    externalId: 'BxrIbNW7f3K',
     name: 'Embe',
-    partOf: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID
+    parentId: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
+    validUntil: null
   },
   {
     id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
-    externalId: 'B1u1bVtIA92',
     name: 'Pualula',
-    partOf: null
+    parentId: null,
+    validUntil: null
   }
 ]
 const userId = '677fb08730f3abfa33072769'
@@ -65,12 +79,17 @@ describe('stringifyEventMetadata', () => {
             family: 'Musonda'
           }
         ],
-        role: 'NATIONAL_REGISTRAR'
+        role: 'NATIONAL_REGISTRAR',
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
       }
     ] satisfies User[]
 
     const stringified = stringifyEventMetadata({
-      metadata: { ...metadata, modifiedAt: new Date(2000, 1, 2).toISOString() },
+      metadata: {
+        ...metadata,
+        modifiedAt: new Date(2000, 1, 2).toISOString(),
+        copiesPrintedForTemplate: 1
+      },
       locations,
       users,
       intl: createIntl({ locale: 'en' })
@@ -127,5 +146,73 @@ describe('svgToPdfTemplate', () => {
       </svg>
       `.trim()
     )
+  })
+})
+
+function expectRenderOutput(template: string, output: string) {
+  const { declaration, ...metadata } = tennisClubMembershipEventIndex
+  const result = compileSvg({
+    templateString: template,
+    $metadata: {
+      ...metadata,
+      modifiedAt: new Date().toISOString(),
+      copiesPrintedForTemplate: 2
+    },
+    $actions: tennisClubMembershipEventDocument.actions as ActionDocument[],
+    $declaration: {
+      'applicant.name': {
+        firstname: 'John',
+        surname: 'Doe'
+      }
+    },
+    review: false,
+    locations: [],
+    users: [],
+    language: { lang: 'en', messages: {} },
+    config: tennisClubMembershipEvent
+  })
+  expect(result).toBe(output)
+}
+
+describe('SVG compiler', () => {
+  describe('$actions', () => {
+    it('allows you to access full list of actions', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $lookup ($actions "DECLARE") "length" }}</text></svg>',
+        '<svg><text>1</text></svg>'
+      )
+    })
+  })
+  describe('$action', () => {
+    it('can be used to get full action details of the event', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $action "DECLARE" }}</text></svg>',
+        '<svg><text>[object Object]</text></svg>'
+      )
+      expectRenderOutput(
+        '<svg><text>{{ $lookup ($action "DECLARE") "createdAt" }}</text></svg>',
+        '<svg><text>23 January 2025</text></svg>'
+      )
+    })
+  })
+  describe('$lookup', () => {
+    it('stringifies complex form field values using the stringifier of said form input', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $lookup $declaration "applicant.name.fullname" }}</text></svg>',
+        '<svg><text>John Doe</text></svg>'
+      )
+    })
+    it('also gives you an access to the fields inside the value', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $lookup $declaration "applicant.name.firstname" }}</text></svg>',
+        '<svg><text>John</text></svg>'
+      )
+    })
+    it('as a debugging helper, renders a json object as JSON instead of [object Object]', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $lookup $declaration "applicant.name" }}</text></svg>',
+        '<svg><text>{&quot;fullname&quot;:&quot;John Doe&quot;,&quot;firstname&quot;:&quot;John&quot;,&quot;surname&quot;:&quot;Doe&quot;}</text></svg>'
+      )
+    })
   })
 })

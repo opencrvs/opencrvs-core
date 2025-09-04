@@ -12,12 +12,13 @@
 import { z } from 'zod'
 import { UUID } from '@opencrvs/commons'
 import * as locationsRepo from '@events/storage/postgres/events/locations'
+import * as config from '@events/service/config/config'
 
 export const Location = z.object({
   id: UUID,
-  externalId: z.string().nullable(),
   name: z.string(),
-  partOf: UUID.nullable()
+  parentId: UUID.nullable(),
+  validUntil: z.date().nullable()
 })
 
 export type Location = z.infer<typeof Location>
@@ -27,24 +28,45 @@ export type Location = z.infer<typeof Location>
  * @param incomingLocations - Locations to be set
  */
 
-export async function setLocations(incomingLocations: Array<Location>) {
+export async function setLocations(locations: Location[]) {
   return locationsRepo.setLocations(
-    incomingLocations.map(({ id, externalId, name, partOf }) => ({
+    locations.map(({ id, name, parentId, validUntil }) => ({
       id,
-      externalId,
       name,
-      parentId: partOf
+      parentId: parentId,
+      validUntil: validUntil ? validUntil.toISOString() : null
     }))
   )
+}
+
+/**
+ * Syncs locations from V1 to V2 database.
+ * @param incomingLocations - Locations to be set
+ */
+
+export async function syncLocations() {
+  const locations = await config.getLocations()
+  return setLocations(locations)
 }
 
 export const getLocations = async () => {
   const locations = await locationsRepo.getLocations()
 
-  return locations.map(({ id, externalId, name, parentId }) => ({
+  return locations.map(({ id, name, parentId, validUntil }) => ({
     id,
-    externalId,
     name,
-    partOf: parentId
+    parentId,
+    validUntil: validUntil ? new Date(validUntil) : null
+  }))
+}
+
+export const getChildLocations = async (parentIdToSearch: string) => {
+  const locations = await locationsRepo.getChildLocations(parentIdToSearch)
+
+  return locations.map(({ id, name, parentId, validUntil }) => ({
+    id,
+    name,
+    validUntil,
+    parentId
   }))
 }

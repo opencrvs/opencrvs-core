@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
@@ -16,20 +15,12 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { useSelector } from 'react-redux'
 import {
   ActionType,
-  EventState,
   getDeclaration,
-  InherentFlags,
-  SCOPES,
-  isMetaAction,
-  deepMerge,
-  Action,
-  RequestedCorrectionAction
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { getCurrentEventState } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -38,20 +29,12 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
-import { getScope } from '@client/profile/profileSelectors'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
-import { hasFieldChanged, isLastActionCorrectionRequest } from '../utils'
-
-function isRequestCorrectionAction(
-  action: Action
-): action is RequestedCorrectionAction & { declaration: EventState } {
-  return action.type === 'REQUEST_CORRECTION'
-}
+import { hasFieldChanged } from '../utils'
 
 export function Review() {
-  const scopes = useSelector(getScope)
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.CORRECTION.REVIEW)
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.VALIDATE.REVIEW
   )
@@ -96,35 +79,12 @@ export function Review() {
     form
   })
 
-  const writeActions = event.actions.filter((a) => !isMetaAction(a.type))
-  const lastWriteAction = writeActions[writeActions.length - 1]
-  const lastActionIsCorrectionRequest = isLastActionCorrectionRequest(event)
-
-  const canReviewCorrection =
-    eventIndex.flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
-    scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
-
-  if (canReviewCorrection && !lastActionIsCorrectionRequest) {
-    throw new Error(
-      `Last action is not a correction request. Last action type: ${lastWriteAction.type}`
-    )
-  }
-
-  const isReviewCorrection =
-    canReviewCorrection && lastActionIsCorrectionRequest
-
-  const formWithNewValues =
-    isReviewCorrection && isRequestCorrectionAction(lastWriteAction)
-      ? deepMerge(form, lastWriteAction.declaration)
-      : form
-
   return (
-    <FormLayout route={ROUTES.V2.EVENTS.REGISTER}>
+    <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       <ReviewComponent.Body
-        form={formWithNewValues}
+        form={form}
         formConfig={formConfig}
         isCorrection={true}
-        isReviewCorrection={isReviewCorrection}
         previousFormValues={previousFormValues}
         title={intlWithData.formatMessage(
           actionConfig.label,
@@ -132,7 +92,7 @@ export function Review() {
         )}
         onEdit={({ pageId, fieldId }) => {
           navigate(
-            ROUTES.V2.EVENTS.CORRECTION.PAGES.buildPath(
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
               { pageId, eventId },
               {
                 from: 'review',
@@ -143,23 +103,21 @@ export function Review() {
           )
         }}
       >
-        {!isReviewCorrection && (
-          <PrimaryButton
-            key="continue_button"
-            disabled={!anyValuesHaveChanged || incomplete}
-            id="continue_button"
-            onClick={() => {
-              navigate(
-                ROUTES.V2.EVENTS.CORRECTION.SUMMARY.buildPath(
-                  { eventId },
-                  { workqueue: slug }
-                )
+        <PrimaryButton
+          key="continue_button"
+          disabled={!anyValuesHaveChanged || incomplete}
+          id="continue_button"
+          onClick={() => {
+            navigate(
+              ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath(
+                { eventId },
+                { workqueue: slug }
               )
-            }}
-          >
-            {intl.formatMessage(buttonMessages.continueButton)}
-          </PrimaryButton>
-        )}
+            )
+          }}
+        >
+          {intl.formatMessage(buttonMessages.continueButton)}
+        </PrimaryButton>
       </ReviewComponent.Body>
     </FormLayout>
   )

@@ -40,7 +40,7 @@ test('Adds ACTION-requested flag while waiting for external validation', async (
 
   mswServer.use(
     http.post(
-      `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/REGISTER`,
+      `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
       () => {
         return HttpResponse.json(
           {},
@@ -79,7 +79,7 @@ test('Does not add any flags when accepted form countryconfig', async () => {
 
   mswServer.use(
     http.post(
-      `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/REGISTER`,
+      `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
       () => {
         return HttpResponse.json(
           { registrationNumber: 'SOME0REG0NUM' },
@@ -118,7 +118,7 @@ test('Adds ACTION-rejected flag when rejected form countryconfig', async () => {
 
   mswServer.use(
     http.post(
-      `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/REGISTER`,
+      `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
       () => {
         return HttpResponse.json(
           {},
@@ -146,7 +146,22 @@ test('Adds ACTION-rejected flag when rejected form countryconfig', async () => {
   )
 })
 
-test(`Adds ${InherentFlags.PRINTED} flag after ${ActionType.PRINT_CERTIFICATE} is called`, async () => {
+test(`Adds ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.REGISTER} is called`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER
+  ])
+
+  const index = await client.event.list()
+
+  expect(index[0].flags).toContain(InherentFlags.PENDING_CERTIFICATION)
+})
+
+test(`Removes ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.PRINT_CERTIFICATE} is called`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -162,10 +177,10 @@ test(`Adds ${InherentFlags.PRINTED} flag after ${ActionType.PRINT_CERTIFICATE} i
 
   const index = await client.event.list()
 
-  expect(index[0].flags).toContain(InherentFlags.PRINTED)
+  expect(index[0].flags).not.toContain(InherentFlags.PENDING_CERTIFICATION)
 })
 
-test(`Removes ${InherentFlags.PRINTED} flag after ${ActionType.APPROVE_CORRECTION} is called`, async () => {
+test(`Removes ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.REQUEST_CORRECTION} is called`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -176,8 +191,25 @@ test(`Removes ${InherentFlags.PRINTED} flag after ${ActionType.APPROVE_CORRECTIO
     ActionType.PRINT_CERTIFICATE
   ])
 
+  await client.event.actions.correction.request.request(
+    generator.event.actions.correction.request(event.id, {
+      keepAssignment: true
+    })
+  )
+
   const index = await client.event.list()
-  expect(index[0].flags).toContain(InherentFlags.PRINTED)
+  expect(index[0].flags).not.toContain(InherentFlags.PENDING_CERTIFICATION)
+})
+test(`Adds back ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.APPROVE_CORRECTION} is called`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER,
+    ActionType.PRINT_CERTIFICATE
+  ])
 
   const withCorrectionRequest =
     await client.event.actions.correction.request.request(
@@ -202,7 +234,7 @@ test(`Removes ${InherentFlags.PRINTED} flag after ${ActionType.APPROVE_CORRECTIO
   )
 
   const index2 = await client.event.list()
-  expect(index2[0].flags).not.toContain(InherentFlags.PRINTED)
+  expect(index2[0].flags).toContain(InherentFlags.PENDING_CERTIFICATION)
 })
 
 test(`Adds ${InherentFlags.CORRECTION_REQUESTED} flag after ${ActionType.REQUEST_CORRECTION} is called`, async () => {

@@ -25,6 +25,7 @@ export async function importEvent(eventDocument: EventDocument, token: string) {
 
     /* eslint-disable @typescript-eslint/no-explicit-any */
     annotation: (action as any).annotation ?? undefined,
+    content: (action as any).content ?? undefined,
     declaration: (action as any).declaration ?? undefined,
     reasonIsDuplicate: (action as any).reason?.isDuplicate ?? undefined,
     reasonMessage: (action as any).reason?.message ?? undefined,

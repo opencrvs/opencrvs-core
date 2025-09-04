@@ -63,7 +63,7 @@ export function Review() {
   const drafts = useDrafts()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
-  const { redirectToOrigin } = useEventFormNavigation()
+  const { closeActionView: closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
@@ -153,7 +153,7 @@ export function Review() {
         transactionId: uuid(),
         annotation
       })
-      redirectToOrigin(slug)
+      closeActionView(slug)
     }
   }
 
@@ -162,7 +162,7 @@ export function Review() {
       (close) => <ReviewComponent.ActionModal.Reject close={close} />
     )
     if (confirmedRejection) {
-      const { rejectAction, message, isDuplicate } = confirmedRejection
+      const { rejectAction, message } = confirmedRejection
 
       if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
         events.actions.reject.mutate({
@@ -170,7 +170,7 @@ export function Review() {
           declaration: {},
           transactionId: uuid(),
           annotation: {},
-          reason: { message }
+          content: { reason: message }
         })
       }
 
@@ -180,11 +180,11 @@ export function Review() {
           declaration: {},
           transactionId: uuid(),
           annotation: {},
-          reason: { message, isDuplicate }
+          content: { reason: message }
         })
       }
 
-      redirectToOrigin(slug)
+      closeActionView(slug)
     }
   }
 
@@ -194,7 +194,7 @@ export function Review() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          redirectToOrigin(slug)
+          closeActionView(slug)
         })
       }
     >

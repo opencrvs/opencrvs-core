@@ -11,7 +11,12 @@
 
 import { TRPCError } from '@trpc/server'
 import { SCOPES } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { ActionType } from '@opencrvs/commons'
+import {
+  createEvent,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -42,16 +47,18 @@ test('Returns multiple events', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  for (let i = 0; i < 10; i++) {
-    await client.event.create(generator.event.create())
-  }
+  await Promise.all(
+    new Array(10)
+      .fill(null)
+      .map(async () => createEvent(client, generator, [ActionType.DECLARE]))
+  )
 
   const events = await client.event.list()
 
   expect(events).toHaveLength(10)
 })
 
-test('Does not return draft events unless they are created by the fetching user', async () => {
+test('Does not return draft events even if they are created by the fetching user', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -68,5 +75,5 @@ test('Does not return draft events unless they are created by the fetching user'
 
   const events = await client.event.list()
 
-  expect(events).toHaveLength(3)
+  expect(events).toHaveLength(0)
 })

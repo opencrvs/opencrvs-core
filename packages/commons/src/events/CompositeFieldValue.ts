@@ -71,8 +71,8 @@ export const NameFieldValue = z.object({
 
 export const NameFieldUpdateValue = z
   .object({
-    firstname: z.string().nullish(),
-    surname: z.string().nullish(),
+    firstname: z.string(),
+    surname: z.string(),
     middlename: z.string().nullish()
   })
   .or(z.null())
@@ -141,3 +141,18 @@ export type FileFieldValueWithOption = z.infer<typeof FileFieldValueWithOption>
 
 export const FileFieldWithOptionValue = z.array(FileFieldValueWithOption)
 export type FileFieldWithOptionValue = z.infer<typeof FileFieldWithOptionValue>
+
+export const HttpFieldValue = z.object({
+  loading: z.boolean(),
+  error: z.object({ statusCode: z.number(), message: z.string() }).nullish(),
+  data: z.any()
+})
+export type HttpFieldValue = z.infer<typeof HttpFieldValue>
+export const HttpFieldUpdateValue = z
+  .object({
+    loading: z.boolean().nullish(),
+    error: z.object({ statusCode: z.number(), message: z.string() }).nullish(),
+    data: z.any().nullish()
+  })
+  .or(z.null())
+  .or(z.undefined())

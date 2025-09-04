@@ -242,13 +242,13 @@ export const typeResolvers: GQLResolver = {
   Person: {
     /* `gender` and `name` resolvers are trivial resolvers, so they don't need implementation */
     name: (person: Patient) => {
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
       return person.name
     },
     dateOfMarriage: (person: Patient) => {
-      if (!person.extension || !person.active) {
+      if (!person.extension || person.active === false) {
         return null
       }
 
@@ -259,7 +259,7 @@ export const typeResolvers: GQLResolver = {
       return (marriageExtension && marriageExtension.valueDateTime) || null
     },
     age: (person: Patient) => {
-      if (!person.extension || !person.active) {
+      if (!person.extension || person.active === false) {
         return null
       }
 
@@ -276,30 +276,30 @@ export const typeResolvers: GQLResolver = {
       return marriageExtension.valueString
     },
     birthDate: (person: Patient) => {
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
       return person.birthDate
     },
     identifier: (person: Patient) => {
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
       return person.identifier
     },
     address: (person: Patient) => {
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
       return person.address
     },
     maritalStatus: (person: Patient) => {
-      return !person.active
+      return person.active === false
         ? null
         : person && person.maritalStatus && person.maritalStatus.text
     },
     occupation: (person: Patient) => {
-      if (!person.extension || !person.active) {
+      if (!person.extension || person.active === false) {
         return null
       }
 
@@ -325,7 +325,7 @@ export const typeResolvers: GQLResolver = {
       )
     },
     ageOfIndividualInYears: (person: Patient) => {
-      if (!person.extension || !person.active) {
+      if (!person.extension || person.active === false) {
         return null
       }
 
@@ -340,7 +340,7 @@ export const typeResolvers: GQLResolver = {
       )
     },
     exactDateOfBirthUnknown: (person: Patient) => {
-      if (!person.extension || !person.active) {
+      if (!person.extension || person.active === false) {
         return null
       }
 
@@ -358,19 +358,19 @@ export const typeResolvers: GQLResolver = {
       return person.active
     },
     multipleBirth: (person: Patient) => {
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
       return person.multipleBirthInteger
     },
     deceased: (person: Patient) => {
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
       return person
     },
     nationality: (person: Patient) => {
-      if (!person.extension || !person.active) {
+      if (!person.extension || person.active === false) {
         return null
       }
 
@@ -401,7 +401,7 @@ export const typeResolvers: GQLResolver = {
       return nationality
     },
     educationalAttainment: (person: Patient) => {
-      if (!person.extension || !person.active) {
+      if (!person.extension || person.active === false) {
         return null
       }
 
@@ -451,7 +451,7 @@ export const typeResolvers: GQLResolver = {
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
 
@@ -467,7 +467,7 @@ export const typeResolvers: GQLResolver = {
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
 
@@ -487,7 +487,7 @@ export const typeResolvers: GQLResolver = {
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
 
@@ -512,7 +512,7 @@ export const typeResolvers: GQLResolver = {
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
 
@@ -527,7 +527,7 @@ export const typeResolvers: GQLResolver = {
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
-      if (!person.active) {
+      if (person.active === false) {
         return null
       }
 
@@ -542,7 +542,7 @@ export const typeResolvers: GQLResolver = {
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
 
@@ -557,7 +557,7 @@ export const typeResolvers: GQLResolver = {
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
 
@@ -584,7 +584,7 @@ export const typeResolvers: GQLResolver = {
         person?.extension || []
       )
 
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
 
@@ -607,7 +607,7 @@ export const typeResolvers: GQLResolver = {
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
 
@@ -634,7 +634,7 @@ export const typeResolvers: GQLResolver = {
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
 
@@ -657,7 +657,7 @@ export const typeResolvers: GQLResolver = {
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
 
@@ -672,7 +672,7 @@ export const typeResolvers: GQLResolver = {
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
 
@@ -687,7 +687,7 @@ export const typeResolvers: GQLResolver = {
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
 
@@ -702,7 +702,7 @@ export const typeResolvers: GQLResolver = {
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
 
@@ -745,7 +745,7 @@ export const typeResolvers: GQLResolver = {
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
 
@@ -768,7 +768,7 @@ export const typeResolvers: GQLResolver = {
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
-      if (person && !person.active) {
+      if (person && person.active === false) {
         return null
       }
 

@@ -27,29 +27,37 @@ import {
   EventDocument,
   EventIndex,
   EventInput,
+  SearchQuery,
   UnassignActionInput,
-  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
-  QueryType
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
 import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
 import {
   getEventConfigurationById,
-  getEventConfigurations
+  getInMemoryEventConfigurations
 } from '@events/service/config/config'
 import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
 import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
 import {
   addAction,
+  deleteUnreferencedFilesFromPreviousDrafts,
   createEvent,
   deleteEvent,
   getEventById,
   throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
+import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { importEvent } from '@events/service/events/import'
-import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
+import {
+  findRecordsByQuery,
+  getIndexedEvents
+} from '@events/service/indexing/indexing'
+import { reindex } from '@events/service/events/reindex'
+import { UserContext } from '../../context'
+import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)
@@ -77,7 +85,7 @@ const eventConfigGetProcedure: QueryProcedure<{
   .input(z.void())
   .output(z.array(EventConfig))
   .query(async (options) => {
-    return getEventConfigurations(options.ctx.token)
+    return getInMemoryEventConfigurations(options.ctx.token)
   })
 
 export const eventRouter = router({
@@ -129,7 +137,6 @@ export const eventRouter = router({
           declaration: {}
         },
         {
-          eventId: event.id,
           user: ctx.user,
           token: ctx.token,
           status: ActionStatus.Accepted
@@ -143,6 +150,10 @@ export const eventRouter = router({
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
+      if (ctx.isDuplicateAction) {
+        return ctx.event
+      }
+
       await throwConflictIfActionNotAllowed(
         input.eventId,
         ActionType.DELETE,
@@ -156,21 +167,52 @@ export const eventRouter = router({
     }),
     create: publicProcedure
       .input(DraftInput)
+      .use(middleware.requireAssignment)
       .output(Draft)
       .mutation(async ({ input, ctx }) => {
-        const { eventId } = input
-        await getEventById(eventId)
+        const { eventId, type } = input
 
-        return createDraft(input, {
+        // Consecutive middlewares lose some of the typing.
+        const user = UserContext.parse(ctx.user)
+        await throwConflictIfActionNotAllowed(eventId, type, ctx.token)
+
+        const previousDraft = await draftsRepo.findLatestDraftForAction(
           eventId,
-          user: ctx.user,
+          user.id,
+          input.type
+        )
+
+        if (previousDraft?.transactionId === input.transactionId) {
+          return previousDraft
+        }
+
+        const currentDraft = await createDraft(input, {
+          eventId,
+          user,
           transactionId: input.transactionId
         })
+
+        const event = await getEventById(eventId)
+        const configuration = await getEventConfigurationById({
+          token: ctx.token,
+          eventType: event.type
+        })
+
+        if (previousDraft) {
+          await deleteUnreferencedFilesFromPreviousDrafts(ctx.token, {
+            event,
+            configuration,
+            currentDraft,
+            previousDraft
+          })
+        }
+
+        return currentDraft
       })
   }),
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
-    declare: router(getDefaultActionProcedures(ActionType.DECLARE)),
+    declare: router(declareActionProcedures()),
     validate: router(getDefaultActionProcedures(ActionType.VALIDATE)),
     reject: router(getDefaultActionProcedures(ActionType.REJECT)),
     archive: router(getDefaultActionProcedures(ActionType.ARCHIVE)),
@@ -194,7 +236,6 @@ export const eventRouter = router({
         .use(middleware.validateAction)
         .mutation(async (options) => {
           return unassignRecord(options.input, {
-            eventId: options.input.eventId,
             user: options.ctx.user,
             token: options.ctx.token
           })
@@ -215,25 +256,44 @@ export const eventRouter = router({
     .output(z.array(EventIndex))
     .query(async ({ ctx }) => {
       const userId = ctx.user.id
-      const eventConfigs = await getEventConfigurations(ctx.token)
+      const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+
       return getIndexedEvents(userId, eventConfigs)
     }),
-  search: publicProcedure
+  search: systemProcedure
     .meta({
       openapi: {
         summary: 'Search for events',
-        method: 'GET',
+        method: 'POST',
         tags: ['Search'],
         path: '/events/search'
       }
     })
     // @todo: remove legacy scopes once all users are configured with new search scopes
-    .use(requiresAnyOfScopes([], ['search']))
-    .input(QueryType)
-    .output(z.array(EventIndex))
+    .use(requiresAnyOfScopes([SCOPES.RECORDSEARCH], ['search']))
+    .input(SearchQuery)
+    .output(
+      z.object({
+        results: z.array(EventIndex),
+        total: z.number()
+      })
+    )
     .query(async ({ input, ctx }) => {
-      const eventConfigs = await getEventConfigurations(ctx.token)
+      const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
       const scopes = getScopes({ Authorization: ctx.token })
+      const isRecordSearchSystemClient = scopes.includes(SCOPES.RECORDSEARCH)
+      const allAccessForEveryEventType = Object.fromEntries(
+        eventConfigs.map(({ id }) => [id, 'all' as const])
+      )
+
+      if (isRecordSearchSystemClient) {
+        return findRecordsByQuery(
+          input,
+          eventConfigs,
+          allAccessForEveryEventType,
+          ctx.user.primaryOfficeId
+        )
+      }
 
       const searchScope = findScope(scopes, 'search')
 
@@ -241,11 +301,10 @@ export const eventRouter = router({
       if (!searchScope) {
         throw new Error('No search scope provided')
       }
-      const searchScopeOptions = searchScope.options
-      return getIndex(
+      return findRecordsByQuery(
         input,
         eventConfigs,
-        searchScopeOptions,
+        searchScope.options,
         ctx.user.primaryOfficeId
       )
     }),
@@ -261,5 +320,21 @@ export const eventRouter = router({
     })
     .input(EventDocument)
     .output(EventDocument)
-    .mutation(async ({ input, ctx }) => importEvent(input, ctx.token))
+    .mutation(async ({ input, ctx }) => importEvent(input, ctx.token)),
+  reindex: systemProcedure
+    .input(z.void())
+    .use(requiresAnyOfScopes([SCOPES.REINDEX]))
+    .output(z.void())
+    .meta({
+      openapi: {
+        summary:
+          'Triggers reindexing of search, workqueues and notifies country config',
+        method: 'POST',
+        path: '/events/reindex',
+        tags: ['events']
+      }
+    })
+    .mutation(async ({ ctx }) => {
+      await reindex(ctx.token)
+    })
 })

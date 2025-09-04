@@ -16,7 +16,8 @@ import {
   isPageVisible,
   FormConfig,
   omitHiddenFields,
-  runFieldValidations
+  runFieldValidations,
+  runStructuralValidations
 } from '@opencrvs/commons/client'
 
 interface FieldErrors {
@@ -45,6 +46,26 @@ export function getValidationErrorsForForm(
     return {
       ...errorsForAllFields,
       [field.id]: runFieldValidations({ field, values })
+    }
+  }, {})
+}
+
+export function getStructuralValidationErrorsForForm(
+  fields: FieldConfig[],
+  values: EventState
+) {
+  return fields.reduce((errorsForAllFields: Errors, field) => {
+    if (
+      // eslint-disable-next-line
+      errorsForAllFields[field.id] &&
+      errorsForAllFields[field.id].errors.length > 0
+    ) {
+      return errorsForAllFields
+    }
+
+    return {
+      ...errorsForAllFields,
+      [field.id]: runStructuralValidations({ field, values })
     }
   }, {})
 }

@@ -19,7 +19,6 @@ import {
   EventConfig
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
-import { useEventConfigurations } from '../features/events/useEventConfiguration'
 
 // Defines custom API functions that are not part of the generated API from TRPC.
 
@@ -62,7 +61,6 @@ export async function registerOnDeclare({
     annotation,
     eventId,
     transactionId,
-    duplicates: [],
     keepAssignment: true
   })
 
@@ -105,8 +103,7 @@ export async function validateOnDeclare(variables: {
       declaration: {},
       annotation,
       eventId,
-      transactionId: variables.transactionId,
-      duplicates: []
+      transactionId: variables.transactionId
     }
   )
 
@@ -132,7 +129,6 @@ export async function registerOnValidate(variables: {
     annotation,
     eventId,
     transactionId: variables.transactionId,
-    duplicates: [],
     keepAssignment: true
   })
 

@@ -10,16 +10,21 @@
  */
 
 import { Location } from '@events/service/locations/locations'
+import { useSelector } from 'react-redux'
 import {
-  EventDocument,
-  getCurrentEventState,
-  isMinioUrl,
-  User,
+  ActionDocument,
+  ActionType,
   CertificateTemplateConfig,
-  LanguageConfig,
   EventConfig,
   FieldType,
-  findActiveDrafts
+  EventDocument,
+  getCurrentEventState,
+  getUUID,
+  isMinioUrl,
+  LanguageConfig,
+  PrintCertificateAction,
+  User,
+  UUID
 } from '@opencrvs/commons/client'
 import { EventState } from '@opencrvs/commons/client'
 import {
@@ -29,17 +34,18 @@ import {
   svgToPdfTemplate
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { useEventConfiguration } from '../features/events/useEventConfiguration'
 import { useDrafts } from '../features/drafts/useDrafts'
 import { getEventDrafts } from '../features/events/components/Action/utils'
+import { useEvents } from '../features/events/useEvents/useEvents'
 
 async function replaceMinioUrlWithBase64(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  declaration: Record<string, any>,
+  declaration: Record<string, unknown>,
   config: EventConfig
 ) {
   // Why a cloned copy? to avoid mutating the original declaration
-  const declarationClone: Record<string, any> = JSON.parse(
+  const declarationClone: Record<string, unknown> = JSON.parse(
     JSON.stringify(declaration)
   )
 
@@ -49,17 +55,19 @@ async function replaceMinioUrlWithBase64(
     .map((field) => field.id)
 
   for (const fieldId of fileFieldIds) {
-    const fieldValue = declarationClone[fieldId]
+    const fieldValue = declarationClone[fieldId] as
+      | { filename?: string }
+      | undefined
     if (
       fieldValue &&
       typeof fieldValue === 'object' &&
-      'filename' in fieldValue &&
+      typeof fieldValue.filename === 'string' &&
       isMinioUrl(fieldValue.filename)
     ) {
-      declarationClone[fieldId].filename = await fetchImageAsBase64(
-        // this should be a presigned minio url
-        fieldValue.filename
-      )
+      const newFilename = await fetchImageAsBase64(fieldValue.filename)
+      // this should be a presigned minio url
+      ;(declarationClone[fieldId] as { filename?: string }).filename =
+        newFilename
     }
   }
   return declarationClone
@@ -85,14 +93,53 @@ export const usePrintableCertificate = ({
     event,
     eventConfiguration
   )
+  const { getEvent } = useEvents()
+  const userDetails = useSelector(getUserDetails)
+
+  const actions = getEvent.getFromCache(event.id).actions
+  if (!userDetails) {
+    throw new Error('User details are not available')
+  }
+
+  const userFromUsersList = users.find((user) => user.id === userDetails.id)
+  if (!userFromUsersList) {
+    throw new Error(`User with id ${userDetails.id} not found in users list`)
+  }
+
+  const actionsWithAnOptimisticPrintAction = actions.concat({
+    type: ActionType.PRINT_CERTIFICATE,
+    id: getUUID(),
+    transactionId: getUUID(),
+    createdByUserType: 'user',
+    createdAt: new Date().toISOString(),
+    createdBy: userFromUsersList.id,
+    createdByRole: userFromUsersList.role,
+    status: 'Accepted',
+    declaration: {},
+    annotation: null,
+    originalActionId: null,
+    createdBySignature: userFromUsersList.signature,
+    createdAtLocation: userDetails.primaryOffice.id as UUID,
+    content: {
+      templateId: certificateConfig?.id
+    }
+  } satisfies PrintCertificateAction)
+
+  const copiesPrintedForTemplate = actionsWithAnOptimisticPrintAction.filter(
+    (action) =>
+      action.type === ActionType.PRINT_CERTIFICATE &&
+      (action as PrintCertificateAction).content?.templateId ===
+        certificateConfig?.id
+  ).length
 
   // Offline flow
-  const { getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts(event.id)
-  const activeDraft = findActiveDrafts(event, drafts)[0]
-  const localDraft = getLocalDraftOrDefault(activeDraft)
-
-  const eventDrafts = getEventDrafts(event.id, localDraft, drafts)
+  const { getLocalDraftOrDefault, getRemoteDraftByEventId } = useDrafts()
+  const remoteDraft = getRemoteDraftByEventId(event.id)
+  const eventDrafts = remoteDraft
+    ? getEventDrafts(event.id, getLocalDraftOrDefault(remoteDraft), [
+        remoteDraft
+      ])
+    : []
   const localDeclaration = eventDrafts[0]?.action?.declaration as
     | EventState
     | undefined
@@ -101,12 +148,13 @@ export const usePrintableCertificate = ({
     ...metadata,
     // Temporarily add `modifiedAt` to the last action's data to display
     // the current certification date in the certificate preview on the review page.
-    modifiedAt: new Date().toISOString()
+    modifiedAt: new Date().toISOString(),
     // Since 'modifiedDate' represents the last action's 'createdAt' date, and when
     // we actually print certificate, in this particular case, last action is PRINT_CERTIFICATE
+    copiesPrintedForTemplate
   }
 
-  if (!language || !certificateConfig) {
+  if (!language || !certificateConfig?.svg) {
     return { svgCode: null }
   }
 
@@ -120,6 +168,8 @@ export const usePrintableCertificate = ({
     templateString: certificateConfig.svg,
     $metadata: modifiedMetadata,
     $declaration: declarationToUse,
+    $actions: actionsWithAnOptimisticPrintAction as ActionDocument[],
+    review: true,
     locations,
     users,
     language,
@@ -128,7 +178,14 @@ export const usePrintableCertificate = ({
 
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
-  const handleCertify = async (updatedEvent: EventDocument) => {
+  /**
+   * NOTE: We have separated the preparing and printing of the PDF certificate. Without the separation, user is already unassigned from the event and cache is cleared. We end up losing the images in the PDF unless we run actions in correct order.
+   * 1. Prepare 2. Trigger print action 3. Open the PDF in a new window 4. Redirect user to workqueue.
+   *
+   * Prepares the PDF certificate by resolving image urls to base64 and compiles them into SVG template.
+   * @returns function that opens a new window with the PDF certificate
+   */
+  const preparePdfCertificate = async (updatedEvent: EventDocument) => {
     const { declaration: updatedDeclaration, ...updatedMetadata } =
       getCurrentEventState(updatedEvent, eventConfiguration)
     // Same fallback logic used for preview: if server-side declaration is empty,
@@ -138,10 +195,10 @@ export const usePrintableCertificate = ({
         ? declarationToUse
         : updatedDeclaration
 
-    const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
+    const declarationWithResolvedImages = (await replaceMinioUrlWithBase64(
       updatedDeclarationToUse,
       config
-    )
+    )) as EventState
 
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
@@ -149,10 +206,13 @@ export const usePrintableCertificate = ({
         ...updatedMetadata,
         // Temporarily add `modifiedAt` to the last action's data to display
         // the current certification date in the certificate preview on the review page.
-        modifiedAt: new Date().toISOString()
+        modifiedAt: new Date().toISOString(),
+        copiesPrintedForTemplate
       },
       $declaration: declarationWithResolvedImages,
+      $actions: actionsWithAnOptimisticPrintAction as ActionDocument[],
       locations,
+      review: false,
       users,
       language,
       config
@@ -164,11 +224,11 @@ export const usePrintableCertificate = ({
       certificateFonts
     )
 
-    printAndDownloadPdf(pdfTemplate, event.id)
+    return () => printAndDownloadPdf(pdfTemplate, event.id)
   }
 
   return {
     svgCode,
-    handleCertify
+    preparePdfCertificate
   }
 }

@@ -20,12 +20,16 @@ import {
   FieldValue,
   InteractiveFieldType,
   isNonInteractiveFieldType,
+  joinValues,
   SystemVariables
 } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
-import { handleDefaultValue } from '@client/v2-events/components/forms/utils'
+import {
+  FIELD_SEPARATOR,
+  handleDefaultValue
+} from '@client/v2-events/components/forms/utils'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
+import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -66,6 +70,7 @@ interface FormFieldGeneratorProps {
   initialValues?: EventState
   onAllFieldsValidated?: (success: boolean) => void
   isCorrection?: boolean
+  parentId?: string // `child____name` part of `child____name____firstname`
 }
 
 export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
@@ -80,21 +85,49 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     readonlyMode,
     id,
     onAllFieldsValidated,
-    isCorrection = false
+    isCorrection = false,
+    parentId
   }) => {
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
 
+    const updateTouchFields = (
+      touched: Record<string, boolean | undefined>
+    ) => {
+      const newlyTouched =
+        Object.keys(touched).length > 0 &&
+        !isEqual(touched, initialTouchedFields) &&
+        Object.keys(touched).filter((key) => !(key in initialTouchedFields))
+      if (newlyTouched && newlyTouched.length > 0) {
+        const newlyTouchedFields = parentId
+          ? newlyTouched.reduce(
+              (prev, fieldId) => ({
+                ...prev,
+                /**
+                 * If we are touching  `firstname` from `child____name`,
+                 * we mark `child____name____firstname` as dirty
+                 */
+                [joinValues([parentId, fieldId], FIELD_SEPARATOR)]: true
+              }),
+              {}
+            )
+          : touched
+
+        setAllTouchedFields({
+          ...initialTouchedFields,
+          ...newlyTouchedFields
+        })
+      }
+    }
+
     const formikOnChange = (values: EventState) =>
       onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
 
-    const user = useUserDetails()
+    const systemVariables = useSystemVariables()
 
     const formikCompatibleInitialValues =
       makeFormFieldIdsFormikCompatible<FieldValue>({
-        ...mapFieldsToValues(fields, {
-          $user: user
-        }),
+        ...mapFieldsToValues(fields, systemVariables),
         ...initialValues
       })
 
@@ -122,16 +155,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
              * have been touched for once during the form manipulation. So that we can show validation
              * errors for all fields that have been touched.
              */
-            if (
-              Object.keys(touched).length > 0 &&
-              !isEqual(touched, initialTouchedFields) &&
-              Object.keys(touched).some((key) => !(key in initialTouchedFields))
-            ) {
-              setAllTouchedFields({
-                ...initialTouchedFields,
-                ...touched
-              })
-            }
+            updateTouchFields(touched)
           }, [touched])
 
           return (
@@ -147,6 +171,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               id={id}
               initialValues={initialValues}
               isCorrection={isCorrection}
+              parentId={parentId}
               readonlyMode={readonlyMode}
               resetForm={formikProps.resetForm}
               setAllTouchedFields={setAllTouchedFields}
@@ -154,7 +179,8 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               setFieldValue={formikProps.setFieldValue}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
-              touched={formikProps.touched}
+              systemVariables={systemVariables}
+              touched={{ ...formikProps.touched, ...initialTouchedFields }}
               validateAllFields={validateAllFields}
               values={formikProps.values}
               onAllFieldsValidated={onAllFieldsValidated}

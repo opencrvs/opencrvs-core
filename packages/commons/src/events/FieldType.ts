@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { z } from 'zod'
+
 export const FieldType = {
   NAME: 'NAME',
   PHONE: 'PHONE',
@@ -38,8 +40,19 @@ export const FieldType = {
   OFFICE: 'OFFICE',
   SIGNATURE: 'SIGNATURE',
   DATA: 'DATA',
-  PRINT_BUTTON: 'PRINT_BUTTON'
+  PRINT_BUTTON: 'PRINT_BUTTON',
+  BUTTON: 'BUTTON',
+  HTTP: 'HTTP'
 } as const
+
+/**
+ * Union of types that handle files. Using common type should help with compiler to know where to add new cases.
+ */
+export const FileFieldType = z.enum([
+  FieldType.FILE,
+  FieldType.FILE_WITH_OPTIONS,
+  FieldType.SIGNATURE
+])
 
 export const fieldTypes = Object.values(FieldType)
 export type FieldType = (typeof fieldTypes)[number]

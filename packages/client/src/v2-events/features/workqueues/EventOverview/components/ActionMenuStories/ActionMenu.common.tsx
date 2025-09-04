@@ -29,7 +29,7 @@ import {
   TranslationConfig,
   UUID,
   DisplayableAction,
-  ExclusiveActions
+  ClientSpecificAction
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { AssignmentStatus } from '@client/v2-events/utils'
@@ -39,7 +39,10 @@ import {
   addLocalEventConfig
 } from '@client/v2-events/features/events/useEvents/api'
 import { ActionMenu } from '../ActionMenu'
-import { actionLabels } from '../useActionMenuItems'
+import { actionLabels } from '../useAllowedActionConfigurations'
+
+/** There is discrepancy between the actual action, and what we communicate. Even if next action is declare, it should have the text of validate  */
+export const REJECTED_DECLARE_AS_REVIEW = ActionType.VALIDATE
 
 const generator = testDataGenerator()
 
@@ -83,7 +86,7 @@ const mockActions: Record<
     ...actionProps,
     type: ActionType.REQUEST_CORRECTION
   },
-  [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
     ...actionProps,
     type: ActionType.REQUEST_CORRECTION
   },
@@ -96,7 +99,7 @@ const mockActions: Record<
     ...actionProps,
     type: ActionType.REJECT_CORRECTION,
     requestId: '827bf7e8-0e1e-66e71287a2c8-aee7-4cef',
-    reason: { message: 'No legal proof' }
+    content: { reason: 'No legal proof' }
   },
   [ActionType.DELETE]: {
     ...actionProps,
@@ -106,28 +109,32 @@ const mockActions: Record<
     ...actionProps,
     type: ActionType.PRINT_CERTIFICATE
   },
-  [ActionType.MARKED_AS_DUPLICATE]: {
+  [ActionType.MARK_AS_DUPLICATE]: {
     ...actionProps,
-    type: ActionType.MARKED_AS_DUPLICATE
+    type: ActionType.MARK_AS_DUPLICATE
   },
   [ActionType.ARCHIVE]: {
     ...actionProps,
     type: ActionType.ARCHIVE,
-    reason: { message: 'Archived' }
+    content: { reason: 'Archived' }
   },
   [ActionType.REJECT]: {
     ...actionProps,
     type: ActionType.REJECT,
-    reason: { message: 'Rejected' }
+    content: { reason: 'Rejected' }
   },
   [ActionType.ASSIGN]: {
     ...actionProps,
     type: ActionType.ASSIGN,
     assignedTo: generator.user.id.localRegistrar
   },
-  [ActionType.DETECT_DUPLICATE]: {
+  [ActionType.DUPLICATE_DETECTED]: {
     ...actionProps,
-    type: ActionType.MARKED_AS_DUPLICATE
+    type: ActionType.MARK_AS_DUPLICATE
+  },
+  [ActionType.MARK_NOT_DUPLICATE]: {
+    ...actionProps,
+    type: ActionType.MARK_NOT_DUPLICATE
   }
 }
 
@@ -271,9 +278,12 @@ export function createStoriesFromScenarios(
           msw: {
             handlers: {
               event: [
-                tRPCMsw.event.search.query(() => [
-                  getCurrentEventState(event, tennisClubMembershipEvent)
-                ])
+                tRPCMsw.event.search.query(() => ({
+                  total: 1,
+                  results: [
+                    getCurrentEventState(event, tennisClubMembershipEvent)
+                  ]
+                }))
               ]
             }
           }

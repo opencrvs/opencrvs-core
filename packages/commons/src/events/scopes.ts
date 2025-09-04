@@ -10,7 +10,11 @@
  */
 import { intersection } from 'lodash'
 import { ConfigurableScopeType, Scope, SCOPES } from '../scopes'
-import { ExclusiveActions, ActionType, DisplayableAction } from './ActionType'
+import {
+  ClientSpecificAction,
+  ActionType,
+  DisplayableAction
+} from './ActionType'
 
 type RequiresNoScope = null
 type NotAvailableAsAction = [] // pseudo actions
@@ -31,15 +35,6 @@ export const CONFIG_GET_ALLOWED_SCOPES = [
   SCOPES.CONFIG,
   SCOPES.CONFIG_UPDATE_ALL
 ] satisfies RequiresAnyOfScopes
-
-export const CONFIG_SEARCH_ALLOWED_SCOPES = [
-  SCOPES.SEARCH_BIRTH,
-  SCOPES.SEARCH_DEATH,
-  SCOPES.SEARCH_MARRIAGE,
-  SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-  SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-  SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
-]
 
 export const ACTION_ALLOWED_SCOPES = {
   [ActionType.READ]: [
@@ -72,17 +67,18 @@ export const ACTION_ALLOWED_SCOPES = {
     SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
     SCOPES.RECORD_REGISTRATION_CORRECT
   ],
-  [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: [
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: [
     SCOPES.RECORD_REGISTRATION_CORRECT
   ],
   [ActionType.REJECT_CORRECTION]: [SCOPES.RECORD_REGISTRATION_CORRECT],
   [ActionType.APPROVE_CORRECTION]: [SCOPES.RECORD_REGISTRATION_CORRECT],
-  [ActionType.MARKED_AS_DUPLICATE]: [SCOPES.RECORD_DECLARATION_ARCHIVE],
+  [ActionType.MARK_AS_DUPLICATE]: [SCOPES.RECORD_REVIEW_DUPLICATES],
+  [ActionType.MARK_NOT_DUPLICATE]: [SCOPES.RECORD_REVIEW_DUPLICATES],
   [ActionType.ARCHIVE]: [SCOPES.RECORD_DECLARATION_ARCHIVE],
   [ActionType.REJECT]: [SCOPES.RECORD_SUBMIT_FOR_UPDATES],
   [ActionType.ASSIGN]: null,
   [ActionType.UNASSIGN]: null,
-  [ActionType.DETECT_DUPLICATE]: []
+  [ActionType.DUPLICATE_DETECTED]: []
 } satisfies Record<DisplayableAction, RequiredScopes>
 
 export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
@@ -97,12 +93,13 @@ export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.REQUEST_CORRECTION]: [],
   [ActionType.REJECT_CORRECTION]: [],
   [ActionType.APPROVE_CORRECTION]: [],
-  [ActionType.MARKED_AS_DUPLICATE]: [],
+  [ActionType.MARK_NOT_DUPLICATE]: [],
+  [ActionType.MARK_AS_DUPLICATE]: [],
   [ActionType.ARCHIVE]: [],
   [ActionType.REJECT]: [],
   [ActionType.ASSIGN]: [],
   [ActionType.UNASSIGN]: [],
-  [ActionType.DETECT_DUPLICATE]: []
+  [ActionType.DUPLICATE_DETECTED]: []
 } satisfies Record<ActionType, ConfigurableScopeType[]>
 
 export const WRITE_ACTION_SCOPES = [

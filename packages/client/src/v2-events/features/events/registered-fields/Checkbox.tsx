@@ -11,14 +11,14 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { Checkbox as CheckboxComponent } from '@opencrvs/components'
-import { FieldProps } from '@opencrvs/commons/client'
+import { FieldPropsWithoutReferenceValue } from '@opencrvs/commons/client'
 
 function CheckboxInput({
   label,
   value,
   onChange,
   ...props
-}: FieldProps<'CHECKBOX'> & {
+}: FieldPropsWithoutReferenceValue<'CHECKBOX'> & {
   value?: boolean
   onChange: (val: boolean) => void
 }) {

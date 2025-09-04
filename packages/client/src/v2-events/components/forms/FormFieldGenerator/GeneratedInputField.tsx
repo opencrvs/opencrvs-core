@@ -9,8 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
+import { omit } from 'lodash'
 import {
   EventState,
   FieldConfig,
@@ -50,7 +53,9 @@ import {
   isSelectDateRangeFieldType,
   SelectDateRangeValue,
   isTimeFieldType,
-  isPrintButtonFieldType
+  isPrintButtonFieldType,
+  isButtonFieldType,
+  isHttpFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -70,7 +75,9 @@ import {
   Paragraph,
   SelectDateRangeField,
   TimeField,
-  PrintButton
+  PrintButton,
+  Button,
+  Http
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -150,13 +157,13 @@ export const GeneratedInputField = React.memo(
     }
 
     const handleFileChange = useCallback(
-      (val: FileFieldValue | undefined) =>
+      (val: FileFieldValue | null) =>
         onFieldValueChange(fieldDefinition.id, val),
       [fieldDefinition.id, onFieldValueChange]
     )
 
     const handleFileWithOptionChange = useCallback(
-      (val: FileFieldWithOptionValue | undefined) =>
+      (val: FileFieldWithOptionValue) =>
         onFieldValueChange(fieldDefinition.id, val),
       [fieldDefinition.id, onFieldValueChange]
     )
@@ -178,13 +185,11 @@ export const GeneratedInputField = React.memo(
       )
 
       return (
-        <InputField {...field.inputFieldProps}>
+        // We are showing errors to underlying text input, so we need to ignore them here
+        <InputField {...omit(field.inputFieldProps, 'error')}>
           <Name.Input
+            configuration={field.config.configuration}
             id={fieldDefinition.id}
-            includeMiddlename={field.config.configuration?.includeMiddlename}
-            maxLength={field.config.configuration?.maxLength}
-            required={fieldDefinition.required}
-            searchMode={field.config.configuration?.searchMode}
             validation={validation}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -420,9 +425,11 @@ export const GeneratedInputField = React.memo(
     }
     if (isAddressFieldType(field)) {
       return (
-        <InputField {...inputFieldProps}>
+        // We are showing errors to underlying inputs, so we need to ignore them here
+        <InputField {...omit(field.inputFieldProps, 'error')}>
           <Address.Input
             {...field.config}
+            configuration={field.config.configuration}
             value={field.value}
             //@TODO: We need to come up with a general solution for complex types.
             // @ts-ignore
@@ -604,6 +611,39 @@ export const GeneratedInputField = React.memo(
         />
       )
     }
+    if (isButtonFieldType(field)) {
+      return (
+        // Button can be always 'touched' to show errors.
+        // Button doesn't have a similar `onBlur -> FocusEvent -> touched -> errors` flow as other InputFields
+        <InputField {...inputFieldProps} touched={true}>
+          <Button.Input
+            configuration={field.config.configuration}
+            disabled={inputProps.disabled}
+            id={field.config.id}
+            value={field.value}
+            onChange={(clicks) =>
+              onFieldValueChange(fieldDefinition.id, clicks)
+            }
+          />
+        </InputField>
+      )
+    }
+
+    if (isHttpFieldType(field)) {
+      return (
+        <Http.Input
+          key={fieldDefinition.id}
+          configuration={field.config.configuration}
+          parentValue={
+            form[
+              field.config.configuration.trigger.$$field
+            ] as unknown as Parameters<typeof Http.Input>[0]['parentValue']
+          }
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
     throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)
   }
 )

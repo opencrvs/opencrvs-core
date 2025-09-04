@@ -33,14 +33,12 @@ export const SCOPES = {
   NATIONALID: 'nationalId',
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
-
+  RECORD_IMPORT: 'record.import',
+  REINDEX: 'record.reindex',
   /**
    * @TODO This is a temporary scope to be used for V2 Events custom events declaration
    */
   RECORD_DECLARE: 'record.declare-birth',
-
-  // declare
-  RECORD_IMPORT: 'record.import',
 
   // declare
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
@@ -166,10 +164,15 @@ const IntegrationScopes = z.union([
   z.literal(SCOPES.RECORDSEARCH)
 ])
 
+// Internal operations
+const InternalOperationsScopes = z.union([
+  z.literal(SCOPES.RECORD_IMPORT),
+  z.literal(SCOPES.REINDEX)
+])
+
 // Declare
 const DeclareScopes = z.union([
   z.literal(SCOPES.RECORD_DECLARE),
-  z.literal(SCOPES.RECORD_IMPORT),
   z.literal(SCOPES.RECORD_DECLARE_BIRTH),
   z.literal(SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION),
   z.literal(SCOPES.RECORD_DECLARE_DEATH),
@@ -292,7 +295,8 @@ const LiteralScopes = z.union([
   OrganisationScopes,
   UserScopes,
   ConfigScope,
-  DataSeedingScope
+  DataSeedingScope,
+  InternalOperationsScopes
 ])
 
 // Configurable scopes are for example:

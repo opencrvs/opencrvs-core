@@ -193,7 +193,7 @@ type AssignmentStatus = (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
 
 export function getAssignmentStatus(
   eventState: EventIndex,
-  userId: string | undefined
+  userId: string
 ): AssignmentStatus {
   if (!eventState.assignedTo) {
     return AssignmentStatus.UNASSIGNED

@@ -11,7 +11,13 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
-import { FullDocumentPath, joinURLPaths } from '@opencrvs/commons/client'
+import { useParams } from 'react-router-dom'
+import {
+  DocumentPath,
+  FullDocumentPath,
+  joinUrlPaths,
+  joinValues
+} from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { queryClient } from '@client/v2-events/trpc'
 import {
@@ -22,17 +28,26 @@ import {
 } from '@client/v2-events/cache'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
 
+interface UploadFileParams {
+  file: File
+  meta: {
+    transactionId: string
+    path?: string
+    referenceId: string
+  }
+}
+
 async function uploadFile({
   file,
-  transactionId
-}: {
-  file: File
-  transactionId: string
-  id: string
-}): Promise<{ url: string }> {
+  meta
+}: UploadFileParams): Promise<{ url: string }> {
   const formData = new FormData()
   formData.append('file', file)
-  formData.append('transactionId', transactionId)
+  formData.append('transactionId', meta.transactionId)
+
+  if (meta.path) {
+    formData.append('path', meta.path)
+  }
 
   const response = await fetch('/api/upload', {
     method: 'POST',
@@ -49,6 +64,13 @@ async function uploadFile({
   return response
 }
 
+/**
+ * NOTE: This function is used to delete a file from the server.
+ * There are two worrying cases:
+ * 1. User deletes a file but does not save the changes when they leave. We try to access the file later and it is not there.
+ * 2. Documents service includes "fail-safe" for users other than the creator of the file. If a user tries to delete a file that they do not own, it will fail (silently). Given the above scenario, the file would still be there.
+ *
+ */
 async function deleteFile({ filename }: { filename: string }): Promise<void> {
   const response = await fetch('/api/files/' + filename, {
     method: 'DELETE',
@@ -58,7 +80,21 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
   })
 
   if (!response.ok) {
-    throw new Error('File deletation upload failed')
+    if (response.status === 403) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Unable to hard-delete the file ${filename}. Only the creator can remove it.`
+      )
+    }
+
+    if (response.status === 404) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Unable to hard-delete the file ${filename}. File not found.`
+      )
+    }
+
+    throw new Error('File deletion failed', { cause: response.status })
   }
 
   return
@@ -68,7 +104,7 @@ const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
 async function getPresignedUrl(filePath: FullDocumentPath) {
-  const url = joinURLPaths('/api/presigned-url', filePath)
+  const url = joinUrlPaths('/api/presigned-url', filePath)
 
   const response = await fetch(url, {
     method: 'GET',
@@ -85,13 +121,26 @@ export async function precacheFile(path: FullDocumentPath) {
   const presignedUrl = (await getPresignedUrl(path)).presignedURL
 
   const file = await fetchFileFromUrl(presignedUrl, path)
-  const url = getUnsignedFileUrl(path)
 
-  await cacheFile({ url, file })
+  if (file) {
+    const url = getUnsignedFileUrl(path)
+
+    await cacheFile({ url, file })
+  }
 }
 
 queryClient.setMutationDefaults([DELETE_MUTATION_KEY], {
-  retry: true,
+  // @ts-ignore
+  retry: (_, error) => {
+    if (error.cause === 403) {
+      return false
+    }
+    if (error.cause === 404) {
+      return false
+    }
+
+    return true
+  },
   retryDelay: 5000,
   mutationFn: deleteFile
 })
@@ -111,22 +160,34 @@ interface Options {
 }
 
 export function useFileUpload(fieldId: string, options: Options = {}) {
+  // Introduce `eventId` to the params to allow uploading files related to a specific event.
+  // Main goal is to allow uploading files in the context of an event, which is helpful when we need to clean up orphans.
+  // Start with good enough: Components do not need to pass `eventId` explicitly, it is automatically derived from the URL params without forcing low-level components to know about events concept.
+  const { eventId } = useParams()
+
   const upload = useMutation({
-    mutationFn: uploadFile,
+    mutationFn: async (variables: UploadFileParams) =>
+      uploadFile({ ...variables, meta: { ...variables.meta, path: eventId } }),
     mutationKey: [UPLOAD_MUTATION_KEY, fieldId],
-    onMutate: async ({ file, transactionId, id }) => {
+    onMutate: async ({ file, meta }) => {
       const extension = file.name.split('.').pop()
-      const temporaryFilename = `${transactionId}.${extension}`
-      const path = getFullDocumentPath(temporaryFilename)
+      const temporaryFilename = `${meta.transactionId}.${extension}`
+      const filePathWithDirectory = joinValues(
+        [meta.path, temporaryFilename],
+        '/'
+      )
+      const path = getFullDocumentPath(filePathWithDirectory)
       const url = getUnsignedFileUrl(path)
       await cacheFile({ url, file })
 
+      // NOTE: In the long run, client should not reverse-engineer the file path.
+      // It should be read from the server response.
       options.onSuccess?.({
         ...file,
         originalFilename: file.name,
         type: file.type,
         path,
-        id
+        id: meta.referenceId
       })
     }
   })
@@ -147,13 +208,16 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
      * Uploads a file with an optional identifier.
      *
      * @param file - The file to be uploaded.
-     * @param id An optional identifier for the file. Allows the caller to track the file when its upload completes.
+     * @param referenceId An optional identifier for the file. Allows the caller to track the file when its upload completes.
      */
-    uploadFile: (file: File, id = 'default') => {
+    uploadFile: (file: File, referenceId = 'default') => {
       return upload.mutate({
         file,
-        transactionId: uuid(),
-        id
+        meta: {
+          transactionId: uuid(),
+          referenceId,
+          path: eventId
+        }
       })
     }
   }

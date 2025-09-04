@@ -49,14 +49,14 @@ import { useReviewActionConfig } from './useReviewActionConfig'
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const [{ workqueue: slug }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.VALIDATE.REVIEW
+    ROUTES.V2.EVENTS.DECLARE.REVIEW
   )
   const events = useEvents()
   const drafts = useDrafts()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
-  const { redirectToOrigin } = useEventFormNavigation()
+  const { closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
   const event = events.getEvent.getFromCache(eventId)
@@ -138,7 +138,7 @@ export function Review() {
 
     if (confirmedDeclaration) {
       reviewActionConfiguration.onConfirm(eventId)
-      redirectToOrigin(slug)
+      closeActionView(slug)
     }
   }
 
@@ -147,7 +147,7 @@ export function Review() {
       (close) => <ReviewComponent.ActionModal.Reject close={close} />
     )
     if (confirmedRejection) {
-      const { rejectAction, message, isDuplicate } = confirmedRejection
+      const { rejectAction, message } = confirmedRejection
 
       if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
         events.actions.reject.mutate({
@@ -155,7 +155,7 @@ export function Review() {
           declaration: {},
           transactionId: uuid(),
           annotation: {},
-          reason: { message }
+          content: { reason: message }
         })
       }
 
@@ -165,10 +165,10 @@ export function Review() {
           declaration: {},
           transactionId: uuid(),
           annotation: {},
-          reason: { message, isDuplicate }
+          content: { reason: message }
         })
       }
-      redirectToOrigin(slug)
+      closeActionView(slug)
     }
   }
 
@@ -178,7 +178,7 @@ export function Review() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          redirectToOrigin(slug)
+          closeActionView(slug)
         })
       }
     >

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { fetchJSON, joinURL, Roles } from '@opencrvs/commons'
+import { fetchJSON, joinUrl, Roles } from '@opencrvs/commons'
 import { env } from '@user-mgnt/environment'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
@@ -71,7 +71,7 @@ export default async function verifyUserHandler(
   }
 
   const roles = await fetchJSON<Roles>(
-    joinURL(env.COUNTRY_CONFIG_URL, '/roles')
+    joinUrl(env.COUNTRY_CONFIG_URL, '/roles')
   )
 
   const response: IVerifyResponse = {

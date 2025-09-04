@@ -12,7 +12,7 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
-  ActionDocument,
+  PrintCertificateAction,
   deepMerge,
   EventDocument,
   FieldType,
@@ -25,6 +25,7 @@ import { ColumnContentAlignment } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
+import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
 const verifiedMessage = {
   id: 'v2.verified',
@@ -37,20 +38,28 @@ export function PrintCertificate({
   action
 }: {
   event: EventDocument
-  action: ActionDocument
+  action: PrintCertificateAction
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const formPages = getPrintCertificatePages(eventConfiguration)
   const intl = useIntl()
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const annotation = deepMerge(eventIndex.declaration, action.annotation ?? {})
+  const templateId = action.content?.templateId
+  const { certificateTemplates } = useAppConfig()
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
-    event.type
+    event.type,
+    eventIndex.declaration,
+    event
   )
+
+  const templateLabel = certificateTemplates.find(
+    (c) => c.id === templateId
+  )?.label
 
   const templateSelectorField = {
     label: intl.formatMessage(certTemplateFieldConfig.label),
-    value: annotation[certTemplateFieldConfig.id]?.toString()
+    value: templateLabel ? intl.formatMessage(templateLabel) : ''
   }
 
   // A very similar kind of listing of "annotation" fields will be done on the correction summary and modal.
@@ -77,7 +86,8 @@ export function PrintCertificate({
         field: {
           id: page.id,
           label: page.title,
-          type: FieldType.CHECKBOX
+          type: FieldType.CHECKBOX,
+          defaultValue: false
         },
         value: annotation[page.id],
         showPreviouslyMissingValuesAsChanged: false
@@ -85,7 +95,6 @@ export function PrintCertificate({
 
       return [{ label: intl.formatMessage(verifiedMessage), value }, ...fields]
     }
-
     return fields
   })
 

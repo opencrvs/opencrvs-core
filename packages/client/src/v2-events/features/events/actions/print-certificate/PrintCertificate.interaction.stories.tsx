@@ -8,19 +8,27 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 
-import { within, userEvent, expect } from '@storybook/test'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import { within, userEvent, expect, waitFor } from '@storybook/test'
+import { Outlet } from 'react-router-dom'
+import {
+  ActionType,
+  generateEventDocument,
+  generateWorkqueues,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import {
   tennisClubMembershipEventIndex,
   tennisClubMembershipEventDocument
 } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
-import { setEventData, addLocalEventConfig } from '../../useEvents/api'
+import { testDataGenerator } from '@client/tests/test-data-generators'
+import { CERT_TEMPLATE_ID } from '../../useCertificateTemplateSelectorFieldConfig'
 import * as PrintCertificate from './index'
 
 const meta: Meta<typeof PrintCertificate.Review> = {
@@ -179,6 +187,108 @@ export const ContinuingAndGoingBack: Story = {
       await expect(
         await canvas.findByRole('button', { name: 'Yes, print certificate' })
       ).toBeInTheDocument()
+    })
+  }
+}
+
+const generator = testDataGenerator()
+
+export const RedirectAfterPrint: Story = {
+  parameters: {
+    chromatic: {
+      disableSnapshot: true
+    },
+    test: {
+      // Since we cannot test the generated PDF, we can ignore the failed font request
+      dangerouslyIgnoreUnhandledErrors: true
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.actions.printCertificate.request.mutation(() => {
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [
+                ActionType.DECLARE,
+                ActionType.VALIDATE,
+                ActionType.REGISTER,
+                ActionType.PRINT_CERTIFICATE
+              ]
+            })
+          })
+        ],
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues()
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: 1 }
+            }, {})
+          })
+        ]
+      }
+    },
+    offline: {
+      events: [tennisClubMembershipEventDocument],
+
+      drafts: [
+        generator.event.draft({
+          eventId: tennisClubMembershipEventDocument.id,
+          actionType: ActionType.PRINT_CERTIFICATE,
+          annotation: {
+            [CERT_TEMPLATE_ID]: 'tennis-club-membership-certified-certificate',
+            'collector.requesterId': 'INFORMANT',
+            'collector.identity.verify': true,
+            templateId: 'v2.tennis-club-membership-certified-certificate'
+          }
+        })
+      ]
+    },
+    reactRouter: {
+      router: {
+        initialPath: '/',
+        element: <Outlet />,
+        children: [routesConfig]
+      },
+      initialPath: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
+        {
+          eventId: tennisClubMembershipEventDocument.id
+        },
+        {
+          templateId: 'tennis-club-membership-certificate'
+        }
+      )
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Prompts confirmation on print', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Yes, print certificate' })
+      )
+
+      await canvas.findByText('Print and issue certificate?')
+      await canvas.findByText(
+        'A Pdf of the certificate will open in a new tab for printing and issuing.'
+      )
+
+      await canvas.findByRole('button', { name: 'Cancel' })
+    })
+
+    await step('Redirects to overview after print', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Print' })
+      )
+
+      await waitFor(
+        async () => {
+          await canvas.findByText('Assigned to')
+          await canvas.findByText('Certificate is ready to print')
+        },
+        { timeout: 7000 } // Generating the PDF takes a long time.
+      )
     })
   }
 }

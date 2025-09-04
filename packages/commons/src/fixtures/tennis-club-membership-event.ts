@@ -10,7 +10,7 @@
  */
 import { defineConditional } from '../conditionals/conditionals'
 import { defineConfig } from '../events/defineConfig'
-import { ActionType } from '../events/ActionType'
+import { ActionType, DeclarationActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
@@ -21,6 +21,8 @@ import {
   TENNIS_CLUB_DECLARATION_FORM,
   TENNIS_CLUB_DECLARATION_REVIEW
 } from './forms'
+import { Clause, EventConfig } from '../events'
+import { and, field as dedupField } from '../events/deduplication'
 
 export const tennisClubMembershipEvent = defineConfig({
   id: TENNIS_CLUB_MEMBERSHIP,
@@ -182,46 +184,45 @@ export const tennisClubMembershipEvent = defineConfig({
           },
           {
             id: 'identity-check',
-            type: PageTypes.enum.FORM,
+            type: PageTypes.enum.VERIFICATION,
             title: {
-              id: 'event.tennis-club-membership.action.requestCorrection.form.section.verify',
-              defaultMessage: 'Verify their identity',
+              id: 'v2.event.birth.action.correction.form.section.requester.identity.verify.title',
+              defaultMessage: 'Verify ID',
               description: 'This is the title of the section'
             },
-            fields: [
-              {
-                id: 'correction.identity-check.instructions',
-                type: 'PAGE_HEADER',
+            fields: [],
+            actions: {
+              verify: {
                 label: {
-                  id: 'correction.corrector.identity.instruction',
-                  defaultMessage:
-                    'Please verify the identity of the person making this request',
-                  description: 'The title for the corrector form'
+                  defaultMessage: 'Verified',
+                  description: 'This is the label for the verification button',
+                  id: 'v2.event.birth.action.correction.form.verify'
                 }
               },
-              {
-                id: 'correction.identity-check.verified',
-                type: 'RADIO_GROUP',
+              cancel: {
                 label: {
-                  id: 'correction.corrector.identity.verified.label',
-                  defaultMessage: 'Identity verified',
-                  description: 'The title for the corrector form'
+                  defaultMessage: 'Identity does not match',
+                  description:
+                    'This is the label for the verification cancellation button',
+                  id: 'v2.event.birth.action.correction.form.cancel'
                 },
-                defaultValue: '',
-                required: true,
-                options: [
-                  {
-                    value: 'VERIFIED',
-                    label: {
-                      id: 'correction.corrector.identity.verified',
-                      defaultMessage: 'I have verified their identity',
-                      description:
-                        'Label for verified option in corrector identity check page'
-                    }
+                confirmation: {
+                  title: {
+                    defaultMessage: 'Correct without proof of ID?',
+                    description:
+                      'This is the title for the verification cancellation modal',
+                    id: 'v2.event.birth.action.correction.form.cancel.confirmation.title'
+                  },
+                  body: {
+                    defaultMessage:
+                      'Please be aware that if you proceed, you will be responsible for making a change to this record without the necessary proof of identification',
+                    description:
+                      'This is the body for the verification cancellation modal',
+                    id: 'v2.event.birth.action.correction.form.cancel.confirmation.body'
                   }
-                ]
+                }
               }
-            ]
+            }
           },
           {
             id: 'correction-request.supporting-documents',
@@ -424,3 +425,38 @@ export const tennisClubMembershipEvent = defineConfig({
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM
 })
+
+/** @knipignore */
+export function tennisClubMembershipEventWithDedupCheck(
+  ...actionsToCheck: DeclarationActionType[]
+): EventConfig {
+  return {
+    ...tennisClubMembershipEvent,
+    actions: tennisClubMembershipEvent.actions.map((action) => {
+      if (!actionsToCheck.includes(action.type as DeclarationActionType)) {
+        return action
+      }
+      return {
+        ...action,
+        deduplication: {
+          id: 'tennis-club-membership-deduplication',
+          label: {
+            defaultMessage: 'Tennis club membership deduplication',
+            description:
+              'This is shown as the label for the deduplication configuration',
+            id: 'event.tennis-club-membership.deduplication.label'
+          },
+          query: Clause.parse(
+            and(
+              dedupField('applicant.name').fuzzyMatches(),
+              dedupField('applicant.email').strictMatches(),
+              dedupField('applicant.dob').dateRangeMatches({
+                days: 3 * 365
+              })
+            )
+          )
+        }
+      }
+    })
+  }
+}

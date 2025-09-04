@@ -53,7 +53,8 @@ const requestCorrectionAction = {
     }
   },
   annotation: {
-    'correction.request.reason': 'My reason'
+    'correction.request.reason': 'My reason',
+    'identity-check': true
   }
 }
 
@@ -108,6 +109,7 @@ export const Read: Story = {
 export const Declared: Story = {
   args: { ...argbase, action: { ...argbase.action, type: ActionType.DECLARE } }
 }
+
 export const Validated: Story = {
   args: { ...argbase, action: { ...argbase.action, type: ActionType.VALIDATE } }
 }
@@ -122,8 +124,8 @@ export const Rejected: Story = {
     action: {
       ...argbase.action,
       type: ActionType.REJECT,
-      reason: {
-        message: 'Invalid information provided'
+      content: {
+        reason: 'Invalid information provided'
       }
     }
   }
@@ -135,9 +137,8 @@ export const Archived: Story = {
     action: {
       ...argbase.action,
       type: ActionType.ARCHIVE,
-      reason: {
-        message: 'Record archived',
-        isDuplicate: false
+      content: {
+        reason: 'Record archived'
       }
     }
   }
@@ -149,9 +150,8 @@ export const MarkedAsDuplicate: Story = {
     action: {
       ...argbase.action,
       type: ActionType.ARCHIVE,
-      reason: {
-        message: 'Duplicate record found',
-        isDuplicate: true
+      content: {
+        reason: 'Duplicate record found'
       }
     }
   }
@@ -305,7 +305,7 @@ export const RejectCorrection: Story = {
     action: {
       ...argbase.action,
       type: ActionType.REJECT_CORRECTION,
-      reason: { message: 'No legal proof' }
+      content: { reason: 'No legal proof' }
     }
   }
 }

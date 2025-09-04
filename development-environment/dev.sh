@@ -52,7 +52,6 @@ if $dependencies; then
   concurrently "yarn run compose:deps"
   exit 0
 elif $services; then
-  yarn dev:secrets:gen
   yarn run start
   exit 0
 fi
@@ -116,4 +115,26 @@ echo
 sleep 10
 
 yarn dev:secrets:gen
+
+
+# List of directories
+dirs=(
+  "data/elasticsearch"
+  "data/mongo"
+  "data/influxdb"
+  "data/minio"
+  "data/backups"
+  "data/postgres"
+)
+
+for dir in "${dirs[@]}"; do
+  if [ ! -d "$dir" ]; then
+    echo "Creating $dir"
+    mkdir -p "$dir"
+    chmod 775 "$dir"
+  else
+    echo "$dir already exists"
+  fi
+done
+
 concurrently "yarn run start" "yarn run compose:deps"

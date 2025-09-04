@@ -8,17 +8,32 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { TRPCError } from '@trpc/server'
+import { http, HttpResponse } from 'msw'
 import {
+  ActionStatus,
   ActionType,
   AddressType,
+  createPrng,
+  eventQueryDataGenerator,
   generateActionDeclarationInput,
-  getAcceptedActions,
-  SCOPES
+  getCurrentEventState,
+  getUUID,
+  SCOPES,
+  TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import {
+  tennisClubMembershipEvent,
+  tennisClubMembershipEventWithDedupCheck
+} from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  getEventIndexName,
+  getOrCreateClient
+} from '@events/storage/elasticsearch'
+import { encodeEventIndex } from '@events/service/indexing/utils'
+import { mswServer } from '@events/tests/msw'
+import { env } from '@events/environment'
 
 test(`prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()
@@ -121,12 +136,16 @@ test('Skips required field validation when they are conditionally hidden', async
   })
 
   const response = await client.event.actions.declare.request(data)
-  const activeActions = getAcceptedActions(response)
 
-  const savedAction = activeActions.find(
-    (action) => action.type === ActionType.DECLARE
+  const savedAction = response.actions.find(
+    ({ type, status }) =>
+      type === ActionType.DECLARE && status === ActionStatus.Requested
   )
-  expect(savedAction?.declaration).toEqual(form)
+
+  expect(savedAction?.status).toEqual(ActionStatus.Requested)
+  if (savedAction?.status === ActionStatus.Requested) {
+    expect(savedAction.declaration).toEqual(form)
+  }
 })
 
 test('gives validation error when a conditional page, which is visible, has a required field', async () => {
@@ -177,6 +196,7 @@ test('successfully validates a fields on a conditional page, which is visible', 
       surname: 'Doe'
     },
     'recommender.none': true,
+    'senior-pass.recommender': true,
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
@@ -192,12 +212,16 @@ test('successfully validates a fields on a conditional page, which is visible', 
   })
 
   const response = await client.event.actions.declare.request(data)
-  const activeActions = getAcceptedActions(response)
 
-  const savedAction = activeActions.find(
-    (action) => action.type === ActionType.DECLARE
+  const savedAction = response.actions.find(
+    ({ type, status }) =>
+      type === ActionType.DECLARE && status === ActionStatus.Requested
   )
-  expect(savedAction?.declaration).toEqual(form)
+
+  expect(savedAction?.status).toEqual(ActionStatus.Requested)
+  if (savedAction?.status === ActionStatus.Requested) {
+    expect(savedAction.declaration).toEqual(form)
+  }
 })
 
 test('Prevents adding birth date in future', async () => {
@@ -270,7 +294,12 @@ test('valid action is appended to event actions', async () => {
     expect.objectContaining({ type: ActionType.CREATE }),
     expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({
-      type: ActionType.DECLARE
+      type: ActionType.DECLARE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.DECLARE,
+      status: ActionStatus.Accepted
     }),
     expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({
@@ -293,4 +322,50 @@ test(`${ActionType.DECLARE} is idempotent`, async () => {
   const secondResponse = await client.event.actions.declare.request(data)
 
   expect(firstResponse).toEqual(secondResponse)
+})
+
+test('deduplication check is performed after declaration', async () => {
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      return HttpResponse.json([
+        tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE),
+        { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+      ])
+    })
+  )
+  const esClient = getOrCreateClient()
+  const prng = createPrng(73)
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const newEvent = await client.event.create(generator.event.create())
+  const existingEventId = getUUID()
+  const declaration = generateActionDeclarationInput(
+    tennisClubMembershipEvent,
+    ActionType.DECLARE,
+    prng
+  )
+  const existingEventIndex = eventQueryDataGenerator({
+    id: existingEventId,
+    declaration
+  })
+
+  await esClient.update({
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    id: existingEventId,
+    body: {
+      doc: encodeEventIndex(existingEventIndex, tennisClubMembershipEvent),
+      doc_as_upsert: true
+    },
+    refresh: 'wait_for'
+  })
+
+  const declaredEvent = await client.event.actions.declare.request(
+    generator.event.actions.declare(newEvent.id, {
+      declaration: existingEventIndex.declaration
+    })
+  )
+  expect(
+    getCurrentEventState(declaredEvent, tennisClubMembershipEvent).duplicates
+  ).toEqual([existingEventId])
 })

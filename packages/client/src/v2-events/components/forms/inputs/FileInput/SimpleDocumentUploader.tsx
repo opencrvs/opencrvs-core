@@ -52,10 +52,10 @@ interface SimpleDocumentUploaderProps {
   disableDeleteInPreview?: boolean
   onComplete: (file: File | null) => void
   touched?: boolean
+  disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   previewTransformer?: (files: FileFieldValue) => FileFieldValue
   maxFileSize: number
-  disabled?: boolean
 }
 
 export function SimpleDocumentUploader({
@@ -68,11 +68,11 @@ export function SimpleDocumentUploader({
   file,
   description,
   error: errorProps,
+  disabled,
   disableDeleteInPreview,
   touched,
   width,
-  maxFileSize,
-  disabled
+  maxFileSize
 }: SimpleDocumentUploaderProps) {
   const intl = useIntl()
   const [previewImage, setPreviewImage] = useState<FileFieldValue | null>(null)

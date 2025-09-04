@@ -2,9 +2,9 @@
 
 exports[`Prevents adding birth date in future 1`] = `[TRPCError: [{"message":"Please enter a valid date","id":"applicant.dob","value":"2040-02-01"}]]`;
 
-exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Required","id":"applicant.name"},{"message":"Invalid date field","id":"applicant.dob","value":"02-02"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"},{"message":"Required","id":"applicant.address"}]]`;
+exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Required","id":"applicant.name"},{"message":"Input contains invalid characters. Please use only letters (a-z, A-Z), numbers (0-9), hyphens (-), apostrophes(') and underscores (_)","id":"applicant.name"},{"message":"Invalid date field","id":"applicant.dob","value":"02-02"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"},{"message":"Required","id":"applicant.address"}]]`;
 
-exports[`gives validation error when a conditional page, which is visible, has a required field 1`] = `[TRPCError: [{"message":"Required","id":"senior-pass.id"}]]`;
+exports[`gives validation error when a conditional page, which is visible, has a required field 1`] = `[TRPCError: [{"message":"Required","id":"senior-pass.id"},{"message":"Required","id":"senior-pass.recommender"}]]`;
 
 exports[`validation prevents including hidden fields 1`] = `[TRPCError: [{"message":"Hidden or disabled field should not receive a value","id":"recommender.firstname","value":"this should not be here"}]]`;
 

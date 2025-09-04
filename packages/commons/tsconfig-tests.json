@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig-base.json",
+  "compilerOptions": {
+    "module": "commonjs"
+  },
+  "references": [
+    {
+      "path": "./tsconfig-commonjs.json"
+    }
+  ],
+  "include": [
+    "src/**/*.test.ts",
+    "typings"
+  ]
+}

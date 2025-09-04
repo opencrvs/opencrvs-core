@@ -18,6 +18,14 @@ import * as fetchAny from 'jest-fetch-mock'
 const fetch = fetchAny as fetchAny.FetchMock
 import { AuthenticateResponse } from '@auth/features/authenticate/handler'
 
+jest.mock('@auth/features/verifyCode/service', () => {
+  const actual = jest.requireActual('@auth/features/verifyCode/service')
+  return {
+    ...actual,
+    sendVerificationCode: jest.fn().mockResolvedValue(undefined)
+  }
+})
+
 describe('authenticate handler receives a request', () => {
   let server: AuthServer
 

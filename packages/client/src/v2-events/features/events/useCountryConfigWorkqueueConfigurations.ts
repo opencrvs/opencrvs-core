@@ -17,7 +17,7 @@ import { getScope } from '@client/profile/profileSelectors'
 /**
  * @returns a list of workqueue configurations
  */
-export function useWorkqueueConfigurations() {
+export function useCountryConfigWorkqueueConfigurations() {
   const trpc = useTRPC()
 
   const config = useSuspenseQuery({
