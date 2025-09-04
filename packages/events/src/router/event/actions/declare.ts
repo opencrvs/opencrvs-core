@@ -13,8 +13,7 @@ import {
   ActionStatus,
   EventDocument,
   DeclareActionInput,
-  ACTION_ALLOWED_SCOPES,
-  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
+  ACTION_SCOPE_MAP,
   getCurrentEventState
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
@@ -30,8 +29,8 @@ import { searchForDuplicates } from '@events/service/deduplication/deduplication
 
 export function declareActionProcedures() {
   const requireScopesMiddleware = requiresAnyOfScopes(
-    ACTION_ALLOWED_SCOPES[ActionType.DECLARE],
-    ACTION_ALLOWED_CONFIGURABLE_SCOPES[ActionType.DECLARE]
+    [],
+    ACTION_SCOPE_MAP[ActionType.DECLARE]
   )
 
   return {

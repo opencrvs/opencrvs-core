@@ -64,7 +64,7 @@ export function getStatusFromActions(actions: Array<Action>) {
         case ActionType.REQUEST_CORRECTION:
         case ActionType.APPROVE_CORRECTION:
         case ActionType.DUPLICATE_DETECTED:
-        case ActionType.MARK_NOT_DUPLICATE:
+        case ActionType.MARK_AS_NOT_DUPLICATE:
         case ActionType.MARK_AS_DUPLICATE:
         case ActionType.REJECT_CORRECTION:
         case ActionType.READ:
@@ -163,14 +163,17 @@ export function resolveDateOfEvent(
   return parsedDate.success ? parsedDate.data : undefined
 }
 
-export function extractDuplicatesFromActions(
+export function extractPotentialDuplicatesFromActions(
   actions: Action[]
 ): PotentialDuplicate[] {
   return actions.reduce<PotentialDuplicate[]>((duplicates, action) => {
     if (action.type === ActionType.DUPLICATE_DETECTED) {
       duplicates = action.content.duplicates
     }
-    if (action.type === ActionType.MARK_NOT_DUPLICATE) {
+    if (
+      action.type === ActionType.MARK_AS_NOT_DUPLICATE ||
+      action.type === ActionType.MARK_AS_DUPLICATE
+    ) {
       duplicates = []
     }
     return duplicates
@@ -224,7 +227,7 @@ export function getCurrentEventState(
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),
-    duplicates: extractDuplicatesFromActions(event.actions),
+    potentialDuplicates: extractPotentialDuplicatesFromActions(event.actions),
     flags: getFlagsFromActions(event.actions)
   })
 }

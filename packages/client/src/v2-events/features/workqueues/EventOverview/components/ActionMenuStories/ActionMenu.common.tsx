@@ -132,9 +132,9 @@ const mockActions: Record<
     ...actionProps,
     type: ActionType.MARK_AS_DUPLICATE
   },
-  [ActionType.MARK_NOT_DUPLICATE]: {
+  [ActionType.MARK_AS_NOT_DUPLICATE]: {
     ...actionProps,
-    type: ActionType.MARK_NOT_DUPLICATE
+    type: ActionType.MARK_AS_NOT_DUPLICATE
   }
 }
 
