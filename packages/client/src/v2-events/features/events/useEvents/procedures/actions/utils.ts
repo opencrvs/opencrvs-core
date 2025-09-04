@@ -77,7 +77,7 @@ export function updateEventOptimistically<T extends ActionInput>(
 
 export function addMarkAsNotDuplicateActionOptimistically<
   T extends ActionInput
->(actionType: typeof ActionType.MARK_NOT_DUPLICATE) {
+>(actionType: typeof ActionType.MARK_AS_NOT_DUPLICATE) {
   return (variables: T) => {
     const localEvent = queryClient.getQueryData(
       trpcOptionsProxy.event.get.queryKey(variables.eventId)

@@ -293,12 +293,12 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
   retry: retryUnlessConflict,
   retryDelay,
   onMutate: addMarkAsNotDuplicateActionOptimistically(
-    ActionType.MARK_NOT_DUPLICATE
+    ActionType.MARK_AS_NOT_DUPLICATE
   ),
   onSuccess: updateLocalEvent,
   onError: errorToastOnConflict,
   meta: {
-    actionType: ActionType.MARK_NOT_DUPLICATE
+    actionType: ActionType.MARK_AS_NOT_DUPLICATE
   }
 })
 
