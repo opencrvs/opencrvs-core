@@ -10,7 +10,15 @@
  */
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
-import { ActionType, generateUuid, SCOPES } from '@opencrvs/commons'
+import { last } from 'lodash'
+import { Kysely } from 'kysely'
+import {
+  ActionType,
+  EventIndex,
+  generateUuid,
+  SCOPES,
+  UUID
+} from '@opencrvs/commons'
 import { tennisClubMembershipEventWithDedupCheck } from '@opencrvs/commons/fixtures'
 import {
   createTestClient,
@@ -19,6 +27,7 @@ import {
 } from '@events/tests/utils'
 import { mswServer } from '../../tests/msw'
 import { env } from '../../environment'
+import AppSchema from '../../storage/postgres/events/schema/app/AppSchema'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -65,6 +74,14 @@ test('Allows access with assignment and right scope', async () => {
   ).resolves.toEqual([])
 })
 
+async function getEventActions(db: Kysely<AppSchema>, eventId: UUID) {
+  return db
+    .selectFrom('eventActions')
+    .where('eventId', '=', eventId)
+    .selectAll()
+    .orderBy('createdAt')
+    .execute()
+}
 test('Returns single duplicate when found', async () => {
   const tennisClubMembershipWithDedupCheckConfig =
     tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
@@ -75,7 +92,7 @@ test('Returns single duplicate when found', async () => {
     })
   )
 
-  const { user, generator } = await setupTestCase(
+  const { user, generator, eventsDb } = await setupTestCase(
     1881,
     tennisClubMembershipWithDedupCheckConfig
   )
@@ -101,10 +118,35 @@ test('Returns single duplicate when found', async () => {
     assignedTo: user.id,
     transactionId: generateUuid()
   })
+  const eventActionsBeforeGetDuplicates = await getEventActions(
+    eventsDb,
+    event1.id
+  )
 
-  await expect(
-    client.event.getDuplicates({ eventId: event2.id })
-  ).resolves.toHaveLength(1)
+  const duplicateEvents = await client.event.getDuplicates({
+    eventId: event2.id
+  })
+
+  expect(duplicateEvents).toHaveLength(1)
+
+  // Expect not to throw
+  EventIndex.parse(duplicateEvents[0])
+
+  const eventActionsAfterGetDuplicates = await getEventActions(
+    eventsDb,
+    event1.id
+  )
+
+  // get duplicates creates audit trail
+  expect(eventActionsAfterGetDuplicates.length).toEqual(
+    eventActionsBeforeGetDuplicates.length + 1
+  )
+  expect(last(eventActionsAfterGetDuplicates)?.actionType).toEqual(
+    ActionType.READ
+  )
+  expect(last(eventActionsBeforeGetDuplicates)?.actionType).toEqual(
+    ActionType.UNASSIGN
+  )
 
   await client.event.actions.assignment.assign(
     generator.event.actions.assign(event1.id, { assignedTo: user.id })
@@ -125,7 +167,7 @@ test('Returns multiple duplicates when found', async () => {
     })
   )
 
-  const { user, generator } = await setupTestCase(
+  const { user, generator, eventsDb } = await setupTestCase(
     1881,
     tennisClubMembershipWithDedupCheckConfig
   )
@@ -153,14 +195,38 @@ test('Returns multiple duplicates when found', async () => {
     })
   )
 
+  const event3ActionsBeforeGet = await getEventActions(eventsDb, event3.id)
+  const event2ActionsBeforeGet = await getEventActions(eventsDb, event2.id)
+  const event1ActionsBeforeGet = await getEventActions(eventsDb, event1.id)
+
   await client.event.actions.assignment.assign(
     generator.event.actions.assign(event3.id, { assignedTo: user.id })
   )
-
   // Last item knows about all the previous ones
   await expect(
     client.event.getDuplicates({ eventId: event3.id })
   ).resolves.toHaveLength(2)
+
+  const event3ActionsAfterGet = await getEventActions(eventsDb, event3.id)
+  const event2ActionsAfterGet = await getEventActions(eventsDb, event2.id)
+  const event1ActionsAfterGet = await getEventActions(eventsDb, event1.id)
+
+  expect(event3ActionsAfterGet).toHaveLength(event3ActionsBeforeGet.length + 1)
+  expect(event2ActionsAfterGet).toHaveLength(event2ActionsBeforeGet.length + 1)
+  expect(event1ActionsAfterGet).toHaveLength(event1ActionsBeforeGet.length + 1)
+
+  expect(last(event3ActionsBeforeGet)?.actionType).toEqual(
+    ActionType.DUPLICATE_DETECTED
+  )
+  expect(last(event2ActionsBeforeGet)?.actionType).toEqual(
+    ActionType.DUPLICATE_DETECTED
+  )
+  expect(last(event1ActionsBeforeGet)?.actionType).toEqual(ActionType.UNASSIGN)
+
+  // no read log for the "target"
+  expect(last(event3ActionsAfterGet)?.actionType).toEqual(ActionType.ASSIGN)
+  expect(last(event2ActionsAfterGet)?.actionType).toEqual(ActionType.READ)
+  expect(last(event1ActionsAfterGet)?.actionType).toEqual(ActionType.READ)
 
   await client.event.actions.assignment.assign(
     generator.event.actions.assign(event2.id, { assignedTo: user.id })
