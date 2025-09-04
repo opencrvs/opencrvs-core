@@ -59,6 +59,6 @@ export function MarkAsNotDuplicateModal({
         }
       )}
       titleHeightAuto={true}
-    ></ResponsiveModal>
+    />
   )
 }

@@ -44,7 +44,7 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
 
   const intl = useIntl()
 
-  const { actions } = useEvents()
+  const { actions, customActions } = useEvents()
 
   const navigate = useNavigate()
   const { getEventTitle } = useEventTitle()
@@ -120,10 +120,14 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
               `Id not found for tracking id ${duplicateTrackingId}. Should never happen.`
             )
           }
-          actions.duplicate.markAsDuplicate.mutate({
-            content: { duplicateOf: duplicateId },
+          customActions.archiveOnDuplicate.mutate({
+            content: {
+              duplicateOf: duplicateId,
+              reason: `Duplicate of ${duplicateId}`
+            },
             transactionId: getUUID(),
-            eventId: eventIndex.id
+            eventId: eventIndex.id,
+            declaration: {}
           })
 
           if (slug) {
