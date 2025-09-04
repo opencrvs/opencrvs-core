@@ -12,7 +12,7 @@
 import { trpcClient } from '@client/v2-events/trpc'
 import { setEventListData } from '../../useEvents/api'
 
-export async function preFetchPotentialDuplicates(eventId: string) {
+export async function prefetchPotentialDuplicates(eventId: string) {
   const potentialDuplicates = await trpcClient.event.getDuplicates.query({
     eventId
   })
