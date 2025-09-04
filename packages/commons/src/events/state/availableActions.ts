@@ -26,23 +26,23 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   [EventStatus.enum.NOTIFIED]: [
     ActionType.READ,
     ActionType.DECLARE,
+    ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
-    ActionType.REJECT,
-    ActionType.MARK_AS_DUPLICATE
+    ActionType.REJECT
   ],
   [EventStatus.enum.DECLARED]: [
     ActionType.READ,
     ActionType.VALIDATE,
+    ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
-    ActionType.REJECT,
-    ActionType.MARK_AS_DUPLICATE
+    ActionType.REJECT
   ],
   [EventStatus.enum.VALIDATED]: [
     ActionType.READ,
     ActionType.REGISTER,
+    ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
-    ActionType.REJECT,
-    ActionType.MARK_AS_DUPLICATE
+    ActionType.REJECT
   ],
   [EventStatus.enum.REGISTERED]: [
     ActionType.READ,
