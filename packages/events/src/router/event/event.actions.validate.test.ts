@@ -370,7 +370,11 @@ test('deduplication check is performed before validation when configured', async
   const declaration = generateActionDeclarationInput(
     tennisClubMembershipEvent,
     ActionType.DECLARE,
-    prng
+    prng,
+    // so that applicate.dob is generated
+    {
+      'applicant.dobUnknown': false
+    }
   )
 
   await client.event.actions.declare.request(

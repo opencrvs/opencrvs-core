@@ -853,7 +853,11 @@ test('deduplication check is performed before register when configured', async (
   const declarationPayload = generateActionDeclarationInput(
     tennisClubMembershipEvent,
     ActionType.DECLARE,
-    prng
+    prng,
+    // so that applicate.dob is generated
+    {
+      'applicant.dobUnknown': false
+    }
   )
 
   await client.event.actions.declare.request(

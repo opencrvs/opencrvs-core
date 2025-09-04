@@ -341,7 +341,11 @@ test('deduplication check is performed after declaration', async () => {
   const declaration = generateActionDeclarationInput(
     tennisClubMembershipEvent,
     ActionType.DECLARE,
-    prng
+    prng,
+    // so that applicate.dob is generated
+    {
+      'applicant.dobUnknown': false
+    }
   )
   const existingEventIndex = eventQueryDataGenerator({
     id: existingEventId,
