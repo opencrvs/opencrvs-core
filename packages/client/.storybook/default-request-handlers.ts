@@ -79,7 +79,7 @@ export const handlers = {
     })
   ],
   eventLocations: [
-    tRPCMsw.locations.get.query(() => {
+    tRPCMsw.locations.list.query(() => {
       return [
         {
           id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,

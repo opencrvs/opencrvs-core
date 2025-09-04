@@ -10,11 +10,12 @@
  */
 
 import { z } from 'zod'
-
+import { TRPCError } from '@trpc/server'
 import { SCOPES } from '@opencrvs/commons'
 import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
 import {
   getLocations,
+  getLocationById,
   Location,
   setLocations,
   syncLocations
@@ -40,7 +41,26 @@ export const locationRouter = router({
     .mutation(async () => {
       await syncLocations()
     }),
-  get: publicProcedure.output(z.array(Location)).query(getLocations),
+  list: publicProcedure.output(z.array(Location)).query(getLocations),
+  get: publicProcedure
+    .input(z.string().uuid().brand<'UUID'>()) // branded UUID
+    .output(Location)
+    .query(async ({ input }) => {
+      const location = await getLocationById(input)
+
+      if (!location) {
+        throw new TRPCError({ code: 'NOT_FOUND' })
+      }
+
+      return {
+        id: location.id,
+        name: location.name,
+        parentId: location.parentId,
+        validUntil: location.validUntil
+          ? new Date(location.validUntil).toISOString()
+          : null
+      } as Location
+    }),
   set: systemProcedure
     .use(requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING]))
     .input(z.array(Location).min(1))

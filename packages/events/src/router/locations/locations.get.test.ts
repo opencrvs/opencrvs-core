@@ -26,7 +26,7 @@ test('Returns single location in right format', async () => {
 
   await client.locations.set(setLocationPayload)
 
-  const locations = await client.locations.get()
+  const locations = await client.locations.list()
 
   expect(locations).toHaveLength(1)
   expect(locations).toMatchObject(setLocationPayload)
@@ -37,7 +37,7 @@ test('Returns multiple locations', async () => {
   const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
   await client.locations.set(generator.locations.set(5))
 
-  const locations = await client.locations.get()
+  const locations = await client.locations.list()
 
   expect(locations).toHaveLength(5)
 })

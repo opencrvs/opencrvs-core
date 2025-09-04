@@ -13,9 +13,9 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 
-setQueryDefaults(trpcOptionsProxy.locations.get, {
+setQueryDefaults(trpcOptionsProxy.locations.list, {
   queryFn: async (...params) => {
-    const queryOptions = trpcOptionsProxy.locations.get.queryOptions()
+    const queryOptions = trpcOptionsProxy.locations.list.queryOptions()
     if (typeof queryOptions.queryFn !== 'function') {
       throw new Error('queryFn is not a function')
     }
@@ -30,8 +30,8 @@ export function useLocations() {
       useSuspenseQuery: () => {
         return [
           useSuspenseQuery({
-            ...trpc.locations.get.queryOptions(),
-            queryKey: trpc.locations.get.queryKey()
+            ...trpc.locations.list.queryOptions(),
+            queryKey: trpc.locations.list.queryKey()
           }).data
         ]
       }

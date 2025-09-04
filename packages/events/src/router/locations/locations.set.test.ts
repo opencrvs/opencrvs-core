@@ -54,7 +54,7 @@ test('Creates single location', async () => {
 
   await dataSeedingClient.locations.set(locationPayload)
 
-  const locations = await dataSeedingClient.locations.get()
+  const locations = await dataSeedingClient.locations.list()
 
   expect(locations).toHaveLength(1)
   expect(locations).toMatchObject(locationPayload)
@@ -76,7 +76,7 @@ test('Creates multiple locations', async () => {
 
   await dataSeedingClient.locations.set(locationPayload)
 
-  const locations = await dataSeedingClient.locations.get()
+  const locations = await dataSeedingClient.locations.list()
 
   expect(locations).toEqual(locationPayload)
 })
@@ -92,7 +92,7 @@ test('Removes existing locations not in payload', async () => {
 
   await dataSeedingClient.locations.set(initialPayload)
 
-  const initialLocations = await dataSeedingClient.locations.get()
+  const initialLocations = await dataSeedingClient.locations.list()
   expect(initialLocations).toHaveLength(initialPayload.length)
 
   const [removedLocation, ...remainingLocationsPayload] = initialPayload
@@ -100,7 +100,7 @@ test('Removes existing locations not in payload', async () => {
   await dataSeedingClient.locations.set(remainingLocationsPayload)
 
   const remainingLocationsAfterDeletion =
-    await dataSeedingClient.locations.get()
+    await dataSeedingClient.locations.list()
 
   expect(remainingLocationsAfterDeletion).toHaveLength(
     remainingLocationsPayload.length

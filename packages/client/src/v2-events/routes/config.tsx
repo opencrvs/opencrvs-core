@@ -54,7 +54,7 @@ function PrefetchQueries() {
   const workqueues = useWorkqueues()
   useEffect(() => {
     void queryClient.prefetchQuery({
-      queryKey: trpcOptionsProxy.locations.get.queryKey()
+      queryKey: trpcOptionsProxy.locations.list.queryKey()
     })
 
     function prefetch() {

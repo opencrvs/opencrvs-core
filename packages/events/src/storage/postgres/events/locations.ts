@@ -60,6 +60,17 @@ export async function getLocations() {
     .execute()
 }
 
+export async function getLocationById(id: UUID) {
+  const db = getClient()
+  return db
+    .selectFrom('locations')
+    .selectAll()
+    .where('id', '=', id)
+    .where('deletedAt', 'is', null)
+    .$narrowType<{ deletedAt: null }>()
+    .executeTakeFirst()
+}
+
 export async function getChildLocations(id: string) {
   const db = getClient()
 
