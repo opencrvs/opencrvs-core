@@ -62,7 +62,7 @@ describe('Declare action', () => {
   })
 
   test('prevents forbidden access if configurable scope does not have required event type allowed', async () => {
-    const client = createTestClient(user, ['record.declare[event=v2.death]'])
+    const client = createTestClient(user, ['record.declare[event=death]'])
 
     await expect(
       client.event.actions.declare.request(
@@ -73,7 +73,7 @@ describe('Declare action', () => {
 
   test('allows access if required scope is present', async () => {
     const client = createTestClient(user, [
-      'record.declare[event=v2.death|v2.birth|tennis-club-membership]'
+      'record.declare[event=death|birth|tennis-club-membership]'
     ])
 
     await expect(

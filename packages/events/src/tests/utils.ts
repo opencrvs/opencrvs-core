@@ -95,16 +95,16 @@ export const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_UNASSIGN_OTHERS,
   SCOPES.SEARCH_BIRTH,
   'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
-  'record.read[event=v2.birth|v2.death|tennis-club-membership]',
-  'record.notify[event=v2.birth|v2.death|tennis-club-membership]',
-  'record.declare[event=v2.birth|v2.death|tennis-club-membership]',
-  'record.declared.validate[event=v2.birth|v2.death|tennis-club-membership]',
-  'record.declared.reject[event=v2.birth|v2.death|tennis-club-membership]',
-  'record.declared.archive[event=v2.birth|v2.death|tennis-club-membership]',
-  'record.register[event=v2.birth|v2.death|tennis-club-membership]',
-  'record.registered.print-certified-copies[event=v2.birth|v2.death|tennis-club-membership]',
-  'record.registered.request-correction[event=v2.birth|v2.death|tennis-club-membership]',
-  'record.registered.correct[event=v2.birth|v2.death|tennis-club-membership]'
+  'record.read[event=birth|death|tennis-club-membership]',
+  'record.notify[event=birth|death|tennis-club-membership]',
+  'record.declare[event=birth|death|tennis-club-membership]',
+  'record.declared.validate[event=birth|death|tennis-club-membership]',
+  'record.declared.reject[event=birth|death|tennis-club-membership]',
+  'record.declared.archive[event=birth|death|tennis-club-membership]',
+  'record.register[event=birth|death|tennis-club-membership]',
+  'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]',
+  'record.registered.request-correction[event=birth|death|tennis-club-membership]',
+  'record.registered.correct[event=birth|death|tennis-club-membership]'
 ]
 
 export function createTestToken(
