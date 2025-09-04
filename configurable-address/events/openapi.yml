@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: cb26af3e-40bd-4716-93eb-15b41d00f2b0
+                transactionId: 7111409e-8c1c-4952-9c6e-d8d486ca7f23
                 type: v2.birth
       responses:
         "200":
@@ -395,7 +395,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 91e88d8e-58fb-4b14-a31a-a08d1c1d4a40
+                transactionId: c5925a70-d3fd-4c3f-b8bf-1e8fecadbea0
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1367,23 +1367,20 @@ paths:
                   enum:
                     - REJECT_CORRECTION
                   default: REJECT_CORRECTION
-                reason:
+                content:
                   type: object
                   properties:
-                    message:
+                    reason:
                       type: string
                       minLength: 1
                       description: Message describing reason for rejection or archiving
-                    isDuplicate:
-                      type: boolean
-                      description: If a declaration is duplicated
                   required:
-                    - message
+                    - reason
               required:
                 - eventId
                 - transactionId
                 - requestId
-                - reason
+                - content
       responses:
         "200":
           description: Successful response
@@ -2189,7 +2186,6 @@ components:
         - $ref: "#/components/schemas/DeclareActionConfig"
         - $ref: "#/components/schemas/ValidateActionConfig"
         - $ref: "#/components/schemas/RejectDeclarationActionConfig"
-        - $ref: "#/components/schemas/MarkedAsDuplicateActionConfig"
         - $ref: "#/components/schemas/ArchiveActionConfig"
         - $ref: "#/components/schemas/RegisterActionConfig"
         - $ref: "#/components/schemas/DeleteActionConfig"
@@ -2204,7 +2200,6 @@ components:
           DECLARE: "#/components/schemas/DeclareActionConfig"
           VALIDATE: "#/components/schemas/ValidateActionConfig"
           REJECT: "#/components/schemas/RejectDeclarationActionConfig"
-          MARKED_AS_DUPLICATE: "#/components/schemas/MarkedAsDuplicateActionConfig"
           ARCHIVE: "#/components/schemas/ArchiveActionConfig"
           REGISTER: "#/components/schemas/RegisterActionConfig"
           DELETE: "#/components/schemas/DeleteActionConfig"
@@ -2248,19 +2243,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: &a12 []
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -2288,110 +2270,6 @@ components:
         - conditionals
         - type
         - review
-    Clause:
-      oneOf:
-        - type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - and
-            clauses:
-              type: array
-              items:
-                $ref: "#/components/schemas/Clause"
-          required:
-            - type
-            - clauses
-        - type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - or
-            clauses:
-              type: array
-              items:
-                $ref: "#/components/schemas/Clause"
-          required:
-            - type
-            - clauses
-        - type: object
-          properties:
-            fieldId:
-              type: string
-            options:
-              type: object
-              properties:
-                fuzziness:
-                  anyOf:
-                    - type: string
-                    - type: number
-                  default: AUTO:4,7
-                boost:
-                  type: number
-                  default: 1
-              required:
-                - fuzziness
-                - boost
-              default:
-                fuzziness: AUTO:4,7
-                boost: 1
-            type:
-              type: string
-              enum:
-                - fuzzy
-          required:
-            - fieldId
-            - options
-            - type
-        - type: object
-          properties:
-            fieldId:
-              type: string
-            options:
-              type: object
-              properties:
-                boost:
-                  type: number
-                  default: 1
-              required:
-                - boost
-              default:
-                boost: 1
-            type:
-              type: string
-              enum:
-                - strict
-          required:
-            - fieldId
-            - options
-            - type
-        - type: object
-          properties:
-            fieldId:
-              type: string
-            options:
-              type: object
-              properties:
-                pivot:
-                  type: number
-                days:
-                  type: number
-                boost:
-                  type: number
-                  default: 1
-              required:
-                - days
-                - boost
-            type:
-              type: string
-              enum:
-                - dateRange
-          required:
-            - fieldId
-            - options
-            - type
     FieldConfig:
       oneOf:
         - type: object
@@ -2468,6 +2346,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -2643,6 +2526,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -2746,6 +2634,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -2844,6 +2737,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -2948,6 +2846,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3042,6 +2945,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3135,6 +3043,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3245,6 +3158,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3349,6 +3267,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3458,6 +3381,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3571,6 +3499,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3673,6 +3606,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3759,6 +3697,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -3861,6 +3804,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4015,6 +3963,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             defaultValue:
               type: string
               minLength: 1
@@ -4101,6 +4054,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             defaultValue:
               type: string
               minLength: 1
@@ -4187,6 +4145,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4274,6 +4237,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4406,6 +4374,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4492,6 +4465,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4599,6 +4577,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4681,6 +4664,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4778,6 +4766,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4864,6 +4857,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -4950,6 +4948,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5058,6 +5061,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5151,6 +5159,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5288,6 +5301,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5400,6 +5418,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5501,6 +5524,11 @@ components:
                 - $$field
               description: Reference to a parent field. If field has a value, the value will
                 be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
             type:
               type: string
               enum:
@@ -5661,19 +5689,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a12
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -5696,11 +5711,128 @@ components:
             - title
             - fields
           description: Configuration for **declaration** review page.
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
       required:
         - label
         - conditionals
         - type
         - review
+    Clause:
+      oneOf:
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - and
+            clauses:
+              type: array
+              items:
+                $ref: "#/components/schemas/Clause"
+          required:
+            - type
+            - clauses
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - or
+            clauses:
+              type: array
+              items:
+                $ref: "#/components/schemas/Clause"
+          required:
+            - type
+            - clauses
+        - type: object
+          properties:
+            fieldId:
+              type: string
+            options:
+              type: object
+              properties:
+                fuzziness:
+                  anyOf:
+                    - type: string
+                    - type: number
+                  default: AUTO:4,7
+                boost:
+                  type: number
+                  default: 1
+              required:
+                - fuzziness
+                - boost
+              default:
+                fuzziness: AUTO:4,7
+                boost: 1
+            type:
+              type: string
+              enum:
+                - fuzzy
+          required:
+            - fieldId
+            - options
+            - type
+        - type: object
+          properties:
+            fieldId:
+              type: string
+            options:
+              type: object
+              properties:
+                boost:
+                  type: number
+                  default: 1
+              required:
+                - boost
+              default:
+                boost: 1
+            type:
+              type: string
+              enum:
+                - strict
+          required:
+            - fieldId
+            - options
+            - type
+        - type: object
+          properties:
+            fieldId:
+              type: string
+            options:
+              type: object
+              properties:
+                pivot:
+                  type: number
+                days:
+                  type: number
+                boost:
+                  type: number
+                  default: 1
+              required:
+                - days
+                - boost
+            type:
+              type: string
+              enum:
+                - dateRange
+          required:
+            - fieldId
+            - options
+            - type
     ValidateActionConfig:
       type: object
       properties:
@@ -5737,19 +5869,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a12
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -5772,6 +5891,19 @@ components:
             - title
             - fields
           description: Configuration for **declaration** review page.
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
       required:
         - label
         - conditionals
@@ -5813,84 +5945,12 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a12
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
           type: string
           enum:
             - REJECT
-      required:
-        - label
-        - conditionals
-        - type
-    MarkedAsDuplicateActionConfig:
-      type: object
-      properties:
-        label:
-          $ref: "#/components/schemas/TranslationConfig"
-        conditionals:
-          type: array
-          items:
-            oneOf:
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - SHOW
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                description: If 'SHOW' conditional is defined, the component is shown to the
-                  user only if the condition is met
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - ENABLE
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                description: If 'ENABLE' conditional is defined, the component is enabled only
-                  if the condition is met
-          default: *a12
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
-        draft:
-          type: boolean
-        type:
-          type: string
-          enum:
-            - MARKED_AS_DUPLICATE
       required:
         - label
         - conditionals
@@ -5931,19 +5991,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a12
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -5990,19 +6037,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a12
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -6025,6 +6059,19 @@ components:
             - title
             - fields
           description: Configuration for **declaration** review page.
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
       required:
         - label
         - conditionals
@@ -6066,19 +6113,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a12
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -6125,19 +6159,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a12
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -6278,19 +6299,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a12
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -6374,19 +6382,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a12
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -6433,19 +6428,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a12
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -6629,6 +6611,8 @@ components:
         - $ref: "#/components/schemas/CreatedAction"
         - $ref: "#/components/schemas/ValidateAction"
         - $ref: "#/components/schemas/RejectAction"
+        - $ref: "#/components/schemas/DuplicateDetectedAction"
+        - $ref: "#/components/schemas/MarkNotDuplicateAction"
         - $ref: "#/components/schemas/MarkAsDuplicateAction"
         - $ref: "#/components/schemas/ArchiveAction"
         - $ref: "#/components/schemas/NotifiedAction"
@@ -6647,7 +6631,9 @@ components:
           CREATE: "#/components/schemas/CreatedAction"
           VALIDATE: "#/components/schemas/ValidateAction"
           REJECT: "#/components/schemas/RejectAction"
-          MARKED_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateAction"
+          DUPLICATE_DETECTED: "#/components/schemas/DuplicateDetectedAction"
+          MARK_AS_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateAction"
+          MARK_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateAction"
           ARCHIVE: "#/components/schemas/ArchiveAction"
           NOTIFY: "#/components/schemas/NotifiedAction"
           REGISTER: "#/components/schemas/RegisterAction"
@@ -7552,18 +7538,15 @@ components:
           type: string
           enum:
             - REJECT
-        reason:
+        content:
           type: object
           properties:
-            message:
+            reason:
               type: string
               minLength: 1
               description: Message describing reason for rejection or archiving
-            isDuplicate:
-              type: boolean
-              description: If a declaration is duplicated
           required:
-            - message
+            - reason
       required:
         - id
         - transactionId
@@ -7574,7 +7557,626 @@ components:
         - declaration
         - status
         - type
-        - reason
+        - content
+    DuplicateDetectedAction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        transactionId:
+          type: string
+        createdByUserType:
+          type: string
+          enum: *a13
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        createdBySignature:
+          type: string
+          nullable: true
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: object
+                nullable: true
+                additionalProperties:
+                  type: string
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a1
+                  administrativeArea:
+                    type: string
+                    nullable: true
+                    format: uuid
+                  streetLevelDetails:
+                    type: object
+                    nullable: true
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
+              - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a2
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  path:
+                    type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - path
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - path
+                    - originalFilename
+                    - type
+                    - option
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
+        annotation:
+          type: object
+          nullable: true
+          additionalProperties:
+            anyOf:
+              - type: object
+                nullable: true
+                additionalProperties:
+                  type: string
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a1
+                  administrativeArea:
+                    type: string
+                    nullable: true
+                    format: uuid
+                  streetLevelDetails:
+                    type: object
+                    nullable: true
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
+              - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a2
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  path:
+                    type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - path
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - path
+                    - originalFilename
+                    - type
+                    - option
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
+        status:
+          type: string
+          enum: *a15
+        originalActionId:
+          type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
+        type:
+          type: string
+          enum:
+            - DUPLICATE_DETECTED
+        content:
+          type: object
+          properties:
+            duplicates:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  trackingId:
+                    type: string
+                required:
+                  - id
+                  - trackingId
+          required:
+            - duplicates
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - status
+        - type
+        - content
+    MarkNotDuplicateAction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        transactionId:
+          type: string
+        createdByUserType:
+          type: string
+          enum: *a13
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        createdBySignature:
+          type: string
+          nullable: true
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: object
+                nullable: true
+                additionalProperties:
+                  type: string
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a1
+                  administrativeArea:
+                    type: string
+                    nullable: true
+                    format: uuid
+                  streetLevelDetails:
+                    type: object
+                    nullable: true
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
+              - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a2
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  path:
+                    type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - path
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - path
+                    - originalFilename
+                    - type
+                    - option
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
+        annotation:
+          type: object
+          nullable: true
+          additionalProperties:
+            anyOf:
+              - type: object
+                nullable: true
+                additionalProperties:
+                  type: string
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a1
+                  administrativeArea:
+                    type: string
+                    nullable: true
+                    format: uuid
+                  streetLevelDetails:
+                    type: object
+                    nullable: true
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
+              - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a2
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  path:
+                    type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - path
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - path
+                    - originalFilename
+                    - type
+                    - option
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
+        status:
+          type: string
+          enum: *a15
+        originalActionId:
+          type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
+        type:
+          type: string
+          enum:
+            - MARK_AS_NOT_DUPLICATE
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - status
+        - type
     MarkAsDuplicateAction:
       type: object
       properties:
@@ -7864,7 +8466,15 @@ components:
         type:
           type: string
           enum:
-            - MARKED_AS_DUPLICATE
+            - MARK_AS_DUPLICATE
+        content:
+          type: object
+          properties:
+            duplicateOf:
+              type: string
+              format: uuid
+          required:
+            - duplicateOf
       required:
         - id
         - transactionId
@@ -8165,18 +8775,15 @@ components:
           type: string
           enum:
             - ARCHIVE
-        reason:
+        content:
           type: object
           properties:
-            message:
+            reason:
               type: string
               minLength: 1
               description: Message describing reason for rejection or archiving
-            isDuplicate:
-              type: boolean
-              description: If a declaration is duplicated
           required:
-            - message
+            - reason
       required:
         - id
         - transactionId
@@ -8187,7 +8794,7 @@ components:
         - declaration
         - status
         - type
-        - reason
+        - content
     NotifiedAction:
       type: object
       properties:
@@ -10288,18 +10895,15 @@ components:
             - REJECT_CORRECTION
         requestId:
           type: string
-        reason:
+        content:
           type: object
           properties:
-            message:
+            reason:
               type: string
               minLength: 1
               description: Message describing reason for rejection or archiving
-            isDuplicate:
-              type: boolean
-              description: If a declaration is duplicated
           required:
-            - message
+            - reason
       required:
         - id
         - transactionId
@@ -10311,7 +10915,7 @@ components:
         - status
         - type
         - requestId
-        - reason
+        - content
     UnassignedAction:
       type: object
       properties:
@@ -11458,25 +12062,27 @@ components:
           items:
             anyOf:
               - type: string
-                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
                   - pending-certification
                   - incomplete
                   - rejected
                   - correction-requested
+                  - potential-duplicate
         noneOf:
           type: array
           items:
             anyOf:
               - type: string
-                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
                   - pending-certification
                   - incomplete
                   - rejected
                   - correction-requested
+                  - potential-duplicate
     QueryInput:
       anyOf:
         - oneOf:
@@ -11692,18 +12298,34 @@ components:
           type: string
           description: System-generated tracking ID used by informants or registrars to
             look up the event.
+        potentialDuplicates:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              trackingId:
+                type: string
+            required:
+              - id
+              - trackingId
+          description: List of event IDs and their tracking IDs that this event could be a
+            duplicate of.
         flags:
           type: array
           items:
             anyOf:
               - type: string
-                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
                   - pending-certification
                   - incomplete
                   - rejected
                   - correction-requested
+                  - potential-duplicate
         declaration:
           type: object
           additionalProperties:
@@ -11845,6 +12467,7 @@ components:
         - updatedByUserRole
         - updatedAt
         - trackingId
+        - potentialDuplicates
         - flags
         - declaration
 
