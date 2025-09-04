@@ -14,7 +14,7 @@ import { last } from 'lodash'
 import { Kysely } from 'kysely'
 import {
   ActionType,
-  EventIndex,
+  EventDocument,
   generateUuid,
   SCOPES,
   UUID
@@ -130,7 +130,7 @@ test('Returns single duplicate when found', async () => {
   expect(duplicateEvents).toHaveLength(1)
 
   // Expect not to throw
-  EventIndex.parse(duplicateEvents[0])
+  EventDocument.parse(duplicateEvents[0])
 
   const eventActionsAfterGetDuplicates = await getEventActions(
     eventsDb,
