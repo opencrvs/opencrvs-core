@@ -32,6 +32,7 @@ import {
   ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
+import { EventIdParam } from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
 import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
 import {
@@ -148,7 +149,7 @@ export const eventRouter = router({
     }),
   getDuplicates: publicProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_REVIEW_DUPLICATES]))
-    .input(DeleteActionInput)
+    .input(EventIdParam)
     .use(middleware.requireAssignment)
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input.eventId)
