@@ -29,9 +29,7 @@ import {
   EventDocument,
   EventConfig,
   getAvailableActionsForEvent,
-  getCurrentEventState,
-  ACTION_ALLOWED_SCOPES,
-  hasAnyOfScopes
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -41,7 +39,7 @@ import { createTemporaryId } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
-import { getScope } from '@client/profile/profileSelectors'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
 
@@ -121,26 +119,19 @@ function useActionGuard(
   event: EventDocument,
   configuration: EventConfig
 ) {
-  const userScopes = useSelector(getScope) ?? []
-
   const eventState = getCurrentEventState(event, configuration)
-
   const availableActions = getAvailableActionsForEvent(eventState)
+  const { isActionAllowed } = useUserAllowedActions(event.type)
 
-  const isActionAllowed = availableActions.includes(actionType)
-  if (!isActionAllowed) {
-    // If the action is not available for the event, redirect to the overview page
+  // If the action is not available for the event, redirect to the overview page
+  if (!availableActions.includes(actionType)) {
     throw new Error(
       `Action ${actionType} not available for the event ${event.id} with status ${getCurrentEventState(event, configuration).status} ${eventState.flags.length > 0 ? `(flags: ${eventState.flags.join(', ')})` : ''}`
     )
   }
 
-  const requiredScopes = ACTION_ALLOWED_SCOPES[actionType]
-
-  const canUserPerformAction = hasAnyOfScopes(userScopes, requiredScopes)
-
-  if (!canUserPerformAction) {
-    // If the user cannot perform the action, redirect to the unauthorized page
+  // If the user may not perform the action, redirect to the unauthorized page
+  if (!isActionAllowed(actionType)) {
     throw new Error(
       `User does not have permission to perform action ${actionType} on event ${event.id}`
     )

@@ -259,7 +259,14 @@ export async function createIndex(
               }
             }
           },
-          flags: { type: 'keyword' }
+          flags: { type: 'keyword' },
+          potentialDuplicates: {
+            type: 'object',
+            properties: {
+              id: { type: 'keyword' },
+              trackingId: { type: 'keyword' }
+            }
+          }
         } satisfies EventIndexMapping
       }
     }

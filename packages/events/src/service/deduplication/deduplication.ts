@@ -14,13 +14,15 @@ import { DateTime } from 'luxon'
 import {
   EventIndex,
   DeduplicationConfig,
-  Clause,
   ClauseOutput,
   FieldValue,
   EventConfig,
   getDeclarationFieldById,
   DateValue,
-  FieldType
+  FieldType,
+  extractPotentialDuplicatesFromActions,
+  EventDocument,
+  getCurrentEventState
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
@@ -35,6 +37,9 @@ import {
   encodeFieldId,
   nameQueryKey
 } from '@events/service/indexing/utils'
+import { TrpcContext } from '../../context'
+import { getEventsAuditTrailed } from '../../storage/postgres/events/events'
+import { getEventConfigurationById } from '../config/config'
 
 export function generateElasticsearchQuery(
   eventIndex: EncodedEventIndex,
@@ -177,7 +182,7 @@ export async function searchForDuplicates(
   eventConfig: EventConfig
 ): Promise<{ score: number; event: EventIndex }[]> {
   const esClient = getOrCreateClient()
-  const query = Clause.parse(configuration.query)
+  const query = configuration.query
 
   const esQuery = generateElasticsearchQuery(
     encodeEventIndex(eventIndex, eventConfig),
@@ -208,4 +213,28 @@ export async function searchForDuplicates(
       event: decodeEventIndex(eventConfig, hit._source)
     }
   })
+}
+
+/**
+ * Given event, returns all the events that have been marked as duplicate.
+ */
+export async function getDuplicateEvents(
+  event: EventDocument,
+  ctx: TrpcContext
+) {
+  const duplicates = extractPotentialDuplicatesFromActions(event.actions)
+  const config = await getEventConfigurationById({
+    token: ctx.token,
+    eventType: event.type
+  })
+
+  if (duplicates.length === 0) {
+    return []
+  }
+
+  const duplicateEventIds = duplicates.map(({ id }) => id)
+
+  const events = await getEventsAuditTrailed(ctx.user, duplicateEventIds)
+
+  return events.map((e) => getCurrentEventState(e, config))
 }

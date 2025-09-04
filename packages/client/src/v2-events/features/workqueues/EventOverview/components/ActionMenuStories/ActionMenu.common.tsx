@@ -99,7 +99,7 @@ const mockActions: Record<
     ...actionProps,
     type: ActionType.REJECT_CORRECTION,
     requestId: '827bf7e8-0e1e-66e71287a2c8-aee7-4cef',
-    reason: { message: 'No legal proof' }
+    content: { reason: 'No legal proof' }
   },
   [ActionType.DELETE]: {
     ...actionProps,
@@ -109,28 +109,32 @@ const mockActions: Record<
     ...actionProps,
     type: ActionType.PRINT_CERTIFICATE
   },
-  [ActionType.MARKED_AS_DUPLICATE]: {
+  [ActionType.MARK_AS_DUPLICATE]: {
     ...actionProps,
-    type: ActionType.MARKED_AS_DUPLICATE
+    type: ActionType.MARK_AS_DUPLICATE
   },
   [ActionType.ARCHIVE]: {
     ...actionProps,
     type: ActionType.ARCHIVE,
-    reason: { message: 'Archived' }
+    content: { reason: 'Archived' }
   },
   [ActionType.REJECT]: {
     ...actionProps,
     type: ActionType.REJECT,
-    reason: { message: 'Rejected' }
+    content: { reason: 'Rejected' }
   },
   [ActionType.ASSIGN]: {
     ...actionProps,
     type: ActionType.ASSIGN,
     assignedTo: generator.user.id.localRegistrar
   },
-  [ActionType.DETECT_DUPLICATE]: {
+  [ActionType.DUPLICATE_DETECTED]: {
     ...actionProps,
-    type: ActionType.MARKED_AS_DUPLICATE
+    type: ActionType.MARK_AS_DUPLICATE
+  },
+  [ActionType.MARK_AS_NOT_DUPLICATE]: {
+    ...actionProps,
+    type: ActionType.MARK_AS_NOT_DUPLICATE
   }
 }
 
@@ -224,9 +228,10 @@ export function createStoriesFromScenarios(
       // Because Validate, Register and Review correction both have same message ('Review'),
       // We need to consider them as one
       const reviewLikeActions: (keyof typeof expected)[] = [
-        'VALIDATE',
-        'REGISTER',
-        'REVIEW_CORRECTION_REQUEST'
+        ActionType.VALIDATE,
+        ActionType.REGISTER,
+        ClientSpecificAction.REVIEW_CORRECTION_REQUEST,
+        ActionType.MARK_AS_DUPLICATE
       ]
       // Normalize all review-like actions to the **first non-hidden value**
       let normalizedValue: AssertType | undefined

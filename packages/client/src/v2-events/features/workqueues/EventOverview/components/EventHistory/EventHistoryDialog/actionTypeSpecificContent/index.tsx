@@ -24,7 +24,8 @@ export function getActionTypeSpecificContent(
 ) {
   const { type } = action
 
-  if (type === ActionType.ARCHIVE && action.reason.isDuplicate) {
+  //@todo check for duplicate flag
+  if (type === ActionType.ARCHIVE) {
     return <Archive />
   }
 

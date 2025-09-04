@@ -36,13 +36,11 @@ import {
   isFieldDisplayedOnReview,
   isPageVisible,
   runFieldValidations,
-  SCOPES,
   Location
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { getScope } from '@client/profile/profileSelectors'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -468,7 +466,8 @@ function ReviewComponent({
   readonlyMode,
   reviewFields,
   isCorrection = false,
-  correctionReview
+  isReviewCorrection = false,
+  banner
 }: {
   children?: React.ReactNode
   formConfig: FormConfig
@@ -490,12 +489,11 @@ function ReviewComponent({
   onAnnotationChange?: (values: EventState) => void
   readonlyMode?: boolean
   isCorrection?: boolean
-  correctionReview?: React.ReactNode
+  isReviewCorrection?: boolean
+  banner?: React.ReactNode
 }) {
-  const scopes = useSelector(getScope)
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
-  const isReviewCorrection = Boolean(correctionReview)
 
   const pageIdsWithFile = formConfig.pages
     .filter(({ fields }) =>
@@ -512,7 +510,7 @@ function ReviewComponent({
   return (
     <Row>
       <LeftColumn>
-        {correctionReview}
+        {banner}
         <Card>
           <ReviewHeader title={title} />
           <FormReview
@@ -551,10 +549,6 @@ function ReviewComponent({
             disabled={readonlyMode || isCorrection || isReviewCorrection}
             form={form}
             formConfig={formConfig}
-            // @todo: ask about this rule
-            showInMobile={
-              scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT) ?? false
-            }
             onEdit={() =>
               onEdit({ pageId: pageIdsWithFile[0], confirmation: true })
             }

@@ -25,12 +25,12 @@ import {
   PrintCertificateActionInput,
   DeclareActionInput,
   ValidateActionInput,
-  ACTION_ALLOWED_SCOPES,
-  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
+  ACTION_SCOPE_MAP,
   RequestCorrectionActionInput,
   ApproveCorrectionActionInput,
   RejectCorrectionActionInput,
-  getPendingAction
+  getPendingAction,
+  ActionInputWithType
 } from '@opencrvs/commons/events'
 import { TokenUserType } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
@@ -43,6 +43,7 @@ import {
   addAsyncRejectAction,
   throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
+import { TrpcUserContext } from '@events/context'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -165,6 +166,80 @@ type ActionProcedure = {
   }>
 }
 
+export async function defaultRequestHandler(
+  input: ActionInputWithType,
+  user: TrpcUserContext,
+  token: string,
+  actionConfirmationResponseSchema?: z.ZodType
+) {
+  await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
+
+  const eventWithRequestedAction = await addAction(input, {
+    user,
+    token,
+    status: ActionStatus.Requested
+  })
+
+  const { responseStatus, body } = await requestActionConfirmation(
+    input.type,
+    eventWithRequestedAction,
+    token
+  )
+
+  // If we get an unexpected failure response, we just return HTTP 500 without saving the
+  if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Unexpected failure from notification API'
+    })
+    // For Async flow, we just return the event with the requested action
+  } else if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
+    return eventWithRequestedAction
+  }
+
+  let status: ActionStatus = ActionStatus.Requested
+  let parsedBody
+
+  // If we immediately get a rejected response, we can mark the action as rejected
+  if (responseStatus === ActionConfirmationResponse.Rejected) {
+    status = ActionStatus.Rejected
+  }
+
+  // If we immediately get a success response, we mark the action as succeeded
+  // and also validate the payload received from the notify API
+  if (responseStatus === ActionConfirmationResponse.Success) {
+    status = ActionStatus.Accepted
+    if (actionConfirmationResponseSchema) {
+      try {
+        parsedBody = actionConfirmationResponseSchema.parse(body)
+      } catch {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Invalid payload received from notification API'
+        })
+      }
+    }
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { declaration, annotation, ...strippedInput } = input
+
+  const requestedAction = getPendingAction(eventWithRequestedAction.actions)
+
+  return addAction(
+    {
+      ...strippedInput,
+      declaration: {},
+      originalActionId: requestedAction.id,
+      ...parsedBody
+    },
+    {
+      user,
+      token,
+      status
+    }
+  )
+}
+
 /**
  * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
  * accepted or rejected, via the notify API. The notify APIs are HTTP APIs served by the countryconfig.
@@ -192,8 +267,8 @@ export function getDefaultActionProcedures(
   }
 
   const requireScopesMiddleware = requiresAnyOfScopes(
-    ACTION_ALLOWED_SCOPES[actionType],
-    ACTION_ALLOWED_CONFIGURABLE_SCOPES[actionType]
+    [],
+    ACTION_SCOPE_MAP[actionType]
   )
 
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
@@ -206,86 +281,25 @@ export function getDefaultActionProcedures(
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
+      .use(middleware.detectDuplicate)
       .use(middleware.requireLocationForSystemUserAction)
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
-        const { token, user, isDuplicateAction } = ctx
+        const { token, user, isDuplicateAction, duplicates } = ctx
 
         if (isDuplicateAction) {
           return ctx.event
         }
 
-        await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
+        if (duplicates.detected) {
+          return duplicates.event
+        }
 
-        const eventWithRequestedAction = await addAction(input, {
-          eventId: input.eventId,
+        return defaultRequestHandler(
+          input,
           user,
           token,
-          status: ActionStatus.Requested
-        })
-
-        const { responseStatus, body } = await requestActionConfirmation(
-          input.type,
-          eventWithRequestedAction,
-          token
-        )
-
-        // If we get an unexpected failure response, we just return HTTP 500 without saving the action
-        if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'Unexpected failure from notification API'
-          })
-          // For Async flow, we just return the event with the requested action
-        } else if (
-          responseStatus === ActionConfirmationResponse.RequiresProcessing
-        ) {
-          return eventWithRequestedAction
-        }
-
-        let status: ActionStatus = ActionStatus.Requested
-        let parsedBody
-
-        // If we immediately get a rejected response, we can mark the action as rejected
-        if (responseStatus === ActionConfirmationResponse.Rejected) {
-          status = ActionStatus.Rejected
-        }
-
-        // If we immediately get a success response, we mark the action as succeeded
-        // and also validate the payload received from the notify API
-        if (responseStatus === ActionConfirmationResponse.Success) {
-          status = ActionStatus.Accepted
-          if (actionConfirmationResponseSchema) {
-            try {
-              parsedBody = actionConfirmationResponseSchema.parse(body)
-            } catch {
-              throw new TRPCError({
-                code: 'INTERNAL_SERVER_ERROR',
-                message: 'Invalid payload received from notification API'
-              })
-            }
-          }
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { declaration, annotation, ...strippedInput } = input
-
-        const requestedAction = getPendingAction(
-          eventWithRequestedAction.actions
-        )
-
-        return addAction(
-          {
-            ...strippedInput,
-            declaration: {},
-            originalActionId: requestedAction.id,
-            ...parsedBody
-          },
-          {
-            eventId: input.eventId,
-            user,
-            token,
-            status
-          }
+          actionConfirmationResponseSchema
         )
       }),
 
@@ -326,7 +340,6 @@ export function getDefaultActionProcedures(
         return addAction(
           { ...input, originalActionId: actionId },
           {
-            eventId,
             user,
             token,
             status: ActionStatus.Accepted

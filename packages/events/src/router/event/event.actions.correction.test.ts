@@ -18,8 +18,7 @@ import {
   createPrng,
   EventDocument,
   generateActionDeclarationInput,
-  getUUID,
-  SCOPES
+  getUUID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -28,7 +27,7 @@ import {
   setupTestCase
 } from '@events/tests/utils'
 
-test(`${ActionType.REQUEST_CORRECTION} prevents forbidden access if missing required scope`, async () => {
+test('REQUEST_CORRECTION prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [])
 
@@ -41,19 +40,21 @@ test(`${ActionType.REQUEST_CORRECTION} prevents forbidden access if missing requ
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`${ActionType.REQUEST_CORRECTION} allows access if required scope is present`, async () => {
+test('REQUEST_CORRECTION allows access if required scope is present', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+  const client = createTestClient(user)
+
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER
   ])
 
   await expect(
     client.event.actions.correction.request.request(
-      generator.event.actions.correction.request(
-        'registered-event-test-id-12345'
-      )
+      generator.event.actions.correction.request(event.id)
     )
-  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+  ).resolves.not.toThrow()
 })
 
 test(`${ActionType.APPROVE_CORRECTION} prevents forbidden access if missing required scope`, async () => {
@@ -72,7 +73,9 @@ test(`${ActionType.APPROVE_CORRECTION} prevents forbidden access if missing requ
 
 test(`${ActionType.APPROVE_CORRECTION} allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_REGISTRATION_CORRECT])
+  const client = createTestClient(user, [
+    'record.registered.correct[event=v2.birth|v2.death|tennis-club-membership]'
+  ])
 
   await expect(
     client.event.actions.correction.approve.request(
@@ -93,7 +96,7 @@ test(`${ActionType.REJECT_CORRECTION} prevents forbidden access if missing requi
       generator.event.actions.correction.reject(
         'registered-event-test-id-12345',
         'request-test-id-12345',
-        { reason: { message: 'No legal proof' } }
+        { content: { reason: 'No legal proof' } }
       )
     )
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -101,14 +104,16 @@ test(`${ActionType.REJECT_CORRECTION} prevents forbidden access if missing requi
 
 test(`${ActionType.REJECT_CORRECTION} allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_REGISTRATION_CORRECT])
+  const client = createTestClient(user, [
+    'record.registered.correct[event=v2.birth|v2.death|tennis-club-membership]'
+  ])
 
   await expect(
     client.event.actions.correction.reject.request(
       generator.event.actions.correction.reject(
         'registered-event-test-id-12345',
         'request-test-id-12345',
-        { reason: { message: 'No legal proof' } }
+        { content: { reason: 'No legal proof' } }
       )
     )
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -142,7 +147,7 @@ test('a correction request can be added to a registered event', async () => {
   ])
 })
 
-test(`${ActionType.REQUEST_CORRECTION} validation error message contains all the offending fields`, async () => {
+test(`REQUEST_CORRECTION validation error message contains all the offending fields`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -165,7 +170,7 @@ test(`${ActionType.REQUEST_CORRECTION} validation error message contains all the
   ).rejects.matchSnapshot()
 })
 
-test(`${ActionType.REQUEST_CORRECTION} when mandatory field is invalid, conditional hidden fields are still skipped`, async () => {
+test(`REQUEST_CORRECTION when mandatory field is invalid, conditional hidden fields are still skipped`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -196,7 +201,7 @@ test(`${ActionType.REQUEST_CORRECTION} when mandatory field is invalid, conditio
   ).rejects.matchSnapshot()
 })
 
-test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they are conditionally hidden`, async () => {
+test(`REQUEST_CORRECTION Skips required field validation when they are conditionally hidden`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -242,7 +247,7 @@ test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they
   }
 })
 
-test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, async () => {
+test(`REQUEST_CORRECTION Prevents adding birth date in future`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -440,8 +445,8 @@ test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
     actionId,
     {
       keepAssignment: true,
-      reason: {
-        message: 'no legal proof'
+      content: {
+        reason: 'no legal proof'
       }
     }
   )

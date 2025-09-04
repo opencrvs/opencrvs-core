@@ -9,12 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { TRPCError } from '@trpc/server'
-import { ActionType, generateUuid, getUUID, SCOPES } from '@opencrvs/commons'
-import {
-  createTestClient,
-  setupTestCase,
-  TEST_USER_DEFAULT_SCOPES
-} from '@events/tests/utils'
+import { ActionType, generateUuid, getUUID } from '@opencrvs/commons'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -25,13 +21,22 @@ test('prevents forbidden access if missing required scope', async () => {
   )
 })
 
-test(`allows access with required scope`, async () => {
+test('allows access if required scope does not have correct event type configured', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_READ])
+  const client = createTestClient(user, [
+    'record.declare[event=tennis-club-membership]',
+    'record.read[event=v2.birth]'
+  ])
 
-  await expect(client.event.get(generateUuid())).rejects.not.toMatchObject(
-    new TRPCError({ code: 'FORBIDDEN' })
-  )
+  await expect(client.event.get(generateUuid())).rejects.toMatchSnapshot()
+})
+
+test('allows access with required scope', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  await expect(client.event.get(event.id)).resolves.not.toThrow()
 })
 
 test(`Returns 404 when not found`, async () => {
@@ -63,10 +68,7 @@ test('Returns event', async () => {
 
 test('Returns event with all actions', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    ...TEST_USER_DEFAULT_SCOPES,
-    SCOPES.RECORD_SUBMIT_INCOMPLETE
-  ])
+  const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
   await client.event.actions.notify.request(
@@ -152,7 +154,7 @@ test('Returns event with all actions', async () => {
       // last action is the assign action and 2nd last is the automatic unassign action
       correctionRequest.actions[correctionRequest.actions.length - 2].id,
       {
-        reason: { message: 'No legal proof' }
+        content: { reason: 'No legal proof' }
       }
     )
   )

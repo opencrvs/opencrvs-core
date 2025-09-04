@@ -12,7 +12,7 @@
 import { deepDropNulls, getCurrentEventState } from '.'
 import { tennisClubMembershipEvent } from '../../fixtures'
 import { getUUID, UUID } from '../../uuid'
-import { ActionStatus } from '../ActionDocument'
+import { ActionStatus, EventState } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { AddressType } from '../CompositeFieldValue'
 import { EventStatus, InherentFlags } from '../EventMetadata'
@@ -296,9 +296,12 @@ describe('getCurrentEventState()', () => {
       status: EventStatus.enum.REGISTERED,
       updatedByUserRole: registerRequestAction.createdByRole,
       updatedAtLocation: registerRequestAction.createdAtLocation,
-      declaration: deepDropNulls(declareRequestAction.declaration),
+      declaration: deepDropNulls(
+        declareRequestAction.declaration
+      ) as EventState,
       dateOfEvent: event.createdAt.split('T')[0],
       flags: [InherentFlags.PENDING_CERTIFICATION],
+      potentialDuplicates: [],
       legalStatuses: {
         [EventStatus.enum.DECLARED]: {
           createdAt: declareRequestAction.createdAt,
@@ -415,9 +418,10 @@ describe('getCurrentEventState()', () => {
       status: EventStatus.enum.REGISTERED,
       updatedByUserRole: registerAcceptAction.createdByRole,
       updatedAtLocation: registerAcceptAction.createdAtLocation,
-      declaration: deepDropNulls(declareAcceptAction.declaration),
+      declaration: deepDropNulls(declareAcceptAction.declaration) as EventState,
       dateOfEvent: event.createdAt.split('T')[0],
       flags: [InherentFlags.PENDING_CERTIFICATION],
+      potentialDuplicates: [],
       legalStatuses: {
         [EventStatus.enum.DECLARED]: {
           createdAt: declareAcceptAction.createdAt,

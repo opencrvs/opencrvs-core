@@ -20,12 +20,12 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import ReactTooltip from 'react-tooltip'
 import toast from 'react-hot-toast'
+import { useSelector } from 'react-redux'
 import {
   ActionType,
   EventConfig,
   getOrThrow,
   getAcceptedActions,
-  SCOPES,
   SystemRole
 } from '@opencrvs/commons/client'
 import {
@@ -49,11 +49,12 @@ import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
-import ProtectedComponent from '@client/components/ProtectedComponent'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useOnlineStatus } from '@client/utils'
+import { getScope } from '@client/profile/profileSelectors'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 
 const CertificateContainer = styled.div`
   svg {
@@ -184,6 +185,7 @@ export function Review() {
 
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const formConfig = getPrintForm(eventConfiguration)
+  const { isActionAllowed } = useUserAllowedActions(fullEvent.type)
 
   const { svgCode, preparePdfCertificate } = usePrintableCertificate({
     event: fullEvent,
@@ -305,6 +307,20 @@ export function Review() {
     }
   }
 
+  // Display make correction button only if the user has permission to correct or request correction
+  const userMayCorrect =
+    isActionAllowed(ActionType.REQUEST_CORRECTION) ||
+    isActionAllowed(ActionType.APPROVE_CORRECTION)
+
+  const makeCorrectionButton = userMayCorrect ? (
+    <Button fullWidth size="large" type="negative" onClick={handleCorrection}>
+      <Icon name="X" size="medium" />
+      {intl.formatMessage(messages.makeCorrection)}
+    </Button>
+  ) : (
+    <></>
+  )
+
   return (
     <FormLayout
       appbarIcon={<Print />}
@@ -330,23 +346,7 @@ export function Review() {
           <Content
             showTitleOnMobile
             bottomActionButtons={[
-              <ProtectedComponent
-                key="edit-record"
-                scopes={[
-                  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-                  SCOPES.RECORD_REGISTRATION_CORRECT
-                ]}
-              >
-                <Button
-                  fullWidth
-                  size="large"
-                  type="negative"
-                  onClick={handleCorrection}
-                >
-                  <Icon name="X" size="medium" />
-                  {intl.formatMessage(messages.makeCorrection)}
-                </Button>
-              </ProtectedComponent>,
+              makeCorrectionButton,
               <TooltipContainer
                 key="confirm-and-print"
                 data-tip

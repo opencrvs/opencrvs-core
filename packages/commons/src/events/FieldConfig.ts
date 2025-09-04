@@ -81,7 +81,14 @@ const BaseField = z.object({
     ),
   value: FieldReference.optional().describe(
     'Reference to a parent field. If field has a value, the value will be copied when the parent field is changed.'
-  )
+  ),
+  analytics: z
+    .boolean()
+    .default(false)
+    .optional()
+    .describe(
+      'Meta field for analytics to allow filtering non-analytics fields away'
+    )
 })
 
 export type BaseField = z.infer<typeof BaseField>
