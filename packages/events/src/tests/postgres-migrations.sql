@@ -61,7 +61,7 @@ CREATE TYPE app.action_type AS ENUM (
     'READ',
     'ASSIGN',
     'UNASSIGN',
-    'MARK_NOT_DUPLICATE'
+    'MARK_AS_NOT_DUPLICATE'
 );
 
 

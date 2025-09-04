@@ -27,7 +27,8 @@ const notificationQueueSchema = new Schema({
   locale: { type: String, required: true },
   createdAt: { type: Number, default: Date.now },
   error: { type: errorSchema },
-  requestId: { type: String, required: true }
+  requestId: { type: String, required: true },
+  retryCount: { type: Number, default: 0 }
 })
 
 export type NotificationQueueRecord = { _id: Types.ObjectId } & InferSchemaType<

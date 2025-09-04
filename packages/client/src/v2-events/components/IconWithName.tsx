@@ -11,7 +11,7 @@
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons'
+import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
 import { Flag, InherentFlags } from '@opencrvs/commons/client'
 
 export const Flex = styled.div`
@@ -81,11 +81,15 @@ export function IconWithName({
   return (
     <Flex id="flex">
       <Icon>
-        <DeclarationIcon
-          color={getIconColor(status, flags)}
-          isArchive={isArchived}
-          isValidatedOnReview={isValidatedOnReview}
-        />
+        {flags?.includes(InherentFlags.POTENTIAL_DUPLICATE) ? (
+          <Duplicate />
+        ) : (
+          <DeclarationIcon
+            color={getIconColor(status, flags)}
+            isArchive={isArchived}
+            isValidatedOnReview={isValidatedOnReview}
+          />
+        )}
       </Icon>
       {name}
     </Flex>

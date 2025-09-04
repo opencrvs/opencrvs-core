@@ -243,7 +243,7 @@ export async function deleteUnreferencedFilesFromPreviousDrafts(
   }
 }
 
-function buildAction(
+export function buildAction(
   input: ActionInputWithType,
   status: ActionStatus,
   user: TrpcUserContext
@@ -298,14 +298,13 @@ function buildAction(
     }
     case ActionType.REJECT:
     case ActionType.ARCHIVE:
-    case ActionType.DUPLICATE_DETECTED:
     case ActionType.PRINT_CERTIFICATE:
     case ActionType.READ:
     case ActionType.CREATE:
     case ActionType.NOTIFY:
     case ActionType.DECLARE:
     case ActionType.VALIDATE:
-    case ActionType.MARK_NOT_DUPLICATE:
+    case ActionType.MARK_AS_NOT_DUPLICATE:
     case ActionType.MARK_AS_DUPLICATE:
     case ActionType.DUPLICATE_DETECTED:
     case ActionType.REQUEST_CORRECTION: {
