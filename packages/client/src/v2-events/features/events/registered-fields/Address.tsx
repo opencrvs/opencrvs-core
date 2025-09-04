@@ -452,24 +452,23 @@ function toCertificateVariables(
   context: {
     intl: IntlShape
     locations: Location[]
+    adminLevels: IAdminStructureItem[]
   }
 ) {
   /*
    * As address is just a collection of other form fields, its string formatter just redirects the data back to
    * form data stringifier so location and other form fields can handle stringifying their own data
    */
-
-  const { config } = useSelector(getOfflineData)
-  const appConfigAdminLevels = config.ADMIN_STRUCTURE.map((level) => level.id)
+  const { intl, locations, adminLevels } = context
+  const appConfigAdminLevels = adminLevels.map((level) => level.id)
 
   const { administrativeArea, streetLevelDetails } = value
-  const { intl, locations } = context
 
   const adminStructureLocations = locations.filter(
     (location) => location.locationType === 'ADMIN_STRUCTURE'
   )
 
-  const adminLevels = getAdminLevelHierarchy(
+  const adminLevelHierarchy = getAdminLevelHierarchy(
     administrativeArea,
     adminStructureLocations,
     appConfigAdminLevels,
@@ -481,7 +480,7 @@ function toCertificateVariables(
 
   return {
     ...stringifiedResult,
-    ...adminLevels,
+    ...adminLevelHierarchy,
     streetLevelDetails
   }
 }
