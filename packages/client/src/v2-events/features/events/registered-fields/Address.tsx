@@ -452,7 +452,7 @@ function toCertificateVariables(
   context: {
     intl: IntlShape
     locations: Location[]
-    adminLevels: IAdminStructureItem[]
+    adminLevels?: IAdminStructureItem[]
   }
 ) {
   /*
@@ -460,7 +460,7 @@ function toCertificateVariables(
    * form data stringifier so location and other form fields can handle stringifying their own data
    */
   const { intl, locations, adminLevels } = context
-  const appConfigAdminLevels = adminLevels.map((level) => level.id)
+  const appConfigAdminLevels = adminLevels?.map((level) => level.id)
 
   const { administrativeArea, streetLevelDetails } = value
 
@@ -471,7 +471,7 @@ function toCertificateVariables(
   const adminLevelHierarchy = getAdminLevelHierarchy(
     administrativeArea,
     adminStructureLocations,
-    appConfigAdminLevels,
+    appConfigAdminLevels as string[],
     'withNames'
   )
 

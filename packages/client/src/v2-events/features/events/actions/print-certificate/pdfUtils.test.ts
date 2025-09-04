@@ -173,7 +173,25 @@ function expectRenderOutput(template: string, output: string) {
     locations: [],
     users: [],
     language: { lang: 'en', messages: {} },
-    config: tennisClubMembershipEvent
+    config: tennisClubMembershipEvent,
+    adminLevels: [
+      {
+        id: 'province',
+        label: {
+          id: 'v2.field.address.province.label',
+          defaultMessage: 'Province',
+          description: 'Label for province in address'
+        }
+      },
+      {
+        id: 'district',
+        label: {
+          id: 'v2.field.address.district.label',
+          defaultMessage: 'District',
+          description: 'Label for district in address'
+        }
+      }
+    ]
   })
   expect(result).toBe(output)
 }
