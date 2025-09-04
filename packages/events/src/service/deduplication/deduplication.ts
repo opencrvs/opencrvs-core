@@ -20,7 +20,7 @@ import {
   getDeclarationFieldById,
   DateValue,
   FieldType,
-  extractDuplicatesFromActions,
+  extractPotentialDuplicatesFromActions,
   EventDocument,
   getCurrentEventState
 } from '@opencrvs/commons/events'
@@ -222,7 +222,7 @@ export async function getDuplicateEvents(
   event: EventDocument,
   ctx: TrpcContext
 ) {
-  const duplicates = extractDuplicatesFromActions(event.actions)
+  const duplicates = extractPotentialDuplicatesFromActions(event.actions)
   const config = await getEventConfigurationById({
     token: ctx.token,
     eventType: event.type
