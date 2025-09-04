@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 57920403-89ed-4a45-a68a-137e80cf461f
+                transactionId: c9a4afd7-cb21-48d8-b62a-a7f65699961c
                 type: v2.birth
       responses:
         "200":
@@ -535,7 +535,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 5821e862-9141-4758-aca5-465021c331df
+                transactionId: 38b3dc81-8a32-4554-be30-8c9576d50f0f
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -7220,7 +7220,7 @@ components:
           VALIDATE: "#/components/schemas/ValidateAction"
           REJECT: "#/components/schemas/RejectAction"
           DUPLICATE_DETECTED: "#/components/schemas/DuplicateDetectedAction"
-          MARK_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateAction"
+          MARK_AS_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateAction"
           MARK_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateAction"
           ARCHIVE: "#/components/schemas/ArchiveAction"
           NOTIFY: "#/components/schemas/NotifiedAction"
@@ -9464,7 +9464,7 @@ components:
         type:
           type: string
           enum:
-            - MARK_NOT_DUPLICATE
+            - MARK_AS_NOT_DUPLICATE
       required:
         - id
         - transactionId
@@ -9907,6 +9907,14 @@ components:
           type: string
           enum:
             - MARK_AS_DUPLICATE
+        content:
+          type: object
+          properties:
+            duplicateOf:
+              type: string
+              format: uuid
+          required:
+            - duplicateOf
       required:
         - id
         - transactionId
@@ -15056,7 +15064,7 @@ components:
           items:
             anyOf:
               - type: string
-                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
                   - pending-certification
@@ -15069,7 +15077,7 @@ components:
           items:
             anyOf:
               - type: string
-                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
                   - pending-certification
@@ -15292,7 +15300,7 @@ components:
           type: string
           description: System-generated tracking ID used by informants or registrars to
             look up the event.
-        duplicates:
+        potentialDuplicates:
           type: array
           items:
             type: object
@@ -15312,7 +15320,7 @@ components:
           items:
             anyOf:
               - type: string
-                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
                   - pending-certification
@@ -15524,7 +15532,7 @@ components:
         - updatedByUserRole
         - updatedAt
         - trackingId
-        - duplicates
+        - potentialDuplicates
         - flags
         - declaration
 
