@@ -65,6 +65,8 @@ const recommenderOtherThanClubMembers = and(
   not(field('recommender.relation').isFalsy())
 )
 
+// misc change
+
 const overriddenEventConfig = {
   ...tennisClubMembershipEvent,
   id: 'v2.death', // use an existing event id, so that permissions to it are in scopes
