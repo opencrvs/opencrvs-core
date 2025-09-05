@@ -230,7 +230,7 @@ function useViewableActionConfigurations(
     event.type
   )
 
-  const isAssignMutationFetching = events.actions.assignment.assign.isAssigning(
+  const isAssignmentInProgress = events.actions.assignment.assign.isAssigning(
     event.id
   )
 
@@ -382,7 +382,7 @@ function useViewableActionConfigurations(
             )
           )
         },
-        disabled: !isDownloadedAndAssignedToUser || isAssignMutationFetching
+        disabled: !isDownloadedAndAssignedToUser || isAssignmentInProgress
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
