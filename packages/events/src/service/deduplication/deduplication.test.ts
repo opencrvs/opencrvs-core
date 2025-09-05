@@ -399,7 +399,7 @@ describe('deduplication tests', () => {
     })
   })
 
-  it('finds a duplicate for even there is a 3 year gap', async () => {
+  it('finds a duplicate even if there is a 3 year gap', async () => {
     await expect(
       findDuplicates({
         'child.dob': ['2011-11-11', '2014-11-01'],
@@ -415,5 +415,23 @@ describe('deduplication tests', () => {
         'mother.nid': ['23412387', '23412387']
       })
     ).resolves.toHaveLength(1)
+  })
+
+  it('does not find a duplicate if there is a missing field value', async () => {
+    await expect(
+      findDuplicates({
+        'child.dob': ['2011-11-11', ''],
+        'child.name': [
+          { firstname: 'John', surname: 'Smith' },
+          { firstname: 'John', surname: 'Smith' }
+        ],
+        'mother.name': [
+          { firstname: 'Mother', surname: 'Smith' },
+          { firstname: 'Mother', surname: 'Smith' }
+        ],
+        'mother.dob': ['2000-11-12', '2000-11-12'],
+        'mother.nid': ['23412387', '23412387']
+      })
+    ).resolves.toHaveLength(0)
   })
 })
