@@ -20,7 +20,7 @@ import {
   Text,
   TextArea
 } from '@opencrvs/components'
-import { PotentialDuplicate } from '@opencrvs/commons/client'
+import { PotentialDuplicate, UUID } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { duplicateMessages } from './ReviewDuplicate'
 
@@ -32,18 +32,22 @@ const StyledTextArea = styled(TextArea)`
   border-radius: 4px;
   margin-bottom: 24px;
 `
+export interface MarkAsDuplicateContent {
+  duplicateOf: UUID
+  reason: string
+}
 
 export function MarkAsDuplicateModal({
   close,
   duplicates,
   originalTrackingId
 }: {
-  close: (selectedTrackingId?: string) => void
+  close: (content?: MarkAsDuplicateContent) => void
   duplicates: PotentialDuplicate[]
   originalTrackingId: string
 }) {
   const intl = useIntl()
-  const [selectedTrackingId, setSelectedTrackingId] = React.useState('')
+  const [duplicateOf, setDuplicateOf] = React.useState('')
   const [comment, setComment] = React.useState('')
 
   const handleCommentChange = (
@@ -64,10 +68,12 @@ export function MarkAsDuplicateModal({
         </Button>,
         <Button
           key="mark-as-duplicate-button"
-          disabled={!(Boolean(selectedTrackingId) && Boolean(comment))}
+          disabled={!(Boolean(duplicateOf) && Boolean(comment))}
           id="mark-as-duplicate-button"
           type="negative"
-          onClick={() => close(selectedTrackingId)}
+          onClick={() =>
+            close({ duplicateOf: duplicateOf as UUID, reason: comment })
+          }
         >
           {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
         </Button>
@@ -93,13 +99,13 @@ export function MarkAsDuplicateModal({
           <Select
             id="selectTrackingId"
             isDisabled={false}
-            options={duplicates.map(({ trackingId }) => ({
-              value: trackingId,
+            options={duplicates.map(({ id, trackingId }) => ({
+              value: id,
               label: trackingId
             }))}
-            value={selectedTrackingId}
+            value={duplicateOf}
             onChange={(val: string) => {
-              setSelectedTrackingId(val)
+              setDuplicateOf(val)
             }}
           />
           <StyledText element="span" variant="reg18">

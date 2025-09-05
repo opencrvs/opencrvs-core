@@ -28,7 +28,10 @@ import { useEventTitle } from '../../useEvents/useEventTitle'
 import { useEvents } from '../../useEvents/useEvents'
 import { duplicateMessages } from './ReviewDuplicate'
 import { MarkAsNotDuplicateModal } from './MarkAsNotDuplicateModal'
-import { MarkAsDuplicateModal } from './MarkAsDuplicateModal'
+import {
+  MarkAsDuplicateContent,
+  MarkAsDuplicateModal
+} from './MarkAsDuplicateModal'
 
 const SubPageContent = styled(Content)`
   margin: auto 0 20px;
@@ -102,29 +105,18 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
       id="mark-as-duplicate"
       type="negative"
       onClick={async () => {
-        const duplicateTrackingId = await openModal<string | undefined>(
-          (close) => (
-            <MarkAsDuplicateModal
-              close={close}
-              duplicates={eventIndex.potentialDuplicates}
-              originalTrackingId={eventIndex.trackingId}
-            />
-          )
-        )
-        if (duplicateTrackingId) {
-          const duplicateId = eventIndex.potentialDuplicates.find(
-            ({ trackingId }) => trackingId === duplicateTrackingId
-          )?.id
-          if (!duplicateId) {
-            throw new Error(
-              `Id not found for tracking id ${duplicateTrackingId}. Should never happen.`
-            )
-          }
+        const markAsDuplicateContent = await openModal<
+          MarkAsDuplicateContent | undefined
+        >((close) => (
+          <MarkAsDuplicateModal
+            close={close}
+            duplicates={eventIndex.potentialDuplicates}
+            originalTrackingId={eventIndex.trackingId}
+          />
+        ))
+        if (markAsDuplicateContent) {
           customActions.archiveOnDuplicate.mutate({
-            content: {
-              duplicateOf: duplicateId,
-              reason: `Duplicate of ${duplicateId}`
-            },
+            content: markAsDuplicateContent,
             transactionId: getUUID(),
             eventId: eventIndex.id,
             declaration: {}
