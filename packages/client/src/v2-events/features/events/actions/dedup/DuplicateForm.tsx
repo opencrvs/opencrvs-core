@@ -115,20 +115,8 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
           />
         ))
         if (markAsDuplicateContent) {
-          const { selectedTrackingId, reason } = markAsDuplicateContent
-          const duplicateId = eventIndex.potentialDuplicates.find(
-            ({ trackingId }) => trackingId === selectedTrackingId
-          )?.id
-          if (!duplicateId) {
-            throw new Error(
-              `Id not found for tracking id ${selectedTrackingId}. Should never happen.`
-            )
-          }
           customActions.archiveOnDuplicate.mutate({
-            content: {
-              duplicateOf: duplicateId,
-              reason
-            },
+            content: markAsDuplicateContent,
             transactionId: getUUID(),
             eventId: eventIndex.id,
             declaration: {}
