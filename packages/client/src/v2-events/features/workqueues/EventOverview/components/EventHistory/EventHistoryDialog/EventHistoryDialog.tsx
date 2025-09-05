@@ -22,7 +22,7 @@ import {
 } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
 import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
-import { getActionTypeSpecificContent } from './actionTypeSpecificContent'
+import { ActionTypeSpecificContent } from './ActionTypeSpecificContent'
 
 export const eventHistoryStatusMessage = {
   id: `v2.events.history.status`,
@@ -194,7 +194,7 @@ export function EventHistoryDialog({
           noResultText=" "
         />
       )}
-      {getActionTypeSpecificContent(action, fullEvent)}
+      <ActionTypeSpecificContent action={action} fullEvent={fullEvent} />
     </ResponsiveModal>
   )
 }
