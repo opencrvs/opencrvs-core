@@ -39,6 +39,11 @@ import {
 import { TrpcContext } from '../../context'
 import { getEventsAuditTrailed } from '../../storage/postgres/events/events'
 
+/**
+ * If the value referenced in a query is missing, the query resolves to null
+ * The `and` query resolves to null if any of the sub-queries is null,
+ * while the `or` query resolves to null if all of the sub-queries are null
+ */
 export function generateElasticsearchQuery(
   eventIndex: EncodedEventIndex,
   queryInput: ClauseOutput,
@@ -49,10 +54,6 @@ export function generateElasticsearchQuery(
       return generateElasticsearchQuery(eventIndex, clause, eventConfig)
     })
 
-    /*
-     * This ensures that if any of values referenced in the query are missing,
-     * the query is skipped
-     */
     if (resolvedQueries.some((q) => q === null)) {
       return null
     }
@@ -66,15 +67,19 @@ export function generateElasticsearchQuery(
       }
     }
   } else if (queryInput.type === 'or') {
+    const resolvedQueries = queryInput.clauses.map((clause) => {
+      return generateElasticsearchQuery(eventIndex, clause, eventConfig)
+    })
+
+    if (resolvedQueries.every((q) => q === null)) {
+      return null
+    }
+
     return {
       bool: {
-        should: queryInput.clauses
-          .map((clause) =>
-            generateElasticsearchQuery(eventIndex, clause, eventConfig)
-          )
-          .filter(
-            (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
-          )
+        should: resolvedQueries.filter(
+          (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
+        )
       }
     }
   }
