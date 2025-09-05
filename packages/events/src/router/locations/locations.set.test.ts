@@ -100,6 +100,7 @@ test('seeding locations is additive, not destructive', async () => {
     initialLocations.length + initialPayload.length
   )
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_removedLocation, ...remainingLocationsPayload] = initialPayload
 
   await dataSeedingClient.locations.set(remainingLocationsPayload)
