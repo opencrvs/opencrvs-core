@@ -255,7 +255,7 @@ export function generateActionDuplicateDeclarationInput(
   ...args: Parameters<typeof generateActionDeclarationInput>
 ): ReturnType<typeof generateActionDeclarationInput> {
   const [configuration, action, rng, overrides] = args
-  return generateActionDuplicateDeclarationInput(configuration, action, rng, {
+  return generateActionDeclarationInput(configuration, action, rng, {
     ...overrides,
     'applicant.dobUnknown': false
   })
