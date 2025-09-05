@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+import { first } from 'lodash'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
 import {
@@ -16,12 +16,14 @@ import {
   SearchQuery,
   UUID,
   getCurrentEventState,
-  applyDraftToEventIndex,
-  getUUID
+  getUUID,
+  EventDocument,
+  getOrThrow,
+  applyDraftToEventIndex
 } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 import { useDrafts } from '../../drafts/useDrafts'
-import { useEventConfiguration } from '../useEventConfiguration'
+import { useEventConfigurations } from '../useEventConfiguration'
 import { prefetchPotentialDuplicates } from '../actions/dedup/getDuplicates'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
@@ -34,7 +36,7 @@ import {
 } from './procedures/actions/action'
 import { useGetEvents } from './procedures/list'
 import { useGetEventCounts } from './procedures/count'
-import { findLocalEventIndex } from './api'
+import { findLocalEventDocument, findLocalEventIndex } from './api'
 import { QueryOptions } from './procedures/utils'
 
 export function useEvents() {
@@ -42,7 +44,14 @@ export function useEvents() {
   const getEvent = useGetEvent()
   const getEvents = useGetEvents()
   const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
-  const { getRemoteDraftByEventId } = useDrafts()
+  const eventConfigs = useEventConfigurations()
+  const { getAllRemoteDrafts } = useDrafts()
+
+  const drafts = getAllRemoteDrafts({
+    refetchOnMount: 'always',
+    staleTime: 0,
+    refetchInterval: 20000
+  })
 
   return {
     createEvent: useCreateEvent,
@@ -82,13 +91,6 @@ export function useEvents() {
     },
     searchEventById: {
       useQuery: (id: string) => {
-        const event = getEvent.findFromCache(id).data
-        if (!event) {
-          throw new Error(`No event or draft cached: ${id}`)
-        }
-        const { eventConfiguration: configuration } = useEventConfiguration(
-          event.type
-        )
         const query = {
           type: 'and',
           clauses: [{ id }]
@@ -103,31 +105,55 @@ export function useEvents() {
           staleTime: 0,
           refetchOnMount: 'always',
           queryFn: async (...args) => {
-            // First, check the draft list for a matching event
-            const draft = getRemoteDraftByEventId(id)
-
-            // If a draft is found, reshape it and return
-            if (draft) {
-              const eventState = getCurrentEventState(event, configuration)
-              // The draft needs to be reshaped to match the elasticsearch data shape
-              return {
-                results: [
-                  applyDraftToEventIndex(eventState, draft, configuration)
-                ],
-                total: 1
-              }
-            }
-
-            // If no draft is found, fall back to the original elasticsearch query
+            // Try Elasticsearch first
             const queryFn = options.queryFn
             if (!queryFn) {
               throw new Error('Query function is not defined')
             }
+
             const res = await queryFn(...args)
-            if (res.total === 0) {
-              throw new Error(`No event or draft found with id: ${id}`)
+            if (res.total > 0) {
+              return res
             }
-            return res
+
+            // Search for drafts if record is not found in ES
+            const eventsWithDrafts = drafts
+              .map(({ eventId }) => findLocalEventDocument(eventId))
+              .filter((event): event is EventDocument => !!event)
+              .map((event) => {
+                const draft = first(
+                  drafts.filter((d) => d.eventId === event.id)
+                )
+                const configuration = getOrThrow(
+                  eventConfigs.find(
+                    ({ id: eventConfigId }) => eventConfigId === event.type
+                  ),
+                  `Event configuration not found for ${event.type}`
+                )
+
+                const currentEventState = getCurrentEventState(
+                  event,
+                  configuration
+                )
+                return draft
+                  ? applyDraftToEventIndex(
+                      currentEventState,
+                      draft,
+                      configuration
+                    )
+                  : currentEventState
+              })
+
+            const eventState = eventsWithDrafts.find((event) => event.id === id)
+            if (eventState) {
+              return {
+                results: [eventState],
+                total: 1
+              }
+            }
+
+            // Nothing found → throw
+            throw new Error(`No event or draft found with id: ${id}`)
           },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
@@ -136,10 +162,6 @@ export function useEvents() {
         })
       },
       useSuspenseQuery: (id: string) => {
-        const event = getEvent.viewEvent(id)
-        const { eventConfiguration: configuration } = useEventConfiguration(
-          event.type
-        )
         const query = {
           type: 'and',
           clauses: [{ id }]
@@ -151,31 +173,54 @@ export function useEvents() {
           ...options,
           queryKey: trpc.event.search.queryKey({ query }),
           queryFn: async (...args) => {
-            // First, check the draft list for a matching event
-            const draft = getRemoteDraftByEventId(id)
-
-            // If a draft is found, reshape it and return
-            if (draft) {
-              const eventState = getCurrentEventState(event, configuration)
-              // The draft needs to be reshaped to match the elasticsearch data shape
-              return {
-                results: [
-                  applyDraftToEventIndex(eventState, draft, configuration)
-                ],
-                total: 1
-              }
-            }
-
-            // If no draft is found, fall back to the original elasticsearch query
+            // Try Elasticsearch first
             const queryFn = options.queryFn
             if (!queryFn) {
               throw new Error('Query function is not defined')
             }
             const res = await queryFn(...args)
-            if (res.total === 0) {
-              throw new Error(`No event or draft found with id: ${id}`)
+            if (res.total > 0) {
+              return res
             }
-            return res
+
+            // Search for drafts if record is not found in ES
+            const eventsWithDrafts = drafts
+              .map(({ eventId }) => findLocalEventDocument(eventId))
+              .filter((event): event is EventDocument => !!event)
+              .map((event) => {
+                const draft = first(
+                  drafts.filter((d) => d.eventId === event.id)
+                )
+                const configuration = getOrThrow(
+                  eventConfigs.find(
+                    ({ id: eventConfigId }) => eventConfigId === event.type
+                  ),
+                  `Event configuration not found for ${event.type}`
+                )
+
+                const currentEventState = getCurrentEventState(
+                  event,
+                  configuration
+                )
+                return draft
+                  ? applyDraftToEventIndex(
+                      currentEventState,
+                      draft,
+                      configuration
+                    )
+                  : currentEventState
+              })
+
+            const eventState = eventsWithDrafts.find((event) => event.id === id)
+            if (eventState) {
+              return {
+                results: [eventState],
+                total: 1
+              }
+            }
+
+            // Nothing found → throw
+            throw new Error(`No event or draft found with id: ${id}`)
           },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
