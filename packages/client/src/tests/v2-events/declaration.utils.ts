@@ -205,6 +205,20 @@ export const createDeclarationTrpcMsw = (
           })
       },
       {
+        name: 'event.actions.duplicate.markAsDuplicate',
+        procedure: trpcMsw.event.actions.duplicate.markAsDuplicate.mutation,
+        handler: () =>
+          generateEventDocument({
+            configuration: tennisClubMembershipEvent,
+            actions: [
+              ActionType.CREATE,
+              ActionType.DECLARE,
+              ActionType.VALIDATE,
+              ActionType.MARK_AS_DUPLICATE
+            ]
+          })
+      },
+      {
         name: 'event.actions.reject.request',
         procedure: trpcMsw.event.actions.reject.request.mutation,
         handler: () =>
