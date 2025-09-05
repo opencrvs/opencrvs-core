@@ -19,7 +19,9 @@ import {
   getUUID,
   EventDocument,
   getOrThrow,
-  applyDraftToEventIndex
+  applyDraftToEventIndex,
+  EventConfig,
+  Draft
 } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 import { useDrafts } from '../../drafts/useDrafts'
@@ -39,13 +41,45 @@ import { useGetEventCounts } from './procedures/count'
 import { findLocalEventDocument, findLocalEventIndex } from './api'
 import { QueryOptions } from './procedures/utils'
 
+function getEventWithDraftOrThrow(
+  id: string,
+  eventConfigs: EventConfig[],
+  getRemoteDraftByEventId: (draftId: string) => Draft | undefined
+): { event: EventDocument; draft: Draft; configuration: EventConfig } {
+  const event = findLocalEventDocument(id)
+  const draft = getRemoteDraftByEventId(id)
+
+  if (!event || !draft) {
+    throw new Error(`No event or draft found with id: ${id}`)
+  }
+
+  const configuration = getOrThrow(
+    eventConfigs.find(({ id: cfgId }) => cfgId === event.type),
+    `Event configuration not found for ${event.type}`
+  )
+
+  return { event, draft, configuration }
+}
+
+function buildDraftedEventResult(
+  event: EventDocument,
+  draft: Draft,
+  configuration: EventConfig
+) {
+  const currentEventState = getCurrentEventState(event, configuration)
+  return {
+    results: [applyDraftToEventIndex(currentEventState, draft, configuration)],
+    total: 1
+  }
+}
+
 export function useEvents() {
   const trpc = useTRPC()
   const getEvent = useGetEvent()
   const getEvents = useGetEvents()
   const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
   const eventConfigs = useEventConfigurations()
-  const { getAllRemoteDrafts } = useDrafts()
+  const { getAllRemoteDrafts, getRemoteDraftByEventId } = useDrafts()
 
   const drafts = getAllRemoteDrafts({
     refetchOnMount: 'always',
@@ -116,44 +150,14 @@ export function useEvents() {
               return res
             }
 
-            // Search for drafts if record is not found in ES
-            const eventsWithDrafts = drafts
-              .map(({ eventId }) => findLocalEventDocument(eventId))
-              .filter((event): event is EventDocument => !!event)
-              .map((event) => {
-                const draft = first(
-                  drafts.filter((d) => d.eventId === event.id)
-                )
-                const configuration = getOrThrow(
-                  eventConfigs.find(
-                    ({ id: eventConfigId }) => eventConfigId === event.type
-                  ),
-                  `Event configuration not found for ${event.type}`
-                )
+            // Search for locally created events if record is not found in ES
+            const { event, draft, configuration } = getEventWithDraftOrThrow(
+              id,
+              eventConfigs,
+              getRemoteDraftByEventId
+            )
 
-                const currentEventState = getCurrentEventState(
-                  event,
-                  configuration
-                )
-                return draft
-                  ? applyDraftToEventIndex(
-                      currentEventState,
-                      draft,
-                      configuration
-                    )
-                  : currentEventState
-              })
-
-            const eventState = eventsWithDrafts.find((event) => event.id === id)
-            if (eventState) {
-              return {
-                results: [eventState],
-                total: 1
-              }
-            }
-
-            // Nothing found → throw
-            throw new Error(`No event or draft found with id: ${id}`)
+            return buildDraftedEventResult(event, draft, configuration)
           },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
@@ -183,44 +187,14 @@ export function useEvents() {
               return res
             }
 
-            // Search for drafts if record is not found in ES
-            const eventsWithDrafts = drafts
-              .map(({ eventId }) => findLocalEventDocument(eventId))
-              .filter((event): event is EventDocument => !!event)
-              .map((event) => {
-                const draft = first(
-                  drafts.filter((d) => d.eventId === event.id)
-                )
-                const configuration = getOrThrow(
-                  eventConfigs.find(
-                    ({ id: eventConfigId }) => eventConfigId === event.type
-                  ),
-                  `Event configuration not found for ${event.type}`
-                )
+            // Search for locally created events if record is not found in ES
+            const { event, draft, configuration } = getEventWithDraftOrThrow(
+              id,
+              eventConfigs,
+              getRemoteDraftByEventId
+            )
 
-                const currentEventState = getCurrentEventState(
-                  event,
-                  configuration
-                )
-                return draft
-                  ? applyDraftToEventIndex(
-                      currentEventState,
-                      draft,
-                      configuration
-                    )
-                  : currentEventState
-              })
-
-            const eventState = eventsWithDrafts.find((event) => event.id === id)
-            if (eventState) {
-              return {
-                results: [eventState],
-                total: 1
-              }
-            }
-
-            // Nothing found → throw
-            throw new Error(`No event or draft found with id: ${id}`)
+            return buildDraftedEventResult(event, draft, configuration)
           },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
