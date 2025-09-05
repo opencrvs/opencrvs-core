@@ -79,26 +79,25 @@ function prepareReason(history: ActionDocument) {
 function prepareDuplicateOf(
   history: ActionDocument,
   fullHistory: ActionDocument[]
-) {
-  if (history.type === ActionType.MARK_AS_DUPLICATE) {
-    const duplicateOf = history.content?.duplicateOf
-    if (duplicateOf) {
-      const duplicateDetectedActions = fullHistory.filter(
-        (action) => action.type === ActionType.DUPLICATE_DETECTED
-      )
-      const allDuplicatesDetectedFlattened = duplicateDetectedActions.flatMap(
-        (action) => action.content.duplicates
-      ) satisfies Array<{ id: UUID; trackingId: string }>
-
-      return (
-        allDuplicatesDetectedFlattened.find(
-          (duplicate) => duplicate.id === duplicateOf
-        )?.trackingId ?? null
-      )
-    }
+): string | null {
+  if (history.type !== ActionType.MARK_AS_DUPLICATE) {
+    return null
   }
+  const duplicateOf = history.content?.duplicateOf
+  if (!duplicateOf) {
+    return null
+  }
+  const duplicatesDetected = fullHistory
+    .filter((action) => action.type === ActionType.DUPLICATE_DETECTED)
+    .flatMap((action) => action.content.duplicates) satisfies Array<{
+    id: UUID
+    trackingId: string
+  }>
 
-  return null
+  return (
+    duplicatesDetected.find((duplicate) => duplicate.id === duplicateOf)
+      ?.trackingId ?? null
+  )
 }
 
 /**
