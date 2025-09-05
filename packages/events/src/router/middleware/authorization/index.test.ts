@@ -25,7 +25,7 @@ describe('requiresScopes()', () => {
     const mockOpts = {
       ctx: {
         token: createTestToken('test-user-id', [
-          'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+          'record.declare[event=birth|death|tennis-club-membership]'
         ])
       },
       next: vi.fn()

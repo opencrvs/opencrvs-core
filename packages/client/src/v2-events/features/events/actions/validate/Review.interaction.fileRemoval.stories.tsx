@@ -263,7 +263,7 @@ export const RemovingExistingSignatureSendsNull: Story = {
 
 const multiFileConfig = {
   ...tennisClubMembershipEvent,
-  id: 'v2.death', // Use an existing event type id here, so that the user has the required scope to it
+  id: 'death', // Use an existing event type id here, so that the user has the required scope to it
   declaration: {
     label: generateTranslationConfig('File club form'),
     pages: [

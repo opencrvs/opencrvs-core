@@ -14,13 +14,13 @@ import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
   Button,
-  Modal,
+  ResponsiveModal,
   Select,
   Stack,
   Text,
   TextArea
 } from '@opencrvs/components'
-import { PotentialDuplicate } from '@opencrvs/commons/client'
+import { PotentialDuplicate, UUID } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { duplicateMessages } from './ReviewDuplicate'
 
@@ -32,21 +32,23 @@ const StyledTextArea = styled(TextArea)`
   border-radius: 4px;
   margin-bottom: 24px;
 `
+export interface MarkAsDuplicateContent {
+  duplicateOf: UUID
+  reason: string
+}
 
 export function MarkAsDuplicateModal({
   close,
   duplicates,
   originalTrackingId
 }: {
-  close: (result: boolean) => void
+  close: (content?: MarkAsDuplicateContent) => void
   duplicates: PotentialDuplicate[]
   originalTrackingId: string
 }) {
   const intl = useIntl()
-  const [selectedTrackingId, setSelectedTrackingId] = React.useState('')
+  const [duplicateOf, setDuplicateOf] = React.useState('')
   const [comment, setComment] = React.useState('')
-
-  const trackingIds = duplicates.map(({ trackingId }) => trackingId).join(', ')
 
   const handleCommentChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
@@ -54,27 +56,31 @@ export function MarkAsDuplicateModal({
     setComment(event.target.value)
   }
   return (
-    <Modal
+    <ResponsiveModal
       actions={[
         <Button
           key="cancel"
           id="modal_cancel"
           type="tertiary"
-          onClick={() => close(false)}
+          onClick={() => close()}
         >
           {intl.formatMessage(buttonMessages.cancel)}
         </Button>,
         <Button
           key="mark-as-duplicate-button"
-          disabled={!(Boolean(selectedTrackingId) && Boolean(comment))}
+          disabled={!(Boolean(duplicateOf) && Boolean(comment))}
           id="mark-as-duplicate-button"
           type="negative"
-          onClick={() => close(true)}
+          onClick={() =>
+            close({ duplicateOf: duplicateOf as UUID, reason: comment })
+          }
         >
           {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
         </Button>
       ]}
-      handleClose={() => close(false)}
+      autoHeight={true}
+      handleClose={() => close()}
+      id="mark-as-duplicate-modal"
       show={true}
       title={intl.formatMessage(
         duplicateMessages.markAsDuplicateConfirmationTitle,
@@ -82,33 +88,37 @@ export function MarkAsDuplicateModal({
           trackingId: originalTrackingId
         }
       )}
+      titleHeightAuto={true}
+      width={840}
     >
-      <Stack alignItems="stretch" direction="column" gap={10}>
-        <Text element="span" variant="reg18">
-          {intl.formatMessage(duplicateMessages.duplicateDropdownMessage)}
-        </Text>
-        <Select
-          id="selectTrackingId"
-          isDisabled={false}
-          options={duplicates.map(({ trackingId }) => ({
-            value: trackingId,
-            label: trackingId
-          }))}
-          value={selectedTrackingId}
-          onChange={(val: string) => {
-            setSelectedTrackingId(val)
-          }}
-        />
-        <StyledText element="span" variant="reg18">
-          {intl.formatMessage(duplicateMessages.markAsDuplicateReason)}
-        </StyledText>
-        <StyledTextArea
-          id="describe-reason"
-          {...{
-            onChange: handleCommentChange
-          }}
-        />
-      </Stack>
-    </Modal>
+      {
+        <Stack alignItems="stretch" direction="column" gap={10}>
+          <Text element="span" variant="reg18">
+            {intl.formatMessage(duplicateMessages.duplicateDropdownMessage)}
+          </Text>
+          <Select
+            id="selectTrackingId"
+            isDisabled={false}
+            options={duplicates.map(({ id, trackingId }) => ({
+              value: id,
+              label: trackingId
+            }))}
+            value={duplicateOf}
+            onChange={(val: string) => {
+              setDuplicateOf(val)
+            }}
+          />
+          <StyledText element="span" variant="reg18">
+            {intl.formatMessage(duplicateMessages.markAsDuplicateReason)}
+          </StyledText>
+          <StyledTextArea
+            id="describe-reason"
+            {...{
+              onChange: handleCommentChange
+            }}
+          />
+        </Stack>
+      }
+    </ResponsiveModal>
   )
 }
