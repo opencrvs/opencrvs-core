@@ -17,7 +17,7 @@ import {
   Flag,
   getCurrentEventState,
   createPrng,
-  generateActionDeclarationInput
+  generateActionDuplicateDeclarationInput
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -392,7 +392,7 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
     const client = createTestClient(user)
 
     const existingEvent = await client.event.create(generator.event.create())
-    const declaration = generateActionDeclarationInput(
+    const declaration = generateActionDuplicateDeclarationInput(
       tennisClubMembershipEvent,
       ActionType.DECLARE,
       prng

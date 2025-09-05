@@ -14,7 +14,9 @@ import { last } from 'lodash'
 import { Kysely } from 'kysely'
 import {
   ActionType,
+  createPrng,
   EventIndex,
+  generateActionDuplicateDeclarationInput,
   generateUuid,
   SCOPES,
   UUID
@@ -102,8 +104,18 @@ test('Returns single duplicate when found', async () => {
     SCOPES.RECORD_REVIEW_DUPLICATES
   ])
 
+  const prng = createPrng(73)
+
+  const declaration = generateActionDuplicateDeclarationInput(
+    tennisClubMembershipWithDedupCheckConfig,
+    ActionType.DECLARE,
+    prng
+  )
+
   const event1 = await client.event.create(generator.event.create())
-  const event1Payload = generator.event.actions.declare(event1.id)
+  const event1Payload = generator.event.actions.declare(event1.id, {
+    declaration
+  })
   await client.event.actions.declare.request(event1Payload)
 
   const event2 = await client.event.create(generator.event.create())
@@ -177,8 +189,18 @@ test('Returns multiple duplicates when found', async () => {
     SCOPES.RECORD_REVIEW_DUPLICATES
   ])
 
+  const prng = createPrng(73)
+
+  const declaration = generateActionDuplicateDeclarationInput(
+    tennisClubMembershipWithDedupCheckConfig,
+    ActionType.DECLARE,
+    prng
+  )
+
   const event1 = await client.event.create(generator.event.create())
-  const event1Payload = generator.event.actions.declare(event1.id)
+  const event1Payload = generator.event.actions.declare(event1.id, {
+    declaration
+  })
   await client.event.actions.declare.request(event1Payload)
 
   const event2 = await client.event.create(generator.event.create())

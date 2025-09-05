@@ -247,6 +247,20 @@ export function generateActionDeclarationInput(
   return {}
 }
 
+/*
+ * Overrides `dobUnknown` to be false so that the mock data
+ * contains applicant dob
+ */
+export function generateActionDuplicateDeclarationInput(
+  ...args: Parameters<typeof generateActionDeclarationInput>
+): ReturnType<typeof generateActionDeclarationInput> {
+  const [configuration, action, rng, overrides] = args
+  return generateActionDuplicateDeclarationInput(configuration, action, rng, {
+    ...overrides,
+    'applicant.dobUnknown': false
+  })
+}
+
 export function generateActionAnnotationInput(
   configuration: EventConfig,
   action: ActionType,

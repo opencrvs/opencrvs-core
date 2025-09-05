@@ -19,6 +19,7 @@ import {
   EventStatus,
   EventIndex,
   generateActionDeclarationInput,
+  generateActionDuplicateDeclarationInput,
   getCurrentEventState,
   getUUID,
   NameFieldValue
@@ -367,14 +368,10 @@ test('deduplication check is performed before validation when configured', async
   const client = createTestClient(user)
 
   const existingEvent = await client.event.create(generator.event.create())
-  const declaration = generateActionDeclarationInput(
+  const declaration = generateActionDuplicateDeclarationInput(
     tennisClubMembershipEvent,
     ActionType.DECLARE,
-    prng,
-    // so that applicate.dob is generated
-    {
-      'applicant.dobUnknown': false
-    }
+    prng
   )
 
   await client.event.actions.declare.request(
@@ -426,7 +423,7 @@ test('deduplication check is skipped if the event has been marked as not duplica
   const client = createTestClient(user)
 
   const existingEvent = await client.event.create(generator.event.create())
-  const declaration = generateActionDeclarationInput(
+  const declaration = generateActionDuplicateDeclarationInput(
     tennisClubMembershipEvent,
     ActionType.DECLARE,
     prng
@@ -491,7 +488,7 @@ test('deduplication check is not skipped if the event has been marked as not dup
   const client = createTestClient(user)
 
   const existingEvent = await client.event.create(generator.event.create())
-  const declaration = generateActionDeclarationInput(
+  const declaration = generateActionDuplicateDeclarationInput(
     tennisClubMembershipEvent,
     ActionType.DECLARE,
     prng
