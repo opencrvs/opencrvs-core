@@ -17,11 +17,12 @@ import {
   ActionDocument,
   ActionType,
   EventDocument,
-  getAcceptedActions
+  getAcceptedActions,
+  UUID
 } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
 import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
-import { getActionTypeSpecificContent } from './actionTypeSpecificContent'
+import { ActionTypeSpecificContent } from './ActionTypeSpecificContent'
 
 export const eventHistoryStatusMessage = {
   id: `v2.events.history.status`,
@@ -44,6 +45,11 @@ const messages = defineMessages({
     defaultMessage: 'Reason',
     description: 'Label for rejection correction reason',
     id: 'v2.constants.reason'
+  },
+  duplicateOf: {
+    defaultMessage: 'Duplicate of',
+    description: 'table header for `duplicate of` in record audit',
+    id: 'v2.constants.duplicateOf'
   }
 })
 
@@ -70,6 +76,30 @@ function prepareReason(history: ActionDocument) {
   return reason
 }
 
+function prepareDuplicateOf(
+  history: ActionDocument,
+  fullHistory: ActionDocument[]
+): string | null {
+  if (history.type !== ActionType.MARK_AS_DUPLICATE) {
+    return null
+  }
+  const duplicateOf = history.content?.duplicateOf
+  if (!duplicateOf) {
+    return null
+  }
+  const duplicatesDetected = fullHistory
+    .filter((action) => action.type === ActionType.DUPLICATE_DETECTED)
+    .flatMap((action) => action.content.duplicates) satisfies Array<{
+    id: UUID
+    trackingId: string
+  }>
+
+  return (
+    duplicatesDetected.find((duplicate) => duplicate.id === duplicateOf)
+      ?.trackingId ?? null
+  )
+}
+
 /**
  * Detailed view of single Action, showing the history of the event.
  */
@@ -93,6 +123,7 @@ export function EventHistoryDialog({
 
   const comments = prepareComments(action)
   const reason = prepareReason(action)
+  const duplicateOf = prepareDuplicateOf(action, history)
 
   return (
     <ResponsiveModal
@@ -119,6 +150,23 @@ export function EventHistoryDialog({
           )}
         </Text>
       </Stack>
+      {Boolean(duplicateOf) && (
+        <Table
+          columns={[
+            {
+              key: 'duplicateOf',
+              label: intl.formatMessage(messages.duplicateOf),
+              width: 100
+            }
+          ]}
+          content={[
+            {
+              duplicateOf: duplicateOf
+            }
+          ]}
+          noResultText=" "
+        />
+      )}
       {comments.length > 0 && (
         <Table
           columns={[
@@ -145,7 +193,7 @@ export function EventHistoryDialog({
           noResultText=" "
         />
       )}
-      {getActionTypeSpecificContent(action, fullEvent)}
+      <ActionTypeSpecificContent action={action} fullEvent={fullEvent} />
     </ResponsiveModal>
   )
 }
