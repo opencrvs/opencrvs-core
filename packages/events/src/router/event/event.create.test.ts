@@ -31,7 +31,7 @@ describe('event.create', () => {
     test(`allows access with required scope`, async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
-        'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+        'record.declare[event=birth|death|tennis-club-membership]'
       ])
 
       await expect(

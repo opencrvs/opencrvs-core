@@ -1063,11 +1063,14 @@ function getCertCollectorGroupForEvent(
     birthCertCollectorOptions,
     marriageCertCollectorOptions
   )
+
   const certificateTemplateOptions =
     certificates
       .filter((x) => x.event === declaration.event)
+      .filter((x) => !x.isV2Template)
       .map((x) => ({ label: x.label, value: x.id, isDefault: x.isDefault })) ||
     []
+
   return {
     id: 'certCollector',
     title: certificateMessages.whoToCollect,
