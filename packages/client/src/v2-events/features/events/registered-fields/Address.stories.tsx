@@ -97,8 +97,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
             defaultValue: {
               country: 'FAR',
               addressType: AddressType.DOMESTIC,
-              administrativeArea:
-                '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID as UUID
+              administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID
             },
             configuration: {
               streetAddressForm: [

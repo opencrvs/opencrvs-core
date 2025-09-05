@@ -131,8 +131,11 @@ function isDomesticAddress() {
 }
 
 type OutputMode = 'withIds' | 'withNames'
+/*
+Function to traverse the administrative leverl hierarchy from an arbitrary / leaf point
+*/
 function getAdminLevelHierarchy(
-  locationUUID: string | undefined,
+  locationUuid: string | undefined,
   locations: Location[],
   adminStructure: string[],
   outputMode: OutputMode = 'withIds'
@@ -140,8 +143,8 @@ function getAdminLevelHierarchy(
   // Collect location objects from leaf to root
   const collectedLocations: Location[] = []
 
-  let current = locationUUID
-    ? locations.find((l) => l.id === locationUUID.toString())
+  let current = locationUuid
+    ? locations.find((l) => l.id === locationUuid.toString())
     : null
 
   while (current) {
@@ -277,7 +280,7 @@ function AddressInput(props: Props) {
 
   const administrativeArea = value?.administrativeArea
 
-  const resolveAdministratitveArea = (
+  const resolveAdministrativeArea = (
     adminArea:
       | AddressFieldValue['administrativeArea']
       | DefaultAddressFieldValue['administrativeArea']
@@ -302,7 +305,7 @@ function AddressInput(props: Props) {
   }
 
   const resolvedAdministrativeArea =
-    resolveAdministratitveArea(administrativeArea)
+    resolveAdministrativeArea(administrativeArea)
 
   if (value) {
     value.administrativeArea = resolvedAdministrativeArea
