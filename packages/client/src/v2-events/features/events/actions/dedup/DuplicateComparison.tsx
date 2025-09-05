@@ -307,7 +307,7 @@ export function DuplicateComparison({
               </Text>
               <DocumentViewer
                 comparisonView={true}
-                disabled={false}
+                disabled={true}
                 form={originalEvent.declaration}
                 formConfig={eventConfiguration.declaration}
                 showInMobile={false}
@@ -326,7 +326,7 @@ export function DuplicateComparison({
               </Text>
               <DocumentViewer
                 comparisonView={true}
-                disabled={false}
+                disabled={true}
                 form={potentialDuplicateEvent.declaration}
                 formConfig={eventConfiguration.declaration}
                 showInMobile={false}
