@@ -17,7 +17,9 @@ import {
   NameFieldValue,
   NameFieldUpdateValue,
   HttpFieldUpdateValue,
-  HttpFieldValue
+  HttpFieldValue,
+  StreetLevelDetailsValue,
+  StreetLevelDetailsUpdateValue
 } from './CompositeFieldValue'
 /**
  * FieldValues defined in this file are primitive field values.
@@ -80,7 +82,10 @@ export const ButtonFieldValue = z.number()
 export type ButtonFieldValue = z.infer<typeof ButtonFieldValue>
 
 export const FieldValue = z.union([
-  z.record(z.string(), z.string()).optional(),
+  /**
+   * Street level is our first dynamic record. In the future we might extend it to include any dynamic (sub)field.
+   */
+  StreetLevelDetailsValue,
   TextValue,
   DateValue,
   TimeValue,
@@ -101,7 +106,10 @@ export const FieldValue = z.union([
 export type FieldValue = z.infer<typeof FieldValue>
 
 export const FieldUpdateValue = z.union([
-  z.record(z.string(), z.string()).nullish(),
+  /**
+   * Street level is our first dynamic record. In the future we might extend it to include any dynamic (sub)field.
+   */
+  StreetLevelDetailsUpdateValue,
   TextValue,
   DateValue,
   TimeValue,

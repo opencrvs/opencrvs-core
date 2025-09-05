@@ -51,6 +51,10 @@ export const NameFieldUpdateValue = z
 export type NameFieldValue = z.infer<typeof NameFieldValue>
 export type NameFieldUpdateValue = z.infer<typeof NameFieldUpdateValue>
 
+export const StreetLevelDetailsValue = z
+  .record(z.string(), z.string())
+  .optional()
+
 export const AddressFieldValue = z.object({
   country: z.string(),
   addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL]),
@@ -58,8 +62,12 @@ export const AddressFieldValue = z.object({
     .string()
     .uuid()
     .optional() /* Leaf level admin structure */,
-  streetLevelDetails: z.record(z.string(), z.string()).optional()
+  streetLevelDetails: StreetLevelDetailsValue
 })
+
+export const StreetLevelDetailsUpdateValue = z
+  .record(z.string(), z.string())
+  .nullish()
 
 export const AddressFieldUpdateValue = z.object({
   country: z.string(),
@@ -68,7 +76,7 @@ export const AddressFieldUpdateValue = z.object({
     .string()
     .uuid()
     .nullish() /* Leaf level admin structure */,
-  streetLevelDetails: z.record(z.string(), z.string()).nullish()
+  streetLevelDetails: StreetLevelDetailsUpdateValue
 })
 
 export type AddressFieldValue = z.infer<typeof AddressFieldValue>

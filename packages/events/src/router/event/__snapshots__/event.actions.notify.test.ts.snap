@@ -1,10 +1,10 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`event.actions.notify > Fooo 1`] = `[TRPCError: System user can not perform action on assigned event]`;
-
 exports[`event.actions.notify > NOTIFY action fails if payload includes field that is not in the declaration 1`] = `[TRPCError: [{"message":"Unexpected field","id":"foo.bar","value":"hello"}]]`;
 
 exports[`event.actions.notify > NOTIFY action fails if payload includes field with unexpected type 1`] = `[TRPCError: [{"message":"Invalid input","id":"applicant.name","value":{}}]]`;
+
+exports[`event.actions.notify > System client receives error for malformed input 1`] = `[TRPCError: [{"message":"Unexpected field","id":"foo.bar","value":"this should cause an error"},{"message":"Invalid input","id":"applicant.name","value":{"surname":"surnameoftheperson"}}]]`;
 
 exports[`event.actions.notify > allows sending partial payload as NOTIFY action 1`] = `
 {
