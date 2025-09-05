@@ -25,7 +25,7 @@ test('allows access if required scope does not have correct event type configure
   const { user } = await setupTestCase()
   const client = createTestClient(user, [
     'record.declare[event=tennis-club-membership]',
-    'record.read[event=v2.birth]'
+    'record.read[event=birth]'
   ])
 
   await expect(client.event.get(generateUuid())).rejects.toMatchSnapshot()
