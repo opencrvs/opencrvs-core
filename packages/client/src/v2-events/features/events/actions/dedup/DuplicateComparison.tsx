@@ -15,7 +15,9 @@ import {
   DeclarationFormConfig,
   EventIndex,
   EventState,
-  FieldType
+  FieldType,
+  isFieldDisplayedOnReview,
+  isPageVisible
 } from '@opencrvs/commons/client'
 import {
   ComparisonListView,
@@ -123,29 +125,44 @@ export function DuplicateComparison({
   )
   const flattenedOriginalEvent = flattenEventIndex(originalEvent)
 
+  const originalDeclaration = originalEvent.declaration
+  const potentialDuplicateDeclaration = potentialDuplicateEvent.declaration
+
+  const hideFieldTypes = [
+    FieldType.FILE,
+    FieldType.FILE_WITH_OPTIONS,
+    FieldType.BULLET_LIST,
+    FieldType.DIVIDER
+  ]
+
   const comparisonData: ComparisonDeclaration[] =
     eventConfiguration.declaration.pages
+      .filter(
+        (page) =>
+          isPageVisible(page, originalDeclaration) ||
+          isPageVisible(page, potentialDuplicateDeclaration)
+      )
       .map((page) => ({
         title: intl.formatMessage(page.title),
         data: page.fields
           .filter(
-            ({ id }) =>
-              originalEvent.declaration[id] ||
-              potentialDuplicateEvent.declaration[id]
+            (field) =>
+              isFieldDisplayedOnReview(field, originalDeclaration) ||
+              isFieldDisplayedOnReview(field, potentialDuplicateDeclaration)
           )
           .filter(
             ({ type }) =>
-              type !== FieldType.FILE && type !== FieldType.FILE_WITH_OPTIONS
+              !hideFieldTypes.some((typeToHide) => type === typeToHide)
           )
           .map((field) => ({
             label: intl.formatMessage(field.label),
             rightValue: ValueOutput({
               config: field,
-              value: potentialDuplicateEvent.declaration[field.id]
+              value: potentialDuplicateDeclaration[field.id]
             }),
             leftValue: ValueOutput({
               config: field,
-              value: originalEvent.declaration[field.id]
+              value: originalDeclaration[field.id]
             })
           }))
       }))
@@ -307,15 +324,15 @@ export function DuplicateComparison({
               </Text>
               <DocumentViewer
                 comparisonView={true}
-                disabled={false}
-                form={originalEvent.declaration}
+                disabled={true}
+                form={originalDeclaration}
                 formConfig={eventConfiguration.declaration}
                 showInMobile={false}
                 onEdit={noop}
               />
               <MobileOnly>
                 <SupportingDocumentList
-                  declaration={originalEvent.declaration}
+                  declaration={originalDeclaration}
                   declarationConfig={eventConfiguration.declaration}
                 />
               </MobileOnly>
@@ -326,15 +343,15 @@ export function DuplicateComparison({
               </Text>
               <DocumentViewer
                 comparisonView={true}
-                disabled={false}
-                form={potentialDuplicateEvent.declaration}
+                disabled={true}
+                form={potentialDuplicateDeclaration}
                 formConfig={eventConfiguration.declaration}
                 showInMobile={false}
                 onEdit={noop}
               />
               <MobileOnly>
                 <SupportingDocumentList
-                  declaration={potentialDuplicateEvent.declaration}
+                  declaration={potentialDuplicateDeclaration}
                   declarationConfig={eventConfiguration.declaration}
                 />
               </MobileOnly>
