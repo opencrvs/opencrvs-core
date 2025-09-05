@@ -235,16 +235,30 @@ export function generateActionDeclarationInput(
 
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
-    return {
-      ...omitHiddenPaginatedFields(declarationConfig, declaration),
+    return omitHiddenPaginatedFields(declarationConfig, {
+      ...declaration,
       ...overrides
-    }
+    })
   }
 
   // eslint-disable-next-line no-console
   console.warn(`${action} is not a declaration action. Setting data as {}.`)
 
   return {}
+}
+
+/*
+ * Overrides `dobUnknown` to be false so that the mock data
+ * contains applicant dob
+ */
+export function generateActionDuplicateDeclarationInput(
+  ...args: Parameters<typeof generateActionDeclarationInput>
+): ReturnType<typeof generateActionDeclarationInput> {
+  const [configuration, action, rng, overrides] = args
+  return generateActionDeclarationInput(configuration, action, rng, {
+    ...overrides,
+    'applicant.dobUnknown': false
+  })
 }
 
 export function generateActionAnnotationInput(

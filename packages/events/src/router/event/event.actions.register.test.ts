@@ -18,7 +18,7 @@ import {
   AddressType,
   createPrng,
   EventIndex,
-  generateActionDeclarationInput,
+  generateActionDuplicateDeclarationInput,
   generateRegistrationNumber,
   getCurrentEventState,
   getOrThrow,
@@ -850,7 +850,7 @@ test('deduplication check is performed before register when configured', async (
   const client = createTestClient(user)
 
   const existingEvent = await client.event.create(generator.event.create())
-  const declarationPayload = generateActionDeclarationInput(
+  const declarationPayload = generateActionDuplicateDeclarationInput(
     tennisClubMembershipEvent,
     ActionType.DECLARE,
     prng
