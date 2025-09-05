@@ -8,7 +8,7 @@ ADD --chown=node:node https://github.com/ufoscout/docker-compose-wait/releases/d
 RUN chmod +x /app/wait
 
 # Override the base log level (info).
-ENV NPM_CONFIG_LOGLEVEL warn
+ENV NPM_CONFIG_LOGLEVEL=warn
 
 WORKDIR /app/packages/migration
 
