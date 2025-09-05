@@ -32,13 +32,17 @@ const StyledTextArea = styled(TextArea)`
   border-radius: 4px;
   margin-bottom: 24px;
 `
+export interface MarkAsDuplicateContent {
+  selectedTrackingId: string
+  reason: string
+}
 
 export function MarkAsDuplicateModal({
   close,
   duplicates,
   originalTrackingId
 }: {
-  close: (selectedTrackingId?: string) => void
+  close: (content?: MarkAsDuplicateContent) => void
   duplicates: PotentialDuplicate[]
   originalTrackingId: string
 }) {
@@ -67,7 +71,7 @@ export function MarkAsDuplicateModal({
           disabled={!(Boolean(selectedTrackingId) && Boolean(comment))}
           id="mark-as-duplicate-button"
           type="negative"
-          onClick={() => close(selectedTrackingId)}
+          onClick={() => close({ selectedTrackingId, reason: comment })}
         >
           {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
         </Button>
