@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { first } from 'lodash'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
 import {
@@ -44,12 +43,11 @@ import { QueryOptions } from './procedures/utils'
 function getEventWithDraftOrThrow(
   id: string,
   eventConfigs: EventConfig[],
-  getRemoteDraftByEventId: (draftId: string) => Draft | undefined
+  maybeDraft: Draft | undefined
 ): { event: EventDocument; draft: Draft; configuration: EventConfig } {
   const event = findLocalEventDocument(id)
-  const draft = getRemoteDraftByEventId(id)
 
-  if (!event || !draft) {
+  if (!event || !maybeDraft) {
     throw new Error(`No event or draft found with id: ${id}`)
   }
 
@@ -58,7 +56,7 @@ function getEventWithDraftOrThrow(
     `Event configuration not found for ${event.type}`
   )
 
-  return { event, draft, configuration }
+  return { event, draft: maybeDraft, configuration }
 }
 
 function buildDraftedEventResult(
@@ -79,13 +77,7 @@ export function useEvents() {
   const getEvents = useGetEvents()
   const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
   const eventConfigs = useEventConfigurations()
-  const { getAllRemoteDrafts, getRemoteDraftByEventId } = useDrafts()
-
-  const drafts = getAllRemoteDrafts({
-    refetchOnMount: 'always',
-    staleTime: 0,
-    refetchInterval: 20000
-  })
+  const { getRemoteDraftByEventId } = useDrafts()
 
   return {
     createEvent: useCreateEvent,
@@ -130,6 +122,7 @@ export function useEvents() {
           clauses: [{ id }]
         } satisfies QueryType
 
+        const maybeDraft = getRemoteDraftByEventId(id)
         const options = trpc.event.search.queryOptions({ query })
 
         return useQuery({
@@ -154,7 +147,7 @@ export function useEvents() {
             const { event, draft, configuration } = getEventWithDraftOrThrow(
               id,
               eventConfigs,
-              getRemoteDraftByEventId
+              maybeDraft
             )
 
             return buildDraftedEventResult(event, draft, configuration)
@@ -172,6 +165,7 @@ export function useEvents() {
         } satisfies QueryType
 
         const options = trpc.event.search.queryOptions({ query })
+        const maybeDraft = getRemoteDraftByEventId(id)
 
         return useSuspenseQuery({
           ...options,
@@ -191,7 +185,7 @@ export function useEvents() {
             const { event, draft, configuration } = getEventWithDraftOrThrow(
               id,
               eventConfigs,
-              getRemoteDraftByEventId
+              maybeDraft
             )
 
             return buildDraftedEventResult(event, draft, configuration)
