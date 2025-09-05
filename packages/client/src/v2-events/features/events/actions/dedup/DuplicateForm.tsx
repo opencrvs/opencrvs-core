@@ -20,14 +20,18 @@ import {
 import { Content } from '@opencrvs/components/lib/Content'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { EventIndex } from '@opencrvs/commons/client'
+import { EventIndex, EventStatus, getUUID } from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes/routes'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { useEventTitle } from '../../useEvents/useEventTitle'
+import { useEvents } from '../../useEvents/useEvents'
 import { duplicateMessages } from './ReviewDuplicate'
 import { MarkAsNotDuplicateModal } from './MarkAsNotDuplicateModal'
-import { MarkAsDuplicateModal } from './MarkAsDuplicateModal'
+import {
+  MarkAsDuplicateContent,
+  MarkAsDuplicateModal
+} from './MarkAsDuplicateModal'
 
 const SubPageContent = styled(Content)`
   margin: auto 0 20px;
@@ -42,6 +46,8 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
   )
 
   const intl = useIntl()
+
+  const { actions, customActions } = useEvents()
 
   const navigate = useNavigate()
   const { getEventTitle } = useEventTitle()
@@ -73,11 +79,16 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
           />
         ))
         if (marAsNotDuplicate) {
-          alert('Marked as not a duplicate')
-          if (slug) {
-            navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
+          actions.duplicate.markNotDuplicate.mutate({
+            transactionId: getUUID(),
+            eventId: eventIndex.id,
+            keepAssignment: true
+          })
+
+          if (eventIndex.status === EventStatus.Values.DECLARED) {
+            navigate(ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId }))
           } else {
-            navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+            navigate(ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId }))
           }
         }
       }}
@@ -94,16 +105,28 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
       id="mark-as-duplicate"
       type="negative"
       onClick={async () => {
-        const marAsDuplicate = await openModal<boolean>((close) => (
+        const markAsDuplicateContent = await openModal<
+          MarkAsDuplicateContent | undefined
+        >((close) => (
           <MarkAsDuplicateModal
             close={close}
             duplicates={eventIndex.potentialDuplicates}
             originalTrackingId={eventIndex.trackingId}
           />
         ))
-        if (marAsDuplicate) {
-          alert('Marked as a duplicate')
-          navigate(ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }))
+        if (markAsDuplicateContent) {
+          customActions.archiveOnDuplicate.mutate({
+            content: markAsDuplicateContent,
+            transactionId: getUUID(),
+            eventId: eventIndex.id,
+            declaration: {}
+          })
+
+          if (slug) {
+            navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
+          } else {
+            navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+          }
         }
       }}
     >
