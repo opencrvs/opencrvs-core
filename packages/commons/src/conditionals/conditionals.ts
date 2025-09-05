@@ -15,6 +15,7 @@ import { ITokenPayload as TokenPayload, Scope } from '../authentication'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { userSerializer } from '../events/serializers/user/serializer'
 import { Location } from '../events/locations'
+import { omitKeyDeep } from '../utils'
 
 /** @knipignore */
 export type JSONSchema = {
@@ -24,9 +25,14 @@ export type JSONSchema = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function defineConditional(schema: any) {
+  // The same conditional schema may appear multiple times in the final schema.
+  // This causes duplicate $id values (since the hash is identical), and Ajv
+  // throws a `resolves to more than one schema` error.
+  // To avoid this, we only keep $id at the top level and remove it from all nested schemas.
+  const schemaWithooutIDRef = omitKeyDeep(schema, '$id')
   return {
-    $id: `https://opencrvs.org/conditionals/${objectHash.sha1(schema)}`,
-    ...schema
+    $id: `https://opencrvs.org/conditionals/${objectHash.sha1(schemaWithooutIDRef)}`,
+    ...schemaWithooutIDRef
   } as JSONSchema
 }
 

@@ -325,4 +325,29 @@ describe('event.actions.notify', () => {
       ).rejects.toMatchSnapshot()
     })
   })
+
+  test.only('Fooo', async () => {
+    const { user, generator } = await setupTestCase()
+
+    let client = createTestClient(user)
+
+    client = createSystemTestClient('test-system-2', [
+      `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+    ])
+
+    const event = await client.event.create(generator.event.create())
+    const result = await client.event.actions.notify.request({
+      eventId: event.id,
+      transactionId: generateUuid(),
+      type: 'NOTIFY',
+      declaration: {
+        'foo.bar': 'this should cause an error',
+        'child.name': { surname: 'surnameoftheperson' },
+        'child.dob': '2002-02-02'
+      },
+      annotation: {}
+    })
+
+    console.log(result)
+  })
 })
