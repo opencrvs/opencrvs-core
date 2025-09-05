@@ -230,6 +230,10 @@ function useViewableActionConfigurations(
     event.type
   )
 
+  const isAssignMutationFetching = events.actions.assignment.assign.isAssigning(
+    event.id
+  )
+
   const isRejected = event.flags.includes(InherentFlags.REJECTED)
   const isDeclaredState = event.status === EventStatus.enum.DECLARED
   const isNotifiedState = event.status === EventStatus.enum.NOTIFIED
@@ -378,7 +382,7 @@ function useViewableActionConfigurations(
             )
           )
         },
-        disabled: !isDownloadedAndAssignedToUser
+        disabled: !isDownloadedAndAssignedToUser || isAssignMutationFetching
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
