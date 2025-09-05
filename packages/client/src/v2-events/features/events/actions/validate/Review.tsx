@@ -174,7 +174,7 @@ export function Review() {
       (close) => <ReviewComponent.ActionModal.Reject close={close} />
     )
     if (confirmedRejection) {
-      const { rejectAction, message } = confirmedRejection
+      const { rejectAction, message, isDuplicate } = confirmedRejection
 
       if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
         events.actions.reject.mutate({
@@ -187,13 +187,22 @@ export function Review() {
       }
 
       if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
-        events.actions.archive.mutate({
-          eventId,
-          declaration: {},
-          transactionId: uuid(),
-          annotation: {},
-          content: { reason: message }
-        })
+        if (isDuplicate) {
+          events.customActions.archiveOnDuplicate.mutate({
+            eventId,
+            declaration: {},
+            transactionId: uuid(),
+            content: { reason: message }
+          })
+        } else {
+          events.actions.archive.mutate({
+            eventId,
+            declaration: {},
+            transactionId: uuid(),
+            annotation: {},
+            content: { reason: message }
+          })
+        }
       }
       closeActionView(slug)
     }
