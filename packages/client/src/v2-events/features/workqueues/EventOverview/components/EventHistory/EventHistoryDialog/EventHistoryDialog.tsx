@@ -11,7 +11,6 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
-import { flatten } from 'lodash'
 import { ResponsiveModal, Stack, Table } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
@@ -87,8 +86,8 @@ function prepareDuplicateOf(
       const duplicateDetectedActions = fullHistory.filter(
         (action) => action.type === ActionType.DUPLICATE_DETECTED
       )
-      const allDuplicatesDetectedFlattened = flatten(
-        duplicateDetectedActions.map((action) => action.content.duplicates)
+      const allDuplicatesDetectedFlattened = duplicateDetectedActions.flatMap(
+        (action) => action.content.duplicates
       ) satisfies Array<{ id: UUID; trackingId: string }>
 
       return (
