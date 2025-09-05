@@ -21,8 +21,7 @@ import {
   DateValue,
   FieldType,
   extractPotentialDuplicatesFromActions,
-  EventDocument,
-  getCurrentEventState
+  EventDocument
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
@@ -39,7 +38,6 @@ import {
 } from '@events/service/indexing/utils'
 import { TrpcContext } from '../../context'
 import { getEventsAuditTrailed } from '../../storage/postgres/events/events'
-import { getEventConfigurationById } from '../config/config'
 
 export function generateElasticsearchQuery(
   eventIndex: EncodedEventIndex,
@@ -231,10 +229,6 @@ export async function getDuplicateEvents(
   ctx: TrpcContext
 ) {
   const duplicates = extractPotentialDuplicatesFromActions(event.actions)
-  const config = await getEventConfigurationById({
-    token: ctx.token,
-    eventType: event.type
-  })
 
   if (duplicates.length === 0) {
     return []
@@ -242,7 +236,5 @@ export async function getDuplicateEvents(
 
   const duplicateEventIds = duplicates.map(({ id }) => id)
 
-  const events = await getEventsAuditTrailed(ctx.user, duplicateEventIds)
-
-  return events.map((e) => getCurrentEventState(e, config))
+  return getEventsAuditTrailed(ctx.user, duplicateEventIds)
 }
