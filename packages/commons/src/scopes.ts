@@ -277,8 +277,8 @@ const LiteralScopes = z.union([
 
 // Configurable scopes are for example:
 // - user.create[role=first-role|second-role]
-// - record.notify[event=v2.birth]
-// - record.registered.print-certified-copies[event=v2.birth|tennis-club-membership]
+// - record.notify[event=birth]
+// - record.registered.print-certified-copies[event=birth|tennis-club-membership]
 const rawConfigurableScopeRegex =
   /^([a-zA-Z][a-zA-Z0-9.-]*(?:\.[a-zA-Z0-9.-]+)*)\[((?:\w+=[\w.-]+(?:\|[\w.-]+)*)(?:,[\w]+=[\w.-]+(?:\|[\w.-]+)*)*)\]$/
 
@@ -316,7 +316,7 @@ const SearchScope = z.object({
 export type SearchScope = z.infer<typeof SearchScope>
 
 // These scopes are used to check if the user has the necessary permissions to perform actions on a record.
-// Each of these is configured with allowed event types (ids), e.g. 'v2.birth', 'v2.death', 'tennis-club-membership'.
+// Each of these is configured with allowed event types (ids), e.g. 'birth', 'death', 'tennis-club-membership'.
 const RecordScope = z.object({
   type: z.enum([
     'record.read',
@@ -402,8 +402,8 @@ export function findScope<T extends ConfigurableScopeType>(
 
 /**
  * Parses a raw options string for non-search scopes (e.g., workqueues).
- * @param rawOptions - The raw string, e.g. "event=v2.birth|club-reg,all"
- * @returns An object like: { event: ['v2.birth', 'club-reg'], access: ['all'] }
+ * @param rawOptions - The raw string, e.g. "event=birth|club-reg,all"
+ * @returns An object like: { event: ['birth', 'club-reg'], access: ['all'] }
  */
 function getScopeOptions(rawOptions: string) {
   return rawOptions
@@ -434,7 +434,7 @@ export function parseConfigurableScope(scope: string) {
   const [, type, rawOptions] = rawScope.match(rawConfigurableScopeRegex) ?? []
 
   // Different options are separated by commas, and each option value is separated by a pipe e.g.:
-  // record.digitise[event=v2.birth|tennis-club-membership, my-jurisdiction]
+  // record.digitise[event=birth|tennis-club-membership, my-jurisdiction]
   const options = getScopeOptions(rawOptions)
 
   const parsedScope = {
@@ -465,9 +465,9 @@ export function parseLiteralScope(scope: string) {
  * @example
  * stringifyScope({
  *   type: "record.notify",
- *   options: { event: ["v2.birth", "tennis-club-membership"] }
+ *   options: { event: ["birth", "tennis-club-membership"] }
  * })
- * // Returns: "record.notify[event=v2.birth|tennis-club-membership]"
+ * // Returns: "record.notify[event=birth|tennis-club-membership]"
  */
 export function stringifyScope(scope: z.infer<typeof ConfigurableRawScopes>) {
   const options = Object.entries(scope.options)
@@ -478,7 +478,7 @@ export function stringifyScope(scope: z.infer<typeof ConfigurableRawScopes>) {
 }
 
 /**
- * Extracts authorized event identifiers (e.g. v2.birth, v2.death) from the provided configurable scopes.
+ * Extracts authorized event identifiers (e.g. birth, death) from the provided configurable scopes.
  *
  * @param scopes - Array of configurable scopes with options
  * @returns Array of authorized event identifiers
