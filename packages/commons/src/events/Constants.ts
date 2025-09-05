@@ -10,4 +10,4 @@
  */
 
 export const TENNIS_CLUB_MEMBERSHIP = 'tennis-club-membership'
-export const BIRTH_EVENT = 'v2.birth'
+export const BIRTH_EVENT = 'birth'

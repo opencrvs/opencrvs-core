@@ -25,6 +25,7 @@ const FontFamily = z.object({
 export const CertificateConfig = z.object({
   id: z.string(),
   event: z.string(),
+  isV2Template: z.boolean().optional(),
   label: TranslationConfig,
   isDefault: z.boolean(),
   fee: z.object({
