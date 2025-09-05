@@ -23,7 +23,6 @@ import {
 } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
 import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { getActionTypeSpecificContent } from './actionTypeSpecificContent'
 
 export const eventHistoryStatusMessage = {
@@ -123,7 +122,6 @@ export function EventHistoryDialog({
   const title = intl.formatMessage(eventHistoryStatusMessage, {
     status: getActionTypeForHistory(history, action)
   })
-  const events = useEvents()
 
   const comments = prepareComments(action)
   const reason = prepareReason(action)
