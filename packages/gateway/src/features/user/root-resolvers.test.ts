@@ -328,6 +328,7 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
+              'record.create[event=birth|death|tennis-club-membership]',
               'record.declare[event=birth|death|tennis-club-membership]',
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
@@ -358,6 +359,7 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
+              'record.create[event=birth|death|tennis-club-membership]',
               'record.declare[event=birth|death|tennis-club-membership]',
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
@@ -427,6 +429,7 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
+              'record.create[event=birth|death|tennis-club-membership]',
               'record.declare[event=birth|death|tennis-club-membership]',
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
@@ -457,6 +460,7 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
+              'record.create[event=birth|death|tennis-club-membership]',
               'record.declare[event=birth|death|tennis-club-membership]',
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
@@ -548,6 +552,7 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
+              'record.create[event=birth|death|tennis-club-membership]',
               'record.declare[event=birth|death|tennis-club-membership]',
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,

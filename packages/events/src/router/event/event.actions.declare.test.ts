@@ -73,9 +73,9 @@ describe('Declare action', () => {
 
   test('allows access if required scope is present', async () => {
     const client = createTestClient(user, [
+      'record.create[event=death|birth|tennis-club-membership]',
       'record.declare[event=death|birth|tennis-club-membership]'
     ])
-
     await expect(
       client.event.actions.declare.request(
         generator.event.actions.declare(eventId, {})

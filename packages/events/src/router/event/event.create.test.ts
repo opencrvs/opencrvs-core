@@ -31,7 +31,7 @@ describe('event.create', () => {
     test(`allows access with required scope`, async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
-        'record.declare[event=birth|death|tennis-club-membership]'
+        'record.create[event=birth|death|tennis-club-membership]'
       ])
 
       await expect(
@@ -42,7 +42,7 @@ describe('event.create', () => {
     test('dont allow access with API scope with incorrect event type', async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
-        'record.notify[event=some-event-type]'
+        `record.create[event=some-event-type]`
       ])
 
       await expect(
@@ -107,7 +107,7 @@ describe('event.create', () => {
   test('event with unknown type cannot be created', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, [
-      'record.declare[event=EVENT_TYPE_THAT_DOES_NOT_EXIST]'
+      'record.create[event=EVENT_TYPE_THAT_DOES_NOT_EXIST]'
     ])
     await expect(
       client.event.create(
@@ -130,7 +130,7 @@ describe('event.create', () => {
     test('event created by system user should not have assignment action', async () => {
       const { generator } = await setupTestCase()
       let client = createSystemTestClient('test-system', [
-        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
       const event = await client.event.create(generator.event.create())
 

@@ -205,6 +205,7 @@ export function testDataGenerator(rngSeed?: number) {
         'search[event=tennis-club-membership,access=all]',
         'search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]',
         SCOPES.USER_READ_ONLY_MY_AUDIT,
+        'record.create[event=birth|death|tennis-club-membership]',
         'record.read[event=birth|death|tennis-club-membership]',
         'record.declare[event=birth|death|tennis-club-membership]',
         'record.declared.reject[event=birth|death|tennis-club-membership]',
@@ -230,6 +231,7 @@ export function testDataGenerator(rngSeed?: number) {
         'search[event=death,access=all]',
         'search[event=tennis-club-membership,access=all]',
         'search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]',
+        'record.create[event=birth|death|tennis-club-membership]',
         'record.read[event=birth|death|tennis-club-membership]',
         'record.declare[event=birth|death|tennis-club-membership]',
         'record.declared.validate[event=birth|death|tennis-club-membership]',
@@ -248,6 +250,7 @@ export function testDataGenerator(rngSeed?: number) {
         'search[event=death,access=all]',
         'search[event=tennis-club-membership,access=all]',
         'search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]',
+        'record.create[event=birth|death|tennis-club-membership]',
         'record.read[event=birth|death|tennis-club-membership]',
         'record.declare[event=birth|death|tennis-club-membership]',
         'record.notify[event=birth|death|tennis-club-membership]'
