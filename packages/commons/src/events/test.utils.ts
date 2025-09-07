@@ -406,7 +406,7 @@ export function eventPayloadGenerator(
           const partialDeclaration = omitBy(
             generateActionDeclarationInput(
               configuration,
-              ActionType.DECLARE,
+              ActionType.NOTIFY,
               rng
             ),
             isString
