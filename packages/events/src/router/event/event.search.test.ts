@@ -1368,6 +1368,7 @@ test('User with my-jurisdiction scope only sees events created by system user to
   const { user, generator, locations } = await setupTestCase(5541)
 
   const client = createSystemTestClient('test-system', [
+    `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
     `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
   ])
 
