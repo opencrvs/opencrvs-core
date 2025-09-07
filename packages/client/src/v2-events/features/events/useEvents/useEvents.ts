@@ -19,7 +19,6 @@ import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
 import {
-  customMutationKeys,
   useEventAction,
   useEventCustomAction,
   useIsMutating
@@ -170,6 +169,14 @@ export function useEvents() {
           }
         },
         unassign: useEventAction(trpc.event.actions.assignment.unassign)
+      },
+      duplicate: {
+        markAsDuplicate: useEventAction(
+          trpc.event.actions.duplicate.markAsDuplicate
+        ),
+        markNotDuplicate: useEventAction(
+          trpc.event.actions.duplicate.markNotDuplicate
+        )
       }
     },
     onlineActions: {
@@ -178,18 +185,11 @@ export function useEvents() {
       )
     },
     customActions: {
-      registerOnDeclare: useEventCustomAction([
-        ...customMutationKeys.registerOnDeclare
-      ]),
-      validateOnDeclare: useEventCustomAction([
-        ...customMutationKeys.validateOnDeclare
-      ]),
-      registerOnValidate: useEventCustomAction([
-        ...customMutationKeys.registerOnValidate
-      ]),
-      makeCorrectionOnRequest: useEventCustomAction([
-        ...customMutationKeys.makeCorrectionOnRequest
-      ])
+      registerOnDeclare: useEventCustomAction('registerOnDeclare'),
+      validateOnDeclare: useEventCustomAction('validateOnDeclare'),
+      registerOnValidate: useEventCustomAction('registerOnValidate'),
+      archiveOnDuplicate: useEventCustomAction('archiveOnDuplicate'),
+      makeCorrectionOnRequest: useEventCustomAction('makeCorrectionOnRequest')
     }
   }
 }

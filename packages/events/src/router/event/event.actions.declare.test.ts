@@ -17,6 +17,7 @@ import {
   createPrng,
   eventQueryDataGenerator,
   generateActionDeclarationInput,
+  generateActionDuplicateDeclarationInput,
   UUID,
   getCurrentEventState,
   getUUID,
@@ -338,10 +339,14 @@ test('deduplication check is performed after declaration', async () => {
 
   const newEvent = await client.event.create(generator.event.create())
   const existingEventId = getUUID()
-  const declaration = generateActionDeclarationInput(
+  const declaration = generateActionDuplicateDeclarationInput(
     tennisClubMembershipEvent,
     ActionType.DECLARE,
-    prng
+    prng,
+    // so that applicate.dob is generated
+    {
+      'applicant.dobUnknown': false
+    }
   )
   const existingEventIndex = eventQueryDataGenerator({
     id: existingEventId,
