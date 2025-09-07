@@ -46,7 +46,7 @@ import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
 import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
 import {
-  addAction,
+  processAction,
   deleteUnreferencedFilesFromPreviousDrafts,
   createEvent,
   deleteEvent,
@@ -147,7 +147,11 @@ export const eventRouter = router({
         throw new TRPCError({ code: 'FORBIDDEN' })
       }
 
-      const updatedEvent = await addAction(
+      const configuration = await getEventConfigurationById({
+        token: ctx.token,
+        eventType: event.type
+      })
+      const updatedEvent = await processAction(
         {
           type: ActionType.READ,
           eventId: event.id,
@@ -155,9 +159,11 @@ export const eventRouter = router({
           declaration: {}
         },
         {
+          event,
           user: ctx.user,
           token: ctx.token,
-          status: ActionStatus.Accepted
+          status: ActionStatus.Accepted,
+          configuration
         }
       )
 
@@ -282,20 +288,34 @@ export const eventRouter = router({
         .input(MarkAsDuplicateActionInput)
         .use(middleware.validateAction)
         .mutation(async (options) => {
+          const event = await getEventById(options.input.eventId)
+          const configuration = await getEventConfigurationById({
+            token: options.ctx.token,
+            eventType: event.type
+          })
           return markAsDuplicate(
+            event,
             options.input,
             options.ctx.user,
-            options.ctx.token
+            options.ctx.token,
+            configuration
           )
         }),
       markNotDuplicate: publicProcedure
         .input(MarkNotDuplicateActionInput)
         .use(middleware.validateAction)
         .mutation(async (options) => {
+          const event = await getEventById(options.input.eventId)
+          const configuration = await getEventConfigurationById({
+            token: options.ctx.token,
+            eventType: event.type
+          })
           return markNotDuplicate(
+            event,
             options.input,
             options.ctx.user,
-            options.ctx.token
+            options.ctx.token,
+            configuration
           )
         })
     })
