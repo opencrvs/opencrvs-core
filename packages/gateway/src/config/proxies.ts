@@ -17,7 +17,7 @@ import z from 'zod'
 import { ServerRoute } from '@hapi/hapi'
 
 const LegacyLocationUpdate = z.object({
-  name: z.string(),
+  name: z.string().optional(),
   alias: z.string().optional(),
   status: z.enum(['active', 'inactive']).optional(),
   statistics: z

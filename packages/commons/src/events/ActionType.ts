@@ -27,7 +27,7 @@ export const ActionType = {
   DUPLICATE_DETECTED: 'DUPLICATE_DETECTED',
   REJECT: 'REJECT', // REJECT_DECLARATION
   MARK_AS_DUPLICATE: 'MARK_AS_DUPLICATE',
-  MARK_NOT_DUPLICATE: 'MARK_NOT_DUPLICATE',
+  MARK_AS_NOT_DUPLICATE: 'MARK_AS_NOT_DUPLICATE',
   ARCHIVE: 'ARCHIVE',
   // Record actions
   PRINT_CERTIFICATE: 'PRINT_CERTIFICATE',
@@ -66,7 +66,7 @@ export const ActionTypes = z.enum([
   'DUPLICATE_DETECTED',
   'REJECT',
   'MARK_AS_DUPLICATE',
-  'MARK_NOT_DUPLICATE',
+  'MARK_AS_NOT_DUPLICATE',
   'ARCHIVE',
   'PRINT_CERTIFICATE',
   'REQUEST_CORRECTION',
@@ -90,7 +90,8 @@ export type ClientSpecificAction =
 const declarationActionValues = [
   ActionTypes.enum.DECLARE,
   ActionTypes.enum.VALIDATE,
-  ActionTypes.enum.REGISTER
+  ActionTypes.enum.REGISTER,
+  ActionTypes.enum.NOTIFY
 ] as const
 
 /** Actions which change event data (declaration) before registration / during declaration. */
@@ -129,8 +130,7 @@ export const workqueueActions = ActionTypes.exclude([
   ActionType.NOTIFY,
   ActionType.DUPLICATE_DETECTED,
   ActionType.REJECT,
-  ActionType.MARK_NOT_DUPLICATE,
-  ActionType.MARK_AS_DUPLICATE,
+  ActionType.MARK_AS_NOT_DUPLICATE,
   ActionType.REJECT_CORRECTION,
   ActionType.APPROVE_CORRECTION
 ])

@@ -59,7 +59,7 @@ test('Slugs in response matches input', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=v2.birth,access=all]',
+    'search[event=birth,access=all]',
     'search[event=tennis-club-membership,access=all]'
   ])
   const input: WorkqueueCountInput = [

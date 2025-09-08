@@ -18,8 +18,6 @@ import {
   getUUID,
   TranslationConfig,
   SCOPES,
-  ACTION_ALLOWED_SCOPES,
-  hasAnyOfScopes,
   WorkqueueActionType,
   EventStatus,
   isMetaAction,
@@ -27,7 +25,8 @@ import {
   InherentFlags,
   ClientSpecificAction,
   workqueueActions,
-  Draft
+  Draft,
+  isActionInScope
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -89,13 +88,6 @@ function getAvailableAssignmentActions(
 
   return []
 }
-interface ActionConfig {
-  label: TranslationConfig
-  icon: IconProps['name']
-  onClick: (workqueue?: string) => Promise<void> | void
-  disabled?: boolean
-  hidden?: boolean
-}
 
 export const actionLabels = {
   [ActionType.READ]: {
@@ -135,6 +127,11 @@ export const actionLabels = {
     description: 'Label for review record button in dropdown menu',
     id: 'v2.event.birth.action.register.label'
   },
+  [ActionType.MARK_AS_DUPLICATE]: {
+    defaultMessage: 'Review',
+    description: 'Label for review potential duplicate button in dropdown menu',
+    id: 'v2.event.birth.action.mark-as-duplicate.label'
+  },
   [ActionType.PRINT_CERTIFICATE]: {
     defaultMessage: 'Print',
     description:
@@ -157,6 +154,14 @@ export const actionLabels = {
     id: 'v2.event.action.review-correction.label'
   }
 } as const
+
+interface ActionConfig {
+  label: TranslationConfig
+  icon: IconProps['name']
+  onClick: (workqueue?: string) => Promise<void> | void
+  disabled?: boolean
+  hidden?: boolean
+}
 
 interface ActionMenuItem extends ActionConfig {
   type: WorkqueueActionType | ClientSpecificAction
@@ -218,17 +223,24 @@ function useViewableActionConfigurations(
   )
 
   const eventId = event.id
-  const hasScopeForValidate = hasAnyOfScopes(
+
+  const userMayValidate = isActionInScope(
     authentication.scope,
-    ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
+    ActionType.VALIDATE,
+    event.type
   )
+
+  const isAssignmentInProgress = events.actions.assignment.assign.isAssigning(
+    event.id
+  )
+
   const isRejected = event.flags.includes(InherentFlags.REJECTED)
   const isDeclaredState = event.status === EventStatus.enum.DECLARED
   const isNotifiedState = event.status === EventStatus.enum.NOTIFIED
 
   // Incomplete declarations are always shown as "Review" for the reviewer.
   const isReviewingIncompleteDeclaration =
-    hasScopeForValidate && !isRejected && isNotifiedState
+    userMayValidate && !isRejected && isNotifiedState
 
   // Rejected declarations are always shown as "Review" for the reviewer.
   const isReviewingRejectedDeclaration =
@@ -240,7 +252,13 @@ function useViewableActionConfigurations(
   // By default, field agent has both scopes for incomplete (notify) and complete (declare) actions.
   // As a business rule, for notified event, client hides the declare action if the user has no scope for validate.
   const shouldHideDeclareAction =
-    isNotifiedState && !hasScopeForValidate && !isRejected
+    isNotifiedState && !userMayValidate && !isRejected
+
+  const userMayCorrect = isActionInScope(
+    authentication.scope,
+    ActionType.REQUEST_CORRECTION,
+    event.type
+  )
 
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
@@ -257,7 +275,7 @@ function useViewableActionConfigurations(
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
         icon: 'PushPin' as const,
-        onClick: async (workqueue?: string) => {
+        onClick: async () => {
           const assign = await openAssignModal<boolean>((close) => (
             <AssignModal close={close} />
           ))
@@ -271,11 +289,9 @@ function useViewableActionConfigurations(
           })
         },
         disabled:
-          !isOnline ||
           // User may not assign themselves if record is waiting for correction approval/rejection but user is not allowed to do that
-          (eventIsWaitingForCorrection &&
-            !authentication.scope.includes(SCOPES.RECORD_REGISTRATION_CORRECT)),
-        hidden: isNotifiedState && !isRejected && !hasScopeForValidate
+          !isOnline || (eventIsWaitingForCorrection && !userMayCorrect),
+        hidden: isNotifiedState && !isRejected && !userMayValidate
       },
       [ActionType.UNASSIGN]: {
         label: actionLabels[ActionType.UNASSIGN],
@@ -353,6 +369,20 @@ function useViewableActionConfigurations(
           )
         },
         disabled: !isDownloadedAndAssignedToUser
+      },
+      [ActionType.MARK_AS_DUPLICATE]: {
+        label: actionLabels[ActionType.MARK_AS_DUPLICATE],
+        icon: 'PencilLine' as const,
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
+            ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.buildPath(
+              { eventId },
+              { workqueue }
+            )
+          )
+        },
+        disabled: !isDownloadedAndAssignedToUser || isAssignmentInProgress
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
@@ -434,6 +464,23 @@ function useViewableActionConfigurations(
   }
 }
 
+export function useUserAllowedActions(eventType: string) {
+  const scopes = useSelector(getScope) ?? []
+
+  const actions = Object.values(ActionType)
+  const clientSpecificActions = Object.values(ClientSpecificAction)
+
+  const allowedActions = [...actions, ...clientSpecificActions].filter(
+    (action) => isActionInScope(scopes, action, eventType)
+  )
+
+  return {
+    allowedActions,
+    isActionAllowed: (action: ActionType | ClientSpecificAction) =>
+      allowedActions.includes(action)
+  }
+}
+
 /**
  *
  * NOTE: In principle, you should never add new business rules to the `useAction` hook alone. All the actions are validated by the server and their order is enforced.
@@ -445,8 +492,7 @@ export function useAllowedActionConfigurations(
   event: EventIndex,
   authentication: ITokenPayload
 ) {
-  const scopes = useSelector(getScope) ?? []
-
+  const { isActionAllowed } = useUserAllowedActions(event.type)
   const drafts = useDrafts()
 
   const openDraft = drafts
@@ -480,12 +526,7 @@ export function useAllowedActionConfigurations(
         ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
         workqueueActions.safeParse(action).success
     )
-    .filter((a) => {
-      const requiredScopes = ACTION_ALLOWED_SCOPES[a]
-      return requiredScopes === null
-        ? true
-        : hasAnyOfScopes(scopes, requiredScopes)
-    })
+    .filter(isActionAllowed)
     // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
     .map((a) => ({ ...config[a], type: a }))
     .filter((a: ActionConfig) => !a.hidden)

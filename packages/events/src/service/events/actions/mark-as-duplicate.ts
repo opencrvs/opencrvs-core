@@ -8,38 +8,27 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import {
   ActionStatus,
-  ApproveCorrectionActionInput
+  EventConfig,
+  EventDocument,
+  MarkAsDuplicateActionInput
 } from '@opencrvs/commons/events'
-import { addAction, getEventById } from '@events/service/events/events'
+import { processAction } from '@events/service/events/events'
 import { TrpcUserContext } from '@events/context'
-import { RequestNotFoundError } from './correction'
 
-export async function approveCorrection(
-  input: ApproveCorrectionActionInput,
-  {
-    user,
-    token
-  }: {
-    user: TrpcUserContext
-    token: string
-  }
+export async function markAsDuplicate(
+  event: EventDocument,
+  input: MarkAsDuplicateActionInput,
+  user: TrpcUserContext,
+  token: string,
+  configuration: EventConfig
 ) {
-  const storedEvent = await getEventById(input.eventId)
-
-  const requestAction = storedEvent.actions.find(
-    (a) => a.id === input.requestId
-  )
-
-  if (!requestAction) {
-    throw new RequestNotFoundError(input.requestId)
-  }
-
-  return addAction(input, {
+  return processAction(input, {
+    event,
     user,
     token,
-    status: ActionStatus.Accepted
+    status: ActionStatus.Accepted,
+    configuration
   })
 }

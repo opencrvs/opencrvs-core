@@ -13,26 +13,24 @@ import {
   ActionStatus,
   EventDocument,
   DeclareActionInput,
-  ACTION_ALLOWED_SCOPES,
-  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
+  ACTION_SCOPE_MAP,
   getCurrentEventState
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
-import { addAction } from '@events/service/events/events'
+import { getEventById, processAction } from '@events/service/events/events'
 import {
-  ActionProcedure,
   defaultRequestHandler,
   getDefaultActionProcedures
 } from '@events/router/event/actions'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 
-export function declareActionProcedures(): ActionProcedure {
+export function declareActionProcedures() {
   const requireScopesMiddleware = requiresAnyOfScopes(
-    ACTION_ALLOWED_SCOPES[ActionType.DECLARE],
-    ACTION_ALLOWED_CONFIGURABLE_SCOPES[ActionType.DECLARE]
+    [],
+    ACTION_SCOPE_MAP[ActionType.DECLARE]
   )
 
   return {
@@ -52,16 +50,23 @@ export function declareActionProcedures(): ActionProcedure {
         }
 
         const configs = await getInMemoryEventConfigurations(token)
+        const event = await getEventById(input.eventId)
 
-        const declaredEvent = await defaultRequestHandler(input, user, token)
-
-        const config = configs.find((c) => c.id === declaredEvent.type)
+        const config = configs.find((c) => c.id === event.type)
 
         if (!config) {
           throw new Error(
-            `Event configuration not found with type: ${declaredEvent.type}`
+            `Event configuration not found with type: ${event.type}`
           )
         }
+
+        const declaredEvent = await defaultRequestHandler(
+          input,
+          user,
+          token,
+          event,
+          config
+        )
 
         const dedupConfig = config.actions.find(
           (action) => action.type === input.type
@@ -77,19 +82,28 @@ export function declareActionProcedures(): ActionProcedure {
           config
         )
 
+        const updatedEvent = await getEventById(input.eventId)
+
         if (duplicates.length > 0) {
-          return addAction(
+          return processAction(
             {
               type: ActionType.DUPLICATE_DETECTED,
               transactionId: input.transactionId,
               eventId: input.eventId,
               declaration: input.declaration,
-              content: { duplicates: duplicates.map((d) => d.event.id) }
+              content: {
+                duplicates: duplicates.map(({ event: { id, trackingId } }) => ({
+                  id,
+                  trackingId
+                }))
+              }
             },
             {
+              event: updatedEvent,
               user,
               token,
-              status: ActionStatus.Accepted
+              status: ActionStatus.Accepted,
+              configuration: config
             }
           )
         }

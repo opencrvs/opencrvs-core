@@ -120,22 +120,11 @@ function mapFieldTypeToElasticsearch(
       const addressProperties = {
         country: { type: 'keyword' },
         addressType: { type: 'keyword' },
-        province: { type: 'keyword' },
-        district: { type: 'keyword' },
-        urbanOrRural: { type: 'keyword' },
-        town: { type: 'keyword' },
-        residentialArea: { type: 'keyword' },
-        street: { type: 'keyword' },
-        number: { type: 'keyword' },
-        zipCode: { type: 'keyword' },
-        village: { type: 'keyword' },
-        state: { type: 'keyword' },
-        district2: { type: 'keyword' },
-        cityOrTown: { type: 'keyword' },
-        addressLine1: { type: 'keyword' },
-        addressLine2: { type: 'keyword' },
-        addressLine3: { type: 'keyword' },
-        postcodeOrZip: { type: 'keyword' }
+        administrativeArea: { type: 'keyword' },
+        streetLevelDetails: {
+          type: 'object',
+          properties: {}
+        }
       } satisfies {
         [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
       }
@@ -272,7 +261,13 @@ export async function createIndex(
             }
           },
           flags: { type: 'keyword' },
-          duplicates: { type: 'keyword' }
+          potentialDuplicates: {
+            type: 'object',
+            properties: {
+              id: { type: 'keyword' },
+              trackingId: { type: 'keyword' }
+            }
+          }
         } satisfies EventIndexMapping
       }
     }

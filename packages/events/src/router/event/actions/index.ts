@@ -25,13 +25,13 @@ import {
   PrintCertificateActionInput,
   DeclareActionInput,
   ValidateActionInput,
-  ACTION_ALLOWED_SCOPES,
-  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
+  ACTION_SCOPE_MAP,
   RequestCorrectionActionInput,
   ApproveCorrectionActionInput,
   RejectCorrectionActionInput,
   getPendingAction,
-  ActionInputWithType
+  ActionInputWithType,
+  EventConfig
 } from '@opencrvs/commons/events'
 import { TokenUserType } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
@@ -42,8 +42,11 @@ import {
   getEventById,
   addAction,
   addAsyncRejectAction,
-  throwConflictIfActionNotAllowed
+  throwConflictIfActionNotAllowed,
+  ensureEventIndexed,
+  processAction
 } from '@events/service/events/events'
+import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
 import {
   ActionConfirmationResponse,
@@ -149,7 +152,7 @@ const ACTION_PROCEDURE_CONFIG = {
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
 
-export type ActionProcedure = {
+type ActionProcedure = {
   request: MutationProcedure<{
     input: ActionInput
     output: EventDocument
@@ -171,14 +174,18 @@ export async function defaultRequestHandler(
   input: ActionInputWithType,
   user: TrpcUserContext,
   token: string,
+  event: EventDocument,
+  configuration: EventConfig,
   actionConfirmationResponseSchema?: z.ZodType
 ) {
   await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
 
   const eventWithRequestedAction = await addAction(input, {
+    event,
     user,
     token,
-    status: ActionStatus.Requested
+    status: ActionStatus.Requested,
+    configuration
   })
 
   const { responseStatus, body } = await requestActionConfirmation(
@@ -193,8 +200,9 @@ export async function defaultRequestHandler(
       code: 'INTERNAL_SERVER_ERROR',
       message: 'Unexpected failure from notification API'
     })
-    // For Async flow, we just return the event with the requested action
+    // For Async flow, we just return the event with the requested action and ensure it is indexed
   } else if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
+    await ensureEventIndexed(eventWithRequestedAction, configuration)
     return eventWithRequestedAction
   }
 
@@ -226,19 +234,17 @@ export async function defaultRequestHandler(
 
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
 
-  return addAction(
+  const updatedEvent = await processAction(
     {
       ...strippedInput,
       declaration: {},
       originalActionId: requestedAction.id,
       ...parsedBody
     },
-    {
-      user,
-      token,
-      status
-    }
+    { event, user, token, status, configuration }
   )
+
+  return updatedEvent
 }
 
 /**
@@ -268,8 +274,8 @@ export function getDefaultActionProcedures(
   }
 
   const requireScopesMiddleware = requiresAnyOfScopes(
-    ACTION_ALLOWED_SCOPES[actionType],
-    ACTION_ALLOWED_CONFIGURABLE_SCOPES[actionType]
+    [],
+    ACTION_SCOPE_MAP[actionType]
   )
 
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
@@ -287,6 +293,12 @@ export function getDefaultActionProcedures(
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user, isDuplicateAction, duplicates } = ctx
+        const { eventId } = input
+        const event = await getEventById(eventId)
+        const configuration = await getEventConfigurationById({
+          token,
+          eventType: event.type
+        })
 
         if (isDuplicateAction) {
           return ctx.event
@@ -300,6 +312,8 @@ export function getDefaultActionProcedures(
           input,
           user,
           token,
+          event,
+          configuration,
           actionConfirmationResponseSchema
         )
       }),
@@ -316,6 +330,10 @@ export function getDefaultActionProcedures(
         const confirmationAction = event.actions.find(
           (a) => a.originalActionId === actionId
         )
+        const configuration = await getEventConfigurationById({
+          token,
+          eventType: event.type
+        })
 
         // Original action is not found
         if (!originalAction) {
@@ -338,12 +356,14 @@ export function getDefaultActionProcedures(
           return getEventById(input.eventId)
         }
 
-        return addAction(
+        return processAction(
           { ...input, originalActionId: actionId },
           {
+            event,
             user,
             token,
-            status: ActionStatus.Accepted
+            status: ActionStatus.Accepted,
+            configuration
           }
         )
       }),

@@ -61,11 +61,24 @@ CREATE TYPE app.action_type AS ENUM (
     'READ',
     'ASSIGN',
     'UNASSIGN',
-    'MARK_NOT_DUPLICATE'
+    'MARK_AS_NOT_DUPLICATE'
 );
 
 
 ALTER TYPE app.action_type OWNER TO events_migrator;
+
+--
+-- Name: location_type; Type: TYPE; Schema: app; Owner: events_migrator
+--
+
+CREATE TYPE app.location_type AS ENUM (
+    'HEALTH_FACILITY',
+    'CRVS_OFFICE',
+    'ADMIN_STRUCTURE'
+);
+
+
+ALTER TYPE app.location_type OWNER TO events_migrator;
 
 --
 -- Name: user_type; Type: TYPE; Schema: app; Owner: events_migrator
@@ -189,6 +202,7 @@ CREATE TABLE app.locations (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     deleted_at timestamp with time zone,
+    location_type app.location_type,
     valid_until timestamp with time zone
 );
 

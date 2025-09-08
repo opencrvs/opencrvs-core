@@ -15,8 +15,7 @@ import {
   ActionType,
   DraftInput,
   FullDocumentPath,
-  getUUID,
-  SCOPES
+  getUUID
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
@@ -39,7 +38,9 @@ test('prevents forbidden access if missing required scope', async () => {
 
 test('allows access with required scope', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
+  const client = createTestClient(user, [
+    'record.declare[event=birth|death|tennis-club-membership]'
+  ])
 
   await expect(
     client.event.delete({ eventId: '00000000-0000-0000-0000-000000000000' })

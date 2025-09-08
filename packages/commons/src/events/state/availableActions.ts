@@ -26,18 +26,21 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   [EventStatus.enum.NOTIFIED]: [
     ActionType.READ,
     ActionType.DECLARE,
+    ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
     ActionType.REJECT
   ],
   [EventStatus.enum.DECLARED]: [
     ActionType.READ,
     ActionType.VALIDATE,
+    ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
     ActionType.REJECT
   ],
   [EventStatus.enum.VALIDATED]: [
     ActionType.READ,
     ActionType.REGISTER,
+    ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
     ActionType.REJECT
   ],
@@ -68,7 +71,13 @@ const ACTION_FILTERS: {
   [ActionType.APPROVE_CORRECTION]: (flags) =>
     flags.includes(InherentFlags.CORRECTION_REQUESTED),
   [ActionType.REJECT_CORRECTION]: (flags) =>
-    flags.includes(InherentFlags.CORRECTION_REQUESTED)
+    flags.includes(InherentFlags.CORRECTION_REQUESTED),
+  [ActionType.MARK_AS_DUPLICATE]: (flags) =>
+    flags.includes(InherentFlags.POTENTIAL_DUPLICATE),
+  [ActionType.VALIDATE]: (flags) =>
+    !flags.includes(InherentFlags.POTENTIAL_DUPLICATE),
+  [ActionType.REGISTER]: (flags) =>
+    !flags.includes(InherentFlags.POTENTIAL_DUPLICATE)
 }
 
 /**

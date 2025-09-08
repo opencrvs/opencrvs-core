@@ -33,6 +33,11 @@ export const useCertificateTemplateSelectorFieldConfig = (
     $now: formatISO(new Date(), { representation: 'date' })
   }
 
+  // Filter out certificates that are not for the event type and are not v2 templates
+  const eventCertificateTemplates = certificateTemplates.filter(
+    (x) => x.event === eventType && x.isV2Template
+  )
+
   return {
     id: CERT_TEMPLATE_ID,
     type: FieldType.SELECT,
@@ -42,11 +47,10 @@ export const useCertificateTemplateSelectorFieldConfig = (
       description: 'This is the label for the field',
       id: 'v2.event.default.action.certificate.template.type.label'
     },
-    defaultValue: certificateTemplates.find(
+    defaultValue: eventCertificateTemplates.find(
       (x) => x.event === eventType && x.isDefault
     )?.id,
-    options: certificateTemplates
-      .filter((x) => x.event === eventType)
+    options: eventCertificateTemplates
       .filter(
         (template) =>
           !template.conditionals ||

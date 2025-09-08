@@ -8,23 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import { useIntl } from 'react-intl'
-import { Pill } from '@opencrvs/components'
 
-export function Archive() {
-  const intl = useIntl()
+import { UUID } from '../uuid'
+import { z } from 'zod'
 
-  return (
-    <p>
-      <Pill
-        label={intl.formatMessage({
-          id: 'v2.event.history.markAsDuplicate',
-          defaultMessage: 'Marked as a duplicate'
-        })}
-        size="small"
-        type="inactive"
-      />
-    </p>
-  )
-}
+export const Location = z.object({
+  id: UUID,
+  name: z.string(),
+  parentId: UUID.nullable(),
+  validUntil: z.date().nullable(),
+  locationType: z
+    .enum(['HEALTH_FACILITY', 'CRVS_OFFICE', 'ADMIN_STRUCTURE'])
+    .nullable()
+})
+export type Location = z.infer<typeof Location>

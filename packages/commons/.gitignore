@@ -9,6 +9,9 @@
 # production
 /build
 
+# development
+.wireit
+
 # misc
 .DS_Store
 .env.local

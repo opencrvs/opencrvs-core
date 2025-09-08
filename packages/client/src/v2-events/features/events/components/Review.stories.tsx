@@ -226,9 +226,7 @@ export const ReviewWithValidationErrors: Story = {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        urbanOrRural: 'RURAL',
-        village: 'Tennisville'
+        administrativeArea: 'invalid-uuid'
       } as AddressFieldValue
     }
   },

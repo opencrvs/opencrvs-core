@@ -23,7 +23,7 @@ import {
   FieldConfig,
   File,
   FileUploadWithOptions,
-  Location,
+  LocationInput,
   Office,
   PageHeader,
   Paragraph,
@@ -211,17 +211,11 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
       return null
     case FieldType.ADDRESS:
       return {
-        country: null,
+        country: '',
         addressType: AddressType.DOMESTIC,
-        province: null,
-        district: null,
-        urbanOrRural: 'URBAN', // Default to urban needed for validation
-        town: null,
-        residentialArea: null,
-        street: null,
-        number: null,
-        zipCode: null
-      }
+        administrativeArea: '',
+        streetLevelDetails: {}
+      } satisfies AddressFieldValue
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
@@ -399,7 +393,7 @@ export const isRadioGroupFieldType = (field: {
 export const isLocationFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: string; config: Location } => {
+}): field is { value: string; config: LocationInput } => {
   return field.config.type === FieldType.LOCATION
 }
 

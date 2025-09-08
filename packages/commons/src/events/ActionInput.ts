@@ -14,7 +14,8 @@ import { ActionType } from './ActionType'
 import {
   PrintContent as PrintContent,
   ActionUpdate,
-  ReasonContent
+  ReasonContent,
+  PotentialDuplicate
 } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { UUID, getUUID } from '../uuid'
@@ -107,7 +108,7 @@ export const DuplicateDetectedActionInput = BaseActionInput.merge(
       .literal(ActionType.DUPLICATE_DETECTED)
       .default(ActionType.DUPLICATE_DETECTED),
     content: z.object({
-      duplicates: z.array(UUID)
+      duplicates: z.array(PotentialDuplicate)
     })
   })
 )
@@ -116,7 +117,12 @@ export const MarkAsDuplicateActionInput = BaseActionInput.merge(
   z.object({
     type: z
       .literal(ActionType.MARK_AS_DUPLICATE)
-      .default(ActionType.MARK_AS_DUPLICATE)
+      .default(ActionType.MARK_AS_DUPLICATE),
+    content: z
+      .object({
+        duplicateOf: UUID
+      })
+      .optional()
   })
 )
 export type MarkAsDuplicateActionInput = z.infer<
@@ -126,8 +132,8 @@ export type MarkAsDuplicateActionInput = z.infer<
 export const MarkNotDuplicateActionInput = BaseActionInput.merge(
   z.object({
     type: z
-      .literal(ActionType.MARK_NOT_DUPLICATE)
-      .default(ActionType.MARK_NOT_DUPLICATE)
+      .literal(ActionType.MARK_AS_NOT_DUPLICATE)
+      .default(ActionType.MARK_AS_NOT_DUPLICATE)
   })
 )
 export type MarkNotDuplicateActionInput = z.infer<
@@ -144,7 +150,7 @@ export type ArchiveActionInput = z.infer<typeof ArchiveActionInput>
 
 export const AssignActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.ASSIGN).default(ActionType.ASSIGN),
+    type: z.literal(ActionType.ASSIGN),
     assignedTo: z.string()
   })
 )
