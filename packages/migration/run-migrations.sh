@@ -32,7 +32,7 @@ for migration_file in $(ls $MIGRATIONS_PATH)
 do
   echo "Updating environment variables in $MIGRATIONS_PATH/$migration_file"
   envsubst < $MIGRATIONS_PATH/$migration_file > $MIGRATIONS_PATH/$migration_file.tmp
-  mv $MIGRATIONS_PATH/$migration_file.tmp $MIGRATIONS_PATH/$migration_file.sql
+  mv $MIGRATIONS_PATH/$migration_file.tmp $MIGRATIONS_PATH/$migration_file
 done
 DATABASE_URL=${EVENTS_POSTGRES_URL} yarn --cwd $SCRIPT_PATH node-pg-migrate up --schema=app --migrations-dir=./src/migrations/events
 
