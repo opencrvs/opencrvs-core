@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Readable, Transform, PassThrough } from 'node:stream'
-import fetch from 'node-fetch'
 import { JsonStreamStringify } from 'json-stream-stringify'
 import { EventDocument } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
