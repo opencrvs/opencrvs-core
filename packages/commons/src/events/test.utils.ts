@@ -157,6 +157,7 @@ export function mapFieldTypeToMockValue(
     case FieldType.PHONE:
     case FieldType.ID:
     case FieldType.OFFICE:
+    case FieldType.LINK_BUTTON:
       return `${field.id}-${field.type}-${i}`
     case FieldType.NAME:
       return generateRandomName(rng)
