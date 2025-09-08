@@ -131,7 +131,7 @@ export function DeclarationComparisonTableComponent({
                   </TableHeader>
                 ),
                 width: 33,
-                key: 'original'
+                key: 'previous'
               },
               {
                 label: (
@@ -142,7 +142,7 @@ export function DeclarationComparisonTableComponent({
                   </TableHeader>
                 ),
                 width: 33,
-                key: 'correction'
+                key: 'latest'
               }
             ]}
             content={changedFields}

@@ -70,11 +70,6 @@ export function useActionForHistory() {
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!action.declaration || Object.keys(action.declaration).length === 0) {
-      return action.type
-    }
-
     const parsedAction = DeclarationActions.safeParse(action.type)
     if (parsedAction.success) {
       if (
