@@ -322,24 +322,36 @@ export function buildAction(
   }
 }
 
+/**
+ * Persists a new action for an event in the database.
+ *
+ * @param input - The action payload including type and related data.
+ * @param options - Context for the action being added.
+ * @param options.event - The event document the action belongs to.
+ * @param options.user - The user performing the action.
+ * @param options.token - Authentication token of the user.
+ * @param options.status - The resulting status of the action e.g - Accepted, Requested.
+ * @param options.configuration - Event configuration.
+ *
+ * @returns The updated event document with the new action included.
+ */
 export async function addAction(
   input: ActionInputWithType,
   {
+    event,
     user,
     token,
-    status
+    status,
+    configuration
   }: {
+    event: EventDocument
     user: TrpcUserContext
     token: string
     status: ActionStatus
+    configuration: EventConfig
   }
 ): Promise<EventDocument> {
-  const event = await getEventById(input.eventId)
-  const configuration = await getEventConfigurationById({
-    token,
-    eventType: event.type
-  })
-
+  const eventId = event.id
   // @TODO: Check that this works after making sure data incldues only declaration fields.
   const fieldConfigs = getDeclarationFields(configuration)
   const fileValuesInCurrentAction = extractFileValues(
@@ -385,9 +397,7 @@ export async function addAction(
     )
   }
 
-  const updatedEvent = await getEventById(input.eventId)
-
-  await indexEvent(updatedEvent, configuration)
+  const updatedEvent = await getEventById(eventId)
 
   const previousDraft = await draftsRepo.findLatestDraftForAction(
     event.id,
@@ -407,6 +417,57 @@ export async function addAction(
     })
   }
 
+  return updatedEvent
+}
+
+function isEventIndexable(event: EventDocument) {
+  return getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
+}
+
+export async function ensureEventIndexed(
+  event: EventDocument,
+  configuration: EventConfig
+) {
+  if (isEventIndexable(event)) {
+    await indexEvent(event, configuration)
+  }
+}
+
+/**
+ * Processes an action on an event:
+ *  - Adds the given action to the event
+ *  - Updates the event state accordingly
+ *  - Record an event in the database
+ *  - Indexes the event in Elasticsearch if it is no longer a draft
+ *
+ * Returns the updated event document.
+ */
+export async function processAction(
+  input: ActionInputWithType,
+  {
+    event,
+    user,
+    token,
+    status,
+    configuration
+  }: {
+    event: EventDocument
+    user: TrpcUserContext
+    token: string
+    status: ActionStatus
+    configuration: EventConfig
+  }
+): Promise<EventDocument> {
+  const updatedEvent = await addAction(input, {
+    event,
+    user,
+    token,
+    status,
+    configuration
+  })
+
+  // Only send the event to Elasticsearch if it is not a draft
+  await ensureEventIndexed(updatedEvent, configuration)
   return updatedEvent
 }
 

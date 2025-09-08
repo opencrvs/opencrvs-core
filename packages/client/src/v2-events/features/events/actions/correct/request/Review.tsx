@@ -34,6 +34,7 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { hasFieldChanged } from '../utils'
 
 export function Review() {
@@ -44,6 +45,8 @@ export function Review() {
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
 
   const event = events.getEvent.getFromCache(eventId)
 
@@ -77,9 +80,14 @@ export function Review() {
     )
   }
 
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
+
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
-    form
+    form,
+    locations: adminStructureLocations
   })
 
   return (
@@ -88,6 +96,7 @@ export function Review() {
         form={form}
         formConfig={formConfig}
         isCorrection={true}
+        locations={adminStructureLocations}
         previousFormValues={previousFormValues}
         title={intlWithData.formatMessage(
           actionConfig.label,

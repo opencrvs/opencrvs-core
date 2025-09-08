@@ -38,6 +38,7 @@ import {
   setEventData,
   addLocalEventConfig
 } from '@client/v2-events/features/events/useEvents/api'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ActionMenu } from '../ActionMenu'
 import { actionLabels } from '../useAllowedActionConfigurations'
 
@@ -284,7 +285,10 @@ export function createStoriesFromScenarios(
                   results: [
                     getCurrentEventState(event, tennisClubMembershipEvent)
                   ]
-                }))
+                })),
+                tRPCMsw.event.get.query(() => {
+                  return tennisClubMembershipEventDocument
+                })
               ]
             }
           }

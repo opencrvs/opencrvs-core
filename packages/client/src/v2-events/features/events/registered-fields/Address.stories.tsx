@@ -19,13 +19,15 @@ import {
   tennisClubMembershipEvent,
   AddressFieldValue,
   AddressType,
-  getDeclaration
+  getDeclaration,
+  UUID
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Review } from '@client/v2-events/features/events/components/Review'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Address',
@@ -95,9 +97,61 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
             defaultValue: {
               country: 'FAR',
               addressType: AddressType.DOMESTIC,
-              province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-              district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-              urbanOrRural: 'URBAN'
+              administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID
+            },
+            configuration: {
+              streetAddressForm: [
+                {
+                  id: 'town',
+                  required: false,
+                  label: {
+                    id: 'v2.field.address.town.label',
+                    defaultMessage: 'Town',
+                    description: 'This is the label for the field'
+                  },
+                  type: FieldType.TEXT
+                },
+                {
+                  id: 'residentialArea',
+                  required: false,
+                  label: {
+                    id: 'v2.field.address.residentialArea.label',
+                    defaultMessage: 'Residential Area',
+                    description: 'This is the label for the field'
+                  },
+                  type: FieldType.TEXT
+                },
+                {
+                  id: 'street',
+                  required: false,
+                  label: {
+                    id: 'v2.field.address.street.label',
+                    defaultMessage: 'Street',
+                    description: 'This is the label for the field'
+                  },
+                  type: FieldType.TEXT
+                },
+                {
+                  id: 'number',
+                  required: false,
+                  label: {
+                    id: 'v2.field.address.number.label',
+                    defaultMessage: 'Number',
+                    description: 'This is the label for the field'
+                  },
+                  type: FieldType.TEXT
+                },
+                {
+                  id: 'zipCode',
+                  required: false,
+                  label: {
+                    id: 'v2.field.address.postcodeOrZip.label',
+                    defaultMessage: 'Postcode / Zip',
+                    description: 'This is the label for the field'
+                  },
+                  type: FieldType.TEXT
+                }
+              ]
             }
           }
         ]}
@@ -114,82 +168,25 @@ const eventConfig: EventConfig = tennisClubMembershipEvent
 
 const declarationForm = getDeclaration(eventConfig)
 
-export const AddressReviewUrban: StoryObj<typeof Review> = {
-  name: 'Review output (Urban)',
-  parameters: {
-    layout: 'centered'
-  },
-  render: function Component() {
-    return (
-      <Review.Body
-        form={{
-          'applicant.address': {
-            country: 'FAR',
-            addressType: AddressType.DOMESTIC,
-            province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-            district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-            urbanOrRural: 'URBAN',
-            town: 'Example Town',
-            residentialArea: 'Example Residential Area',
-            street: 'Example Street',
-            number: '55',
-            zipCode: '123456'
-          }
-        }}
-        formConfig={declarationForm}
-        title="My address form with address output"
-        // eslint-disable-next-line no-console
-        onEdit={(values) => console.log(values)}
-      >
-        <div />
-      </Review.Body>
-    )
-  }
-}
-export const AddressReviewRural: StoryObj<typeof Review> = {
-  name: 'Review output (Rural)',
-  parameters: {
-    layout: 'centered'
-  },
-  render: function Component() {
-    return (
-      <Review.Body
-        form={{
-          'applicant.address': {
-            country: 'FAR',
-            addressType: AddressType.DOMESTIC,
-            province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-            district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-            urbanOrRural: 'RURAL',
-            village: 'Example Village'
-          }
-        }}
-        formConfig={declarationForm}
-        title="My address form with address output"
-        // eslint-disable-next-line no-console
-        onEdit={(values) => console.log(values)}
-      >
-        <div />
-      </Review.Body>
-    )
-  }
-}
 export const AddressReviewInvalid: StoryObj<typeof Review> = {
   name: 'Review output (Invalid)',
   parameters: {
     layout: 'centered'
   },
   render: function Component() {
+    const { getLocations } = useLocations()
+    const [locations] = getLocations.useSuspenseQuery()
     return (
       <Review.Body
         form={{
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+            administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
           } as AddressFieldValue
         }}
         formConfig={declarationForm}
+        locations={locations}
         title="My address form with address output"
         // eslint-disable-next-line no-console
         onEdit={(values) => console.log(values)}
@@ -230,14 +227,14 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-            district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-            urbanOrRural: 'URBAN',
-            town: 'Example Town',
-            residentialArea: 'Example Residential Area',
-            street: 'Example Street',
-            number: '55',
-            zipCode: '123456'
+            administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+            streetLevelDetails: {
+              town: 'Example Town',
+              residentialArea: 'Example Residential Area',
+              street: 'Example Street',
+              number: '55',
+              zipCode: '123456'
+            }
           }
         }}
         formConfig={declarationForm}
@@ -245,10 +242,10 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-            district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-            urbanOrRural: 'RURAL',
-            village: 'Example Village'
+            administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+            streetLevelDetails: {
+              town: 'Example Village'
+            }
           }
         }}
         title="My address form with address changed"
@@ -273,14 +270,14 @@ export const AddressInCopy: StoryObj<typeof Review> = {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'URBAN' as const,
-        town: 'Example Town',
-        residentialArea: 'Example Residential Area',
-        street: 'Example Street',
-        number: '55',
-        zipCode: '123456'
+        administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+        streetLevelDetails: {
+          town: 'Example Town',
+          residentialArea: 'Example Residential Area',
+          street: 'Example Street',
+          number: '55',
+          zipCode: '123456'
+        }
       }
     }
     return (

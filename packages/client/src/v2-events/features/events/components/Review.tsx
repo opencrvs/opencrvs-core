@@ -35,7 +35,8 @@ import {
   FormConfig,
   isFieldDisplayedOnReview,
   isPageVisible,
-  runFieldValidations
+  runFieldValidations,
+  Location
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
@@ -275,6 +276,7 @@ function FormReview({
   formConfig,
   form,
   previousForm,
+  locations,
   onEdit,
   showPreviouslyMissingValuesAsChanged,
   readonlyMode,
@@ -284,6 +286,7 @@ function FormReview({
   formConfig: FormConfig
   form: EventState
   previousForm: EventState
+  locations?: Location[]
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
   readonlyMode?: boolean
@@ -315,9 +318,12 @@ function FormReview({
                 formConfig
               })
 
+              const context = locations ? { locations } : undefined
+
               const error = runFieldValidations({
                 field,
-                values: form
+                values: form,
+                context
               })
 
               const errorDisplay =
@@ -451,6 +457,7 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   form,
+  locations,
   annotation,
   onEdit,
   children,
@@ -465,6 +472,7 @@ function ReviewComponent({
   children?: React.ReactNode
   formConfig: FormConfig
   form: EventState
+  locations?: Location[]
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
@@ -510,6 +518,7 @@ function ReviewComponent({
             formConfig={formConfig}
             isCorrection={isCorrection}
             isReviewCorrection={isReviewCorrection}
+            locations={locations}
             previousForm={previousForm}
             readonlyMode={readonlyMode}
             showPreviouslyMissingValuesAsChanged={
