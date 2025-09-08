@@ -325,7 +325,7 @@ export function createFieldConditionals(fieldId: string) {
         inPast: () => defineFormConditional(getDayRange(days, 'before')),
         inFuture: () => defineFormConditional(getDayRange(-days, 'before'))
       }),
-      date: (date: string | FieldReference) => {
+      date: (date: `${string}-${string}-${string}` | FieldReference) => {
         if (isFieldReference(date)) {
           const comparedFieldId = date.$$field
           return defineFormConditional(
