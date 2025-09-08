@@ -67,7 +67,7 @@ function getAuthorizedEntitiesFromScopes(scopes: ConfigurableScopes[]) {
  * @returns Object containing authorized entities (e.g. events) based on found scopes
  * @throws {TRPCError} If no matching configurable scopes are found
  */
-export function inConfigurableScopes(
+function inConfigurableScopes(
   authHeader: IAuthHeader,
   configurableScopes: ConfigurableScopeType[]
 ) {

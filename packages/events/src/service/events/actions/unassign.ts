@@ -13,14 +13,13 @@ import { TRPCError } from '@trpc/server'
 import {
   ActionStatus,
   ActionType,
+  configurableEventScopeAllowed,
   findLastAssignmentAction,
   UnassignActionInput
 } from '@opencrvs/commons/events'
+import { getScopes } from '@opencrvs/commons'
 import { processAction, getEventById } from '@events/service/events/events'
-import {
-  inConfigurableScopes,
-  setBearerForToken
-} from '@events/router/middleware'
+import { setBearerForToken } from '@events/router/middleware'
 import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
 
@@ -49,12 +48,14 @@ export async function unassignRecord({
   // If event is not assigned to the user who is unassigning, we need to ensure that the user may unassign others
   if (lastAssignmentAction.assignedTo !== user.id) {
     // Ensure that the user has scope to unassign users from this event type
-    const { events } = inConfigurableScopes(
-      { Authorization: setBearerForToken(token) },
-      ['record.unassign-others']
+    const userScopes = getScopes({ Authorization: setBearerForToken(token) })
+    const unassignOtherAllowed = configurableEventScopeAllowed(
+      userScopes,
+      ['record.unassign-others'],
+      event.type
     )
 
-    if (!events || !events.includes(event.type)) {
+    if (!unassignOtherAllowed) {
       throw new TRPCError({ code: 'FORBIDDEN' })
     }
   }
