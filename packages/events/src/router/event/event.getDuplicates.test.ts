@@ -126,6 +126,7 @@ test('Returns single duplicate when found', async () => {
   )
 
   await client.event.actions.assignment.assign({
+    type: ActionType.ASSIGN,
     eventId: event2.id,
     assignedTo: user.id,
     transactionId: generateUuid()
