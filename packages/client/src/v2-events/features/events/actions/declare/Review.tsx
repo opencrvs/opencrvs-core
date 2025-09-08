@@ -41,6 +41,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
@@ -56,6 +57,8 @@ export function Review() {
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const { closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
 
   const event = events.getEvent.getFromCache(eventId)
 
@@ -73,12 +76,17 @@ export function Review() {
 
   const { isActionAllowed } = useUserAllowedActions(event.type)
 
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
+
   const reviewActionConfiguration = useReviewActionConfig({
     eventType: event.type,
     formConfig,
     declaration: form,
     annotation,
-    reviewFields: reviewConfig.fields
+    reviewFields: reviewConfig.fields,
+    locations: adminStructureLocations
   })
 
   async function handleEdit({
@@ -193,6 +201,7 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
+        locations={adminStructureLocations}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
         onAnnotationChange={(values) => setAnnotation(values)}

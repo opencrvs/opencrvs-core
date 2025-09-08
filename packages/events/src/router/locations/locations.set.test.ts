@@ -10,6 +10,7 @@
  */
 import { generateUuid, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { Location } from '@events/service/locations/locations'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -45,12 +46,13 @@ test('Creates single location', async () => {
 
   const initialLocations = await dataSeedingClient.locations.get()
 
-  const locationPayload = [
+  const locationPayload: Location[] = [
     {
       id: generateUuid(),
       parentId: null,
       name: 'Location foobar',
-      validUntil: null
+      validUntil: null,
+      locationType: 'ADMIN_STRUCTURE'
     }
   ]
 

@@ -18,7 +18,10 @@ export const Location = z.object({
   id: UUID,
   name: z.string(),
   parentId: UUID.nullable(),
-  validUntil: z.date().nullable()
+  validUntil: z.date().nullable(),
+  locationType: z
+    .enum(['HEALTH_FACILITY', 'CRVS_OFFICE', 'ADMIN_STRUCTURE'])
+    .nullable()
 })
 
 export type Location = z.infer<typeof Location>
@@ -30,11 +33,12 @@ export type Location = z.infer<typeof Location>
 
 export async function setLocations(locations: Location[]) {
   return locationsRepo.setLocations(
-    locations.map(({ id, name, parentId, validUntil }) => ({
+    locations.map(({ id, name, parentId, validUntil, locationType }) => ({
       id,
       name,
       parentId: parentId,
-      validUntil: validUntil ? validUntil.toISOString() : null
+      validUntil: validUntil ? validUntil.toISOString() : null,
+      locationType
     }))
   )
 }
@@ -52,21 +56,23 @@ export async function syncLocations() {
 export const getLocations = async () => {
   const locations = await locationsRepo.getLocations()
 
-  return locations.map(({ id, name, parentId, validUntil }) => ({
+  return locations.map(({ id, name, parentId, validUntil, locationType }) => ({
     id,
     name,
     parentId,
-    validUntil: validUntil ? new Date(validUntil) : null
+    validUntil: validUntil ? new Date(validUntil) : null,
+    locationType
   }))
 }
 
 export const getChildLocations = async (parentIdToSearch: string) => {
   const locations = await locationsRepo.getChildLocations(parentIdToSearch)
 
-  return locations.map(({ id, name, parentId, validUntil }) => ({
+  return locations.map(({ id, name, parentId, validUntil, locationType }) => ({
     id,
     name,
     validUntil,
-    parentId
+    parentId,
+    locationType
   }))
 }
