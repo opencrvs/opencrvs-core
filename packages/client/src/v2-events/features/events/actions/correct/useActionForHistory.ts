@@ -10,10 +10,12 @@
  */
 
 import { isEqual, take } from 'lodash'
+import { z } from 'zod'
 import {
   Action,
   ActionDocument,
   ActionType,
+  ActionTypes,
   DeclarationActions,
   DeclarationActionType
 } from '@opencrvs/commons/client'
@@ -28,10 +30,12 @@ function getPreviousActions(arr: ActionDocument[], id: string) {
   const index = arr.findIndex((item) => item.id === id)
   return index === -1 ? arr : take(arr, index)
 }
-
 function hasDeclarationChanged(
   actions: ActionDocument[],
-  action: Extract<Action, { type: DeclarationActionType }>
+  action: Extract<
+    Action,
+    { type: Exclude<DeclarationActionType, typeof ActionType.NOTIFY> }
+  >
 ) {
   const previousActions = getPreviousActions(actions, action.id)
   const previousActionType = getPreviousDeclarationActionType(
@@ -78,7 +82,10 @@ export function useActionForHistory() {
       }
     }
 
-    const parsedAction = DeclarationActions.safeParse(action.type)
+    const parsedAction = DeclarationActions.exclude([
+      ActionType.NOTIFY
+    ]).safeParse(action.type)
+
     if (parsedAction.success) {
       if (
         hasDeclarationChanged(actions, { ...action, type: parsedAction.data })
