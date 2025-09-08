@@ -264,7 +264,8 @@ test('validation prevents including hidden fields', async () => {
       ...generateActionDeclarationInput(
         tennisClubMembershipEvent,
         ActionType.VALIDATE,
-        () => 0.1
+        () => 0.1,
+        { locations: [] }
       ),
       'recommender.firstname': 'this should not be here'
     }

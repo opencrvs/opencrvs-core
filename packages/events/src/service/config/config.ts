@@ -170,7 +170,8 @@ export async function getLocations() {
         id: entry.id,
         name: entry.name,
         parentId: parsePartOf(entry.partOf?.reference),
-        validUntil: entry.status === 'inactive' ? new Date() : null
+        validUntil: entry.status === 'inactive' ? new Date() : null,
+        locationType: entry.type?.coding ? entry.type.coding[0]?.code : null
       }
     })
 
