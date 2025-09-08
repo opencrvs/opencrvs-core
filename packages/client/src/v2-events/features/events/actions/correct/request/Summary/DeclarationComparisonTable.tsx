@@ -13,8 +13,10 @@ import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import {
   Action,
+  applyDeclarationToEventIndex,
   EventConfig,
   EventDocument,
+  EventState,
   getCurrentEventState,
   getDeclaration,
   isFieldDisplayedOnReview
@@ -31,6 +33,23 @@ const TableHeader = styled.th`
   ${({ theme }) => theme.fonts.bold12}
   display: inline-block;
 `
+interface BaseDeclarationComparisonTableProps {
+  fullEvent: EventDocument
+  eventConfig: EventConfig
+  id: string
+}
+
+type DeclarationComparisonTableProps =
+  | (BaseDeclarationComparisonTableProps & {
+      /** When action is provided, the comparison is done between the state before the action and the state after it. */
+      action: Action
+      form?: undefined
+    })
+  | (BaseDeclarationComparisonTableProps & {
+      /** When form is provided, form is applied on top of the latest state and compared to the previous one. */
+      form: EventState
+      action?: undefined
+    })
 
 /**
  *
@@ -39,36 +58,33 @@ const TableHeader = styled.th`
  */
 export function DeclarationComparisonTableComponent({
   action,
+  form,
   fullEvent,
   eventConfig,
   id
-}: {
-  action?: Action
-  fullEvent: EventDocument
-  eventConfig: EventConfig
-  id: string
-}) {
-  if (!action) {
-    return null
-  }
-
-  // We need to get the state of the event before the correction/update was made
-  // so that we can display the original, uncorrected values
-  const index = fullEvent.actions.findIndex((a) => a.id === action.id)
-  const eventBeforeUpdate = {
-    ...fullEvent,
-    actions: fullEvent.actions.slice(0, index)
-  }
+}: DeclarationComparisonTableProps) {
+  const index = fullEvent.actions.findIndex((a) => a.id === action?.id)
+  // When action is not found or provided, we compare the full event
+  const eventBeforeUpdate =
+    index === -1
+      ? fullEvent
+      : {
+          ...fullEvent,
+          actions: fullEvent.actions.slice(0, index)
+        }
 
   const declarationConfig = getDeclaration(eventConfig)
 
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
-  const latestDeclaration = getCurrentEventState(
-    fullEvent,
-    eventConfiguration
-  ).declaration
+  const currentState = getCurrentEventState(fullEvent, eventConfiguration)
+
+  // When form is provided, we apply it on top of the current state to get the latest declaration
+  const latestDeclaration = form
+    ? applyDeclarationToEventIndex(currentState, form, eventConfiguration)
+        .declaration
+    : currentState.declaration
 
   const previousDeclaration = getCurrentEventState(
     eventBeforeUpdate,
