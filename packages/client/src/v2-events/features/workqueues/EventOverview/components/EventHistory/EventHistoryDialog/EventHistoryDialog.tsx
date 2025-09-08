@@ -22,7 +22,7 @@ import {
 } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
 import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
-import { ActionTypeSpecificContent } from './actionTypeSpecificContent'
+import { ActionTypeSpecificContent } from './components'
 
 export const eventHistoryStatusMessage = {
   id: `v2.events.history.status`,
