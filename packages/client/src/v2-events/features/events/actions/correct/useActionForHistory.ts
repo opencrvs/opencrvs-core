@@ -10,7 +10,6 @@
  */
 
 import { isEqual, take } from 'lodash'
-import { Declaration } from 'typescript'
 import {
   Action,
   ActionDocument,
@@ -45,9 +44,19 @@ function hasDeclarationChanged(
     ? actions.find((act) => act.type === previousActionType)
     : undefined
 
+  const currentActionHasUpdates = Object.keys(action.declaration).length > 0
+  const previousActionHasDeclaration = !!previousDeclarationAction?.declaration
+
+  const hasUpdatedValues = Object.entries(action.declaration).some(
+    ([key, value]) => {
+      const prevValue = previousDeclarationAction?.declaration[key]
+
+      return !isEqual(prevValue, value)
+    }
+  )
+
   return (
-    !!previousDeclarationAction &&
-    !isEqual(previousDeclarationAction.declaration, action.declaration)
+    currentActionHasUpdates && previousActionHasDeclaration && hasUpdatedValues
   )
 }
 

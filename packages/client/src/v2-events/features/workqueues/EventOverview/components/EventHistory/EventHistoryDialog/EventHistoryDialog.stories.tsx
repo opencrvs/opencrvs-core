@@ -230,7 +230,7 @@ export const Validated: Story = {
     ...argbase,
     action: {
       ...argbase.action,
-      id: eventWhenValidateUpdatesDeclaration.id,
+      id: generateUuid(prng),
       type: ActionType.VALIDATE
     }
   }
