@@ -8,9 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-/* eslint-disable import/no-named-as-default-member */
+
 import { APPLICATION_CONFIG_URL, AUTH_URL } from '@gateway/constants'
-import fetch from '@gateway/fetch'
 import { rateLimitedRoute } from '@gateway/rate-limit'
 import { api } from '@gateway/v2-events/events/service'
 import z from 'zod'
@@ -132,6 +131,7 @@ export const catchAllProxy = {
         }
       })
 
+      // @ts-ignore
       return h.response(response.body).code(response.status)
     },
     options: {

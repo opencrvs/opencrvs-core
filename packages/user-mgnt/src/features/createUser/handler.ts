@@ -82,7 +82,7 @@ export default async function createUser(
       )
     }
 
-    const role = await createFhirPractitionerRole(user, practitionerId, false)
+    const role = createFhirPractitionerRole(user, practitionerId, false)
     roleId = await postFhir(token, role)
     if (!roleId) {
       throw new Error(

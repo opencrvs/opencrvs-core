@@ -602,7 +602,6 @@ test('Event status does not change if validation action is rejected', async () =
       () => {
         return HttpResponse.json(
           { error: 'Simulating rejection' },
-          // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
           { status: 400 }
         )
       }

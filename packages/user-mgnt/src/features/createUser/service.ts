@@ -91,11 +91,11 @@ export const getSignatureExtension = (extensions: Extension[] | undefined) => {
   )
 }
 
-export const createFhirPractitionerRole = async (
+export const createFhirPractitionerRole = (
   user: IUser,
   practitionerId: string,
   system: boolean
-): Promise<fhir.PractitionerRole> => {
+): fhir.PractitionerRole => {
   if (system) {
     return {
       resourceType: 'PractitionerRole',
