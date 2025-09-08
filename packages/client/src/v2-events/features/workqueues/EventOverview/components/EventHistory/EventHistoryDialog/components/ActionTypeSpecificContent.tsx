@@ -12,10 +12,12 @@ import React from 'react'
 import {
   ActionDocument,
   ActionType,
+  DeclarationActions,
   EventDocument
 } from '@opencrvs/commons/client'
 import { RequestCorrection } from './RequestCorrection'
 import { PrintCertificate } from './PrintCertificate'
+import { DeclarationUpdate } from './DeclarationUpdate'
 
 export function ActionTypeSpecificContent({
   action,
@@ -25,6 +27,11 @@ export function ActionTypeSpecificContent({
   fullEvent: EventDocument
 }) {
   const { type } = action
+
+  const isDeclarationAction = DeclarationActions.safeParse(type).success
+  if (isDeclarationAction) {
+    return <DeclarationUpdate action={action} fullEvent={fullEvent} />
+  }
 
   if (type === ActionType.REQUEST_CORRECTION) {
     return <RequestCorrection action={action} fullEvent={fullEvent} />
