@@ -17,7 +17,6 @@ import {
   DeclarationActions,
   DeclarationActionType
 } from '@opencrvs/commons/client'
-
 import { getPreviousDeclarationActionType } from '../../components/Action/utils'
 
 /**
