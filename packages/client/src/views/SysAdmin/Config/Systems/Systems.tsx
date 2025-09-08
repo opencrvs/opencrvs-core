@@ -216,7 +216,8 @@ export function SystemList() {
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
     NATIONAL_ID: intl.formatMessage(integrationMessages.nationalId),
     WEBHOOK: intl.formatMessage(integrationMessages.webhook),
-    IMPORT: intl.formatMessage(integrationMessages.import)
+    IMPORT: intl.formatMessage(integrationMessages.import),
+    IMPORT_EXPORT: intl.formatMessage(integrationMessages.importExport)
   }
 
   const systemToLabel = (system: System) => {
@@ -535,6 +536,12 @@ export function SystemList() {
                     {
                       label: intl.formatMessage(integrationMessages.webhook),
                       value: SystemRole.enum.WEBHOOK
+                    },
+                    {
+                      label: intl.formatMessage(
+                        integrationMessages.importExport
+                      ),
+                      value: SystemRole.enum.IMPORT_EXPORT
                     }
                   ]}
                   id={'permissions-selectors'}

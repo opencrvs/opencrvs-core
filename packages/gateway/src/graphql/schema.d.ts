@@ -982,7 +982,8 @@ export const enum GQLSystemType {
   HEALTH = 'HEALTH',
   RECORD_SEARCH = 'RECORD_SEARCH',
   WEBHOOK = 'WEBHOOK',
-  IMPORT = 'IMPORT'
+  IMPORT = 'IMPORT',
+  IMPORT_EXPORT = 'IMPORT_EXPORT'
 }
 
 export const enum GQLIntegratingSystemType {
@@ -4047,7 +4048,11 @@ export interface DeathRegistrationToHistoryResolver<
 }
 
 export interface GQLEventRegistrationTypeResolver<TParent = any> {
-  (parent: TParent, context: Context, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: Context,
+    info: GraphQLResolveInfo
+  ):
     | 'BirthRegistration'
     | 'DeathRegistration'
     | 'MarriageRegistration'
@@ -4270,7 +4275,11 @@ export interface MarriageRegistrationToHistoryResolver<
 }
 
 export interface GQLRecordDetailsTypeResolver<TParent = any> {
-  (parent: TParent, context: Context, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: Context,
+    info: GraphQLResolveInfo
+  ):
     | 'BirthRegistration'
     | 'DeathRegistration'
     | Promise<'BirthRegistration' | 'DeathRegistration'>
@@ -4627,7 +4636,11 @@ export interface TotalMetricsResultToResultsResolver<
 }
 
 export interface GQLMixedTotalMetricsResultTypeResolver<TParent = any> {
-  (parent: TParent, context: Context, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: Context,
+    info: GraphQLResolveInfo
+  ):
     | 'TotalMetricsByRegistrar'
     | 'TotalMetricsByLocation'
     | 'TotalMetricsByTime'
@@ -7496,13 +7509,21 @@ export interface VSExportToCreatedOnResolver<TParent = any, TResult = any> {
 }
 
 export interface GQLUserAuditLogResultItemTypeResolver<TParent = any> {
-  (parent: TParent, context: Context, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: Context,
+    info: GraphQLResolveInfo
+  ):
     | 'UserAuditLogItemWithComposition'
     | 'UserAuditLogItem'
     | Promise<'UserAuditLogItemWithComposition' | 'UserAuditLogItem'>
 }
 export interface GQLEventSearchSetTypeResolver<TParent = any> {
-  (parent: TParent, context: Context, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: Context,
+    info: GraphQLResolveInfo
+  ):
     | 'BirthEventSearchSet'
     | 'DeathEventSearchSet'
     | 'MarriageEventSearchSet'
@@ -10169,7 +10190,11 @@ export interface WebhookPermissionToPermissionsResolver<
 }
 
 export interface GQLAuditLogItemBaseTypeResolver<TParent = any> {
-  (parent: TParent, context: Context, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: Context,
+    info: GraphQLResolveInfo
+  ):
     | 'UserAuditLogItemWithComposition'
     | 'UserAuditLogItem'
     | Promise<'UserAuditLogItemWithComposition' | 'UserAuditLogItem'>

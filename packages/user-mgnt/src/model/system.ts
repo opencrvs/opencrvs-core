@@ -83,7 +83,8 @@ const systemSchema = new Schema({
       types.NATIONAL_ID,
       types.IMPORT,
       types.RECORD_SEARCH,
-      types.WEBHOOK
+      types.WEBHOOK,
+      types.IMPORT_EXPORT
     ]
   },
   integratingSystemType: {

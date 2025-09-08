@@ -18,6 +18,7 @@ export const SystemRole = z.enum([
   'IMPORT',
   'REINDEX',
   'WEBHOOK'
+  'IMPORT_EXPORT'
 ])
 
 export const REINDEX_USER_ID = '__ANONYMOUS_REINDEX_USER__'
