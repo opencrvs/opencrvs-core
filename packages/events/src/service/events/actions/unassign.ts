@@ -16,13 +16,11 @@ import {
   findLastAssignmentAction,
   UnassignActionInput
 } from '@opencrvs/commons/events'
-import {
-  findScope,
-  getAuthorizedEventsFromScopes,
-  getScopes
-} from '@opencrvs/commons'
 import { processAction, getEventById } from '@events/service/events/events'
-import { setBearerForToken } from '@events/router/middleware'
+import {
+  inConfigurableScopes,
+  setBearerForToken
+} from '@events/router/middleware'
 import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
 
@@ -50,19 +48,13 @@ export async function unassignRecord({
 
   // If event is not assigned to the user who is unassigning, we need to ensure that the user may unassign others
   if (lastAssignmentAction.assignedTo !== user.id) {
-    // Find the scopes that are authorized for the given action
-    const scopes = getScopes({ Authorization: setBearerForToken(token) })
-    const parsedScope = findScope(scopes, 'record.unassign-others')
+    // Ensure that the user has scope to unassign users from this event type
+    const { events } = inConfigurableScopes(
+      { Authorization: setBearerForToken(token) },
+      ['record.unassign-others']
+    )
 
-    if (!parsedScope) {
-      throw new TRPCError({ code: 'FORBIDDEN' })
-    }
-
-    // Ensure that the given event type is authorized in the found scopes
-    const authorizedEvents = getAuthorizedEventsFromScopes([parsedScope])
-    const mayUnassignOthers = authorizedEvents.includes(event.type)
-
-    if (lastAssignmentAction.assignedTo !== user.id && !mayUnassignOthers) {
+    if (!events || !events.includes(event.type)) {
       throw new TRPCError({ code: 'FORBIDDEN' })
     }
   }
