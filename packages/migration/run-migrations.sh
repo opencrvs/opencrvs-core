@@ -30,6 +30,7 @@ export EVENTS_DB_USER="${EVENTS_DB_USER:-events_app}"
 MIGRATIONS_PATH=$SCRIPT_PATH/src/migrations/events
 for migration_file in $(ls $MIGRATIONS_PATH)
 do
+  echo "Updating environment variables in $MIGRATIONS_PATH/$migration_file"
   envsubst < $MIGRATIONS_PATH/$migration_file > $MIGRATIONS_PATH/$migration_file.tmp
   mv $MIGRATIONS_PATH/$migration_file.tmp $MIGRATIONS_PATH/$migration_file.sql
 done
