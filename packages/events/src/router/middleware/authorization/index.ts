@@ -108,7 +108,7 @@ export function requiresAnyOfScopes(
     const token = setBearerForToken(opts.ctx.token)
     const authHeader = { Authorization: token }
 
-    // If the user has any of the allowd plain scopes, allow access
+    // If the user has any of the allowed plain scopes, allow access
     if (inScope(authHeader, scopes)) {
       return opts.next()
     }

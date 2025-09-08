@@ -262,21 +262,16 @@ export const eventRouter = router({
       assign: publicProcedure
         .input(AssignActionInput)
         .use(middleware.validateAction)
-        .mutation(async (options) => {
-          return assignRecord({
-            input: options.input,
-            user: options.ctx.user,
-            token: options.ctx.token
-          })
+        .mutation(async ({ ctx, input }) => {
+          const { user, token } = ctx
+          return assignRecord({ input, user, token })
         }),
       unassign: publicProcedure
         .input(UnassignActionInput)
         .use(middleware.validateAction)
-        .mutation(async (options) => {
-          return unassignRecord(options.input, {
-            user: options.ctx.user,
-            token: options.ctx.token
-          })
+        .mutation(async ({ input, ctx }) => {
+          const { user, token } = ctx
+          return unassignRecord({ input, user, token })
         })
     }),
     correction: router({
