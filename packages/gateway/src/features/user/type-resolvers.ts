@@ -14,7 +14,7 @@ import {
   Roles,
   UUID,
   fetchJSON,
-  joinURL,
+  joinUrl,
   logger
 } from '@opencrvs/commons'
 import { COUNTRY_CONFIG_URL } from '@gateway/constants'
@@ -160,7 +160,7 @@ export const userTypeResolvers: GQLResolver = {
     },
     role: async (userModel: IUserModelData) => {
       const roles = await fetchJSON<Roles>(
-        joinURL(COUNTRY_CONFIG_URL, '/roles')
+        joinUrl(COUNTRY_CONFIG_URL, '/roles')
       )
 
       logger.info('Fetching roles from country config')

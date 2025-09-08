@@ -597,8 +597,11 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - name: Install dependencies
-        run: pnpm install
+      - uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: pnpm install
 
       - name: Build commons
         run: pnpm build

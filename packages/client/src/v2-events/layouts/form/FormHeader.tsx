@@ -39,13 +39,14 @@ export function FormHeader({
   route,
   appbarIcon
 }: {
-  label: TranslationConfig
+  label: string
   onSaveAndExit?: () => void
   route: AllowedRouteWithEventId
   appbarIcon?: React.ReactNode
 }) {
   const intl = useIntl()
-  const { modal, exit, goToHome, deleteDeclaration } = useEventFormNavigation()
+  const { modal, exit, closeActionView, deleteDeclaration } =
+    useEventFormNavigation()
 
   const { eventId } = useTypedParams(route)
 
@@ -124,7 +125,7 @@ export function FormHeader({
               data-testid="exit-button"
               size="small"
               type="icon"
-              onClick={goToHome}
+              onClick={() => closeActionView()}
             >
               <Icon name="X" />
             </Button>
@@ -132,7 +133,7 @@ export function FormHeader({
           {modal}
         </>
       }
-      desktopTitle={intl.formatMessage(label)}
+      desktopTitle={label}
       mobileLeft={appbarIcon}
       mobileRight={
         <>
@@ -169,14 +170,14 @@ export function FormHeader({
               />
             </>
           ) : (
-            <Button size="small" type="icon" onClick={goToHome}>
+            <Button size="small" type="icon" onClick={() => closeActionView()}>
               <Icon name="X" />
             </Button>
           )}
           {modal}
         </>
       }
-      mobileTitle={intl.formatMessage(label)}
+      mobileTitle={label}
     />
   )
 }

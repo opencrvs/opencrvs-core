@@ -11,6 +11,7 @@
 
 import {
   Action,
+  ActionDocument,
   ActionStatus,
   ActionType,
   EventDocument,
@@ -40,6 +41,7 @@ export const tennisClubMembershipEventIndex: EventIndex = {
   updatedBy: 'system',
   updatedByUserRole: 'system',
   flags: [],
+  potentialDuplicates: [],
   declaration: {
     'applicant.name': {
       firstname: 'John',
@@ -63,7 +65,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdAt: '2025-01-23T05:30:02.615Z',
       createdByUserType: 'user',
       createdBy: localRegistrarId,
-      createdByRole: 'some-user-role',
+      createdByRole: 'LOCAL_REGISTRAR',
       createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
       declaration: {},
       transactionId: 'a0f1b2c3-d4e5-6f7g-8h9i-j0k1l2m3n4o5'
@@ -92,7 +94,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       type: 'DECLARE',
       createdBy: localRegistrarId,
       createdByUserType: 'user',
-      createdByRole: 'some-user-role',
+      createdByRole: 'LOCAL_REGISTRAR',
       createdAt: '2025-01-23T05:30:08.847Z',
       createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
       transactionId: 'aasdk342-asdkj3423-kn234k23'
@@ -113,7 +115,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       },
       type: 'VALIDATE',
       createdBy: localRegistrarId,
-      createdByRole: 'some-user-role',
+      createdByRole: 'LOCAL_REGISTRAR',
       createdByUserType: 'user',
       createdAt: '2025-01-23T05:35:27.689Z',
       createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
@@ -135,7 +137,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       },
       type: 'REGISTER',
       createdBy: localRegistrarId,
-      createdByRole: 'some-user-role',
+      createdByRole: 'LOCAL_REGISTRAR',
       createdAt: '2025-01-23T05:35:27.689Z',
       createdByUserType: 'user',
       createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
@@ -148,14 +150,14 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       declaration: {},
       type: ActionType.ASSIGN,
       createdBy: localRegistrarId,
-      createdByRole: 'some-user-role',
+      createdByRole: 'LOCAL_REGISTRAR',
       createdByUserType: 'user',
       createdAt: '2025-01-23T05:35:27.689Z',
       createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
       assignedTo: testDataGenerator().user.id.localRegistrar,
       transactionId: 'aasdk342-asdkj3423-kn234k26'
     }
-  ]
+  ] satisfies ActionDocument[]
 }
 
 const correctionRequestAction: Action = {

@@ -9,10 +9,39 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { env } from '@user-mgnt/environment'
-import { EventConfig, joinURL } from '@opencrvs/commons'
+import { EventConfig, joinUrl, logger } from '@opencrvs/commons'
 
-export async function getEventConfigurations(authorization: string) {
-  const url = joinURL(env.COUNTRY_CONFIG_URL, '/events')
+/**
+ * During 1.9.0 we support only docker swarm configuration.
+ * In docker swarm deployment process updates all the containers.
+ * There shouldn't be a situation where countryconfig changes and events do not restart.
+ */
+
+let inMemoryEventConfigurations: EventConfig[] | null = null
+
+/**
+ * @returns in-memory event configurations when running in production-like environment.
+ */
+export async function getInMemoryEventConfigurations(token: string) {
+  if (!env.isProduction) {
+    logger.info(
+      `Running in ${process.env.NODE_ENV} mode. Fetching event configurations from API`
+    )
+    // In development, we should always fetch the latest configurations
+    return getEventConfigurations(token)
+  }
+
+  if (inMemoryEventConfigurations) {
+    logger.info('Returning in-memory event configurations')
+    return inMemoryEventConfigurations
+  }
+
+  inMemoryEventConfigurations = await getEventConfigurations(token)
+  return inMemoryEventConfigurations
+}
+
+async function getEventConfigurations(authorization: string) {
+  const url = joinUrl(env.COUNTRY_CONFIG_URL, '/events')
 
   const res = await fetch(url, {
     headers: {

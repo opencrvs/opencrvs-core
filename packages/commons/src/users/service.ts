@@ -11,7 +11,7 @@
 
 import { UUID } from '../uuid'
 import { FullDocumentPath } from '../documents'
-import { joinURL } from '../url'
+import { joinUrl } from '../url'
 
 export interface IUserName {
   use: string
@@ -64,7 +64,7 @@ export async function getUser(
   userId: string,
   token: string
 ) {
-  const res = await fetch(joinURL(userManagementHost, 'getUser').href, {
+  const res = await fetch(joinUrl(userManagementHost, 'getUser').href, {
     method: 'POST',
     body: JSON.stringify({ userId }),
     headers: {

@@ -12,7 +12,6 @@
 import { hashKey, MutationKey, useMutationState } from '@tanstack/react-query'
 import * as z from 'zod'
 import {
-  deepMerge,
   getCurrentEventState,
   applyDeclarationToEventIndex
 } from '@opencrvs/commons/client'
@@ -83,6 +82,10 @@ export function useOutbox() {
       }
     })
     .filter((event) => event !== null)
+    .filter(
+      /* uniqueById */
+      (e, i, arr) => arr.findIndex((a) => a.id === e.id) === i
+    )
 
   return outboxEvents
 }

@@ -388,6 +388,17 @@ const messagesToDefine = {
     defaultMessage: 'Send record correction for approval?',
     description:
       'The title for the dialog when record correction sent by registration agent for approval'
+  },
+  verifyIdentity: {
+    id: 'v2.correction.label.verifyIdentity.confirm',
+    defaultMessage: 'Yes',
+    description: 'Label for verification of identity in correction request'
+  },
+  cancelVerifyIdentity: {
+    id: 'v2.correction.label.verifyIdentity.cancel',
+    defaultMessage: 'No',
+    description:
+      'Label for cancellation of identity verificationin correction request'
   }
 }
 

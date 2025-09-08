@@ -1,6 +1,36 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Event document contains all created actions 1`] = `
+exports[`Action updates > partial declaration update accounts for conditional field values not in payload 1`] = `
+{
+  "applicant.address": {
+    "addressType": "DOMESTIC",
+    "administrativeArea": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
+    "country": "FAR",
+    "streetLevelDetails": {
+      "number": "55",
+      "residentialArea": "Example Residential Area",
+      "street": "Example Street",
+      "town": "Example Town",
+      "zipCode": "123456",
+    },
+  },
+  "applicant.age": 25,
+  "applicant.dobUnknown": true,
+  "applicant.email": "test@opencrvs.org",
+  "applicant.image": {
+    "originalFilename": "abcd.png",
+    "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+    "type": "image/png",
+  },
+  "applicant.name": {
+    "firstname": "Sara",
+    "surname": "Sarajanen",
+  },
+  "recommender.none": true,
+}
+`;
+
+exports[`Adding actions > Event document contains all created actions 1`] = `
 {
   "actions": [
     {
@@ -48,15 +78,15 @@ exports[`Event document contains all created actions 1`] = `
       "declaration": {
         "applicant.address": {
           "addressType": "DOMESTIC",
+          "administrativeArea": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
           "country": "FAR",
-          "district": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
-          "number": "55",
-          "province": "a45b982a-5c7b-4bd9-8fd8-a42d0994054c",
-          "residentialArea": "Example Residential Area",
-          "street": "Example Street",
-          "town": "Example Town",
-          "urbanOrRural": "URBAN",
-          "zipCode": "123456",
+          "streetLevelDetails": {
+            "number": "55",
+            "residentialArea": "Example Residential Area",
+            "street": "Example Street",
+            "town": "Example Town",
+            "zipCode": "123456",
+          },
         },
         "applicant.age": 19,
         "applicant.dobUnknown": true,
@@ -73,6 +103,20 @@ exports[`Event document contains all created actions 1`] = `
         "recommender.none": true,
       },
       "id": "[sanitized]",
+      "status": "Requested",
+      "transactionId": "[sanitized]",
+      "type": "DECLARE",
+    },
+    {
+      "createdAt": "[sanitized]",
+      "createdAtLocation": "[sanitized]",
+      "createdBy": "[sanitized]",
+      "createdByRole": "REGISTRATION_AGENT",
+      "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdByUserType": "[sanitized]",
+      "declaration": {},
+      "id": "[sanitized]",
+      "originalActionId": "[sanitized]",
       "status": "Accepted",
       "transactionId": "[sanitized]",
       "type": "DECLARE",
@@ -122,15 +166,15 @@ exports[`Event document contains all created actions 1`] = `
       "declaration": {
         "applicant.address": {
           "addressType": "DOMESTIC",
+          "administrativeArea": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
           "country": "FAR",
-          "district": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
-          "number": "55",
-          "province": "a45b982a-5c7b-4bd9-8fd8-a42d0994054c",
-          "residentialArea": "Example Residential Area",
-          "street": "Example Street",
-          "town": "Example Town",
-          "urbanOrRural": "URBAN",
-          "zipCode": "123456",
+          "streetLevelDetails": {
+            "number": "55",
+            "residentialArea": "Example Residential Area",
+            "street": "Example Street",
+            "town": "Example Town",
+            "zipCode": "123456",
+          },
         },
         "applicant.age": 19,
         "applicant.dobUnknown": true,
@@ -147,6 +191,20 @@ exports[`Event document contains all created actions 1`] = `
         "recommender.none": true,
       },
       "id": "[sanitized]",
+      "status": "Requested",
+      "transactionId": "[sanitized]",
+      "type": "VALIDATE",
+    },
+    {
+      "createdAt": "[sanitized]",
+      "createdAtLocation": "[sanitized]",
+      "createdBy": "[sanitized]",
+      "createdByRole": "REGISTRATION_AGENT",
+      "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdByUserType": "[sanitized]",
+      "declaration": {},
+      "id": "[sanitized]",
+      "originalActionId": "[sanitized]",
       "status": "Accepted",
       "transactionId": "[sanitized]",
       "type": "VALIDATE",
@@ -196,15 +254,15 @@ exports[`Event document contains all created actions 1`] = `
       "declaration": {
         "applicant.address": {
           "addressType": "DOMESTIC",
+          "administrativeArea": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
           "country": "FAR",
-          "district": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
-          "number": "55",
-          "province": "a45b982a-5c7b-4bd9-8fd8-a42d0994054c",
-          "residentialArea": "Example Residential Area",
-          "street": "Example Street",
-          "town": "Example Town",
-          "urbanOrRural": "URBAN",
-          "zipCode": "123456",
+          "streetLevelDetails": {
+            "number": "55",
+            "residentialArea": "Example Residential Area",
+            "street": "Example Street",
+            "town": "Example Town",
+            "zipCode": "123456",
+          },
         },
         "applicant.age": 19,
         "applicant.dobUnknown": true,
@@ -221,6 +279,20 @@ exports[`Event document contains all created actions 1`] = `
         "recommender.none": true,
       },
       "id": "[sanitized]",
+      "status": "Requested",
+      "transactionId": "[sanitized]",
+      "type": "REGISTER",
+    },
+    {
+      "createdAt": "[sanitized]",
+      "createdAtLocation": "[sanitized]",
+      "createdBy": "[sanitized]",
+      "createdByRole": "REGISTRATION_AGENT",
+      "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdByUserType": "[sanitized]",
+      "declaration": {},
+      "id": "[sanitized]",
+      "originalActionId": "[sanitized]",
       "registrationNumber": "[sanitized]",
       "status": "Accepted",
       "transactionId": "[sanitized]",
@@ -258,35 +330,5 @@ exports[`Event document contains all created actions 1`] = `
   "trackingId": "[sanitized]",
   "type": "tennis-club-membership",
   "updatedAt": "[sanitized]",
-}
-`;
-
-exports[`partial declaration update accounts for conditional field values not in payload 1`] = `
-{
-  "applicant.address": {
-    "addressType": "DOMESTIC",
-    "country": "FAR",
-    "district": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
-    "number": "55",
-    "province": "a45b982a-5c7b-4bd9-8fd8-a42d0994054c",
-    "residentialArea": "Example Residential Area",
-    "street": "Example Street",
-    "town": "Example Town",
-    "urbanOrRural": "URBAN",
-    "zipCode": "123456",
-  },
-  "applicant.age": 25,
-  "applicant.dobUnknown": true,
-  "applicant.email": "test@opencrvs.org",
-  "applicant.image": {
-    "originalFilename": "abcd.png",
-    "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
-    "type": "image/png",
-  },
-  "applicant.name": {
-    "firstname": "Sara",
-    "surname": "Sarajanen",
-  },
-  "recommender.none": true,
 }
 `;

@@ -33,36 +33,6 @@ export const FileFieldValue = z.object({
 
 export type FileFieldValue = z.infer<typeof FileFieldValue>
 
-const AdminStructure = z.object({
-  country: z.string(),
-  addressType: z.literal(AddressType.DOMESTIC),
-  province: z.string(),
-  district: z.string()
-})
-
-export const UrbanAddressValue = AdminStructure.extend({
-  urbanOrRural: z.literal(GeographicalArea.URBAN),
-  town: z.string().optional(),
-  residentialArea: z.string().optional(),
-  street: z.string().optional(),
-  number: z.string().optional(),
-  zipCode: z.string().optional()
-})
-
-export const RuralAddressValue = AdminStructure.extend({
-  urbanOrRural: z.literal(GeographicalArea.RURAL),
-  village: z.string().optional()
-})
-
-export const UrbanAddressUpdateValue = AdminStructure.extend({
-  urbanOrRural: z.literal(GeographicalArea.URBAN),
-  town: z.string().nullish(),
-  residentialArea: z.string().nullish(),
-  street: z.string().nullish(),
-  number: z.string().nullish(),
-  zipCode: z.string().nullish()
-})
-
 export const NameFieldValue = z.object({
   firstname: z.string(),
   surname: z.string(),
@@ -81,52 +51,33 @@ export const NameFieldUpdateValue = z
 export type NameFieldValue = z.infer<typeof NameFieldValue>
 export type NameFieldUpdateValue = z.infer<typeof NameFieldUpdateValue>
 
-export type UrbanAddressUpdateValue = z.infer<typeof UrbanAddressUpdateValue>
+export const StreetLevelDetailsValue = z
+  .record(z.string(), z.string())
+  .optional()
 
-export const RuralAddressUpdateValue = AdminStructure.extend({
-  urbanOrRural: z.literal(GeographicalArea.RURAL),
-  village: z.string().nullish()
-})
-export type RuralAddressUpdateValue = z.infer<typeof RuralAddressUpdateValue>
-
-export const GenericAddressValue = z.object({
+export const AddressFieldValue = z.object({
   country: z.string(),
-  addressType: z.literal(AddressType.INTERNATIONAL),
-  state: z.string(),
-  district2: z.string(),
-  cityOrTown: z.string().optional(),
-  addressLine1: z.string().optional(),
-  addressLine2: z.string().optional(),
-  addressLine3: z.string().optional(),
-  postcodeOrZip: z.string().optional()
+  addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL]),
+  administrativeArea: z
+    .string()
+    .uuid()
+    .optional() /* Leaf level admin structure */,
+  streetLevelDetails: StreetLevelDetailsValue
 })
 
-export const AddressFieldValue = z
-  .discriminatedUnion('urbanOrRural', [UrbanAddressValue, RuralAddressValue])
-  .or(GenericAddressValue)
+export const StreetLevelDetailsUpdateValue = z
+  .record(z.string(), z.string())
+  .nullish()
 
-export const GenericAddressUpdateValue = z.object({
+export const AddressFieldUpdateValue = z.object({
   country: z.string(),
-  addressType: z.literal(AddressType.INTERNATIONAL),
-  state: z.string(),
-  district2: z.string(),
-  cityOrTown: z.string().nullish(),
-  addressLine1: z.string().nullish(),
-  addressLine2: z.string().nullish(),
-  addressLine3: z.string().nullish(),
-  postcodeOrZip: z.string().nullish()
+  addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL]),
+  administrativeArea: z
+    .string()
+    .uuid()
+    .nullish() /* Leaf level admin structure */,
+  streetLevelDetails: StreetLevelDetailsUpdateValue
 })
-
-export type GenericAddressUpdateValue = z.infer<
-  typeof GenericAddressUpdateValue
->
-
-export const AddressFieldUpdateValue = z
-  .discriminatedUnion('urbanOrRural', [
-    UrbanAddressUpdateValue,
-    RuralAddressUpdateValue
-  ])
-  .or(GenericAddressUpdateValue)
 
 export type AddressFieldValue = z.infer<typeof AddressFieldValue>
 
@@ -141,3 +92,18 @@ export type FileFieldValueWithOption = z.infer<typeof FileFieldValueWithOption>
 
 export const FileFieldWithOptionValue = z.array(FileFieldValueWithOption)
 export type FileFieldWithOptionValue = z.infer<typeof FileFieldWithOptionValue>
+
+export const HttpFieldValue = z.object({
+  loading: z.boolean(),
+  error: z.object({ statusCode: z.number(), message: z.string() }).nullish(),
+  data: z.any()
+})
+export type HttpFieldValue = z.infer<typeof HttpFieldValue>
+export const HttpFieldUpdateValue = z
+  .object({
+    loading: z.boolean().nullish(),
+    error: z.object({ statusCode: z.number(), message: z.string() }).nullish(),
+    data: z.any().nullish()
+  })
+  .or(z.null())
+  .or(z.undefined())

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { env } from './environment'
-import { seedLocations, seedLocationsForV2Events } from './locations'
+import { seedLocations } from './locations'
 import { seedUsers } from './users'
 import { parseGQLResponse, raise } from './utils'
 import { print } from 'graphql'
@@ -95,12 +95,8 @@ async function main() {
   const token = await getToken()
 
   // eslint-disable-next-line no-console
-  console.log('Seeding locations for v1 system')
+  console.log('Seeding locations')
   await seedLocations(token)
-
-  // eslint-disable-next-line no-console
-  console.log('Seeding locations for v2 system (events)')
-  await seedLocationsForV2Events(token)
 
   // eslint-disable-next-line no-console
   console.log('Seeding users')

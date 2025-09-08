@@ -23,7 +23,7 @@ import {
   FieldConfig,
   File,
   FileUploadWithOptions,
-  Location,
+  LocationInput,
   Office,
   PageHeader,
   Paragraph,
@@ -39,7 +39,9 @@ import {
   IdField,
   DateRangeField,
   SelectDateRangeField,
-  TimeField
+  TimeField,
+  HttpField,
+  ButtonField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -54,7 +56,8 @@ import {
   DataFieldValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
-  TimeValue
+  TimeValue,
+  ButtonFieldValue
 } from './FieldValue'
 
 import { FullDocumentPath } from '../documents'
@@ -66,7 +69,8 @@ import {
   FileFieldWithOptionValue,
   AddressType,
   NameFieldValue,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  HttpFieldUpdateValue
 } from './CompositeFieldValue'
 
 /**
@@ -145,6 +149,12 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.NAME:
       schema = required ? NameFieldValue : NameFieldUpdateValue
       break
+    case FieldType.BUTTON:
+      schema = ButtonFieldValue
+      break
+    case FieldType.HTTP:
+      schema = HttpFieldUpdateValue
+      break
   }
 
   return required ? schema : schema.nullish()
@@ -191,21 +201,17 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.DATA:
     case FieldType.NAME:
     case FieldType.PHONE:
+    case FieldType.BUTTON:
+    case FieldType.HTTP:
     case FieldType.ID:
       return null
     case FieldType.ADDRESS:
       return {
-        country: null,
+        country: '',
         addressType: AddressType.DOMESTIC,
-        province: null,
-        district: null,
-        urbanOrRural: 'URBAN', // Default to urban needed for validation
-        town: null,
-        residentialArea: null,
-        street: null,
-        number: null,
-        zipCode: null
-      }
+        administrativeArea: '',
+        streetLevelDetails: {}
+      } satisfies AddressFieldValue
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
@@ -323,7 +329,6 @@ export const isFileFieldType = (field: {
   config: FieldConfig
   value: FieldValue
 }): field is { value: FileFieldValue; config: File } => {
-  // @TODO?
   return field.config.type === FieldType.FILE
 }
 
@@ -382,7 +387,7 @@ export const isRadioGroupFieldType = (field: {
 export const isLocationFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: string; config: Location } => {
+}): field is { value: string; config: LocationInput } => {
   return field.config.type === FieldType.LOCATION
 }
 
@@ -421,6 +426,20 @@ export const isDataFieldType = (field: {
   return field.config.type === FieldType.DATA
 }
 
+export const isButtonFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: ButtonField } => {
+  return field.config.type === FieldType.BUTTON
+}
+
+export const isHttpFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: HttpField } => {
+  return field.config.type === FieldType.HTTP
+}
+
 export type NonInteractiveFieldType =
   | Divider
   | PageHeader
@@ -438,6 +457,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.PAGE_HEADER ||
     field.type === FieldType.PARAGRAPH ||
     field.type === FieldType.BULLET_LIST ||
-    field.type === FieldType.DATA
+    field.type === FieldType.DATA ||
+    field.type === FieldType.HTTP
   )
 }

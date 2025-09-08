@@ -12,16 +12,24 @@
 import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import {
+  Draft,
   createEmptyDraft,
-  findActiveDrafts,
-  getCurrentEventStateWithDrafts,
+  findActiveDraftForEvent,
+  dangerouslyGetCurrentEventStateWithDrafts,
   getActionAnnotation,
   DeclarationUpdateActionType,
   ActionType,
   Action,
   deepMerge,
-  getAnnotationFromDrafts
+  getUUID,
+  deepDropNulls,
+  mergeDrafts,
+  EventDocument,
+  EventConfig,
+  getAvailableActionsForEvent,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -31,36 +39,63 @@ import { createTemporaryId } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
-import { getEventDrafts } from './utils'
 
+export type AvailableActionTypes = Extract<
+  ActionType,
+  | 'DECLARE'
+  | 'VALIDATE'
+  | 'REGISTER'
+  | 'REQUEST_CORRECTION'
+  | 'APPROVE_CORRECTION'
+  | 'REJECT_CORRECTION'
+>
+
+/**
+ * Business requirement states that annotation must be prefilled from previous action.
+ * From architechtual perspective, each action has separate annotation of its own.
+ *
+ * @returns the previous declaration action type based on the current action type.
+ */
 function getPreviousDeclarationActionType(
   actions: Action[],
-  currentActionType: DeclarationUpdateActionType
-): DeclarationUpdateActionType | undefined {
-  // If action type is DECLARE, there is no previous declaration action
-  if (currentActionType === ActionType.DECLARE) {
-    return
-  }
+  currentActionType: AvailableActionTypes
+): DeclarationUpdateActionType | typeof ActionType.NOTIFY | undefined {
+  /** NOTE: If event is rejected before registration, there might be previous action of the same type present.
+   * Action arrays are intentionally ordered to get the latest prefilled annotation.
+   * */
 
-  // If action type is VALIDATE, we know that the previous declaration action is DECLARE
-  if (currentActionType === ActionType.VALIDATE) {
-    return ActionType.DECLARE
-  }
+  let actionTypes: (DeclarationUpdateActionType | typeof ActionType.NOTIFY)[]
 
-  // If action type is REGISTER, we know that the previous declaration action is VALIDATE
-  if (currentActionType === ActionType.REGISTER) {
-    return ActionType.VALIDATE
+  switch (currentActionType) {
+    case ActionType.DECLARE: {
+      actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
+      break
+    }
+    case ActionType.VALIDATE: {
+      actionTypes = [ActionType.VALIDATE, ActionType.DECLARE]
+      break
+    }
+    case ActionType.REGISTER: {
+      actionTypes = [ActionType.VALIDATE]
+      break
+    }
+    case ActionType.REQUEST_CORRECTION: {
+      actionTypes = [ActionType.REGISTER]
+      break
+    }
+    case ActionType.APPROVE_CORRECTION:
+    case ActionType.REJECT_CORRECTION: {
+      actionTypes = [ActionType.REQUEST_CORRECTION]
+      break
+    }
+    default: {
+      const _check: never = currentActionType
+      actionTypes = []
+    }
   }
-
-  // If action type is REQUEST_CORRECTION, we want to get the 'latest' action type
-  // Check for the most recent action type in order of precedence
-  const actionTypes = [
-    ActionType.REGISTER,
-    ActionType.VALIDATE,
-    ActionType.DECLARE
-  ]
 
   for (const type of actionTypes) {
     if (actions.find((a) => a.type === type)) {
@@ -71,6 +106,37 @@ function getPreviousDeclarationActionType(
   return
 }
 
+/**
+ *
+ * @param actionType Action type of the declaration action
+ * @param event Event document
+ * @param configuration Event configuration
+ *
+ * Throws an error if the action is not allowed for the event or if the user does not have permission to perform the action.
+ */
+function useActionGuard(
+  actionType: AvailableActionTypes,
+  event: EventDocument,
+  configuration: EventConfig
+) {
+  const eventState = getCurrentEventState(event, configuration)
+  const availableActions = getAvailableActionsForEvent(eventState)
+  const { isActionAllowed } = useUserAllowedActions(event.type)
+
+  // If the action is not available for the event, redirect to the overview page
+  if (!availableActions.includes(actionType)) {
+    throw new Error(
+      `Action ${actionType} not available for the event ${event.id} with status ${getCurrentEventState(event, configuration).status} ${eventState.flags.length > 0 ? `(flags: ${eventState.flags.join(', ')})` : ''}`
+    )
+  }
+
+  // If the user may not perform the action, redirect to the unauthorized page
+  if (!isActionAllowed(actionType)) {
+    throw new Error(
+      `User does not have permission to perform action ${actionType} on event ${event.id}`
+    )
+  }
+}
 /**
  * Creates a wrapper component for the declaration action.
  * Manages the state of the declaration action and its local draft.
@@ -83,12 +149,15 @@ function getPreviousDeclarationActionType(
 function DeclarationActionComponent({
   children,
   actionType
-}: PropsWithChildren<{ actionType: DeclarationUpdateActionType }>) {
+}: PropsWithChildren<{
+  actionType: AvailableActionTypes
+}>) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
 
   const events = useEvents()
   const navigate = useNavigate()
-  const { setLocalDraft, getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
+  const { setLocalDraft, getLocalDraftOrDefault, getRemoteDraftByEventId } =
+    useDrafts()
 
   const event = events.getEvent.findFromCache(eventId).data
 
@@ -110,23 +179,29 @@ function DeclarationActionComponent({
     event.type
   )
 
-  const drafts = getRemoteDrafts(event.id)
-  const activeDraft = findActiveDrafts(event, drafts)[0]
+  useActionGuard(actionType, event, configuration)
+
+  const remoteDraft: Draft | undefined = getRemoteDraftByEventId(event.id)
+
+  const activeRemoteDraft = remoteDraft
+    ? findActiveDraftForEvent(event, remoteDraft)
+    : undefined
+
   const localDraft = getLocalDraftOrDefault(
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    activeDraft || createEmptyDraft(eventId, createTemporaryId(), actionType)
+    activeRemoteDraft
+      ? // new transactionId must be generated for the draft to be saved. Otherwise it will hit the "idempotency wall"
+        { ...activeRemoteDraft, transactionId: getUUID() }
+      : createEmptyDraft(eventId, createTemporaryId(), actionType)
   )
 
   /*
    * Keep the local draft updated as per the form changes
    */
-  const formValues = useEventFormData((state) => state.formValues)
-  const annotation = useActionAnnotation((state) => state.annotation)
-  const clearForm = useEventFormData((state) => state.clear)
-  const clearAnnotation = useActionAnnotation((state) => state.clear)
+  const currentDeclaration = useEventFormData((state) => state.formValues)
+  const currentAnnotation = useActionAnnotation((state) => state.annotation)
 
   useEffect(() => {
-    if (!formValues || !annotation) {
+    if (!currentDeclaration || !currentAnnotation) {
       return
     }
 
@@ -135,12 +210,12 @@ function DeclarationActionComponent({
       eventId: event.id,
       action: {
         ...localDraft.action,
-        declaration: formValues,
-        annotation
+        declaration: currentDeclaration,
+        annotation: currentAnnotation
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formValues, annotation])
+  }, [currentDeclaration, currentAnnotation])
 
   /*
    * Initialize the form state
@@ -148,16 +223,37 @@ function DeclarationActionComponent({
   const setFormValues = useEventFormData((state) => state.setFormValues)
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
-  const eventDrafts = getEventDrafts(event.id, localDraft, drafts)
+  const localDraftWithAdjustedTimestamp = {
+    ...localDraft,
+    /*
+     * Force the local draft always to be the latest
+     * This is to prevent a situation where the local draft gets created,
+     * then a CREATE action request finishes in the background and is stored with a later
+     * timestamp
+     */
+    createdAt: new Date().toISOString(),
+    /*
+     * If params.eventId changes (from tmp id to concrete id) then change the local draft id
+     */
+    eventId: event.id,
+    action: {
+      ...localDraft.action,
+      createdAt: new Date().toISOString()
+    }
+  }
+
+  const mergedDraft: Draft = activeRemoteDraft
+    ? mergeDrafts(activeRemoteDraft, localDraftWithAdjustedTimestamp)
+    : localDraftWithAdjustedTimestamp
 
   const eventStateWithDrafts = useMemo(
     () =>
-      getCurrentEventStateWithDrafts({
+      dangerouslyGetCurrentEventStateWithDrafts({
         event,
-        drafts: eventDrafts,
+        draft: mergedDraft,
         configuration
       }),
-    [eventDrafts, event, configuration]
+    [mergedDraft, event, configuration]
   )
 
   const actionAnnotation = useMemo(() => {
@@ -166,15 +262,15 @@ function DeclarationActionComponent({
       actionType === ActionType.REQUEST_CORRECTION &&
       !isLastActionCorrectionRequest(event)
     ) {
-      return getAnnotationFromDrafts(eventDrafts)
+      return deepDropNulls(mergedDraft.action.annotation || {})
     }
 
     return getActionAnnotation({
       event,
       actionType,
-      drafts: eventDrafts
+      draft: mergedDraft
     })
-  }, [eventDrafts, event, actionType])
+  }, [mergedDraft, event, actionType])
 
   const previousActionAnnotation = useMemo(() => {
     const previousActionType = getPreviousDeclarationActionType(
@@ -208,28 +304,18 @@ function DeclarationActionComponent({
     // If user e.g. enters the 'screen lock' flow while filling form.
     // Then use form values from drafts.
     const initialFormValues = deepMerge(
-      formValues || {},
+      currentDeclaration || {},
       eventStateWithDrafts.declaration
     )
 
     setFormValues(initialFormValues)
 
     const initialAnnotation = deepMerge(
-      deepMerge(annotation || {}, previousActionAnnotation),
+      deepMerge(currentAnnotation || {}, previousActionAnnotation),
       actionAnnotation
     )
 
     setAnnotation(initialAnnotation)
-
-    return () => {
-      /*
-       * When user leaves the action, remove all
-       * staged drafts the user has for this event id and type
-       */
-      setLocalDraft(null)
-      clearForm()
-      clearAnnotation()
-    }
 
     /*
      * This is fine to only run once on mount and unmount as

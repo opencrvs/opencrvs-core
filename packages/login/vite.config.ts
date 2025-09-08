@@ -84,6 +84,7 @@ export default defineConfig(({ mode }): any => {
           rewrite: (path: string) => path.replace(/^\/api\/countryconfig/, '')
         }
       }
-    }
+    },
+    logLevel: 'error'
   }
 })

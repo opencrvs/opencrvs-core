@@ -2,7 +2,7 @@
   "compilerOptions": {
     "lib": ["esnext"],
     "target": "es2016",
-    "module": "CommonJS",
+    "module": "node16",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -16,7 +16,9 @@
         "../commons/src/conditionals/conditionals.ts"
       ],
       "@opencrvs/commons/scopes": ["../commons/src/scopes.ts"],
-      "@opencrvs/commons/events": ["../commons/src/events/index.ts"]
+      "@opencrvs/commons/events": ["../commons/src/events/index.ts"],
+      "@opencrvs/commons/events/deduplication": ["../commons/src/events/deduplication.ts"],
+      "@opencrvs/commons/notification": ["../commons/src/notification/index.ts"]
     }
   },
   "references": [{ "path": "../commons/tsconfig-commonjs.json" }],

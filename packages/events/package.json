@@ -5,7 +5,7 @@
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first tsnd --respawn -r tsconfig-paths/register src/index.ts",
+    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon -r tsconfig-paths/register src/index.ts",
     "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "pnpm test:compilation && vitest run",
     "test:watch": "vitest",
@@ -15,7 +15,7 @@
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.router.json",
     "build:clean": "rm -rf build",
     "generate-db-types": "kanel && prettier src/storage/postgres/events/schema --write",
-    "generate-db-schema": "docker run --rm postgres:17 pg_dump postgres://events_migrator:migrator_password@host.docker.internal:5432/events -s > src/tests/postgres-migrations.sql"
+    "generate-db-schema": "docker run --rm postgres:17.6 pg_dump postgres://events_migrator:migrator_password@host.docker.internal:5432/events -s > src/tests/postgres-migrations.sql"
   },
   "dependencies": {
     "@elastic/elasticsearch": "8.16.2",
@@ -25,6 +25,7 @@
     "@types/pg": "^8.15.4",
     "app-module-path": "^2.2.0",
     "envalid": "^8.0.0",
+    "json-stream-stringify": "^3.1.6",
     "jsonwebtoken": "^9.0.0",
     "kysely": "^0.28.2",
     "lodash": "^4.17.21",
@@ -32,11 +33,13 @@
     "msw": "^2.7.3",
     "node-fetch": "^2.6.7",
     "pg": "^8.16.0",
+    "pg-cursor": "^2.15.3",
     "pg-query-stream": "^4.10.0",
     "superjson": "1.9.0-0",
     "trpc-to-openapi": "2.1.5",
     "tsconfig-paths": "^3.13.0",
     "zod": "^3.23.8",
+    "@types/pg-cursor": "^2.7.2",
     "zod-openapi": "^4.2.4"
   },
   "devDependencies": {
@@ -66,7 +69,6 @@
     "testcontainers": "^10.15.0",
     "ts-jest": "27.1.4",
     "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
     "typescript": "5.6.3",
     "vite-tsconfig-paths": "^3.5.0",
     "vitest": "^2.1.5",

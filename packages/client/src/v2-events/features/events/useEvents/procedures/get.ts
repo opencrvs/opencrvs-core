@@ -14,7 +14,12 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { EventDocument } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { cacheFiles } from '@client/v2-events/features/files/cache'
-import { useTRPC, trpcOptionsProxy, queryClient } from '@client/v2-events/trpc'
+import {
+  useTRPC,
+  trpcOptionsProxy,
+  queryClient,
+  trpcClient
+} from '@client/v2-events/trpc'
 import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
 import { updateLocalEventIndex } from '../api'
 import { setQueryDefaults } from './utils'
@@ -63,6 +68,31 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
   }
 })
 
+function viewEvent(id: string) {
+  const trpc = useTRPC()
+  const eventConfig = useEventConfigurations()
+  const options = trpc.event.get.queryOptions(id)
+
+  return useSuspenseQuery({
+    // In this case we can use the queryFn as this is a ad-hoc query
+    ...options,
+    queryKey: [['view-event', id]],
+    queryFn: async () => trpcClient.event.get.query(id),
+    meta: {
+      eventConfig
+    },
+    gcTime: 0,
+    /*
+     * We never want to refetch this query automatically
+     * because it is the user's explicit (audit logged) action to fetch a record
+     */
+    staleTime: Infinity,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false
+  }).data
+}
+
 export function useGetEvent() {
   const trpc = useTRPC()
 
@@ -99,35 +129,22 @@ export function useGetEvent() {
     /*
      * This downloads the event document from the server without caching it
      */
-    viewEvent: (id: string) => {
-      const eventConfig = useEventConfigurations()
-      const options = trpc.event.get.queryOptions(id)
-
-      return [
-        useSuspenseQuery({
-          // In this case we can use the queryFn as this is a ad-hoc query
-          ...options,
-          meta: {
-            eventConfig
-          },
-          gcTime: 0,
-          /*
-           * We never want to refetch this query automatically
-           * because it is the user's explicit (audit logged) action to fetch a record
-           */
-          staleTime: Infinity,
-          refetchOnMount: false,
-          refetchOnReconnect: false,
-          refetchOnWindowFocus: false
-        }).data
-      ]
-    },
+    viewEvent,
     getFromCache: (id: string) => {
       const eventConfig = useEventConfigurations()
       // Skip the queryFn defined by tRPC and use our own default defined above
       const { queryFn, ...queryOptions } = trpc.event.get.queryOptions(id)
 
-      if (!queryClient.getQueryData(trpc.event.get.queryKey(id))) {
+      const downloaded = queryClient.getQueryData(trpc.event.get.queryKey(id))
+      const downloadedForViewing = queryClient.getQueryData([
+        ['view-event', id]
+      ])
+
+      if (downloadedForViewing) {
+        return viewEvent(id)
+      }
+
+      if (!downloaded) {
         throw new Error(
           `Event with id ${id} not found in cache. Please ensure the event is first assigned and downloaded to the browser.`
         )
@@ -135,7 +152,9 @@ export function useGetEvent() {
 
       return useSuspenseQuery({
         ...queryOptions,
-        queryKey: trpc.event.get.queryKey(id),
+        queryKey: downloadedForViewing
+          ? [['view-event', id]]
+          : trpc.event.get.queryKey(id),
         meta: {
           eventConfig
         },

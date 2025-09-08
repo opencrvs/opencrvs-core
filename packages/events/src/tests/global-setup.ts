@@ -31,7 +31,7 @@ async function setupElasticSearchServer() {
 }
 
 async function setupPostgresServer() {
-  return new PostgreSqlContainer('postgres:17')
+  return new PostgreSqlContainer('postgres:17.6')
     .withUsername('postgres')
     .withPassword('postgres')
     .withDatabase('postgres')

@@ -9,12 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { TRPCError } from '@trpc/server'
-import { ActionType, generateUuid, getUUID, SCOPES } from '@opencrvs/commons'
-import {
-  createTestClient,
-  setupTestCase,
-  TEST_USER_DEFAULT_SCOPES
-} from '@events/tests/utils'
+import { ActionType, generateUuid, getUUID } from '@opencrvs/commons'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
+
+vi.mock('@events/service/indexing/indexing')
+
+import { indexEvent } from '@events/service/indexing/indexing'
+
+type TestClient = ReturnType<typeof createTestClient>
+type CreatedEvent = Awaited<ReturnType<TestClient['event']['create']>>
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -25,13 +28,22 @@ test('prevents forbidden access if missing required scope', async () => {
   )
 })
 
-test(`allows access with required scope`, async () => {
+test('allows access if required scope does not have correct event type configured', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_READ])
+  const client = createTestClient(user, [
+    'record.declare[event=tennis-club-membership]',
+    'record.read[event=birth]'
+  ])
 
-  await expect(client.event.get(generateUuid())).rejects.not.toMatchObject(
-    new TRPCError({ code: 'FORBIDDEN' })
-  )
+  await expect(client.event.get(generateUuid())).rejects.toMatchSnapshot()
+})
+
+test('allows access with required scope', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  await expect(client.event.get(event.id)).resolves.not.toThrow()
 })
 
 test(`Returns 404 when not found`, async () => {
@@ -63,10 +75,7 @@ test('Returns event', async () => {
 
 test('Returns event with all actions', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    ...TEST_USER_DEFAULT_SCOPES,
-    SCOPES.RECORD_SUBMIT_INCOMPLETE
-  ])
+  const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
   await client.event.actions.notify.request(
@@ -152,7 +161,7 @@ test('Returns event with all actions', async () => {
       // last action is the assign action and 2nd last is the automatic unassign action
       correctionRequest.actions[correctionRequest.actions.length - 2].id,
       {
-        reason: { message: 'No legal proof' }
+        content: { reason: 'No legal proof' }
       }
     )
   )
@@ -188,4 +197,238 @@ test('Returns event with all actions', async () => {
       (action) => action.type === ActionType.READ
     )
   ).toHaveLength(2)
+})
+
+describe('Event indexing behavior', () => {
+  let client: ReturnType<typeof createTestClient>
+  let generator: Awaited<ReturnType<typeof setupTestCase>>['generator']
+  let user: Awaited<ReturnType<typeof setupTestCase>>['user']
+
+  beforeEach(async () => {
+    vi.mocked(indexEvent).mockClear()
+    const setup = await setupTestCase()
+    user = setup.user
+    generator = setup.generator
+    client = createTestClient(user)
+  })
+
+  const createEvent = async () => client.event.create(generator.event.create())
+
+  const declareEvent = async (event: CreatedEvent) =>
+    client.event.actions.declare.request(
+      generator.event.actions.declare(event.id)
+    )
+
+  const findCreateAction = (event: CreatedEvent) =>
+    event.actions.find((action) => action.type === ActionType.CREATE) ??
+    ({} as { createdBy: string })
+
+  const assignEvent = async (event: CreatedEvent, assignedTo: string) =>
+    client.event.actions.assignment.assign({
+      ...generator.event.actions.assign(event.id, { assignedTo }),
+      transactionId: getUUID()
+    })
+
+  const validateEvent = async (event: CreatedEvent) =>
+    client.event.actions.validate.request(
+      generator.event.actions.validate(event.id)
+    )
+
+  const registerEvent = async (event: CreatedEvent) =>
+    client.event.actions.register.request(
+      generator.event.actions.register(event.id)
+    )
+
+  const archiveEvent = async (event: CreatedEvent) =>
+    client.event.actions.archive.request(
+      generator.event.actions.archive(event.id)
+    )
+
+  const rejectEvent = async (event: CreatedEvent) =>
+    client.event.actions.reject.request(
+      generator.event.actions.reject(event.id)
+    )
+
+  const printCertificate = async (event: CreatedEvent) =>
+    client.event.actions.printCertificate.request(
+      generator.event.actions.printCertificate(event.id)
+    )
+
+  const correctionRequest = async (event: CreatedEvent) =>
+    client.event.actions.correction.request.request(
+      generator.event.actions.correction.request(event.id)
+    )
+
+  const correctionApprove = async (event: CreatedEvent, actionId: string) =>
+    client.event.actions.correction.approve.request(
+      generator.event.actions.correction.approve(event.id, actionId)
+    )
+
+  const correctionReject = async (event: CreatedEvent, actionId: string) =>
+    client.event.actions.correction.reject.request(
+      generator.event.actions.correction.reject(event.id, actionId, {
+        content: { reason: 'No legal proof' }
+      })
+    )
+
+  describe('Non-indexing actions', () => {
+    test('does not index on create', async () => {
+      await createEvent()
+      expect(indexEvent).not.toHaveBeenCalled()
+    })
+
+    test('does not index on create and read', async () => {
+      const event = await createEvent()
+      await client.event.get(event.id)
+      await client.event.get(event.id)
+      expect(indexEvent).not.toHaveBeenCalled()
+    })
+
+    test('does not index before declare', async () => {
+      const event = await createEvent()
+      await client.event.get(event.id)
+      expect(indexEvent).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Indexing actions', () => {
+    test('indexes on declare', async () => {
+      const event = await createEvent()
+      await declareEvent(event)
+      expect(indexEvent).toHaveBeenCalledTimes(1)
+    })
+
+    test('indexes on assign', async () => {
+      const event = await createEvent()
+      await declareEvent(event)
+      const createAction = findCreateAction(event)
+      await assignEvent(event, createAction.createdBy)
+      expect(indexEvent).toHaveBeenCalledTimes(2) // declare -> assign
+    })
+
+    test('indexes on validate', async () => {
+      const event = await createEvent()
+      await declareEvent(event)
+      const createAction = findCreateAction(event)
+      await assignEvent(event, createAction.createdBy)
+      await validateEvent(event)
+      expect(indexEvent).toHaveBeenCalledTimes(3) // declare -> assign -> validate
+    })
+
+    test('indexes on register', async () => {
+      const event = await createEvent()
+      await declareEvent(event)
+      const createAction = findCreateAction(event)
+      await assignEvent(event, createAction.createdBy)
+      await validateEvent(event)
+      await assignEvent(event, createAction.createdBy)
+      await registerEvent(event)
+      expect(indexEvent).toHaveBeenCalledTimes(5) // declare -> assign -> validate -> assign -> register
+    })
+
+    test('indexes on register (with reads)', async () => {
+      const event = await createEvent()
+      await declareEvent(event)
+      await client.event.get(event.id)
+      const createAction = findCreateAction(event)
+      await assignEvent(event, createAction.createdBy)
+      await validateEvent(event)
+      await client.event.get(event.id)
+      await assignEvent(event, createAction.createdBy)
+      await registerEvent(event)
+      await client.event.get(event.id)
+      expect(indexEvent).toHaveBeenCalledTimes(8) // declare -> view -> assign -> validate -> view -> assign -> register -> view
+    })
+
+    test('indexes on notify', async () => {
+      const notifyClient = createTestClient(user)
+      const event = await notifyClient.event.create(generator.event.create())
+      await notifyClient.event.actions.notify.request(
+        generator.event.actions.notify(event.id)
+      )
+      expect(indexEvent).toHaveBeenCalledTimes(1)
+    })
+
+    test('indexes on reject', async () => {
+      const event = await createEvent()
+      await declareEvent(event)
+      const createAction = findCreateAction(event)
+      await assignEvent(event, createAction.createdBy)
+      await rejectEvent(event)
+      expect(indexEvent).toHaveBeenCalledTimes(3) // declare -> assign -> reject
+    })
+
+    test('indexes on archive', async () => {
+      const event = await createEvent()
+      await declareEvent(event)
+      const createAction = findCreateAction(event)
+      await assignEvent(event, createAction.createdBy)
+      await archiveEvent(event)
+      expect(indexEvent).toHaveBeenCalledTimes(3) // declare -> assign -> archive
+    })
+
+    test('indexes on printCertificate', async () => {
+      const event = await createEvent()
+      await declareEvent(event)
+      const createAction = findCreateAction(event)
+      await assignEvent(event, createAction.createdBy)
+      await validateEvent(event)
+      await assignEvent(event, createAction.createdBy)
+      await registerEvent(event)
+      await assignEvent(event, createAction.createdBy)
+      await printCertificate(event)
+      expect(indexEvent).toHaveBeenCalledTimes(7) // declare -> assign -> validate -> assign -> register -> assign -> print
+    })
+
+    describe('Correction flow', () => {
+      test('indexes on correction request', async () => {
+        const event = await createEvent()
+        await declareEvent(event)
+        const createAction = findCreateAction(event)
+        await assignEvent(event, createAction.createdBy)
+        await validateEvent(event)
+        await assignEvent(event, createAction.createdBy)
+        await registerEvent(event)
+        await assignEvent(event, createAction.createdBy)
+        await correctionRequest(event)
+        expect(indexEvent).toHaveBeenCalledTimes(7) // declare -> assign -> validate -> assign -> register -> assign -> correction-req
+      })
+
+      test('indexes on correction approve', async () => {
+        const event = await createEvent()
+        await declareEvent(event)
+        const createAction = findCreateAction(event)
+        await assignEvent(event, createAction.createdBy)
+        await validateEvent(event)
+        await assignEvent(event, createAction.createdBy)
+        await registerEvent(event)
+        await assignEvent(event, createAction.createdBy)
+        const correction = await correctionRequest(event)
+        await assignEvent(event, createAction.createdBy)
+        await correctionApprove(
+          event,
+          correction.actions[correction.actions.length - 2].id
+        )
+        expect(indexEvent).toHaveBeenCalledTimes(9) // declare -> assign -> validate -> assign -> register -> assign -> correction-req -> assign -> correction-approve
+      })
+
+      test('indexes on correction reject', async () => {
+        const event = await createEvent()
+        await declareEvent(event)
+        const createAction = findCreateAction(event)
+        await assignEvent(event, createAction.createdBy)
+        await validateEvent(event)
+        await assignEvent(event, createAction.createdBy)
+        await registerEvent(event)
+        await assignEvent(event, createAction.createdBy)
+        const correction = await correctionRequest(event)
+        await assignEvent(event, createAction.createdBy)
+        await correctionReject(
+          event,
+          correction.actions[correction.actions.length - 2].id
+        )
+        expect(indexEvent).toHaveBeenCalledTimes(9) // declare -> assign -> validate -> assign -> register -> assign -> correction-req -> assign -> correction-reject
+      })
+    })
+  })
 })

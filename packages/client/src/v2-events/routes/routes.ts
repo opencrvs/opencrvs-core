@@ -13,7 +13,10 @@ import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
 import { zod } from 'react-router-typesafe-routes/zod'
 import * as z from 'zod'
 import { config } from '@client/config'
-import { routes as correctionRoutes } from '@client/v2-events/features/events/actions/correct/request/routes'
+import {
+  requestRoutes as correctionRequestRoutes,
+  reviewRoutes as correctionReviewRoutes
+} from '@client/v2-events/features/events/actions/correct/request/routes'
 import { routes as workqueueRoutes } from '@client/v2-events/features/workqueues/routes'
 import { uuid } from './utils'
 
@@ -145,7 +148,14 @@ export const ROUTES = {
               })
             }
           ),
-          CORRECTION: correctionRoutes
+          REVIEW_POTENTIAL_DUPLICATE: route('review-duplicate/:eventId', {
+            params: { eventId: uuid().defined() },
+            searchParams: {
+              workqueue: string()
+            }
+          }),
+          REQUEST_CORRECTION: correctionRequestRoutes,
+          REVIEW_CORRECTION: correctionReviewRoutes
         }
       ),
       WORKQUEUES: workqueueRoutes,
@@ -162,7 +172,8 @@ export const ROUTES = {
           limit: zod(z.number().min(1).max(100)).default(10),
           offset: zod(z.number().min(0)).default(0)
         }
-      })
+      }),
+      SETTINGS: route('settings', {})
     }
   )
 }

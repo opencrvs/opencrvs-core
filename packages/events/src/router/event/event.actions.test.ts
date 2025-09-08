@@ -8,12 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+import { http, HttpResponse } from 'msw'
 import {
   ActionStatus,
   ActionType,
+  defineFormPage,
+  EventConfig,
+  FieldType,
+  generateTransactionId,
+  generateTranslationConfig,
   getCurrentEventState,
   getUUID,
+  PageTypes,
   PrintCertificateAction
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
@@ -23,200 +29,438 @@ import {
   setupTestCase,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
+import { mswServer } from '../../tests/msw'
+import { env } from '../../environment'
 
-test('actions can be added to created events', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+describe('Adding actions', () => {
+  test('actions can be added to created events', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
 
-  const originalEvent = await client.event.create(generator.event.create())
+    const originalEvent = await client.event.create(generator.event.create())
 
-  const event = await client.event.actions.declare.request(
-    generator.event.actions.declare(originalEvent.id)
-  )
+    const event = await client.event.actions.declare.request(
+      generator.event.actions.declare(originalEvent.id)
+    )
 
-  expect(event.actions).toEqual([
-    expect.objectContaining({ type: ActionType.CREATE }),
-    expect.objectContaining({ type: ActionType.ASSIGN }),
-    expect.objectContaining({ type: ActionType.DECLARE }),
-    expect.objectContaining({ type: ActionType.UNASSIGN })
-  ])
+    expect(event.actions).toEqual([
+      expect.objectContaining({ type: ActionType.CREATE }),
+      expect.objectContaining({ type: ActionType.ASSIGN }),
+      expect.objectContaining({
+        type: ActionType.DECLARE,
+        status: ActionStatus.Requested
+      }),
+      expect.objectContaining({
+        type: ActionType.DECLARE,
+        status: ActionStatus.Accepted
+      }),
+      expect.objectContaining({ type: ActionType.UNASSIGN })
+    ])
+  })
+
+  test('Event document contains all created actions', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+
+    const originalEvent = await client.event.create(generator.event.create())
+
+    const generatedDeclaration = generator.event.actions.declare(
+      originalEvent.id
+    )
+    await client.event.actions.declare.request(generatedDeclaration)
+
+    const createAction = originalEvent.actions.filter(
+      (action) => action.type === ActionType.CREATE
+    )
+
+    const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+      assignedTo: createAction[0].createdBy
+    })
+
+    await client.event.actions.assignment.assign(assignmentInput)
+
+    const generatedValidation = generator.event.actions.validate(
+      originalEvent.id
+    )
+    await client.event.actions.validate.request(generatedValidation)
+
+    await client.event.actions.assignment.assign({
+      ...assignmentInput,
+      transactionId: getUUID()
+    })
+
+    const generatedRegistration = generator.event.actions.register(
+      originalEvent.id
+    )
+    await client.event.actions.register.request(generatedRegistration)
+
+    const updatedEvent = await client.event.get(originalEvent.id)
+
+    expect(updatedEvent.actions).toEqual([
+      expect.objectContaining({ type: ActionType.CREATE }),
+      expect.objectContaining({ type: ActionType.ASSIGN }),
+      expect.objectContaining({
+        type: ActionType.DECLARE,
+        status: ActionStatus.Requested
+      }),
+      expect.objectContaining({
+        type: ActionType.DECLARE,
+        status: ActionStatus.Accepted
+      }),
+      expect.objectContaining({ type: ActionType.UNASSIGN }),
+      expect.objectContaining({ type: ActionType.ASSIGN }),
+      expect.objectContaining({
+        type: ActionType.VALIDATE,
+        status: ActionStatus.Requested
+      }),
+      expect.objectContaining({
+        type: ActionType.VALIDATE,
+        status: ActionStatus.Accepted
+      }),
+      expect.objectContaining({ type: ActionType.UNASSIGN }),
+      expect.objectContaining({ type: ActionType.ASSIGN }),
+      expect.objectContaining({
+        type: ActionType.REGISTER,
+        status: ActionStatus.Requested
+      }),
+      expect.objectContaining({
+        type: ActionType.REGISTER,
+        status: ActionStatus.Accepted
+      }),
+      expect.objectContaining({ type: ActionType.UNASSIGN }),
+      expect.objectContaining({ type: ActionType.READ })
+    ])
+
+    updatedEvent.actions.forEach((action) => {
+      expect(action.createdAtLocation).toBe(user.primaryOfficeId)
+      expect(action.createdByRole).toBe(user.role)
+      expect(action.createdBySignature).toBe(user.signature)
+
+      const actionsWithoutAnnotatation = [
+        ActionType.CREATE,
+        ActionType.READ,
+        ActionType.ASSIGN,
+        ActionType.UNASSIGN
+      ]
+
+      if (
+        actionsWithoutAnnotatation.every((ac) => ac !== action.type) &&
+        action.status !== ActionStatus.Accepted
+      ) {
+        expect(action).toHaveProperty('annotation')
+      }
+    })
+
+    expect(
+      sanitizeForSnapshot(updatedEvent, UNSTABLE_EVENT_FIELDS)
+    ).toMatchSnapshot()
+  })
 })
 
-test('Event document contains all created actions', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+describe('Action drafts', () => {
+  test('READ action does not delete draft', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
 
-  const originalEvent = await client.event.create(generator.event.create())
+    const originalEvent = await client.event.create(generator.event.create())
 
-  const generatedDeclaration = generator.event.actions.declare(originalEvent.id)
-  await client.event.actions.declare.request(generatedDeclaration)
-
-  const createAction = originalEvent.actions.filter(
-    (action) => action.type === ActionType.CREATE
-  )
-
-  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
-    assignedTo: createAction[0].createdBy
-  })
-
-  await client.event.actions.assignment.assign(assignmentInput)
-
-  const generatedValidation = generator.event.actions.validate(originalEvent.id)
-  await client.event.actions.validate.request(generatedValidation)
-
-  await client.event.actions.assignment.assign({
-    ...assignmentInput,
-    transactionId: getUUID()
-  })
-
-  const generatedRegistration = generator.event.actions.register(
-    originalEvent.id
-  )
-  await client.event.actions.register.request(generatedRegistration)
-
-  const updatedEvent = await client.event.get(originalEvent.id)
-
-  expect(updatedEvent.actions).toEqual([
-    expect.objectContaining({ type: ActionType.CREATE }),
-    expect.objectContaining({ type: ActionType.ASSIGN }),
-    expect.objectContaining({ type: ActionType.DECLARE }),
-    expect.objectContaining({ type: ActionType.UNASSIGN }),
-    expect.objectContaining({ type: ActionType.ASSIGN }),
-    expect.objectContaining({ type: ActionType.VALIDATE }),
-    expect.objectContaining({ type: ActionType.UNASSIGN }),
-    expect.objectContaining({ type: ActionType.ASSIGN }),
-    expect.objectContaining({ type: ActionType.REGISTER }),
-    expect.objectContaining({ type: ActionType.UNASSIGN }),
-    expect.objectContaining({ type: ActionType.READ })
-  ])
-
-  updatedEvent.actions.forEach((action) => {
-    expect(action.createdAtLocation).toBe(user.primaryOfficeId)
-    expect(action.createdByRole).toBe(user.role)
-    expect(action.createdBySignature).toBe(user.signature)
-
-    const actionsWithoutAnnotatation = [
-      ActionType.CREATE,
-      ActionType.READ,
-      ActionType.ASSIGN,
-      ActionType.UNASSIGN
-    ]
-
-    if (actionsWithoutAnnotatation.every((ac) => ac !== action.type)) {
-      expect(action).toHaveProperty('annotation')
+    const draftData = {
+      type: ActionType.DECLARE,
+      declaration: {
+        ...generator.event.actions.declare(originalEvent.id).declaration,
+        'applicant.image': {
+          type: 'image/png',
+          originalFilename: 'abcd.png',
+          path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+        }
+      },
+      transactionId: getUUID(),
+      eventId: originalEvent.id,
+      status: ActionStatus.Requested
     }
+
+    await client.event.draft.create(draftData)
+
+    const draftEvents = await client.event.draft.list()
+
+    const event = await client.event.get(originalEvent.id)
+    // this triggers READ action
+    expect(event.actions.at(-1)?.type).toBe(ActionType.READ)
+
+    const draftEventsAfterRead = await client.event.draft.list()
+
+    expect(draftEvents).toEqual(draftEventsAfterRead)
   })
 
-  expect(
-    sanitizeForSnapshot(updatedEvent, UNSTABLE_EVENT_FIELDS)
-  ).toMatchSnapshot()
+  test('Action other than READ deletes draft', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+
+    const originalEvent = await client.event.create(generator.event.create())
+
+    const draftData = {
+      type: ActionType.DECLARE,
+      declaration: {
+        ...generator.event.actions.declare(originalEvent.id).declaration,
+        'applicant.image': {
+          type: 'image/png',
+          originalFilename: 'abcd.png',
+          path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+        }
+      },
+      transactionId: getUUID(),
+      eventId: originalEvent.id,
+      status: ActionStatus.Requested
+    }
+
+    await client.event.draft.create(draftData)
+
+    const draftEvents = await client.event.draft.list()
+    expect(draftEvents.length).toBe(1)
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(originalEvent.id)
+    )
+
+    const draftEventsAfterRead = await client.event.draft.list()
+
+    expect(draftEventsAfterRead.length).toBe(0)
+  })
 })
 
-test('READ action does not delete draft', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+const multiFileConfig = {
+  ...tennisClubMembershipEvent,
+  id: 'death', // using existing event type id here, so that the user has the required scope to it
+  declaration: {
+    label: generateTranslationConfig('File club form'),
+    pages: [
+      defineFormPage({
+        id: 'documents',
+        type: PageTypes.enum.FORM,
+        title: generateTranslationConfig('Upload supporting documents'),
+        fields: [
+          {
+            id: 'documents.singleFile',
+            type: FieldType.FILE,
+            required: false,
+            configuration: {},
+            label: generateTranslationConfig('single file')
+          },
+          {
+            id: 'documents.multiFile',
+            type: FieldType.FILE_WITH_OPTIONS,
+            required: false,
+            label: generateTranslationConfig('multi file'),
+            configuration: {},
+            options: [
+              {
+                label: generateTranslationConfig('multi file option 1'),
+                value: 'multifile1'
+              },
+              {
+                label: generateTranslationConfig('multi file option 2'),
+                value: 'multifile2'
+              }
+            ]
+          }
+        ]
+      })
+    ]
+  },
+  advancedSearch: []
+} satisfies EventConfig
 
-  const originalEvent = await client.event.create(generator.event.create())
+describe('Action updates', () => {
+  const deleteFileMock = vi.fn()
+  const fileExistsMock = vi.fn()
 
-  const draftData = {
-    type: ActionType.DECLARE,
-    declaration: {
-      ...generator.event.actions.declare(originalEvent.id).declaration,
-      'applicant.image': {
-        type: 'image/png',
-        originalFilename: 'abcd.png',
-        path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
-      }
+  beforeEach(() => {
+    deleteFileMock.mockClear()
+    fileExistsMock.mockClear()
+
+    mswServer.use(
+      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+        return HttpResponse.json([multiFileConfig, tennisClubMembershipEvent])
+      }),
+      http.post(
+        `${env.COUNTRY_CONFIG_URL}/events/multi-file-event/actions/:action`,
+        (ctx) => {
+          const payload =
+            ctx.params.action === ActionType.REGISTER
+              ? { registrationNumber: `ABC${Number(new Date())}` }
+              : {}
+
+          return HttpResponse.json(payload)
+        }
+      ),
+      http.head(`${env.DOCUMENTS_URL}/files/:filePath*`, (req) => {
+        fileExistsMock(
+          typeof req.params.filePath === 'string'
+            ? req.params.filePath
+            : req.params.filePath?.join('/')
+        )
+        return HttpResponse.json({ ok: true })
+      }),
+
+      http.delete(`${env.DOCUMENTS_URL}/files/:filePath*`, (req) => {
+        deleteFileMock(
+          typeof req.params.filePath === 'string'
+            ? req.params.filePath
+            : req.params.filePath?.join('/')
+        )
+        return HttpResponse.json({ ok: true })
+      })
+    )
+  })
+
+  const declarationWithFiles = {
+    'documents.singleFile': {
+      type: 'image/svg+xml',
+      originalFilename: 'tree.svg',
+      path: '/ocrvs/tree.svg'
     },
-    transactionId: getUUID(),
-    eventId: originalEvent.id,
-    status: ActionStatus.Requested
+    'documents.multiFile': [
+      {
+        type: 'image/svg+xml',
+        originalFilename: 'multi-file-1.svg',
+        path: '/ocrvs/fish.svg',
+        option: 'multifile1'
+      },
+      {
+        type: 'image/svg+xml',
+        originalFilename: 'multi-file-2.svg',
+        path: '/ocrvs/mountain.svg',
+        option: 'multifile2'
+      }
+    ]
   }
 
-  await client.event.draft.create(draftData)
+  it('partial declaration update accounts for conditional field values not in payload', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
 
-  const draftEvents = await client.event.draft.list()
+    const originalEvent = await client.event.create(generator.event.create())
 
-  const event = await client.event.get(originalEvent.id)
-  // this triggers READ action
-  expect(event.actions.at(-1)?.type).toBe(ActionType.READ)
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(originalEvent.id)
+    )
 
-  const draftEventsAfterRead = await client.event.draft.list()
+    const createAction = originalEvent.actions.filter(
+      (action) => action.type === ActionType.CREATE
+    )
 
-  expect(draftEvents).toEqual(draftEventsAfterRead)
-})
+    await client.event.actions.assignment.assign(
+      generator.event.actions.assign(originalEvent.id, {
+        assignedTo: createAction[0].createdBy
+      })
+    )
 
-test('Action other than READ deletes draft', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+    await client.event.actions.validate.request({
+      type: ActionType.VALIDATE,
+      declaration: {
+        'applicant.dobUnknown': true,
+        'applicant.age': 25
+      },
+      eventId: originalEvent.id,
+      transactionId: getUUID()
+    })
 
-  const originalEvent = await client.event.create(generator.event.create())
-
-  const draftData = {
-    type: ActionType.DECLARE,
-    declaration: {
-      ...generator.event.actions.declare(originalEvent.id).declaration,
-      'applicant.image': {
-        type: 'image/png',
-        originalFilename: 'abcd.png',
-        path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
-      }
-    },
-    transactionId: getUUID(),
-    eventId: originalEvent.id,
-    status: ActionStatus.Requested
-  }
-
-  await client.event.draft.create(draftData)
-
-  const draftEvents = await client.event.draft.list()
-  expect(draftEvents.length).toBe(1)
-
-  await client.event.actions.declare.request(
-    generator.event.actions.declare(originalEvent.id)
-  )
-
-  const draftEventsAfterRead = await client.event.draft.list()
-
-  expect(draftEventsAfterRead.length).toBe(0)
-})
-
-test('partial declaration update accounts for conditional field values not in payload', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const originalEvent = await client.event.create(generator.event.create())
-
-  await client.event.actions.declare.request(
-    generator.event.actions.declare(originalEvent.id)
-  )
-
-  const createAction = originalEvent.actions.filter(
-    (action) => action.type === ActionType.CREATE
-  )
-
-  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
-    assignedTo: createAction[0].createdBy
+    const event = await client.event.get(originalEvent.id)
+    const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
+    expect(eventState.declaration).toMatchSnapshot()
   })
 
-  await client.event.actions.assignment.assign(assignmentInput)
+  it('File references are removed with explicit null', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user)
 
-  await client.event.actions.validate.request({
-    type: ActionType.VALIDATE,
-    duplicates: [],
-    declaration: {
-      'applicant.dobUnknown': true,
-      'applicant.age': 25
-    },
-    eventId: originalEvent.id,
-    transactionId: getUUID()
+    const originalEvent = await client.event.create({
+      transactionId: generateTransactionId(),
+      type: multiFileConfig.id
+    })
+
+    await client.event.actions.declare.request({
+      eventId: originalEvent.id,
+      type: ActionType.DECLARE,
+      declaration: declarationWithFiles,
+      transactionId: generateTransactionId(),
+      keepAssignment: true
+    })
+
+    const [eventAfterDeclare] = await client.event.list()
+
+    expect(eventAfterDeclare.declaration['documents.singleFile']).toBeDefined()
+    expect(eventAfterDeclare.declaration['documents.multiFile']).toHaveLength(2)
+    expect(eventAfterDeclare.declaration['documents.singleFile']).toBeDefined()
+
+    await client.event.actions.validate.request({
+      eventId: originalEvent.id,
+      type: ActionType.VALIDATE,
+      declaration: {
+        'documents.multiFile': null,
+        'documents.singleFile': null
+      },
+
+      transactionId: generateTransactionId(),
+      keepAssignment: true
+    })
+
+    const [eventAfterValidate] = await client.event.list()
+
+    expect(
+      eventAfterValidate.declaration['documents.singleFile']
+    ).not.toBeDefined()
+    expect(
+      eventAfterValidate.declaration['documents.multiFile']
+    ).not.toBeDefined()
   })
 
-  const event = await client.event.get(originalEvent.id)
+  it('file with option references are removed with empty array', async () => {
+    const { user } = await setupTestCase()
+    const client = createTestClient(user)
 
-  const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
+    const originalEvent = await client.event.create({
+      transactionId: generateTransactionId(),
+      type: multiFileConfig.id
+    })
 
-  expect(eventState.declaration).toMatchSnapshot()
+    await client.event.actions.declare.request({
+      eventId: originalEvent.id,
+      type: ActionType.DECLARE,
+      declaration: declarationWithFiles,
+      transactionId: generateTransactionId(),
+      keepAssignment: true
+    })
+
+    const [eventAfterDeclare] = await client.event.list()
+
+    expect(eventAfterDeclare.declaration['documents.singleFile']).toBeDefined()
+    expect(eventAfterDeclare.declaration['documents.multiFile']).toHaveLength(2)
+
+    expect(fileExistsMock.mock.calls[0]).toEqual(['ocrvs/tree.svg'])
+
+    await client.event.actions.validate.request({
+      eventId: originalEvent.id,
+      type: ActionType.VALIDATE,
+      declaration: {
+        'documents.multiFile': [],
+        'documents.singleFile': null
+      },
+      transactionId: generateTransactionId(),
+      keepAssignment: true
+    })
+
+    // No files should be deleted, only references removed
+    expect(deleteFileMock.mock.calls).toHaveLength(0)
+    const [eventAfterValidate] = await client.event.list()
+
+    expect(
+      eventAfterValidate.declaration['documents.singleFile']
+    ).not.toBeDefined()
+    expect(eventAfterValidate.declaration['documents.multiFile']).toHaveLength(
+      0
+    )
+  })
 })
 
 test('PRINT_CERTIFICATE action can include a valid content.templateId property in payload', async () => {
@@ -285,4 +529,61 @@ test('REGISTER action throws when content property is in payload', async () => {
   await expect(
     client.event.actions.register.request(registerActionWithDetails)
   ).rejects.toThrow()
+})
+
+test('Can not add action with same [transactionId, type, status]', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  const declarePayload = generator.event.actions.declare(originalEvent.id)
+  await client.event.actions.declare.request(declarePayload)
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.reject.request(
+    generator.event.actions.reject(originalEvent.id)
+  )
+
+  const eventBeforeDuplicateAttempt =
+    await client.event.actions.assignment.assign({
+      ...assignmentInput,
+      transactionId: getUUID()
+    })
+
+  const eventWithDuplicateAttempt = await client.event.actions.declare.request(
+    generator.event.actions.declare(originalEvent.id, {
+      transactionId: declarePayload.transactionId
+    })
+  )
+  expect(eventBeforeDuplicateAttempt).toStrictEqual(eventWithDuplicateAttempt)
+
+  const updatedEvent = await client.event.actions.declare.request({
+    ...declarePayload,
+    transactionId: getUUID()
+  })
+
+  expect(updatedEvent.actions).toStrictEqual([
+    ...eventBeforeDuplicateAttempt.actions,
+    expect.objectContaining({
+      type: ActionType.DECLARE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.DECLARE,
+      status: ActionStatus.Accepted
+    }),
+    expect.objectContaining({ type: ActionType.UNASSIGN })
+  ])
 })

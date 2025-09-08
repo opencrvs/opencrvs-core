@@ -14,13 +14,14 @@
     "./fixtures": "./build/dist/common/fixtures.js",
     "./assignment": "./build/dist/common/assignment.js",
     "./client": "./build/dist/esm/client.js",
-    "./events": "./build/dist/common/events/index.js"
+    "./events": "./build/dist/common/events/index.js",
+    "./events/deduplication": "./build/dist/common/events/deduplication.js"
   },
   "scripts": {
     "start": "pnpm build:watch",
     "test": "pnpm test:compilation && jest",
     "test:watch": "jest --watch",
-    "test:compilation": "tsc --noEmit",
+    "test:compilation": "tsc -b",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "postinstall": "pnpm build",
     "build": "pnpm tsc -b tsconfig.build.json",
@@ -43,6 +44,7 @@
     "jest": "29.7.0",
     "jwt-decode": "^3.0.0",
     "lodash": "^4.17.10",
+    "object-hash": "^3.0.0",
     "pino": "^7.0.0",
     "pkg-up": "^3.1.0",
     "typescript": "5.6.3",
@@ -53,6 +55,7 @@
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.9",
+    "@types/object-hash": "^3.0.6",
     "@typescript-eslint/eslint-plugin": "8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "eslint": "^9.23.0",

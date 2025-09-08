@@ -84,97 +84,142 @@ export const handlers = {
         {
           id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
           name: 'Central',
-          partOf: null
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: null,
+          validUntil: null
         },
         {
           id: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
           name: 'Sulaka',
-          partOf: null
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: null,
+          validUntil: null
         },
         {
           id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
           name: 'Pualula',
-          partOf: null
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: null,
+          validUntil: null
         },
         {
           id: '6d1a59df-988c-4021-a846-ccbc021931a7' as UUID,
           name: 'Chuminga',
-          partOf: null
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: null,
+          validUntil: null
         },
         {
           id: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
           name: 'Ibombo',
-          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          validUntil: null
+        },
+        {
+          id: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+          name: 'Isango',
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          validUntil: null
         },
         {
           id: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
           name: 'Isamba',
-          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          validUntil: null
         },
         {
           id: '89a33893-b17d-481d-a26d-6461e7ac1651' as UUID,
           name: 'Itambo',
-          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          validUntil: null
         },
         {
           id: 'd42ab2fe-e7ed-470e-8b31-4fb27f9b8250' as UUID,
           name: 'Ezhi',
-          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          validUntil: null
         },
         {
           id: '423d000f-101b-47c0-8b86-21a908067cee' as UUID,
           name: 'Chamakubi Health Post',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: '4d3279be-d026-420c-88f7-f0a4ae986973' as UUID,
           name: 'Ibombo Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: '190902f4-1d77-476a-8947-41145af1db7d' as UUID,
           name: 'Chikobo Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: 'f5ecbd9b-a01e-4a65-910e-70e86ab41b71' as UUID,
           name: 'Chilochabalenje Health Post',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: 'dbfc178f-7295-4b90-b28d-111c95b03127' as UUID,
           name: 'Chipeso Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: '09862bfe-c7ac-46cd-987b-668681533c80' as UUID,
           name: 'Chisamba Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: '834ce389-e95b-4fb0-96a0-33e9ab323059' as UUID,
           name: 'Chitanda Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: '0431c433-6062-4a4c-aee9-25271aec61ee' as UUID,
           name: 'Golden Valley Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: 'bc84d0b6-7ba7-480d-a339-5d9920d90eb2' as UUID,
           name: 'Ipongo Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: '4cf1f53b-b730-41d2-8649-dff7eeed970d' as UUID,
           name: 'Itumbwe Health Post',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: '4b3676cb-9355-4942-9eb9-2ce46acaf0e0' as UUID,
           name: 'Kabangalala Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         }
       ]
     })
@@ -1119,8 +1164,8 @@ export const handlers = {
       return HttpResponse.json({
         data: {
           getUser: {
-            id: '679397db138339c63cdc24e1',
-            userMgntUserID: '679397db138339c63cdc24e1',
+            id: testDataGenerator().user.id.localRegistrar,
+            userMgntUserID: testDataGenerator().user.id.localRegistrar,
             creationDate: '1737725915295',
             username: 'k.mweene',
             fullHonorificName: 'Mr. Kennedy Mweene',
@@ -1179,7 +1224,8 @@ export const handlers = {
           name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
           role: 'LOCAL_REGISTRAR',
           signature: undefined,
-          avatar: undefined
+          avatar: undefined,
+          primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
         }
       ]
     }),
@@ -1195,7 +1241,8 @@ export const handlers = {
         ],
         role: 'LOCAL_REGISTRAR',
         signature: 'signature.png' as FullDocumentPath,
-        avatar: undefined
+        avatar: undefined,
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
       }
     })
   ],
@@ -1207,15 +1254,7 @@ export const handlers = {
       return [tennisClubMembershipEventIndex]
     }),
     tRPCMsw.event.search.query((input) => {
-      return []
-    }),
-    tRPCMsw.workqueue.config.list.query(() => {
-      return generateWorkqueues()
-    }),
-    tRPCMsw.workqueue.count.query((input) => {
-      return input.reduce((acc, { slug }) => {
-        return { ...acc, [slug]: 7 }
-      }, {})
+      return { results: [], total: 0 }
     })
   ],
   locations: [
@@ -2124,6 +2163,7 @@ export const handlers = {
         certificates: [
           {
             id: 'tennis-club-membership-certificate',
+            isV2Template: true,
             event: TENNIS_CLUB_MEMBERSHIP,
             label: {
               id: 'certificates.tennis-club-membership.certificate.copy',
@@ -2149,6 +2189,7 @@ export const handlers = {
           },
           {
             id: 'tennis-club-membership-certified-certificate',
+            isV2Template: true,
             event: TENNIS_CLUB_MEMBERSHIP,
             label: {
               id: 'certificates.tennis-club-membership.certificate.certified-copy',
@@ -2219,6 +2260,16 @@ export const handlers = {
           'Content-Type': 'image/svg+xml'
         }
       })
+    })
+  ],
+  workqueues: [
+    tRPCMsw.workqueue.count.query((input) => {
+      return input.reduce((acc, { slug }) => {
+        return { ...acc, [slug]: 7 }
+      }, {})
+    }),
+    tRPCMsw.workqueue.config.list.query(() => {
+      return generateWorkqueues()
     })
   ]
 }

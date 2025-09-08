@@ -24,7 +24,9 @@ import {
   TranslationConfig,
   EventState,
   NameFieldValue,
-  isFieldVisible
+  isFieldVisible,
+  isDateRangeFieldType,
+  isNameFieldType
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues } from '@client/v2-events/utils'
@@ -98,6 +100,32 @@ function SearchSectionForm({
   )
 }
 
+function countFilledFieldsForInputType(
+  field: FieldConfig,
+  value: FieldValue
+): number {
+  if (value === null || value === undefined || value === '') {
+    return 0
+  }
+  const data = { value, config: field }
+
+  if (isNameFieldType(data)) {
+    return Object.values(data.value).filter(Boolean).length
+  }
+
+  if (isDateRangeFieldType(data)) {
+    if (typeof data.value === 'string') {
+      return data.value !== '' ? 1 : 0
+    }
+    if (data.value.start && data.value.end) {
+      return 1
+    }
+    return 0
+  }
+
+  return value && value !== '' ? 1 : 0
+}
+
 export function TabSearch({
   currentEvent,
   fieldValues,
@@ -145,9 +173,9 @@ export function TabSearch({
 
   const nonEmptyValues = filterEmptyValues(formValues)
 
-  const handleSearch = () => {
-    const fields = sections.flatMap((section) => section.fields)
+  const fields = sections.flatMap((section) => section.fields)
 
+  const handleSearch = () => {
     const updatedValues = Object.entries(nonEmptyValues).reduce(
       (result, [fieldId, value]) => {
         const field = fields.find((f) => f.id === fieldId)
@@ -185,10 +213,17 @@ export function TabSearch({
       return 0
     }
     if (typeof value === 'object') {
-      return Object.values(value).reduce<number>(
-        (count, val) => count + countNonEmptyFields(val),
-        0
-      )
+      return Object.entries(value).reduce<number>((count, [key, val]) => {
+        const field = fields.find((f) => f.id === key)
+
+        if (!field) {
+          return count
+        }
+        if (!isFieldVisible(field, formValues)) {
+          return count
+        }
+        return count + countFilledFieldsForInputType(field, val)
+      }, 0)
     }
     return 1
   }

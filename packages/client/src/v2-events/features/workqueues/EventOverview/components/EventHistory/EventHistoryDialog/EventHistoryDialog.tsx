@@ -17,16 +17,17 @@ import {
   ActionDocument,
   ActionType,
   EventDocument,
-  getAcceptedActions
+  getAcceptedActions,
+  UUID
 } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
 import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
-import { getActionTypeSpecificContent } from './actionTypeSpecificContent'
+import { ActionTypeSpecificContent } from './ActionTypeSpecificContent'
 
 export const eventHistoryStatusMessage = {
   id: `v2.events.history.status`,
   defaultMessage:
-    '{status, select, CREATE {Declaration started} NOTIFY {Notified} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}'
+    '{status, select, CREATE {Draft} NOTIFY {Sent incomplete} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}'
 }
 
 const messages = defineMessages({
@@ -44,6 +45,11 @@ const messages = defineMessages({
     defaultMessage: 'Reason',
     description: 'Label for rejection correction reason',
     id: 'v2.constants.reason'
+  },
+  duplicateOf: {
+    defaultMessage: 'Duplicate of',
+    description: 'table header for `duplicate of` in record audit',
+    id: 'v2.constants.duplicateOf'
   }
 })
 
@@ -54,7 +60,7 @@ function prepareComments(history: ActionDocument) {
     history.type === ActionType.REJECT ||
     history.type === ActionType.ARCHIVE
   ) {
-    comments.push({ comment: history.reason.message })
+    comments.push({ comment: history.content.reason })
   }
 
   return comments
@@ -64,10 +70,34 @@ function prepareReason(history: ActionDocument) {
   const reason: { message?: string } = {}
 
   if (history.type === ActionType.REJECT_CORRECTION) {
-    reason.message = history.reason.message
+    reason.message = history.content.reason
   }
 
   return reason
+}
+
+function prepareDuplicateOf(
+  history: ActionDocument,
+  fullHistory: ActionDocument[]
+): string | null {
+  if (history.type !== ActionType.MARK_AS_DUPLICATE) {
+    return null
+  }
+  const duplicateOf = history.content?.duplicateOf
+  if (!duplicateOf) {
+    return null
+  }
+  const duplicatesDetected = fullHistory
+    .filter((action) => action.type === ActionType.DUPLICATE_DETECTED)
+    .flatMap((action) => action.content.duplicates) satisfies Array<{
+    id: UUID
+    trackingId: string
+  }>
+
+  return (
+    duplicatesDetected.find((duplicate) => duplicate.id === duplicateOf)
+      ?.trackingId ?? null
+  )
 }
 
 /**
@@ -93,6 +123,7 @@ export function EventHistoryDialog({
 
   const comments = prepareComments(action)
   const reason = prepareReason(action)
+  const duplicateOf = prepareDuplicateOf(action, history)
 
   return (
     <ResponsiveModal
@@ -119,6 +150,23 @@ export function EventHistoryDialog({
           )}
         </Text>
       </Stack>
+      {Boolean(duplicateOf) && (
+        <Table
+          columns={[
+            {
+              key: 'duplicateOf',
+              label: intl.formatMessage(messages.duplicateOf),
+              width: 100
+            }
+          ]}
+          content={[
+            {
+              duplicateOf: duplicateOf
+            }
+          ]}
+          noResultText=" "
+        />
+      )}
       {comments.length > 0 && (
         <Table
           columns={[
@@ -145,7 +193,7 @@ export function EventHistoryDialog({
           noResultText=" "
         />
       )}
-      {getActionTypeSpecificContent(action, fullEvent)}
+      <ActionTypeSpecificContent action={action} fullEvent={fullEvent} />
     </ResponsiveModal>
   )
 }

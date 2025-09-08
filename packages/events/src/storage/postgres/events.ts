@@ -12,6 +12,7 @@
 import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely'
 import { Pool, types } from 'pg'
 import { Settings, DateTime } from 'luxon'
+import Cursor from 'pg-cursor'
 import { env } from '@events/environment'
 import Schema from './events/schema/Database'
 
@@ -38,7 +39,8 @@ export const getPool = (connectionString = env.EVENTS_POSTGRES_URL) => {
 export function getClient() {
   if (!db) {
     const dialect = new PostgresDialect({
-      pool: getPool()
+      pool: getPool(),
+      cursor: Cursor
     })
 
     db = new Kysely<Schema>({

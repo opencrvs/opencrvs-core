@@ -8,9 +8,9 @@ type ActionType =
   | 'DECLARE'
   | 'VALIDATE'
   | 'REGISTER'
-  | 'DETECT_DUPLICATE'
+  | 'DUPLICATE_DETECTED'
   | 'REJECT'
-  | 'MARKED_AS_DUPLICATE'
+  | 'MARK_AS_DUPLICATE'
   | 'ARCHIVE'
   | 'PRINT_CERTIFICATE'
   | 'REQUEST_CORRECTION'
@@ -20,5 +20,6 @@ type ActionType =
   | 'READ'
   | 'ASSIGN'
   | 'UNASSIGN'
+  | 'MARK_AS_NOT_DUPLICATE'
 
 export default ActionType

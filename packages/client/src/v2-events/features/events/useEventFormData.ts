@@ -43,22 +43,31 @@ function removeUndefinedKeys(data: EventState) {
  * @property {function} getTouchedFields - Retrieves the fields that have been touched.
  * @property {function} clear - Clears the form values.
  */
-export const useEventFormData = create<EventFormData>()((set, get) => ({
-  formValues: {},
-  touchedFields: {},
-  getFormValues: (initialValues?: EventState) =>
-    get().formValues || initialValues || {},
-  setFormValues: (form: EventState) => {
-    const formValues = removeUndefinedKeys(form)
-    return set(() => ({ formValues }))
-  },
-  setAllTouchedFields: (fields) => set(() => ({ touchedFields: fields })),
-  getTouchedFields: () =>
-    Object.fromEntries(
-      Object.entries(get().getFormValues()).map(([key]) => [key, true])
-    ),
-  clear: () => set(() => ({ formValues: {}, touchedFields: {} }))
-}))
+export const useEventFormData = create<EventFormData>()((set, get) => {
+  return {
+    formValues: {},
+    touchedFields: {},
+
+    getFormValues: (initialValues?: EventState) =>
+      get().formValues || initialValues || {},
+
+    setFormValues: (form: EventState) => {
+      const formValues = removeUndefinedKeys(form)
+      return set(() => ({ formValues }))
+    },
+
+    setAllTouchedFields: (fields) => set(() => ({ touchedFields: fields })),
+
+    getTouchedFields: () =>
+      Object.fromEntries(
+        Object.entries(get().getFormValues()).map(([key]) => [key, true])
+      ),
+
+    clear: () => {
+      set(() => ({ formValues: {}, touchedFields: {} }))
+    }
+  }
+})
 /**
  * Based on https://github.com/pmndrs/zustand?tab=readme-ov-file#transient-updates-for-often-occurring-state-changes
  *

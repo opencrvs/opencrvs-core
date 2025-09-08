@@ -13,7 +13,7 @@ import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
 import { ConditionalParameters, JSONSchema } from './conditionals'
 import { formatISO, isAfter, isBefore } from 'date-fns'
-import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
+import { ErrorMapCtx, z, ZodIssueOptionalMessage } from 'zod'
 import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
@@ -21,10 +21,18 @@ import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 
+import { Location } from '../events/locations'
+
 const ajv = new Ajv({
   $data: true,
   allowUnionTypes: true,
   strict: false // Allow minContains and other newer features
+})
+
+const DataContext = z.object({
+  rootData: z.object({
+    $locations: z.array(Location)
+  })
 })
 
 // https://ajv.js.org/packages/ajv-formats.html
@@ -91,8 +99,48 @@ ajv.addKeyword({
   }
 })
 
+ajv.addKeyword({
+  keyword: 'isLeafLevelLocation',
+  type: 'string',
+  schemaType: 'boolean',
+  $data: true,
+  errors: true,
+  validate(
+    schema: {},
+    data: string,
+    _: unknown,
+    dataContext?: { rootData: unknown }
+  ) {
+    const context = DataContext.safeParse(dataContext)
+
+    if (!context.success) {
+      throw new Error('Validation context must contain $locations')
+    }
+
+    const locationToValidate = data
+
+    const locations = context.data.rootData.$locations
+
+    return !locations.some(
+      (location) => location.parentId === locationToValidate
+    )
+  }
+})
+
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
-  return ajv.validate(schema, data)
+  const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
+
+  const result = validator(data) as boolean
+
+  return result
+}
+
+export function isOnline() {
+  if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+    return navigator.onLine
+  }
+  // Server-side: assume always online
+  return true
 }
 
 export function isConditionMet(
@@ -101,7 +149,8 @@ export function isConditionMet(
 ) {
   return validate(conditional, {
     $form: values,
-    $now: formatISO(new Date(), { representation: 'date' })
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $online: isOnline()
   })
 }
 
@@ -143,7 +192,8 @@ function isFieldConditionMet(
     $form: form,
     $now: formatISO(new Date(), {
       representation: 'date'
-    })
+    }),
+    $online: isOnline()
   })
 
   return validConditionals.includes(conditionalType)
@@ -154,6 +204,18 @@ export function isFieldVisible(
   form: ActionUpdate | EventState
 ) {
   return isFieldConditionMet(field, form, ConditionalType.SHOW)
+}
+
+export function getOnlyVisibleFormValues(
+  field: FieldConfig[],
+  form: EventState
+) {
+  return field.reduce((acc, f) => {
+    if (isFieldVisible(f, form) && form[f.id] !== undefined) {
+      acc[f.id] = form[f.id]
+    }
+    return acc
+  }, {} as EventState)
 }
 
 function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
@@ -250,7 +312,10 @@ function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
     }
 
     case 'invalid_type': {
-      if (issue.expected !== issue.received && issue.received === 'undefined') {
+      if (
+        issue.expected !== issue.received &&
+        (issue.received === 'undefined' || issue.received === 'null')
+      ) {
         return createIntlError(errorMessages.requiredField)
       }
 
@@ -364,10 +429,12 @@ export function runStructuralValidations({
 
 export function runFieldValidations({
   field,
-  values
+  values,
+  context
 }: {
   field: FieldConfig
   values: ActionUpdate
+  context?: { locations: Array<Location> }
 }) {
   if (
     !isFieldVisible(field, values) ||
@@ -380,7 +447,9 @@ export function runFieldValidations({
 
   const conditionalParameters = {
     $form: values,
-    $now: formatISO(new Date(), { representation: 'date' })
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $locations: context?.locations ?? [],
+    $online: isOnline()
   }
 
   const fieldValidationResult = validateFieldInput({
@@ -442,6 +511,7 @@ export function getValidatorsForField(
         message,
         validator: {
           ...jsonSchema,
+          $id: jsonSchema.$id + '.' + fieldId,
           properties: {
             $form: {
               type: 'object',

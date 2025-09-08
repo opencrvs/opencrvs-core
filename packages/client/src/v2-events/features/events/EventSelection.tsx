@@ -150,7 +150,7 @@ function EventSelector() {
 
 function EventSelection() {
   const intl = useIntl()
-  const { goToHome } = useEventFormNavigation()
+  const { closeActionView } = useEventFormNavigation()
 
   return (
     <Frame
@@ -162,7 +162,7 @@ function EventSelection() {
               id="goBack"
               size="small"
               type="secondary"
-              onClick={goToHome}
+              onClick={() => closeActionView()}
             >
               <Icon name="X" />
               {intl.formatMessage(messages.exitButton)}
@@ -171,7 +171,7 @@ function EventSelection() {
           desktopTitle={intl.formatMessage(messages.registerNewEventTitle)}
           mobileLeft={<Icon name="Draft" size="large" />}
           mobileRight={
-            <Button size="medium" type="icon" onClick={goToHome}>
+            <Button size="medium" type="icon" onClick={() => closeActionView()}>
               <Icon name="X" />
             </Button>
           }

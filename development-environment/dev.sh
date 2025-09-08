@@ -48,11 +48,30 @@ do
   esac
 done
 
+# List of directories
+dirs=(
+  "data/elasticsearch"
+  "data/mongo"
+  "data/influxdb"
+  "data/minio"
+  "data/backups"
+  "data/postgres"
+)
+
+for dir in "${dirs[@]}"; do
+  if [ ! -d "$dir" ]; then
+    echo "Creating $dir"
+    mkdir -p "$dir"
+    chmod 775 "$dir"
+  else
+    echo "$dir already exists"
+  fi
+done
+
 if $dependencies; then
   concurrently "pnpm run compose:deps"
   exit 0
 elif $services; then
-  pnpm dev:secrets:gen
   pnpm run start
   exit 0
 fi
@@ -116,4 +135,6 @@ echo
 sleep 10
 
 pnpm dev:secrets:gen
+
+
 concurrently "pnpm run start" "pnpm run compose:deps"

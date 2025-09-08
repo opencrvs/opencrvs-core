@@ -8,16 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { logger } from '@opencrvs/commons'
+import {
+  triggerUserEventNotification,
+  logger,
+  personNameFromV1ToV2
+} from '@opencrvs/commons'
 import {
   Extension,
   findExtension,
   OPENCRVS_SPECIFICATION_URL
 } from '@opencrvs/commons/types'
 import {
+  COUNTRY_CONFIG_URL,
   DOCUMENTS_URL,
-  FHIR_URL,
-  NOTIFICATION_SERVICE_URL
+  FHIR_URL
 } from '@user-mgnt/constants'
 import User, {
   ISignature,
@@ -275,52 +279,20 @@ export async function sendCredentialsNotification(
   msisdn?: string,
   email?: string
 ) {
-  const url = `${NOTIFICATION_SERVICE_URL}${
-    NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
-  }userCredentialsInvite`
   try {
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({
-        msisdn,
-        email,
+    await triggerUserEventNotification({
+      event: 'user-created',
+      payload: {
+        recipient: {
+          name: personNameFromV1ToV2(userFullName),
+          email,
+          mobile: msisdn
+        },
         username,
-        password,
-        userFullName
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
-    })
-  } catch (err) {
-    logger.error(`Unable to send notification for error : ${err}`)
-  }
-}
-
-export async function sendUpdateUsernameNotification(
-  userFullName: IUserName[],
-  username: string,
-  authHeader: { Authorization: string },
-  msisdn?: string,
-  email?: string
-) {
-  const url = `${NOTIFICATION_SERVICE_URL}${
-    NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
-  }updateUserNameSMS`
-  try {
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({
-        msisdn,
-        email,
-        username,
-        userFullName
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
+        temporaryPassword: password
+      },
+      countryConfigUrl: COUNTRY_CONFIG_URL,
+      authHeader
     })
   } catch (err) {
     logger.error(`Unable to send notification for error : ${err}`)

@@ -17,7 +17,8 @@ import {
   FullDocumentPath,
   generateEventDocument,
   generateEventDraftDocument,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  UUID
 } from '@opencrvs/commons/client'
 import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -75,7 +76,8 @@ const mockUser = {
   ],
   role: 'SOCIAL_WORKER',
   signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined
+  avatar: undefined,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 }
 
 export const ReviewForLocalRegistrarComplete: Story = {

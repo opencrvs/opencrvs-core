@@ -8,12 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import { AuthServer, createServer } from '@auth/server'
 import * as codeService from '@auth/features/verifyCode/service'
 import * as retrievalService from '@auth/features/retrievalSteps/verifyUser/service'
 import * as fetchAny from 'jest-fetch-mock'
 const fetch = fetchAny as fetchAny.FetchMock
 
+jest.mock('@auth/features/verifyCode/service', () => {
+  const actual = jest.requireActual('@auth/features/verifyCode/service')
+  return {
+    ...actual,
+    sendVerificationCode: jest.fn().mockResolvedValue(undefined)
+  }
+})
 describe('verifyNumber handler receives a request', () => {
   let server: AuthServer
 

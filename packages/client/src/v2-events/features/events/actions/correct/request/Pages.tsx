@@ -16,6 +16,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import {
+  ActionType,
   getDeclarationPages,
   isNonInteractiveFieldType,
   PageConfig
@@ -53,7 +54,6 @@ export function Pages() {
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const eventIndex = getCurrentEventState(event, configuration)
 
   const formPages = getDeclarationPages(configuration)
   const correctablePages = getCorrectablePages(formPages)
@@ -68,7 +68,7 @@ export function Pages() {
   useEffect(() => {
     if (pageId !== currentPageId) {
       navigate(
-        ROUTES.V2.EVENTS.CORRECTION.PAGES.buildPath(
+        ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
           {
             eventId,
             pageId: currentPageId
@@ -81,10 +81,10 @@ export function Pages() {
   }, [pageId, currentPageId, navigate, eventId, searchParams])
 
   return (
-    <FormLayout route={ROUTES.V2.EVENTS.CORRECTION}>
+    <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       {modal}
       <PagesComponent
-        declaration={eventIndex.declaration}
+        actionType={ActionType.REQUEST_CORRECTION}
         eventConfig={configuration}
         form={form}
         formPages={correctablePages}
@@ -94,7 +94,7 @@ export function Pages() {
         showReviewButton={searchParams.from === 'review'}
         onPageChange={(nextPageId: string) =>
           navigate(
-            ROUTES.V2.EVENTS.CORRECTION.PAGES.buildPath(
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
               {
                 eventId,
                 pageId: nextPageId
@@ -105,7 +105,7 @@ export function Pages() {
         }
         onSubmit={() =>
           navigate(
-            ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath(
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
               { eventId },
               { workqueue: searchParams.workqueue }
             )

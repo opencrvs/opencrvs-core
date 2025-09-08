@@ -81,7 +81,9 @@ export function flattenEventIndex(event: EventIndex) {
     'event.trackingId': trackingId,
     'event.status': status,
     'event.registrationNumber':
-      rest.legalStatuses.REGISTERED?.registrationNumber
+      rest.legalStatuses.REGISTERED?.registrationNumber,
+    'event.registeredAt': rest.legalStatuses.REGISTERED?.createdAtLocation,
+    'event.registeredBy': rest.legalStatuses.REGISTERED?.createdBy
   }
 }
 
@@ -193,7 +195,7 @@ type AssignmentStatus = (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
 
 export function getAssignmentStatus(
   eventState: EventIndex,
-  userId: string | undefined
+  userId: string
 ): AssignmentStatus {
   if (!eventState.assignedTo) {
     return AssignmentStatus.UNASSIGNED

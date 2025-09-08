@@ -19,6 +19,11 @@ on:
         type: boolean
         required: false
         default: false
+      skip_security_check:
+        description: Skip security scan
+        type: boolean
+        required: false
+        default: false
     outputs:
       build_status:
         description: build job output
@@ -33,6 +38,10 @@ on:
         type: boolean
         default: false
         description: Runs additional checks for release version
+      skip_security_check:
+        type: boolean
+        required: false
+        default: false
   push:
     branches:
       - develop
@@ -83,7 +92,7 @@ jobs:
           if [[ "${{ matrix.runner }}" == "ubuntu-24.04-arm" ]]; then
             echo "arch=-arm64" >> $GITHUB_OUTPUT
           else
-            echo "arch=" >> $GITHUB_OUTPUT
+            echo "arch=-amd64" >> $GITHUB_OUTPUT
           fi
       - name: Get list of services
         id: get-services
@@ -121,7 +130,7 @@ jobs:
 
   merge-manifest:
     needs: [base]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -134,7 +143,7 @@ jobs:
           for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
             echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-base:$TAG"
             docker manifest create ghcr.io/opencrvs/ocrvs-base:$TAG \
-              ghcr.io/opencrvs/ocrvs-base:$TAG \
+              ghcr.io/opencrvs/ocrvs-base:$TAG-amd64 \
               ghcr.io/opencrvs/ocrvs-base:$TAG-arm64
             docker manifest push ghcr.io/opencrvs/ocrvs-base:$TAG
           done
@@ -175,7 +184,7 @@ jobs:
           if [[ "${{ matrix.runner }}" == "ubuntu-24.04-arm" ]]; then
             echo "arch=-arm64" >> $GITHUB_OUTPUT
           else
-            echo "arch=" >> $GITHUB_OUTPUT
+            echo "arch=-amd64" >> $GITHUB_OUTPUT
           fi
 
       - name: Build and push
@@ -198,6 +207,7 @@ jobs:
 
   merge-services-manifest:
     needs: [base, build]
+    if: always()
     strategy:
       fail-fast: false
       matrix:
@@ -206,7 +216,7 @@ jobs:
           # metabase/metabase:v0.50.30.1 doesn't support arm arch
           # https://discourse.metabase.com/t/install-with-docker-on-arm/18501
           - service: 'dashboards'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -220,15 +230,36 @@ jobs:
           for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
             echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG"
             docker manifest create ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG \
-              ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG \
+              ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-amd64 \
               ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-arm64
             docker manifest push ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG
+          done
+
+  merge-dashboards-manifest:
+    needs: [base, build]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
+
+      - name: Create and push multi-arch (bare-bones tag) manifest
+        run: |
+          for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
+            echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-dashboards:$TAG"
+            docker manifest create ghcr.io/opencrvs/ocrvs-dashboards:$TAG \
+              ghcr.io/opencrvs/ocrvs-dashboards:$TAG-amd64
+            docker manifest push ghcr.io/opencrvs/ocrvs-dashboards:$TAG
           done
 
   security-scans-pr:
     needs: [build, base]
     runs-on: ubuntu-24.04
-    if: github.event_name == 'pull_request' && (github.event.pull_request.base.ref == 'develop' || github.event.pull_request.base.ref == 'main')
+    if: >
+      github.event_name == 'pull_request' && (github.event.pull_request.base.ref == 'develop' || github.event.pull_request.base.ref == 'main') && !inputs.skip_security_check
     strategy:
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
@@ -266,7 +297,7 @@ jobs:
   security-scans-develop:
     needs: [build, base]
     runs-on: ubuntu-24.04
-    if: ${{ needs.base.outputs.branch == 'develop' || inputs.publish_release }}
+    if: ${{ (needs.base.outputs.branch == 'develop' || inputs.publish_release) && !inputs.skip_security_check }}
     strategy:
       fail-fast: false
       matrix:

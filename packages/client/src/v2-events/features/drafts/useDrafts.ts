@@ -23,11 +23,12 @@ import {
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   createEventActionMutationFn,
+  QueryOptions,
   setMutationDefaults,
   setQueryDefaults
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
-import { createTemporaryId } from '@client/v2-events/utils'
+import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
 import { getFilepathsFromActionDocument } from '../files/cache'
 import { precacheFile } from '../files/useFileUpload'
 
@@ -38,7 +39,6 @@ import { precacheFile } from '../files/useFileUpload'
  * This ensures the full record can be browsed even when the user goes offline
  */
 setQueryDefaults(trpcOptionsProxy.event.draft.list, {
-  staleTime: Infinity,
   queryFn: async (...params) => {
     const queryOptions = trpcOptionsProxy.event.draft.list.queryOptions()
 
@@ -77,16 +77,19 @@ interface DraftStore {
   getLocalDraftOrDefault: (draft: Draft) => Draft
 }
 
-const localDraftStore = create<DraftStore>()(
+export const localDraftStore = create<DraftStore>()(
   persist(
     (set, get) => ({
       draft: null,
       setDraft: (draft: Draft | null) => set({ draft }),
       getLocalDraftOrDefault: (defaultDraft: Draft) => {
         const draft = get().draft
-        if (draft) {
+
+        // If we do not explicitly check for eventId, we might accidentally return previous draft when creating separate drafts in a row.
+        if (draft && draft.eventId === defaultDraft.eventId) {
           return draft
         }
+
         return defaultDraft
       }
     }),
@@ -121,7 +124,6 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
         createdBy: '@todo',
         createdByUserType: 'user',
         createdByRole: '@todo',
-        createdAtLocation: '@todo' as UUID,
         ...variables,
         originalActionId: variables.originalActionId as UUID,
         /*
@@ -175,14 +177,40 @@ export function useDrafts() {
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
 
-  function findAllRemoteDrafts(): Draft[] {
+  function findAllRemoteDrafts(
+    additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
+  ): Draft[] {
     // Skip the queryFn defined by tRPC and use the one defined above
     const { queryFn, ...options } = trpc.event.draft.list.queryOptions()
 
     const drafts = useSuspenseQuery({
       ...options,
+      ...additionalOptions,
+      // First use data from browser cache, then fetch from the server if online
+      networkMode: 'offlineFirst',
       queryKey: trpc.event.draft.list.queryKey(),
-      networkMode: 'always'
+      select: (currentDraftState) => {
+        const locallyStoredDrafts =
+          queryClient.getQueryData<Draft[]>(trpc.event.draft.list.queryKey()) ??
+          []
+        const serverStoredDrafts = currentDraftState.filter(
+          (draft) => !isTemporaryId(draft.id)
+        )
+
+        /*
+         * These drafts are still pending for successful creation.
+         * We still want to show them to the user as if they were already created as
+         * syncing ultimately should be a background process.
+         */
+
+        const optimisticallyStoredLocalDrafts = locallyStoredDrafts.filter(
+          (d) =>
+            isTemporaryId(d.id) &&
+            !serverStoredDrafts.some((i) => i.transactionId === d.transactionId)
+        )
+
+        return [...serverStoredDrafts, ...optimisticallyStoredLocalDrafts]
+      }
     })
 
     return drafts.data
@@ -206,8 +234,21 @@ export function useDrafts() {
       })
     },
     getAllRemoteDrafts: findAllRemoteDrafts,
-    getRemoteDrafts: function useDraftList(eventId: string): Draft[] {
-      return findAllRemoteDrafts().filter((draft) => draft.eventId === eventId)
+    getRemoteDraftByEventId: function useDraftList(
+      eventId: string,
+      additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
+    ): Draft | undefined {
+      const eventDrafts = findAllRemoteDrafts(additionalOptions).filter(
+        (draft) => draft.eventId === eventId
+      )
+
+      if (eventDrafts.length > 1) {
+        throw new Error(
+          `Multiple drafts found for event ${eventId}. This should not happen.`
+        )
+      }
+
+      return eventDrafts[0]
     }
   }
 }

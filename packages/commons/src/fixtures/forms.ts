@@ -8,7 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineConditional, never, not } from '../conditionals/conditionals'
+import {
+  and,
+  defineConditional,
+  never,
+  not
+} from '../conditionals/conditionals'
 import {
   defineActionForm,
   defineDeclarationForm
@@ -17,6 +22,7 @@ import { ConditionalType } from '../events/Conditional'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
+import { AddressType } from '../events/CompositeFieldValue'
 import { format, subDays, subMonths, subQuarters, subYears } from 'date-fns'
 import { EventStatus } from '../events/EventMetadata'
 
@@ -719,6 +725,20 @@ export const TENNIS_CLUB_DECLARATION_REVIEW = {
 }
 
 /** @knipignore */
+
+function isInternationalAddress() {
+  return and(
+    not(field('country').isUndefined()),
+    field('addressType').isEqualTo(AddressType.INTERNATIONAL)
+  )
+}
+
+function isDomesticAddress() {
+  return and(
+    not(field('country').isUndefined()),
+    field('addressType').isEqualTo(AddressType.DOMESTIC)
+  )
+}
 export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
   label: {
     id: 'v2.event.tennis-club-membership.action.declare.form.label',
@@ -782,6 +802,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
         {
           id: 'applicant.dob',
           type: FieldType.DATE,
+          analytics: true,
           required: true,
           validation: [
             {
@@ -824,6 +845,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
         {
           id: 'applicant.age',
           type: FieldType.NUMBER,
+          analytics: true,
           required: true,
           label: {
             defaultMessage: 'Age of tennis-member',
@@ -841,6 +863,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           id: 'applicant.image',
           type: FieldType.FILE,
           required: false,
+          uncorrectable: true,
           label: {
             defaultMessage: "Applicant's profile picture",
             description: 'This is the label for the field',
@@ -849,7 +872,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
         },
         {
           id: 'applicant.address',
-          type: 'ADDRESS',
+          type: FieldType.ADDRESS,
           required: true,
           secured: true,
           conditionals: [],
@@ -857,6 +880,240 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
             defaultMessage: "Applicant's address",
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.address.label'
+          },
+          validation: [
+            {
+              message: {
+                defaultMessage: 'Invalid input',
+                description: 'Error message when generic field is invalid',
+                id: 'v2.error.invalid'
+              },
+              validator:
+                field('applicant.address').isValidAdministrativeLeafLevel()
+            }
+          ],
+          configuration: {
+            streetAddressForm: [
+              {
+                id: 'town',
+                required: false,
+                parent: field('country'),
+                label: {
+                  id: 'v2.field.address.town.label',
+                  defaultMessage: 'Town',
+                  description: 'This is the label for the field'
+                },
+                conditionals: [
+                  {
+                    type: ConditionalType.SHOW,
+                    conditional: and(
+                      isDomesticAddress(),
+                      not(field('district').isUndefined())
+                    )
+                  }
+                ],
+                type: FieldType.TEXT
+              },
+              {
+                id: 'residentialArea',
+                required: false,
+                parent: field('country'),
+                label: {
+                  id: 'v2.field.address.residentialArea.label',
+                  defaultMessage: 'Residential Area',
+                  description: 'This is the label for the field'
+                },
+                conditionals: [
+                  {
+                    type: ConditionalType.SHOW,
+                    conditional: and(
+                      isDomesticAddress(),
+                      not(field('district').isUndefined())
+                    )
+                  }
+                ],
+                type: FieldType.TEXT
+              },
+              {
+                id: 'street',
+                required: false,
+                parent: field('country'),
+                label: {
+                  id: 'v2.field.address.street.label',
+                  defaultMessage: 'Street',
+                  description: 'This is the label for the field'
+                },
+                conditionals: [
+                  {
+                    type: ConditionalType.SHOW,
+                    conditional: and(
+                      isDomesticAddress(),
+                      not(field('district').isUndefined())
+                    )
+                  }
+                ],
+                type: FieldType.TEXT
+              },
+              {
+                id: 'number',
+                required: false,
+                parent: field('country'),
+                label: {
+                  id: 'v2.field.address.number.label',
+                  defaultMessage: 'Number',
+                  description: 'This is the label for the field'
+                },
+                conditionals: [
+                  {
+                    type: ConditionalType.SHOW,
+                    conditional: and(
+                      isDomesticAddress(),
+                      not(field('district').isUndefined())
+                    )
+                  }
+                ],
+                type: FieldType.TEXT
+              },
+              {
+                id: 'zipCode',
+                required: false,
+                parent: field('country'),
+                label: {
+                  id: 'v2.field.address.postcodeOrZip.label',
+                  defaultMessage: 'Postcode / Zip',
+                  description: 'This is the label for the field'
+                },
+                conditionals: [
+                  {
+                    type: ConditionalType.SHOW,
+                    conditional: and(
+                      isDomesticAddress(),
+                      not(field('district').isUndefined())
+                    )
+                  }
+                ],
+                type: FieldType.TEXT
+              },
+              {
+                id: 'state',
+                conditionals: [
+                  {
+                    type: ConditionalType.SHOW,
+                    conditional: isInternationalAddress()
+                  }
+                ],
+                parent: field('country'),
+                required: true,
+                label: {
+                  id: 'v2.field.address.state.label',
+                  defaultMessage: 'State',
+                  description: 'This is the label for the field'
+                },
+                type: FieldType.TEXT
+              },
+              {
+                id: 'district2',
+                parent: field('country'),
+                conditionals: [
+                  {
+                    type: ConditionalType.SHOW,
+                    conditional: isInternationalAddress()
+                  }
+                ],
+                required: true,
+                label: {
+                  id: 'v2.field.address.district2.label',
+                  defaultMessage: 'District',
+                  description: 'This is the label for the field'
+                },
+                type: FieldType.TEXT
+              },
+              {
+                id: 'cityOrTown',
+                parent: field('country'),
+                conditionals: [
+                  {
+                    type: ConditionalType.SHOW,
+                    conditional: isInternationalAddress()
+                  }
+                ],
+                required: false,
+                label: {
+                  id: 'v2.field.address.cityOrTown.label',
+                  defaultMessage: 'City / Town',
+                  description: 'This is the label for the field'
+                },
+                type: FieldType.TEXT
+              },
+              {
+                id: 'addressLine1',
+                parent: field('country'),
+                conditionals: [
+                  {
+                    type: ConditionalType.SHOW,
+                    conditional: isInternationalAddress()
+                  }
+                ],
+                required: false,
+                label: {
+                  id: 'v2.field.address.addressLine1.label',
+                  defaultMessage: 'Address Line 1',
+                  description: 'This is the label for the field'
+                },
+                type: FieldType.TEXT
+              },
+              {
+                id: 'addressLine2',
+                parent: field('country'),
+                conditionals: [
+                  {
+                    type: ConditionalType.SHOW,
+                    conditional: isInternationalAddress()
+                  }
+                ],
+                required: false,
+                label: {
+                  id: 'v2.field.address.addressLine2.label',
+                  defaultMessage: 'Address Line 2',
+                  description: 'This is the label for the field'
+                },
+                type: FieldType.TEXT
+              },
+              {
+                id: 'addressLine3',
+                parent: field('country'),
+                conditionals: [
+                  {
+                    type: ConditionalType.SHOW,
+                    conditional: isInternationalAddress()
+                  }
+                ],
+                required: false,
+                label: {
+                  id: 'v2.field.address.addressLine3.label',
+                  defaultMessage: 'Address Line 3',
+                  description: 'This is the label for the field'
+                },
+                type: FieldType.TEXT
+              },
+              {
+                id: 'postcodeOrZip',
+                parent: field('country'),
+                conditionals: [
+                  {
+                    type: ConditionalType.SHOW,
+                    conditional: isInternationalAddress()
+                  }
+                ],
+                required: false,
+                label: {
+                  id: 'v2.field.address.postcodeOrZip.label',
+                  defaultMessage: 'Postcode / Zip',
+                  description: 'This is the label for the field'
+                },
+                type: FieldType.TEXT
+              }
+            ]
           }
         }
       ]
@@ -878,6 +1135,19 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
             defaultMessage: 'Senior pass ID',
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.field.id.label'
+          }
+        },
+        {
+          id: 'senior-pass.recommender',
+          type: 'CHECKBOX',
+          required: true,
+          parent: field('recommender.none'),
+          defaultValue: false,
+          conditionals: [],
+          label: {
+            defaultMessage: 'Does recommender have senior pass?',
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.field.recommender'
           }
         }
       ]

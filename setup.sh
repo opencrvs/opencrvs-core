@@ -353,6 +353,8 @@ mkdir -p data/influxdb
 chmod 775 data/influxdb
 mkdir -p data/minio
 chmod 775 data/minio
+mkdir -p data/postgres
+chmod 775 data/postgres
 
 echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo

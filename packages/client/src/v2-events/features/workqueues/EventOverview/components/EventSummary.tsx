@@ -17,7 +17,8 @@ import {
   areConditionsMet,
   getMixedPath,
   Flag,
-  ActionFlag
+  ActionFlag,
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -53,7 +54,7 @@ const messages = {
     value: {
       id: 'v2.event.summary.status.value',
       defaultMessage:
-        '{event.status, select, CREATED {Draft} NOTIFIED {Incomplete} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
+        '{event.status, select, CREATED {Draft} NOTIFIED {Notified} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARK_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
       description: 'Status of the event'
     }
   },
@@ -112,6 +113,8 @@ const messages = {
   }
 }
 
+export const summaryMessages = messages
+
 export function EventSummary({
   event,
   eventConfiguration,
@@ -149,11 +152,13 @@ export function EventSummary({
         label: field.label ?? config.label,
         emptyValueMessage: field.emptyValueMessage,
         secured: config.secured ?? false,
-        value: Output({
-          field: config,
-          showPreviouslyMissingValuesAsChanged: false,
-          value
-        })
+        value: (
+          <Output
+            field={config}
+            showPreviouslyMissingValuesAsChanged={false}
+            value={value}
+          />
+        )
       }
     }
 
@@ -172,6 +177,7 @@ export function EventSummary({
 
   const flattenedFlags = flags
     .filter((flag) => !ActionFlag.safeParse(flag).success)
+    .filter((flag) => flag !== InherentFlags.INCOMPLETE)
     .join(', ')
 
   return (

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventDocument, ActionInput, logger } from '@opencrvs/commons'
+import { EventDocument, logger, ActionType } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
 export const ActionConfirmationResponse = {
@@ -27,10 +27,9 @@ const ActionConfirmationResponseCodes = {
 } as const
 
 export async function requestActionConfirmation(
-  action: ActionInput,
+  actionType: ActionType,
   event: EventDocument,
-  token: string,
-  actionId: string
+  token: string
 ): Promise<{
   responseStatus: ActionConfirmationResponse
   body: Record<string, unknown> | undefined
@@ -38,12 +37,12 @@ export async function requestActionConfirmation(
   try {
     const res = await fetch(
       new URL(
-        `/events/${event.type}/actions/${action.type}`,
+        `/trigger/events/${event.type}/actions/${actionType}`,
         env.COUNTRY_CONFIG_URL
       ),
       {
         method: 'POST',
-        body: JSON.stringify({ event, actionId, action }),
+        body: JSON.stringify(event),
         headers: {
           'Content-Type': 'application/json',
           Authorization: token

@@ -137,7 +137,7 @@ interface TestContext {
 }
 
 function wrapper({ children }: PropsWithChildren) {
-  return <TRPCProvider>{children}</TRPCProvider>
+  return <TRPCProvider waitForClientRestored={false}>{children}</TRPCProvider>
 }
 
 beforeEach<TestContext>(async (testContext) => {

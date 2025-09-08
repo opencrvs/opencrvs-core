@@ -140,8 +140,18 @@ export const bytesToMB = (bytes: number) =>
 export async function fetchFileFromUrl(
   externalUrl: string,
   filename: string
-): Promise<File> {
+): Promise<File | undefined> {
   const res = await fetch(externalUrl)
+
+  if (!res.ok) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `Failed to fetch file from URL: ${externalUrl}. Status: ${res.status} ${res.statusText}`
+    )
+
+    return undefined
+  }
+
   const blob = await res.blob()
 
   return new File([blob], filename, { type: blob.type })

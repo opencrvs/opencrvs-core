@@ -378,7 +378,8 @@ function applySearchFieldOverridesToFieldConfig(
       ...field,
       ...commonConfig,
       configuration: {
-        searchMode: true
+        ...field.configuration,
+        fields: ['country']
       }
     }
   }
@@ -388,7 +389,20 @@ function applySearchFieldOverridesToFieldConfig(
       ...commonConfig,
       configuration: {
         ...field.configuration,
-        searchMode: true
+        name: {
+          firstname: {
+            ...field.configuration?.name?.firstname,
+            required: false
+          },
+          surname: {
+            ...field.configuration?.name?.surname,
+            required: false
+          },
+          middlename: {
+            ...field.configuration?.name?.middlename,
+            required: false
+          }
+        }
       }
     }
   }

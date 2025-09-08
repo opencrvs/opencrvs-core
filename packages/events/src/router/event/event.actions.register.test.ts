@@ -17,11 +17,17 @@ import {
   ActionType,
   AddressType,
   createPrng,
+  EventIndex,
+  generateActionDuplicateDeclarationInput,
   generateRegistrationNumber,
+  getCurrentEventState,
   getOrThrow,
-  getUUID,
-  SCOPES
+  getUUID
 } from '@opencrvs/commons'
+import {
+  tennisClubMembershipEvent,
+  tennisClubMembershipEventWithDedupCheck
+} from '@opencrvs/commons/fixtures'
 import {
   createEvent,
   createTestClient,
@@ -43,7 +49,9 @@ test('prevents forbidden access if missing required scope', async () => {
 
 test(`allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_REGISTER])
+  const client = createTestClient(user, [
+    'record.register[event=birth|death|tennis-club-membership]'
+  ])
 
   await expect(
     client.event.actions.register.request(
@@ -163,14 +171,20 @@ test('Skips required field validation when they are conditionally hidden', async
 
   const response = await client.event.actions.register.request(data)
 
-  const savedAction = response.actions.find(
+  const registerActions = response.actions.filter(
     (action) => action.type === ActionType.REGISTER
   )
 
-  expect(savedAction).toMatchObject({
-    status: ActionStatus.Accepted,
-    declaration: data.declaration
-  })
+  expect(registerActions).toEqual([
+    expect.objectContaining({
+      status: ActionStatus.Requested,
+      declaration: data.declaration
+    }),
+    expect.objectContaining({
+      status: ActionStatus.Accepted,
+      declaration: {}
+    })
+  ])
 })
 
 test('Prevents adding birth date in future', async () => {
@@ -214,7 +228,7 @@ describe('Request and confirmation flow', () => {
   function mockNotifyApi(status: number) {
     return mswServer.use(
       http.post<never, { actionId: string }>(
-        `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/REGISTER`,
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
         () => {
           registrationNumber = generateRegistrationNumber(prng)
           const responseBody = status === 200 ? { registrationNumber } : {}
@@ -258,7 +272,14 @@ describe('Request and confirmation flow', () => {
       (action) => action.type === ActionType.REGISTER
     )
 
-    expect(registerActions).toHaveLength(1)
+    expect(registerActions).toEqual([
+      expect.objectContaining({
+        status: ActionStatus.Requested
+      }),
+      expect.objectContaining({
+        status: ActionStatus.Accepted
+      })
+    ])
   })
 
   describe('Synchronous confirmation flow', () => {
@@ -276,12 +297,14 @@ describe('Request and confirmation flow', () => {
 
       const response = await client.event.actions.register.request(data)
       const savedAction = response.actions.find(
-        (action) => action.type === ActionType.REGISTER
+        (action) =>
+          action.type === ActionType.REGISTER &&
+          action.status === ActionStatus.Accepted
       )
 
       expect(savedAction).toMatchObject({
         status: ActionStatus.Accepted,
-        declaration: data.declaration,
+        declaration: {},
         registrationNumber: registrationNumber
       })
     })
@@ -296,7 +319,7 @@ describe('Request and confirmation flow', () => {
 
       mswServer.use(
         http.post(
-          `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/REGISTER`,
+          `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
           () => {
             return HttpResponse.json(
               { registrationNumber: 1234567890 }, // Registration number is not a string as it should be
@@ -316,7 +339,11 @@ describe('Request and confirmation flow', () => {
       const registerActions = event.actions.filter(
         (action) => action.type === ActionType.REGISTER
       )
-      expect(registerActions).toHaveLength(0)
+      expect(registerActions).toEqual([
+        expect.objectContaining({
+          status: ActionStatus.Requested
+        })
+      ])
     })
 
     test('should mark action as rejected if notify API returns HTTP 400', async () => {
@@ -334,17 +361,21 @@ describe('Request and confirmation flow', () => {
       })
 
       const response = await client.event.actions.register.request(data)
-      const savedAction = response.actions.find(
+      const registerActions = response.actions.filter(
         (action) => action.type === ActionType.REGISTER
       )
 
-      expect(savedAction).toMatchObject({
-        status: ActionStatus.Rejected,
-        declaration
-      })
+      expect(registerActions).toEqual([
+        expect.objectContaining({
+          status: ActionStatus.Requested
+        }),
+        expect.objectContaining({
+          status: ActionStatus.Rejected
+        })
+      ])
     })
 
-    test('should not save action if notify API returns HTTP 500', async () => {
+    test(`should not save ${ActionStatus.Accepted} / ${ActionStatus.Rejected} action if notify API returns HTTP 500`, async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user)
 
@@ -366,7 +397,11 @@ describe('Request and confirmation flow', () => {
       const registerActions = registeredEvent.actions.filter(
         (action) => action.type === ActionType.REGISTER
       )
-      expect(registerActions).toHaveLength(0)
+      expect(registerActions).toEqual([
+        expect.objectContaining({
+          status: ActionStatus.Requested
+        })
+      ])
     })
   })
 
@@ -798,4 +833,66 @@ describe('Request and confirmation flow', () => {
       })
     })
   })
+})
+
+test('deduplication check is performed before register when configured', async () => {
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      return HttpResponse.json([
+        tennisClubMembershipEventWithDedupCheck(ActionType.REGISTER)
+      ])
+    })
+  )
+  const prng = createPrng(73)
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const existingEvent = await client.event.create(generator.event.create())
+  const declarationPayload = generateActionDuplicateDeclarationInput(
+    tennisClubMembershipEvent,
+    ActionType.DECLARE,
+    prng
+  )
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(existingEvent.id, {
+      declaration: declarationPayload
+    })
+  )
+
+  const duplicateEvent = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(duplicateEvent.id, {
+      declaration: declarationPayload
+    })
+  )
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(duplicateEvent.id, {
+      assignedTo: user.id
+    })
+  )
+  await client.event.actions.validate.request(
+    generator.event.actions.validate(duplicateEvent.id, {
+      declaration: declarationPayload
+    })
+  )
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(duplicateEvent.id, {
+      assignedTo: user.id
+    })
+  )
+  const stillValidated = await client.event.actions.register.request(
+    generator.event.actions.register(duplicateEvent.id, {
+      declaration: declarationPayload
+    })
+  )
+
+  expect(
+    getCurrentEventState(stillValidated, tennisClubMembershipEvent)
+  ).toMatchObject({
+    status: 'VALIDATED',
+    potentialDuplicates: [
+      { id: existingEvent.id, trackingId: existingEvent.trackingId }
+    ]
+  } satisfies Partial<EventIndex>)
 })
