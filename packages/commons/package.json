@@ -85,6 +85,7 @@
     "pkg-up": "^3.1.0",
     "typescript": "5.6.3",
     "uuid": "^9.0.0",
+    "wireit": "^0.14.12",
     "zod": "^3.23.8",
     "zod-openapi": "^4.2.4"
   },
@@ -101,8 +102,7 @@
     "jest-fetch-mock": "^2.1.2",
     "jsonwebtoken": "^9.0.2",
     "pino-pretty": "^11.0.0",
-    "ts-jest": "29.2.5",
-    "wireit": "^0.14.12"
+    "ts-jest": "29.2.5"
   },
   "lint-staged": {
     "src/**/*.ts": [
