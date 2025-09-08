@@ -9,7 +9,47 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionDocument, ActionType } from '@opencrvs/commons/client'
+import { isEqual, take } from 'lodash'
+import { Declaration } from 'typescript'
+import {
+  Action,
+  ActionDocument,
+  ActionType,
+  DeclarationActions,
+  DeclarationActionType
+} from '@opencrvs/commons/client'
+
+import { getPreviousDeclarationActionType } from '../../components/Action/utils'
+
+/**
+ * Indicates that declaration action changed declaration content. Satisfies V1 spec.
+ */
+const DECLARATION_ACTION_UPDATE = 'UPDATE'
+
+function getPreviousActions(arr: ActionDocument[], id: string) {
+  const index = arr.findIndex((item) => item.id === id)
+  return index === -1 ? arr : take(arr, index)
+}
+
+function hasDeclarationChanged(
+  actions: ActionDocument[],
+  action: Extract<Action, { type: DeclarationActionType }>
+) {
+  const previousActions = getPreviousActions(actions, action.id)
+  const previousActionType = getPreviousDeclarationActionType(
+    previousActions,
+    action.type
+  )
+
+  const previousDeclarationAction = previousActionType
+    ? actions.find((act) => act.type === previousActionType)
+    : undefined
+
+  return (
+    !!previousDeclarationAction &&
+    !isEqual(previousDeclarationAction.declaration, action.declaration)
+  )
+}
 
 export function useActionForHistory() {
   function getActionTypeForHistory(
@@ -27,6 +67,20 @@ export function useActionForHistory() {
       )
       if (approveAction) {
         return 'CORRECTED'
+      }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (!action.declaration || Object.keys(action.declaration).length === 0) {
+      return action.type
+    }
+
+    const parsedAction = DeclarationActions.safeParse(action.type)
+    if (parsedAction.success) {
+      if (
+        hasDeclarationChanged(actions, { ...action, type: parsedAction.data })
+      ) {
+        return DECLARATION_ACTION_UPDATE
       }
     }
 

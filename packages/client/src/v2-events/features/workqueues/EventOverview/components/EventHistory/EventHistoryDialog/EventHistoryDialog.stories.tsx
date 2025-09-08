@@ -9,7 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { ActionType, getUUID } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  generateUuid,
+  getUUID,
+  tennisClubMembershipEvent,
+  generateActionDocument,
+  createPrng
+} from '@opencrvs/commons/client'
 import { EventHistoryDialog } from './EventHistoryDialog'
 
 const meta: Meta<typeof EventHistoryDialog> = {
@@ -30,7 +37,6 @@ const declaration = {
 }
 
 const actionBase = {
-  id: getUUID(),
   createdAt: '2021-01-01',
   createdBy: 'John Doe',
   createdByRole: 'User',
@@ -41,9 +47,11 @@ const actionBase = {
   requestId: '123'
 } as const
 
+const prng = createPrng(1231232)
+
 const requestCorrectionAction = {
   ...actionBase,
-  id: getUUID(),
+  id: generateUuid(prng),
   type: ActionType.REQUEST_CORRECTION,
   declaration: {
     'applicant.email': 'foo@baz.fi',
@@ -64,20 +72,24 @@ const fullEvent = {
   actions: [
     {
       ...actionBase,
+      id: generateUuid(prng),
       type: ActionType.CREATE
     },
     {
       ...actionBase,
+      id: generateUuid(prng),
       type: ActionType.DECLARE,
       declaration
     },
     {
       ...actionBase,
+      id: generateUuid(prng),
       type: ActionType.VALIDATE,
       declaration
     },
     {
       ...actionBase,
+      id: generateUuid(prng),
       type: ActionType.REGISTER,
       declaration
     }
@@ -95,27 +107,167 @@ const argbase = {
   }
 }
 export const Created: Story = {
-  args: { ...argbase, action: { ...argbase.action, type: ActionType.CREATE } }
+  args: {
+    ...argbase,
+    action: {
+      ...argbase.action,
+      id: generateUuid(prng),
+      type: ActionType.CREATE
+    }
+  }
 }
 
 export const Notified: Story = {
-  args: { ...argbase, action: { ...argbase.action, type: ActionType.NOTIFY } }
+  args: {
+    ...argbase,
+    action: {
+      ...argbase.action,
+      id: generateUuid(prng),
+      type: ActionType.NOTIFY
+    }
+  }
 }
 
 export const Read: Story = {
-  args: { ...argbase, action: { ...argbase.action, type: ActionType.READ } }
+  args: {
+    ...argbase,
+    action: { ...argbase.action, id: generateUuid(prng), type: ActionType.READ }
+  }
+}
+
+const createAction = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.CREATE,
+  rng: prng,
+  defaults: {
+    id: generateUuid(prng)
+  }
+})
+
+const notifyAction = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.NOTIFY,
+  rng: prng,
+  defaults: {
+    id: generateUuid(prng)
+  },
+  declarationOverrides: {
+    'applicant.email': null
+  }
+})
+
+const declareAction = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.DECLARE,
+  rng: prng,
+  defaults: {
+    id: generateUuid(prng)
+  }
+})
+
+const validateAction = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.VALIDATE,
+  rng: prng,
+  defaults: {
+    id: generateUuid(prng)
+  },
+  declarationOverrides: {
+    'applicant.email': 'mail.that.updated@opencrvs.org'
+  }
+})
+
+const registerAction = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.REGISTER,
+  rng: prng,
+  defaults: {
+    id: generateUuid(prng)
+  },
+  declarationOverrides: {
+    'applicant.email': 'mail.updated.again.during.registration@opencrvs.org'
+  }
+})
+
+const eventWhenDeclareUpdatesDeclaration = {
+  trackingId: generateUuid(prng),
+  type: tennisClubMembershipEvent.id,
+  actions: [createAction, declareAction],
+  createdAt: new Date().toISOString(),
+  id: generateUuid(prng),
+  updatedAt: new Date().toISOString()
 }
 
 export const Declared: Story = {
-  args: { ...argbase, action: { ...argbase.action, type: ActionType.DECLARE } }
+  args: {
+    ...argbase,
+    action: {
+      ...argbase.action,
+      id: generateUuid(prng),
+      type: ActionType.DECLARE
+    }
+  }
+}
+
+export const DeclaredOnDeclarationUpdate: Story = {
+  args: {
+    fullEvent: eventWhenDeclareUpdatesDeclaration,
+    action: declareAction
+  }
+}
+
+const eventWhenValidateUpdatesDeclaration = {
+  trackingId: generateUuid(prng),
+  type: tennisClubMembershipEvent.id,
+  actions: [createAction, declareAction, validateAction],
+  createdAt: new Date().toISOString(),
+  id: generateUuid(prng),
+  updatedAt: new Date().toISOString()
 }
 
 export const Validated: Story = {
-  args: { ...argbase, action: { ...argbase.action, type: ActionType.VALIDATE } }
+  args: {
+    ...argbase,
+    action: {
+      ...argbase.action,
+      id: eventWhenValidateUpdatesDeclaration.id,
+      type: ActionType.VALIDATE
+    }
+  }
+}
+
+export const ValidatedOnDeclarationUpdate: Story = {
+  args: {
+    fullEvent: eventWhenValidateUpdatesDeclaration,
+    action: validateAction
+  }
+}
+
+const eventWhenRegisterUpdatesDeclaration = {
+  trackingId: generateUuid(prng),
+  type: tennisClubMembershipEvent.id,
+  actions: [createAction, declareAction, validateAction, registerAction],
+  createdAt: new Date().toISOString(),
+  id: generateUuid(prng),
+  updatedAt: new Date().toISOString()
 }
 
 export const Registered: Story = {
-  args: { ...argbase, action: { ...argbase.action, type: ActionType.REGISTER } }
+  args: {
+    ...argbase,
+    action: {
+      ...argbase.action,
+      id: eventWhenRegisterUpdatesDeclaration.id,
+      type: ActionType.REGISTER
+    }
+  }
+}
+
+export const RegisteredOnDeclarationUpdate: Story = {
+  args: {
+    fullEvent: eventWhenRegisterUpdatesDeclaration,
+    action: registerAction
+  }
 }
 
 export const Rejected: Story = {
@@ -123,6 +275,7 @@ export const Rejected: Story = {
     ...argbase,
     action: {
       ...argbase.action,
+      id: generateUuid(prng),
       type: ActionType.REJECT,
       content: {
         reason: 'Invalid information provided'
@@ -136,6 +289,7 @@ export const Archived: Story = {
     ...argbase,
     action: {
       ...argbase.action,
+      id: generateUuid(prng),
       type: ActionType.ARCHIVE,
       content: {
         reason: 'Record archived'
@@ -149,6 +303,7 @@ export const MarkedAsDuplicate: Story = {
     ...argbase,
     action: {
       ...argbase.action,
+      id: generateUuid(prng),
       type: ActionType.ARCHIVE,
       content: {
         reason: 'Duplicate record found'
@@ -162,6 +317,7 @@ export const PrintCertificate: Story = {
     ...argbase,
     action: {
       ...argbase.action,
+      id: generateUuid(prng),
       type: ActionType.PRINT_CERTIFICATE,
       annotation: {
         'collector.identity.verify': true,
@@ -174,20 +330,24 @@ export const PrintCertificate: Story = {
       actions: [
         {
           ...actionBase,
+          id: generateUuid(prng),
           type: ActionType.CREATE
         },
         {
           ...actionBase,
+          id: generateUuid(prng),
           type: ActionType.DECLARE,
           declaration
         },
         {
           ...actionBase,
+          id: generateUuid(prng),
           type: ActionType.VALIDATE,
           declaration
         },
         {
           ...actionBase,
+          id: generateUuid(prng),
           type: ActionType.REGISTER,
           declaration
         }
@@ -209,24 +369,24 @@ export const RequestCorrection: Story = {
       actions: [
         {
           ...actionBase,
-          id: getUUID(),
+          id: generateUuid(prng),
           type: ActionType.CREATE
         },
         {
           ...actionBase,
-          id: getUUID(),
+          id: generateUuid(prng),
           type: ActionType.DECLARE,
           declaration
         },
         {
           ...actionBase,
-          id: getUUID(),
+          id: generateUuid(prng),
           type: ActionType.VALIDATE,
           declaration
         },
         {
           ...actionBase,
-          id: getUUID(),
+          id: generateUuid(prng),
           type: ActionType.REGISTER,
           declaration
         },
@@ -249,29 +409,29 @@ export const RecordCorrected: Story = {
       }
     },
     fullEvent: {
-      id: getUUID(),
+      id: generateUuid(prng),
       type: 'tennis-club-membership',
       actions: [
         {
           ...actionBase,
-          id: getUUID(),
+          id: generateUuid(prng),
           type: ActionType.CREATE
         },
         {
           ...actionBase,
-          id: getUUID(),
+          id: generateUuid(prng),
           type: ActionType.DECLARE,
           declaration
         },
         {
           ...actionBase,
-          id: getUUID(),
+          id: generateUuid(prng),
           type: ActionType.VALIDATE,
           declaration
         },
         {
           ...actionBase,
-          id: getUUID(),
+          id: generateUuid(prng),
           type: ActionType.REGISTER,
           declaration
         },
@@ -284,7 +444,7 @@ export const RecordCorrected: Story = {
         },
         {
           ...actionBase,
-          id: getUUID(),
+          id: generateUuid(prng),
           type: ActionType.APPROVE_CORRECTION,
           requestId: requestCorrectionAction.id,
           annotation: {
@@ -304,6 +464,7 @@ export const RejectCorrection: Story = {
     ...argbase,
     action: {
       ...argbase.action,
+      id: generateUuid(prng),
       type: ActionType.REJECT_CORRECTION,
       content: { reason: 'No legal proof' }
     }
@@ -313,7 +474,11 @@ export const RejectCorrection: Story = {
 export const ApproveCorrection: Story = {
   args: {
     ...argbase,
-    action: { ...argbase.action, type: ActionType.APPROVE_CORRECTION }
+    action: {
+      ...argbase.action,
+      id: generateUuid(prng),
+      type: ActionType.APPROVE_CORRECTION
+    }
   }
 }
 
@@ -322,6 +487,7 @@ export const Assigned: Story = {
     ...argbase,
     action: {
       ...argbase.action,
+      id: generateUuid(prng),
       type: ActionType.ASSIGN,
       assignedTo: 'John Doe'
     }
@@ -329,5 +495,12 @@ export const Assigned: Story = {
 }
 
 export const Unassigned: Story = {
-  args: { ...argbase, action: { ...argbase.action, type: ActionType.UNASSIGN } }
+  args: {
+    ...argbase,
+    action: {
+      ...argbase.action,
+      id: generateUuid(prng),
+      type: ActionType.UNASSIGN
+    }
+  }
 }
