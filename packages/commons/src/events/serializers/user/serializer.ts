@@ -20,13 +20,25 @@ export const SerializedUserField = z.object({
     'signature',
     'avatar',
     'primaryOfficeId'
-  ])
+  ]),
+  $location: z.string().optional()
 })
 
 export type SerializedUserField = z.infer<typeof SerializedUserField>
 
-export function userSerializer(userField: keyof User): SerializedUserField {
+export function userSerializer(userField: keyof User) {
   return {
-    $userField: userField
+    $userField: userField,
+    locationLevel(adminLevelId: string) {
+      return {
+        $userField: this.$userField,
+        $location: adminLevelId
+      }
+    },
+    toJSON() {
+      return {
+        $userField: userField
+      }
+    }
   }
 }

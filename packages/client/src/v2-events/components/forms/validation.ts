@@ -17,7 +17,8 @@ import {
   FormConfig,
   omitHiddenFields,
   runFieldValidations,
-  runStructuralValidations
+  runStructuralValidations,
+  Location
 } from '@opencrvs/commons/client'
 
 interface FieldErrors {
@@ -32,7 +33,8 @@ export interface Errors {
 
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
-  values: EventState
+  values: EventState,
+  locations?: Location[]
 ) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
     if (
@@ -43,9 +45,15 @@ export function getValidationErrorsForForm(
       return errorsForAllFields
     }
 
+    const context = locations ? { locations } : undefined
+
     return {
       ...errorsForAllFields,
-      [field.id]: runFieldValidations({ field, values })
+      [field.id]: runFieldValidations({
+        field,
+        values,
+        context
+      })
     }
   }, {})
 }
@@ -65,7 +73,10 @@ export function getStructuralValidationErrorsForForm(
 
     return {
       ...errorsForAllFields,
-      [field.id]: runStructuralValidations({ field, values })
+      [field.id]: runStructuralValidations({
+        field,
+        values
+      })
     }
   }, {})
 }
@@ -74,12 +85,14 @@ export function validationErrorsInActionFormExist({
   formConfig,
   form,
   annotation,
-  reviewFields = []
+  reviewFields = [],
+  locations
 }: {
   formConfig: FormConfig
   form: EventState
   annotation?: EventState
   reviewFields?: FieldConfig[]
+  locations?: Location[]
 }): boolean {
   // We don't want to validate hidden fields
   const formWithoutHiddenFields = omitHiddenPaginatedFields(formConfig, form)
@@ -94,7 +107,8 @@ export function validationErrorsInActionFormExist({
     .some((page) => {
       const fieldErrors = getValidationErrorsForForm(
         page.fields,
-        formWithoutHiddenFields
+        formWithoutHiddenFields,
+        locations
       )
       return Object.values(fieldErrors).some((field) => field.errors.length > 0)
     })

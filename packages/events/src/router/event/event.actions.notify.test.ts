@@ -325,4 +325,29 @@ describe('event.actions.notify', () => {
       ).rejects.toMatchSnapshot()
     })
   })
+
+  test('System client receives error for malformed input', async () => {
+    const { user, generator } = await setupTestCase()
+
+    let client = createTestClient(user)
+
+    client = createSystemTestClient('test-system-2', [
+      `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+    ])
+
+    const event = await client.event.create(generator.event.create())
+    await expect(
+      client.event.actions.notify.request({
+        eventId: event.id,
+        transactionId: generateUuid(),
+        type: 'NOTIFY',
+        declaration: {
+          'foo.bar': 'this should cause an error',
+          'applicant.name': { surname: 'surnameoftheperson' },
+          'applicant.dob': '2002-02-02'
+        },
+        annotation: {}
+      })
+    ).rejects.toMatchSnapshot()
+  })
 })
