@@ -46,6 +46,7 @@ describe('ForgotPIN tests', () => {
             practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
             mobile: '+8801711111111',
             role: {
+              id: 'CHA',
               label: {
                 id: 'userRoles.cha',
                 defaultMessage: 'CHA',

@@ -90,7 +90,7 @@ async function drawSignature(canvas: HTMLCanvasElement) {
   dispatchMouseEvent('mouseup', strokePoints[2])
 
   await new Promise((res) => setTimeout(res, 50)) // needs time to render the signature
-  signaturePngBase64 = canvas.toDataURL(MimeType.enum['image/png'])
+  signaturePngBase64 = canvas.toDataURL('image/png' satisfies MimeType)
 }
 
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
@@ -151,7 +151,7 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
             type: FieldType.SIGNATURE,
             configuration: {
               maxFileSize: 1 * 1024 * 1024,
-              acceptedFileTypes: [MimeType.enum['image/png']]
+              acceptedFileTypes: ['image/png' satisfies MimeType]
             },
             signaturePromptLabel: generateTranslationConfig('Signature'),
             label: generateTranslationConfig('Upload signature')
@@ -181,7 +181,7 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
         await userEvent.click(fileInput)
 
         const svgFile = new File(['treeSvg'], 'tree.svg', {
-          type: MimeType.enum['image/svg+xml']
+          type: 'image/svg+xml' satisfies MimeType
         })
 
         await userEvent.upload(input, svgFile)
@@ -195,7 +195,7 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
       'Prevents upload of a file with an invalid file size',
       async () => {
         const largeFile = new File(['a'.repeat(1024 * 1025)], 'large.png', {
-          type: MimeType.enum['image/png']
+          type: 'image/png' satisfies MimeType
         })
 
         await userEvent.upload(input, largeFile)
@@ -206,7 +206,7 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
     await step('Accepts file of valid size and type', async () => {
       const filename = 'valid.jpg'
       const validFile = new File(['a'.repeat(512 * 512)], filename, {
-        type: MimeType.enum['image/png']
+        type: 'image/png' satisfies MimeType
       })
 
       await userEvent.upload(input, validFile)
@@ -255,7 +255,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
 
               return new HttpResponse(binary, {
                 headers: {
-                  'Content-Type': MimeType.enum['image/png'],
+                  'Content-Type': 'image/png' satisfies MimeType,
                   'Cache-Control': 'no-cache'
                 }
               })

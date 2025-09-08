@@ -338,6 +338,7 @@ describe('archiveDeclaration tests', () => {
       creationDate: '2133213212',
       mobile: '09123433',
       role: {
+        id: 'FIELD_AGENT',
         label: {
           id: 'userRoles.fieldAgent',
           defaultMessage: 'Field Agent',

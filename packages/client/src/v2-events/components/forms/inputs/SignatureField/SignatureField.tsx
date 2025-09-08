@@ -56,7 +56,7 @@ interface SignatureFieldProps {
  */
 function base64ToFile(fileString: string, filename: string) {
   const [header, base64] = fileString.split(',')
-  const mime = header.match(/:(.*?);/)?.[1] || MimeType.enum['image/png']
+  const mime = header.match(/:(.*?);/)?.[1] || ('image/png' satisfies MimeType)
 
   const binary = atob(base64)
   const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0))
