@@ -32,6 +32,8 @@ import {
   HttpFieldValue
 } from './CompositeFieldValue'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { UUID } from '../uuid'
+import { SerializedUserField } from './serializers/user/serializer'
 extendZodWithOpenApi(z)
 
 const FieldId = z.string().describe('Unique identifier for the field')
@@ -465,7 +467,7 @@ const AdministrativeArea = BaseField.extend({
 
 export type AdministrativeArea = z.infer<typeof AdministrativeArea>
 
-const Location = BaseField.extend({
+const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z
@@ -477,7 +479,7 @@ const Location = BaseField.extend({
     .optional()
 }).describe('Input field for a location')
 
-export type Location = z.infer<typeof Location>
+export type LocationInput = z.infer<typeof LocationInput>
 
 const FileUploadWithOptions = BaseField.extend({
   type: z.literal(FieldType.FILE_WITH_OPTIONS),
@@ -514,38 +516,34 @@ const Office = BaseField.extend({
 
 export type Office = z.infer<typeof Office>
 
+export const DefaultAddressFieldValue = AddressFieldValue.extend({
+  administrativeArea: z.union([UUID, SerializedUserField]).optional()
+})
+
+export type DefaultAddressFieldValue = z.infer<typeof DefaultAddressFieldValue>
+
 const Address = BaseField.extend({
   type: z.literal(FieldType.ADDRESS),
   configuration: z
     .object({
       lineSeparator: z.string().optional(),
-      fields: z
+      fields: z.array(z.enum(['country', 'administrativeArea'])).optional(),
+      administrativeLevels: z.array(z.string()).optional(),
+      streetAddressForm: z
         .array(
-          z.enum([
-            'number',
-            'country',
-            'province',
-            'addressType',
-            'district',
-            'urbanOrRural',
-            'town',
-            'residentialArea',
-            'street',
-            'zipCode',
-            'village',
-            'state',
-            'district2',
-            'cityOrTown',
-            'addressLine1',
-            'addressLine2',
-            'addressLine3',
-            'postcodeOrZip'
-          ])
+          z.object({
+            id: z.string(),
+            required: z.boolean(),
+            label: TranslationConfig,
+            type: z.literal(FieldType.TEXT),
+            conditionals: z.array(FieldConditional).default([]).optional(),
+            parent: FieldReference.optional()
+          })
         )
         .optional()
     })
     .optional(),
-  defaultValue: AddressFieldValue.optional()
+  defaultValue: DefaultAddressFieldValue.optional()
 }).describe('Address input field – a combination of location and text fields')
 
 export const DataEntry = z.union([
@@ -632,7 +630,7 @@ export type FieldConfig =
   | z.infer<typeof Country>
   | z.infer<typeof AdministrativeArea>
   | z.infer<typeof Divider>
-  | z.infer<typeof Location>
+  | z.infer<typeof LocationInput>
   | z.infer<typeof Facility>
   | z.infer<typeof Office>
   | z.infer<typeof SignatureField>
@@ -669,7 +667,7 @@ export type FieldConfigInput =
   | z.input<typeof Country>
   | z.input<typeof AdministrativeArea>
   | z.input<typeof Divider>
-  | z.input<typeof Location>
+  | z.input<typeof LocationInput>
   | z.input<typeof Facility>
   | z.input<typeof Office>
   | z.input<typeof SignatureField>
@@ -709,7 +707,7 @@ export const FieldConfig: z.ZodType<
     Country,
     AdministrativeArea,
     Divider,
-    Location,
+    LocationInput,
     Facility,
     Office,
     SignatureField,
@@ -728,7 +726,7 @@ export type SelectField = z.infer<typeof Select>
 export type NameField = z.infer<typeof NameField>
 export type PhoneField = z.infer<typeof PhoneField>
 export type IdField = z.infer<typeof IdField>
-export type LocationField = z.infer<typeof Location>
+export type LocationField = z.infer<typeof LocationInput>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
 export type NumberField = z.infer<typeof NumberField>

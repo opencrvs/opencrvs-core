@@ -379,16 +379,7 @@ function applySearchFieldOverridesToFieldConfig(
       ...commonConfig,
       configuration: {
         ...field.configuration,
-        fields: [
-          'country',
-          'province',
-          'district',
-          'state',
-          'district2',
-          'urbanOrRural',
-          'town',
-          'village'
-        ]
+        fields: ['country']
       }
     }
   }

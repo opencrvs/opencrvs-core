@@ -36,7 +36,7 @@ import {
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
-
+import { Location } from '@events/service/locations/locations'
 test('User without any search scopes should not see any events', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
@@ -883,13 +883,14 @@ test('Returns correctly based on registration location even when a parent locati
     name: 'Parent location'
   }
 
-  const newLocations = [
+  const newLocations: Location[] = [
     parentLocation,
     {
       ...locations[0],
       id: user.primaryOfficeId,
       name: 'Child location',
-      parentId: parentLocation.id
+      parentId: parentLocation.id,
+      locationType: 'ADMIN_STRUCTURE'
     }
   ]
 

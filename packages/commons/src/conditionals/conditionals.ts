@@ -14,6 +14,7 @@ import { EventState } from '../events/ActionDocument'
 import { ITokenPayload as TokenPayload, Scope } from '../authentication'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { userSerializer } from '../events/serializers/user/serializer'
+import { Location } from '../events/locations'
 import { omitKeyDeep } from '../utils'
 
 /** @knipignore */
@@ -63,6 +64,7 @@ export type FormConditionalParameters = {
   $online: boolean
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   $form: EventState | Record<string, any>
+  $locations?: Array<Location>
 }
 
 export type ConditionalParameters =
@@ -188,7 +190,12 @@ export const user = Object.assign(userSerializer, {
         }
       },
       required: ['$online']
-    })
+    }),
+  locationLevel: (adminLevelId: string) => ({
+    $user: {
+      $location: adminLevelId
+    }
+  })
 })
 
 /**
@@ -445,6 +452,23 @@ export function createFieldConditionals(fieldId: string) {
               "^[\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*( [\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*)*$",
             description:
               "Name must contain only letters, numbers, and allowed special characters ('.-). No double spaces."
+          }
+        }
+      }),
+    isValidAdministrativeLeafLevel: () =>
+      defineFormConditional({
+        type: 'object',
+        properties: {
+          [fieldId]: {
+            type: 'object',
+            properties: {
+              administrativeArea: {
+                type: 'string',
+                isLeafLevelLocation: true
+              }
+            },
+            description:
+              'The provided administrative value should have a value corresponding to the required lowest administrative level'
           }
         }
       }),

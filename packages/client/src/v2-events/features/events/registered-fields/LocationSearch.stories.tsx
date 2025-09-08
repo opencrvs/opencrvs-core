@@ -48,6 +48,9 @@ export const LocationSearchInputInvalid: StoryObj<typeof LocationSearch.Input> =
     render: (props) => {
       return <LocationSearch.Input {...props} />
     },
+    parameters: {
+      chromatic: { disableSnapshot: true }
+    },
     args: {
       id: 'location-search',
       searchableResource: ['locations', 'facilities', 'offices'],
