@@ -14,19 +14,17 @@ import {
   ActionType,
   EventDocument
 } from '@opencrvs/commons/client'
-import { Archive } from './Archive'
 import { RequestCorrection } from './RequestCorrection'
 import { PrintCertificate } from './PrintCertificate'
 
-export function getActionTypeSpecificContent(
-  action: ActionDocument,
+export function ActionTypeSpecificContent({
+  action,
+  fullEvent
+}: {
+  action: ActionDocument
   fullEvent: EventDocument
-) {
+}) {
   const { type } = action
-
-  if (type === ActionType.ARCHIVE && action.reason.isDuplicate) {
-    return <Archive />
-  }
 
   if (type === ActionType.REQUEST_CORRECTION) {
     return <RequestCorrection action={action} fullEvent={fullEvent} />

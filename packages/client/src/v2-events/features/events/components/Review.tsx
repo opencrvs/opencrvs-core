@@ -36,13 +36,11 @@ import {
   isFieldDisplayedOnReview,
   isPageVisible,
   runFieldValidations,
-  SCOPES
+  Location
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { getScope } from '@client/profile/profileSelectors'
-import { ReviewCorrection } from '../actions/correct/request/ReviewCorrection'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -278,6 +276,7 @@ function FormReview({
   formConfig,
   form,
   previousForm,
+  locations,
   onEdit,
   showPreviouslyMissingValuesAsChanged,
   readonlyMode,
@@ -287,6 +286,7 @@ function FormReview({
   formConfig: FormConfig
   form: EventState
   previousForm: EventState
+  locations?: Location[]
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
   readonlyMode?: boolean
@@ -318,9 +318,12 @@ function FormReview({
                 formConfig
               })
 
+              const context = locations ? { locations } : undefined
+
               const error = runFieldValidations({
                 field,
-                values: form
+                values: form,
+                context
               })
 
               const errorDisplay =
@@ -454,6 +457,7 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   form,
+  locations,
   annotation,
   onEdit,
   children,
@@ -462,11 +466,13 @@ function ReviewComponent({
   readonlyMode,
   reviewFields,
   isCorrection = false,
-  isReviewCorrection = false
+  isReviewCorrection = false,
+  banner
 }: {
-  children: React.ReactNode
+  children?: React.ReactNode
   formConfig: FormConfig
   form: EventState
+  locations?: Location[]
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
@@ -484,8 +490,8 @@ function ReviewComponent({
   readonlyMode?: boolean
   isCorrection?: boolean
   isReviewCorrection?: boolean
+  banner?: React.ReactNode
 }) {
-  const scopes = useSelector(getScope)
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
 
@@ -504,7 +510,7 @@ function ReviewComponent({
   return (
     <Row>
       <LeftColumn>
-        {isReviewCorrection && <ReviewCorrection form={form} />}
+        {banner}
         <Card>
           <ReviewHeader title={title} />
           <FormReview
@@ -512,6 +518,7 @@ function ReviewComponent({
             formConfig={formConfig}
             isCorrection={isCorrection}
             isReviewCorrection={isReviewCorrection}
+            locations={locations}
             previousForm={previousForm}
             readonlyMode={readonlyMode}
             showPreviouslyMissingValuesAsChanged={
@@ -542,10 +549,6 @@ function ReviewComponent({
             disabled={readonlyMode || isCorrection || isReviewCorrection}
             form={form}
             formConfig={formConfig}
-            // @todo: ask about this rule
-            showInMobile={
-              scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT) ?? false
-            }
             onEdit={() =>
               onEdit({ pageId: pageIdsWithFile[0], confirmation: true })
             }

@@ -39,6 +39,7 @@ import { isMobileDevice } from '@client/utils/commonUtils'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { LocationSearch } from '@client/v2-events/features/events/registered-fields'
+import { IAdminStructureItem } from '@client/utils/referenceApi'
 
 interface FontFamilyTypes {
   normal: string
@@ -213,8 +214,10 @@ export function compileSvg({
   $actions,
   locations,
   users,
+  review,
   language,
-  config
+  config,
+  adminLevels
 }: {
   templateString: string
   $metadata: EventMetadata & {
@@ -225,8 +228,14 @@ export function compileSvg({
   $declaration: EventState
   locations: Location[]
   users: User[]
+  /**
+   * Indicates whether certificate is reviewed or actually printed
+   * in V1 "preview" was used. In V2, "review" is used to remain consistent with action terminology (review of print action rather than preview of certificate).
+   */
+  review: boolean
   language: LanguageConfig
   config: EventConfig
+  adminLevels: IAdminStructureItem[]
 }): string {
   const intl = createIntl(
     {
@@ -238,7 +247,11 @@ export function compileSvg({
 
   const customHelpers = getHandlebarHelpers()
 
-  const stringifyDeclaration = getFormDataStringifier(intl, locations)
+  const stringifyDeclaration = getFormDataStringifier(
+    intl,
+    locations,
+    adminLevels
+  )
   const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
   const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
 
@@ -545,6 +558,7 @@ export function compileSvg({
   const data = {
     $declaration: resolvedDeclaration,
     $metadata,
+    $review: review,
     $references: {
       locations,
       users

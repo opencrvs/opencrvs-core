@@ -17,11 +17,17 @@ import {
   ActionType,
   AddressType,
   createPrng,
+  EventIndex,
+  generateActionDuplicateDeclarationInput,
   generateRegistrationNumber,
+  getCurrentEventState,
   getOrThrow,
-  getUUID,
-  SCOPES
+  getUUID
 } from '@opencrvs/commons'
+import {
+  tennisClubMembershipEvent,
+  tennisClubMembershipEventWithDedupCheck
+} from '@opencrvs/commons/fixtures'
 import {
   createEvent,
   createTestClient,
@@ -43,7 +49,9 @@ test('prevents forbidden access if missing required scope', async () => {
 
 test(`allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_REGISTER])
+  const client = createTestClient(user, [
+    'record.register[event=birth|death|tennis-club-membership]'
+  ])
 
   await expect(
     client.event.actions.register.request(
@@ -827,4 +835,66 @@ describe('Request and confirmation flow', () => {
       })
     })
   })
+})
+
+test('deduplication check is performed before register when configured', async () => {
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      return HttpResponse.json([
+        tennisClubMembershipEventWithDedupCheck(ActionType.REGISTER)
+      ])
+    })
+  )
+  const prng = createPrng(73)
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const existingEvent = await client.event.create(generator.event.create())
+  const declarationPayload = generateActionDuplicateDeclarationInput(
+    tennisClubMembershipEvent,
+    ActionType.DECLARE,
+    prng
+  )
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(existingEvent.id, {
+      declaration: declarationPayload
+    })
+  )
+
+  const duplicateEvent = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(duplicateEvent.id, {
+      declaration: declarationPayload
+    })
+  )
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(duplicateEvent.id, {
+      assignedTo: user.id
+    })
+  )
+  await client.event.actions.validate.request(
+    generator.event.actions.validate(duplicateEvent.id, {
+      declaration: declarationPayload
+    })
+  )
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(duplicateEvent.id, {
+      assignedTo: user.id
+    })
+  )
+  const stillValidated = await client.event.actions.register.request(
+    generator.event.actions.register(duplicateEvent.id, {
+      declaration: declarationPayload
+    })
+  )
+
+  expect(
+    getCurrentEventState(stillValidated, tennisClubMembershipEvent)
+  ).toMatchObject({
+    status: 'VALIDATED',
+    potentialDuplicates: [
+      { id: existingEvent.id, trackingId: existingEvent.trackingId }
+    ]
+  } satisfies Partial<EventIndex>)
 })

@@ -12,30 +12,16 @@ import {
   createPrng,
   eventPayloadGenerator,
   getUUID,
-  SCOPES as Scopes
+  SCOPES
 } from '@opencrvs/commons/client'
 import { FetchUserQuery, Status } from '@client/utils/gateway'
-
-const SCOPES = {
-  ...Scopes,
-  SEARCH_SCOPES_BIRTH: 'search[event=v2.birth,access=all]',
-  SEARCH_SCOPES_DEATH: 'search[event=v2.death,access=all]',
-  SEARCH_SCOPES_TENNIS_CLUB: 'search[event=tennis-club-membership,access=all]',
-  SEARCH_SCOPES_FOOTBALL_CLUB:
-    'search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]',
-  WORKQUEUE_LOCAL_REGISTRAR:
-    'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
-  WORKQUEUE_REGISTRATION_AGENT:
-    'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]',
-  WORKQUEUE_FIELD_AGENT:
-    'workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]'
-}
 
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
  */
 export function testDataGenerator(rngSeed?: number) {
   const prng = createPrng(rngSeed ?? 1001)
+
   const user = {
     token: {
       /**
@@ -52,11 +38,11 @@ export function testDataGenerator(rngSeed?: number) {
        * not supported in the browser.
        */
       fieldAgent:
-        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQuZGVjbGFyZS1iaXJ0aCIsInJlY29yZC5kZWNsYXJlLWRlYXRoIiwicmVjb3JkLmRlY2xhcmUtbWFycmlhZ2UiLCJyZWNvcmQuZGVjbGFyYXRpb24tc3VibWl0LWluY29tcGxldGUiLCJyZWNvcmQuZGVjbGFyYXRpb24tc3VibWl0LWZvci1yZXZpZXciLCJzZWFyY2guYmlydGgiLCJzZWFyY2guZGVhdGgiLCJzZWFyY2gubWFycmlhZ2UiLCJ3b3JrcXVldWVbaWQ9YWxsLWV2ZW50c3xhc3NpZ25lZC10by15b3V8cmVjZW50fHJlcXVpcmVzLXVwZGF0ZXN8c2VudC1mb3ItcmV2aWV3XSIsInNlYXJjaFtldmVudD12Mi5iaXJ0aCxhY2Nlc3M9YWxsXSIsInNlYXJjaFtldmVudD12Mi5kZWF0aCxhY2Nlc3M9YWxsXSIsInNlYXJjaFtldmVudD10ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwLGFjY2Vzcz1hbGxdIiwic2VhcmNoW2V2ZW50PUZPT1RCQUxMX0NMVUJfTUVNQkVSU0hJUCxhY2Nlc3M9YWxsXSJdLCJpYXQiOjE0ODcwNzY3MDgsImF1ZCI6Im9wZW5jcnZzOmdhdGV3YXktdXNlciIsImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjY3ZWY3ZjgzZDZhOWNiOTJlOWVkYWE5OSJ9.oRWlv_Psoc_-uzJh9-XZxHxRel-HRnqOLh4jrv2oMWzXzouf_CX2ksZm2f84Tdh_ZOl0Roo56vsEGkVmZIZXVcmjbzYBkeELDpG41LymUKtwyjlYc0I4iMzSNhgrIv0tHeyeHT-60opBAgN2kvhG-dKyypucb0SKz8HMDl0U0u3VjKqK_JEAGb4XG_DNaqNesw1gFuwswlGhKnDymAaObFBRhkpRY8SQrvib9Omr4T3NYIb-o8FMlEz9z-tLul3iSvwEwunXoA9voLqp8pxrZbcGoC_wzbm_DJk_RcWu7N03Ad2ibZRSknpWWOnWhbN7dGoV1eh3lTMl5g1vZZFMP64cfuixH1GJ_A-hJWtMqX6S55xbI_yBC56PtgTOsbR4MnCRp7gyWcyHBMD6m6JX5uufe3M7mDI2F7eVE65RJwlsuDSvhxGfrvKq6plPxpWPxDXV2teQy4aO3lO1tNf9mfOyQUFrJtNvSA7eWm9iMmhArF5m0MP20iSrQyr0YptPtH8jdhrNFI37L1XWvgkJr8sQLhKsQ5JCbWrd4KFEf51m8rxuQvgU-MiXptizJRfGbIccAWQ8d4uDCi1m3ypemsarYvVqGHp1Epru6CS0mmxaKVv8AYWE9n6QAewjNpIxpptXtzafjcX5uvuaVSw9E23-WP4p-p481I5to_9WHuk',
-      registrationAgent:
-        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQucmVhZCIsInJlY29yZC5kZWNsYXJlLWJpcnRoIiwicmVjb3JkLmRlY2xhcmUtZGVhdGgiLCJyZWNvcmQuZGVjbGFyZS1tYXJyaWFnZSIsInJlY29yZC5kZWNsYXJhdGlvbi1lZGl0IiwicmVjb3JkLmRlY2xhcmF0aW9uLXN1Ym1pdC1mb3ItYXBwcm92YWwiLCJyZWNvcmQuZGVjbGFyYXRpb24tc3VibWl0LWZvci11cGRhdGVzIiwicmVjb3JkLmRlY2xhcmF0aW9uLWFyY2hpdmUiLCJyZWNvcmQuZGVjbGFyYXRpb24tcmVpbnN0YXRlIiwicmVjb3JkLnJlZ2lzdHJhdGlvbi1yZXF1ZXN0LWNvcnJlY3Rpb24iLCJyZWNvcmQuZGVjbGFyYXRpb24tcHJpbnQtc3VwcG9ydGluZy1kb2N1bWVudHMiLCJyZWNvcmQuZXhwb3J0LXJlY29yZHMiLCJyZWNvcmQucmVnaXN0cmF0aW9uLXByaW50Jmlzc3VlLWNlcnRpZmllZC1jb3BpZXMiLCJwZXJmb3JtYW5jZS5yZWFkIiwicGVyZm9ybWFuY2UucmVhZC1kYXNoYm9hcmRzIiwib3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zOm15LW9mZmljZSIsInVzZXIucmVhZDpvbmx5LW15LWF1ZGl0Iiwic2VhcmNoLmJpcnRoIiwic2VhcmNoLmRlYXRoIiwic2VhcmNoLm1hcnJpYWdlIiwid29ya3F1ZXVlW2lkPWFsbC1ldmVudHN8YXNzaWduZWQtdG8teW91fHJlY2VudHxyZXF1aXJlcy1jb21wbGV0aW9ufHJlcXVpcmVzLXVwZGF0ZXN8aW4tcmV2aWV3fHNlbnQtZm9yLWFwcHJvdmFsfGluLWV4dGVybmFsLXZhbGlkYXRpb258cmVhZHktdG8tcHJpbnR8cmVhZHktdG8taXNzdWVdIiwic2VhcmNoW2V2ZW50PXYyLmJpcnRoLGFjY2Vzcz1hbGxdIiwic2VhcmNoW2V2ZW50PXYyLmRlYXRoLGFjY2Vzcz1hbGxdIiwic2VhcmNoW2V2ZW50PXRlbm5pcy1jbHViLW1lbWJlcnNoaXAsYWNjZXNzPWFsbF0iLCJzZWFyY2hbZXZlbnQ9Rk9PVEJBTExfQ0xVQl9NRU1CRVJTSElQLGFjY2Vzcz1hbGxdIl0sImlhdCI6MTQ4NzA3NjcwOCwiYXVkIjoib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNjdlZjdmODNkNmE5Y2I5MmU5ZWRhYWExIn0.n4kWxn-7I71ftuQJaCw3_viz1sSl4-1nf8nOff4u5M_dp34oagZA7l-bAFcGiXw6n7nC6SDkEmMf9KXZWDUA-41-YUiwpqM_tZGBERyoKR-6zRee7TvddttCoxME5uoDdKve5Tir3BO653HAriSDBEhOanOgeAXXO_g5lqMTJ2wSyZsBIXLhQXKTlCpg8Gug9uYiYZqk1-FYs3tDvXQQS5KAm1FSuBLj23cQXcW85uTAHQacojYKJ6ULQ0n3y71oNNDpsOmpkGWuBGUER9qvH4xYrUodi-yXcnN5CIJ5ZSTfXX9EQxI84ZE476jBpIDOFo0SuFsmBhucI0cx_7l_dQNWpgdGiRgojxkIE2Y7DZIP4KRRm8Ta__-txYyKtkY10D2uBOIUdTXXorSAU3MA2d3G7rKP1BPpos6HotGptOcnrHgvzZLJ5S9qHGBLq9eLtYpPVyEm1d_hqIJHq0btP3O0pNOsQQDJ5TOznAxbez6qaUOi7adb-30uSrO7oFxkePzlE5ozixYtjS5qpVtfBYKhfdo9heMeZMVL_N2PHOaiaZd-BYSLlNaJsdPCSeo5OEMUQDLnaqWMArNppjlV_rXk8QeWQflFLvh-WrUlGk6vRk8ANqNDKRnCHk9JDYUoCC3YaqiPKA58CuxIy7N1byYdGAtvz4rhepsJphQf-LE',
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQuZGVjbGFyYXRpb24tc3VibWl0LWZvci1yZXZpZXciLCJzZWFyY2guYmlydGgiLCJzZWFyY2guZGVhdGgiLCJzZWFyY2gubWFycmlhZ2UiLCJ3b3JrcXVldWVbaWQ9YWxsLWV2ZW50c3xhc3NpZ25lZC10by15b3V8cmVjZW50fHJlcXVpcmVzLXVwZGF0ZXN8c2VudC1mb3ItcmV2aWV3XSIsInNlYXJjaFtldmVudD1iaXJ0aCxhY2Nlc3M9YWxsXSIsInNlYXJjaFtldmVudD1kZWF0aCxhY2Nlc3M9YWxsXSIsInNlYXJjaFtldmVudD10ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwLGFjY2Vzcz1hbGxdIiwic2VhcmNoW2V2ZW50PUZPT1RCQUxMX0NMVUJfTUVNQkVSU0hJUCxhY2Nlc3M9YWxsXSIsInJlY29yZC5yZWFkW2V2ZW50PWJpcnRofGRlYXRofHRlbm5pcy1jbHViLW1lbWJlcnNoaXBdIiwicmVjb3JkLmRlY2xhcmVbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcF0iLCJyZWNvcmQubm90aWZ5W2V2ZW50PWJpcnRofGRlYXRofHRlbm5pcy1jbHViLW1lbWJlcnNoaXBdIl0sImlhdCI6MTQ4NzA3NjcwOCwiYXVkIjoib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNjdlZjdmODNkNmE5Y2I5MmU5ZWRhYTk5In0.L2ML1YQ4qXMlS7EfFNwJDQ2-TZB9XJNXgqeAVk_LKd0L36lcLs17vVWIAx8gJnuNZEc0bWqyp9a7_w-71gcsedtEeZTdRHVeXL8koD6fNkzzcdQtYkf6wzYe6LOwOcve_5cPYkJEsjRbgrOG3Jn92mMh1S93ZtlE4KbzPjx_NQahb8J5jiBREXDKXEIUcELL5vExhhHcuWeijmZmMw7gWgvhyaHM-TbKMu90hVibkiYF4KWVHrOupq92GsFBQGdNNiN_golauFkicf0-JQPTAPsUlCnKbdPM8DXs4WCImLMiOYx-VZ0UowZ1iZwfudfJcfWz2xYr3GV12NmeSRjJh9kntm3dDMzY4CS0JMTQeo0irklYWkUn1uGmlB2WLuKn740nW1OGFXt1J0FtjgeiKuBu7i54kKLimKfoc9ZIHGl5YdM6XQe8WmnDB6taTBa3uQTaYRhC44OJbjm5oz6eclK1CI94mi3eRSrKMNiAv_-St70zvCcvqjk1LGyZH1zyLqpcoD-XaOHlTLgMTZZkPfTTAPh_iTLFrXXFQ25bKnNQ6UhcVpbxpG-TJK1PM8P_8J61qXcSiNZZ9ARGTSiIep8f1Ewk-1mLPhig5MTKSodaEG3umofvLWRnjfJ9HtgKWE9iCdbBD170pQz8ugElYUd_oUvzVSziCdozFV8ODyE',
       localRegistrar:
-        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQucmVhZCIsInJlY29yZC5kZWNsYXJlLWJpcnRoIiwicmVjb3JkLmRlY2xhcmUtZGVhdGgiLCJyZWNvcmQuZGVjbGFyZS1tYXJyaWFnZSIsInJlY29yZC5kZWNsYXJhdGlvbi1lZGl0IiwicmVjb3JkLmRlY2xhcmF0aW9uLXN1Ym1pdC1mb3ItdXBkYXRlcyIsInJlY29yZC5yZXZpZXctZHVwbGljYXRlcyIsInJlY29yZC5kZWNsYXJhdGlvbi1hcmNoaXZlIiwicmVjb3JkLmRlY2xhcmF0aW9uLXJlaW5zdGF0ZSIsInJlY29yZC5yZWdpc3RlciIsInJlY29yZC5yZWdpc3RyYXRpb24tY29ycmVjdCIsInJlY29yZC5kZWNsYXJhdGlvbi1wcmludC1zdXBwb3J0aW5nLWRvY3VtZW50cyIsInJlY29yZC5leHBvcnQtcmVjb3JkcyIsInJlY29yZC51bmFzc2lnbi1vdGhlcnMiLCJyZWNvcmQucmVnaXN0cmF0aW9uLXByaW50Jmlzc3VlLWNlcnRpZmllZC1jb3BpZXMiLCJyZWNvcmQuY29uZmlybS1yZWdpc3RyYXRpb24iLCJyZWNvcmQucmVqZWN0LXJlZ2lzdHJhdGlvbiIsInBlcmZvcm1hbmNlLnJlYWQiLCJwZXJmb3JtYW5jZS5yZWFkLWRhc2hib2FyZHMiLCJwcm9maWxlLmVsZWN0cm9uaWMtc2lnbmF0dXJlIiwib3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zOm15LW9mZmljZSIsInNlYXJjaC5iaXJ0aCIsInNlYXJjaC5kZWF0aCIsInNlYXJjaC5tYXJyaWFnZSIsIndvcmtxdWV1ZVtpZD1hbGwtZXZlbnRzfGFzc2lnbmVkLXRvLXlvdXxyZWNlbnR8cmVxdWlyZXMtY29tcGxldGlvbnxyZXF1aXJlcy11cGRhdGVzfGluLXJldmlldy1hbGx8aW4tZXh0ZXJuYWwtdmFsaWRhdGlvbnxyZWFkeS10by1wcmludHxyZWFkeS10by1pc3N1ZV0iLCJzZWFyY2hbZXZlbnQ9djIuYmlydGgsYWNjZXNzPWFsbF0iLCJzZWFyY2hbZXZlbnQ9djIuZGVhdGgsYWNjZXNzPWFsbF0iLCJzZWFyY2hbZXZlbnQ9dGVubmlzLWNsdWItbWVtYmVyc2hpcCxhY2Nlc3M9YWxsXSIsInNlYXJjaFtldmVudD1GT09UQkFMTF9DTFVCX01FTUJFUlNISVAsYWNjZXNzPWFsbF0iLCJ1c2VyLnJlYWQ6b25seS1teS1hdWRpdCJdLCJpYXQiOjE0ODcwNzY3MDgsImF1ZCI6Im9wZW5jcnZzOmdhdGV3YXktdXNlciIsImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjY4MjFjMTc1ZGNlNGQ3ODg2ZDRlODIxMCJ9.mBZa5Bnn-d1vW55DZCOKNKcNytFLdQGyGl3cEkx6BCSS4vlEO1CXT59z2lz-awJu8kMFxDfi2JYgMwK4ae_xJyb8LcaDs2LARmMwRAKMOI_4NswlWKOzp4Le9gP98bO-BxsEhCpUeLlumSlDWLKEKm-mjwdemO8e5SMHzhwrowvrttNjTU_stbrXcqUsVlRgu_TUnqFDIQhtjZBbNRvRvXavx0uHC_opXtjMtQ4uRddWK-3KcxMe7xgKMPcJWbfX7uVuNYwXhpNFxiC3mH53ioEhB9XDYUG5fJ49_Iyh8ZAqJIjhBNvF4FrIooJBCAC4vwB_etfSjRMfxCIz-KL0gZ_OHdGVwm3vFOBkNLiQw_ayq3z8WdeUq1jnTs2lUkOsQuCoKUMkHlNESADybkBLrqj9EoLLBD_RgL7Lcp2NBHbpAeoP12uVKmoQer023NwvqO4kEf5kuGd3HHqz9eMxpQK1-hzRzQuiT9k2-Po42dRT-c9DCraGtxJ72-hX92uhxtSgBWUuAOt_AJdk2H3TX-Y2as-gfbGoyi0DaRN41DQNVSdjzd9eDL-FzvzGLP6tLn3AvPqmEOuNUsgMbfDx9r5aI-qpSAf-739ZKsbRpk2PGYeB5l5HWeVuMdZJxYvrVWbkxVtj_GFsLDN4p34jbuoSjGf-bmulEbHmI9b0wpE'
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQuZGVjbGFyYXRpb24tZWRpdCIsInJlY29yZC5yZXZpZXctZHVwbGljYXRlcyIsInJlY29yZC5kZWNsYXJhdGlvbi1yZWluc3RhdGUiLCJyZWNvcmQuZGVjbGFyYXRpb24tcHJpbnQtc3VwcG9ydGluZy1kb2N1bWVudHMiLCJyZWNvcmQuZXhwb3J0LXJlY29yZHMiLCJyZWNvcmQudW5hc3NpZ24tb3RoZXJzIiwicmVjb3JkLmNvbmZpcm0tcmVnaXN0cmF0aW9uIiwicmVjb3JkLnJlamVjdC1yZWdpc3RyYXRpb24iLCJwZXJmb3JtYW5jZS5yZWFkIiwicGVyZm9ybWFuY2UucmVhZC1kYXNoYm9hcmRzIiwicHJvZmlsZS5lbGVjdHJvbmljLXNpZ25hdHVyZSIsIm9yZ2FuaXNhdGlvbi5yZWFkLWxvY2F0aW9uczpteS1vZmZpY2UiLCJzZWFyY2guYmlydGgiLCJzZWFyY2guZGVhdGgiLCJzZWFyY2gubWFycmlhZ2UiLCJ3b3JrcXVldWVbaWQ9YWxsLWV2ZW50c3xhc3NpZ25lZC10by15b3V8cmVjZW50fHJlcXVpcmVzLWNvbXBsZXRpb258cmVxdWlyZXMtdXBkYXRlc3xpbi1yZXZpZXctYWxsfGluLWV4dGVybmFsLXZhbGlkYXRpb258cmVhZHktdG8tcHJpbnR8cmVhZHktdG8taXNzdWVdIiwic2VhcmNoW2V2ZW50PWJpcnRoLGFjY2Vzcz1hbGxdIiwic2VhcmNoW2V2ZW50PWRlYXRoLGFjY2Vzcz1hbGxdIiwic2VhcmNoW2V2ZW50PXRlbm5pcy1jbHViLW1lbWJlcnNoaXAsYWNjZXNzPWFsbF0iLCJzZWFyY2hbZXZlbnQ9Rk9PVEJBTExfQ0xVQl9NRU1CRVJTSElQLGFjY2Vzcz1hbGxdIiwidXNlci5yZWFkOm9ubHktbXktYXVkaXQiLCJyZWNvcmQucmVhZFtldmVudD1iaXJ0aHxkZWF0aHx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwXSIsInJlY29yZC5kZWNsYXJlW2V2ZW50PWJpcnRofGRlYXRofHRlbm5pcy1jbHViLW1lbWJlcnNoaXBdIiwicmVjb3JkLmRlY2xhcmVkLnJlamVjdFtldmVudD1iaXJ0aHxkZWF0aHx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwXSIsInJlY29yZC5kZWNsYXJlZC5hcmNoaXZlW2V2ZW50PWJpcnRofGRlYXRofHRlbm5pcy1jbHViLW1lbWJlcnNoaXBdIiwicmVjb3JkLnJlZ2lzdGVyW2V2ZW50PWJpcnRofGRlYXRofHRlbm5pcy1jbHViLW1lbWJlcnNoaXBdIiwicmVjb3JkLnJlZ2lzdGVyZWQucHJpbnQtY2VydGlmaWVkLWNvcGllc1tldmVudD1iaXJ0aHxkZWF0aHx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwXSIsInJlY29yZC5yZWdpc3RlcmVkLmNvcnJlY3RbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcF0iXSwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2ODIxYzE3NWRjZTRkNzg4NmQ0ZTgyMTAifQ.A_IXrYAqMt_fWhPexN1km9T8F4XkWLhYDK8HwFdHlLe_fsFRK2mUF9xQMatyVdZIynenkVPU5-erjccC6MaDk8vDPdJlyrAgLvyF_ylezlWItY8T8wVr8j-Hnm4lGbMTfWAq2blQ--02MLd0VKGe1RDAuLG0xFxLXE6kndshstzrVZoMQNAjAXaR_13bIu5frn5QGfumNiVKUbgc4PjWudvXrO4MS7vISu7H30AtampvbyCTNvCkzcaRl9nRvQoOF_DH88LmStRoT2w4191IHHscKocxLfMFtfAPs4ifCqsiDSQv_OVfbjqs-BGKIOU4zuv65wzZleiG-Cz54DWWIyE-Zewr8cgXJcXHltTQe8d5_cVqbMSiflswvrPyL76C60j4rNzaBRpAKVA5UbCSOcP7t6ATXJsfAGnmEtMbKeA23cPzkL6S9iwWQPMW7Hxz_fneS_Pi5Mh_sJyHL7wD7ttyTnJLxCwYtTiMIwD0Rt6oGAi167nJ_ot2UCh4l2GoUvOBZyOml5d6czuomdPeLnYtDcbWG_ZvkALoTP5K0aSflJeD3gMfuf2fSEqrju5F4sD6kEWt5Tx1NUyMb9JiUdCfbYSRcp-G1eLaYCiQpxZP0Zhz7JsEnpPhQqx5ZeuT1RhmF2mZeuX_UVIUpuJLypkRKbFXsAXeJ1NtcNleIXA',
+      registrationAgent:
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQuZGVjbGFyYXRpb24tZWRpdCIsInJlY29yZC5kZWNsYXJhdGlvbi1yZWluc3RhdGUiLCJyZWNvcmQuZGVjbGFyYXRpb24tcHJpbnQtc3VwcG9ydGluZy1kb2N1bWVudHMiLCJyZWNvcmQuZXhwb3J0LXJlY29yZHMiLCJwZXJmb3JtYW5jZS5yZWFkIiwicGVyZm9ybWFuY2UucmVhZC1kYXNoYm9hcmRzIiwib3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zOm15LW9mZmljZSIsInVzZXIucmVhZDpvbmx5LW15LWF1ZGl0Iiwic2VhcmNoLmJpcnRoIiwic2VhcmNoLmRlYXRoIiwic2VhcmNoLm1hcnJpYWdlIiwid29ya3F1ZXVlW2lkPWFsbC1ldmVudHN8YXNzaWduZWQtdG8teW91fHJlY2VudHxyZXF1aXJlcy1jb21wbGV0aW9ufHJlcXVpcmVzLXVwZGF0ZXN8aW4tcmV2aWV3fHNlbnQtZm9yLWFwcHJvdmFsfGluLWV4dGVybmFsLXZhbGlkYXRpb258cmVhZHktdG8tcHJpbnR8cmVhZHktdG8taXNzdWVdIiwic2VhcmNoW2V2ZW50PWJpcnRoLGFjY2Vzcz1hbGxdIiwic2VhcmNoW2V2ZW50PWRlYXRoLGFjY2Vzcz1hbGxdIiwic2VhcmNoW2V2ZW50PXRlbm5pcy1jbHViLW1lbWJlcnNoaXAsYWNjZXNzPWFsbF0iLCJzZWFyY2hbZXZlbnQ9Rk9PVEJBTExfQ0xVQl9NRU1CRVJTSElQLGFjY2Vzcz1hbGxdIiwicmVjb3JkLnJlYWRbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcF0iLCJyZWNvcmQuZGVjbGFyZVtldmVudD1iaXJ0aHxkZWF0aHx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwXSIsInJlY29yZC5kZWNsYXJlZC52YWxpZGF0ZVtldmVudD1iaXJ0aHxkZWF0aHx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwXSIsInJlY29yZC5kZWNsYXJlZC5yZWplY3RbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcF0iLCJyZWNvcmQuZGVjbGFyZWQuYXJjaGl2ZVtldmVudD1iaXJ0aHxkZWF0aHx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwXSIsInJlY29yZC5yZWdpc3RlcmVkLnByaW50LWNlcnRpZmllZC1jb3BpZXNbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcF0iLCJyZWNvcmQucmVnaXN0ZXJlZC5yZXF1ZXN0LWNvcnJlY3Rpb25bZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcF0iXSwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2N2VmN2Y4M2Q2YTljYjkyZTllZGFhYTEifQ.QZY7rWXeF9dwxtiJy8fdEL75wB3N4zP5dFk4jSSkbxkMGOcBj4BJmRtm7MWBI5gUuyp4gyXBnoyBfUQ4k8-OmLJqwRBdX1dNRIxh_sZTWpg3JbtlOsQpLZTNfGQtBrbdiLYiRigCPZf77E4YXDvmgIRaM9fhd_mWH561_Mn_8hV6Kbc5_duzxsxRMkT7IFtS8KY74gy71wlEcspDtKBpx1G7L8-X1LfkhIqytUjyby1VVuvI6EXVYXt9cC_-_aC2PqytoC4GmYpcpbLO1n5lp4dGNdt-tmjgQG_TyuCH17PTYvMJModvj0-WkOmayJxq6JfFmeh2Rvbqbvf7mE8tzHvU608hZUG6YmWYuO4_GXbtxdff6WfTZFcqgYaiSHVPjhWmpz4_9LNjDXXhrxauPtnUx9nhw0YHKMNpNBRzp0c5jHD7ApWNI_ukdcMqVxnacuyu-Z0RmegNY75BpzUQQu9YpZgRNmf_B7VDndpcYXjG6XbHgjZBhLjn5IL_dyc3GRHm99toJ7X2EEpN49JRzaX6dz3tKbyTKYYQg8zYzxT4sqHgGH2eQyBhUGQsI-hpPkN0OWUpgyexKuLRBOWha3AOdF0mUHL39KTHO4GYXFh7v9I7fySjpzZ5dzzfHGTqFhvjSR0pBnO0vvJYxESJazyjhUvso3KJGaKeQZd26Tg'
     },
     id: {
       localRegistrar: '6821c175dce4d7886d4e8210',
@@ -198,21 +184,12 @@ export function testDataGenerator(rngSeed?: number) {
        * except for workque scope that has an extra workqueue: all-events
        */
       localRegistrar: [
-        SCOPES.RECORD_READ,
-        SCOPES.RECORD_DECLARE_BIRTH,
-        SCOPES.RECORD_DECLARE_DEATH,
-        SCOPES.RECORD_DECLARE_MARRIAGE,
         SCOPES.RECORD_DECLARATION_EDIT,
-        SCOPES.RECORD_SUBMIT_FOR_UPDATES,
         SCOPES.RECORD_REVIEW_DUPLICATES,
-        SCOPES.RECORD_DECLARATION_ARCHIVE,
         SCOPES.RECORD_DECLARATION_REINSTATE,
-        SCOPES.RECORD_REGISTER,
-        SCOPES.RECORD_REGISTRATION_CORRECT,
         SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
         SCOPES.RECORD_EXPORT_RECORDS,
         SCOPES.RECORD_UNASSIGN_OTHERS,
-        SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
         SCOPES.RECORD_CONFIRM_REGISTRATION,
         SCOPES.RECORD_REJECT_REGISTRATION,
         SCOPES.PERFORMANCE_READ,
@@ -222,27 +199,25 @@ export function testDataGenerator(rngSeed?: number) {
         SCOPES.SEARCH_BIRTH,
         SCOPES.SEARCH_DEATH,
         SCOPES.SEARCH_MARRIAGE,
-        SCOPES.WORKQUEUE_LOCAL_REGISTRAR,
-        SCOPES.SEARCH_SCOPES_BIRTH,
-        SCOPES.SEARCH_SCOPES_DEATH,
-        SCOPES.SEARCH_SCOPES_TENNIS_CLUB,
-        SCOPES.SEARCH_SCOPES_FOOTBALL_CLUB,
-        SCOPES.USER_READ_ONLY_MY_AUDIT
+        'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
+        'search[event=birth,access=all]',
+        'search[event=death,access=all]',
+        'search[event=tennis-club-membership,access=all]',
+        'search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]',
+        SCOPES.USER_READ_ONLY_MY_AUDIT,
+        'record.read[event=birth|death|tennis-club-membership]',
+        'record.declare[event=birth|death|tennis-club-membership]',
+        'record.declared.reject[event=birth|death|tennis-club-membership]',
+        'record.declared.archive[event=birth|death|tennis-club-membership]',
+        'record.register[event=birth|death|tennis-club-membership]',
+        'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]',
+        'record.registered.correct[event=birth|death|tennis-club-membership]'
       ],
       registrationAgent: [
-        SCOPES.RECORD_READ,
-        SCOPES.RECORD_DECLARE_BIRTH,
-        SCOPES.RECORD_DECLARE_DEATH,
-        SCOPES.RECORD_DECLARE_MARRIAGE,
         SCOPES.RECORD_DECLARATION_EDIT,
-        SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-        SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-        SCOPES.RECORD_DECLARATION_ARCHIVE,
         SCOPES.RECORD_DECLARATION_REINSTATE,
-        SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
         SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
         SCOPES.RECORD_EXPORT_RECORDS,
-        SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
         SCOPES.PERFORMANCE_READ,
         SCOPES.PERFORMANCE_READ_DASHBOARDS,
         SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
@@ -250,26 +225,32 @@ export function testDataGenerator(rngSeed?: number) {
         SCOPES.SEARCH_BIRTH,
         SCOPES.SEARCH_DEATH,
         SCOPES.SEARCH_MARRIAGE,
-        SCOPES.WORKQUEUE_REGISTRATION_AGENT,
-        SCOPES.SEARCH_SCOPES_BIRTH,
-        SCOPES.SEARCH_SCOPES_DEATH,
-        SCOPES.SEARCH_SCOPES_TENNIS_CLUB,
-        SCOPES.SEARCH_SCOPES_FOOTBALL_CLUB
+        'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]',
+        'search[event=birth,access=all]',
+        'search[event=death,access=all]',
+        'search[event=tennis-club-membership,access=all]',
+        'search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]',
+        'record.read[event=birth|death|tennis-club-membership]',
+        'record.declare[event=birth|death|tennis-club-membership]',
+        'record.declared.validate[event=birth|death|tennis-club-membership]',
+        'record.declared.reject[event=birth|death|tennis-club-membership]',
+        'record.declared.archive[event=birth|death|tennis-club-membership]',
+        'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]',
+        'record.registered.request-correction[event=birth|death|tennis-club-membership]'
       ],
       fieldAgent: [
-        SCOPES.RECORD_DECLARE_BIRTH,
-        SCOPES.RECORD_DECLARE_DEATH,
-        SCOPES.RECORD_DECLARE_MARRIAGE,
-        SCOPES.RECORD_SUBMIT_INCOMPLETE,
         SCOPES.RECORD_SUBMIT_FOR_REVIEW,
         SCOPES.SEARCH_BIRTH,
         SCOPES.SEARCH_DEATH,
         SCOPES.SEARCH_MARRIAGE,
-        SCOPES.WORKQUEUE_FIELD_AGENT,
-        SCOPES.SEARCH_SCOPES_BIRTH,
-        SCOPES.SEARCH_SCOPES_DEATH,
-        SCOPES.SEARCH_SCOPES_TENNIS_CLUB,
-        SCOPES.SEARCH_SCOPES_FOOTBALL_CLUB
+        'workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]',
+        'search[event=birth,access=all]',
+        'search[event=death,access=all]',
+        'search[event=tennis-club-membership,access=all]',
+        'search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]',
+        'record.read[event=birth|death|tennis-club-membership]',
+        'record.declare[event=birth|death|tennis-club-membership]',
+        'record.notify[event=birth|death|tennis-club-membership]'
       ]
     }
   }

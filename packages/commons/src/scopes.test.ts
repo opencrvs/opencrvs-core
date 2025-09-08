@@ -9,14 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { findScope, parseScope, SCOPES } from './scopes'
+import {
+  findScope,
+  parseConfigurableScope,
+  parseLiteralScope,
+  SCOPES
+} from './scopes'
 
 describe('findScope()', () => {
   const userScopes = [
     SCOPES.USER_CREATE,
     SCOPES.USER_READ,
     'user.create[role=first-role|second-role]',
-    'record.notify[event=v2.birth]'
+    'record.notify[event=birth]'
   ]
 
   it('successfully finds a configurable scope', () => {
@@ -31,7 +36,7 @@ describe('findScope()', () => {
     const result = findScope(userScopes, 'record.notify')
     expect(result).toEqual({
       type: 'record.notify',
-      options: { event: ['v2.birth'] }
+      options: { event: ['birth'] }
     })
   })
 
@@ -41,15 +46,27 @@ describe('findScope()', () => {
   })
 })
 
-describe('parseScope()', () => {
+describe('parseLiteralScope()', () => {
+  it('should not be able to parse a configurable scope', () => {
+    const scope = 'user.create[role=foo|bar]'
+    const result = parseLiteralScope(scope)
+    expect(result).toEqual(undefined)
+  })
+
   it('should successfully parse a literal scope', () => {
-    const result = parseScope(SCOPES.USER_CREATE)
+    const result = parseLiteralScope(SCOPES.USER_CREATE)
     expect(result).toEqual({ type: 'user.create:all' })
+  })
+})
+
+describe('parseConfigurableScope()', () => {
+  it('should not be able to parse a literal scope', () => {
+    expect(parseConfigurableScope(SCOPES.USER_CREATE)).toEqual(undefined)
   })
 
   it('should successfully parse a configurable scope', () => {
     const scope = 'user.create[role=foo|bar]'
-    const result = parseScope(scope)
+    const result = parseConfigurableScope(scope)
 
     expect(result).toEqual({
       type: 'user.create',
@@ -59,25 +76,25 @@ describe('parseScope()', () => {
 
   it('should return undefined for a configurable scope with no options', () => {
     const scope = 'user.create[role=]'
-    const result = parseScope(scope)
+    const result = parseConfigurableScope(scope)
     expect(result).toEqual(undefined)
   })
 
   it('should return undefined for a configurable scope with missing options bracket', () => {
     const scope = 'user.create'
-    const result = parseScope(scope)
+    const result = parseConfigurableScope(scope)
     expect(result).toEqual(undefined)
   })
 
   it('should return undefined for a configurable scope with empty options bracket', () => {
     const scope = 'user.create[]'
-    const result = parseScope(scope)
+    const result = parseConfigurableScope(scope)
     expect(result).toEqual(undefined)
   })
 
   it('should return undefined for an invalid scope with search', () => {
     const scope = 'search[event=]'
-    const result = parseScope(scope)
+    const result = parseConfigurableScope(scope)
     expect(result).toEqual(undefined)
   })
 
@@ -85,7 +102,7 @@ describe('parseScope()', () => {
     const tennisScope = 'search[event=tennis-club-membership,access=all]'
     const birthScope = 'search[event=birth,access=all]'
 
-    expect(parseScope(tennisScope)).toEqual({
+    expect(parseConfigurableScope(tennisScope)).toEqual({
       type: 'search',
       options: {
         event: ['tennis-club-membership'],
@@ -93,7 +110,7 @@ describe('parseScope()', () => {
       }
     })
 
-    expect(parseScope(birthScope)).toEqual({
+    expect(parseConfigurableScope(birthScope)).toEqual({
       type: 'search',
       options: {
         event: ['birth'],
@@ -113,7 +130,7 @@ describe('parseScope()', () => {
       'search[event=tennis-club-membership,access=my-jurisdiction]'
     const birthScope = 'search[event=birth,access=all]'
 
-    expect(parseScope(tennisScope)).toEqual({
+    expect(parseConfigurableScope(tennisScope)).toEqual({
       type: 'search',
       options: {
         event: ['tennis-club-membership'],
@@ -121,7 +138,7 @@ describe('parseScope()', () => {
       }
     })
 
-    expect(parseScope(birthScope)).toEqual({
+    expect(parseConfigurableScope(birthScope)).toEqual({
       type: 'search',
       options: {
         event: ['birth'],
@@ -137,7 +154,7 @@ describe('parseScope()', () => {
 
   it('should return scope for a valid scope with search for a single event', () => {
     const scope = 'search[event=tennis-club-membership,access=all]'
-    expect(parseScope(scope)).toEqual({
+    expect(parseConfigurableScope(scope)).toEqual({
       type: 'search',
       options: {
         event: ['tennis-club-membership'],
@@ -153,14 +170,14 @@ describe('parseScope()', () => {
 
   it('should return undefined for odd jurisdiction id', () => {
     const scope1 = 'search[event=tennis-club-membership,access=random]'
-    expect(parseScope(scope1)).toEqual(undefined)
+    expect(parseConfigurableScope(scope1)).toEqual(undefined)
 
     const scope2 = 'search[event=tennis-club-membership,access=alls]'
-    expect(parseScope(scope2)).toEqual(undefined)
+    expect(parseConfigurableScope(scope2)).toEqual(undefined)
 
     const scope3 =
       'search[event=tennis-club-membership,access=my-jurisdictions]'
-    expect(parseScope(scope3)).toEqual(undefined)
+    expect(parseConfigurableScope(scope3)).toEqual(undefined)
 
     const mergedScopes = findScope([scope1, scope2, scope3], 'search')
     expect(mergedScopes).toEqual(undefined)

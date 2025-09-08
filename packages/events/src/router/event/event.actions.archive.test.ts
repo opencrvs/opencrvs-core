@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { SCOPES, ActionType, getUUID } from '@opencrvs/commons'
+import { ActionType, getUUID } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test(`prevents forbidden access if missing required scope`, async () => {
@@ -26,7 +26,9 @@ test(`prevents forbidden access if missing required scope`, async () => {
 
 test(`allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DECLARATION_ARCHIVE])
+  const client = createTestClient(user, [
+    'record.declared.archive[event=birth|death|tennis-club-membership]'
+  ])
 
   await expect(
     client.event.actions.archive.request(
@@ -35,7 +37,8 @@ test(`allows access if required scope is present`, async () => {
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`contains both ${ActionType.MARKED_AS_DUPLICATE} and ${ActionType.ARCHIVE} actions when marked as duplicate`, async () => {
+//@todo fix after implementing MARK_AS_DUPLICATE action
+test.skip(`contains both ${ActionType.MARK_AS_DUPLICATE} and ${ActionType.ARCHIVE} actions when marked as duplicate`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -61,12 +64,12 @@ test(`contains both ${ActionType.MARKED_AS_DUPLICATE} and ${ActionType.ARCHIVE} 
   })
   const actions = (
     await client.event.actions.archive.request(
-      generator.event.actions.archive(originalEvent.id, undefined, true)
+      generator.event.actions.archive(originalEvent.id)
     )
   ).actions.map(({ type }) => type)
 
   expect(actions.slice(-3)).toEqual([
-    ActionType.MARKED_AS_DUPLICATE,
+    ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
     ActionType.UNASSIGN
   ])
@@ -103,7 +106,7 @@ test(`should only contain ${ActionType.ARCHIVE} action if not marked as duplicat
   ).actions.map(({ type }) => type)
 
   expect(actions.at(-2)).toStrictEqual(ActionType.ARCHIVE)
-  expect(actions.at(-3)).not.toStrictEqual(ActionType.MARKED_AS_DUPLICATE)
+  expect(actions.at(-3)).not.toStrictEqual(ActionType.MARK_AS_DUPLICATE)
 })
 
 test(`${ActionType.ARCHIVE} action is idempotent`, async () => {

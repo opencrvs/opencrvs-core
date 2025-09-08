@@ -38,7 +38,10 @@ import {
   onAssign,
   updateLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
-import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
+import {
+  addMarkAsNotDuplicateActionOptimistically,
+  updateEventOptimistically
+} from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   createEventActionMutationFn,
   MutationType,
@@ -270,12 +273,52 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
   }
 })
 
+setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markAsDuplicate, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.duplicate.markAsDuplicate
+  ),
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
+  meta: {
+    actionType: ActionType.MARK_AS_DUPLICATE
+  }
+})
+
+setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.duplicate.markNotDuplicate
+  ),
+  retry: retryUnlessConflict,
+  retryDelay,
+  onMutate: addMarkAsNotDuplicateActionOptimistically(
+    ActionType.MARK_AS_NOT_DUPLICATE
+  ),
+  onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
+  meta: {
+    actionType: ActionType.MARK_AS_NOT_DUPLICATE
+  }
+})
+
+type CustomMutationKeys = keyof typeof customApi
+
 export const customMutationKeys = {
   validateOnDeclare: [['validateOnDeclare']],
   registerOnDeclare: [['registerOnDeclare']],
   registerOnValidate: [['registerOnValidate']],
+  archiveOnDuplicate: [['archiveOnDuplicate']],
   makeCorrectionOnRequest: [['makeCorrectionOnRequest']]
-} as const
+} satisfies Record<CustomMutationKeys, MutationKey>
+
+interface CustomMutationTypes {
+  validateOnDeclare: customApi.CustomMutationParams
+  registerOnDeclare: customApi.CustomMutationParams
+  registerOnValidate: customApi.CustomMutationParams
+  archiveOnDuplicate: customApi.ArchiveOnDuplicateParams
+  makeCorrectionOnRequest: customApi.CorrectionRequestParams
+}
 
 queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
   mutationFn: waitUntilEventIsCreated(customApi.validateOnDeclare),
@@ -300,7 +343,7 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
 })
 
 queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
-  mutationFn: waitUntilEventIsCreated(customApi.registerOnValidate),
+  mutationFn: customApi.registerOnValidate,
   retry: retryUnlessConflict,
   retryDelay,
   onSuccess: updateLocalEvent,
@@ -310,8 +353,19 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
   }
 })
 
+queryClient.setMutationDefaults(customMutationKeys.archiveOnDuplicate, {
+  mutationFn: customApi.archiveOnDuplicate,
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
+  meta: {
+    actionType: ActionType.MARK_AS_DUPLICATE
+  }
+})
+
 queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
-  mutationFn: waitUntilEventIsCreated(customApi.makeCorrectionOnRequest),
+  mutationFn: customApi.makeCorrectionOnRequest,
   retry: retryUnlessConflict,
   retryDelay,
   onSuccess: updateLocalEvent,
@@ -421,15 +475,18 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   }
 }
 
-export function useEventCustomAction(mutationKey: MutationKey) {
+export function useEventCustomAction<T extends CustomMutationKeys>(
+  mutationName: T
+) {
   const eventConfigurations = useEventConfigurations()
+  const mutationKey = customMutationKeys[mutationName]
   const mutation = useMutation({
     mutationKey: mutationKey,
     ...queryClient.getMutationDefaults(mutationKey)
   })
 
   return {
-    mutate: (params: customApi.OnDeclareParams) => {
+    mutate: (params: Omit<CustomMutationTypes[T], 'eventConfiguration'>) => {
       const localEvent = findLocalEventDocument(params.eventId)
 
       const eventConfiguration = eventConfigurations.find(
@@ -440,12 +497,21 @@ export function useEventCustomAction(mutationKey: MutationKey) {
         throw new Error('Event configuration not found')
       }
 
-      const originalDeclaration = params.fullEvent
-        ? getCurrentEventState(params.fullEvent, eventConfiguration).declaration
-        : {}
+      const originalDeclaration =
+        'event' in params
+          ? getCurrentEventState(
+              /*
+               * typescript is somehow unable to infer the type of params.event to
+               * be EventDocument
+               */
+              params.event as EventDocument,
+              eventConfiguration
+            ).declaration
+          : {}
 
       return mutation.mutate({
         ...params,
+        eventConfiguration,
         declaration: getCleanedDeclarationDiff(
           eventConfiguration,
           originalDeclaration,

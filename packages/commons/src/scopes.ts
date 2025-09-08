@@ -34,11 +34,6 @@ export const SCOPES = {
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
 
-  /**
-   * @TODO This is a temporary scope to be used for V2 Events custom events declaration
-   */
-  RECORD_DECLARE: 'record.declare-birth',
-
   // declare
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
   RECORD_DECLARE_BIRTH_MY_JURISDICTION: 'record.declare-birth:my-jurisdiction',
@@ -48,6 +43,8 @@ export const SCOPES = {
   RECORD_DECLARE_MARRIAGE_MY_JURISDICTION:
     'record.declare-marriage:my-jurisdiction',
   RECORD_SUBMIT_INCOMPLETE: 'record.declaration-submit-incomplete',
+
+  // @todo: should this record be removed from events v2?
   RECORD_SUBMIT_FOR_REVIEW: 'record.declaration-submit-for-review',
   RECORD_UNASSIGN_OTHERS: 'record.unassign-others',
 
@@ -75,8 +72,6 @@ export const SCOPES = {
   RECORD_PRINT_ISSUE_CERTIFIED_COPIES:
     'record.registration-print&issue-certified-copies',
   RECORD_PRINT_CERTIFIED_COPIES: 'record.registration-print-certified-copies', // v1.8
-  RECORD_BULK_PRINT_CERTIFIED_COPIES:
-    'record.registration-bulk-print-certified-copies', // v1.8
   RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES:
     'record.registration-verify-certified-copies', // v1.8
 
@@ -84,12 +79,6 @@ export const SCOPES = {
   RECORD_REGISTRATION_REQUEST_CORRECTION:
     'record.registration-request-correction',
   RECORD_REGISTRATION_CORRECT: 'record.registration-correct',
-  RECORD_REGISTRATION_REQUEST_REVOCATION:
-    'record.registration-request-revocation', // v1.8
-  RECORD_REGISTRATION_REVOKE: 'record.registration-revoke', // v1.8
-  RECORD_REGISTRATION_REQUEST_REINSTATEMENT:
-    'record.registration-request-reinstatement', // v1.8
-  RECORD_REGISTRATION_REINSTATE: 'record.registration-reinstate', // v1.8
   RECORD_CONFIRM_REGISTRATION: 'record.confirm-registration',
   RECORD_REJECT_REGISTRATION: 'record.reject-registration',
 
@@ -103,9 +92,6 @@ export const SCOPES = {
 
   // audit v1.8
   RECORD_READ: 'record.read',
-  RECORD_READ_AUDIT: 'record.read-audit',
-  RECORD_READ_COMMENTS: 'record.read-comments',
-  RECORD_CREATE_COMMENTS: 'record.create-comments',
 
   // profile
   PROFILE_UPDATE: 'profile.update', //v1.8
@@ -175,7 +161,6 @@ const InternalOperationsScopes = z.union([
 
 // Declare
 const DeclareScopes = z.union([
-  z.literal(SCOPES.RECORD_DECLARE),
   z.literal(SCOPES.RECORD_DECLARE_BIRTH),
   z.literal(SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION),
   z.literal(SCOPES.RECORD_DECLARE_DEATH),
@@ -209,7 +194,6 @@ const CertifyScopes = z.union([
   z.literal(SCOPES.RECORD_REGISTRATION_PRINT),
   z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
   z.literal(SCOPES.RECORD_PRINT_CERTIFIED_COPIES),
-  z.literal(SCOPES.RECORD_BULK_PRINT_CERTIFIED_COPIES),
   z.literal(SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES)
 ])
 
@@ -217,10 +201,6 @@ const CertifyScopes = z.union([
 const CorrectionScopes = z.union([
   z.literal(SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION),
   z.literal(SCOPES.RECORD_REGISTRATION_CORRECT),
-  z.literal(SCOPES.RECORD_REGISTRATION_REQUEST_REVOCATION),
-  z.literal(SCOPES.RECORD_REGISTRATION_REVOKE),
-  z.literal(SCOPES.RECORD_REGISTRATION_REQUEST_REINSTATEMENT),
-  z.literal(SCOPES.RECORD_REGISTRATION_REINSTATE),
   z.literal(SCOPES.RECORD_CONFIRM_REGISTRATION),
   z.literal(SCOPES.RECORD_REJECT_REGISTRATION)
 ])
@@ -236,12 +216,7 @@ export const SearchScopes = z.union([
 ])
 
 // Audit
-const AuditScopes = z.union([
-  z.literal(SCOPES.RECORD_READ),
-  z.literal(SCOPES.RECORD_READ_AUDIT),
-  z.literal(SCOPES.RECORD_READ_COMMENTS),
-  z.literal(SCOPES.RECORD_CREATE_COMMENTS)
-])
+const AuditScopes = z.literal(SCOPES.RECORD_READ)
 
 // Profile
 const ProfileScopes = z.union([
@@ -304,9 +279,10 @@ const LiteralScopes = z.union([
 
 // Configurable scopes are for example:
 // - user.create[role=first-role|second-role]
-// - record.notify[event=v2.birth]
+// - record.notify[event=birth]
+// - record.registered.print-certified-copies[event=birth|tennis-club-membership]
 const rawConfigurableScopeRegex =
-  /^([a-zA-Z\.]+)\[((?:\w+=[\w.-]+(?:\|[\w.-]+)*)(?:,[\w]+=[\w.-]+(?:\|[\w.-]+)*)*)\]$/
+  /^([a-zA-Z][a-zA-Z0-9.-]*(?:\.[a-zA-Z0-9.-]+)*)\[((?:\w+=[\w.-]+(?:\|[\w.-]+)*)(?:,[\w]+=[\w.-]+(?:\|[\w.-]+)*)*)\]$/
 
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
 
@@ -331,13 +307,6 @@ const WorkqueueScope = z.object({
   })
 })
 
-const NotifyRecordScope = z.object({
-  type: z.literal('record.notify'),
-  options: z.object({
-    event: z.array(z.string())
-  })
-})
-
 const SearchScope = z.object({
   type: z.literal('search'),
   options: z.object({
@@ -348,12 +317,33 @@ const SearchScope = z.object({
 
 export type SearchScope = z.infer<typeof SearchScope>
 
+// These scopes are used to check if the user has the necessary permissions to perform actions on a record.
+// Each of these is configured with allowed event types (ids), e.g. 'birth', 'death', 'tennis-club-membership'.
+const RecordScope = z.object({
+  type: z.enum([
+    'record.read',
+    'record.declare',
+    'record.notify',
+    'record.declared.validate',
+    'record.declared.reject',
+    'record.declared.archive',
+    'record.declared.review-duplicates',
+    'record.register',
+    'record.registered.print-certified-copies',
+    'record.registered.request-correction',
+    'record.registered.correct'
+  ]),
+  options: z.object({
+    event: z.array(z.string())
+  })
+})
+
 const ConfigurableRawScopes = z.discriminatedUnion('type', [
   SearchScope,
   CreateUserScope,
   EditUserScope,
   WorkqueueScope,
-  NotifyRecordScope
+  RecordScope
 ])
 
 type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
@@ -401,7 +391,7 @@ export function findScope<T extends ConfigurableScopeType>(
   scopes: string[],
   scopeType: T
 ) {
-  const parsedScopes = scopes.map((rawScope) => parseScope(rawScope))
+  const parsedScopes = scopes.map(parseConfigurableScope)
   const searchScopes = parsedScopes.filter((scope) => scope?.type === 'search')
   const otherScopes = parsedScopes.filter((scope) => scope?.type !== 'search')
   const mergedSearchScope = flattenAndMergeScopes(searchScopes)
@@ -414,8 +404,8 @@ export function findScope<T extends ConfigurableScopeType>(
 
 /**
  * Parses a raw options string for non-search scopes (e.g., workqueues).
- * @param rawOptions - The raw string, e.g. "event=v2.birth|club-reg,all"
- * @returns An object like: { event: ['v2.birth', 'club-reg'], access: ['all'] }
+ * @param rawOptions - The raw string, e.g. "event=birth|club-reg,all"
+ * @returns An object like: { event: ['birth', 'club-reg'], access: ['all'] }
  */
 function getScopeOptions(rawOptions: string) {
   return rawOptions
@@ -435,15 +425,9 @@ function getScopeOptions(rawOptions: string) {
  * parseScope("user.create[role=field-agent|registration-agent]")
  * // Returns: { type: "user.create", options: { role: ["field-agent", "registration-agent"] } }
  */
-export function parseScope(scope: string) {
-  const maybeLiteralScope = LiteralScopes.safeParse(scope)
-  if (maybeLiteralScope.success) {
-    return {
-      type: maybeLiteralScope.data
-    }
-  }
-
+export function parseConfigurableScope(scope: string) {
   const maybeConfigurableScope = rawConfigurableScope.safeParse(scope)
+
   if (!maybeConfigurableScope.success) {
     return
   }
@@ -452,7 +436,7 @@ export function parseScope(scope: string) {
   const [, type, rawOptions] = rawScope.match(rawConfigurableScopeRegex) ?? []
 
   // Different options are separated by commas, and each option value is separated by a pipe e.g.:
-  // record.digitise[event=v2.birth|tennis-club-membership, my-jurisdiction]
+  // record.digitise[event=birth|tennis-club-membership, my-jurisdiction]
   const options = getScopeOptions(rawOptions)
 
   const parsedScope = {
@@ -464,6 +448,18 @@ export function parseScope(scope: string) {
   return result.success ? result.data : undefined
 }
 
+export function parseLiteralScope(scope: string) {
+  const maybeLiteralScope = LiteralScopes.safeParse(scope)
+
+  if (maybeLiteralScope.success) {
+    return {
+      type: maybeLiteralScope.data
+    }
+  }
+
+  return
+}
+
 /**
  * Stringifies a ConfigurableScopes object into a scope string.
  * @param {ConfigurableScopes} scope - The scope object to stringify
@@ -471,17 +467,40 @@ export function parseScope(scope: string) {
  * @example
  * stringifyScope({
  *   type: "record.notify",
- *   options: { event: ["v2.birth", "tennis-club-membership"] }
+ *   options: { event: ["birth", "tennis-club-membership"] }
  * })
- * // Returns: "record.notify[event=v2.birth|tennis-club-membership]"
+ * // Returns: "record.notify[event=birth|tennis-club-membership]"
  */
-export function stringifyScope(scope: z.infer<typeof NotifyRecordScope>) {
+export function stringifyScope(scope: z.infer<typeof ConfigurableRawScopes>) {
   const options = Object.entries(scope.options)
     .map(([key, value]) => `${key}=${value.join('|')}`)
     .join(',')
 
   return `${scope.type}[${options}]`
 }
+
+/**
+ * Extracts authorized event identifiers (e.g. birth, death) from the provided configurable scopes.
+ *
+ * @param scopes - Array of configurable scopes with options
+ * @returns Array of authorized event identifiers
+ */
+export function getAuthorizedEventsFromScopes(scopes: ConfigurableScopes[]) {
+  return (
+    scopes
+      .flatMap(({ options }) => {
+        if (options && 'event' in options) {
+          return options.event
+        }
+
+        return undefined
+      })
+      .filter((event) => event !== undefined)
+      // remove duplicates
+      .filter((event, index, self) => self.indexOf(event) === index)
+  )
+}
+
 /*
  * @deprecated
  * scopes are configurable so all possible
@@ -489,7 +508,9 @@ export function stringifyScope(scope: z.infer<typeof NotifyRecordScope>) {
  */
 export const scopes: Scope[] = Object.values(SCOPES)
 
-export type ParsedScopes = NonNullable<ReturnType<typeof parseScope>>
+export type ParsedScopes = NonNullable<
+  ReturnType<typeof parseConfigurableScope>
+>
 export type RawScopes = z.infer<typeof LiteralScopes> | (string & {})
 
 // for backwards compatibility

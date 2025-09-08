@@ -10,30 +10,34 @@
  */
 
 import { TRPCError } from '@trpc/server'
+import { inScope, SCOPES, TokenWithBearer } from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
   findLastAssignmentAction,
   UnassignActionInput
 } from '@opencrvs/commons/events'
-import { inScope, SCOPES, TokenWithBearer, UUID } from '@opencrvs/commons'
-import { addAction, getEventById } from '@events/service/events/events'
-import { setBearerForToken } from '@events/router/middleware'
 import { TrpcUserContext } from '@events/context'
+import { setBearerForToken } from '@events/router/middleware'
+import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventById, processAction } from '@events/service/events/events'
 
 export async function unassignRecord(
   input: UnassignActionInput,
   {
-    eventId,
     user,
     token
   }: {
-    eventId: UUID
     user: TrpcUserContext
     token: TokenWithBearer
   }
 ) {
-  const storedEvent = await getEventById(eventId)
+  const storedEvent = await getEventById(input.eventId)
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType: storedEvent.type
+  })
+
   const lastAssignmentAction = findLastAssignmentAction(storedEvent.actions)
 
   if (lastAssignmentAction?.type === ActionType.ASSIGN) {
@@ -48,11 +52,12 @@ export async function unassignRecord(
       })
     }
 
-    return addAction(input, {
-      eventId,
+    return processAction(input, {
+      event: storedEvent,
       user,
       token,
-      status: ActionStatus.Accepted
+      status: ActionStatus.Accepted,
+      configuration
     })
   }
 

@@ -16,14 +16,12 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { useSelector } from 'react-redux'
 import {
   ActionType,
   EventStatus,
   getActionReview,
   getCurrentEventState,
-  getDeclaration,
-  SCOPES
+  getDeclaration
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -40,10 +38,11 @@ import {
 import { FormLayout } from '@client/v2-events/layouts'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
@@ -58,6 +57,8 @@ export function Review() {
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const { closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
 
   const event = events.getEvent.getFromCache(eventId)
 
@@ -73,14 +74,19 @@ export function Review() {
   const { setAnnotation, getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
 
-  const scopes = useSelector(getScope) ?? undefined
+  const { isActionAllowed } = useUserAllowedActions(event.type)
+
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
 
   const reviewActionConfiguration = useReviewActionConfig({
+    eventType: event.type,
     formConfig,
     declaration: form,
     annotation,
-    scopes,
-    reviewFields: reviewConfig.fields
+    reviewFields: reviewConfig.fields,
+    locations: adminStructureLocations
   })
 
   async function handleEdit({
@@ -150,13 +156,22 @@ export function Review() {
       const { rejectAction, message, isDuplicate } = confirmedRejection
 
       if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
-        events.actions.reject.mutate({
-          eventId,
-          declaration: {},
-          transactionId: uuid(),
-          annotation: {},
-          reason: { message }
-        })
+        if (isDuplicate) {
+          events.customActions.archiveOnDuplicate.mutate({
+            eventId,
+            declaration: {},
+            transactionId: uuid(),
+            content: { reason: message }
+          })
+        } else {
+          events.actions.reject.mutate({
+            eventId,
+            declaration: {},
+            transactionId: uuid(),
+            annotation: {},
+            content: { reason: message }
+          })
+        }
       }
 
       if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
@@ -165,7 +180,7 @@ export function Review() {
           declaration: {},
           transactionId: uuid(),
           annotation: {},
-          reason: { message, isDuplicate }
+          content: { reason: message }
         })
       }
       closeActionView(slug)
@@ -186,13 +201,14 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
+        locations={adminStructureLocations}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
         onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions
-          canSendIncomplete={scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)}
+          canSendIncomplete={isActionAllowed(ActionType.NOTIFY)}
           icon={reviewActionConfiguration.icon}
           incomplete={reviewActionConfiguration.incomplete}
           messages={reviewActionConfiguration.messages}

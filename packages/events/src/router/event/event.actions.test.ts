@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { http, HttpResponse } from 'msw'
 import {
   ActionStatus,
@@ -231,7 +230,7 @@ describe('Action drafts', () => {
 
 const multiFileConfig = {
   ...tennisClubMembershipEvent,
-  id: 'multi-file-event',
+  id: 'death', // using existing event type id here, so that the user has the required scope to it
   declaration: {
     label: generateTranslationConfig('File club form'),
     pages: [
@@ -350,15 +349,14 @@ describe('Action updates', () => {
       (action) => action.type === ActionType.CREATE
     )
 
-    const assignmentInput = generator.event.actions.assign(originalEvent.id, {
-      assignedTo: createAction[0].createdBy
-    })
-
-    await client.event.actions.assignment.assign(assignmentInput)
+    await client.event.actions.assignment.assign(
+      generator.event.actions.assign(originalEvent.id, {
+        assignedTo: createAction[0].createdBy
+      })
+    )
 
     await client.event.actions.validate.request({
       type: ActionType.VALIDATE,
-      duplicates: [],
       declaration: {
         'applicant.dobUnknown': true,
         'applicant.age': 25
@@ -368,9 +366,7 @@ describe('Action updates', () => {
     })
 
     const event = await client.event.get(originalEvent.id)
-
     const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
-
     expect(eventState.declaration).toMatchSnapshot()
   })
 
@@ -400,7 +396,6 @@ describe('Action updates', () => {
     await client.event.actions.validate.request({
       eventId: originalEvent.id,
       type: ActionType.VALIDATE,
-      duplicates: [],
       declaration: {
         'documents.multiFile': null,
         'documents.singleFile': null
@@ -447,7 +442,6 @@ describe('Action updates', () => {
     await client.event.actions.validate.request({
       eventId: originalEvent.id,
       type: ActionType.VALIDATE,
-      duplicates: [],
       declaration: {
         'documents.multiFile': [],
         'documents.singleFile': null

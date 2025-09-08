@@ -51,3 +51,20 @@ export function personNameFromV1ToV2([name]: FullNameV1): NameFieldValue {
     surname: name.family
   }
 }
+
+export function omitKeyDeep(obj: any, keyToRemove: string): any {
+  if (Array.isArray(obj)) {
+    return obj.map((item) => omitKeyDeep(item, keyToRemove))
+  }
+  if (obj === null || typeof obj !== 'object') {
+    return obj
+  }
+
+  const newObj: any = {}
+  for (const key of Object.keys(obj)) {
+    if (key !== keyToRemove) {
+      newObj[key] = omitKeyDeep(obj[key], keyToRemove)
+    }
+  }
+  return newObj
+}

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -154,7 +155,7 @@ export const WithRejectedAction: Story = {
           createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
           createdByRole: 'LOCAL_REGISTRAR',
           declaration: {},
-          reason: { message: 'Archived', isDuplicate: true }
+          content: { reason: 'Archived' }
         }
       ])
     }
@@ -268,6 +269,19 @@ export const WithSystemUserActions: Story = {
           createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
           createdByRole: 'LOCAL_REGISTRAR',
           declaration: {}
+        },
+        {
+          id: '9e048856-8c4d-4f85-8b7f-5f13885d2374' as UUID,
+          status: ActionStatus.Accepted,
+          declaration: {},
+          type: ActionType.ASSIGN,
+          createdBy: testDataGenerator().user.id.localRegistrar,
+          createdByRole: 'LOCAL_REGISTRAR',
+          createdByUserType: 'user' as const,
+          createdAt: '2025-01-23T05:35:27.689Z',
+          createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          assignedTo: testDataGenerator().user.id.localRegistrar,
+          transactionId: 'aasdk342-asdkj3423-kn234k26'
         }
       ]
     }
@@ -550,6 +564,19 @@ export const WithVariousUserRoles: Story = {
           createdByUserType: 'user' as const,
           createdByRole: 'WEBHOOK',
           declaration: {}
+        },
+        {
+          id: '9e048856-8c4d-4f85-8b7f-5f13885d2374' as UUID,
+          status: ActionStatus.Accepted,
+          declaration: {},
+          type: ActionType.ASSIGN,
+          createdBy: testDataGenerator().user.id.localRegistrar,
+          createdByRole: 'LOCAL_REGISTRAR',
+          createdByUserType: 'user' as const,
+          createdAt: '2025-01-23T05:35:27.689Z',
+          createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          assignedTo: testDataGenerator().user.id.localRegistrar,
+          transactionId: 'aasdk342-asdkj3423-kn234k26'
         }
       ]
     }

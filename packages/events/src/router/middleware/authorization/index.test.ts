@@ -25,7 +25,9 @@ describe('requiresScopes()', () => {
     // missing all of the required scopes
     const mockOpts = {
       ctx: {
-        token: createTestToken('test-user-id', [SCOPES.RECORD_DECLARE])
+        token: createTestToken('test-user-id', [
+          'record.declare[event=birth|death|tennis-club-membership]'
+        ])
       },
       next: vi.fn()
     } as unknown as MiddlewareOptions<TrpcContext>

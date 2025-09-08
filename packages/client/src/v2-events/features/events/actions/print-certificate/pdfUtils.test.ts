@@ -12,6 +12,7 @@
 import { createIntl } from 'react-intl'
 import createFetchMock from 'vitest-fetch-mock'
 import { ContentSvg } from 'pdfmake/interfaces'
+import { Location } from '@events/service/locations/locations'
 import {
   ActionDocument,
   eventQueryDataGenerator,
@@ -37,21 +38,24 @@ const locations = [
     id: '35391063-7dca-4e57-abd3-20dcc8538a64' as UUID,
     name: 'HQ Office',
     parentId: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID,
-    validUntil: null
+    validUntil: null,
+    locationType: 'ADMIN_STRUCTURE'
   },
   {
     id: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID,
     name: 'Embe',
     parentId: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
-    validUntil: null
+    validUntil: null,
+    locationType: 'ADMIN_STRUCTURE'
   },
   {
     id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
     name: 'Pualula',
     parentId: null,
-    validUntil: null
+    validUntil: null,
+    locationType: 'ADMIN_STRUCTURE'
   }
-]
+] as Location[]
 const userId = '677fb08730f3abfa33072769'
 
 describe('stringifyEventMetadata', () => {
@@ -165,10 +169,29 @@ function expectRenderOutput(template: string, output: string) {
         surname: 'Doe'
       }
     },
+    review: false,
     locations: [],
     users: [],
     language: { lang: 'en', messages: {} },
-    config: tennisClubMembershipEvent
+    config: tennisClubMembershipEvent,
+    adminLevels: [
+      {
+        id: 'province',
+        label: {
+          id: 'v2.field.address.province.label',
+          defaultMessage: 'Province',
+          description: 'Label for province in address'
+        }
+      },
+      {
+        id: 'district',
+        label: {
+          id: 'v2.field.address.district.label',
+          defaultMessage: 'District',
+          description: 'Label for district in address'
+        }
+      }
+    ]
   })
   expect(result).toBe(output)
 }

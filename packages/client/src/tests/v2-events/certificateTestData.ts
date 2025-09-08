@@ -19,6 +19,7 @@ import {
 export const tennisClubMembershipCertificateWithoutConditionals: CertificateTemplateConfig =
   {
     id: 'tennis-club-membership-certificate',
+    isV2Template: true,
     event: 'tennis-club-membership',
     label: {
       id: 'certificates.tennis-club-membership.certificate.basic',
@@ -50,6 +51,7 @@ export const testEventDocument = {
 export const tennisClubMembershipCertificateWithPrintCountConditionals: CertificateTemplateConfig =
   {
     id: 'tennis-club-membership-certificate-print-count',
+    isV2Template: true,
     event: 'tennis-club-membership',
     label: {
       id: 'certificates.tennis-club-membership.certificate.print-count',
@@ -76,6 +78,7 @@ export const tennisClubMembershipCertificateWithPrintCountConditionals: Certific
 export const tennisClubMembershipCertificateWithMultiplePrintConditionals: CertificateTemplateConfig =
   {
     id: 'tennis-club-membership-certificate-multiple-print',
+    isV2Template: true,
     event: 'tennis-club-membership',
     label: {
       id: 'certificates.tennis-club-membership.certificate.multiple-print',
@@ -102,6 +105,7 @@ export const tennisClubMembershipCertificateWithMultiplePrintConditionals: Certi
 export const tennisClubMembershipReplacementCertificate: CertificateTemplateConfig =
   {
     id: 'tennis-club-membership-replacement-certificate',
+    isV2Template: true,
     event: 'tennis-club-membership',
     label: {
       id: 'certificates.tennis-club-membership.certificate.replacement',
@@ -123,6 +127,7 @@ export const tennisClubMembershipReplacementCertificate: CertificateTemplateConf
 export const tennisClubMembershipDuplicateCertificate: CertificateTemplateConfig =
   {
     id: 'tennis-club-membership-duplicate-certificate',
+    isV2Template: true,
     event: 'tennis-club-membership',
     label: {
       id: 'certificates.tennis-club-membership.certificate.duplicate',
