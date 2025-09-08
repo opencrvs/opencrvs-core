@@ -148,52 +148,9 @@ export function generateQueryForAddressField(
     mustMatches.push({ match: { [`${fieldId}.country`]: country } })
   }
   if (addressType === 'DOMESTIC') {
-    if (value.province) {
+    if (value.administrativeArea) {
       mustMatches.push({
-        match: { [`${fieldId}.province`]: value.province }
-      })
-    }
-    if (value.district) {
-      mustMatches.push({
-        match: { [`${fieldId}.district`]: value.district }
-      })
-    }
-    if (value.urbanOrRural === 'URBAN' && value.town) {
-      mustMatches.push({
-        match: {
-          [`${fieldId}.town`]: {
-            query: value.town,
-            fuzziness: 'AUTO'
-          }
-        }
-      })
-    }
-    if (value.urbanOrRural === 'RURAL' && value.village) {
-      mustMatches.push({
-        match: {
-          [`${fieldId}.village`]: {
-            query: value.village,
-            fuzziness: 'AUTO'
-          }
-        }
-      })
-    }
-  } else {
-    if (value.state) {
-      mustMatches.push({
-        match: {
-          [`${fieldId}.state`]: { query: value.state, fuzziness: 'AUTO' }
-        }
-      })
-    }
-    if (value.district2) {
-      mustMatches.push({
-        match: {
-          [`${fieldId}.district2`]: {
-            query: value.district2,
-            fuzziness: 'AUTO'
-          }
-        }
+        match: { [`${fieldId}.administrativeArea`]: value.administrativeArea }
       })
     }
   }

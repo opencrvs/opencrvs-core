@@ -21,7 +21,8 @@ import {
   InteractiveFieldType,
   isNonInteractiveFieldType,
   joinValues,
-  SystemVariables
+  SystemVariables,
+  Location
 } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import {
@@ -71,6 +72,7 @@ interface FormFieldGeneratorProps {
   onAllFieldsValidated?: (success: boolean) => void
   isCorrection?: boolean
   parentId?: string // `child____name` part of `child____name____firstname`
+  locations?: Location[]
 }
 
 export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
@@ -86,7 +88,8 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     id,
     onAllFieldsValidated,
     isCorrection = false,
-    parentId
+    parentId,
+    locations
   }) => {
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
@@ -139,7 +142,8 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         validate={(values) =>
           getValidationErrorsForForm(
             fields,
-            makeFormikFieldIdsOpenCRVSCompatible(values)
+            makeFormikFieldIdsOpenCRVSCompatible(values),
+            locations ?? []
           )
         }
         validateOnMount={true}

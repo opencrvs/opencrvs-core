@@ -61,16 +61,18 @@ export function payloadGenerator(
           id: getUUID(),
           name: `Location name ${i}`,
           parentId: null,
-          validUntil: null
-        }))
+          validUntil: null,
+          locationType: 'ADMIN_STRUCTURE'
+        })) as Location[]
       }
 
       return input.map((location, i) => ({
         id: location.id ?? getUUID(),
         name: location.name ?? `Location name ${i}`,
         parentId: location.parentId ?? null,
-        validUntil: null
-      }))
+        validUntil: null,
+        locationType: 'ADMIN_STRUCTURE'
+      })) as Location[]
     }
   }
 

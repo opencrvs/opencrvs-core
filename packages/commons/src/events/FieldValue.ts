@@ -14,16 +14,12 @@ import {
   AddressFieldUpdateValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  RuralAddressValue,
-  RuralAddressUpdateValue,
-  UrbanAddressValue,
-  UrbanAddressUpdateValue,
-  GenericAddressValue,
-  GenericAddressUpdateValue,
   NameFieldValue,
   NameFieldUpdateValue,
   HttpFieldUpdateValue,
-  HttpFieldValue
+  HttpFieldValue,
+  StreetLevelDetailsValue,
+  StreetLevelDetailsUpdateValue
 } from './CompositeFieldValue'
 /**
  * FieldValues defined in this file are primitive field values.
@@ -86,19 +82,21 @@ export const ButtonFieldValue = z.number()
 export type ButtonFieldValue = z.infer<typeof ButtonFieldValue>
 
 export const FieldValue = z.union([
+  /**
+   * Street level is our first dynamic record. In the future we might extend it to include any dynamic (sub)field.
+   */
+  StreetLevelDetailsValue,
   TextValue,
   DateValue,
   TimeValue,
+  AddressFieldValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
   CheckboxFieldValue,
   NumberFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  UrbanAddressValue,
-  RuralAddressValue,
   DataFieldValue,
-  GenericAddressValue,
   NameFieldValue,
   NameFieldUpdateValue,
   ButtonFieldValue,
@@ -108,19 +106,21 @@ export const FieldValue = z.union([
 export type FieldValue = z.infer<typeof FieldValue>
 
 export const FieldUpdateValue = z.union([
+  /**
+   * Street level is our first dynamic record. In the future we might extend it to include any dynamic (sub)field.
+   */
+  StreetLevelDetailsUpdateValue,
   TextValue,
   DateValue,
   TimeValue,
+  AddressFieldUpdateValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
   CheckboxFieldValue,
   NumberFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  UrbanAddressUpdateValue,
-  RuralAddressUpdateValue,
   DataFieldValue,
-  GenericAddressUpdateValue,
   NameFieldUpdateValue,
   HttpFieldUpdateValue
 ])

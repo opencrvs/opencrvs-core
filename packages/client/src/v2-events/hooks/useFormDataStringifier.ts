@@ -10,8 +10,11 @@
  */
 import { Location } from '@events/service/locations/locations'
 import { IntlShape, useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
 import { EventState, FieldConfig, FieldValue } from '@opencrvs/commons/client'
 import { getRegisteredFieldByFieldConfig } from '@client/v2-events/features/events/registered-fields'
+import { IAdminStructureItem } from '@client/utils/referenceApi'
+import { getOfflineData } from '@client/offline/selectors'
 import { useLocations } from './useLocations'
 interface RecursiveStringRecord {
   [key: string]: string | undefined | RecursiveStringRecord
@@ -51,7 +54,8 @@ function formDataStringifierFactory(stringifier: FieldStringifier) {
  */
 export const getFormDataStringifier = (
   intl: IntlShape,
-  locations: Location[]
+  locations: Location[],
+  adminLevels?: IAdminStructureItem[]
 ) => {
   const stringifier = (fieldConfig: FieldConfig, value: FieldValue) => {
     const field = getRegisteredFieldByFieldConfig(fieldConfig)
@@ -63,7 +67,8 @@ export const getFormDataStringifier = (
       return field.toCertificateVariables(value, {
         intl,
         locations,
-        config: fieldConfig
+        config: fieldConfig,
+        adminLevels
       })
     }
     if (field.stringify) {
@@ -83,6 +88,8 @@ export function useFormDataStringifier() {
   const intl = useIntl()
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
+  const { config } = useSelector(getOfflineData)
+  const adminLevels = config.ADMIN_STRUCTURE
 
-  return getFormDataStringifier(intl, locations)
+  return getFormDataStringifier(intl, locations, adminLevels)
 }

@@ -157,20 +157,9 @@ export function ValueOutput(
   if (isAddressFieldType(field)) {
     return Address.Output({
       value: field.value,
-      fields:
-        searchMode === true
-          ? [
-              'country',
-              'province',
-              'district',
-              'state',
-              'district2',
-              'urbanOrRural',
-              'town',
-              'village'
-            ]
-          : undefined,
-      lineSeparator: searchMode === true ? ', ' : undefined
+      fields: searchMode === true ? ['country'] : undefined,
+      lineSeparator: searchMode === true ? ', ' : undefined,
+      configuration: field.config
     })
   }
 
