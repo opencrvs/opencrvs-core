@@ -67,7 +67,7 @@ function getAvailableAssignmentActions(
 
   const mayUnassignOthers = configurableEventScopeAllowed(
     authentication.scope,
-    'record.unassign-others',
+    ['record.unassign-others'],
     event.type
   )
 
