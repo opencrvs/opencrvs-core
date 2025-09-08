@@ -42,13 +42,15 @@ import {
   ActionInputWithType,
   ApproveCorrectionActionInput,
   RejectCorrectionActionInput,
-  runStructuralValidations
+  runStructuralValidations,
+  Location
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
 import { isLeafLocation } from '@events/storage/postgres/events/locations'
+import { getLocations } from '@events/service/locations/locations'
 import {
   getInvalidUpdateKeys,
   getVerificationPageErrors,
@@ -58,7 +60,8 @@ import {
 export function getFieldErrors(
   fields: FieldConfig[],
   data: ActionUpdate,
-  declaration: EventState = {}
+  declaration: EventState = {},
+  context?: { locations: Array<Location> }
 ) {
   const visibleFields = fields.filter((field) =>
     isFieldVisible(field, { ...data, ...declaration })
@@ -92,7 +95,8 @@ export function getFieldErrors(
   const visibleFieldErrors = visibleFields.flatMap((field) => {
     const fieldErrors = runFieldValidations({
       field,
-      values: data
+      values: data,
+      context
     })
 
     return fieldErrors.errors.map((error) => ({
@@ -110,7 +114,8 @@ function validateDeclarationUpdateAction({
   event,
   actionType,
   declarationUpdate,
-  annotation
+  annotation,
+  context
 }: {
   eventConfig: EventConfig
   event: EventDocument
@@ -118,6 +123,7 @@ function validateDeclarationUpdateAction({
   declarationUpdate: ActionUpdate
   // @TODO: annotation is always specific to action. Is there ever a need for null?
   annotation?: ActionUpdate
+  context: { locations: Array<Location> }
 }) {
   /*
    * Declaration allows partial updates. Updates are validated against primitive types (zod) and field based custom validators (JSON schema).
@@ -159,7 +165,9 @@ function validateDeclarationUpdateAction({
 
   const declarationErrors = getFieldErrors(
     allVisiblePageFields,
-    cleanedDeclaration
+    cleanedDeclaration,
+    {},
+    context
   )
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
@@ -174,7 +182,11 @@ function validateDeclarationUpdateAction({
     deepDropNulls(annotation ?? {})
   )
 
-  const annotationErrors = getFieldErrors(reviewFields, visibleAnnotationFields)
+  const annotationErrors = getFieldErrors(
+    reviewFields,
+    visibleAnnotationFields,
+    {}
+  )
 
   return [...declarationErrors, ...annotationErrors]
 }
@@ -332,6 +344,12 @@ export const validateAction: MiddlewareFunction<
   ActionInputWithType
 > = async ({ input, next, ctx }) => {
   const actionType = input.type
+
+  const locations = await getLocations()
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
+
   const event = await getEventById(input.eventId)
   const eventConfig = await getEventConfigurationById({
     token: ctx.token,
@@ -375,7 +393,8 @@ export const validateAction: MiddlewareFunction<
       event,
       declarationUpdate: input.declaration,
       annotation: input.annotation,
-      actionType: declarationUpdateAction.data
+      actionType: declarationUpdateAction.data,
+      context: { locations: adminStructureLocations }
     })
 
     throwWhenNotEmpty(errors)

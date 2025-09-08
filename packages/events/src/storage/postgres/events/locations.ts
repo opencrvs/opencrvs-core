@@ -40,6 +40,7 @@ export async function addLocations(locations: NewLocations[]) {
              ELSE locations.name
            END`,
           parentId: (eb) => eb.ref('excluded.parentId'),
+          locationType: (eb) => eb.ref('excluded.locationType'),
           updatedAt: () => sql`now()`,
           validUntil: () =>
             sql`CASE

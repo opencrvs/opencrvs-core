@@ -19,6 +19,7 @@ import {
   EventStatus,
   EventIndex,
   generateActionDeclarationInput,
+  generateActionDuplicateDeclarationInput,
   getCurrentEventState,
   getUUID,
   NameFieldValue
@@ -263,7 +264,8 @@ test('validation prevents including hidden fields', async () => {
       ...generateActionDeclarationInput(
         tennisClubMembershipEvent,
         ActionType.VALIDATE,
-        () => 0.1
+        () => 0.1,
+        { locations: [] }
       ),
       'recommender.firstname': 'this should not be here'
     }
@@ -367,7 +369,7 @@ test('deduplication check is performed before validation when configured', async
   const client = createTestClient(user)
 
   const existingEvent = await client.event.create(generator.event.create())
-  const declaration = generateActionDeclarationInput(
+  const declaration = generateActionDuplicateDeclarationInput(
     tennisClubMembershipEvent,
     ActionType.DECLARE,
     prng
@@ -422,7 +424,7 @@ test('deduplication check is skipped if the event has been marked as not duplica
   const client = createTestClient(user)
 
   const existingEvent = await client.event.create(generator.event.create())
-  const declaration = generateActionDeclarationInput(
+  const declaration = generateActionDuplicateDeclarationInput(
     tennisClubMembershipEvent,
     ActionType.DECLARE,
     prng
@@ -487,7 +489,7 @@ test('deduplication check is not skipped if the event has been marked as not dup
   const client = createTestClient(user)
 
   const existingEvent = await client.event.create(generator.event.create())
-  const declaration = generateActionDeclarationInput(
+  const declaration = generateActionDuplicateDeclarationInput(
     tennisClubMembershipEvent,
     ActionType.DECLARE,
     prng

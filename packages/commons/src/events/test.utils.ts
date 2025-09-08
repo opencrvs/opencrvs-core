@@ -170,14 +170,14 @@ export function mapFieldTypeToMockValue(
       return {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'URBAN',
-        town: 'Example Town',
-        residentialArea: 'Example Residential Area',
-        street: 'Example Street',
-        number: '55',
-        zipCode: '123456'
+        administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+        streetLevelDetails: {
+          town: 'Example Town',
+          residentialArea: 'Example Residential Area',
+          street: 'Example Street',
+          number: '55',
+          zipCode: '123456'
+        }
       }
     case FieldType.DATE:
       return '2021-01-01'
@@ -235,16 +235,30 @@ export function generateActionDeclarationInput(
 
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
-    return {
-      ...omitHiddenPaginatedFields(declarationConfig, declaration),
+    return omitHiddenPaginatedFields(declarationConfig, {
+      ...declaration,
       ...overrides
-    }
+    })
   }
 
   // eslint-disable-next-line no-console
   console.warn(`${action} is not a declaration action. Setting data as {}.`)
 
   return {}
+}
+
+/*
+ * Overrides `dobUnknown` to be false so that the mock data
+ * contains applicant dob
+ */
+export function generateActionDuplicateDeclarationInput(
+  ...args: Parameters<typeof generateActionDeclarationInput>
+): ReturnType<typeof generateActionDeclarationInput> {
+  const [configuration, action, rng, overrides] = args
+  return generateActionDeclarationInput(configuration, action, rng, {
+    ...overrides,
+    'applicant.dobUnknown': false
+  })
 }
 
 export function generateActionAnnotationInput(
@@ -392,7 +406,7 @@ export function eventPayloadGenerator(
           const partialDeclaration = omitBy(
             generateActionDeclarationInput(
               configuration,
-              ActionType.DECLARE,
+              ActionType.NOTIFY,
               rng
             ),
             isString

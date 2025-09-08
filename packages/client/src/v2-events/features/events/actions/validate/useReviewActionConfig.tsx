@@ -16,6 +16,7 @@ import {
   Scope,
   FieldConfig,
   EventStatus,
+  Location,
   ActionType
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -30,6 +31,7 @@ export function useReviewActionConfig({
   reviewFields,
   scopes,
   status,
+  locations,
   eventType
 }: {
   formConfig: DeclarationFormConfig
@@ -38,6 +40,7 @@ export function useReviewActionConfig({
   reviewFields: FieldConfig[]
   scopes?: Scope[]
   status: EventStatus
+  locations: Location[]
   eventType: string
 }) {
   const events = useEvents()
@@ -45,7 +48,8 @@ export function useReviewActionConfig({
     formConfig,
     form: declaration,
     annotation,
-    reviewFields
+    reviewFields,
+    locations
   })
 
   const { isActionAllowed } = useUserAllowedActions(eventType)

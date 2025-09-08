@@ -13,7 +13,7 @@ import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
 import { ConditionalParameters, JSONSchema } from './conditionals'
 import { formatISO, isAfter, isBefore } from 'date-fns'
-import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
+import { ErrorMapCtx, z, ZodIssueOptionalMessage } from 'zod'
 import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
@@ -21,10 +21,18 @@ import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 
+import { Location } from '../events/locations'
+
 const ajv = new Ajv({
   $data: true,
   allowUnionTypes: true,
   strict: false // Allow minContains and other newer features
+})
+
+const DataContext = z.object({
+  rootData: z.object({
+    $locations: z.array(Location)
+  })
 })
 
 // https://ajv.js.org/packages/ajv-formats.html
@@ -88,6 +96,34 @@ ajv.addKeyword({
     return clause === 'after'
       ? isAfter(date, offsetDate)
       : isBefore(date, offsetDate)
+  }
+})
+
+ajv.addKeyword({
+  keyword: 'isLeafLevelLocation',
+  type: 'string',
+  schemaType: 'boolean',
+  $data: true,
+  errors: true,
+  validate(
+    schema: {},
+    data: string,
+    _: unknown,
+    dataContext?: { rootData: unknown }
+  ) {
+    const context = DataContext.safeParse(dataContext)
+
+    if (!context.success) {
+      throw new Error('Validation context must contain $locations')
+    }
+
+    const locationToValidate = data
+
+    const locations = context.data.rootData.$locations
+
+    return !locations.some(
+      (location) => location.parentId === locationToValidate
+    )
   }
 })
 
@@ -393,10 +429,12 @@ export function runStructuralValidations({
 
 export function runFieldValidations({
   field,
-  values
+  values,
+  context
 }: {
   field: FieldConfig
   values: ActionUpdate
+  context?: { locations: Array<Location> }
 }) {
   if (
     !isFieldVisible(field, values) ||
@@ -410,6 +448,7 @@ export function runFieldValidations({
   const conditionalParameters = {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
+    $locations: context?.locations ?? [],
     $online: isOnline()
   }
 
