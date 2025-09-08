@@ -609,7 +609,8 @@ export type HttpField = z.infer<typeof HttpField>
 const LinkButtonField = BaseField.extend({
   type: z.literal(FieldType.LINK_BUTTON),
   configuration: z.object({
-    url: z.string().describe('URL to open')
+    url: z.string().describe('URL to open'),
+    text: TranslationConfig.describe('Text to display on the button')
   })
 }).describe('Button that opens a link')
 
