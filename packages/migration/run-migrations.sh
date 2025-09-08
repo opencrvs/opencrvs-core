@@ -26,6 +26,13 @@ yarn --cwd $SCRIPT_PATH migrate-mongo up --file $HEARTH_CONFIG
 yarn --cwd $SCRIPT_PATH migrate-mongo status --file $HEARTH_CONFIG
 
 # events migrations
+export EVENTS_DB_USER="${EVENTS_DB_USER:-events_app}"
+MIGRATIONS_PATH=$SCRIPT_PATH/src/migrations/events
+for migration_file in $(ls $MIGRATIONS_PATH)
+do
+  envsubst < $MIGRATIONS_PATH/$migration_file > $MIGRATIONS_PATH/$migration_file.tmp
+  mv $MIGRATIONS_PATH/$migration_file.tmp $MIGRATIONS_PATH/$migration_file.sql
+done
 DATABASE_URL=${EVENTS_POSTGRES_URL} yarn --cwd $SCRIPT_PATH node-pg-migrate up --schema=app --migrations-dir=./src/migrations/events
 
 #openhim migrations
