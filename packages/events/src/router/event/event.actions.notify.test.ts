@@ -338,6 +338,7 @@ describe('event.actions.notify', () => {
     let client = createTestClient(user)
 
     client = createSystemTestClient('test-system-2', [
+      `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
       `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
     ])
 
