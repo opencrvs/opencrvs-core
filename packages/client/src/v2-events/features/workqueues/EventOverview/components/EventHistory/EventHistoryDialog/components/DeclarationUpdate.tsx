@@ -9,8 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import styled from 'styled-components'
-import { ActionDocument, EventDocument } from '@opencrvs/commons/client'
+import {
+  ActionDocument,
+  EventDocument,
+  EventStatus,
+  getCurrentEventState,
+  getStatusFromActions
+} from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { DeclarationComparisonTable } from '@client/v2-events/features/events/actions/correct/request/Summary/DeclarationComparisonTable'
@@ -27,6 +32,14 @@ export function DeclarationUpdateComponent({
   fullEvent: EventDocument
 }) {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+
+  const index = fullEvent.actions.findIndex((a) => a.id === action.id)
+  const previousStatus = getStatusFromActions(fullEvent.actions.slice(0, index))
+
+  // Comparison is not needed when there is nothing to compare to.
+  if (previousStatus === EventStatus.enum.CREATED) {
+    return null
+  }
 
   return (
     <DeclarationComparisonTable

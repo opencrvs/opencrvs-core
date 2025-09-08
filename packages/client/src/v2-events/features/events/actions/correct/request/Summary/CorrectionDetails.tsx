@@ -67,12 +67,6 @@ const Label = styled.label`
   ${({ theme }) => theme.fonts.bold14}
 `
 
-const TableHeader = styled.th`
-  text-transform: uppercase;
-  ${({ theme }) => theme.fonts.bold12}
-  display: inline-block;
-`
-
 /*
  * If this correction was already requested, prepend metadata about the request itself.
  * These entries (submitter, office, and submission date) are shown before the
