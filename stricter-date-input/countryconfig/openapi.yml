@@ -739,105 +739,87 @@ components:
                   items:
                     type: string
                     enum:
-                      - number
                       - country
-                      - province
-                      - addressType
-                      - district
-                      - urbanOrRural
-                      - town
-                      - residentialArea
-                      - street
-                      - zipCode
-                      - village
-                      - state
-                      - district2
-                      - cityOrTown
-                      - addressLine1
-                      - addressLine2
-                      - addressLine3
-                      - postcodeOrZip
+                      - administrativeArea
+                administrativeLevels:
+                  type: array
+                  items:
+                    type: string
+                streetAddressForm:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      required:
+                        type: boolean
+                      label:
+                        $ref: "#/components/schemas/TranslationConfig"
+                      type:
+                        type: string
+                        const: TEXT
+                      conditionals:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/FieldConditional"
+                        default: []
+                      parent:
+                        type: object
+                        properties:
+                          $$field:
+                            type: string
+                            description: Unique identifier for the field
+                          $$subfield:
+                            type: array
+                            items:
+                              type: string
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        required:
+                          - $$field
+                        description: Reference to a field by its ID
+                    required:
+                      - id
+                      - required
+                      - label
+                      - type
             defaultValue:
-              anyOf:
-                - oneOf:
+              type: object
+              properties:
+                country:
+                  type: string
+                addressType:
+                  type: string
+                  enum:
+                    - DOMESTIC
+                    - INTERNATIONAL
+                administrativeArea:
+                  anyOf:
+                    - type: string
+                      format: uuid
                     - type: object
                       properties:
-                        country:
+                        $userField:
                           type: string
-                        addressType:
-                          type: string
-                          const: DOMESTIC
-                        province:
-                          type: string
-                        district:
-                          type: string
-                        urbanOrRural:
-                          type: string
-                          const: URBAN
-                        town:
-                          type: string
-                        residentialArea:
-                          type: string
-                        street:
-                          type: string
-                        number:
-                          type: string
-                        zipCode:
+                          enum:
+                            - id
+                            - name
+                            - role
+                            - signature
+                            - avatar
+                            - primaryOfficeId
+                        $location:
                           type: string
                       required:
-                        - country
-                        - addressType
-                        - province
-                        - district
-                        - urbanOrRural
-                    - type: object
-                      properties:
-                        country:
-                          type: string
-                        addressType:
-                          type: string
-                          const: DOMESTIC
-                        province:
-                          type: string
-                        district:
-                          type: string
-                        urbanOrRural:
-                          type: string
-                          const: RURAL
-                        village:
-                          type: string
-                      required:
-                        - country
-                        - addressType
-                        - province
-                        - district
-                        - urbanOrRural
-                - type: object
-                  properties:
-                    country:
-                      type: string
-                    addressType:
-                      type: string
-                      const: INTERNATIONAL
-                    state:
-                      type: string
-                    district2:
-                      type: string
-                    cityOrTown:
-                      type: string
-                    addressLine1:
-                      type: string
-                    addressLine2:
-                      type: string
-                    addressLine3:
-                      type: string
-                    postcodeOrZip:
-                      type: string
-                  required:
-                    - country
-                    - addressType
-                    - state
-                    - district2
+                        - $userField
+                streetLevelDetails:
+                  type: object
+                  additionalProperties:
+                    type: string
+              required:
+                - country
+                - addressType
           required:
             - id
             - label
@@ -4911,12 +4893,41 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      &a12
+                      - DOMESTIC
+                      - INTERNATIONAL
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -4973,106 +4984,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -5118,12 +5029,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -5180,106 +5117,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -5322,7 +5159,7 @@ components:
         status:
           type: string
           enum:
-            &a12
+            &a13
             - Requested
             - Accepted
             - Rejected
@@ -5378,12 +5215,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -5440,106 +5303,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -5585,12 +5348,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -5647,106 +5436,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -5788,7 +5477,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -5841,12 +5530,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -5903,106 +5618,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -6048,12 +5663,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -6110,106 +5751,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -6251,7 +5792,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -6314,12 +5855,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -6376,106 +5943,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -6521,12 +5988,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -6583,106 +6076,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -6724,7 +6117,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -6796,12 +6189,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -6858,106 +6277,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -7003,12 +6322,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -7065,106 +6410,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -7206,7 +6451,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -7259,12 +6504,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -7321,106 +6592,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -7466,12 +6637,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -7528,106 +6725,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -7669,7 +6766,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -7730,12 +6827,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -7792,106 +6915,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -7937,12 +6960,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -7999,106 +7048,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -8140,7 +7089,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -8203,12 +7152,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -8265,106 +7240,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -8410,12 +7285,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -8472,106 +7373,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -8613,7 +7414,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -8666,12 +7467,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -8728,106 +7555,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -8873,12 +7600,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -8935,106 +7688,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -9076,7 +7729,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -9131,12 +7784,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -9193,106 +7872,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -9338,12 +7917,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -9400,106 +8005,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -9541,7 +8046,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -9594,12 +8099,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -9656,106 +8187,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -9801,12 +8232,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -9863,106 +8320,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -10004,7 +8361,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -10060,12 +8417,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -10122,106 +8505,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -10267,12 +8550,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -10329,106 +8638,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -10470,7 +8679,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -10523,12 +8732,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -10585,106 +8820,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -10730,12 +8865,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -10792,106 +8953,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -10933,7 +8994,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -10989,12 +9050,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -11051,106 +9138,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -11196,12 +9183,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -11258,106 +9271,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -11399,7 +9312,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -11465,12 +9378,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -11527,106 +9466,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -11672,12 +9511,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -11734,106 +9599,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -11875,7 +9640,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -11928,12 +9693,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -11990,106 +9781,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -12135,12 +9826,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -12197,106 +9914,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -12338,7 +9955,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -12398,12 +10015,38 @@ components:
           type: object
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -12460,106 +10103,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -12605,12 +10148,38 @@ components:
             - "null"
           additionalProperties:
             anyOf:
+              - type:
+                  - object
+                  - "null"
+                additionalProperties:
+                  type: string
               - type: string
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum: *a12
+                  administrativeArea:
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                  streetLevelDetails:
+                    type:
+                      - object
+                      - "null"
+                    additionalProperties:
+                      type: string
+                required:
+                  - country
+                  - addressType
               - anyOf:
                   - type: object
                     properties:
@@ -12667,106 +10236,6 @@ components:
                     - originalFilename
                     - type
                     - option
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: URBAN
-                  town:
-                    type:
-                      - string
-                      - "null"
-                  residentialArea:
-                    type:
-                      - string
-                      - "null"
-                  street:
-                    type:
-                      - string
-                      - "null"
-                  number:
-                    type:
-                      - string
-                      - "null"
-                  zipCode:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: DOMESTIC
-                  province:
-                    type: string
-                  district:
-                    type: string
-                  urbanOrRural:
-                    type: string
-                    const: RURAL
-                  village:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - province
-                  - district
-                  - urbanOrRural
-              - type: object
-                properties:
-                  country:
-                    type: string
-                  addressType:
-                    type: string
-                    const: INTERNATIONAL
-                  state:
-                    type: string
-                  district2:
-                    type: string
-                  cityOrTown:
-                    type:
-                      - string
-                      - "null"
-                  addressLine1:
-                    type:
-                      - string
-                      - "null"
-                  addressLine2:
-                    type:
-                      - string
-                      - "null"
-                  addressLine3:
-                    type:
-                      - string
-                      - "null"
-                  postcodeOrZip:
-                    type:
-                      - string
-                      - "null"
-                required:
-                  - country
-                  - addressType
-                  - state
-                  - district2
               - anyOf:
                   - anyOf:
                       - type: object
@@ -12808,7 +10277,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
