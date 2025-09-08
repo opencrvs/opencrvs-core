@@ -21,12 +21,46 @@
     "start": "yarn build:watch",
     "test": "yarn test:compilation && jest",
     "test:watch": "jest --watch",
-    "test:compilation": "tsc -b",
+    "test:compilation": "wireit",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "postinstall": "yarn build",
-    "build": "yarn tsc -b tsconfig.build.json",
-    "build:watch": "yarn tsc -b --watch --preserveWatchOutput tsconfig.build.json",
+    "build": "wireit",
+    "build:watch": "yarn build --watch",
     "build:clean": "rm -rf build"
+  },
+  "wireit": {
+    "build": {
+      "command": "yarn tsc -b tsconfig.build.json --pretty",
+      "clean": "if-file-deleted",
+      "files": [
+        "src/**/*.ts",
+        "!src/**/*.test.ts",
+        "tsconfig-esm.json",
+        "tsconfig-commonjs.json",
+        "tsconfig.build.json"
+      ],
+      "output": [
+        "build/dist/common/**",
+        "build/dist/tsconfig-commonjs.tsbuildinfo",
+        "build/dist/esm/**",
+        "build/dist/tsconfig-esm.tsbuildinfo"
+      ]
+    },
+    "test:compilation": {
+      "command": "yarn tsc -b --pretty",
+      "clean": "if-file-deleted",
+      "files": [
+        "src/**/*.test.ts",
+        "tsconfig-commonjs.json",
+        "tsconfig.json"
+      ],
+      "output": [
+        "build/dist/common/**",
+        "build/dist/tsconfig-commonjs.tsbuildinfo",
+        "build/dist/tests/**",
+        "build/dist/tsconfig-tests.tsbuildinfo"
+      ]
+    }
   },
   "private": true,
   "dependencies": {
@@ -67,7 +101,8 @@
     "jest-fetch-mock": "^2.1.2",
     "jsonwebtoken": "^9.0.2",
     "pino-pretty": "^11.0.0",
-    "ts-jest": "29.2.5"
+    "ts-jest": "29.2.5",
+    "wireit": "^0.14.12"
   },
   "lint-staged": {
     "src/**/*.ts": [
