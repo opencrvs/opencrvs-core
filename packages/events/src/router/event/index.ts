@@ -170,8 +170,9 @@ export const eventRouter = router({
       return updatedEvent
     }),
   getDuplicates: publicProcedure
-    .use(requiresAnyOfScopes([SCOPES.RECORD_REVIEW_DUPLICATES]))
+    .use(requiresAnyOfScopes([], ['record.review-duplicates']))
     .input(EventIdParam)
+    .use(middleware.eventTypeAuthorization)
     .use(middleware.requireAssignment)
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input.eventId)
