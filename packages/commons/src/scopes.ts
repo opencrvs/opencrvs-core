@@ -33,6 +33,9 @@ export const SCOPES = {
   NATIONALID: 'nationalId',
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
+  RECORD_IMPORT: 'record.import',
+  RECORD_EXPORT: 'record.export',
+  REINDEX: 'record.reindex',
 
   // declare
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
