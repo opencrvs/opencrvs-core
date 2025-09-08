@@ -8,7 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Draft, UUID } from '@opencrvs/commons/client'
+import {
+  Action,
+  ActionType,
+  DeclarationUpdateActionType,
+  Draft,
+  UUID
+} from '@opencrvs/commons/client'
 
 export function getEventDrafts(
   eventId: UUID,
@@ -35,4 +41,67 @@ export function getEventDrafts(
         createdAt: new Date().toISOString()
       }
     })
+}
+
+export type AvailableActionTypes = Extract<
+  ActionType,
+  | 'DECLARE'
+  | 'VALIDATE'
+  | 'REGISTER'
+  | 'REQUEST_CORRECTION'
+  | 'APPROVE_CORRECTION'
+  | 'REJECT_CORRECTION'
+>
+
+/**
+ * Business requirement states that annotation must be prefilled from previous action.
+ * From architechtual perspective, each action has separate annotation of its own.
+ *
+ * @returns the previous declaration action type based on the current action type.
+ */
+export function getPreviousDeclarationActionType(
+  actions: Action[],
+  currentActionType: AvailableActionTypes
+): DeclarationUpdateActionType | typeof ActionType.NOTIFY | undefined {
+  /** NOTE: If event is rejected before registration, there might be previous action of the same type present.
+   * Action arrays are intentionally ordered to get the latest prefilled annotation.
+   * */
+
+  let actionTypes: (DeclarationUpdateActionType | typeof ActionType.NOTIFY)[]
+
+  switch (currentActionType) {
+    case ActionType.DECLARE: {
+      actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
+      break
+    }
+    case ActionType.VALIDATE: {
+      actionTypes = [ActionType.VALIDATE, ActionType.DECLARE]
+      break
+    }
+    case ActionType.REGISTER: {
+      actionTypes = [ActionType.VALIDATE]
+      break
+    }
+    case ActionType.REQUEST_CORRECTION: {
+      actionTypes = [ActionType.REGISTER]
+      break
+    }
+    case ActionType.APPROVE_CORRECTION:
+    case ActionType.REJECT_CORRECTION: {
+      actionTypes = [ActionType.REQUEST_CORRECTION]
+      break
+    }
+    default: {
+      const _check: never = currentActionType
+      actionTypes = []
+    }
+  }
+
+  for (const type of actionTypes) {
+    if (actions.find((a) => a.type === type)) {
+      return type
+    }
+  }
+
+  return
 }

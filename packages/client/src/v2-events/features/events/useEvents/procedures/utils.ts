@@ -22,12 +22,18 @@ import type {
   inferOutput,
   TRPCQueryOptions
 } from '@trpc/tanstack-react-query'
+import { ActionType } from '@opencrvs/commons/client'
 import {
   findLocalEventDocument,
   findLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
-import { AppRouter, queryClient } from '@client/v2-events/trpc'
+import {
+  AppRouter,
+  queryClient,
+  trpcOptionsProxy
+} from '@client/v2-events/trpc'
 import { isTemporaryId, RequireKey } from '@client/v2-events/utils'
+import { prefetchPotentialDuplicates } from '../../actions/dedup/getDuplicates'
 
 export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
   canonicalMutationFn: (params: T) => Promise<R>
@@ -141,10 +147,14 @@ export function createEventActionMutationFn<
 
   return waitUntilEventIsCreated<inferInput<P>, inferOutput<P>>(
     async ({ eventType, ...params }) => {
-      return defaultMutationFn({
+      const response = await defaultMutationFn({
         ...params,
         declaration: params.declaration
       })
+      if (params.type === ActionType.ASSIGN) {
+        await prefetchPotentialDuplicates(params.eventId)
+      }
+      return response
     }
   )
 }
