@@ -221,14 +221,6 @@ export function CorrectionDetails({
     correctionRequestAction
   )
 
-  /**
-   * Compare either the currently edited form or previous action.
-   * Stricter types to avoid confusion of passing both items when only one is needed.
-   */
-  const comparisonProps = correctionRequestAction
-    ? { action: correctionRequestAction }
-    : { form: form }
-
   return (
     <>
       <Table
@@ -293,8 +285,9 @@ export function CorrectionDetails({
           : intl.formatMessage(correctionMessages.makeCorrectionSectionTitle)}
       </CorrectionSectionTitle>
       <DeclarationComparisonTable
-        {...comparisonProps}
+        action={correctionRequestAction}
         eventConfig={eventConfiguration}
+        form={form}
         fullEvent={event}
         id={'corrections-table'}
       />

@@ -43,12 +43,12 @@ type DeclarationComparisonTableProps =
   | (BaseDeclarationComparisonTableProps & {
       /** When action is provided, the comparison is done between the state before the action and the state after it. */
       action: Action
-      form?: undefined
+      form?: EventState
     })
   | (BaseDeclarationComparisonTableProps & {
       /** When form is provided, form is applied on top of the latest state and compared to the previous one. */
       form: EventState
-      action?: undefined
+      action?: Action
     })
 
 /**
