@@ -17,7 +17,6 @@ import {
   EventIndex,
   getUUID,
   TranslationConfig,
-  SCOPES,
   WorkqueueActionType,
   EventStatus,
   isMetaAction,

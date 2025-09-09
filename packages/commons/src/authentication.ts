@@ -184,21 +184,24 @@ export interface ITokenPayload {
   userType: TokenUserType
 }
 
-export function getScopes(authHeader: IAuthHeader): RawScopes[] {
-  if (!authHeader || !authHeader.Authorization) {
-    return []
-  }
+/**
+ * Depending on how the API is called, there might or might not be Bearer keyword in the header.
+ * To allow for usage with both direct HTTP calls and TRPC, ensure it's present to be able to use shared scope auth functions.
+ */
+export function setBearerForToken(token: string) {
+  const bearer = 'Bearer'
+  return token.startsWith(bearer) ? token : `${bearer} ${token}`
+}
+
+export function getScopes(token: string): RawScopes[] {
+  const authHeader = { Authorization: setBearerForToken(token) }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+
   return tokenPayload.scope || []
 }
 
-export function hasScope(authHeader: IAuthHeader, scope: Scope) {
-  return getScopes(authHeader).includes(scope)
-}
-
-export function inScope(authHeader: IAuthHeader, scopes: Scope[]) {
-  const tokenScopes = getScopes(authHeader)
-  return scopes.some((scope) => tokenScopes.includes(scope))
+export function hasScope(token: string, scope: Scope) {
+  return getScopes(token).includes(scope)
 }
 
 export const getTokenPayload = (token: string): ITokenPayload => {

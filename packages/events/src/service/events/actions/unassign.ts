@@ -19,7 +19,6 @@ import {
 } from '@opencrvs/commons/events'
 import { getScopes } from '@opencrvs/commons'
 import { processAction, getEventById } from '@events/service/events/events'
-import { setBearerForToken } from '@events/router/middleware'
 import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
 
@@ -48,7 +47,7 @@ export async function unassignRecord({
   // If event is not assigned to the user who is unassigning, we need to ensure that the user may unassign others
   if (lastAssignmentAction.assignedTo !== user.id) {
     // Ensure that the user has scope to unassign users from this event type
-    const userScopes = getScopes({ Authorization: setBearerForToken(token) })
+    const userScopes = getScopes(token)
     const unassignOtherAllowed = configurableEventScopeAllowed(
       userScopes,
       ['record.unassign-others'],
