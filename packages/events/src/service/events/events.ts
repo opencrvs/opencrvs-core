@@ -10,37 +10,37 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { z } from 'zod'
 import { NoResultError } from 'kysely'
+import { z } from 'zod'
+import { TokenUserType, TokenWithBearer, UUID } from '@opencrvs/commons'
 import {
   ActionInputWithType,
   ActionStatus,
+  ActionType,
   ActionUpdate,
+  AsyncRejectActionDocument,
+  DisplayableAction,
   Draft,
+  EventConfig,
   EventDocument,
   EventInput,
+  EventStatus,
   FieldType,
   FieldUpdateValue,
   FileFieldValue,
-  getDeclarationFields,
   getAcceptedActions,
-  AsyncRejectActionDocument,
-  ActionType,
-  isWriteAction,
-  getStatusFromActions,
-  EventConfig,
-  EventStatus,
   getAvailableActionsForEvent,
   getCurrentEventState,
-  DisplayableAction
+  getDeclarationFields,
+  getStatusFromActions,
+  isWriteAction
 } from '@opencrvs/commons/events'
-import { TokenUserType, UUID } from '@opencrvs/commons'
+import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { indexEvent } from '@events/service/indexing/indexing'
-import * as eventsRepo from '@events/storage/postgres/events/events'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
-import { TrpcUserContext } from '@events/context'
+import * as eventsRepo from '@events/storage/postgres/events/events'
 import { getUnreferencedDraftFiles } from '../files/utils'
 
 class EventNotFoundError extends TRPCError {
@@ -78,10 +78,13 @@ function getValidFileValue(
   return validFieldValue.data
 }
 
-async function deleteEventAttachments(token: string, event: EventDocument) {
+async function deleteEventAttachments(
+  token: TokenWithBearer,
+  event: EventDocument
+) {
   const configuration = await getEventConfigurationById({
-    token,
-    eventType: event.type
+    eventType: event.type,
+    token
   })
 
   const actions = getAcceptedActions(event)
@@ -103,12 +106,12 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
 export async function throwConflictIfActionNotAllowed(
   eventId: UUID,
   actionType: ActionType,
-  token: string
+  token: TokenWithBearer
 ) {
   const event = await getEventById(eventId)
   const eventConfig = await getEventConfigurationById({
-    token,
-    eventType: event.type
+    eventType: event.type,
+    token
   })
   const eventIndex = getCurrentEventState(event, eventConfig)
 
@@ -123,7 +126,10 @@ export async function throwConflictIfActionNotAllowed(
   }
 }
 
-export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
+export async function deleteEvent(
+  eventId: UUID,
+  { token }: { token: TokenWithBearer }
+) {
   const event = await getEventById(eventId)
   const eventStatus = getStatusFromActions(event.actions)
 
@@ -346,7 +352,7 @@ export async function addAction(
   }: {
     event: EventDocument
     user: TrpcUserContext
-    token: string
+    token: TokenWithBearer
     status: ActionStatus
     configuration: EventConfig
   }
@@ -453,7 +459,7 @@ export async function processAction(
   }: {
     event: EventDocument
     user: TrpcUserContext
-    token: string
+    token: TokenWithBearer
     status: ActionStatus
     configuration: EventConfig
   }
@@ -480,7 +486,7 @@ type AsyncRejectActionInput = Omit<
   originalActionId: UUID
   createdAtLocation?: UUID
   createdByUserType: TokenUserType
-  token: string
+  token: TokenWithBearer
   eventType: string
 }
 
@@ -493,12 +499,12 @@ export async function addAsyncRejectAction({
   createdByRole,
   createdByUserType,
   createdAtLocation,
-  token,
-  eventType
+  eventType,
+  token
 }: AsyncRejectActionInput) {
   const configuration = await getEventConfigurationById({
-    token,
-    eventType
+    eventType,
+    token
   })
 
   await eventsRepo.createAction({

@@ -19,6 +19,7 @@ import {
   getUserId,
   getUserTypeFromToken,
   logger,
+  REINDEX_USER_ID,
   SystemRole,
   TokenUserType,
   TokenWithBearer,
@@ -110,6 +111,15 @@ async function resolveUserDetails(
   }
 
   try {
+    if (userId === REINDEX_USER_ID) {
+      return SystemContext.parse({
+        type: TokenUserType.Enum.system,
+        id: userId,
+        primaryOfficeId: undefined,
+        role: SystemRole.enum.REINDEX
+      })
+    }
+
     if (userType === TokenUserType.Enum.system) {
       const { type } = await getSystem(env.USER_MANAGEMENT_URL, userId, token)
 

@@ -399,7 +399,7 @@ export const eventRouter = router({
     .mutation(async ({ input, ctx }) => importEvent(input, ctx.token)),
   reindex: systemProcedure
     .input(z.void())
-    .use(requiresAnyOfScopes([SCOPES.REINDEX]))
+    .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
     .output(z.void())
     .meta({
       openapi: {

@@ -275,7 +275,10 @@ export async function createIndex(
   return ensureAlias(indexName)
 }
 
-export async function ensureIndexExists(eventConfiguration: EventConfig) {
+export async function ensureIndexExists(
+  eventConfiguration: EventConfig,
+  { overwrite }: { overwrite?: boolean } = { overwrite: false }
+) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(eventConfiguration.id)
   const hasEventsIndex = await esClient.indices.exists({
@@ -286,7 +289,12 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
     logger.info(`Creating index ${indexName}`)
     await createIndex(indexName, getDeclarationFields(eventConfiguration))
   } else {
-    logger.info(`Index ${indexName} already exists.\n`)
+    logger.info(`Index ${indexName} already exists.`)
+    if (overwrite) {
+      logger.info(`. - Overwriting index ${indexName}`)
+      await esClient.indices.delete({ index: indexName })
+      await createIndex(indexName, getDeclarationFields(eventConfiguration))
+    }
   }
   return ensureAlias(indexName)
 }
