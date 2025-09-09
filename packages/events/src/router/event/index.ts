@@ -320,22 +320,6 @@ export const eventRouter = router({
         })
     })
   }),
-  list: systemProcedure
-    .use(
-      requiresAnyOfScopes([
-        SCOPES.RECORD_READ,
-        SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-        SCOPES.RECORD_REGISTER,
-        SCOPES.RECORD_EXPORT_RECORDS
-      ])
-    )
-    .output(z.array(EventIndex))
-    .query(async ({ ctx }) => {
-      const userId = ctx.user.id
-      const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
-
-      return getIndexedEvents(userId, eventConfigs)
-    }),
   search: systemProcedure
     .meta({
       openapi: {
