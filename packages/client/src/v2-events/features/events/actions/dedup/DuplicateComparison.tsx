@@ -15,6 +15,7 @@ import {
   DeclarationFormConfig,
   EventIndex,
   EventState,
+  FieldConfig,
   FieldType,
   isFieldDisplayedOnReview,
   isPageVisible
@@ -33,7 +34,7 @@ import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { noop } from '@client/v2-events'
 import { useEventConfiguration } from '../../useEventConfiguration'
-import { ValueOutput } from '../../components/Output'
+import { Output, ValueOutput } from '../../components/Output'
 import { AdministrativeArea } from '../../registered-fields'
 import { DocumentViewer } from '../../components/DocumentViewer'
 import { duplicateMessages } from './ReviewDuplicate'
@@ -154,15 +155,33 @@ export function DuplicateComparison({
             ({ type }) =>
               !hideFieldTypes.some((typeToHide) => type === typeToHide)
           )
+          // Refer to 'findPreviousValueWithSameLabel' in Output.tsx for explanation
+          .reduce<FieldConfig[]>((acc, field) => {
+            const fieldWithSameLabelDontExist = !acc.find(
+              (f) => f.label.id === field.label.id
+            )
+            if (fieldWithSameLabelDontExist) {
+              acc.push(field)
+            }
+            return acc
+          }, [])
           .map((field) => ({
             label: intl.formatMessage(field.label),
-            rightValue: ValueOutput({
-              config: field,
-              value: potentialDuplicateDeclaration[field.id]
+            rightValue: Output({
+              field,
+              value: potentialDuplicateDeclaration[field.id],
+              previousForm: potentialDuplicateDeclaration,
+              formConfig: eventConfiguration.declaration,
+              displayEmptyAsDash: true,
+              showPreviouslyMissingValuesAsChanged: false
             }),
-            leftValue: ValueOutput({
-              config: field,
-              value: originalDeclaration[field.id]
+            leftValue: Output({
+              field,
+              value: originalDeclaration[field.id],
+              previousForm: originalDeclaration,
+              formConfig: eventConfiguration.declaration,
+              displayEmptyAsDash: true,
+              showPreviouslyMissingValuesAsChanged: false
             })
           }))
       }))
