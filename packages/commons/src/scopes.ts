@@ -10,13 +10,7 @@
  */
 
 import { z } from 'zod'
-import {
-  ActionType,
-  CreatedAction,
-  EventIndex,
-  isActionInScope,
-  SearchScopeAccessLevels
-} from './events'
+import { SearchScopeAccessLevels } from './events'
 
 export const SCOPES = {
   // TODO v1.8 legacy scopes
