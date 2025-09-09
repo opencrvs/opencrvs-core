@@ -30,11 +30,7 @@ function useAdminLocations(partOf: string) {
 
   return filteredLocations.map((location) => ({
     value: location.id,
-    label: {
-      id: 'v2.location.' + location.id,
-      description: 'Label for location: ' + location.name,
-      defaultMessage: location.name
-    }
+    label: location.name
   }))
 }
 

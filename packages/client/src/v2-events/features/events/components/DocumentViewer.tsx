@@ -88,7 +88,10 @@ function getFileOptions(
             return null
           }
 
-          const optionLabel = intl.formatMessage(fieldOption.label)
+          const optionLabel =
+            typeof fieldOption.label === 'string'
+              ? fieldOption.label
+              : intl.formatMessage(fieldOption.label)
 
           return {
             value: {
