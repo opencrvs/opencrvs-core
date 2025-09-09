@@ -630,8 +630,9 @@ export const GeneratedInputField = React.memo(
     if (isLinkButtonFieldType(field)) {
       return (
         <LinkButton.Input
-          text={field.config.configuration.text}
-          url={field.config.configuration.url}
+          configuration={field.config.configuration}
+          disabled={inputProps.disabled}
+          id={field.config.id}
         />
       )
     }

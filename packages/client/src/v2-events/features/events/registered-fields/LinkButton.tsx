@@ -14,16 +14,30 @@ import { useIntl } from 'react-intl'
 import { TranslationConfig } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 
-function LinkButtonInput(configuration: {
-  url: string
-  text: TranslationConfig
+function LinkButtonInput({
+  id,
+  disabled,
+  configuration
+}: {
+  id: string
+  configuration: {
+    url: string
+    text: TranslationConfig
+  }
+  disabled?: boolean
 }) {
   const intl = useIntl()
   const handleClick = () => {
     window.location.href = configuration.url
   }
   return (
-    <Button type="secondary" onClick={handleClick}>
+    <Button
+      disabled={disabled}
+      element="a"
+      id={id}
+      type="secondary"
+      onClick={handleClick}
+    >
       {intl.formatMessage(configuration.text)}
     </Button>
   )
