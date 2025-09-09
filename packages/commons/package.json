@@ -90,7 +90,6 @@
     "zod-openapi": "^4.2.4"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/object-hash": "^3.0.6",
     "@typescript-eslint/eslint-plugin": "8.28.0",
@@ -103,7 +102,7 @@
     "jest-fetch-mock": "^2.1.2",
     "jsonwebtoken": "^9.0.2",
     "pino-pretty": "^11.0.0",
-    "ts-jest": "^29.4.0"
+    "ts-jest": "29.2.5"
   },
   "lint-staged": {
     "src/**/*.ts": [
