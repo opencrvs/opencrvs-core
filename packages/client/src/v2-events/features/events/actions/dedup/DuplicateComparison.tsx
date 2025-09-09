@@ -170,22 +170,26 @@ export function DuplicateComparison({
           }, [])
           .map((field) => ({
             label: intl.formatMessage(field.label),
-            rightValue: Output({
-              field,
-              value: potentialDuplicateDeclaration[field.id],
-              previousForm: potentialDuplicateDeclaration,
-              formConfig: eventConfiguration.declaration,
-              displayEmptyAsDash: true,
-              showPreviouslyMissingValuesAsChanged: false
-            }),
-            leftValue: Output({
-              field,
-              value: originalDeclaration[field.id],
-              previousForm: originalDeclaration,
-              formConfig: eventConfiguration.declaration,
-              displayEmptyAsDash: true,
-              showPreviouslyMissingValuesAsChanged: false
-            })
+            rightValue: (
+              <Output
+                displayEmptyAsDash={true}
+                field={field}
+                formConfig={eventConfiguration.declaration}
+                previousForm={potentialDuplicateDeclaration}
+                showPreviouslyMissingValuesAsChanged={false}
+                value={potentialDuplicateDeclaration[field.id]}
+              />
+            ),
+            leftValue: (
+              <Output
+                displayEmptyAsDash={true}
+                field={field}
+                formConfig={eventConfiguration.declaration}
+                previousForm={originalDeclaration}
+                showPreviouslyMissingValuesAsChanged={false}
+                value={originalDeclaration[field.id]}
+              />
+            )
           }))
       }))
       .filter(({ data }) => data.length > 0)
