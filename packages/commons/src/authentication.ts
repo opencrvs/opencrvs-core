@@ -87,7 +87,7 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.RECORD_DECLARE_MARRIAGE,
       SCOPES.RECORD_SUBMIT_FOR_UPDATES,
       SCOPES.RECORD_REVIEW_DUPLICATES,
-      'record.review-duplicates[event=birth|death|tennis-club-membership]',
+      'record.declared.review-duplicates[event=birth|death|tennis-club-membership]',
       SCOPES.RECORD_DECLARATION_ARCHIVE,
       SCOPES.RECORD_DECLARATION_REINSTATE,
       SCOPES.RECORD_REGISTER,

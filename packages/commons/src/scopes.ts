@@ -324,7 +324,6 @@ const RecordScope = z.object({
     'record.declare',
     'record.notify',
     'record.declared.validate',
-    'record.declared.edit',
     'record.declared.reject',
     'record.declared.archive',
     'record.register',
@@ -332,7 +331,7 @@ const RecordScope = z.object({
     'record.registered.request-correction',
     'record.registered.correct',
     'record.unassign-others',
-    'record.review-duplicates'
+    'record.declared.review-duplicates'
   ]),
   options: z.object({
     event: z.array(z.string())
