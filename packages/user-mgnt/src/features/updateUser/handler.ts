@@ -13,8 +13,7 @@ import {
   logger,
   isBase64FileString,
   triggerUserEventNotification,
-  personNameFromV1ToV2,
-  IAuthHeader
+  personNameFromV1ToV2
 } from '@opencrvs/commons'
 import {
   Practitioner,
