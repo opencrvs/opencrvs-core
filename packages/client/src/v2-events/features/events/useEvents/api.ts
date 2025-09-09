@@ -248,7 +248,7 @@ async function deleteEventData(updatedEvent: EventDocument) {
   await removeCachedFiles(updatedEvent)
 }
 
-export async function updateLocalEvent(updatedEvent: EventDocument) {
+export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
   await invalidateWorkqueues()
   return refetchAllSearchQueries()

@@ -15,41 +15,41 @@ import {
 } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import {
+  ActionInputWithType,
   ActionType,
   ActionUpdate,
-  DeclarationUpdateActions,
   AnnotationActionType,
-  EventConfig,
-  isPageVisible,
-  getVisibleVerificationPageIds,
-  annotationActions,
-  findRecordActionPages,
-  DeclarationUpdateActionType,
-  getActionReviewFields,
-  getDeclaration,
+  ApproveCorrectionActionInput,
   DeclarationActions,
-  getCurrentEventState,
-  omitHiddenPaginatedFields,
+  DeclarationUpdateActionType,
+  DeclarationUpdateActions,
+  EventConfig,
   EventDocument,
-  deepMerge,
-  deepDropNulls,
-  omitHiddenFields,
   EventState,
   FieldConfig,
-  isFieldVisible,
-  errorMessages,
-  runFieldValidations,
-  ActionInputWithType,
-  ApproveCorrectionActionInput,
   RejectCorrectionActionInput,
+  annotationActions,
+  deepDropNulls,
+  deepMerge,
+  errorMessages,
+  findRecordActionPages,
+  getActionReviewFields,
+  getCurrentEventState,
+  getDeclaration,
+  getVisibleVerificationPageIds,
+  isFieldVisible,
+  isPageVisible,
+  omitHiddenFields,
+  omitHiddenPaginatedFields,
+  runFieldValidations,
   runStructuralValidations,
   Location
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
-import { getEventById } from '@events/service/events/events'
-import { TrpcContext } from '@events/context'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
+import { getEventById } from '@events/service/events/events'
 import { isLeafLocation } from '@events/storage/postgres/events/locations'
+import { TrpcContext } from '@events/context'
 import { getLocations } from '@events/service/locations/locations'
 import {
   getInvalidUpdateKeys,
@@ -339,8 +339,8 @@ function validateCorrectableFields({
 export const validateAction: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
-  TrpcContext,
-  TrpcContext & { isDuplicateAction?: boolean; event: EventDocument },
+  unknown,
+  unknown,
   ActionInputWithType
 > = async ({ input, next, ctx }) => {
   const actionType = input.type
@@ -352,8 +352,8 @@ export const validateAction: MiddlewareFunction<
 
   const event = await getEventById(input.eventId)
   const eventConfig = await getEventConfigurationById({
-    token: ctx.token,
-    eventType: event.type
+    eventType: event.type,
+    token: ctx.token
   })
 
   const declaration = getCurrentEventState(event, eventConfig).declaration
