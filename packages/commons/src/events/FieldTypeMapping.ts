@@ -456,6 +456,7 @@ export type NonInteractiveFieldType =
   | Paragraph
   | BulletList
   | DataField
+  | HttpField
   | LinkButtonField
 
 export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>

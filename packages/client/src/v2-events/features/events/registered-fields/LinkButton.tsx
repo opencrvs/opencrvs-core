@@ -14,17 +14,17 @@ import { useIntl } from 'react-intl'
 import { TranslationConfig } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 
-function LinkButtonInput(coinfiguration: {
+function LinkButtonInput(configuration: {
   url: string
   text: TranslationConfig
 }) {
   const intl = useIntl()
   const handleClick = () => {
-    window.location.href = coinfiguration.url
+    window.location.href = configuration.url
   }
   return (
     <Button type="secondary" onClick={handleClick}>
-      {intl.formatMessage(coinfiguration.text)}
+      {intl.formatMessage(configuration.text)}
     </Button>
   )
 }

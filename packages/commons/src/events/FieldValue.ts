@@ -81,9 +81,6 @@ export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
 export const ButtonFieldValue = z.number()
 export type ButtonFieldValue = z.infer<typeof ButtonFieldValue>
 
-export const LinkButtonFieldValue = z.boolean()
-export type LinkButtonFieldValue = z.infer<typeof LinkButtonFieldValue>
-
 export const FieldValue = z.union([
   /**
    * Street level is our first dynamic record. In the future we might extend it to include any dynamic (sub)field.
@@ -103,8 +100,7 @@ export const FieldValue = z.union([
   NameFieldValue,
   NameFieldUpdateValue,
   ButtonFieldValue,
-  HttpFieldValue,
-  LinkButtonFieldValue
+  HttpFieldValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>
