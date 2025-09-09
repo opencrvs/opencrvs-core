@@ -15,9 +15,26 @@ import { OpenApiMeta } from 'trpc-to-openapi'
 import { logger, TokenUserType } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
 
-export const t = initTRPC.context<TrpcContext>().meta<OpenApiMeta>().create({
-  transformer: superjson
-})
+export const t = initTRPC
+  .context<TrpcContext>()
+  .meta<OpenApiMeta>()
+  .create({
+    transformer: superjson,
+    errorFormatter: ({ shape, error }) => {
+      // If received unhandled error, don't leak the error message or stack trace in the response.
+      // This is a security measure: the message or stack trace could contain internal technical details etc. sensitive information.
+      if (error.code === 'INTERNAL_SERVER_ERROR') {
+        return {
+          ...shape,
+          message: 'Internal server error',
+          data: { code: shape.data.code, httpStatus: shape.data.httpStatus }
+        }
+      }
+
+      // Keep all other errors as is.
+      return shape
+    }
+  })
 
 export const router = t.router
 
