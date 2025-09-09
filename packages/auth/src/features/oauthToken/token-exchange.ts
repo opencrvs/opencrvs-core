@@ -34,10 +34,12 @@ export async function tokenExchangeHandler(
   const subjectToken = request.query.subject_token
   const subjectTokenType = request.query.subject_token_type
   const requestedTokenType = request.query.requested_token_type
-  const recordId = request.query.record_id
+  const eventId = request.query.event_id
+  const actionId = request.query.action_id
 
   if (
-    !recordId ||
+    !eventId ||
+    !actionId ||
     !subjectToken ||
     subjectTokenType !== SUBJECT_TOKEN_TYPE ||
     requestedTokenType !== RECORD_TOKEN_TYPE
@@ -53,8 +55,8 @@ export async function tokenExchangeHandler(
 
   // @TODO: If in the future we have a fine grained access control for records, check here that the subject actually has access to the record requested
   const recordToken = await createTokenForRecordValidation(
-    sub as UUID,
-    recordId
+    { eventId, actionId },
+    sub as UUID
   )
 
   return oauthResponse.success(h, recordToken)

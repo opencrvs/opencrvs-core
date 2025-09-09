@@ -128,6 +128,33 @@ export function createTestToken(
   return `Bearer ${token}`
 }
 
+function createTokenExchangeTestToken(
+  userId: string,
+  eventId: string,
+  actionId: string
+): TokenWithBearer {
+  const token = jwt.sign(
+    {
+      scope: [
+        SCOPES.RECORD_CONFIRM_REGISTRATION,
+        SCOPES.RECORD_REJECT_REGISTRATION
+      ],
+      sub: userId,
+      userType: TokenUserType.enum.user,
+      eventId,
+      actionId
+    },
+    readFileSync(join(__dirname, './cert.key')),
+    {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:events-user'
+    }
+  )
+
+  return `Bearer ${token}`
+}
+
 export function createSystemTestClient(
   systemId: string,
   scopes: string[] = TEST_USER_DEFAULT_SCOPES
@@ -154,6 +181,24 @@ export function createTestClient(
 ) {
   const createCaller = createCallerFactory(appRouter)
   const token = createTestToken(user.id, scopes)
+
+  const caller = createCaller({
+    user: {
+      ...user,
+      type: TokenUserType.enum.user
+    },
+    token
+  })
+  return caller
+}
+
+export function createTokenExchangeClient(
+  user: CreatedUser,
+  eventId: string,
+  actionId: string
+) {
+  const createCaller = createCallerFactory(appRouter)
+  const token = createTokenExchangeTestToken(user.id, eventId, actionId)
 
   const caller = createCaller({
     user: {

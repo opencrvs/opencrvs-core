@@ -137,13 +137,14 @@ export async function createToken(
 }
 
 export async function createTokenForRecordValidation(
-  userId: UUID,
-  recordId: UUID
+  { eventId, actionId }: { eventId: UUID; actionId: UUID },
+  userId: UUID
 ) {
   return sign(
     {
       scope: ['record.confirm-registration', 'record.reject-registration'],
-      recordId
+      eventId,
+      actionId
     },
     cert,
     {

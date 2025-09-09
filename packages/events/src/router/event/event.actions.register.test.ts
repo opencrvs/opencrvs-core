@@ -31,6 +31,7 @@ import {
 import {
   createEvent,
   createTestClient,
+  createTokenExchangeClient,
   setupTestCase
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
@@ -645,6 +646,128 @@ describe('Request and confirmation flow', () => {
         })
       })
       test.todo('should be able to edit the event data while accept action')
+
+      test('allows accepting a registration request with the same exchanged event and action id', async () => {
+        const { user, generator } = await setupTestCase()
+        const client = createTestClient(user)
+
+        const originalEvent = await createEvent(client, generator, [
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        ])
+
+        const { id: eventId } = originalEvent
+        mockNotifyApi(202)
+
+        const data = generator.event.actions.register(eventId)
+
+        const registerResponse =
+          await client.event.actions.register.request(data)
+
+        const originalActionId = getOrThrow(
+          registerResponse.actions.find(
+            (action) => action.type === ActionType.REGISTER
+          )?.id,
+          'Could not find register action for id'
+        )
+
+        const createAction = originalEvent.actions.filter(
+          (action) => action.type === ActionType.CREATE
+        )
+
+        const assignmentInput = generator.event.actions.assign(
+          originalEvent.id,
+          {
+            assignedTo: createAction[0].createdBy
+          }
+        )
+        await client.event.actions.assignment.assign(assignmentInput)
+
+        await client.event.actions.register.request(data)
+
+        const tokenExchangeClient = createTokenExchangeClient(
+          user,
+          eventId,
+          originalActionId
+        )
+
+        const response =
+          await tokenExchangeClient.event.actions.register.accept({
+            ...data,
+            transactionId: getUUID(),
+            actionId: originalActionId,
+            registrationNumber: MOCK_REGISTRATION_NUMBER
+          })
+
+        const registerActions = response.actions.filter(
+          (action) =>
+            action.type === ActionType.REGISTER &&
+            action.status !== ActionStatus.Rejected
+        )
+
+        expect(registerActions.length).toBe(2)
+        expect(registerActions[0].status).toEqual(ActionStatus.Requested)
+        expect(registerActions[1]).toMatchObject({
+          status: ActionStatus.Accepted,
+          declaration: data.declaration,
+          registrationNumber: MOCK_REGISTRATION_NUMBER,
+          originalActionId: originalActionId
+        })
+      })
+
+      test('does not allow accepting a registration request with different exchanged event and action id', async () => {
+        const { user, generator } = await setupTestCase()
+        const client = createTestClient(user)
+
+        const originalEvent = await createEvent(client, generator, [
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        ])
+
+        const { id: eventId } = originalEvent
+        mockNotifyApi(202)
+
+        const data = generator.event.actions.register(eventId)
+
+        const registerResponse =
+          await client.event.actions.register.request(data)
+
+        const originalActionId = getOrThrow(
+          registerResponse.actions.find(
+            (action) => action.type === ActionType.REGISTER
+          )?.id,
+          'Could not find register action for id'
+        )
+
+        const createAction = originalEvent.actions.filter(
+          (action) => action.type === ActionType.CREATE
+        )
+
+        const assignmentInput = generator.event.actions.assign(
+          originalEvent.id,
+          {
+            assignedTo: createAction[0].createdBy
+          }
+        )
+        await client.event.actions.assignment.assign(assignmentInput)
+
+        await client.event.actions.register.request(data)
+
+        const tokenExchangeClient = createTokenExchangeClient(
+          user,
+          'cafecafe-cafe-4caf-8afe-cafecafecafe',
+          'abbaabba-abba-4abb-8baa-abbaabbaabba'
+        )
+
+        await expect(
+          tokenExchangeClient.event.actions.register.accept({
+            ...data,
+            transactionId: getUUID(),
+            actionId: originalActionId,
+            registrationNumber: MOCK_REGISTRATION_NUMBER
+          })
+        ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+      })
     })
 
     describe('Rejecting', () => {
@@ -832,6 +955,122 @@ describe('Request and confirmation flow', () => {
           status: ActionStatus.Rejected,
           originalActionId
         })
+      })
+
+      test('allows rejecting a registration request with the same exchanged event and action id', async () => {
+        const { user, generator } = await setupTestCase()
+        const client = createTestClient(user)
+
+        const originalEvent = await createEvent(client, generator, [
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        ])
+
+        const { id: eventId } = originalEvent
+        mockNotifyApi(202)
+
+        const data = generator.event.actions.register(eventId)
+
+        const registerResponse =
+          await client.event.actions.register.request(data)
+
+        const originalActionId = getOrThrow(
+          registerResponse.actions.find(
+            (action) => action.type === ActionType.REGISTER
+          )?.id,
+          'Could not find register action for id'
+        )
+
+        const createAction = originalEvent.actions.filter(
+          (action) => action.type === ActionType.CREATE
+        )
+
+        const assignmentInput = generator.event.actions.assign(
+          originalEvent.id,
+          {
+            assignedTo: createAction[0].createdBy
+          }
+        )
+        await client.event.actions.assignment.assign(assignmentInput)
+
+        await client.event.actions.register.request(data)
+
+        const tokenExchangeClient = createTokenExchangeClient(
+          user,
+          eventId,
+          originalActionId
+        )
+
+        const response =
+          await tokenExchangeClient.event.actions.register.reject({
+            eventId,
+            transactionId: getUUID(),
+            actionId: originalActionId
+          })
+
+        const registerActions = response.actions.filter(
+          (action) => action.type === ActionType.REGISTER
+        )
+
+        expect(registerActions.length).toBe(2)
+        expect(registerActions[0].status).toEqual(ActionStatus.Requested)
+        expect(registerActions[1]).toMatchObject({
+          status: ActionStatus.Rejected,
+          originalActionId
+        })
+      })
+
+      test('does not allow rejecting a registration request with different exchanged event and action id', async () => {
+        const { user, generator } = await setupTestCase()
+        const client = createTestClient(user)
+
+        const originalEvent = await createEvent(client, generator, [
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        ])
+
+        const { id: eventId } = originalEvent
+        mockNotifyApi(202)
+
+        const data = generator.event.actions.register(eventId)
+
+        const registerResponse =
+          await client.event.actions.register.request(data)
+
+        const originalActionId = getOrThrow(
+          registerResponse.actions.find(
+            (action) => action.type === ActionType.REGISTER
+          )?.id,
+          'Could not find register action for id'
+        )
+
+        const createAction = originalEvent.actions.filter(
+          (action) => action.type === ActionType.CREATE
+        )
+
+        const assignmentInput = generator.event.actions.assign(
+          originalEvent.id,
+          {
+            assignedTo: createAction[0].createdBy
+          }
+        )
+        await client.event.actions.assignment.assign(assignmentInput)
+
+        await client.event.actions.register.request(data)
+
+        const tokenExchangeClient = createTokenExchangeClient(
+          user,
+          'cafecafe-cafe-4caf-8afe-cafecafecafe',
+          'abbaabba-abba-4abb-8baa-abbaabbaabba'
+        )
+
+        await expect(
+          tokenExchangeClient.event.actions.register.reject({
+            eventId,
+            transactionId: getUUID(),
+            actionId: originalActionId
+          })
+        ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
       })
     })
   })

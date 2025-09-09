@@ -30,10 +30,12 @@ import {
   UUID,
   EventDocument,
   ConfigurableScopes,
-  getAuthorizedEventsFromScopes
+  getAuthorizedEventsFromScopes,
+  getTokenPayload
 } from '@opencrvs/commons'
 import { getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
+import { ActionConfirmationResponseSchema } from '@events/router/event/actions'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -252,5 +254,34 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
   if (input.some(({ slug }) => !availableWorkqueues.includes(slug))) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
+  return next()
+}
+
+/**
+ * Checks that the token has been exchanged for the specific `eventId` and `actionId` in the input.
+ *
+ * Registrars token can be exchanged in auth into a more specific token with `eventId` and `actionId`.
+ * This is useful when tokens need to be exposed outside of core of OpenCRVS, e.g. countryconfig or external systems.
+ */
+export const requireEventActionAuthorization: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  ActionConfirmationResponseSchema
+> = async ({ next, ctx, input }) => {
+  const { eventId: grantedEventId, actionId: grantedTokenId } = getTokenPayload(
+    ctx.token
+  )
+
+  if (!grantedEventId && !grantedTokenId) {
+    // This was not an exchanged token (i.e. a user token), so we skip this check
+    return next()
+  }
+
+  if (grantedEventId !== input.eventId || grantedTokenId !== input.actionId) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
   return next()
 }
