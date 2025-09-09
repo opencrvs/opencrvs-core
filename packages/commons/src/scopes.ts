@@ -326,12 +326,12 @@ const RecordScope = z.object({
     'record.declared.validate',
     'record.declared.reject',
     'record.declared.archive',
+    'record.declared.review-duplicates',
     'record.register',
     'record.registered.print-certified-copies',
     'record.registered.request-correction',
     'record.registered.correct',
-    'record.unassign-others',
-    'record.declared.review-duplicates'
+    'record.unassign-others'
   ]),
   options: z.object({
     event: z.array(z.string())

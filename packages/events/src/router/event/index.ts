@@ -159,7 +159,7 @@ export const eventRouter = router({
       return updatedEvent
     }),
   getDuplicates: publicProcedure
-    .use(requiresAnyOfScopes([], ['record.review-duplicates']))
+    .use(requiresAnyOfScopes([], ['record.declared.review-duplicates']))
     .input(EventIdParam)
     .use(middleware.eventTypeAuthorization)
     .use(middleware.requireAssignment)
