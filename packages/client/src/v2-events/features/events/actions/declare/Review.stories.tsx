@@ -101,9 +101,6 @@ export const ReviewForLocalRegistrarComplete: Story = {
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
           })
         ],
         user: [
@@ -142,9 +139,6 @@ export const ReviewForLocalRegistrarIncomplete: Story = {
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
           })
         ],
         user: [
@@ -202,9 +196,6 @@ export const ReviewForRegistrationAgentComplete: Story = {
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
           })
         ],
         user: [
@@ -254,9 +245,6 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
           })
         ],
         user: [
@@ -307,9 +295,6 @@ export const ReviewForFieldAgentComplete: Story = {
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
           })
         ],
         user: [
@@ -356,9 +341,6 @@ export const ReviewForFieldAgentIncomplete: Story = {
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
           })
         ],
         user: [
@@ -411,9 +393,6 @@ export const ReviewShowsFilesFromDraft: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return createdEvent
-          }),
-          tRPCMsw.event.list.query(() => {
-            return []
           })
         ],
         files: [

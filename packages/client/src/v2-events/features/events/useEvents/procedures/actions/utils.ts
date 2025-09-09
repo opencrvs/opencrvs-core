@@ -21,7 +21,7 @@ import {
 import {
   findLocalEventConfig,
   setEventData,
-  setEventListData
+  updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
@@ -67,11 +67,7 @@ export function updateEventOptimistically<T extends ActionInput>(
       ]
     }
 
-    setEventListData((eventIndices) =>
-      eventIndices
-        ?.filter((ei) => ei.id !== optimisticEvent.id)
-        .concat(getCurrentEventState(optimisticEvent, eventConfig))
-    )
+    updateLocalEventIndex(optimisticEvent.id, optimisticEvent)
   }
 }
 

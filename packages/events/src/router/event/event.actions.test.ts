@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -27,6 +28,7 @@ import {
   createTestClient,
   sanitizeForSnapshot,
   setupTestCase,
+  TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
 import { mswServer } from '../../tests/msw'
@@ -372,7 +374,11 @@ describe('Action updates', () => {
 
   it('File references are removed with explicit null', async () => {
     const { user } = await setupTestCase()
-    const client = createTestClient(user)
+
+    const client = createTestClient(user, [
+      ...TEST_USER_DEFAULT_SCOPES,
+      `search[event=${multiFileConfig.id},access=all]`
+    ])
 
     const originalEvent = await client.event.create({
       transactionId: generateTransactionId(),
@@ -387,7 +393,19 @@ describe('Action updates', () => {
       keepAssignment: true
     })
 
-    const [eventAfterDeclare] = await client.event.list()
+    const { results } = await client.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            id: originalEvent.id,
+            eventType: originalEvent.type
+          }
+        ]
+      }
+    })
+
+    const [eventAfterDeclare] = results
 
     expect(eventAfterDeclare.declaration['documents.singleFile']).toBeDefined()
     expect(eventAfterDeclare.declaration['documents.multiFile']).toHaveLength(2)
@@ -405,7 +423,18 @@ describe('Action updates', () => {
       keepAssignment: true
     })
 
-    const [eventAfterValidate] = await client.event.list()
+    const { results: resultsAfterValidate } = await client.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            id: originalEvent.id
+          }
+        ]
+      }
+    })
+
+    const [eventAfterValidate] = resultsAfterValidate
 
     expect(
       eventAfterValidate.declaration['documents.singleFile']
@@ -417,8 +446,10 @@ describe('Action updates', () => {
 
   it('file with option references are removed with empty array', async () => {
     const { user } = await setupTestCase()
-    const client = createTestClient(user)
-
+    const client = createTestClient(user, [
+      ...TEST_USER_DEFAULT_SCOPES,
+      `search[event=${multiFileConfig.id},access=all]`
+    ])
     const originalEvent = await client.event.create({
       transactionId: generateTransactionId(),
       type: multiFileConfig.id
@@ -432,7 +463,18 @@ describe('Action updates', () => {
       keepAssignment: true
     })
 
-    const [eventAfterDeclare] = await client.event.list()
+    const { results } = await client.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            id: originalEvent.id
+          }
+        ]
+      }
+    })
+
+    const [eventAfterDeclare] = results
 
     expect(eventAfterDeclare.declaration['documents.singleFile']).toBeDefined()
     expect(eventAfterDeclare.declaration['documents.multiFile']).toHaveLength(2)
@@ -452,8 +494,19 @@ describe('Action updates', () => {
 
     // No files should be deleted, only references removed
     expect(deleteFileMock.mock.calls).toHaveLength(0)
-    const [eventAfterValidate] = await client.event.list()
 
+    const { results: resultsAfterValidate } = await client.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            id: originalEvent.id
+          }
+        ]
+      }
+    })
+
+    const [eventAfterValidate] = resultsAfterValidate
     expect(
       eventAfterValidate.declaration['documents.singleFile']
     ).not.toBeDefined()

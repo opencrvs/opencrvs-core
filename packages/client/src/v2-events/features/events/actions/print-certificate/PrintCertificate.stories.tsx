@@ -62,9 +62,6 @@ export const CollectorForm: Story = {
           }),
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
           })
         ]
       }

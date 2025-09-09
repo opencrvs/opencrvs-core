@@ -34,7 +34,10 @@ function SelectInput({ onChange, value, ...props }: SelectInputProps) {
   const selectedOption = options.find((option) => option.value === value)
   const formattedOptions = options.map((option: SelectOption) => ({
     value: option.value,
-    label: intl.formatMessage(option.label)
+    label:
+      typeof option.label === 'string'
+        ? option.label
+        : intl.formatMessage(option.label)
   }))
 
   const inputValue = selectedOption?.value ?? ''
@@ -60,7 +63,13 @@ function SelectOutput({
   const intl = useIntlWithFormData()
   const selectedOption = options.find((option) => option.value === value)
 
-  return selectedOption ? intl.formatMessage(selectedOption.label) : ''
+  if (!selectedOption) {
+    return ''
+  }
+
+  return typeof selectedOption.label === 'string'
+    ? selectedOption.label
+    : intl.formatMessage(selectedOption.label)
 }
 
 function stringify(value: string, context: StringifierContext<SelectField>) {
@@ -78,7 +87,9 @@ function stringify(value: string, context: StringifierContext<SelectField>) {
     return value
   }
 
-  return context.intl.formatMessage(option.label)
+  return typeof option.label === 'string'
+    ? option.label
+    : context.intl.formatMessage(option.label)
 }
 
 export const Select = {

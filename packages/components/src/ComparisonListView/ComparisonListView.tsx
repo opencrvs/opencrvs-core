@@ -52,9 +52,9 @@ export const ComparisonListView = ({
     <React.Fragment>
       <Grid {...props} headingCount={headings.length + 1}>
         {[
-          <HideOnSmallScreen></HideOnSmallScreen>,
+          <HideOnSmallScreen key="spacer"></HideOnSmallScreen>,
           ...headings.map((heading, index) => (
-            <HideOnSmallScreen>
+            <HideOnSmallScreen key={`heading-${heading}-${index}`}>
               <Text
                 variant="reg16"
                 element="span"
