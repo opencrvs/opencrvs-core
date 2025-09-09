@@ -17,7 +17,6 @@ import {
   EventIndex,
   getUUID,
   TranslationConfig,
-  SCOPES,
   WorkqueueActionType,
   EventStatus,
   isMetaAction,
@@ -26,7 +25,8 @@ import {
   ClientSpecificAction,
   workqueueActions,
   Draft,
-  isActionInScope
+  isActionInScope,
+  configurableEventScopeAllowed
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -63,8 +63,11 @@ function getAvailableAssignmentActions(
 ) {
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
   const eventStatus = event.status
-  const mayUnassignOthers = authentication.scope.includes(
-    SCOPES.RECORD_UNASSIGN_OTHERS
+
+  const mayUnassignOthers = configurableEventScopeAllowed(
+    authentication.scope,
+    ['record.unassign-others'],
+    event.type
   )
 
   if (!STATUSES_THAT_CAN_BE_ASSIGNED.includes(eventStatus)) {

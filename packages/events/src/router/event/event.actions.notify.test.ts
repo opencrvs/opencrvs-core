@@ -51,6 +51,7 @@ describe('event.actions.notify', () => {
     test('disallows access with API scope with incorrect event type', async () => {
       const { user, generator } = await setupTestCase()
       const eventCreateClient = createTestClient(user, [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
@@ -70,6 +71,7 @@ describe('event.actions.notify', () => {
     test('allows access with API scope with correct event type', async () => {
       const { user } = await setupTestCase()
       const client = createTestClient(user, [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
@@ -219,6 +221,7 @@ describe('event.actions.notify', () => {
       const locations = await dataSeedingClient.locations.get()
 
       const client = createSystemTestClient('test-system', [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
@@ -273,12 +276,14 @@ describe('event.actions.notify', () => {
       const { generator } = await setupTestCase()
 
       let client = createSystemTestClient('test-system', [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
       const event = await client.event.create(generator.event.create())
 
       client = createSystemTestClient('test-system-2', [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
@@ -315,6 +320,7 @@ describe('event.actions.notify', () => {
       const event = await client.event.create(generator.event.create())
 
       client = createSystemTestClient('test-system-2', [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
@@ -332,6 +338,7 @@ describe('event.actions.notify', () => {
     let client = createTestClient(user)
 
     client = createSystemTestClient('test-system-2', [
+      `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
       `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
     ])
 

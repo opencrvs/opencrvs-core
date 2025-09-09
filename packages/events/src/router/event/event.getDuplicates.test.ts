@@ -18,7 +18,6 @@ import {
   generateActionDuplicateDeclarationInput,
   EventDocument,
   generateUuid,
-  SCOPES,
   UUID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEventWithDedupCheck } from '@opencrvs/commons/fixtures'
@@ -40,11 +39,31 @@ test('prevents forbidden access if missing required scope', async () => {
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
+test('prevents forbidden access if the scope doesnt allow the event type', async () => {
+  const { generator, users } = await setupTestCase()
+  const someOtherClient = createTestClient(users[0])
+
+  const myClient = createTestClient(users[1], [
+    'record.declared.review-duplicates[event=death]'
+  ])
+
+  const event = await someOtherClient.event.create(generator.event.create())
+  await someOtherClient.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
+
+  await expect(
+    myClient.event.getDuplicates({ eventId: event.id })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
 test('prevents forbidden access without assignment but with right scope', async () => {
   const { generator, users } = await setupTestCase()
   const someOtherClient = createTestClient(users[0])
 
-  const myClient = createTestClient(users[1], [SCOPES.RECORD_REVIEW_DUPLICATES])
+  const myClient = createTestClient(users[1], [
+    'record.declared.review-duplicates[event=tennis-club-membership]'
+  ])
 
   const event = await someOtherClient.event.create(generator.event.create())
   await someOtherClient.event.actions.declare.request(
@@ -60,7 +79,7 @@ test('Allows access with assignment and right scope', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    SCOPES.RECORD_REVIEW_DUPLICATES
+    'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
   ])
 
   const event = await client.event.create(generator.event.create())
@@ -101,7 +120,7 @@ test('Returns single duplicate when found', async () => {
 
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    SCOPES.RECORD_REVIEW_DUPLICATES
+    'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
   ])
 
   const prng = createPrng(73)
@@ -187,7 +206,7 @@ test('Returns multiple duplicates when found', async () => {
 
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    SCOPES.RECORD_REVIEW_DUPLICATES
+    'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
   ])
 
   const prng = createPrng(73)

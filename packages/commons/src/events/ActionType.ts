@@ -91,6 +91,8 @@ const declarationActionValues = [
   ActionTypes.enum.DECLARE,
   ActionTypes.enum.VALIDATE,
   ActionTypes.enum.REGISTER,
+  // @TODO: Check whether NOTIFY should be included here or not.
+  // It is not a declaration action strictly speaking, but it can change declaration data.
   ActionTypes.enum.NOTIFY
 ] as const
 
