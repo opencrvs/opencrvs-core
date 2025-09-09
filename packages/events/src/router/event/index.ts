@@ -51,10 +51,7 @@ import {
 } from '@events/service/events/events'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { importEvent } from '@events/service/events/import'
-import {
-  findRecordsByQuery,
-  getIndexedEvents
-} from '@events/service/indexing/indexing'
+import { findRecordsByQuery } from '@events/service/indexing/indexing'
 import { reindex } from '@events/service/events/reindex'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
