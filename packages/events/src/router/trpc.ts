@@ -14,6 +14,7 @@ import superjson from 'superjson'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { logger, TokenUserType } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
+import { env } from '@events/environment'
 
 export const t = initTRPC
   .context<TrpcContext>()
@@ -23,7 +24,7 @@ export const t = initTRPC
     errorFormatter: ({ shape, error }) => {
       // If received unhandled error, don't leak the error message or stack trace in the response.
       // This is a security measure: the message or stack trace could contain internal technical details etc. sensitive information.
-      if (error.code === 'INTERNAL_SERVER_ERROR') {
+      if (error.code === 'INTERNAL_SERVER_ERROR' && env.isProduction) {
         return {
           ...shape,
           message: 'Internal server error',
