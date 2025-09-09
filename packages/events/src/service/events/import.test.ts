@@ -46,7 +46,8 @@ test('importing an event indexes it into Elasticsearch', async () => {
   const { user } = await setupTestCase()
   const client = createSystemTestClient('test-system', [
     SCOPES.RECORD_IMPORT,
-    SCOPES.RECORD_READ
+    SCOPES.RECORD_READ,
+    `search[event=${tennisClubMembershipEvent.id},access=all]`
   ])
   const event = generateEventDocument({
     user,
@@ -55,7 +56,18 @@ test('importing an event indexes it into Elasticsearch', async () => {
   })
 
   await client.event.import(event)
-  const events = await client.event.list()
+
+  const { results: events } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: tennisClubMembershipEvent.id
+        }
+      ]
+    }
+  })
+
   expect(events).toHaveLength(1)
   expect(events[0].id).toEqual(event.id)
 })
@@ -64,7 +76,8 @@ test('importing the same event twice overwrites the previous one', async () => {
   const { user } = await setupTestCase()
   const client = createSystemTestClient('test-system', [
     SCOPES.RECORD_IMPORT,
-    SCOPES.RECORD_READ
+    SCOPES.RECORD_READ,
+    `search[event=${tennisClubMembershipEvent.id},access=all]`
   ])
   const event = generateEventDocument({
     user,
@@ -76,7 +89,17 @@ test('importing the same event twice overwrites the previous one', async () => {
 
   await client.event.import({ ...event, trackingId: 'ABCDEF' })
 
-  const events = await client.event.list()
+  const { results: events } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: tennisClubMembershipEvent.id
+        }
+      ]
+    }
+  })
+
   expect(events).toHaveLength(1)
   expect(events[0].id).toEqual(event.id)
   expect(events[0].trackingId).toEqual('ABCDEF')

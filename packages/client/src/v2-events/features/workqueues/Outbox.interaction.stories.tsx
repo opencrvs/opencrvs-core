@@ -71,11 +71,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 const declarationTrpcMsw = {
   events: wrapHandlersWithSpies([
     {
-      name: 'event.list',
-      procedure: tRPCMsw.event.list.query,
-      handler: () => [tennisClubMembershipEventIndex]
-    },
-    {
       name: 'event.create',
       procedure: tRPCMsw.event.create.mutation,
       handler: () => createdEventDocument
