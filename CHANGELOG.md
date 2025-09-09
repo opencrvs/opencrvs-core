@@ -27,6 +27,7 @@
 - Add retry on deploy-to-feature-environment workflow at core repo [#9847](https://github.com/opencrvs/opencrvs-core/issues/9847)
 - Save certificate templateId so it can be shown in task history and made available for conditional [#9959](https://github.com/opencrvs/opencrvs-core/issues/9959)
 - Deprecate external id/ statistical id in V2. Remove external_id column from locations table and location seeding step [#9974](https://github.com/opencrvs/opencrvs-core/issues/9974)
+- Previously uncaught errors were not logged properly, now all the backend servers register the `ErrorLoggerPlugin` which logs all the Boom errors. [#8724](https://github.com/opencrvs/opencrvs-core/issues/8724)
 
 - **Updated environment variable**
 
