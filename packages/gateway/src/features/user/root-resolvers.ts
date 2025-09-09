@@ -338,8 +338,11 @@ export const resolvers: GQLResolver = {
         }
       }
 
-      if (user.role && !hasScope(authHeader, SCOPES.USER_DATA_SEEDING)) {
-        const scopes = getScopes(authHeader)
+      if (
+        user.role &&
+        !hasScope(authHeader.Authorization, SCOPES.USER_DATA_SEEDING)
+      ) {
+        const scopes = getScopes(authHeader.Authorization)
         const creatableRoleIds =
           findScope(scopes, 'user.create')?.options?.role ?? []
 

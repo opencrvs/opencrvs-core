@@ -59,6 +59,21 @@ export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
 }
 
+export function configurableEventScopeAllowed(
+  scopes: Scope[],
+  allowedConfigurableScopes: ConfigurableScopeType[],
+  eventType: string
+) {
+  // Find the scopes that are authorized for the given action
+  const parsedScopes = allowedConfigurableScopes
+    .map((scope) => findScope(scopes, scope))
+    .filter((scope) => scope !== undefined)
+
+  // Ensure that the given event type is authorized in the found scopes
+  const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
+  return authorizedEvents.includes(eventType)
+}
+
 /**
  * Checks if a given action is allowed for the provided scopes and event type.
  *
@@ -88,12 +103,9 @@ export function isActionInScope(
     return false
   }
 
-  // Find the scopes that are authorized for the given action
-  const parsedScopes = allowedConfigurableScopes
-    .map((scope) => findScope(scopes, scope))
-    .filter((scope) => scope !== undefined)
-
-  // Ensure that the given event type is authorized in the found scopes
-  const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
-  return authorizedEvents.includes(eventType)
+  return configurableEventScopeAllowed(
+    scopes,
+    allowedConfigurableScopes,
+    eventType
+  )
 }
