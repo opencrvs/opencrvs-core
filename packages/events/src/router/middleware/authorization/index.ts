@@ -28,7 +28,8 @@ import {
   UUID,
   EventDocument,
   ConfigurableScopes,
-  getAuthorizedEventsFromScopes
+  getAuthorizedEventsFromScopes,
+  canUserReadRecord
 } from '@opencrvs/commons'
 import { getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
@@ -254,4 +255,36 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
   return next()
+}
+
+export const userCanReadEvent: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext & { event: EventDocument },
+  UUID
+> = async ({ next, ctx, input }) => {
+  const event = await getEventById(input)
+
+  const createAction = event.actions.find(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  if (!createAction) {
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: `Event ${event.id} is missing ${ActionType.CREATE} action`
+    })
+  }
+
+  const canRead = canUserReadRecord(createAction, {
+    userId: ctx.user.id,
+    scopes: getScopes(ctx.token)
+  })
+
+  if (canRead) {
+    return next({ ctx: { ...ctx, event } })
+  }
+
+  throw new TRPCError({ code: 'FORBIDDEN' })
 }
