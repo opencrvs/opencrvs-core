@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: c284e919-90d5-4b7f-b551-9a1fdae56a72
+                transactionId: 8a612618-5f52-44a2-868d-c0c8da828fd6
                 type: birth
       responses:
         "200":
@@ -395,7 +395,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: cdc781d6-d961-42ae-afe1-363931b8add9
+                transactionId: fc143a50-f2fb-4a49-a6ec-f173b5ca161a
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -4689,6 +4689,9 @@ components:
                       - offices
                 status:
                   type: string
+                  enum:
+                    - active
+                    - inactive
               required:
                 - searchableResource
                 - status
@@ -4789,6 +4792,9 @@ components:
               properties:
                 status:
                   type: string
+                  enum:
+                    - active
+                    - inactive
               required:
                 - status
           required:
@@ -4888,6 +4894,9 @@ components:
               properties:
                 status:
                   type: string
+                  enum:
+                    - active
+                    - inactive
               required:
                 - status
           required:

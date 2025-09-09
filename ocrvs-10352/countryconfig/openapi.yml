@@ -3042,6 +3042,9 @@ components:
                       - offices
                 status:
                   type: string
+                  enum:
+                    - active
+                    - inactive
               required:
                 - searchableResource
                 - status
@@ -3141,6 +3144,9 @@ components:
               properties:
                 status:
                   type: string
+                  enum:
+                    - active
+                    - inactive
               required:
                 - status
           required:
@@ -3239,6 +3245,9 @@ components:
               properties:
                 status:
                   type: string
+                  enum:
+                    - active
+                    - inactive
               required:
                 - status
           required:
