@@ -248,6 +248,10 @@ async function deleteEventData(updatedEvent: EventDocument) {
   await removeCachedFiles(updatedEvent)
 }
 
+export function updateLocalEvent(data: EventDocument) {
+  setEventData(data.id, data)
+}
+
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
   await invalidateWorkqueues()
