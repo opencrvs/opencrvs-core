@@ -49,7 +49,7 @@ export default async function updateUser(
   if (!existingUser) {
     throw new Error(`No user found by given id: ${user.id}`)
   }
-  const scopes = getScopes(request.headers as IAuthHeader)
+  const scopes = getScopes(request.headers.authorization)
   const editableRoleIds = findScope(scopes, 'user.edit')?.options?.role
 
   if (Array.isArray(editableRoleIds) && !editableRoleIds.includes(user.role)) {

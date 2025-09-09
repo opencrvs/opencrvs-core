@@ -14,7 +14,6 @@ import {
   findScope,
   getScopes,
   hasScope,
-  IAuthHeader,
   logger,
   SCOPES
 } from '@opencrvs/commons'
