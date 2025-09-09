@@ -155,12 +155,14 @@ export function ValueOutput(
   }
 
   if (isAddressFieldType(field)) {
-    return Address.Output({
-      value: field.value,
-      fields: searchMode === true ? ['country'] : undefined,
-      lineSeparator: searchMode === true ? ', ' : undefined,
-      configuration: field.config
-    })
+    return (
+      <Address.Output
+        configuration={field.config}
+        fields={searchMode === true ? ['country'] : undefined}
+        lineSeparator={searchMode === true ? ', ' : undefined}
+        value={field.value}
+      />
+    )
   }
 
   if (isRadioGroupFieldType(field)) {
