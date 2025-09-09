@@ -11,11 +11,7 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import {
-  QueryProcedure,
-  TRPCError
-} from '@trpc/server/unstable-core-do-not-import'
-import { OpenApiMeta } from 'trpc-to-openapi'
+import { TRPCError } from '@trpc/server/unstable-core-do-not-import'
 import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -69,46 +65,39 @@ import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)
 
-/*
- * Explicitely type the procedure to reduce the inference
- * thus avoiding "The inferred type of this node exceeds the maximum length the
- * compiler will serialize" error
- */
-const eventConfigGetProcedure: QueryProcedure<{
-  meta: OpenApiMeta
-  input: void
-  output: EventConfig[]
-}> = publicProcedure
-  .meta({
-    openapi: {
-      summary: 'List event configurations',
-      method: 'GET',
-      path: '/config',
-      tags: ['events'],
-      protect: true
-    }
-  })
-  .use(
-    requiresAnyOfScopes(
-      [
-        SCOPES.RECORD_READ,
-        SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-        SCOPES.RECORD_EXPORT_RECORDS,
-        SCOPES.CONFIG,
-        SCOPES.CONFIG_UPDATE_ALL
-      ],
-      ['record.declare', 'record.notify', 'record.register']
-    )
-  )
-  .input(z.void())
-  .output(z.array(EventConfig))
-  .query(async (options) => {
-    return getInMemoryEventConfigurations(options.ctx.token)
-  })
-
 export const eventRouter = router({
   config: router({
-    get: eventConfigGetProcedure
+    get: publicProcedure
+      .meta({
+        openapi: {
+          summary: 'List event configurations',
+          method: 'GET',
+          path: '/config',
+          tags: ['events'],
+          protect: true
+        }
+      })
+      .use(
+        requiresAnyOfScopes(
+          [
+            SCOPES.RECORD_READ,
+            SCOPES.RECORD_EXPORT_RECORDS,
+            SCOPES.CONFIG,
+            SCOPES.CONFIG_UPDATE_ALL
+          ],
+          [
+            'record.create',
+            'record.declare',
+            'record.notify',
+            'record.register'
+          ]
+        )
+      )
+      .input(z.void())
+      .output(z.array(EventConfig))
+      .query(async (options) =>
+        getInMemoryEventConfigurations(options.ctx.token)
+      )
   }),
   create: systemProcedure
     .meta({
@@ -320,7 +309,6 @@ export const eventRouter = router({
     .use(
       requiresAnyOfScopes([
         SCOPES.RECORD_READ,
-        SCOPES.RECORD_SUBMIT_FOR_REVIEW,
         SCOPES.RECORD_REGISTER,
         SCOPES.RECORD_EXPORT_RECORDS
       ])
