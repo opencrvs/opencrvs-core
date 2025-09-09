@@ -13,10 +13,8 @@ import { z } from 'zod'
 import {
   ActionType,
   CreatedAction,
-  EventDocument,
   EventIndex,
   isActionInScope,
-  isEventCreatedByUser,
   SearchScopeAccessLevels
 } from './events'
 
