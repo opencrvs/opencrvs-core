@@ -12,10 +12,12 @@
 import { logger } from '@opencrvs/commons'
 import '@opencrvs/commons/monitoring'
 import { env } from './environment'
+
+import { server } from './server'
 import { getAnonymousToken } from './service/auth'
 import { getInMemoryEventConfigurations } from './service/config/config'
 import { ensureIndexExists } from './service/indexing/indexing'
-import { server } from './server'
+import { ensureConnection } from './storage/postgres/events'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
@@ -25,9 +27,11 @@ const appModulePath = require('app-module-path')
 appModulePath.addPath(path.join(__dirname, '../'))
 
 export async function main() {
+  await ensureConnection()
   try {
+    const anonymousToken = await getAnonymousToken()
     const configurations = await getInMemoryEventConfigurations(
-      await getAnonymousToken()
+      `Bearer ${anonymousToken}`
     )
     for (const configuration of configurations) {
       logger.info(`Loaded event configuration: ${configuration.id}`)

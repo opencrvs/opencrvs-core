@@ -1,6 +1,12 @@
 ARG  BRANCH=develop
 FROM ghcr.io/opencrvs/ocrvs-base:${BRANCH}
 
+USER root
+# Install envsubst and clean up apt cache
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gettext-base \
+    && rm -rf /var/lib/apt/lists/*
+
 USER node
 
 ## Add the wait script to the image
@@ -8,7 +14,7 @@ ADD --chown=node:node https://github.com/ufoscout/docker-compose-wait/releases/d
 RUN chmod +x /app/wait
 
 # Override the base log level (info).
-ENV NPM_CONFIG_LOGLEVEL warn
+ENV NPM_CONFIG_LOGLEVEL=warn
 
 WORKDIR /app/packages/migration
 

@@ -213,6 +213,10 @@ export function setEventData(id: string, data: EventDocument) {
   updateDraftsWithEvent(id, data)
 }
 
+export function updateLocalEvent(data: EventDocument) {
+  setEventData(data.id, data)
+}
+
 export async function refetchEventsList() {
   /*
    * Invalidate search queries
@@ -242,7 +246,7 @@ async function deleteEventData(updatedEvent: EventDocument) {
   await removeCachedFiles(updatedEvent)
 }
 
-export async function updateLocalEvent(updatedEvent: EventDocument) {
+export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
   await invalidateWorkqueues()
   return refetchEventsList()
