@@ -305,6 +305,10 @@ export function buildAction(
     case ActionType.DUPLICATE_DETECTED:
       return {
         ...commonAttributes,
+        /*
+         * @todo: createdBy & createdByRole is required for all actions but
+         * that should not be the case for duplicate detected action.
+         */
         createdBy: '',
         createdByUserType: TokenUserType.enum.system,
         createdByRole: '',
