@@ -18,7 +18,7 @@ import {
   clearPendingDraftCreationRequests,
   findLocalEventDocument,
   refetchDraftsList,
-  refetchEventsList,
+  refetchAllSearchQueries,
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import {
@@ -148,7 +148,7 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
     return optimisticDraft
   },
   onSuccess: async () => {
-    await refetchEventsList()
+    await refetchAllSearchQueries()
     await refetchDraftsList()
   },
   retryDelay: 10000

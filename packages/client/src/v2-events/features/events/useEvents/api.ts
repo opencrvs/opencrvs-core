@@ -105,12 +105,18 @@ export function findLocalEventIndex(id: string): EventIndex | undefined {
     .flatMap(([, data]) => data?.results || [])[0]
 }
 
-export function setEventListData(
-  updater: (eventIndices: EventIndex[] | undefined) => EventIndex[] | undefined
-) {
-  return queryClient.setQueryData(
-    trpcOptionsProxy.event.list.queryKey(),
-    updater
+export function setEventSearchQuery(updatedEventIndex: EventIndex | undefined) {
+  if (!updatedEventIndex) {
+    return
+  }
+  queryClient.setQueryData(
+    trpcOptionsProxy.event.search.queryKey({
+      query: {
+        type: 'and',
+        clauses: [{ id: updatedEventIndex.id }]
+      }
+    }),
+    () => ({ results: [updatedEventIndex], total: 1 })
   )
 }
 
@@ -124,13 +130,7 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
   }
   const updatedEventIndex = getCurrentEventState(updatedEvent, config)
   // Update the local event index with the updated event
-  setEventListData((eventIndices) =>
-    eventIndices?.map((eventIndex) =>
-      eventIndex.id === id
-        ? { ...eventIndex, ...updatedEventIndex }
-        : eventIndex
-    )
-  )
+  setEventSearchQuery(updatedEventIndex)
 
   /*
    * Ensure there exists a local cached search query for this event
@@ -213,7 +213,17 @@ export function setEventData(id: string, data: EventDocument) {
   updateDraftsWithEvent(id, data)
 }
 
-export async function refetchEventsList() {
+export async function refetchSearchQuery(eventId: string) {
+  await queryClient.refetchQueries({
+    queryKey: trpcOptionsProxy.event.search.queryKey({
+      query: {
+        type: 'and',
+        clauses: [{ id: eventId }]
+      }
+    })
+  })
+}
+export async function refetchAllSearchQueries() {
   /*
    * Invalidate search queries
    */
@@ -226,10 +236,6 @@ export async function refetchEventsList() {
       }
     )
   )
-
-  return queryClient.refetchQueries({
-    queryKey: trpcOptionsProxy.event.list.queryKey()
-  })
 }
 
 async function deleteEventData(updatedEvent: EventDocument) {
@@ -245,7 +251,7 @@ async function deleteEventData(updatedEvent: EventDocument) {
 export async function updateLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
   await invalidateWorkqueues()
-  return refetchEventsList()
+  return refetchAllSearchQueries()
 }
 
 export async function onAssign(updatedEvent: EventDocument) {
@@ -256,17 +262,6 @@ export async function onAssign(updatedEvent: EventDocument) {
 
   if (!lastAssignment) {
     return
-  }
-
-  if (lastAssignment.type === ActionType.ASSIGN) {
-    const { assignedTo } = lastAssignment
-    return setEventListData((eventIndices) =>
-      eventIndices?.map((eventIndex) =>
-        eventIndex.id === updatedEvent.id
-          ? { ...eventIndex, assignedTo }
-          : eventIndex
-      )
-    )
   }
 }
 
