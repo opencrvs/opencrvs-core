@@ -12,6 +12,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import * as _ from 'lodash'
+import { isUndefined } from 'lodash'
 import {
   FieldConfig,
   FieldValue,
@@ -40,7 +41,11 @@ import {
   isIdFieldType,
   isPhoneFieldType,
   isSelectDateRangeFieldType,
-  isLocationFieldType
+  isLocationFieldType,
+  FileFieldWithOptionValue,
+  EventState,
+  FormConfig,
+  FieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -68,23 +73,30 @@ const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
 `
 
+const DeletedEmpty = styled(Deleted)`
+  text-decoration: none;
+`
+
 /**
  *  Used for setting output/read (REVIEW) values for FORM input/write fields (string defaults based on FieldType).
  * For setting default fields for intl object @see setEmptyValuesForFields
  *
  *  @returns sensible default value for the field type given the field configuration.
  */
-export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
+export function ValueOutput(
+  field: {
+    config: FieldConfig
+    value: FieldValue
+  },
+  searchMode?: {} | boolean
+) {
   if (
     isEmailFieldType(field) ||
     isIdFieldType(field) ||
     isPhoneFieldType(field) ||
-    isTextFieldType(field)
+    isTextFieldType(field) ||
+    isTextAreaFieldType(field)
   ) {
-    return Text.Output({ value: field.value })
-  }
-
-  if (isTextAreaFieldType(field)) {
     return Text.Output({ value: field.value })
   }
 
@@ -145,7 +157,9 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   if (isAddressFieldType(field)) {
     return Address.Output({
       value: field.value,
-      searchMode: field.config.configuration?.searchMode
+      fields: searchMode === true ? ['country'] : undefined,
+      lineSeparator: searchMode === true ? ', ' : undefined,
+      configuration: field.config
     })
   }
 
@@ -157,7 +171,7 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   }
 
   if (isNameFieldType(field)) {
-    return Name.Output({ value: field.value })
+    return Name.Output({ value: field.value, configuration: field.config })
   }
 
   if (isAdministrativeAreaFieldType(field)) {
@@ -177,23 +191,92 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   }
 }
 
+function findPreviousValueWithSameLabel(
+  field: FieldConfig,
+  previousForm: EventState,
+  formConfig: FormConfig
+): { value?: FieldValue; field?: FieldConfig } {
+  const allFieldsOfCurrentPage =
+    formConfig.pages.find((page) => page.fields.some((f) => f.id === field.id))
+      ?.fields || []
+
+  const formValuesWithSameLabel = allFieldsOfCurrentPage
+    .filter(
+      (f) =>
+        f.label.id === field.label.id &&
+        f.id !== field.id &&
+        previousForm[f.id] !== undefined &&
+        previousForm[f.id] !== null &&
+        previousForm[f.id] !== ''
+    )
+    .map((f) => ({
+      value: previousForm[f.id],
+      field: f
+    }))
+
+  // Most likely there is only one field with the same label
+  // at a time, so we take the first match
+  if (formValuesWithSameLabel.length > 0) {
+    return {
+      value: formValuesWithSameLabel[0].value,
+      field: formValuesWithSameLabel[0].field
+    }
+  }
+
+  return { value: undefined, field: undefined }
+}
+
 export function Output({
   field,
   value,
   previousValue,
-  showPreviouslyMissingValuesAsChanged = true
+  showPreviouslyMissingValuesAsChanged = true,
+  previousForm,
+  formConfig,
+  displayEmptyAsDash = false
 }: {
   field: FieldConfig
   value?: FieldValue
   previousValue?: FieldValue
   showPreviouslyMissingValuesAsChanged?: boolean
+  previousForm?: EventState
+  formConfig?: FormConfig
+  displayEmptyAsDash?: boolean
 }) {
-  // Explicitly check for undefined, so that e.g. number 0 is considered a value
-  const hasValue = value !== undefined
+  // Explicitly check for undefined, so that e.g. number 0 is considered a value,
+  // even null is considered as value removed
+  const hasValue = !isUndefined(value)
+
+  let previousValueField: FieldConfig | undefined
+
+  if (isUndefined(previousValue) && previousForm && formConfig) {
+    // Multiple fields can share the same label but have different IDs
+    // (e.g. "child.birthLocation" and "child.address.privateHome" share the label "Location of birth").
+    // In correction view, if the previous form had a value for "child.birthLocation"
+    // and the correction form populates "child.address.privateHome", only the latter
+    // will be visible while the previous value is hidden due to conditionals.
+    // When comparing to a previous form, check all fields with the same label and compare
+    // their values to detect changes, even if the active field ID is different.
+    // IMPROVEMENT TODO: https://github.com/opencrvs/opencrvs-core/issues/10206
+    const previousValueWithSameLabel = findPreviousValueWithSameLabel(
+      field,
+      previousForm,
+      formConfig
+    )
+    previousValue = previousValueWithSameLabel.value
+    previousValueField = previousValueWithSameLabel.field
+  }
 
   if (!hasValue) {
     if (previousValue) {
-      return ValueOutput({ config: field, value: previousValue })
+      return ValueOutput({
+        config: previousValueField ?? field,
+        value: previousValue
+      })
+    }
+
+    if (displayEmptyAsDash) {
+      return '-'
     }
 
     return ValueOutput({ config: field, value: '' })
@@ -209,11 +292,15 @@ export function Output({
     })
 
     if (valueOutput === null) {
+      if (displayEmptyAsDash) {
+        return '-'
+      }
+
       return null
     }
 
     const previousValueOutput = ValueOutput({
-      config: field,
+      config: previousValueField ?? field,
       value: previousValue
     })
 
@@ -222,7 +309,10 @@ export function Output({
         {previousValueOutput !== null && (
           <>
             <Deleted>
-              <ValueOutput config={field} value={previousValue} />
+              <ValueOutput
+                config={previousValueField ?? field}
+                value={previousValue}
+              />
             </Deleted>
             <br />
           </>
@@ -233,11 +323,19 @@ export function Output({
   }
 
   if (!hasPreviousValue && showPreviouslyMissingValuesAsChanged) {
+    const deleted = ValueOutput({
+      config: { ...field, required: true },
+      value: undefined
+    })
+
     return (
       <>
-        <Deleted>
-          <ValueOutput config={{ ...field, required: true }} value="-" />
-        </Deleted>
+        {deleted ? (
+          <Deleted>{deleted}</Deleted>
+        ) : (
+          // For a deleted 'dash', we dont want to overline the dash
+          <DeletedEmpty>{'-'}</DeletedEmpty>
+        )}
         <br />
         <ValueOutput config={field} value={value} />
       </>

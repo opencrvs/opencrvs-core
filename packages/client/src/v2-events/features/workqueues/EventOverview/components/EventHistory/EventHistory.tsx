@@ -24,7 +24,8 @@ import {
   ActionDocument,
   ActionType,
   EventDocument,
-  getAcceptedActions
+  getAcceptedActions,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -36,6 +37,8 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
+import { usePermissions } from '@client/hooks/useAuthorization'
+import { ILocation } from '@client/offline/reducer'
 import {
   EventHistoryDialog,
   eventHistoryStatusMessage
@@ -68,7 +71,7 @@ const messages = defineMessages({
   role: {
     id: 'v2.event.history.role',
     defaultMessage:
-      '{role, select, LOCAL_REGISTRAR {Local Registrar} SOCIAL_WORKER {Field Agent} REGISTRATION_AGENT {Registration Agent} HEALTH {Health integration} IMPORT {Import integration} NATIONAL_ID {National ID integration} RECORD_SEARCH {Record search integration} WEBHOOK {Webhook} other {Unknown}}',
+      '{role, select, LOCAL_REGISTRAR {Local Registrar} SOCIAL_WORKER {Social Worker} FIELD_AGENT {Field Agent} POLICE_OFFICER {Police Officer} REGISTRATION_AGENT {Registration Agent} HEALTHCARE_WORKER {Healthcare Worker} LOCAL_LEADER {Local Leader} HOSPITAL_CLERK {Hospital Clerk} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} COMMUNITY_LEADER {Community Leader} HEALTH {Health integration} IMPORT {Import integration} NATIONAL_ID {National ID integration} RECORD_SEARCH {Record search integration} WEBHOOK {Webhook} other {Unknown}}',
     description: 'Role of the user in the event history'
   },
   systemDefaultName: {
@@ -81,14 +84,6 @@ const messages = defineMessages({
 const Header = styled(Text)`
   margin-bottom: 20px;
 `
-
-// At first we tried adding a field such as 'userType' to all actions etc, but that would have caused file changes to like 20 files.
-// So lets Keep It Stupid Simple and just check it there is no location -> machine user.
-function isUserAction(
-  item: ActionDocument
-): item is ActionDocument & { createdAtLocation: string } {
-  return Boolean(item.createdAtLocation)
-}
 
 const SystemName = styled.div`
   display: flex;
@@ -112,9 +107,10 @@ function getUserAvatar(
   intl: IntlShape,
   name: string,
   navigate: NavigateFunction,
-  userId: string
+  userId: string,
+  isClickable: boolean
 ) {
-  return (
+  return isClickable ? (
     <Link
       font="bold14"
       id="profile-link"
@@ -127,6 +123,8 @@ function getUserAvatar(
         names={name}
       />
     </Link>
+  ) : (
+    <UserAvatar avatar={undefined} locale={intl.locale} names={name} />
   )
 }
 
@@ -138,6 +136,31 @@ function getSystemAvatar(name: string) {
       </div>
       {name}
     </SystemName>
+  )
+}
+
+function getEventLocation(
+  navigate: NavigateFunction,
+  location: ILocation | undefined,
+  action: ActionDocument,
+  isClickable: boolean
+) {
+  return isClickable ? (
+    <Link
+      font="bold14"
+      onClick={() => {
+        navigate({
+          pathname: routes.TEAM_USER_LIST,
+          search: serializeSearchParams({
+            locationId: action.createdAtLocation
+          })
+        })
+      }}
+    >
+      {location?.name}
+    </Link>
+  ) : (
+    <>{location?.name}</>
   )
 }
 
@@ -169,6 +192,8 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const { getUser, getLocation } = useEventOverviewContext()
   const { getActionTypeForHistory } = useActionForHistory()
 
+  const { canReadUser, canAccessOffice } = usePermissions()
+
   const onHistoryRowClick = (item: ActionDocument, userName: string) => {
     void openModal<void>((close) => (
       <EventHistoryDialog
@@ -192,7 +217,7 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         const immediateApprovedCorrection = visibleHistory.find(
           (h) =>
             h.type === ActionType.APPROVE_CORRECTION &&
-            h.requestId === x.id &&
+            (h.requestId === x.id || h.requestId === x.originalActionId) &&
             h.annotation?.isImmediateCorrection &&
             h.createdBy === x.createdBy
         )
@@ -223,20 +248,34 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       currentPageNumber * DEFAULT_HISTORY_RECORD_PAGE_SIZE
     )
     .map((action) => {
-      const userAction = isUserAction(action)
       const user = getUser(action.createdBy)
       const system = systems.find((s) => s._id === action.createdBy)
-
-      const location = userAction
+      const location = action.createdAtLocation
         ? getLocation(action.createdAtLocation)
         : undefined
 
+      const canSeeOtherUserHistory = canReadUser({
+        id: user.id,
+        primaryOffice: { id: user.primaryOfficeId }
+      })
+
+      const canSeeHistoryUserOffice = canAccessOffice({
+        id: user.primaryOfficeId
+      })
+
+      const userAction = action.createdByUserType === TokenUserType.enum.user
       const userName = userAction
         ? getUsersFullName(user.name, intl.locale)
         : (system?.name ?? intl.formatMessage(messages.systemDefaultName))
 
       const userElement = userAction
-        ? getUserAvatar(intl, userName, navigate, action.createdBy)
+        ? getUserAvatar(
+            intl,
+            userName,
+            navigate,
+            action.createdBy,
+            canSeeOtherUserHistory
+          )
         : getSystemAvatar(userName)
 
       return {
@@ -256,20 +295,11 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         ),
         user: userElement,
         role: intl.formatMessage(messages.role, { role: action.createdByRole }),
-        location: (
-          <Link
-            font="bold14"
-            onClick={() => {
-              navigate({
-                pathname: routes.TEAM_USER_LIST,
-                search: serializeSearchParams({
-                  locationId: action.createdAtLocation
-                })
-              })
-            }}
-          >
-            {location?.name}
-          </Link>
+        location: getEventLocation(
+          navigate,
+          location,
+          action,
+          canSeeHistoryUserOffice
         )
       }
     })

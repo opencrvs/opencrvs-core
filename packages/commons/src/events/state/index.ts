@@ -10,22 +10,30 @@
  */
 
 import { ActionType } from '../ActionType'
+import { orderBy, findLast } from 'lodash'
 import {
   Action,
   ActionDocument,
   ActionStatus,
   ActionUpdate,
-  EventState
+  EventState,
+  PotentialDuplicate
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
-import { deepMerge, findActiveDrafts } from '../utils'
+import {
+  aggregateActionDeclarations,
+  deepMerge,
+  getAcceptedActions,
+  getCompleteActionAnnotation,
+  omitHiddenPaginatedFields
+} from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
 import { getFlagsFromActions } from './flags'
-import { UUID } from '../../uuid'
+import { getUUID, UUID } from '../../uuid'
 import {
   DocumentPath,
   FullDocumentPath,
@@ -55,7 +63,9 @@ export function getStatusFromActions(actions: Array<Action>) {
         case ActionType.REJECT:
         case ActionType.REQUEST_CORRECTION:
         case ActionType.APPROVE_CORRECTION:
-        case ActionType.MARKED_AS_DUPLICATE:
+        case ActionType.DUPLICATE_DETECTED:
+        case ActionType.MARK_AS_NOT_DUPLICATE:
+        case ActionType.MARK_AS_DUPLICATE:
         case ActionType.REJECT_CORRECTION:
         case ActionType.READ:
         default:
@@ -90,44 +100,6 @@ export function getAssignedUserSignatureFromActions(
 
     return signature
   }, null)
-}
-
-function aggregateActionDeclarations(
-  actions: Array<ActionDocument>
-): EventState {
-  /** Types that are not taken into the aggregate values (e.g. while printing certificate)
-   * stop auto filling collector form with previous print action data)
-   */
-
-  const excludedActions = [
-    ActionType.REQUEST_CORRECTION,
-    ActionType.PRINT_CERTIFICATE,
-    ActionType.REJECT_CORRECTION
-  ]
-
-  return actions.reduce((declaration, action) => {
-    if (
-      excludedActions.some((excludedAction) => excludedAction === action.type)
-    ) {
-      return declaration
-    }
-
-    /*
-     * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
-     * details in the correction. To do this, we find the original request that this
-     * approval is for and merge its details with the current data of the record.
-     */
-
-    if (action.type === ActionType.APPROVE_CORRECTION) {
-      const requestAction = actions.find(({ id }) => id === action.requestId)
-      if (!requestAction) {
-        return declaration
-      }
-      return deepMerge(declaration, requestAction.declaration)
-    }
-
-    return deepMerge(declaration, action.declaration)
-  }, {})
 }
 
 type NonNullableDeep<T> = T extends [unknown, ...unknown[]] // <-- ✨ tiny change: handle tuples first
@@ -175,11 +147,6 @@ export function deepDropNulls<T>(obj: T): NonNullableDeep<T> {
 export function isUndeclaredDraft(status: EventStatus): boolean {
   return status === EventStatus.enum.CREATED
 }
-export function getAcceptedActions(event: EventDocument): ActionDocument[] {
-  return event.actions.filter(
-    (a): a is ActionDocument => a.status === ActionStatus.Accepted
-  )
-}
 
 export const DEFAULT_DATE_OF_EVENT_PROPERTY =
   'createdAt' satisfies keyof EventDocument
@@ -194,6 +161,23 @@ export function resolveDateOfEvent(
   }
   const parsedDate = ZodDate.safeParse(declaration[config.dateOfEvent.$$field])
   return parsedDate.success ? parsedDate.data : undefined
+}
+
+export function extractPotentialDuplicatesFromActions(
+  actions: Action[]
+): PotentialDuplicate[] {
+  return actions.reduce<PotentialDuplicate[]>((duplicates, action) => {
+    if (action.type === ActionType.DUPLICATE_DETECTED) {
+      duplicates = action.content.duplicates
+    }
+    if (
+      action.type === ActionType.MARK_AS_NOT_DUPLICATE ||
+      action.type === ActionType.MARK_AS_DUPLICATE
+    ) {
+      duplicates = []
+    }
+    return duplicates
+  }, [])
 }
 
 /**
@@ -222,7 +206,7 @@ export function getCurrentEventState(
   // Includes only accepted actions metadata. Sometimes (e.g. on updatedAt) we want to show the accepted timestamp rather than the request timestamp.
   const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
 
-  const declaration = aggregateActionDeclarations(acceptedActions)
+  const declaration = aggregateActionDeclarations(event, config)
 
   return deepDropNulls({
     id: event.id,
@@ -239,56 +223,63 @@ export function getCurrentEventState(
     assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
     updatedBy: requestActionMetadata.createdBy,
     updatedAtLocation: requestActionMetadata.createdAtLocation,
-    declaration,
+    declaration: omitHiddenPaginatedFields(config.declaration, declaration),
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),
+    potentialDuplicates: extractPotentialDuplicatesFromActions(event.actions),
     flags: getFlagsFromActions(event.actions)
   })
 }
 
 /**
- * @returns the future state of the event with drafts applied
+ * @returns the future state of the event with drafts applied to all fields.
+ *
+ * NOTE: We treat the draft as a new action that is applied to the event. This means that even the status of the is changed as if draft has been accepted.
+ * @see applyDraftToEventIndex to apply the draft to the event without changing the status.
+ *
  */
-export function getCurrentEventStateWithDrafts({
+export function dangerouslyGetCurrentEventStateWithDrafts({
   event,
-  drafts,
+  draft,
   configuration
 }: {
   event: EventDocument
-  drafts: Draft[]
+  draft: Draft
   configuration: EventConfig
 }): EventIndex {
   const actions = event.actions
     .slice()
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  const activeDrafts = findActiveDrafts(event, drafts)
-    .map((draft) => draft.action)
-    .flatMap((action) => {
-      /*
-       * If the action encountered is "REQUEST_CORRECTION", we want to pretend like it was approved
-       * so previews etc are shown correctly
-       */
-      if (action.type === ActionType.REQUEST_CORRECTION) {
-        return [
-          action,
+  const draftActions: ActionDocument[] =
+    draft.action.type === ActionType.REQUEST_CORRECTION
+      ? /*
+         * If the action encountered is "REQUEST_CORRECTION", we want to pretend like it was approved
+         * so previews etc are shown correctly
+         */
+        [
+          draft.action as ActionDocument,
           {
-            ...action,
+            id: getUUID(),
+            ...draft.action,
             type: ActionType.APPROVE_CORRECTION
-          }
-        ] as ActionDocument[]
-      }
-      return [action] as ActionDocument[]
-    })
+          } as ActionDocument
+        ]
+      : [{ ...draft.action, id: getUUID() } as ActionDocument]
 
-  const actionWithDrafts = [...actions, ...activeDrafts].sort()
-  const withDrafts: EventDocument = {
+  const actionsWithDraft = orderBy(
+    [...actions, ...draftActions],
+    ['createdAt'],
+    'asc'
+  )
+
+  const eventWithDraft: EventDocument = {
     ...event,
-    actions: actionWithDrafts
+    actions: actionsWithDraft
   }
 
-  return getCurrentEventState(withDrafts, configuration)
+  return getCurrentEventState(eventWithDraft, configuration)
 }
 
 export function applyDeclarationToEventIndex(
@@ -308,28 +299,24 @@ export function applyDeclarationToEventIndex(
   }
 }
 
-export function applyDraftsToEventIndex(
+/**
+ * Applies draft to the event index following internal business rules.
+ *
+ * Ensures only necessary fields are updated based on the draft (declaration, updatedAt, flags).
+ * NOTE: When naively applying draft, it leads to incorrect event state, since drafts are 'Accepted' by default.
+ *
+ */
+export function applyDraftToEventIndex(
   eventIndex: EventIndex,
-  drafts: Draft[],
+  draft: Draft,
   eventConfiguration: EventConfig
 ) {
-  const indexedAt = eventIndex.updatedAt
-
-  const activeDrafts = drafts
-    .filter(({ createdAt }) => new Date(createdAt) > new Date(indexedAt))
-    .map((draft) => draft.action)
-    .sort()
-
-  if (activeDrafts.length === 0) {
-    return eventIndex
-  }
-
   return applyDeclarationToEventIndex(
     {
       ...eventIndex,
-      updatedAt: activeDrafts[activeDrafts.length - 1].createdAt
+      updatedAt: draft.createdAt
     },
-    activeDrafts[activeDrafts.length - 1].declaration,
+    draft.action.declaration,
     eventConfiguration
   )
 }
@@ -353,25 +340,32 @@ export function getAnnotationFromDrafts(drafts: Draft[]) {
 export function getActionAnnotation({
   event,
   actionType,
-  drafts = []
+  draft
 }: {
   event: EventDocument
   actionType: ActionType
-  drafts?: Draft[]
+  draft?: Draft
 }): EventState {
   const activeActions = getAcceptedActions(event)
-  const action = activeActions.find(
-    (activeAction) => actionType === activeAction.type
+
+  const action = findLast(activeActions, (a) => a.type === actionType)
+
+  const actionWithCompleteAnnotation = action && {
+    ...action,
+    annotation: getCompleteActionAnnotation({}, event, action)
+  }
+
+  const matchingDraft = draft?.action.type === actionType ? draft : undefined
+
+  const sortedActions = orderBy(
+    [actionWithCompleteAnnotation, matchingDraft?.action].filter(
+      (a) => a !== undefined
+    ),
+    'createdAt',
+    'asc'
   )
 
-  const eventDrafts = drafts.filter((draft) => draft.eventId === event.id)
-
-  const sorted = [
-    ...(action ? [action] : []),
-    ...eventDrafts.map((draft) => draft.action)
-  ].sort()
-
-  const annotation = sorted.reduce((ann, sortedAction) => {
+  const annotation = sortedActions.reduce((ann, sortedAction) => {
     return deepMerge(ann, sortedAction.annotation ?? {})
   }, {})
 

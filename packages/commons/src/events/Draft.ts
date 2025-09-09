@@ -26,12 +26,12 @@ export const Draft = z.object({
   transactionId: z.string(),
   createdAt: z.string().datetime(),
   action: ActionBase.extend({
-    type: ActionTypes
-  }).omit({ id: true })
+    type: ActionTypes.exclude([ActionTypes.Enum.DELETE])
+  }).omit({ id: true, createdAtLocation: true })
 })
 
 export const DraftInput = BaseActionInput.extend({
-  type: ActionTypes,
+  type: ActionTypes.exclude([ActionTypes.Enum.DELETE]),
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,

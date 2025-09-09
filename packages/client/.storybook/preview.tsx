@@ -41,7 +41,9 @@ import {
 import {
   Draft,
   EventDocument,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  TestUserRole,
+  UUID
 } from '@opencrvs/commons/client'
 import {
   tennisClubMembershipEventDocument,
@@ -178,11 +180,47 @@ const preview: Preview = {
     async (options) => {
       await clearStorage()
       queryClient.clear()
+      const primaryOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 
-      window.localStorage.setItem(
-        'opencrvs',
-        generator.user.token.localRegistrar
-      )
+      if (options.userRole === TestUserRole.Enum.FIELD_AGENT) {
+        window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+        addUserToQueryData({
+          id: generator.user.id.fieldAgent,
+          name: [
+            {
+              use: 'en',
+              given: ['Kalusha'],
+              family: 'Bwalya'
+            }
+          ],
+          role: 'SOCIAL_WORKER',
+          primaryOfficeId
+        })
+      } else if (options.userRole === TestUserRole.Enum.REGISTRATION_AGENT) {
+        window.localStorage.setItem(
+          'opencrvs',
+          generator.user.token.registrationAgent
+        )
+
+        addUserToQueryData({
+          id: generator.user.id.registrationAgent,
+          name: [{ use: 'en', given: ['Felix'], family: 'Katongo' }],
+          role: TestUserRole.Enum.REGISTRATION_AGENT,
+          primaryOfficeId
+        })
+      } else {
+        window.localStorage.setItem(
+          'opencrvs',
+          generator.user.token.localRegistrar
+        )
+
+        addUserToQueryData({
+          id: generator.user.id.localRegistrar,
+          name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
+          role: TestUserRole.Enum.LOCAL_REGISTRAR,
+          primaryOfficeId
+        })
+      }
 
       /*
        * OFFLINE DATA INITIALISATION
@@ -207,7 +245,8 @@ const preview: Preview = {
         name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
         role: 'LOCAL_REGISTRAR',
         signature: undefined,
-        avatar: undefined
+        avatar: undefined,
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
       })
 
       const offlineEvents: Array<EventDocument> = options.parameters?.offline

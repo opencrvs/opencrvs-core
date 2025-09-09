@@ -18,8 +18,8 @@ exports[`Returns events based on the updatedAt column 1`] = `
       "type": "image/png",
     },
     "applicant.name": {
-      "firstname": "Sara",
-      "surname": "Sarajanen",
+      "firstname": "Sarachella",
+      "surname": "Smith",
     },
     "recommender.none": true,
   },
@@ -36,6 +36,7 @@ exports[`Returns events based on the updatedAt column 1`] = `
       "createdByUserType": "[sanitized]",
     },
   },
+  "potentialDuplicates": [],
   "status": "DECLARED",
   "trackingId": "[sanitized]",
   "type": "tennis-club-membership",
@@ -64,8 +65,8 @@ exports[`Returns events based on the updatedAt column 2`] = `
       "type": "image/png",
     },
     "applicant.name": {
-      "firstname": "Sarachella",
-      "surname": "Smith",
+      "firstname": "Sara",
+      "surname": "Sarajanen",
     },
     "recommender.none": true,
   },
@@ -82,6 +83,7 @@ exports[`Returns events based on the updatedAt column 2`] = `
       "createdByUserType": "[sanitized]",
     },
   },
+  "potentialDuplicates": [],
   "status": "DECLARED",
   "trackingId": "[sanitized]",
   "type": "tennis-club-membership",
@@ -129,6 +131,7 @@ exports[`Returns relevant events in right order 1`] = `
       "createdByUserType": "[sanitized]",
     },
   },
+  "potentialDuplicates": [],
   "status": "DECLARED",
   "trackingId": "[sanitized]",
   "type": "tennis-club-membership",
@@ -188,6 +191,7 @@ exports[`Returns relevant events in right order 2`] = `
       "registrationNumber": "[sanitized]",
     },
   },
+  "potentialDuplicates": [],
   "status": "REGISTERED",
   "trackingId": "[sanitized]",
   "type": "tennis-club-membership",
@@ -205,6 +209,7 @@ exports[`Throws when date field is invalid 1`] = `
     "validation": "date",
     "message": "Invalid date",
     "path": [
+      "query",
       "clauses",
       0,
       "updatedAt",
@@ -221,6 +226,7 @@ exports[`Throws when one of the date range fields has invalid date 1`] = `
     "validation": "date",
     "message": "Invalid date",
     "path": [
+      "query",
       "clauses",
       0,
       "updatedAt",
@@ -236,6 +242,7 @@ exports[`Throws when searching by unrelated properties 1`] = `
     "code": "custom",
     "message": "At least one query field must be specified.",
     "path": [
+      "query",
       "clauses",
       0
     ]
@@ -253,6 +260,7 @@ exports[`Throws when searching with empty clauses 1`] = `
     "exact": false,
     "message": "At least one clause is required.",
     "path": [
+      "query",
       "clauses"
     ]
   }
@@ -263,47 +271,12 @@ exports[`Throws when searching without payload 1`] = `
 [TRPCError: [
   {
     "code": "invalid_type",
-    "expected": "array",
+    "expected": "object",
     "received": "undefined",
     "path": [
-      "clauses"
+      "query"
     ],
     "message": "Required"
-  },
-  {
-    "code": "invalid_union",
-    "unionErrors": [
-      {
-        "issues": [
-          {
-            "code": "invalid_literal",
-            "expected": "and",
-            "path": [
-              "type"
-            ],
-            "message": "Invalid literal value, expected \\"and\\""
-          }
-        ],
-        "name": "ZodError"
-      },
-      {
-        "issues": [
-          {
-            "code": "invalid_literal",
-            "expected": "or",
-            "path": [
-              "type"
-            ],
-            "message": "Invalid literal value, expected \\"or\\""
-          }
-        ],
-        "name": "ZodError"
-      }
-    ],
-    "path": [
-      "type"
-    ],
-    "message": "Invalid input"
   }
 ]]
 `;
@@ -328,8 +301,8 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "type": "image/png",
       },
       "applicant.name": {
-        "firstname": "Sarah",
-        "surname": "Tsarakovski",
+        "firstname": "Emily",
+        "surname": "Garcia",
       },
       "recommender.none": true,
     },
@@ -346,6 +319,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "createdByUserType": "[sanitized]",
       },
     },
+    "potentialDuplicates": [],
     "status": "DECLARED",
     "trackingId": "[sanitized]",
     "type": "tennis-club-membership",
@@ -372,8 +346,8 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "type": "image/png",
       },
       "applicant.name": {
-        "firstname": "Emily",
-        "surname": "Garcia",
+        "firstname": "Sarah",
+        "surname": "Tsarakovski",
       },
       "recommender.none": true,
     },
@@ -390,6 +364,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "createdByUserType": "[sanitized]",
       },
     },
+    "potentialDuplicates": [],
     "status": "DECLARED",
     "trackingId": "[sanitized]",
     "type": "tennis-club-membership",
@@ -403,94 +378,6 @@ exports[`User only sees tennis club membership events within their jurisdiction 
 
 exports[`User only sees tennis club membership events within their jurisdiction 2`] = `
 [
-  {
-    "assignedTo": "[sanitized]",
-    "createdAt": "[sanitized]",
-    "createdAtLocation": "[sanitized]",
-    "createdBy": "[sanitized]",
-    "createdBySignature": "/random-bucket/9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
-    "createdByUserType": "[sanitized]",
-    "dateOfEvent": "[sanitized]",
-    "declaration": {
-      "applicant.age": 19,
-      "applicant.dobUnknown": true,
-      "applicant.email": "test@opencrvs.org",
-      "applicant.image": {
-        "originalFilename": "abcd.png",
-        "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
-        "type": "image/png",
-      },
-      "applicant.name": {
-        "firstname": "Sarah",
-        "surname": "Tsarakovski",
-      },
-      "recommender.none": true,
-    },
-    "flags": [],
-    "id": "[sanitized]",
-    "legalStatuses": {
-      "DECLARED": {
-        "acceptedAt": "[sanitized]",
-        "createdAt": "[sanitized]",
-        "createdAtLocation": "[sanitized]",
-        "createdBy": "[sanitized]",
-        "createdByRole": "REGISTRATION_AGENT",
-        "createdBySignature": "/random-bucket/9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
-        "createdByUserType": "[sanitized]",
-      },
-    },
-    "status": "DECLARED",
-    "trackingId": "[sanitized]",
-    "type": "tennis-club-membership",
-    "updatedAt": "[sanitized]",
-    "updatedAtLocation": "[sanitized]",
-    "updatedBy": "[sanitized]",
-    "updatedByUserRole": "REGISTRATION_AGENT",
-  },
-  {
-    "assignedTo": "[sanitized]",
-    "createdAt": "[sanitized]",
-    "createdAtLocation": "[sanitized]",
-    "createdBy": "[sanitized]",
-    "createdBySignature": "/random-bucket/9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
-    "createdByUserType": "[sanitized]",
-    "dateOfEvent": "[sanitized]",
-    "declaration": {
-      "applicant.age": 19,
-      "applicant.dobUnknown": true,
-      "applicant.email": "test@opencrvs.org",
-      "applicant.image": {
-        "originalFilename": "abcd.png",
-        "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
-        "type": "image/png",
-      },
-      "applicant.name": {
-        "firstname": "Emily",
-        "surname": "Garcia",
-      },
-      "recommender.none": true,
-    },
-    "flags": [],
-    "id": "[sanitized]",
-    "legalStatuses": {
-      "DECLARED": {
-        "acceptedAt": "[sanitized]",
-        "createdAt": "[sanitized]",
-        "createdAtLocation": "[sanitized]",
-        "createdBy": "[sanitized]",
-        "createdByRole": "REGISTRATION_AGENT",
-        "createdBySignature": "/random-bucket/9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
-        "createdByUserType": "[sanitized]",
-      },
-    },
-    "status": "DECLARED",
-    "trackingId": "[sanitized]",
-    "type": "tennis-club-membership",
-    "updatedAt": "[sanitized]",
-    "updatedAtLocation": "[sanitized]",
-    "updatedBy": "[sanitized]",
-    "updatedByUserRole": "REGISTRATION_AGENT",
-  },
   {
     "assignedTo": "[sanitized]",
     "createdAt": "[sanitized]",
@@ -527,6 +414,97 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "createdByUserType": "[sanitized]",
       },
     },
+    "potentialDuplicates": [],
+    "status": "DECLARED",
+    "trackingId": "[sanitized]",
+    "type": "tennis-club-membership",
+    "updatedAt": "[sanitized]",
+    "updatedAtLocation": "[sanitized]",
+    "updatedBy": "[sanitized]",
+    "updatedByUserRole": "REGISTRATION_AGENT",
+  },
+  {
+    "assignedTo": "[sanitized]",
+    "createdAt": "[sanitized]",
+    "createdAtLocation": "[sanitized]",
+    "createdBy": "[sanitized]",
+    "createdBySignature": "/random-bucket/9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
+    "createdByUserType": "[sanitized]",
+    "dateOfEvent": "[sanitized]",
+    "declaration": {
+      "applicant.age": 19,
+      "applicant.dobUnknown": true,
+      "applicant.email": "test@opencrvs.org",
+      "applicant.image": {
+        "originalFilename": "abcd.png",
+        "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+        "type": "image/png",
+      },
+      "applicant.name": {
+        "firstname": "Emily",
+        "surname": "Garcia",
+      },
+      "recommender.none": true,
+    },
+    "flags": [],
+    "id": "[sanitized]",
+    "legalStatuses": {
+      "DECLARED": {
+        "acceptedAt": "[sanitized]",
+        "createdAt": "[sanitized]",
+        "createdAtLocation": "[sanitized]",
+        "createdBy": "[sanitized]",
+        "createdByRole": "REGISTRATION_AGENT",
+        "createdBySignature": "/random-bucket/9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
+        "createdByUserType": "[sanitized]",
+      },
+    },
+    "potentialDuplicates": [],
+    "status": "DECLARED",
+    "trackingId": "[sanitized]",
+    "type": "tennis-club-membership",
+    "updatedAt": "[sanitized]",
+    "updatedAtLocation": "[sanitized]",
+    "updatedBy": "[sanitized]",
+    "updatedByUserRole": "REGISTRATION_AGENT",
+  },
+  {
+    "assignedTo": "[sanitized]",
+    "createdAt": "[sanitized]",
+    "createdAtLocation": "[sanitized]",
+    "createdBy": "[sanitized]",
+    "createdBySignature": "/random-bucket/9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
+    "createdByUserType": "[sanitized]",
+    "dateOfEvent": "[sanitized]",
+    "declaration": {
+      "applicant.age": 19,
+      "applicant.dobUnknown": true,
+      "applicant.email": "test@opencrvs.org",
+      "applicant.image": {
+        "originalFilename": "abcd.png",
+        "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+        "type": "image/png",
+      },
+      "applicant.name": {
+        "firstname": "Sarah",
+        "surname": "Tsarakovski",
+      },
+      "recommender.none": true,
+    },
+    "flags": [],
+    "id": "[sanitized]",
+    "legalStatuses": {
+      "DECLARED": {
+        "acceptedAt": "[sanitized]",
+        "createdAt": "[sanitized]",
+        "createdAtLocation": "[sanitized]",
+        "createdBy": "[sanitized]",
+        "createdByRole": "REGISTRATION_AGENT",
+        "createdBySignature": "/random-bucket/9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
+        "createdByUserType": "[sanitized]",
+      },
+    },
+    "potentialDuplicates": [],
     "status": "DECLARED",
     "trackingId": "[sanitized]",
     "type": "tennis-club-membership",
@@ -575,6 +553,7 @@ exports[`User with my-jurisdiction scope can see events from other offices based
       "createdByUserType": "[sanitized]",
     },
   },
+  "potentialDuplicates": [],
   "status": "DECLARED",
   "trackingId": "[sanitized]",
   "type": "tennis-club-membership",
@@ -582,6 +561,42 @@ exports[`User with my-jurisdiction scope can see events from other offices based
   "updatedAtLocation": "[sanitized]",
   "updatedBy": "[sanitized]",
   "updatedByUserRole": "REGISTRATION_AGENT",
+}
+`;
+
+exports[`User with my-jurisdiction scope only sees events created by system user to their primary office 1`] = `
+{
+  "createdAt": "[sanitized]",
+  "createdBy": "[sanitized]",
+  "createdByUserType": "[sanitized]",
+  "dateOfEvent": "[sanitized]",
+  "declaration": {
+    "applicant.age": 19,
+    "applicant.dobUnknown": true,
+    "applicant.image": {
+      "originalFilename": "abcd.png",
+      "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+      "type": "image/png",
+    },
+    "applicant.name": {
+      "firstname": "Chris",
+      "surname": "Smith",
+    },
+    "recommender.none": true,
+  },
+  "flags": [
+    "incomplete",
+  ],
+  "id": "[sanitized]",
+  "legalStatuses": {},
+  "potentialDuplicates": [],
+  "status": "NOTIFIED",
+  "trackingId": "[sanitized]",
+  "type": "tennis-club-membership",
+  "updatedAt": "[sanitized]",
+  "updatedAtLocation": "[sanitized]",
+  "updatedBy": "[sanitized]",
+  "updatedByUserRole": "HEALTH",
 }
 `;
 
@@ -622,6 +637,7 @@ exports[`User with my-jurisdiction scope only sees events from their primary off
       "createdByUserType": "[sanitized]",
     },
   },
+  "potentialDuplicates": [],
   "status": "DECLARED",
   "trackingId": "[sanitized]",
   "type": "tennis-club-membership",

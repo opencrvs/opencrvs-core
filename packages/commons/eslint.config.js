@@ -16,7 +16,7 @@ const baseConfig = require('../../eslint.config.js')
 const eventsConfig = require('./eslint.events.config.js')
 
 module.exports = defineConfig([
-  { ignores: ['build/**/*', 'eslint*'] },
+  { ignores: ['build/**/*', 'eslint*', '.wireit'] },
   ...baseConfig,
   {
     languageOptions: {

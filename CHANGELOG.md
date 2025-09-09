@@ -28,6 +28,14 @@
 - Save certificate templateId so it can be shown in task history and made available for conditional [#9959](https://github.com/opencrvs/opencrvs-core/issues/9959)
 - Deprecate external id/ statistical id in V2. Remove external_id column from locations table and location seeding step [#9974](https://github.com/opencrvs/opencrvs-core/issues/9974)
 
+- **Updated environment variable**
+
+  - Renamed `COUNTRY_CONFIG_URL` → `COUNTRY_CONFIG_URL_EXTERNAL` in the auth service to make its purpose clearer and more explicit.
+
+### Bug fixes
+
+- Fix informant details not populating in API [#10311](https://github.com/opencrvs/opencrvs-core/issues/10311)
+
 ## [1.8.1](https://github.com/opencrvs/opencrvs-core/compare/v1.8.0...v1.8.1)
 
 ### Bug fixes

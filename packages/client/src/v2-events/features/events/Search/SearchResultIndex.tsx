@@ -70,16 +70,20 @@ export const SearchResultIndex = () => {
    * useSuspenseQuery unmounts the component causing the searchQuery to be
    * re-evaluated, which leads to an infinite loop.
    */
-  const queryData =
-    searchEvent.useQuery(toAdvancedSearchQueryType(searchQuery, eventType))
-      .data ?? []
+  const queryData = searchEvent.useQuery({
+    query: toAdvancedSearchQueryType(searchQuery, eventType),
+    ...typedSearchParams
+  }).data ?? {
+    results: [],
+    total: 0
+  }
 
   return (
     <SearchResultComponent
       actions={['DEFAULT']}
       columns={mandatoryColumns}
       eventConfigs={[eventConfig]}
-      queryData={queryData}
+      queryData={queryData.results}
       tabBarContent={
         <SearchCriteriaPanel
           eventConfig={eventConfig}
@@ -93,9 +97,10 @@ export const SearchResultIndex = () => {
           defaultMessage: 'Search results ({count})'
         },
         {
-          count: queryData.length
+          count: queryData.total
         }
       )}
+      totalResults={queryData.total}
       {...typedSearchParams}
     />
   )

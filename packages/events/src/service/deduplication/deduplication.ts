@@ -8,18 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import * as elasticsearch from '@elastic/elasticsearch'
-
+import { get } from 'lodash'
 import { DateTime } from 'luxon'
 import {
   EventIndex,
   DeduplicationConfig,
-  Clause,
   ClauseOutput,
   FieldValue,
-  EventConfig
+  EventConfig,
+  getDeclarationFieldById,
+  DateValue,
+  FieldType,
+  extractPotentialDuplicatesFromActions,
+  EventDocument
 } from '@opencrvs/commons/events'
+import { logger } from '@opencrvs/commons'
 import {
   getOrCreateClient,
   getEventIndexName
@@ -29,17 +33,75 @@ import {
   decodeEventIndex,
   EncodedEventIndex,
   encodeEventIndex,
-  encodeFieldId
+  encodeFieldId,
+  nameQueryKey
 } from '@events/service/indexing/utils'
+import { TrpcContext } from '../../context'
+import { getEventsAuditTrailed } from '../../storage/postgres/events/events'
 
-function generateElasticsearchQuery(
+/**
+ * If the value referenced in a query is missing, the query resolves to null
+ * The `and` query resolves to null if any of the sub-queries is null,
+ * while the `or` query resolves to null if all of the sub-queries are null
+ */
+export function generateElasticsearchQuery(
   eventIndex: EncodedEventIndex,
-  configuration: ClauseOutput
+  queryInput: ClauseOutput,
+  eventConfig: EventConfig
 ): elasticsearch.estypes.QueryDslQueryContainer | null {
-  // @TODO: When implementing deduplication revisit this. For now, we just want to use the right types for es.
+  if (queryInput.type === 'and') {
+    const resolvedQueries = queryInput.clauses.map((clause) => {
+      return generateElasticsearchQuery(eventIndex, clause, eventConfig)
+    })
+
+    if (resolvedQueries.some((q) => q === null)) {
+      return null
+    }
+
+    return {
+      bool: {
+        must: resolvedQueries.filter(
+          (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
+        ),
+        should: undefined
+      }
+    }
+  } else if (queryInput.type === 'or') {
+    const resolvedQueries = queryInput.clauses.map((clause) => {
+      return generateElasticsearchQuery(eventIndex, clause, eventConfig)
+    })
+
+    if (resolvedQueries.every((q) => q === null)) {
+      return null
+    }
+
+    return {
+      bool: {
+        should: resolvedQueries.filter(
+          (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
+        )
+      }
+    }
+  }
+  const rawFieldId = queryInput.fieldId
+  const fieldConfig = getDeclarationFieldById(eventConfig, rawFieldId)
+  const encodedFieldId = encodeFieldId(rawFieldId)
+  const valuePath =
+    fieldConfig.type === FieldType.NAME
+      ? nameQueryKey(encodedFieldId)
+      : encodedFieldId
+
+  const queryKey = declarationReference(valuePath)
+  const queryValue = get(eventIndex.declaration, valuePath)
+  if (!queryValue) {
+    logger.warn(
+      `No value found for field ${rawFieldId} in the current event. Skipping query clause.`
+    )
+    return null
+  }
   const isPrimitiveQueryValue = (
     value: FieldValue
-  ): value is string | number => {
+  ): value is string | number | boolean => {
     return (
       typeof value === 'string' ||
       typeof value === 'number' ||
@@ -47,101 +109,78 @@ function generateElasticsearchQuery(
     )
   }
 
-  const matcherFieldWithoutData =
-    configuration.type !== 'and' &&
-    configuration.type !== 'or' &&
-    !eventIndex.declaration[encodeFieldId(configuration.fieldId)]
-
-  if (matcherFieldWithoutData) {
-    return null
-  }
-
-  switch (configuration.type) {
-    case 'and':
-      const clauses = configuration.clauses
-        .map((clause) => {
-          return generateElasticsearchQuery(eventIndex, clause)
-        })
-        .filter(
-          (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
-        )
-
-      return {
-        bool: {
-          must: clauses
-        } as elasticsearch.estypes.QueryDslBoolQuery
-      }
-    case 'or':
-      return {
-        bool: {
-          should: configuration.clauses
-            .map((clause) => generateElasticsearchQuery(eventIndex, clause))
-            .filter(
-              (x): x is elasticsearch.estypes.QueryDslQueryContainer =>
-                x !== null
-            )
-        }
-      }
+  switch (queryInput.type) {
     case 'fuzzy': {
-      const encodedFieldId = encodeFieldId(configuration.fieldId)
-
-      const fieldValue = eventIndex.declaration[encodedFieldId]
-      if (!isPrimitiveQueryValue(fieldValue)) {
+      if (!isPrimitiveQueryValue(queryValue)) {
+        logger.warn(
+          queryValue,
+          `Invalid query value found for fuzzy matching ${rawFieldId}. Expected string, number or boolean`
+        )
         return null
       }
 
       return {
         match: {
-          [declarationReference(encodedFieldId)]: {
-            query: fieldValue,
-            fuzziness: configuration.options.fuzziness,
-            boost: configuration.options.boost
+          [queryKey]: {
+            query: queryValue,
+            fuzziness: queryInput.options.fuzziness,
+            boost: queryInput.options.boost
           }
         }
       }
     }
     case 'strict': {
-      const encodedFieldId = encodeFieldId(configuration.fieldId)
-      const fieldValue = eventIndex.declaration[encodedFieldId]
-      if (!isPrimitiveQueryValue(fieldValue)) {
+      if (!isPrimitiveQueryValue(queryValue)) {
+        logger.warn(
+          queryValue,
+          `Invalid query value for found for strict matching ${rawFieldId}. Expected string, number or boolean`
+        )
         return null
       }
 
       return {
         match_phrase: {
-          [declarationReference(encodedFieldId)]: fieldValue.toString()
+          [queryKey]: queryValue.toString()
         }
       }
     }
     case 'dateRange': {
-      const encodedFieldId = encodeFieldId(configuration.fieldId)
-      const origin = encodeFieldId(configuration.options.origin)
-      return {
-        range: {
-          [declarationReference(encodedFieldId)]: {
-            // @TODO: Improve types for origin field to be sure it returns a string when accessing data
-            gte: DateTime.fromJSDate(
-              new Date(eventIndex.declaration[origin] as string)
-            )
-              .minus({ days: configuration.options.days })
-              .toISO(),
-            lte: DateTime.fromJSDate(
-              new Date(eventIndex.declaration[origin] as string)
-            )
-              .plus({ days: configuration.options.days })
-              .toISO()
-          }
-        }
+      const dateValue = DateValue.safeParse(queryValue)
+      if (!dateValue.success) {
+        logger.warn(
+          queryValue,
+          `Invalid query value for found for dateRange matching ${rawFieldId}. Expected date in YYYY-MM-DD format`
+        )
+        return null
       }
-    }
-    case 'dateDistance': {
-      const encodedFieldId = encodeFieldId(configuration.fieldId)
-      const origin = encodeFieldId(configuration.options.origin)
+      const pivot =
+        queryInput.options.pivot ??
+        Math.floor((queryInput.options.days * 2) / 3)
       return {
-        distance_feature: {
-          field: declarationReference(encodedFieldId),
-          pivot: `${configuration.options.days}d`,
-          origin: eventIndex.declaration[origin]
+        bool: {
+          must: [
+            {
+              range: {
+                [queryKey]: {
+                  gte: DateTime.fromISO(dateValue.data)
+                    .minus({ days: queryInput.options.days })
+                    .toISO(),
+                  lte: DateTime.fromISO(dateValue.data)
+                    .plus({ days: queryInput.options.days })
+                    .toISO()
+                }
+              }
+            }
+          ],
+          should: [
+            {
+              distance_feature: {
+                field: queryKey,
+                pivot: `${pivot}d`,
+                origin: dateValue.data
+              }
+            }
+          ]
         }
       }
     }
@@ -152,13 +191,14 @@ export async function searchForDuplicates(
   eventIndex: EventIndex,
   configuration: DeduplicationConfig,
   eventConfig: EventConfig
-): Promise<{ score: number; event: EventIndex | undefined }[]> {
+): Promise<{ score: number; event: EventIndex }[]> {
   const esClient = getOrCreateClient()
-  const query = Clause.parse(configuration.query)
+  const query = configuration.query
 
   const esQuery = generateElasticsearchQuery(
     encodeEventIndex(eventIndex, eventConfig),
-    query
+    query,
+    eventConfig
   )
 
   if (!esQuery) {
@@ -175,10 +215,31 @@ export async function searchForDuplicates(
     }
   })
 
-  return result.hits.hits
-    .filter((hit) => hit._source)
-    .map((hit) => ({
+  return result.hits.hits.flatMap((hit) => {
+    if (!hit._source) {
+      return []
+    }
+    return {
       score: hit._score || 0,
-      event: hit._source && decodeEventIndex(eventConfig, hit._source)
-    }))
+      event: decodeEventIndex(eventConfig, hit._source)
+    }
+  })
+}
+
+/**
+ * Given event, returns all the events that have been marked as duplicate.
+ */
+export async function getDuplicateEvents(
+  event: EventDocument,
+  ctx: TrpcContext
+) {
+  const duplicates = extractPotentialDuplicatesFromActions(event.actions)
+
+  if (duplicates.length === 0) {
+    return []
+  }
+
+  const duplicateEventIds = duplicates.map(({ id }) => id)
+
+  return getEventsAuditTrailed(ctx.user, duplicateEventIds)
 }

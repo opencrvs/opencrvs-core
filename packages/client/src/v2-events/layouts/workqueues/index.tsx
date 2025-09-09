@@ -17,22 +17,22 @@ import { AppBar, Button, Frame, Icon, Stack } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
-import { useWorkqueueConfigurations } from '@client/v2-events/features/events/useWorkqueueConfiguration'
 import { advancedSearchMessages } from '@client/v2-events/features/events/Search/AdvancedSearch'
 import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { useAllWorkqueueConfigurations } from '@client/v2-events/features/events/useAllWorkqueueConfigurations'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
 
 export function DesktopCenter() {
-  const navigate = useNavigate()
+  const { createNewDeclaration } = useEventFormNavigation()
+
   return (
     <Stack gap={16}>
       <Button
         id="header-new-event"
         type="iconPrimary"
-        onClick={() => {
-          navigate(ROUTES.V2.EVENTS.CREATE.path)
-        }}
+        onClick={() => createNewDeclaration()}
       >
         <Plus />
       </Button>
@@ -49,7 +49,7 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const navigate = useNavigate()
   const intl = useIntl()
-  const workqueues = useWorkqueueConfigurations()
+  const workqueues = useAllWorkqueueConfigurations()
 
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
 

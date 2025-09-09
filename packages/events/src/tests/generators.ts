@@ -13,9 +13,11 @@ import {
   getUUID,
   eventPayloadGenerator,
   UUID,
-  TestUserRole
+  TestUserRole,
+  EventConfig
 } from '@opencrvs/commons'
-import { Location, setLocations } from '@events/service/locations/locations'
+import { Location } from '@events/service/locations/locations'
+import { addLocations } from '@events/storage/postgres/events/locations'
 
 interface Name {
   use: string
@@ -39,7 +41,10 @@ interface CreateUser {
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
  */
-export function payloadGenerator(rng: () => number) {
+export function payloadGenerator(
+  rng: () => number,
+  configuration?: EventConfig
+) {
   const user = {
     create: (input: CreateUser) => ({
       role: input.role ?? ('REGISTRATION_AGENT' as TestUserRole),
@@ -55,19 +60,23 @@ export function payloadGenerator(rng: () => number) {
         return Array.from({ length: input }).map((_, i) => ({
           id: getUUID(),
           name: `Location name ${i}`,
-          partOf: null
-        }))
+          parentId: null,
+          validUntil: null,
+          locationType: 'ADMIN_STRUCTURE'
+        })) as Location[]
       }
 
       return input.map((location, i) => ({
         id: location.id ?? getUUID(),
         name: location.name ?? `Location name ${i}`,
-        partOf: null
-      }))
+        parentId: location.parentId ?? null,
+        validUntil: null,
+        locationType: 'ADMIN_STRUCTURE'
+      })) as Location[]
     }
   }
 
-  return { event: eventPayloadGenerator(rng), locations, user }
+  return { event: eventPayloadGenerator(rng, configuration), locations, user }
 }
 
 /**
@@ -83,7 +92,15 @@ export function seeder() {
       id: getUUID()
     }
   }
-  const seedLocations = async (locations: Location[]) => setLocations(locations)
+  const seedLocations = async (locations: Location[]) =>
+    addLocations(
+      locations.map((location) => ({
+        ...location,
+        validUntil: location.validUntil
+          ? location.validUntil.toISOString()
+          : null
+      }))
+    )
 
   return {
     user: seedUser,

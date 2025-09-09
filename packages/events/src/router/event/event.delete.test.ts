@@ -15,8 +15,7 @@ import {
   ActionType,
   DraftInput,
   FullDocumentPath,
-  getUUID,
-  SCOPES
+  getUUID
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
@@ -39,7 +38,9 @@ test('prevents forbidden access if missing required scope', async () => {
 
 test('allows access with required scope', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
+  const client = createTestClient(user, [
+    'record.declare[event=birth|death|tennis-club-membership]'
+  ])
 
   await expect(
     client.event.delete({ eventId: '00000000-0000-0000-0000-000000000000' })
@@ -146,7 +147,7 @@ describe('check unreferenced draft attachments are deleted while final action su
       }
     }
 
-    // declaring 5 drafts with  4 different file attachments
+    // declaring 5 drafts with 4 different file attachments
     await client.event.draft.create(getDraft(1))
     await client.event.draft.create(getDraft(2))
     await client.event.draft.create(getDraft(3))
@@ -156,7 +157,7 @@ describe('check unreferenced draft attachments are deleted while final action su
     // declaring final action submission
     await client.event.actions.declare.request(getDeclaration(6))
 
-    // file attachment exist api should be called once
+    // file attachment exist api should be called once, only for (status: "Requested")
     expect(fileExistMock.mock.calls).toHaveLength(1)
 
     // total 4 unreferenced draft attachments should be deleted
@@ -168,7 +169,14 @@ describe('check unreferenced draft attachments are deleted while final action su
     expect(updatedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
       expect.objectContaining({ type: ActionType.ASSIGN }),
-      expect.objectContaining({ type: ActionType.DECLARE }),
+      expect.objectContaining({
+        type: ActionType.DECLARE,
+        status: ActionStatus.Requested
+      }),
+      expect.objectContaining({
+        type: ActionType.DECLARE,
+        status: ActionStatus.Accepted
+      }),
       expect.objectContaining({ type: ActionType.UNASSIGN }),
       expect.objectContaining({ type: ActionType.READ })
     ])

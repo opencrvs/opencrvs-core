@@ -12,14 +12,13 @@
 import { TRPCError } from '@trpc/server'
 import { omit } from 'lodash'
 import {
+  ActionStatus,
   ActionType,
   AddressType,
   createPrng,
   EventDocument,
   generateActionDeclarationInput,
-  getAcceptedActions,
-  getUUID,
-  SCOPES
+  getUUID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -28,7 +27,7 @@ import {
   setupTestCase
 } from '@events/tests/utils'
 
-test(`${ActionType.REQUEST_CORRECTION} prevents forbidden access if missing required scope`, async () => {
+test('REQUEST_CORRECTION prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [])
 
@@ -41,19 +40,21 @@ test(`${ActionType.REQUEST_CORRECTION} prevents forbidden access if missing requ
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`${ActionType.REQUEST_CORRECTION} allows access if required scope is present`, async () => {
+test('REQUEST_CORRECTION allows access if required scope is present', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+  const client = createTestClient(user)
+
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER
   ])
 
   await expect(
     client.event.actions.correction.request.request(
-      generator.event.actions.correction.request(
-        'registered-event-test-id-12345'
-      )
+      generator.event.actions.correction.request(event.id)
     )
-  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+  ).resolves.not.toThrow()
 })
 
 test(`${ActionType.APPROVE_CORRECTION} prevents forbidden access if missing required scope`, async () => {
@@ -72,7 +73,9 @@ test(`${ActionType.APPROVE_CORRECTION} prevents forbidden access if missing requ
 
 test(`${ActionType.APPROVE_CORRECTION} allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_REGISTRATION_CORRECT])
+  const client = createTestClient(user, [
+    'record.registered.correct[event=birth|death|tennis-club-membership]'
+  ])
 
   await expect(
     client.event.actions.correction.approve.request(
@@ -93,7 +96,7 @@ test(`${ActionType.REJECT_CORRECTION} prevents forbidden access if missing requi
       generator.event.actions.correction.reject(
         'registered-event-test-id-12345',
         'request-test-id-12345',
-        { reason: { message: 'No legal proof' } }
+        { content: { reason: 'No legal proof' } }
       )
     )
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -101,14 +104,16 @@ test(`${ActionType.REJECT_CORRECTION} prevents forbidden access if missing requi
 
 test(`${ActionType.REJECT_CORRECTION} allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_REGISTRATION_CORRECT])
+  const client = createTestClient(user, [
+    'record.registered.correct[event=birth|death|tennis-club-membership]'
+  ])
 
   await expect(
     client.event.actions.correction.reject.request(
       generator.event.actions.correction.reject(
         'registered-event-test-id-12345',
         'request-test-id-12345',
-        { reason: { message: 'No legal proof' } }
+        { content: { reason: 'No legal proof' } }
       )
     )
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -129,15 +134,20 @@ test('a correction request can be added to a registered event', async () => {
       generator.event.actions.correction.request(event.id)
     )
 
-  expect(withCorrectionRequest.actions.slice(-2)).toEqual([
+  expect(withCorrectionRequest.actions.slice(-3)).toEqual([
     expect.objectContaining({
-      type: ActionType.REQUEST_CORRECTION
+      type: ActionType.REQUEST_CORRECTION,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.REQUEST_CORRECTION,
+      status: ActionStatus.Accepted
     }),
     expect.objectContaining({ type: ActionType.UNASSIGN })
   ])
 })
 
-test(`${ActionType.REQUEST_CORRECTION} validation error message contains all the offending fields`, async () => {
+test(`REQUEST_CORRECTION validation error message contains all the offending fields`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -160,7 +170,7 @@ test(`${ActionType.REQUEST_CORRECTION} validation error message contains all the
   ).rejects.matchSnapshot()
 })
 
-test(`${ActionType.REQUEST_CORRECTION} when mandatory field is invalid, conditional hidden fields are still skipped`, async () => {
+test(`REQUEST_CORRECTION when mandatory field is invalid, conditional hidden fields are still skipped`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -191,7 +201,7 @@ test(`${ActionType.REQUEST_CORRECTION} when mandatory field is invalid, conditio
   ).rejects.matchSnapshot()
 })
 
-test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they are conditionally hidden`, async () => {
+test(`REQUEST_CORRECTION Skips required field validation when they are conditionally hidden`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -224,15 +234,20 @@ test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they
   })
 
   const response = await client.event.actions.correction.request.request(data)
-  const activeActions = getAcceptedActions(response)
 
-  const savedAction = activeActions.find(
-    (action) => action.type === ActionType.REQUEST_CORRECTION
+  const savedAction = response.actions.find(
+    ({ type, status }) =>
+      type === ActionType.REQUEST_CORRECTION &&
+      status === ActionStatus.Requested
   )
-  expect(savedAction?.declaration).toEqual(form)
+
+  expect(savedAction?.status).toEqual(ActionStatus.Requested)
+  if (savedAction?.status === ActionStatus.Requested) {
+    expect(savedAction.declaration).toEqual(form)
+  }
 })
 
-test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, async () => {
+test(`REQUEST_CORRECTION Prevents adding birth date in future`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -305,7 +320,8 @@ describe('when a correction request exists', () => {
         ...generateActionDeclarationInput(
           tennisClubMembershipEvent,
           ActionType.DECLARE,
-          rng
+          rng,
+          { locations: [] }
         ),
         'applicant.name': {
           firstname: 'Johnny',
@@ -313,7 +329,7 @@ describe('when a correction request exists', () => {
         }
       },
       // Omit applicant.email, since it is configured as not correctable
-      ['applicant.email']
+      ['applicant.email', 'applicant.image']
     )
 
     withCorrectionRequest =
@@ -429,8 +445,8 @@ test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
     actionId,
     {
       keepAssignment: true,
-      reason: {
-        message: 'no legal proof'
+      content: {
+        reason: 'no legal proof'
       }
     }
   )
@@ -473,10 +489,5 @@ test('a correction request is not allowed if the event is already waiting for co
     client.event.actions.correction.request.request(
       generator.event.actions.correction.request(event.id)
     )
-  ).rejects.toThrow(
-    new TRPCError({
-      code: 'CONFLICT',
-      message: 'Event is waiting for correction'
-    })
-  )
+  ).rejects.toThrowErrorMatchingSnapshot()
 })

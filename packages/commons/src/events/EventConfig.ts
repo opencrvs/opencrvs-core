@@ -10,7 +10,6 @@
  */
 import { z } from 'zod'
 import { ActionConfig } from './ActionConfig'
-import { DeduplicationConfig } from './DeduplicationConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
@@ -42,7 +41,6 @@ export const EventConfig = z
     label: TranslationConfig,
     actions: z.array(ActionConfig),
     declaration: DeclarationFormConfig,
-    deduplication: z.array(DeduplicationConfig).optional().default([]),
     advancedSearch: z.array(AdvancedSearchConfig).optional().default([])
   })
   .superRefine((event, ctx) => {
@@ -85,34 +83,6 @@ export const EventConfig = z
         path: ['advancedSearch']
       })
     }
-
-    // Additional check: alternateFieldIds must exist in allFields
-    event.advancedSearch.forEach((section, sectionIndex) => {
-      section.fields.forEach((field, fieldIndex) => {
-        if (
-          'alternateFieldIds' in field &&
-          Array.isArray(field.alternateFieldIds)
-        ) {
-          const invalidAltIds = field.alternateFieldIds.filter(
-            (id) => !fieldIds.includes(id)
-          )
-
-          if (invalidAltIds.length > 0) {
-            ctx.addIssue({
-              code: 'custom',
-              message: `Invalid alternateFieldIds: ${invalidAltIds.join(', ')}`,
-              path: [
-                'advancedSearch',
-                sectionIndex,
-                'fields',
-                fieldIndex,
-                'alternateFieldIds'
-              ]
-            })
-          }
-        }
-      })
-    })
 
     if (event.dateOfEvent) {
       const eventDateFieldId = getDeclarationFields(event).find(

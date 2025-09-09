@@ -10,6 +10,7 @@
  */
 import { generateUuid, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { Location } from '@events/service/locations/locations'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -43,11 +44,15 @@ test('Creates single location', async () => {
   const { user } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const locationPayload = [
+  const initialLocations = await dataSeedingClient.locations.get()
+
+  const locationPayload: Location[] = [
     {
       id: generateUuid(),
-      partOf: null,
-      name: 'Location foobar'
+      parentId: null,
+      name: 'Location foobar',
+      validUntil: null,
+      locationType: 'ADMIN_STRUCTURE'
     }
   ]
 
@@ -55,8 +60,8 @@ test('Creates single location', async () => {
 
   const locations = await dataSeedingClient.locations.get()
 
-  expect(locations).toHaveLength(1)
-  expect(locations).toMatchObject(locationPayload)
+  expect(locations).toHaveLength(initialLocations.length + 1)
+  expect(locations).toMatchObject(initialLocations.concat(locationPayload))
 })
 
 test('Creates multiple locations', async () => {
@@ -64,12 +69,14 @@ test('Creates multiple locations', async () => {
 
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
+  const initialLocations = await dataSeedingClient.locations.get()
+
   const parentId = generateUuid(rng)
 
   const locationPayload = generator.locations.set([
-    { id: generateUuid(rng) },
-    { partOf: parentId },
-    { partOf: parentId },
+    { id: parentId },
+    { parentId: parentId },
+    { parentId: parentId },
     {}
   ])
 
@@ -77,37 +84,33 @@ test('Creates multiple locations', async () => {
 
   const locations = await dataSeedingClient.locations.get()
 
-  expect(locations).toEqual(locationPayload)
+  expect(locations).toEqual(initialLocations.concat(locationPayload))
 })
 
-/**
- * e.g. country-config removed a line from .csv config.
- */
-test('Removes existing locations not in payload', async () => {
+test('seeding locations is additive, not destructive', async () => {
   const { user, generator } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+
+  const initialLocations = await dataSeedingClient.locations.get()
 
   const initialPayload = generator.locations.set(5)
 
   await dataSeedingClient.locations.set(initialPayload)
 
-  const initialLocations = await dataSeedingClient.locations.get()
-  expect(initialLocations).toHaveLength(initialPayload.length)
+  const locationAfterInitialSeed = await dataSeedingClient.locations.get()
+  expect(locationAfterInitialSeed).toHaveLength(
+    initialLocations.length + initialPayload.length
+  )
 
-  const [removedLocation, ...remainingLocationsPayload] = initialPayload
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_removedLocation, ...remainingLocationsPayload] = initialPayload
 
   await dataSeedingClient.locations.set(remainingLocationsPayload)
 
   const remainingLocationsAfterDeletion =
     await dataSeedingClient.locations.get()
 
-  expect(remainingLocationsAfterDeletion).toHaveLength(
-    remainingLocationsPayload.length
+  expect(remainingLocationsAfterDeletion).toStrictEqual(
+    locationAfterInitialSeed
   )
-
-  expect(
-    remainingLocationsAfterDeletion.some(
-      (location) => location.id === removedLocation.id
-    )
-  ).toBe(false)
 })

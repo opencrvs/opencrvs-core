@@ -14,18 +14,53 @@
     "./fixtures": "./build/dist/common/fixtures.js",
     "./assignment": "./build/dist/common/assignment.js",
     "./client": "./build/dist/esm/client.js",
-    "./events": "./build/dist/common/events/index.js"
+    "./events": "./build/dist/common/events/index.js",
+    "./events/deduplication": "./build/dist/common/events/deduplication.js"
   },
   "scripts": {
     "start": "yarn build:watch",
     "test": "yarn test:compilation && jest",
     "test:watch": "jest --watch",
-    "test:compilation": "tsc --noEmit",
+    "test:compilation": "wireit",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "postinstall": "yarn build",
-    "build": "yarn tsc -b tsconfig.build.json",
-    "build:watch": "yarn tsc -b --watch --preserveWatchOutput tsconfig.build.json",
+    "build": "wireit",
+    "build:watch": "yarn build --watch",
     "build:clean": "rm -rf build"
+  },
+  "wireit": {
+    "build": {
+      "command": "yarn tsc -b tsconfig.build.json --pretty",
+      "clean": "if-file-deleted",
+      "files": [
+        "src/**/*.ts",
+        "!src/**/*.test.ts",
+        "tsconfig-esm.json",
+        "tsconfig-commonjs.json",
+        "tsconfig.build.json"
+      ],
+      "output": [
+        "build/dist/common/**",
+        "build/dist/tsconfig-commonjs.tsbuildinfo",
+        "build/dist/esm/**",
+        "build/dist/tsconfig-esm.tsbuildinfo"
+      ]
+    },
+    "test:compilation": {
+      "command": "yarn tsc -b --pretty",
+      "clean": "if-file-deleted",
+      "files": [
+        "src/**/*.test.ts",
+        "tsconfig-commonjs.json",
+        "tsconfig.json"
+      ],
+      "output": [
+        "build/dist/common/**",
+        "build/dist/tsconfig-commonjs.tsbuildinfo",
+        "build/dist/tests/**",
+        "build/dist/tsconfig-tests.tsbuildinfo"
+      ]
+    }
   },
   "private": true,
   "dependencies": {
@@ -45,16 +80,19 @@
     "jwt-decode": "^3.0.0",
     "lodash": "^4.17.10",
     "node-fetch": "^2.6.7",
+    "object-hash": "^3.0.0",
     "pino": "^7.0.0",
     "pkg-up": "^3.1.0",
     "typescript": "5.6.3",
     "uuid": "^9.0.0",
+    "wireit": "^0.14.12",
     "zod": "^3.23.8",
     "zod-openapi": "^4.2.4"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.9",
+    "@types/object-hash": "^3.0.6",
     "@typescript-eslint/eslint-plugin": "8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "eslint": "^9.23.0",

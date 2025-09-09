@@ -26,7 +26,8 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.fieldAgent'
     },
     scopes: [
-      // new scopes
+      `record.create[event=birth|death|tennis-club-membership]`,
+      'record.declare[event=birth|death|tennis-club-membership]',
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -47,6 +48,8 @@ export const DEFAULT_ROLES_DEFINITION = [
     scopes: [
       SCOPES.PERFORMANCE,
       SCOPES.CERTIFY,
+      `record.create[event=birth|death|tennis-club-membership]`,
+      'record.declare[event=birth|death|tennis-club-membership]',
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -60,7 +63,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.RECORD_EXPORT_RECORDS,
       SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
       SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
-      SCOPES.RECORD_CREATE_COMMENTS,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.ORGANISATION_READ_LOCATIONS,
@@ -80,6 +82,8 @@ export const DEFAULT_ROLES_DEFINITION = [
     scopes: [
       SCOPES.PERFORMANCE,
       SCOPES.CERTIFY,
+      `record.create[event=birth|death|tennis-club-membership]`,
+      'record.declare[event=birth|death|tennis-club-membership]',
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -94,7 +98,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.RECORD_EXPORT_RECORDS,
       SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
       SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
-      SCOPES.RECORD_CREATE_COMMENTS,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.ORGANISATION_READ_LOCATIONS,

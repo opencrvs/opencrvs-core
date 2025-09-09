@@ -98,12 +98,12 @@ jobs:
           echo "BRANCH_NAME=$(echo ${{ github.head_ref }})" >> $GITHUB_ENV
       - name: Get e2e branch
         id: get_e2e_branch
+        # ls-remote should provide list of branches. When none are found, it should be empty string.
         run: |
           e2e_repo_url="https://github.com/opencrvs/e2e.git"
-
-          if git ls-remote --heads "$e2e_repo_url" | grep -q "refs/heads/${{ github.head_ref }}"; then
+          if [ -n "$(git ls-remote --heads "$e2e_repo_url" "refs/heads/${{ github.head_ref }}")" ]; then
             e2e_branch=${{ github.head_ref }}
-          elif git ls-remote --heads "$e2e_repo_url" | grep -q "refs/heads/${{ github.base_ref }}"; then
+          elif [ -n "$(git ls-remote --heads "$e2e_repo_url" "refs/heads/${{ github.base_ref }}")" ]; then
             e2e_branch="${{ github.base_ref }}"
           else
             e2e_branch="develop"
@@ -140,7 +140,7 @@ jobs:
                 .replace(/\s+/g, '-')
                 .replace(/-+/g, '-')
                 .substr(0, 30)
-                .replace(/[^a-zA-Z0-9]+$/g, '');
+                .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, '');
             }
             core.setOutput('stack', slugify('${{ env.BRANCH_NAME }}'));
 
@@ -150,10 +150,11 @@ jobs:
     uses: ./.github/workflows/build-images-from-branch.yml
     with:
       branch_tag_name: ${{ needs.generate_stack_name_and_branch.outputs.branch_name }}
+      skip_security_check: true
     secrets: inherit
 
   trigger-e2e:
-    if: always() && needs.trigger-build.outputs.build_status == 'success'
+    if: always()
     runs-on: ubuntu-24.04
     needs: [generate_stack_name_and_branch, trigger-build]
     outputs:
@@ -161,6 +162,14 @@ jobs:
       deployment_link: ${{ steps.print-links.outputs.deployment_link }}
     steps:
       - uses: actions/checkout@v3
+      - name: Check trigger-build status and exit on non-success
+        run: |
+          if [ ${{ needs.trigger-build.outputs.build_status }} == 'success' ]; then
+            echo "Trigger build completed without issues"
+          else
+            echo "Trigger build job failed"
+            exit 1
+          fi
 
       - name: Parse the branch name and set it as environment variable
         run: |

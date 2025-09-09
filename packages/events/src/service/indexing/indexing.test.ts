@@ -114,7 +114,7 @@ const fullAndPayload: QueryType = {
         location: RANDOM_UUID
       },
       data: {
-        name: { type: 'exact', term: 'John Doe' }
+        'applicant.name': { type: 'exact', term: 'John Doe' }
       }
     }
   ]
@@ -243,7 +243,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
               ]
             }
           },
-          { match: { 'declaration.name': 'John Doe' } }
+          { match: { 'declaration.applicant____name.__fullname': 'John Doe' } }
         ])
       }
     })
@@ -318,7 +318,7 @@ describe('withJurisdictionFilters', () => {
   }
 
   test('returns original query if no my-jurisdiction and no userOfficeId', () => {
-    const options = { 'v2.birth': 'all' as const }
+    const options = { birth: 'all' as const }
 
     const result = withJurisdictionFilters(baseQuery, options, undefined)
 
@@ -334,7 +334,7 @@ describe('withJurisdictionFilters', () => {
                   must: [
                     {
                       term: {
-                        type: 'v2.birth'
+                        type: 'birth'
                       }
                     }
                   ],
@@ -350,7 +350,7 @@ describe('withJurisdictionFilters', () => {
   })
 
   test('returns original query if no my-jurisdiction scopes are available for multiple events', () => {
-    const options = { 'v2.birth': 'all' as const, 'v2.death': 'all' as const }
+    const options = { birth: 'all' as const, death: 'all' as const }
 
     const result = withJurisdictionFilters(baseQuery, options, undefined)
 
@@ -363,12 +363,12 @@ describe('withJurisdictionFilters', () => {
             should: [
               {
                 bool: {
-                  must: [{ term: { type: 'v2.birth' } }]
+                  must: [{ term: { type: 'birth' } }]
                 }
               },
               {
                 bool: {
-                  must: [{ term: { type: 'v2.death' } }]
+                  must: [{ term: { type: 'death' } }]
                 }
               }
             ]
@@ -380,8 +380,8 @@ describe('withJurisdictionFilters', () => {
 
   test('adds filters for my-jurisdiction eventTypes only', () => {
     const options = {
-      'v2.birth': 'my-jurisdiction' as const,
-      'v2.death': 'all' as const
+      birth: 'my-jurisdiction' as const,
+      death: 'all' as const
     }
 
     const result = withJurisdictionFilters(baseQuery, options, 'office-123')
@@ -396,14 +396,14 @@ describe('withJurisdictionFilters', () => {
               {
                 bool: {
                   must: [
-                    { term: { type: 'v2.birth' } },
+                    { term: { type: 'birth' } },
                     { term: { updatedAtLocation: 'office-123' } }
                   ]
                 }
               },
               {
                 bool: {
-                  must: [{ term: { type: 'v2.death' } }]
+                  must: [{ term: { type: 'death' } }]
                 }
               }
             ]
@@ -415,8 +415,8 @@ describe('withJurisdictionFilters', () => {
 
   test('returns filtered query if multiple events are marked as my-jurisdiction', () => {
     const options = {
-      'v2.birth': 'my-jurisdiction' as const,
-      'v2.death': 'my-jurisdiction' as const
+      birth: 'my-jurisdiction' as const,
+      death: 'my-jurisdiction' as const
     }
 
     const result = withJurisdictionFilters(baseQuery, options, 'office-123')
@@ -431,7 +431,7 @@ describe('withJurisdictionFilters', () => {
               {
                 bool: {
                   must: [
-                    { term: { type: 'v2.birth' } },
+                    { term: { type: 'birth' } },
                     { term: { updatedAtLocation: 'office-123' } }
                   ]
                 }
@@ -439,7 +439,7 @@ describe('withJurisdictionFilters', () => {
               {
                 bool: {
                   must: [
-                    { term: { type: 'v2.death' } },
+                    { term: { type: 'death' } },
                     { term: { updatedAtLocation: 'office-123' } }
                   ]
                 }
@@ -453,8 +453,8 @@ describe('withJurisdictionFilters', () => {
 
   test('returns filtered query if multiple events are marked with different jurisdiction access', () => {
     const options = {
-      'v2.birth': 'my-jurisdiction' as const,
-      'v2.death': 'all' as const
+      birth: 'my-jurisdiction' as const,
+      death: 'all' as const
     }
 
     const result = withJurisdictionFilters(baseQuery, options, 'office-123')
@@ -468,14 +468,14 @@ describe('withJurisdictionFilters', () => {
               {
                 bool: {
                   must: [
-                    { term: { type: 'v2.birth' } },
+                    { term: { type: 'birth' } },
                     { term: { updatedAtLocation: 'office-123' } }
                   ]
                 }
               },
               {
                 bool: {
-                  must: [{ term: { type: 'v2.death' } }]
+                  must: [{ term: { type: 'death' } }]
                 }
               }
             ]

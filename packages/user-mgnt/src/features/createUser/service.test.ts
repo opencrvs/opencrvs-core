@@ -14,7 +14,6 @@ import * as mockingoose from 'mockingoose'
 import fetchMock from 'jest-fetch-mock'
 import jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import { logger } from '@opencrvs/commons'
 
 const fetch = fetchMock as fetchMock.FetchMock
 const mockUser = {
@@ -25,6 +24,21 @@ const token = jwt.sign({ scope: ['system'] }, readFileSync('./test/cert.key'), {
   algorithm: 'RS256',
   issuer: 'opencrvs:auth-service',
   audience: 'opencrvs:user-mgnt-user'
+})
+
+let capturedEvent = 'none'
+
+jest.mock('@opencrvs/commons', () => {
+  const actual = jest.requireActual('@opencrvs/commons')
+
+  return {
+    ...actual,
+    triggerUserEventNotification: jest.fn(
+      ({ event }: { event: string; [key: string]: any }, ...rest) => {
+        capturedEvent = event
+      }
+    )
+  }
 })
 
 describe('Username generation', () => {
@@ -87,12 +101,12 @@ describe('Username generation', () => {
 
 describe('User credentials notification', () => {
   it('returns ok when successfully called', async () => {
-    const spy = jest.spyOn(logger, 'error')
     fetch.mockResponse(
       JSON.stringify({
         status: 200
       })
     )
+    capturedEvent = 'none'
 
     await sendCredentialsNotification(
       [
@@ -110,31 +124,6 @@ describe('User credentials notification', () => {
       '01730037449'
     )
 
-    expect(spy).not.toHaveBeenCalled()
-  })
-
-  it('thows error when operation is not successful', async () => {
-    const spy = jest.spyOn(logger, 'error')
-    fetch.mockImplementation(() => {
-      throw new Error('error')
-    })
-
-    await sendCredentialsNotification(
-      [
-        {
-          use: 'en',
-          family: 'Anik',
-          given: ['Sadman']
-        }
-      ],
-      'Name1',
-      'Name2',
-      {
-        Authorization: `Bearer ${token}`
-      },
-      '01730037449'
-    )
-
-    expect(spy).toHaveBeenCalled()
+    expect(capturedEvent).toBe('user-created')
   })
 })

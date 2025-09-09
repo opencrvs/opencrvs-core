@@ -24,6 +24,30 @@ import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/fo
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
+import { AvailableActionTypes } from './Action/utils'
+
+interface PagesProps {
+  form: EventState
+  setFormData: (dec: EventState) => void
+  pageId: string
+  showReviewButton?: boolean
+  formPages: PageConfig[]
+  onPageChange: (nextPageId: string) => void
+  onSubmit: () => void
+  continueButtonText?: string
+  eventConfig?: EventConfig
+  validateBeforeNextPage?: boolean
+  isCorrection?: boolean
+}
+
+type DeclarationProps =
+  | {
+      actionType: AvailableActionTypes
+      declaration?: undefined
+    }
+  | {
+      declaration: EventState
+    }
 /**
  *
  * Reusable component for rendering a form with pagination. Used by different action forms
@@ -42,20 +66,7 @@ export function Pages({
   validateBeforeNextPage = false,
   // When isCorrection is true, we should disabled fields with 'uncorrectable' set to true, or skip pages where all fields have 'uncorrectable' set to true
   isCorrection = false
-}: {
-  form: EventState
-  setFormData: (dec: EventState) => void
-  pageId: string
-  showReviewButton?: boolean
-  formPages: PageConfig[]
-  onPageChange: (nextPageId: string) => void
-  onSubmit: () => void
-  continueButtonText?: string
-  eventConfig?: EventConfig
-  declaration?: EventState
-  validateBeforeNextPage?: boolean
-  isCorrection?: boolean
-}) {
+}: PagesProps & DeclarationProps) {
   const intl = useIntl()
   const visiblePages = formPages.filter((page) => isPageVisible(page, form))
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
@@ -128,8 +139,10 @@ export function Pages({
       eventConfig={eventConfig}
       fields={page.fields}
       id="locationForm"
-      // As initial values we use both the provided declaration data (previously saved to the event)
-      // and the form data (which is currently being edited).
+      // In some Action page forms, the form data itself is not the complete declaration.
+      // We still merge the optional `declaration` prop into the initial form values so that
+      // read-only declaration data is available for Data components or calculations.
+      // Example: Print Certificate action.
       initialValues={{ ...declaration, ...form }}
       isCorrection={isCorrection}
       validateAllFields={validateAllFields}

@@ -11,7 +11,6 @@
 
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useIntl } from 'react-intl'
 import {
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
@@ -24,6 +23,7 @@ import { ErrorText } from '@opencrvs/components'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
+import { useIntlWithFormData } from '@client/v2-events/messages/utils'
 import { DocumentUploader } from './SimpleDocumentUploader'
 import { DocumentListPreview } from './DocumentListPreview'
 import { DocumentPreview } from './DocumentPreview'
@@ -60,6 +60,10 @@ const DocumentTypeRequiredError = {
   description: 'Show error message if the document type is not selected'
 }
 
+/**
+ * Document uploader with option for selecting a document type.
+ * If you don't need to select a document type, use @see SimpleDocumentUploader.
+ */
 function DocumentUploaderWithOption({
   value,
   onChange,
@@ -77,13 +81,13 @@ function DocumentUploaderWithOption({
   acceptedFileTypes?: MimeType[]
   options: SelectOption[]
   value: FileFieldWithOptionValue
-  onChange: (file?: FileFieldValueWithOption[]) => void
+  onChange: (file: FileFieldValueWithOption[]) => void
   error?: string
   hideOnEmptyOption?: boolean
   autoSelectOnlyOption?: boolean
   maxFileSize: number
 }) {
-  const intl = useIntl()
+  const intl = useIntlWithFormData()
   const documentTypeRequiredErrorMessage = intl.formatMessage(
     DocumentTypeRequiredError
   )
@@ -101,27 +105,22 @@ function DocumentUploaderWithOption({
   const [previewImage, setPreviewImage] =
     useState<FileFieldValueWithOption | null>(null)
 
-  const { uploadFile, deleteFile: deleteFileFromBackend } = useFileUpload(
-    name,
-    {
-      onSuccess: ({ type, originalFilename, path, id }) => {
-        const newFile = {
-          path,
-          originalFilename: originalFilename,
-          type: type,
-          option: id
-        }
-
-        setFilesBeingProcessed((prev) =>
-          prev.filter(({ label }) => label !== id)
-        )
-
-        setFiles((prevFiles) => getUpdatedFiles(prevFiles, newFile))
-        onChange(getUpdatedFiles(files, newFile))
-        setSelectedOption(undefined)
+  const { uploadFile } = useFileUpload(name, {
+    onSuccess: ({ type, originalFilename, path, id }) => {
+      const newFile = {
+        path,
+        originalFilename,
+        type: type,
+        option: id
       }
+
+      setFilesBeingProcessed((prev) => prev.filter(({ label }) => label !== id))
+
+      setFiles((prevFiles) => getUpdatedFiles(prevFiles, newFile))
+      onChange(getUpdatedFiles(files, newFile))
+      setSelectedOption(undefined)
     }
-  )
+  })
 
   const getLabelForDocumentOption = (docType: string) => {
     const label = options.find(({ value: val }) => val === docType)?.label
@@ -147,9 +146,13 @@ function DocumentUploaderWithOption({
   })
 
   const onDeleteFile = (path: FullDocumentPath) => {
-    deleteFileFromBackend(path)
-    setFiles((prevFiles) => prevFiles.filter((file) => file.path !== path))
-    onChange(files.filter((file) => file.path !== path))
+    setFiles((prevFiles) => {
+      const updatedFiles = prevFiles.filter((file) => file.path !== path)
+      onChange(updatedFiles)
+
+      return updatedFiles
+    })
+
     setPreviewImage(null)
   }
 
@@ -259,7 +262,7 @@ function DocumentWithOptionOutput({
   value?: FileFieldWithOptionValue
   config: FileUploadWithOptions
 }) {
-  const intl = useIntl()
+  const intl = useIntlWithFormData()
   const [previewImage, setPreviewImage] =
     useState<FileFieldValueWithOption | null>(null)
 

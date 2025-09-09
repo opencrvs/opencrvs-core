@@ -12,6 +12,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import * as selectEvent from 'react-select-event'
 import {
   ActionStatus,
   ActionType,
@@ -21,10 +22,12 @@ import {
   tennisClubMembershipEvent,
   UUID
 } from '@opencrvs/commons/client'
-import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventFormData } from '../../useEventFormData'
+import { useActionAnnotation } from '../../useActionAnnotation'
 import { Pages } from './index'
 
 // Use an undeclared draft event for tests
@@ -44,6 +47,8 @@ const meta: Meta<typeof Pages> = {
   },
   beforeEach: () => {
     useEventFormData.setState({ formValues: {} })
+    useActionAnnotation.setState({})
+    localDraftStore.getState().setDraft(null)
   }
 }
 
@@ -79,7 +84,6 @@ function createDraftHandlers() {
           createdBy: 'test-user',
           createdByUserType: 'user',
           createdByRole: 'test-role',
-          createdAtLocation: 'test-location' as UUID,
           createdAt: new Date().toISOString(),
           status: ActionStatus.Accepted
         }
@@ -119,10 +123,7 @@ export const SaveAndExit: Story = {
             ]
           })
         ],
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return undeclaredDraftEvent
-          }),
+        workqueues: [
           tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues()
           }),
@@ -130,14 +131,22 @@ export const SaveAndExit: Story = {
             return input.reduce((acc, { slug }) => {
               return { ...acc, [slug]: 7 }
             }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return undeclaredDraftEvent
           }),
           tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                undeclaredDraftEvent,
-                tennisClubMembershipEvent
-              )
-            ]
+            return {
+              results: [
+                getCurrentEventState(
+                  undeclaredDraftEvent,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
           })
         ]
       }
@@ -207,6 +216,11 @@ export const SaveAndExit: Story = {
 
     const recordInCreatedState = canvas.queryByText(/CREATED_STATUS/)
     await expect(recordInCreatedState).not.toBeInTheDocument()
+
+    const reviewButton = canvas.queryByRole('button', { name: 'Review' })
+    await expect(reviewButton).not.toBeInTheDocument()
+    // Draft status should not affect the action.
+    await canvas.findByRole('button', { name: 'Declare' })
   }
 }
 
@@ -224,6 +238,16 @@ export const DraftShownInForm: Story = {
     msw: {
       handlers: {
         drafts: createDraftHandlers(),
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues()
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: 1 }
+            }, {})
+          })
+        ],
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
@@ -236,21 +260,16 @@ export const DraftShownInForm: Story = {
               )
             ]
           }),
-          tRPCMsw.workqueue.config.list.query(() => {
-            return generateWorkqueues()
-          }),
-          tRPCMsw.workqueue.count.query((input) => {
-            return input.reduce((acc, { slug }) => {
-              return { ...acc, [slug]: 1 }
-            }, {})
-          }),
           tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                undeclaredDraftEvent,
-                tennisClubMembershipEvent
-              )
-            ]
+            return {
+              results: [
+                getCurrentEventState(
+                  undeclaredDraftEvent,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
           })
         ],
         event: [
@@ -358,6 +377,9 @@ export const FilledPagesVisibleInReview: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return undeclaredDraftEvent
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return { results: [], total: 0 }
           })
         ]
       }
@@ -393,12 +415,17 @@ export const CanSubmitValidlyFilledForm: Story = {
         await canvas.findByText('Tennis club membership application')
       )
 
-      await userEvent.click(await canvas.findByText('Select...'))
-      await userEvent.click(await canvas.findByText('Bangladesh'))
-      await userEvent.click(await canvas.findByText('Select...'))
-      await userEvent.click(await canvas.findByText('Central'))
-      await userEvent.click(await canvas.findByText('Select...'))
-      await userEvent.click(await canvas.findByText('Ibombo'))
+      const country = await canvas.findByTestId('location__country')
+      await userEvent.click(country)
+      await selectEvent.select(country, 'Bangladesh')
+
+      const province = await canvas.findByTestId('location__province')
+      await userEvent.click(province)
+      await selectEvent.select(province, 'Central')
+
+      const district = await canvas.findByTestId('location__district')
+      await userEvent.click(district)
+      await selectEvent.select(district, 'Ibombo')
 
       const continueButton = await canvas.findByText('Continue')
       await userEvent.click(continueButton)

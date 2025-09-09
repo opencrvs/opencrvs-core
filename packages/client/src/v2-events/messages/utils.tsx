@@ -17,7 +17,10 @@ import {
   isPluralElement,
   parse
 } from '@formatjs/icu-messageformat-parser'
+import { useMemo } from 'react'
 import { EventState } from '@opencrvs/commons/client'
+import { useEventFormData } from '../features/events/useEventFormData'
+import { useActionAnnotation } from '../features/events/useActionAnnotation'
 
 const INTERNAL_SEPARATOR = '___'
 
@@ -49,6 +52,11 @@ function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
       })
       /* @TODO: Check if the typing is correct or is there a case where null could come in */
     } else if (typeof value === 'object' && value !== null) {
+      if ('loading' in value) {
+        // HTTP field with a `{ loading: boolean; data: any; error: any }` object will not contain any keys that we want to convert
+        continue
+      }
+
       Object.assign(result, convertDotToTripleUnderscore(value, newKey))
     } else {
       result[newKey] = !value ? EMPTY_TOKEN : value
@@ -184,5 +192,28 @@ export function useIntlFormatMessageWithFlattenedParams() {
     formatMessage,
     variablesUsed: (message: MessageDescriptor) =>
       variablesUsed(getDefaultMessage(message))
+  }
+}
+
+export function useIntlWithFormData() {
+  const intl = useIntlFormatMessageWithFlattenedParams()
+  const formValues = useEventFormData((state) => state.formValues)
+  const annotation = useActionAnnotation((state) => state.annotation)
+
+  const formData = useMemo(
+    () => ({ ...formValues, ...annotation }),
+    [formValues, annotation]
+  )
+
+  function formatMessage<T extends {}>(message: MessageDescriptor, params?: T) {
+    return intl.formatMessage(message, {
+      ...formData,
+      ...params
+    })
+  }
+
+  return {
+    ...intl,
+    formatMessage
   }
 }

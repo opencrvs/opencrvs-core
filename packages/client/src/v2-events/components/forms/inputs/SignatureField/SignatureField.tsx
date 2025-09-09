@@ -42,7 +42,7 @@ interface SignatureFieldProps {
    * File should be stored in the cache where it is then retrieved by the component.
    */
   value?: FileFieldValue
-  onChange: (value: FileFieldValue | undefined) => void
+  onChange: (value: FileFieldValue | null) => void
   required?: boolean
   maxFileSize: number
   acceptedFileTypes?: MimeType[]
@@ -159,7 +159,7 @@ export function SignatureField({
           size="medium"
           type="tertiary"
           onClick={() => {
-            onChange(undefined)
+            onChange(null)
             setSignature(undefined)
             setTouched(true)
           }}

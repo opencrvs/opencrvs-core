@@ -10,16 +10,21 @@
  */
 import { generateUuid, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { Location } from '@events/service/locations/locations'
 
 test('Returns single location in right format', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const setLocationPayload = [
+  const initialLocations = await client.locations.get()
+
+  const setLocationPayload: Location[] = [
     {
       id: generateUuid(),
-      partOf: null,
-      name: 'Location foobar'
+      parentId: null,
+      name: 'Location foobar',
+      validUntil: null,
+      locationType: 'ADMIN_STRUCTURE'
     }
   ]
 
@@ -27,16 +32,19 @@ test('Returns single location in right format', async () => {
 
   const locations = await client.locations.get()
 
-  expect(locations).toHaveLength(1)
-  expect(locations).toMatchObject(setLocationPayload)
+  expect(locations).toHaveLength(initialLocations.length + 1)
+  expect(locations).toMatchObject(initialLocations.concat(setLocationPayload))
 })
 
 test('Returns multiple locations', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+
+  const initialLocations = await client.locations.get()
+
   await client.locations.set(generator.locations.set(5))
 
   const locations = await client.locations.get()
 
-  expect(locations).toHaveLength(5)
+  expect(locations).toHaveLength(initialLocations.length + 5)
 })

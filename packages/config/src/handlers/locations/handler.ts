@@ -318,7 +318,10 @@ export async function createLocationHandler(
     throw Error('Cannot create location to FHIR')
   })
 
-  return h.response(response.statusText)
+  return h.response({
+    id: response.headers.get('location')?.split('/')[3],
+    status: response.statusText
+  })
 }
 
 export async function updateLocationHandler(

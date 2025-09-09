@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -19,7 +20,9 @@ import {
   has,
   isNil,
   uniqBy,
-  cloneDeep
+  cloneDeep,
+  orderBy,
+  groupBy
 } from 'lodash'
 import {
   ActionType,
@@ -31,12 +34,17 @@ import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import {
   Action,
+  ActionDocument,
   ActionStatus,
   ActionUpdate,
   EventState
 } from './ActionDocument'
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
-import { isConditionMet, isFieldVisible } from '../conditionals/validate'
+import {
+  getOnlyVisibleFormValues,
+  isConditionMet,
+  isFieldVisible
+} from '../conditionals/validate'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID, UUID } from '../uuid'
@@ -194,26 +202,34 @@ export function omitHiddenPaginatedFields(
   return omitHiddenFields(visiblePagesFormFields, declaration)
 }
 
-export function findActiveDrafts(event: EventDocument, drafts: Draft[]) {
-  const actions = event.actions
-    .slice()
-    .filter(({ type }) => type !== ActionType.READ)
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+/**
+ *
+ * @returns a draft for the event that has been created since the last non-read action.
+ */
+export function findActiveDraftForEvent(
+  event: EventDocument,
+  draft: Draft
+): Draft | undefined {
+  const actions = orderBy(
+    event.actions.filter(({ type }) => type !== ActionType.READ),
+    ['createdAt'],
+    ['asc']
+  )
 
   const lastAction = actions[actions.length - 1]
-  return (
-    drafts
-      // Temporally allows equal timestamps as the generated demo data is not perfect yet
-      // should be > rather than >=
-      .filter(({ createdAt }) => createdAt >= lastAction.createdAt)
-      .filter(({ eventId }) => eventId === event.id)
-  )
+  // After migrations have been run, there should always be [0..1[ actions.
+  // Temporally allows equal timestamps as the generated demo data is not perfect yet
+  const isDraftActive = draft.createdAt >= lastAction.createdAt
+
+  const isDraftForEvent = event.id === draft.eventId
+
+  return isDraftActive && isDraftForEvent ? draft : undefined
 }
 
 export function createEmptyDraft(
   eventId: UUID,
   draftId: UUID,
-  actionType: ActionType
+  actionType: Exclude<ActionType, 'DELETE'>
 ): Draft {
   return {
     id: draftId,
@@ -227,7 +243,6 @@ export function createEmptyDraft(
       createdAt: new Date().toISOString(),
       createdByUserType: TokenUserType.Enum.user,
       createdBy: '@todo',
-      createdAtLocation: '00000000-0000-0000-0000-000000000000' as UUID,
       status: ActionStatus.Accepted,
       transactionId: '@todo',
       createdByRole: '@todo'
@@ -291,6 +306,14 @@ export function omitHiddenAnnotationFields(
   )
 }
 
+/**
+ * Merges two documents together.
+ *
+ * @example deepMerge({'review.signature': { path: '/path.png', type: 'image/png' }}, { foo: 'bar'}) } => { 'review.signature': { path: '/path.png', type: 'image/png' }, foo: 'bar' }
+ *
+ * NOTE: When merging deep objects, the values from the second object will override the first one.
+ * @example { annotation: {'review.signature': { path: '/path.png', type: 'image/png' }}, { annotation: { foo: 'bar'}) } } => { annotation: { foo: 'bar' } }
+ */
 export function deepMerge<
   T extends Record<string, unknown>,
   K extends Record<string, unknown>
@@ -415,4 +438,187 @@ export function timePeriodToDateRange(value: SelectDateRangeValue) {
     startDate: startDate.toISOString(),
     endDate: new Date().toISOString()
   }
+}
+
+export function mergeDrafts(currentDraft: Draft, incomingDraft: Draft): Draft {
+  if (currentDraft.eventId !== incomingDraft.eventId) {
+    throw new Error(
+      `Cannot merge drafts for different events: ${currentDraft.eventId} and ${incomingDraft.eventId}`
+    )
+  }
+
+  return {
+    ...currentDraft,
+    ...incomingDraft,
+    action: {
+      ...currentDraft.action,
+      ...incomingDraft.action,
+      declaration: deepMerge(
+        currentDraft.action.declaration,
+        incomingDraft.action.declaration
+      ),
+      annotation: deepMerge(
+        currentDraft.action.annotation ?? {},
+        incomingDraft.action.annotation ?? {}
+      )
+    }
+  }
+}
+
+function isRequestedAction(a: Action): a is ActionDocument {
+  return a.status === ActionStatus.Requested
+}
+function isAcceptedAction(a: Action): a is ActionDocument {
+  return a.status === ActionStatus.Accepted
+}
+
+function getPendingActions(actions: Action[]): ActionDocument[] {
+  const actionGroups: Record<string, Action[]> = groupBy(
+    actions,
+    ({ transactionId, type }: Action) => `${transactionId}::${type}`
+  )
+
+  const pendingActions = Object.values(actionGroups)
+    .filter((actionsInGroup) => actionsInGroup.length === 1)
+    .map((actionsInGroup) => actionsInGroup[0])
+    .filter(isRequestedAction)
+
+  return pendingActions
+}
+
+export function getPendingAction(actions: Action[]): ActionDocument {
+  const pendingActions = getPendingActions(actions)
+
+  if (pendingActions.length !== 1) {
+    throw new Error(
+      `Expected exactly one pending action, but found ${pendingActions.length}`
+    )
+  }
+
+  return pendingActions[0]
+}
+
+export function getCompleteActionAnnotation(
+  annotation: EventState,
+  event: EventDocument,
+  action: ActionDocument
+): EventState {
+  /*
+   * When an action has an `originalActionId`, it means this action is linked
+   * to another one (the "original" action).
+   *
+   * - The original action, with status `Requested`, was created by core.
+   * - The linked action (with status `Accepted`) comes from
+   *   the country configuration in response to that request.
+   *
+   * If we find the original action, we merge its annotation into the current one
+   * so that the current action includes the original details.
+   */
+  if (action.originalActionId) {
+    const originalAction = event.actions.find(
+      ({ id }) => id === action.originalActionId
+    )
+    if (originalAction?.status !== ActionStatus.Requested) {
+      return annotation
+    }
+
+    return deepMerge(
+      deepMerge(annotation, originalAction.annotation ?? {}),
+      action.annotation ?? {}
+    )
+  }
+  return deepMerge(annotation, action.annotation ?? {})
+}
+
+export function getCompleteActionDeclaration(
+  declaration: EventState,
+  event: EventDocument,
+  action: ActionDocument
+): EventState {
+  /*
+   * When an action has an `originalActionId`, it means this action is linked
+   * to another one (the "original" action).
+   *
+   * - The original action, with status `Requested`, was created by core.
+   * - The linked action (with status `Accepted`) comes from
+   *   the country configuration in response to that request.
+   *
+   * If we find the original action, we merge its declaration into the current one
+   * so that the current action includes the original details.
+   */
+  if (action.originalActionId) {
+    const originalAction = event.actions.find(
+      ({ id }) => id === action.originalActionId
+    )
+    if (originalAction?.status !== ActionStatus.Requested) {
+      return declaration
+    }
+
+    return deepMerge(
+      deepMerge(declaration, originalAction.declaration),
+      action.declaration
+    )
+  }
+  return deepMerge(declaration, action.declaration)
+}
+
+export function getAcceptedActions(event: EventDocument): ActionDocument[] {
+  return event.actions.filter(isAcceptedAction).map((action) => ({
+    ...action,
+    declaration: getCompleteActionDeclaration({}, event, action),
+    annotation: getCompleteActionAnnotation({}, event, action)
+  }))
+}
+
+export function aggregateActionDeclarations(
+  event: EventDocument,
+  config: EventConfig
+): EventState {
+  /*
+   * Types that are not taken into the aggregate values (e.g. while printing certificate
+   * stop auto filling collector form with previous print action data)
+   */
+  const excludedActions = [
+    ActionType.REQUEST_CORRECTION,
+    ActionType.PRINT_CERTIFICATE,
+    ActionType.REJECT_CORRECTION
+  ]
+
+  const acceptedActions = getAcceptedActions(event).sort((a, b) =>
+    a.createdAt.localeCompare(b.createdAt)
+  )
+
+  const aggregatedDeclaration = acceptedActions.reduce(
+    (declaration, action) => {
+      if (
+        excludedActions.some((excludedAction) => excludedAction === action.type)
+      ) {
+        return declaration
+      }
+
+      /*
+       * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
+       * details in the correction. To do this, we find the original request that this
+       * approval is for and merge its details with the current data of the record.
+       */
+
+      if (action.type === ActionType.APPROVE_CORRECTION) {
+        const requestAction = acceptedActions.find(
+          ({ id }) => id === action.requestId
+        )
+        if (!requestAction) {
+          return declaration
+        }
+        return getCompleteActionDeclaration(declaration, event, requestAction)
+      }
+
+      return getCompleteActionDeclaration(declaration, event, action)
+    },
+    {}
+  )
+
+  return getOnlyVisibleFormValues(
+    config.declaration.pages.flatMap(({ fields }) => fields),
+    aggregatedDeclaration
+  )
 }

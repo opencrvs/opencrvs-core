@@ -11,7 +11,6 @@
 
 import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import {
   useTypedParams,
@@ -20,10 +19,10 @@ import {
 import {
   FieldConfig,
   generateTransactionId,
-  SCOPES,
   isFieldVisible,
   getDeclarationFields,
   getCurrentEventState,
+  EventDocument,
   ActionType
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -35,13 +34,13 @@ import { Check } from '@opencrvs/components/lib/icons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { hasFieldChanged } from '../../utils'
 import { CorrectionDetails } from './CorrectionDetails'
 
@@ -74,20 +73,21 @@ function setEmptyValuesForFields(fields: FieldConfig[]) {
 }
 
 export function Summary() {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.CORRECTION.SUMMARY)
+  const { eventId } = useTypedParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
+  )
 
   const [{ workqueue }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.CORRECTION.SUMMARY
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
-  const scopes = useSelector(getScope)
   const [showPrompt, setShowPrompt] = React.useState(false)
   const togglePrompt = () => setShowPrompt(!showPrompt)
-  const { goToHome } = useEventFormNavigation()
+  const eventFormNavigation = useEventFormNavigation()
   const navigate = useNavigate()
   const intl = useIntl()
 
   const events = useEvents()
-  const event = events.getEvent.getFromCache(eventId)
+  const event: EventDocument = events.getEvent.getFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
 
@@ -99,9 +99,12 @@ export function Summary() {
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
 
+  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const userMayCorrect = isActionAllowed(ActionType.APPROVE_CORRECTION)
+
   const submitCorrection = React.useCallback(() => {
     const formWithOnlyChangedValues = Object.fromEntries(
-      Object.entries(form).filter(([key, value]) => {
+      Object.entries(form).filter(([key]) => {
         const field = fields.find((f) => f.id === key)
         if (!field) {
           return false
@@ -126,14 +129,12 @@ export function Summary() {
         ...nullifiedHiddenValues
       },
       transactionId: generateTransactionId(),
-      annotation
+      annotation,
+      event
     }
-    if (scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)) {
-      events.customActions.makeCorrectionOnRequest.mutate({
-        ...mutationPayload,
-        fullEvent: event,
-        eventConfiguration
-      })
+
+    if (userMayCorrect) {
+      events.customActions.makeCorrectionOnRequest.mutate(mutationPayload)
     } else {
       events.actions.correction.request.mutate(mutationPayload)
     }
@@ -143,14 +144,13 @@ export function Summary() {
     form,
     fields,
     event,
-    eventConfiguration,
-    scopes,
     events.customActions.makeCorrectionOnRequest,
     events.actions.correction.request,
     eventId,
     annotation,
     previousFormValues,
-    navigate
+    navigate,
+    userMayCorrect
   ])
 
   return (
@@ -158,7 +158,7 @@ export function Summary() {
       <ActionPageLight
         hideBackground
         goBack={() => navigate(-1)}
-        goHome={goToHome}
+        goHome={() => eventFormNavigation.closeActionView()}
         id="corrector_form"
         title={intl.formatMessage(correctionMessages.title)}
       >
@@ -173,7 +173,7 @@ export function Summary() {
               onClick={togglePrompt}
             >
               <Check />
-              {scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+              {userMayCorrect
                 ? intl.formatMessage(messages.makeCorrection)
                 : intl.formatMessage(messages.submitCorrectionRequest)}
             </Button>
@@ -186,7 +186,7 @@ export function Summary() {
               id="back-to-review"
               onClick={() =>
                 navigate(
-                  ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
+                  ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
                     eventId
                   })
                 )
@@ -201,7 +201,7 @@ export function Summary() {
             editable={true}
             event={event}
             form={form}
-            requesting={!scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)}
+            requesting={!userMayCorrect}
             workqueue={workqueue}
           />
         </Content>
@@ -234,7 +234,7 @@ export function Summary() {
         id="without-correction-for-approval-prompt"
         isOpen={showPrompt}
         title={intl.formatMessage(
-          scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+          userMayCorrect
             ? correctionMessages.correctRecordDialogTitle
             : correctionMessages.correctionApprovalDialogTitle
         )}
@@ -242,7 +242,7 @@ export function Summary() {
       >
         <Text element="p" variant="reg16">
           {intl.formatMessage(
-            scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+            userMayCorrect
               ? correctionMessages.correctRecordDialogDescription
               : correctionMessages.correctionForApprovalDialogDescription
           )}

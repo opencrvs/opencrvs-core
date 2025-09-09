@@ -10,18 +10,31 @@
  */
 
 import { TRPCError } from '@trpc/server'
+import { http, HttpResponse } from 'msw'
 import {
+  ActionStatus,
   ActionType,
   AddressType,
+  createPrng,
+  EventStatus,
+  EventIndex,
   generateActionDeclarationInput,
-  getAcceptedActions,
+  generateActionDuplicateDeclarationInput,
+  getCurrentEventState,
   getUUID,
-  SCOPES
+  NameFieldValue
 } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import {
+  tennisClubMembershipEvent,
+  tennisClubMembershipEventWithDedupCheck
+} from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { mswServer } from '@events/tests/msw'
+import { env } from '@events/environment'
 
-test(`prevents forbidden access if missing required scope`, async () => {
+/* eslint-disable max-lines */
+
+test('prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [])
 
@@ -32,9 +45,9 @@ test(`prevents forbidden access if missing required scope`, async () => {
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`allows access if required scope is present`, async () => {
+test('allows access if required scope is present', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_SUBMIT_FOR_APPROVAL])
+  const client = createTestClient(user)
 
   await expect(
     client.event.actions.validate.request(
@@ -169,12 +182,17 @@ test('Skips required field validation when they are conditionally hidden', async
   })
 
   const response = await client.event.actions.validate.request(declaration)
-  const activeActions = getAcceptedActions(response)
 
-  const savedAction = activeActions.find(
-    (action) => action.type === ActionType.VALIDATE
+  const savedAction = response.actions.find(
+    (action) =>
+      action.type === ActionType.VALIDATE &&
+      action.status === ActionStatus.Accepted
   )
-  expect(savedAction?.declaration).toEqual(form)
+
+  expect(savedAction).toMatchObject({
+    status: ActionStatus.Accepted,
+    declaration: {}
+  })
 })
 
 test('Prevents adding birth date in future', async () => {
@@ -246,7 +264,8 @@ test('validation prevents including hidden fields', async () => {
       ...generateActionDeclarationInput(
         tennisClubMembershipEvent,
         ActionType.VALIDATE,
-        () => 0.1
+        () => 0.1,
+        { locations: [] }
       ),
       'recommender.firstname': 'this should not be here'
     }
@@ -287,12 +306,22 @@ test('valid action is appended to event actions', async () => {
     expect.objectContaining({ type: ActionType.CREATE }),
     expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({
-      type: ActionType.DECLARE
+      type: ActionType.DECLARE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.DECLARE,
+      status: ActionStatus.Accepted
     }),
     expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({
-      type: ActionType.VALIDATE
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Accepted
     }),
     expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({
@@ -325,4 +354,297 @@ test(`${ActionType.VALIDATE} is idempotent`, async () => {
     .execute()
   expect(databaseResultAfterFirst).toEqual(databaseResultAfterSecond)
   expect(firstResponse).toEqual(secondResponse)
+})
+
+test('deduplication check is performed before validation when configured', async () => {
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      return HttpResponse.json([
+        tennisClubMembershipEventWithDedupCheck(ActionType.VALIDATE)
+      ])
+    })
+  )
+  const prng = createPrng(73)
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const existingEvent = await client.event.create(generator.event.create())
+  const declaration = generateActionDuplicateDeclarationInput(
+    tennisClubMembershipEvent,
+    ActionType.DECLARE,
+    prng
+  )
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(existingEvent.id, {
+      declaration
+    })
+  )
+
+  const duplicateEvent = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(duplicateEvent.id, {
+      declaration
+    })
+  )
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(duplicateEvent.id, {
+      assignedTo: user.id
+    })
+  )
+  const stillDeclaredEvent = await client.event.actions.validate.request(
+    generator.event.actions.validate(duplicateEvent.id, {
+      declaration
+    })
+  )
+
+  expect(
+    getCurrentEventState(stillDeclaredEvent, tennisClubMembershipEvent)
+  ).toMatchObject({
+    status: 'DECLARED',
+    potentialDuplicates: [
+      { id: existingEvent.id, trackingId: existingEvent.trackingId }
+    ]
+  } satisfies Partial<EventIndex>)
+})
+
+test('deduplication check is skipped if the event has been marked as not duplicate and data has not changed', async () => {
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      return HttpResponse.json([
+        tennisClubMembershipEventWithDedupCheck(
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        )
+      ])
+    })
+  )
+  const prng = createPrng(73)
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const existingEvent = await client.event.create(generator.event.create())
+  const declaration = generateActionDuplicateDeclarationInput(
+    tennisClubMembershipEvent,
+    ActionType.DECLARE,
+    prng
+  )
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(existingEvent.id, {
+      declaration
+    })
+  )
+
+  const duplicateEvent = await client.event.create(generator.event.create())
+  const declaredDuplicateEvent = await client.event.actions.declare.request(
+    generator.event.actions.declare(duplicateEvent.id, {
+      declaration
+    })
+  )
+
+  expect(
+    getCurrentEventState(declaredDuplicateEvent, tennisClubMembershipEvent)
+      .potentialDuplicates
+  ).toEqual([{ id: existingEvent.id, trackingId: existingEvent.trackingId }])
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(duplicateEvent.id, {
+      assignedTo: user.id
+    })
+  )
+  await client.event.actions.duplicate.markNotDuplicate(
+    generator.event.actions.duplicate.markNotDuplicate(duplicateEvent.id, {
+      declaration,
+      keepAssignment: true
+    })
+  )
+  const validatedEvent = await client.event.actions.validate.request(
+    generator.event.actions.validate(duplicateEvent.id, {
+      declaration
+    })
+  )
+
+  expect(
+    getCurrentEventState(validatedEvent, tennisClubMembershipEvent)
+  ).toMatchObject({
+    status: 'VALIDATED',
+    potentialDuplicates: []
+  })
+})
+
+test('deduplication check is not skipped if the event has been marked as not duplicate but data has changed', async () => {
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      return HttpResponse.json([
+        tennisClubMembershipEventWithDedupCheck(
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        )
+      ])
+    })
+  )
+  const prng = createPrng(73)
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const existingEvent = await client.event.create(generator.event.create())
+  const declaration = generateActionDuplicateDeclarationInput(
+    tennisClubMembershipEvent,
+    ActionType.DECLARE,
+    prng
+  )
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(existingEvent.id, {
+      declaration
+    })
+  )
+
+  const duplicateEvent = await client.event.create(generator.event.create())
+  const declaredDuplicateEvent = await client.event.actions.declare.request(
+    generator.event.actions.declare(duplicateEvent.id, {
+      declaration
+    })
+  )
+
+  expect(
+    getCurrentEventState(declaredDuplicateEvent, tennisClubMembershipEvent)
+      .potentialDuplicates
+  ).toEqual([{ id: existingEvent.id, trackingId: existingEvent.trackingId }])
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(duplicateEvent.id, {
+      assignedTo: user.id
+    })
+  )
+  await client.event.actions.duplicate.markNotDuplicate(
+    generator.event.actions.duplicate.markNotDuplicate(duplicateEvent.id, {
+      declaration,
+      keepAssignment: true
+    })
+  )
+  const previousName = declaration['applicant.name'] as NameFieldValue
+  const stillDeclaredEvent = await client.event.actions.validate.request(
+    generator.event.actions.validate(duplicateEvent.id, {
+      declaration: {
+        ...declaration,
+        'applicant.name': {
+          ...previousName,
+          firstname: `${previousName.firstname}2`
+        }
+      }
+    })
+  )
+
+  expect(
+    getCurrentEventState(stillDeclaredEvent, tennisClubMembershipEvent)
+  ).toMatchObject({
+    status: 'DECLARED',
+    potentialDuplicates: [
+      { id: existingEvent.id, trackingId: existingEvent.trackingId }
+    ]
+  })
+})
+
+test('Event status changes after validation action is accepted', async () => {
+  const { user, generator } = await setupTestCase(100)
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  const declarePayload = generator.event.actions.declare(event.id)
+  const eventAfterDeclareAction =
+    await client.event.actions.declare.request(declarePayload)
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event.id, {
+      assignedTo: user.id
+    })
+  )
+  const validatePayload = generator.event.actions.validate(event.id, {
+    keepAssignment: true
+  })
+  const eventAfterValidatedAction =
+    await client.event.actions.validate.request(validatePayload)
+
+  const statusAfterDeclareAction = getCurrentEventState(
+    eventAfterDeclareAction,
+    tennisClubMembershipEvent
+  ).status
+  const statusAfterValidateAction = getCurrentEventState(
+    eventAfterValidatedAction,
+    tennisClubMembershipEvent
+  ).status
+
+  expect(eventAfterValidatedAction.actions).toStrictEqual([
+    ...eventAfterDeclareAction.actions,
+    expect.objectContaining({ type: ActionType.ASSIGN }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Accepted
+    })
+  ])
+
+  expect(statusAfterDeclareAction).toBe(EventStatus.Enum.DECLARED)
+  expect(statusAfterValidateAction).toBe(EventStatus.Enum.VALIDATED)
+})
+
+test('Event status does not change if validation action is rejected', async () => {
+  const { user, generator } = await setupTestCase(100)
+  const client = createTestClient(user)
+  mswServer.use(
+    http.post(
+      `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/validate`,
+      () => {
+        return HttpResponse.json(
+          { error: 'Simulating rejection' },
+          // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
+          { status: 400 }
+        )
+      }
+    )
+  )
+  const event = await client.event.create(generator.event.create())
+  const declarePayload = generator.event.actions.declare(event.id)
+  const eventAfterDeclareAction =
+    await client.event.actions.declare.request(declarePayload)
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event.id, {
+      assignedTo: user.id
+    })
+  )
+  const validatePayload = generator.event.actions.validate(event.id, {
+    keepAssignment: true
+  })
+  const eventAfterValidatedAction =
+    await client.event.actions.validate.request(validatePayload)
+
+  const statusAfterDeclareAction = getCurrentEventState(
+    eventAfterDeclareAction,
+    tennisClubMembershipEvent
+  ).status
+  const statusAfterValidateAction = getCurrentEventState(
+    eventAfterValidatedAction,
+    tennisClubMembershipEvent
+  ).status
+
+  expect(eventAfterValidatedAction.actions).toStrictEqual([
+    ...eventAfterDeclareAction.actions,
+    expect.objectContaining({ type: ActionType.ASSIGN }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Rejected
+    })
+  ])
+
+  expect(statusAfterDeclareAction).toBe(statusAfterValidateAction)
 })

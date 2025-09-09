@@ -10,32 +10,53 @@
  */
 
 import { sql } from 'kysely'
+import { chunk } from 'lodash'
+import { logger, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { Locations, NewLocations } from './schema/app/Locations'
 
-export async function setLocations(locations: NewLocations[]) {
+const INSERT_MAX_CHUNK_SIZE = 10000
+
+export async function addLocations(locations: NewLocations[]) {
   const db = getClient()
-  const locationIds = locations.map(({ id }) => id)
 
-  await db
-    .insertInto('locations')
-    .values(locations.map((loc) => ({ ...loc, deletedAt: null })))
-    .onConflict((oc) =>
-      oc.column('id').doUpdateSet({
-        name: (eb) => eb.ref('excluded.name'),
-        parentId: (eb) => eb.ref('excluded.parentId'),
-        updatedAt: () => sql`now()`,
-        deletedAt: null
-      })
+  // Insert new locations in chunks to avoid exceeding max query size
+  for (const [index, batch] of chunk(
+    locations,
+    INSERT_MAX_CHUNK_SIZE
+  ).entries()) {
+    logger.info(
+      `Processing ${Math.min((index + 1) * INSERT_MAX_CHUNK_SIZE, locations.length)}/${locations.length} locations`
     )
-    .execute()
+    await db
+      .insertInto('locations')
+      .values(batch.map((loc) => ({ ...loc, deletedAt: null })))
+      .onConflict((oc) =>
+        oc.column('id').doUpdateSet({
+          name: () =>
+            sql`CASE
+             WHEN excluded.name IS NOT NULL
+             THEN excluded.name
+             ELSE locations.name
+           END`,
+          parentId: (eb) => eb.ref('excluded.parentId'),
+          locationType: (eb) => eb.ref('excluded.locationType'),
+          updatedAt: () => sql`now()`,
+          validUntil: () =>
+            sql`CASE
+             WHEN excluded.valid_until IS NOT NULL
+             THEN excluded.valid_until
+             ELSE locations.valid_until
+           END`,
+          deletedAt: null
+        })
+      )
+      .execute()
+  }
+}
 
-  await db
-    .updateTable('locations')
-    .set({ deletedAt: sql`now()` })
-    .where('deletedAt', 'is', null)
-    .where('id', 'not in', locationIds)
-    .execute()
+export async function setLocations(locations: NewLocations[]) {
+  return addLocations(locations)
 }
 
 export async function getLocations() {
@@ -56,7 +77,7 @@ export async function getChildLocations(id: string) {
     WITH RECURSIVE r AS (
       SELECT id, parent_id
       FROM app.locations
-      WHERE id = ${id}
+      WHERE id = ${id} AND deleted_at IS NULL
       UNION ALL
       SELECT l.id, l.parent_id
       FROM app.locations l
@@ -65,7 +86,21 @@ export async function getChildLocations(id: string) {
     SELECT l.*
     FROM app.locations l
     JOIN r ON r.id = l.id
-    WHERE l.id <> ${id};
+    WHERE l.id <> ${id} AND l.deleted_at IS NULL;
   `.execute(db)
   return rows
+}
+
+// Check if a location is a leaf location, i.e. it has no children
+export async function isLeafLocation(id: UUID) {
+  const db = getClient()
+
+  const result = await db
+    .selectFrom('locations')
+    .select('id')
+    .where('parentId', '=', id)
+    .limit(1)
+    .executeTakeFirst()
+
+  return !result
 }

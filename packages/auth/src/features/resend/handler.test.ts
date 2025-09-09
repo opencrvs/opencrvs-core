@@ -14,6 +14,14 @@ import {
 } from '@auth/tests/util'
 import { AuthServer, createServer } from '@auth/server'
 
+jest.mock('@auth/features/verifyCode/service', () => {
+  const actual = jest.requireActual('@auth/features/verifyCode/service')
+  return {
+    ...actual,
+    sendVerificationCode: jest.fn().mockResolvedValue(undefined)
+  }
+})
+
 describe('resend handler receives a request', () => {
   let server: AuthServer
 
@@ -83,7 +91,7 @@ describe('resend handler receives a request', () => {
         scope: ['demo'],
         mobile: '+8801712323234'
       })
-      const spy = jest.spyOn(codeService, 'sendVerificationCode')
+      const spy = jest.spyOn(codeService, 'generateVerificationCode')
 
       const res = await server.server.inject({
         method: 'POST',
