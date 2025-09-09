@@ -36,7 +36,6 @@ import {
   useEventCustomAction,
   useIsMutating
 } from './procedures/actions/action'
-import { useGetEvents } from './procedures/list'
 import { useGetEventCounts } from './procedures/count'
 import { findLocalEventDocument, findLocalEventIndex } from './api'
 import { QueryOptions } from './procedures/utils'
@@ -75,7 +74,6 @@ function buildDraftedEventResult(
 export function useEvents() {
   const trpc = useTRPC()
   const getEvent = useGetEvent()
-  const getEvents = useGetEvents()
   const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
   const eventConfigs = useEventConfigurations()
   const { getRemoteDraftByEventId } = useDrafts()
@@ -84,7 +82,6 @@ export function useEvents() {
     createEvent: useCreateEvent,
     /** Returns an event with full history. If you only need the state of the event, use getEventState. */
     getEvent,
-    getEvents,
     useGetEventCounts,
     deleteEvent: {
       useMutation: useDeleteEvent
