@@ -305,7 +305,7 @@ export function buildAction(
     case ActionType.DUPLICATE_DETECTED:
       return {
         ...commonAttributes,
-        createdBy: 'system',
+        createdBy: '',
         createdByUserType: TokenUserType.enum.system,
         createdByRole: '',
         createdAtLocation: undefined
