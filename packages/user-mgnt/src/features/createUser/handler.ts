@@ -42,10 +42,10 @@ export default async function createUser(
 ) {
   const user = request.payload as IUser & { password?: string }
   const token = request.headers.authorization
-  const scopes = getScopes(request.headers as IAuthHeader)
+  const scopes = getScopes(request.headers.authorization)
   const creatableRoleIds = findScope(scopes, 'user.create')?.options?.role
   const isDataSeeder = hasScope(
-    request.headers as IAuthHeader,
+    request.headers.authorization,
     SCOPES.USER_DATA_SEEDING
   )
 
