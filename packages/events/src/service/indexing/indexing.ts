@@ -95,6 +95,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.PAGE_HEADER:
     case FieldType.EMAIL:
     case FieldType.TIME:
+    case FieldType.LINK_BUTTON:
       return { type: 'text' }
     case FieldType.EMAIL:
       return {
