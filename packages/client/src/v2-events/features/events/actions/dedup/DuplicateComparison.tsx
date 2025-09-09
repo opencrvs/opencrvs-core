@@ -133,7 +133,10 @@ export function DuplicateComparison({
     FieldType.FILE,
     FieldType.FILE_WITH_OPTIONS,
     FieldType.BULLET_LIST,
-    FieldType.DIVIDER
+    FieldType.DIVIDER,
+    FieldType.PAGE_HEADER,
+    FieldType.PARAGRAPH,
+    FieldType.BULLET_LIST
   ]
 
   const comparisonData: ComparisonDeclaration[] =
