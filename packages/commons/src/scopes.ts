@@ -319,6 +319,7 @@ export type SearchScope = z.infer<typeof SearchScope>
 // Each of these is configured with allowed event types (ids), e.g. 'birth', 'death', 'tennis-club-membership'.
 const RecordScope = z.object({
   type: z.enum([
+    'record.create',
     'record.read',
     'record.declare',
     'record.notify',
