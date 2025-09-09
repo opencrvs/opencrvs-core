@@ -10,6 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
+import { TokenWithBearer } from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
@@ -18,9 +19,9 @@ import {
   UnassignActionInput
 } from '@opencrvs/commons/events'
 import { getScopes } from '@opencrvs/commons'
-import { processAction, getEventById } from '@events/service/events/events'
 import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventById, processAction } from '@events/service/events/events'
 
 export async function unassignRecord({
   input,
@@ -29,7 +30,7 @@ export async function unassignRecord({
 }: {
   input: UnassignActionInput
   user: TrpcUserContext
-  token: string
+  token: TokenWithBearer
 }) {
   const event = await getEventById(input.eventId)
   const configuration = await getEventConfigurationById({
