@@ -472,7 +472,7 @@ const LocationInput = BaseField.extend({
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z.object({
     searchableResource: z.array(z.enum(['locations', 'facilities', 'offices'])),
-    status: z.string(z.enum(['active', 'inactive']))
+    status: z.enum(['active', 'inactive'])
   })
 }).describe('Input field for a location')
 
@@ -503,7 +503,7 @@ const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z.object({
-    status: z.string(z.enum(['active', 'inactive']))
+    status: z.enum(['active', 'inactive'])
   })
 }).describe('Input field for a facility')
 
@@ -513,7 +513,7 @@ const Office = BaseField.extend({
   type: z.literal(FieldType.OFFICE),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z.object({
-    status: z.string(z.enum(['active', 'inactive']))
+    status: z.enum(['active', 'inactive'])
   })
 }).describe('Input field for an office')
 
