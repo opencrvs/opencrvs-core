@@ -8,8 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { IAuthHeader } from './http'
 import decode from 'jwt-decode'
 import { Nominal } from './nominal'
 import { z } from 'zod'
