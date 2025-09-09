@@ -191,6 +191,7 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const [modal, openModal] = useModal()
   const { getUser, getLocation } = useEventOverviewContext()
   const { getActionTypeForHistory } = useActionForHistory()
+
   const { canReadUser, canAccessOffice } = usePermissions()
 
   const onHistoryRowClick = (item: ActionDocument, userName: string) => {

@@ -26,7 +26,7 @@ type AlwaysAllowed = null
 // This defines the mapping between event actions and the scopes required to perform them.
 export const ACTION_SCOPE_MAP = {
   [ActionType.READ]: ['record.read'],
-  [ActionType.CREATE]: ['record.declare', 'record.notify'],
+  [ActionType.CREATE]: ['record.create'],
   [ActionType.NOTIFY]: ['record.notify'],
   [ActionType.DECLARE]: [
     'record.declare',

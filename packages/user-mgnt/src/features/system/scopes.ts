@@ -25,7 +25,7 @@ const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
 } satisfies Record<SystemRole, Scope[]>
 
 const DEFAULT_SYSTEM_INTEGRATION_ROLE_CONFIGURABLE_SCOPES = {
-  HEALTH: ['record.notify'],
+  HEALTH: ['record.create', 'record.notify'],
   IMPORT: [],
   NATIONAL_ID: [],
   RECORD_SEARCH: [],

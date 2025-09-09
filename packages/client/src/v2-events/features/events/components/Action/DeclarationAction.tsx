@@ -12,7 +12,6 @@
 import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import {
   Draft,
   createEmptyDraft,
@@ -42,69 +41,7 @@ import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
-
-export type AvailableActionTypes = Extract<
-  ActionType,
-  | 'DECLARE'
-  | 'VALIDATE'
-  | 'REGISTER'
-  | 'REQUEST_CORRECTION'
-  | 'APPROVE_CORRECTION'
-  | 'REJECT_CORRECTION'
->
-
-/**
- * Business requirement states that annotation must be prefilled from previous action.
- * From architechtual perspective, each action has separate annotation of its own.
- *
- * @returns the previous declaration action type based on the current action type.
- */
-function getPreviousDeclarationActionType(
-  actions: Action[],
-  currentActionType: AvailableActionTypes
-): DeclarationUpdateActionType | typeof ActionType.NOTIFY | undefined {
-  /** NOTE: If event is rejected before registration, there might be previous action of the same type present.
-   * Action arrays are intentionally ordered to get the latest prefilled annotation.
-   * */
-
-  let actionTypes: (DeclarationUpdateActionType | typeof ActionType.NOTIFY)[]
-
-  switch (currentActionType) {
-    case ActionType.DECLARE: {
-      actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
-      break
-    }
-    case ActionType.VALIDATE: {
-      actionTypes = [ActionType.VALIDATE, ActionType.DECLARE]
-      break
-    }
-    case ActionType.REGISTER: {
-      actionTypes = [ActionType.VALIDATE]
-      break
-    }
-    case ActionType.REQUEST_CORRECTION: {
-      actionTypes = [ActionType.REGISTER]
-      break
-    }
-    case ActionType.APPROVE_CORRECTION:
-    case ActionType.REJECT_CORRECTION: {
-      actionTypes = [ActionType.REQUEST_CORRECTION]
-      break
-    }
-    default: {
-      const _check: never = currentActionType
-      actionTypes = []
-    }
-  }
-
-  for (const type of actionTypes) {
-    if (actions.find((a) => a.type === type)) {
-      return type
-    }
-  }
-
-  return
-}
+import { AvailableActionTypes, getPreviousDeclarationActionType } from './utils'
 
 /**
  *
