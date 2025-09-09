@@ -17,7 +17,7 @@ export const SystemRole = z.enum([
   'RECORD_SEARCH',
   'IMPORT',
   'REINDEX',
-  'WEBHOOK'
+  'WEBHOOK',
   'IMPORT_EXPORT'
 ])
 
