@@ -313,7 +313,9 @@ export type File = z.infer<typeof File>
 
 export const SelectOption = z.object({
   value: z.string().describe('The value of the option'),
-  label: TranslationConfig.describe('The label of the option')
+  label: z
+    .union([z.string(), TranslationConfig])
+    .describe('The label of the option')
 })
 
 const RadioGroup = BaseField.extend({

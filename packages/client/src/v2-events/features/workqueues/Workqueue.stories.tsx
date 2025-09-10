@@ -84,9 +84,6 @@ export const Workqueue: Story = {
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
           }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
           tRPCMsw.event.search.query((input) => {
             return { results: queryData, total: queryData.length }
           })
@@ -141,9 +138,6 @@ export const WorkqueueWithMultipleEventType: Story = {
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
           }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
           tRPCMsw.event.search.query((input) => {
             return {
               results: queryDataWithMultipleEventType,
@@ -182,9 +176,6 @@ export const WorkqueueWithPagination: Story = {
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.list.query(() => {
-            return queryData
           }),
           tRPCMsw.event.search.query((input) => {
             return { results: queryData, total: queryData.length }
@@ -226,11 +217,6 @@ export const ReadyToPrintWorkqueue: Story = {
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.list.query(() => {
-            return queryData.filter(
-              (record) => record.status === EventStatus.enum.REGISTERED
-            )
           }),
           tRPCMsw.event.search.query((input) => {
             const results = queryData.filter(
@@ -275,9 +261,6 @@ export const NoResults: Story = {
           })
         ],
         events: [
-          tRPCMsw.event.list.query(() => {
-            return []
-          }),
           tRPCMsw.event.search.query((input) => {
             return { results: [], total: 0 }
           })
@@ -340,9 +323,6 @@ export const Draft: Story = {
           })
         ],
         events: [
-          tRPCMsw.event.list.query(() => {
-            return []
-          }),
           tRPCMsw.event.search.query((input) => {
             return { results: [], total: 0 }
           })

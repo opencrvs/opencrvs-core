@@ -16,7 +16,10 @@ export const SystemRole = z.enum([
   'NATIONAL_ID',
   'RECORD_SEARCH',
   'IMPORT',
+  'REINDEX',
   'WEBHOOK'
 ])
+
+export const REINDEX_USER_ID = '__ANONYMOUS_REINDEX_USER__'
 
 export type SystemRole = z.infer<typeof SystemRole>
