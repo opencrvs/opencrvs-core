@@ -56,3 +56,8 @@ export function resetServer() {
   db = undefined
   pool = undefined
 }
+
+export async function ensureConnection() {
+  const client = getClient()
+  return client.selectFrom('events').limit(1).execute()
+}

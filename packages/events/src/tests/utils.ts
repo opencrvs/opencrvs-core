@@ -93,7 +93,6 @@ const { createCallerFactory } = t
 
 export const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_READ, // @TODO: this can be removed after unnecessary .list endpoint is removed
-  SCOPES.RECORD_UNASSIGN_OTHERS,
   SCOPES.SEARCH_BIRTH,
   'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
   `record.create[event=birth|death|tennis-club-membership]`,
@@ -107,7 +106,8 @@ export const TEST_USER_DEFAULT_SCOPES = [
   'record.register[event=birth|death|tennis-club-membership]',
   'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]',
   'record.registered.request-correction[event=birth|death|tennis-club-membership]',
-  'record.registered.correct[event=birth|death|tennis-club-membership]'
+  'record.registered.correct[event=birth|death|tennis-club-membership]',
+  'record.unassign-others[event=birth|death|tennis-club-membership]'
 ]
 
 export function createTestToken(

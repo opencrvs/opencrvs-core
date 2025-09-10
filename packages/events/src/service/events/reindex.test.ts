@@ -92,13 +92,13 @@ test(`prevents forbidden access if missing required scope`, async () => {
 })
 
 test('allows access with reindex scope', async () => {
-  const client = createSystemTestClient('test-system', [SCOPES.REINDEX])
+  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
 
   await expect(client.event.reindex()).resolves.not.toThrow()
 })
 
 test('reindexing indexes all events into Elasticsearch', async () => {
-  const client = createSystemTestClient('test-system', [SCOPES.REINDEX])
+  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
 
   await expect(client.event.reindex()).resolves.not.toThrow()
 
@@ -124,7 +124,7 @@ test('reindexing indexes all events into Elasticsearch', async () => {
 })
 
 test('reindexing twice', async () => {
-  const client = createSystemTestClient('test-system', [SCOPES.REINDEX])
+  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
 
   await expect(client.event.reindex()).resolves.not.toThrow()
   await expect(client.event.reindex()).resolves.not.toThrow()

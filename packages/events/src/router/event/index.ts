@@ -11,11 +11,7 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import {
-  QueryProcedure,
-  TRPCError
-} from '@trpc/server/unstable-core-do-not-import'
-import { OpenApiMeta } from 'trpc-to-openapi'
+import { TRPCError } from '@trpc/server/unstable-core-do-not-import'
 import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -55,10 +51,7 @@ import {
 } from '@events/service/events/events'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { importEvent } from '@events/service/events/import'
-import {
-  findRecordsByQuery,
-  getIndexedEvents
-} from '@events/service/indexing/indexing'
+import { findRecordsByQuery } from '@events/service/indexing/indexing'
 import { reindex } from '@events/service/events/reindex'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
@@ -69,46 +62,39 @@ import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)
 
-/*
- * Explicitely type the procedure to reduce the inference
- * thus avoiding "The inferred type of this node exceeds the maximum length the
- * compiler will serialize" error
- */
-const eventConfigGetProcedure: QueryProcedure<{
-  meta: OpenApiMeta
-  input: void
-  output: EventConfig[]
-}> = publicProcedure
-  .meta({
-    openapi: {
-      summary: 'List event configurations',
-      method: 'GET',
-      path: '/config',
-      tags: ['events'],
-      protect: true
-    }
-  })
-  .use(
-    requiresAnyOfScopes(
-      [
-        SCOPES.RECORD_READ,
-        SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-        SCOPES.RECORD_EXPORT_RECORDS,
-        SCOPES.CONFIG,
-        SCOPES.CONFIG_UPDATE_ALL
-      ],
-      ['record.declare', 'record.notify', 'record.register']
-    )
-  )
-  .input(z.void())
-  .output(z.array(EventConfig))
-  .query(async (options) => {
-    return getInMemoryEventConfigurations(options.ctx.token)
-  })
-
 export const eventRouter = router({
   config: router({
-    get: eventConfigGetProcedure
+    get: publicProcedure
+      .meta({
+        openapi: {
+          summary: 'List event configurations',
+          method: 'GET',
+          path: '/config',
+          tags: ['events'],
+          protect: true
+        }
+      })
+      .use(
+        requiresAnyOfScopes(
+          [
+            SCOPES.RECORD_READ,
+            SCOPES.RECORD_EXPORT_RECORDS,
+            SCOPES.CONFIG,
+            SCOPES.CONFIG_UPDATE_ALL
+          ],
+          [
+            'record.create',
+            'record.declare',
+            'record.notify',
+            'record.register'
+          ]
+        )
+      )
+      .input(z.void())
+      .output(z.array(EventConfig))
+      .query(async (options) =>
+        getInMemoryEventConfigurations(options.ctx.token)
+      )
   }),
   create: systemProcedure
     .meta({
@@ -170,8 +156,9 @@ export const eventRouter = router({
       return updatedEvent
     }),
   getDuplicates: publicProcedure
-    .use(requiresAnyOfScopes([SCOPES.RECORD_REVIEW_DUPLICATES]))
+    .use(requiresAnyOfScopes([], ['record.declared.review-duplicates']))
     .input(EventIdParam)
+    .use(middleware.eventTypeAuthorization)
     .use(middleware.requireAssignment)
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input.eventId)
@@ -257,21 +244,16 @@ export const eventRouter = router({
       assign: publicProcedure
         .input(AssignActionInput)
         .use(middleware.validateAction)
-        .mutation(async (options) => {
-          return assignRecord({
-            input: options.input,
-            user: options.ctx.user,
-            token: options.ctx.token
-          })
+        .mutation(async ({ ctx, input }) => {
+          const { user, token } = ctx
+          return assignRecord({ input, user, token })
         }),
       unassign: publicProcedure
         .input(UnassignActionInput)
         .use(middleware.validateAction)
-        .mutation(async (options) => {
-          return unassignRecord(options.input, {
-            user: options.ctx.user,
-            token: options.ctx.token
-          })
+        .mutation(async ({ input, ctx }) => {
+          const { user, token } = ctx
+          return unassignRecord({ input, user, token })
         })
     }),
     correction: router({
@@ -320,22 +302,6 @@ export const eventRouter = router({
         })
     })
   }),
-  list: systemProcedure
-    .use(
-      requiresAnyOfScopes([
-        SCOPES.RECORD_READ,
-        SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-        SCOPES.RECORD_REGISTER,
-        SCOPES.RECORD_EXPORT_RECORDS
-      ])
-    )
-    .output(z.array(EventIndex))
-    .query(async ({ ctx }) => {
-      const userId = ctx.user.id
-      const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
-
-      return getIndexedEvents(userId, eventConfigs)
-    }),
   search: systemProcedure
     .meta({
       openapi: {
@@ -356,7 +322,7 @@ export const eventRouter = router({
     )
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
-      const scopes = getScopes({ Authorization: ctx.token })
+      const scopes = getScopes(ctx.token)
       const isRecordSearchSystemClient = scopes.includes(SCOPES.RECORDSEARCH)
       const allAccessForEveryEventType = Object.fromEntries(
         eventConfigs.map(({ id }) => [id, 'all' as const])
@@ -399,7 +365,7 @@ export const eventRouter = router({
     .mutation(async ({ input, ctx }) => importEvent(input, ctx.token)),
   reindex: systemProcedure
     .input(z.void())
-    .use(requiresAnyOfScopes([SCOPES.REINDEX]))
+    .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
     .output(z.void())
     .meta({
       openapi: {
