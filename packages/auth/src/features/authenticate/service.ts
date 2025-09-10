@@ -144,7 +144,8 @@ export async function createTokenForActionConfirmation(
     {
       scope: ['record.confirm-registration', 'record.reject-registration'],
       eventId,
-      actionId
+      actionId,
+      userType: TokenUserType.enum.user
     },
     cert,
     {
