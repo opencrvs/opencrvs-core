@@ -43,7 +43,7 @@ import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import * as eventsRepo from '@events/storage/postgres/events/events'
 import { getUnreferencedDraftFiles } from '../files/utils'
 
-class EventNotFoundError extends TRPCError {
+export class EventNotFoundError extends TRPCError {
   constructor(id: string) {
     super({
       code: 'NOT_FOUND',

@@ -121,8 +121,8 @@ export function isActionInScope(
  *
  * @deprecated - Will be removed in 1.10
  */
-export function canUserReadRecord(
-  event: EventIndex | CreatedAction,
+export function canUserReadEvent(
+  event: EventIndex | { createdBy: string; type: string },
   {
     userId,
     scopes

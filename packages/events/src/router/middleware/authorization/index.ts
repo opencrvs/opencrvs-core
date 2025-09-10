@@ -29,9 +29,9 @@ import {
   EventDocument,
   ConfigurableScopes,
   getAuthorizedEventsFromScopes,
-  canUserReadRecord
+  canUserReadEvent
 } from '@opencrvs/commons'
-import { getEventById } from '@events/service/events/events'
+import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
 
 /**
@@ -277,14 +277,21 @@ export const userCanReadEvent: MiddlewareFunction<
     })
   }
 
-  const canRead = canUserReadRecord(createAction, {
-    userId: ctx.user.id,
-    scopes: getScopes(ctx.token)
-  })
+  const canRead = canUserReadEvent(
+    {
+      createdBy: createAction.createdBy,
+      type: event.type
+    },
+    {
+      userId: ctx.user.id,
+      scopes: getScopes(ctx.token)
+    }
+  )
 
   if (canRead) {
     return next({ ctx: { ...ctx, event } })
   }
 
-  throw new TRPCError({ code: 'FORBIDDEN' })
+  // Throw not found to avoid leaking the existence of the event
+  throw new EventNotFoundError(input)
 }

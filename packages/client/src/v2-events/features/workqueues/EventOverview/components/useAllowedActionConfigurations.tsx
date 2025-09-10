@@ -27,7 +27,7 @@ import {
   Draft,
   isActionInScope,
   configurableEventScopeAllowed,
-  canUserReadRecord
+  canUserReadEvent
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -534,7 +534,7 @@ export function useAllowedActionConfigurations(
       (action) =>
         isActionAllowed(action) ||
         (action === ActionType.READ &&
-          canUserReadRecord(event, {
+          canUserReadEvent(event, {
             userId: authentication.sub,
             scopes: authentication.scope
           }))
