@@ -157,7 +157,7 @@ export const footballClubMembershipEvent = defineConfig({
                   {
                     value: 'INFORMANT',
                     label: {
-                      id: 'v2.correction.corrector.informant',
+                      id: 'informant.name',
                       defaultMessage: 'Informant',
                       description:
                         'Label for informant option in certificate correction form'
