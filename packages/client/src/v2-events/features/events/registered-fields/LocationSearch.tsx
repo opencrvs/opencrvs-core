@@ -32,20 +32,15 @@ const resourceTypeMap: Record<'locations' | 'facilities' | 'offices', string> =
 function useAdministrativeAreas(
   searchableResource: ('locations' | 'facilities' | 'offices')[]
 ) {
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const { getActiveLocations } = useLocations()
+  const [locations] = getActiveLocations.useSuspenseQuery()
   const locationsBasedOnSearchableResource = locations.filter((location) =>
     searchableResource.some(
       (resource) => location.locationType === resourceTypeMap[resource]
     )
   )
 
-  const now = new Date()
-  const filteredActiveLocations = locationsBasedOnSearchableResource.filter(
-    (location) => !location.validUntil || location.validUntil > now
-  )
-
-  return filteredActiveLocations.map((location) => ({
+  return locationsBasedOnSearchableResource.map((location) => ({
     id: location.id,
     searchableText: location.name.toLowerCase(),
     displayLabel: location.name

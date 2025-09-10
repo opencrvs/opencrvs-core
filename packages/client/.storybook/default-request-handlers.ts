@@ -202,14 +202,14 @@ export const handlers = {
           name: 'Ipongo Rural Health Centre',
           locationType: 'HEALTH_FACILITY',
           parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          validUntil: new Date('2023-01-01T00:00:00Z')
+          validUntil: '2023-01-01T00:00:00Z'
         },
         {
           id: '4cf1f53b-b730-41d2-8649-dff7eeed970d' as UUID,
           name: 'Itumbwe Health Post',
           locationType: 'HEALTH_FACILITY',
           parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          validUntil: new Date('2022-01-01T00:00:00Z')
+          validUntil: '2022-01-01T00:00:00Z'
         },
         {
           id: '4b3676cb-9355-4942-9eb9-2ce46acaf0e0' as UUID,
