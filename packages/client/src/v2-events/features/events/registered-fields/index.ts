@@ -30,6 +30,7 @@ import { SelectCountry } from './SelectCountry'
 import { SelectDateRangeField } from './SelectDateRangeField'
 import { Text } from './Text'
 import { TimeField } from './TimeField'
+import { PrintButton } from './PrintButton'
 
 export * from './Address'
 export * from './AdministrativeArea'
@@ -50,6 +51,7 @@ export * from './SelectCountry'
 export * from './SelectDateRangeField'
 export * from './Text'
 export * from './TimeField'
+export * from './PrintButton'
 
 export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
   type: T
@@ -69,6 +71,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return DateField
     case FieldType.TIME:
       return TimeField
+    case FieldType.PRINT_BUTTON:
+      return PrintButton
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:

@@ -17,6 +17,7 @@ import {
   CertificateTemplateConfig,
   EventConfig,
   EventDocument,
+  EventState,
   FieldType,
   getCurrentEventState,
   getUUID,
@@ -37,32 +38,40 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { getOfflineData } from '@client/offline/selectors'
 import { useEventConfiguration } from '../features/events/useEventConfiguration'
 import { useEvents } from '../features/events/useEvents/useEvents'
+import { useDrafts } from '../features/drafts/useDrafts'
+import { getEventDrafts } from '../features/events/components/Action/utils'
 
 async function replaceMinioUrlWithBase64(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  declaration: Record<string, any>,
+  declaration: Record<string, unknown>,
   config: EventConfig
 ) {
+  // Why a cloned copy? to avoid mutating the original declaration
+  const declarationClone: Record<string, unknown> = JSON.parse(
+    JSON.stringify(declaration)
+  )
+
   const fileFieldIds = config.declaration.pages
     .flatMap((page) => page.fields)
     .filter((field) => field.type === FieldType.FILE)
     .map((field) => field.id)
 
   for (const fieldId of fileFieldIds) {
-    const fieldValue = declaration[fieldId]
+    const fieldValue = declarationClone[fieldId] as
+      | { filename?: string }
+      | undefined
     if (
       fieldValue &&
       typeof fieldValue === 'object' &&
-      'filename' in fieldValue &&
+      typeof fieldValue.filename === 'string' &&
       isMinioUrl(fieldValue.filename)
     ) {
-      declaration[fieldId].filename = await fetchImageAsBase64(
-        // this should be a presigned minio url
-        fieldValue.filename
-      )
+      const newFilename = await fetchImageAsBase64(fieldValue.filename)
+      // this should be a presigned minio url
+      ;(declarationClone[fieldId] as { filename?: string }).filename =
+        newFilename
     }
   }
-  return declaration
+  return declarationClone
 }
 
 export const usePrintableCertificate = ({
@@ -127,6 +136,18 @@ export const usePrintableCertificate = ({
         certificateConfig?.id
   ).length
 
+  // Offline flow
+  const { getLocalDraftOrDefault, getRemoteDraftByEventId } = useDrafts()
+  const remoteDraft = getRemoteDraftByEventId(event.id)
+  const eventDrafts = remoteDraft
+    ? getEventDrafts(event.id, getLocalDraftOrDefault(remoteDraft), [
+        remoteDraft
+      ])
+    : []
+  const localDeclaration = eventDrafts[0]?.action?.declaration as
+    | EventState
+    | undefined
+
   const modifiedMetadata = {
     ...metadata,
     // Temporarily add `modifiedAt` to the last action's data to display
@@ -142,11 +163,15 @@ export const usePrintableCertificate = ({
   }
 
   const certificateFonts = certificateConfig.fonts ?? {}
+  const isEmptyDeclaration = Object.keys(declaration).length === 0
+  const declarationToUse: EventState = isEmptyDeclaration
+    ? ((localDeclaration ?? declaration) as EventState)
+    : declaration
 
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
     $metadata: modifiedMetadata,
-    $declaration: declaration,
+    $declaration: declarationToUse,
     $actions: actionsWithAnOptimisticPrintAction as ActionDocument[],
     review: true,
     locations,
@@ -168,10 +193,17 @@ export const usePrintableCertificate = ({
   const preparePdfCertificate = async (updatedEvent: EventDocument) => {
     const { declaration: updatedDeclaration, ...updatedMetadata } =
       getCurrentEventState(updatedEvent, eventConfiguration)
-    const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
-      updatedDeclaration,
+    // Same fallback logic used for preview: if server-side declaration is empty,
+    // use the local draft (declarationToUse)
+    const updatedDeclarationToUse =
+      Object.keys(updatedDeclaration).length === 0
+        ? declarationToUse
+        : updatedDeclaration
+
+    const declarationWithResolvedImages = (await replaceMinioUrlWithBase64(
+      updatedDeclarationToUse,
       config
-    )
+    )) as EventState
 
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,

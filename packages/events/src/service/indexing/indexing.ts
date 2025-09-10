@@ -112,6 +112,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.OFFICE:
     case FieldType.DATA:
     case FieldType.BUTTON:
+    case FieldType.PRINT_BUTTON:
     case FieldType.ID:
     case FieldType.PHONE:
       return { type: 'keyword' }

@@ -18,6 +18,7 @@ const Label = styled.label<{ disabled?: boolean }>`
   gap: 12px;
   border-radius: 4px;
   width: auto;
+  position: relative;
   padding: 8px 8px;
   align-items: center;
   isolation: isolate;

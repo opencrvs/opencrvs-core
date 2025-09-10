@@ -40,6 +40,7 @@ import {
   DateRangeField,
   SelectDateRangeField,
   TimeField,
+  PrintButton,
   HttpField,
   ButtonField
 } from './FieldConfig'
@@ -152,6 +153,9 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.BUTTON:
       schema = ButtonFieldValue
       break
+    case FieldType.PRINT_BUTTON:
+      schema = TextValue
+      break
     case FieldType.HTTP:
       schema = HttpFieldUpdateValue
       break
@@ -202,6 +206,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.NAME:
     case FieldType.PHONE:
     case FieldType.BUTTON:
+    case FieldType.PRINT_BUTTON:
     case FieldType.HTTP:
     case FieldType.ID:
       return null
@@ -433,6 +438,13 @@ export const isButtonFieldType = (field: {
   return field.config.type === FieldType.BUTTON
 }
 
+export const isPrintButtonFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: PrintButton } => {
+  return field.config.type === FieldType.PRINT_BUTTON
+}
+
 export const isHttpFieldType = (field: {
   config: FieldConfig
   value: FieldValue
@@ -446,6 +458,7 @@ export type NonInteractiveFieldType =
   | Paragraph
   | BulletList
   | DataField
+  | PrintButton
 
 export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
 
@@ -458,6 +471,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.PARAGRAPH ||
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
+    field.type === FieldType.PRINT_BUTTON ||
     field.type === FieldType.HTTP
   )
 }

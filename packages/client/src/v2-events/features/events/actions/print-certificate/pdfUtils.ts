@@ -415,14 +415,16 @@ export function compileSvg({
       this: any,
       ...args: [...(string | undefined)[], Handlebars.HelperOptions]
     ) {
-      // If even one of the parts is undefined, then return empty string
+      // If even one of the parts is undefined or null, then return empty string
       const idParts = args.slice(0, -1)
-      if (idParts.some((part) => part === undefined)) {
+      if (idParts.some((part) => part == null)) {
         return ''
       }
 
+      // NOTE: If you are having issues with casing mismatch, please ensure that you are using lookup helper rather than $lookup. Former returns actual values, latter stringified ones.
+      const id = idParts.map((part) => part?.toString().toLowerCase()).join('.')
+
       // NOTE: If you are having isues with casing mismatch, please ensure that you are using lookup helper rather than $lookup. Former returns actual values, latter stringified ones.
-      const id = idParts.map((part) => part?.toString()).join('.')
 
       return intl.formatMessage({
         id,

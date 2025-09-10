@@ -59,6 +59,7 @@ export function testDataGenerator(rngSeed?: number) {
         mobile: '+260911111111',
         email: 'kalushabwalya17@gmail.com',
         role: {
+          id: 'SOCIAL_WORKER',
           label: {
             id: 'userRole.socialWorker',
             defaultMessage: 'Social Worker',
@@ -98,6 +99,7 @@ export function testDataGenerator(rngSeed?: number) {
         mobile: '+260922222222',
         email: 'kalushabwalya17+@gmail.com',
         role: {
+          id: 'REGISTRATION_AGENT',
           label: {
             id: 'userRole.registrationAgent',
             defaultMessage: 'Registration Agent',
@@ -137,6 +139,7 @@ export function testDataGenerator(rngSeed?: number) {
         mobile: '+260933333333',
         email: 'kalushabwalya1.7@gmail.com',
         role: {
+          id: 'LOCAL_REGISTRAR',
           label: {
             id: 'userRole.localRegistrar',
             defaultMessage: 'Local Registrar',

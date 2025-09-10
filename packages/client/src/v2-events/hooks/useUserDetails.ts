@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux'
 import { getLocations } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 
-export function useUserAddress() {
+export function useUserDetails() {
   const userDetails = useSelector(getUserDetails)
   const locations = useSelector(getLocations)
 
@@ -28,12 +28,16 @@ export function useUserAddress() {
     const provinceId = district?.partOf.split('/')[1]
 
     return {
+      name: `${userDetails.name[0].firstNames} ${userDetails.name[0].familyName}`,
+      role: userDetails.role.id,
       district: districtId ?? '',
       province: provinceId ?? ''
     }
   }
 
   return {
+    name: `${userDetails?.name[0].firstNames} ${userDetails?.name[0].familyName}`,
+    role: userDetails?.role.id,
     district: '',
     province: ''
   }

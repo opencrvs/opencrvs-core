@@ -54,6 +54,7 @@ import {
   SelectDateRangeValue,
   isTimeFieldType,
   isButtonFieldType,
+  isPrintButtonFieldType,
   isHttpFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
@@ -75,6 +76,7 @@ import {
   SelectDateRangeField,
   TimeField,
   Button,
+  PrintButton,
   Http
 } from '@client/v2-events/features/events/registered-fields'
 
@@ -592,6 +594,20 @@ export const GeneratedInputField = React.memo(
           {...field.config}
           declarationFields={getDeclarationFields(eventConfig)}
           formData={form}
+        />
+      )
+    }
+
+    if (isPrintButtonFieldType(field)) {
+      return (
+        <PrintButton.Input
+          buttonLabel={field.config.configuration.buttonLabel}
+          disabled={disabled}
+          id={fieldDefinition.id}
+          template={field.config.configuration.template}
+          onChange={(val: string) =>
+            onFieldValueChange(fieldDefinition.id, val)
+          }
         />
       )
     }
