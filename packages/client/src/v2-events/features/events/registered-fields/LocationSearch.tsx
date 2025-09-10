@@ -22,37 +22,27 @@ interface SearchLocation {
   displayLabel: string
 }
 
-function filterActiveLocations(locations: Location[]) {
-  return locations.filter((location) => {
-    if (!location.validUntil) {
-      return true
-    }
-    const now = new Date()
-    return location.validUntil > now
-  })
-}
+const resourceTypeMap: Record<'locations' | 'facilities' | 'offices', string> =
+  {
+    locations: 'ADMIN_STRUCTURE',
+    facilities: 'HEALTH_FACILITY',
+    offices: 'CRVS_OFFICE'
+  }
 
 function useAdministrativeAreas(
   searchableResource: ('locations' | 'facilities' | 'offices')[]
 ) {
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
+  const locationsBasedOnSearchableResource = locations.filter((location) =>
+    searchableResource.some(
+      (resource) => location.locationType === resourceTypeMap[resource]
+    )
+  )
 
-  const locationListBasedOnSearchableResource = locations.filter((location) => {
-    if (searchableResource.includes('locations')) {
-      return location.locationType === 'ADMIN_STRUCTURE'
-    }
-    if (searchableResource.includes('facilities')) {
-      return location.locationType === 'HEALTH_FACILITY'
-    }
-    if (searchableResource.includes('offices')) {
-      return location.locationType === 'CRVS_OFFICE'
-    }
-    return false
-  })
-
-  const filteredActiveLocations = filterActiveLocations(
-    locationListBasedOnSearchableResource
+  const now = new Date()
+  const filteredActiveLocations = locationsBasedOnSearchableResource.filter(
+    (location) => !location.validUntil || location.validUntil > now
   )
 
   return filteredActiveLocations.map((location) => ({
