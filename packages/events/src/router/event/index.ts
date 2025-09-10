@@ -51,10 +51,7 @@ import {
 } from '@events/service/events/events'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { importEvent } from '@events/service/events/import'
-import {
-  findRecordsByQuery,
-  getIndexedEvents
-} from '@events/service/indexing/indexing'
+import { findRecordsByQuery } from '@events/service/indexing/indexing'
 import { reindex } from '@events/service/events/reindex'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
@@ -305,21 +302,6 @@ export const eventRouter = router({
         })
     })
   }),
-  list: systemProcedure
-    .use(
-      requiresAnyOfScopes([
-        SCOPES.RECORD_READ,
-        SCOPES.RECORD_REGISTER,
-        SCOPES.RECORD_EXPORT_RECORDS
-      ])
-    )
-    .output(z.array(EventIndex))
-    .query(async ({ ctx }) => {
-      const userId = ctx.user.id
-      const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
-
-      return getIndexedEvents(userId, eventConfigs)
-    }),
   search: systemProcedure
     .meta({
       openapi: {

@@ -84,9 +84,6 @@ export const SortWorkqueue: Story = {
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
           }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
           tRPCMsw.event.search.query((input) => {
             return {
               results: queryData.slice(input.offset, input.limit),
@@ -256,9 +253,6 @@ export const WorkqueueCtaByStatus: Story = {
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
           }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
           tRPCMsw.event.search.query(() => {
             return {
               total: eventsWithDifferentStatuses.length,
@@ -300,9 +294,6 @@ export const WorkqueueCtaByStatusRejected: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
           }),
           tRPCMsw.event.search.query(() => {
             return {

@@ -112,9 +112,6 @@ const server = setupServer(
 
   tRPCMsw.event.config.get.query(() => {
     return [tennisClubMembershipEvent]
-  }),
-  tRPCMsw.event.list.query(() => {
-    return [tennisClubMembershipEventIndex]
   })
 )
 
