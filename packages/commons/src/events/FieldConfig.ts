@@ -473,8 +473,7 @@ const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z.object({
-    searchableResource: z.array(z.enum(['locations', 'facilities', 'offices'])),
-    status: z.enum(['active', 'inactive'])
+    searchableResource: z.array(z.enum(['locations', 'facilities', 'offices']))
   })
 }).describe('Input field for a location')
 
@@ -503,20 +502,14 @@ export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY),
-  defaultValue: NonEmptyTextValue.optional(),
-  configuration: z.object({
-    status: z.enum(['active', 'inactive'])
-  })
+  defaultValue: NonEmptyTextValue.optional()
 }).describe('Input field for a facility')
 
 export type Facility = z.infer<typeof Facility>
 
 const Office = BaseField.extend({
   type: z.literal(FieldType.OFFICE),
-  defaultValue: NonEmptyTextValue.optional(),
-  configuration: z.object({
-    status: z.enum(['active', 'inactive'])
-  })
+  defaultValue: NonEmptyTextValue.optional()
 }).describe('Input field for an office')
 
 export type Office = z.infer<typeof Office>
