@@ -27,16 +27,13 @@ function LinkButtonInput({
   disabled?: boolean
 }) {
   const intl = useIntl()
-  const handleClick = () => {
-    window.location.href = configuration.url
-  }
   return (
     <Button
       disabled={disabled}
       element="a"
+      href={configuration.url}
       id={id}
       type="secondary"
-      onClick={handleClick}
     >
       {intl.formatMessage(configuration.text)}
     </Button>
