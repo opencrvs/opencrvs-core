@@ -35,6 +35,16 @@ export function useLocations() {
           }).data
         ]
       }
+    },
+    getActiveLocations: {
+      useSuspenseQuery: () => {
+        return [
+          useSuspenseQuery({
+            ...trpc.locations.getActiveLocations.queryOptions(),
+            queryKey: trpc.locations.getActiveLocations.queryKey()
+          }).data
+        ]
+      }
     }
   }
 }

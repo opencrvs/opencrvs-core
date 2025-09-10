@@ -59,15 +59,23 @@ export async function setLocations(locations: NewLocations[]) {
   return addLocations(locations)
 }
 
-export async function getLocations() {
+export async function getLocations(isActive?: boolean) {
   const db = getClient()
 
-  return db
+  let query = db
     .selectFrom('locations')
     .selectAll()
     .where('deletedAt', 'is', null)
     .$narrowType<{ deletedAt: null }>()
-    .execute()
+
+  if (isActive) {
+    const now = new Date().toISOString()
+    query = query.where((eb) =>
+      eb.or([eb('validUntil', 'is', null), eb('validUntil', '>', now)])
+    )
+  }
+
+  return query.execute()
 }
 
 export async function getChildLocations(id: string) {

@@ -53,8 +53,8 @@ export async function syncLocations() {
   return setLocations(locations)
 }
 
-export const getLocations = async () => {
-  const locations = await locationsRepo.getLocations()
+export const getLocations = async (isActive?: boolean) => {
+  const locations = await locationsRepo.getLocations(isActive)
 
   return locations.map(({ id, name, parentId, validUntil, locationType }) => ({
     id,

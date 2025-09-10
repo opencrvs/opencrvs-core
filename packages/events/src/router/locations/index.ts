@@ -40,7 +40,12 @@ export const locationRouter = router({
     .mutation(async () => {
       await syncLocations()
     }),
-  get: systemProcedure.output(z.array(Location)).query(getLocations),
+  get: systemProcedure
+    .output(z.array(Location))
+    .query(async () => getLocations()),
+  getActiveLocations: systemProcedure
+    .output(z.array(Location))
+    .query(async () => getLocations(true)),
   set: systemProcedure
     .use(
       requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])
