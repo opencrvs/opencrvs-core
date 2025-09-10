@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta } from '@storybook/react'
+import { createTRPCMsw } from '@vafanassieff/msw-trpc'
+import { AppRouter } from '@events/router'
 import { ActionType } from '@opencrvs/commons/client'
 import { AssignmentStatus } from '@client/v2-events/utils'
 import { ActionMenu } from '../../ActionMenu'
@@ -18,7 +20,9 @@ import {
   createStoriesFromScenarios,
   AssertType,
   Scenario,
-  UserRoles
+  UserRoles,
+  getMockEvent,
+  createdByOtherUserScenario
 } from '../ActionMenu.common'
 
 export default {
@@ -46,3 +50,17 @@ const stories = createStoriesFromScenarios(
 )
 
 export const AssignedToSelf = stories['AssignedToSelf']
+
+// Created by some other user
+const event = getMockEvent([ActionType.CREATE], UserRoles.REGISTRATION_AGENT)
+
+export const CreatedByOtherUser = createdByOtherUserScenario({
+  event,
+  role: UserRoles.LOCAL_REGISTRAR,
+  expected: {
+    ...getHiddenActions(),
+    [ActionType.READ]: AssertType.ENABLED,
+    [ActionType.DECLARE]: AssertType.DISABLED,
+    [ActionType.DELETE]: AssertType.DISABLED
+  }
+})
