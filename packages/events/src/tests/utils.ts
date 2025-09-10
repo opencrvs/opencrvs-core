@@ -192,7 +192,10 @@ export function createTestClient(
   return caller
 }
 
-export function createTokenExchangeClient(
+/**
+ * The token that is passed to country config needs to have been exchanged for the specific eventId and actionId.
+ */
+export function createCountryConfigClient(
   user: CreatedUser,
   eventId: string,
   actionId: string

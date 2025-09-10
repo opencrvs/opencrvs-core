@@ -31,7 +31,7 @@ import {
 import {
   createEvent,
   createTestClient,
-  createTokenExchangeClient,
+  createCountryConfigClient,
   setupTestCase
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
@@ -450,10 +450,18 @@ describe('Request and confirmation flow', () => {
           declaration
         })
 
+        const allegedActionId = getUUID()
+
+        const countryConfigClient = createCountryConfigClient(
+          user,
+          event.id,
+          allegedActionId
+        )
+
         await expect(
-          client.event.actions.register.accept({
+          countryConfigClient.event.actions.register.accept({
             ...data,
-            actionId: getUUID(),
+            actionId: allegedActionId,
             registrationNumber: MOCK_REGISTRATION_NUMBER
           })
         ).rejects.matchSnapshot()
@@ -496,7 +504,13 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.assignment.assign(assignmentInput)
 
-        await client.event.actions.register.reject({
+        const countryConfigClient = createCountryConfigClient(
+          user,
+          eventId,
+          originalActionId
+        )
+
+        await countryConfigClient.event.actions.register.reject({
           eventId,
           actionId: originalActionId,
           transactionId: getUUID()
@@ -508,7 +522,7 @@ describe('Request and confirmation flow', () => {
         })
 
         await expect(
-          client.event.actions.register.accept({
+          countryConfigClient.event.actions.register.accept({
             ...data,
             actionId: originalActionId,
             registrationNumber: MOCK_REGISTRATION_NUMBER
@@ -554,12 +568,19 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.request(data)
 
-        const response = await client.event.actions.register.accept({
-          ...data,
-          transactionId: getUUID(),
-          actionId: originalActionId,
-          registrationNumber: MOCK_REGISTRATION_NUMBER
-        })
+        const countryConfigClient = createCountryConfigClient(
+          user,
+          eventId,
+          originalActionId
+        )
+
+        const response =
+          await countryConfigClient.event.actions.register.accept({
+            ...data,
+            transactionId: getUUID(),
+            actionId: originalActionId,
+            registrationNumber: MOCK_REGISTRATION_NUMBER
+          })
 
         const registerActions = response.actions.filter(
           (action) =>
@@ -614,7 +635,13 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.assignment.assign(assignmentInput)
 
-        await client.event.actions.register.accept({
+        const countryConfigClient = createCountryConfigClient(
+          user,
+          eventId,
+          originalActionId
+        )
+
+        await countryConfigClient.event.actions.register.accept({
           ...data,
           transactionId: getUUID(),
           actionId: originalActionId,
@@ -625,12 +652,13 @@ describe('Request and confirmation flow', () => {
           ...assignmentInput,
           transactionId: getUUID()
         })
-        const response = await client.event.actions.register.accept({
-          ...data,
-          transactionId: getUUID(),
-          actionId: originalActionId,
-          registrationNumber: MOCK_REGISTRATION_NUMBER
-        })
+        const response =
+          await countryConfigClient.event.actions.register.accept({
+            ...data,
+            transactionId: getUUID(),
+            actionId: originalActionId,
+            registrationNumber: MOCK_REGISTRATION_NUMBER
+          })
 
         const registerActions = response.actions.filter(
           (action) =>
@@ -685,14 +713,14 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.request(data)
 
-        const tokenExchangeClient = createTokenExchangeClient(
+        const countryConfigClient = createCountryConfigClient(
           user,
           eventId,
           originalActionId
         )
 
         const response =
-          await tokenExchangeClient.event.actions.register.accept({
+          await countryConfigClient.event.actions.register.accept({
             ...data,
             transactionId: getUUID(),
             actionId: originalActionId,
@@ -753,14 +781,14 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.request(data)
 
-        const tokenExchangeClient = createTokenExchangeClient(
+        const countryConfigClient = createCountryConfigClient(
           user,
           'cafecafe-cafe-4caf-8afe-cafecafecafe',
           'abbaabba-abba-4abb-8baa-abbaabbaabba'
         )
 
         await expect(
-          tokenExchangeClient.event.actions.register.accept({
+          countryConfigClient.event.actions.register.accept({
             ...data,
             transactionId: getUUID(),
             actionId: originalActionId,
@@ -785,10 +813,18 @@ describe('Request and confirmation flow', () => {
           declaration
         })
 
+        const allegedActionId = getUUID()
+
+        const countryConfigClient = createCountryConfigClient(
+          user,
+          event.id,
+          allegedActionId
+        )
+
         await expect(
-          client.event.actions.register.reject({
+          countryConfigClient.event.actions.register.reject({
             ...data,
-            actionId: getUUID()
+            actionId: allegedActionId
           })
         ).rejects.matchSnapshot()
       })
@@ -826,7 +862,13 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.assignment.assign(assignmentInput)
 
-        await client.event.actions.register.accept({
+        const countryConfigClient = createCountryConfigClient(
+          user,
+          eventId,
+          originalActionId
+        )
+
+        await countryConfigClient.event.actions.register.accept({
           ...data,
           actionId: originalActionId,
           transactionId: getUUID(),
@@ -838,7 +880,7 @@ describe('Request and confirmation flow', () => {
           transactionId: getUUID()
         })
         await expect(
-          client.event.actions.register.reject({
+          countryConfigClient.event.actions.register.reject({
             ...data,
             actionId: originalActionId
           })
@@ -881,7 +923,13 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.assignment.assign(assignmentInput)
 
-        await client.event.actions.register.reject({
+        const countryConfigClient = createCountryConfigClient(
+          user,
+          eventId,
+          originalActionId
+        )
+
+        await countryConfigClient.event.actions.register.reject({
           eventId,
           transactionId: getUUID(),
           actionId: originalActionId
@@ -891,11 +939,12 @@ describe('Request and confirmation flow', () => {
           ...assignmentInput,
           transactionId: getUUID()
         })
-        const response = await client.event.actions.register.reject({
-          eventId,
-          transactionId: getUUID(),
-          actionId: originalActionId
-        })
+        const response =
+          await countryConfigClient.event.actions.register.reject({
+            eventId,
+            transactionId: getUUID(),
+            actionId: originalActionId
+          })
 
         const registerActions = response.actions.filter(
           (action) => action.type === ActionType.REGISTER
@@ -939,11 +988,18 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.assignment.assign(assignmentInput)
 
-        const response = await client.event.actions.register.reject({
+        const countryConfigClient = createCountryConfigClient(
+          user,
           eventId,
-          transactionId: getUUID(),
-          actionId: originalActionId
-        })
+          originalActionId
+        )
+
+        const response =
+          await countryConfigClient.event.actions.register.reject({
+            eventId,
+            transactionId: getUUID(),
+            actionId: originalActionId
+          })
 
         const registerActions = response.actions.filter(
           (action) => action.type === ActionType.REGISTER
@@ -995,14 +1051,14 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.request(data)
 
-        const tokenExchangeClient = createTokenExchangeClient(
+        const countryConfigClient = createCountryConfigClient(
           user,
           eventId,
           originalActionId
         )
 
         const response =
-          await tokenExchangeClient.event.actions.register.reject({
+          await countryConfigClient.event.actions.register.reject({
             eventId,
             transactionId: getUUID(),
             actionId: originalActionId
@@ -1058,14 +1114,14 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.request(data)
 
-        const tokenExchangeClient = createTokenExchangeClient(
+        const countryConfigClient = createCountryConfigClient(
           user,
           'cafecafe-cafe-4caf-8afe-cafecafecafe',
           'abbaabba-abba-4abb-8baa-abbaabbaabba'
         )
 
         await expect(
-          tokenExchangeClient.event.actions.register.reject({
+          countryConfigClient.event.actions.register.reject({
             eventId,
             transactionId: getUUID(),
             actionId: originalActionId

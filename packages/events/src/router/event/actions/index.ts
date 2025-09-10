@@ -33,9 +33,12 @@ import {
   ActionInputWithType,
   EventConfig
 } from '@opencrvs/commons/events'
-import { SCOPES, TokenUserType } from '@opencrvs/commons/authentication'
+import { TokenUserType } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
-import { requiresAnyOfScopes } from '@events/router/middleware'
+import {
+  requiresAnyOfScopes,
+  setBearerForToken
+} from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
 
 import {
@@ -197,7 +200,7 @@ export async function defaultRequestHandler(
   const { responseStatus, body } = await requestActionConfirmation(
     input.type,
     eventWithRequestedAction,
-    `Bearer ${eventActionToken}`
+    setBearerForToken(eventActionToken)
   )
 
   // If we get an unexpected failure response, we just return HTTP 500 without saving the
@@ -292,12 +295,6 @@ export function getDefaultActionProcedures(
     ACTION_SCOPE_MAP[actionType]
   )
 
-  // Token exchange cannot 'request', but can 'accept' or 'reject' actions
-  const requireScopesForAcceptAndRejectMiddleware = requiresAnyOfScopes(
-    [SCOPES.RECORD_CONFIRM_REGISTRATION, SCOPES.RECORD_REJECT_REGISTRATION],
-    ACTION_SCOPE_MAP[actionType]
-  )
-
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
 
   return {
@@ -339,9 +336,8 @@ export function getDefaultActionProcedures(
       }),
 
     accept: systemProcedure
-      .use(requireScopesForAcceptAndRejectMiddleware)
       .input(inputSchema.merge(acceptInputFields))
-      .use(middleware.requireEventActionAuthorization)
+      .use(middleware.requireActionConfirmationAuthorization)
       .use(middleware.validateAction)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
@@ -390,9 +386,8 @@ export function getDefaultActionProcedures(
       }),
 
     reject: systemProcedure
-      .use(requireScopesForAcceptAndRejectMiddleware)
       .input(ActionConfirmationResponseSchema)
-      .use(middleware.requireEventActionAuthorization)
+      .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input
         const event = await getEventById(eventId)

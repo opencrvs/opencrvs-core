@@ -263,23 +263,34 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
  * Registrars token can be exchanged in auth into a more specific token with `eventId` and `actionId`.
  * This is useful when tokens need to be exposed outside of core of OpenCRVS, e.g. countryconfig or external systems.
  */
-export const requireEventActionAuthorization: MiddlewareFunction<
+export const requireActionConfirmationAuthorization: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
   TrpcContext,
   TrpcContext,
   ActionConfirmationResponseSchema
 > = async ({ next, ctx, input }) => {
-  const { eventId: grantedEventId, actionId: grantedTokenId } = getTokenPayload(
-    ctx.token
-  )
+  const {
+    eventId: grantedEventId,
+    actionId: grantedActionId,
+    scope
+  } = getTokenPayload(ctx.token)
 
-  if (!grantedEventId && !grantedTokenId) {
-    // This was not an exchanged token (i.e. a user token), so we skip this check
-    return next()
+  const hasConfirmAndRejectScope =
+    scope.includes('record.confirm-registration') &&
+    scope.includes('record.reject-registration')
+
+  if (!hasConfirmAndRejectScope) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
-  if (grantedEventId !== input.eventId || grantedTokenId !== input.actionId) {
+  const isActionConfirmationToken = grantedEventId && grantedActionId
+
+  if (!isActionConfirmationToken) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  if (grantedEventId !== input.eventId || grantedActionId !== input.actionId) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 

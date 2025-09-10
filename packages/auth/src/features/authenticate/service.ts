@@ -136,7 +136,7 @@ export async function createToken(
   })
 }
 
-export async function createTokenForRecordValidation(
+export async function createTokenForActionConfirmation(
   { eventId, actionId }: { eventId: UUID; actionId: UUID },
   userId: UUID
 ) {
@@ -152,8 +152,8 @@ export async function createTokenForRecordValidation(
       algorithm: 'RS256',
       expiresIn: '7 days',
       audience: [
-        'opencrvs:gateway-user', // to get to the gateway
-        'opencrvs:user-mgnt-user', // to allow the gateway to connect the 'sub' to an actual user
+        'opencrvs:gateway-user',
+        'opencrvs:user-mgnt-user',
         'opencrvs:auth-user',
         'opencrvs:hearth-user',
         'opencrvs:notification-user',
