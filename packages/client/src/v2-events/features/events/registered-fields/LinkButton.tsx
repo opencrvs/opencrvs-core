@@ -11,9 +11,13 @@
 
 import React from 'react'
 import { useIntl } from 'react-intl'
+import styled from 'styled-components'
 import { TranslationConfig } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 
+const StyledButton = styled(Button)`
+  text-decoration: none;
+`
 function LinkButtonInput({
   id,
   disabled,
@@ -28,7 +32,7 @@ function LinkButtonInput({
 }) {
   const intl = useIntl()
   return (
-    <Button
+    <StyledButton
       disabled={disabled}
       element="a"
       href={configuration.url}
@@ -36,7 +40,7 @@ function LinkButtonInput({
       type="secondary"
     >
       {intl.formatMessage(configuration.text)}
-    </Button>
+    </StyledButton>
   )
 }
 
