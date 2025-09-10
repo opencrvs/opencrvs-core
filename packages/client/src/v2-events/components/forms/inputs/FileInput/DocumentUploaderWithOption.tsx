@@ -200,8 +200,6 @@ function DocumentUploaderWithOption({
     setSelectedOption(remainingOptions[0].value)
   }
 
-  console.log({ error })
-
   const errorMessage = error || unselectedOptionError || fileChangeError || ''
 
   return (
