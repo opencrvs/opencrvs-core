@@ -154,11 +154,6 @@ jobs:
       matrix:
         runner: [ubuntu-24.04, ubuntu-24.04-arm]
         service: ${{ fromJSON(needs.base.outputs.services) }}
-        exclude:
-          # metabase/metabase:v0.50.30.1 doesn't support arm arch
-          # https://discourse.metabase.com/t/install-with-docker-on-arm/18501
-          - service: 'dashboards'
-            runner: 'ubuntu-24.04-arm'
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
@@ -212,10 +207,6 @@ jobs:
       fail-fast: false
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
-        exclude:
-          # metabase/metabase:v0.50.30.1 doesn't support arm arch
-          # https://discourse.metabase.com/t/install-with-docker-on-arm/18501
-          - service: 'dashboards'
     runs-on: ubuntu-24.04
     steps:
       - name: Log in to GitHub Container Registry
@@ -233,26 +224,6 @@ jobs:
               ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-amd64 \
               ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-arm64
             docker manifest push ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG
-          done
-
-  merge-dashboards-manifest:
-    needs: [base, build]
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
-
-      - name: Create and push multi-arch (bare-bones tag) manifest
-        run: |
-          for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
-            echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-dashboards:$TAG"
-            docker manifest create ghcr.io/opencrvs/ocrvs-dashboards:$TAG \
-              ghcr.io/opencrvs/ocrvs-dashboards:$TAG-amd64
-            docker manifest push ghcr.io/opencrvs/ocrvs-dashboards:$TAG
           done
 
   security-scans-pr:
