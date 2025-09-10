@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 9f73db3d-6c06-476e-8f55-caab8c8bd68c
+                transactionId: 94ad5e6a-86e1-44a1-b3f6-6ed7577984e9
                 type: birth
       responses:
         "200":
@@ -395,7 +395,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 11024ef4-8a50-4eee-8fd1-f94f1f984185
+                transactionId: 6ec38ce3-438f-4503-9afb-4e234a658252
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -4691,14 +4691,8 @@ components:
                       - locations
                       - facilities
                       - offices
-                status:
-                  type: string
-                  enum:
-                    - active
-                    - inactive
               required:
                 - searchableResource
-                - status
           required:
             - id
             - label
@@ -4791,21 +4785,10 @@ components:
             defaultValue:
               type: string
               minLength: 1
-            configuration:
-              type: object
-              properties:
-                status:
-                  type: string
-                  enum:
-                    - active
-                    - inactive
-              required:
-                - status
           required:
             - id
             - label
             - type
-            - configuration
           description: Input field for a facility
         - type: object
           properties:
@@ -4893,21 +4876,10 @@ components:
             defaultValue:
               type: string
               minLength: 1
-            configuration:
-              type: object
-              properties:
-                status:
-                  type: string
-                  enum:
-                    - active
-                    - inactive
-              required:
-                - status
           required:
             - id
             - label
             - type
-            - configuration
           description: Input field for an office
         - type: object
           properties:

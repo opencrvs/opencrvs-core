@@ -3048,14 +3048,8 @@ components:
                       - locations
                       - facilities
                       - offices
-                status:
-                  type: string
-                  enum:
-                    - active
-                    - inactive
               required:
                 - searchableResource
-                - status
           required:
             - id
             - label
@@ -3147,21 +3141,10 @@ components:
             defaultValue:
               type: string
               minLength: 1
-            configuration:
-              type: object
-              properties:
-                status:
-                  type: string
-                  enum:
-                    - active
-                    - inactive
-              required:
-                - status
           required:
             - id
             - label
             - type
-            - configuration
           description: Input field for a facility
         - type: object
           properties:
@@ -3248,21 +3231,10 @@ components:
             defaultValue:
               type: string
               minLength: 1
-            configuration:
-              type: object
-              properties:
-                status:
-                  type: string
-                  enum:
-                    - active
-                    - inactive
-              required:
-                - status
           required:
             - id
             - label
             - type
-            - configuration
           description: Input field for an office
         - type: object
           properties:
