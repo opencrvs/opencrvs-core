@@ -83,10 +83,14 @@ export const DocumentListPreview = ({
     const matchingOptionForDocType =
       dropdownOptions &&
       dropdownOptions.find((option) => option.value === docType)
-    return (
-      matchingOptionForDocType &&
-      intl.formatMessage(matchingOptionForDocType.label)
-    )
+
+    if (!matchingOptionForDocType) {
+      return null
+    }
+
+    return typeof matchingOptionForDocType.label === 'string'
+      ? matchingOptionForDocType.label
+      : intl.formatMessage(matchingOptionForDocType.label)
   }
 
   return (
@@ -107,7 +111,9 @@ export const DocumentListPreview = ({
                 <span>
                   {(inReviewSection &&
                     dropdownOptions &&
-                    intl.formatMessage(dropdownOptions[key]?.label)) ||
+                    (typeof dropdownOptions[key]?.label === 'string'
+                      ? dropdownOptions[key]?.label
+                      : intl.formatMessage(dropdownOptions[key]?.label))) ||
                     getFormattedLabelForDocType(document.option as string) ||
                     (document.option as string)}
                 </span>

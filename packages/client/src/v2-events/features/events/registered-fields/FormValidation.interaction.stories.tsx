@@ -72,9 +72,6 @@ const parameters = {
       events: [
         tRPCMsw.event.config.get.query(() => {
           return [tennisClubMembershipEvent]
-        }),
-        tRPCMsw.event.list.query(() => {
-          return [getCurrentEventState(createdEvent, tennisClubMembershipEvent)]
         })
       ],
       workqueues: [

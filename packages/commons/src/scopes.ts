@@ -33,8 +33,6 @@ export const SCOPES = {
   NATIONALID: 'nationalId',
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
-  RECORD_IMPORT: 'record.import',
-  REINDEX: 'record.reindex',
 
   // declare
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
@@ -125,7 +123,11 @@ export const SCOPES = {
   CONFIG_UPDATE_ALL: 'config.update:all',
 
   // data seeding
-  USER_DATA_SEEDING: 'user.data-seeding'
+  USER_DATA_SEEDING: 'user.data-seeding',
+
+  // systems / integrations
+  RECORD_IMPORT: 'record.import',
+  RECORD_REINDEX: 'record.reindex'
 } as const
 
 // Legacy scopes
@@ -153,8 +155,8 @@ const IntegrationScopes = z.union([
 
 // Internal operations
 const InternalOperationsScopes = z.union([
-  z.literal(SCOPES.RECORD_IMPORT),
-  z.literal(SCOPES.REINDEX)
+  z.literal(SCOPES.RECORD_REINDEX),
+  z.literal(SCOPES.RECORD_IMPORT)
 ])
 
 // Declare
@@ -319,6 +321,7 @@ export type SearchScope = z.infer<typeof SearchScope>
 // Each of these is configured with allowed event types (ids), e.g. 'birth', 'death', 'tennis-club-membership'.
 const RecordScope = z.object({
   type: z.enum([
+    'record.create',
     'record.read',
     'record.declare',
     'record.notify',
@@ -329,7 +332,8 @@ const RecordScope = z.object({
     'record.register',
     'record.registered.print-certified-copies',
     'record.registered.request-correction',
-    'record.registered.correct'
+    'record.registered.correct',
+    'record.unassign-others'
   ]),
   options: z.object({
     event: z.array(z.string())

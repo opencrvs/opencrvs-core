@@ -36,6 +36,7 @@ import {
   findLocalEventDocument,
   findLocalEventIndex,
   onAssign,
+  deleteLocalEvent,
   updateLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
 import {
@@ -121,7 +122,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   onMutate: updateEventOptimistically(ActionType.DECLARE),
   meta: {
@@ -135,7 +136,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.REGISTER
@@ -148,7 +149,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.notify.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.NOTIFY
@@ -161,7 +162,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.validate.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.VALIDATE
@@ -174,7 +175,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.reject.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.REJECT
@@ -187,7 +188,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.archive.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.ARCHIVE
@@ -200,7 +201,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.PRINT_CERTIFICATE
@@ -213,7 +214,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.request.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.REQUEST_CORRECTION
@@ -226,7 +227,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.APPROVE_CORRECTION
@@ -239,7 +240,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.REJECT_CORRECTION
@@ -279,7 +280,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markAsDuplicate, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.MARK_AS_DUPLICATE
@@ -324,7 +325,7 @@ queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
   mutationFn: waitUntilEventIsCreated(customApi.validateOnDeclare),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.DECLARE
@@ -335,7 +336,7 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   mutationFn: waitUntilEventIsCreated(customApi.registerOnDeclare),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.DECLARE
@@ -346,7 +347,7 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
   mutationFn: customApi.registerOnValidate,
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.REGISTER
@@ -357,7 +358,7 @@ queryClient.setMutationDefaults(customMutationKeys.archiveOnDuplicate, {
   mutationFn: customApi.archiveOnDuplicate,
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.MARK_AS_DUPLICATE
@@ -368,7 +369,7 @@ queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
   mutationFn: customApi.makeCorrectionOnRequest,
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.APPROVE_CORRECTION

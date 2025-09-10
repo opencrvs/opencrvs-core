@@ -132,11 +132,6 @@ export const createDeclarationTrpcMsw = (
         handler: () => eventDocument
       },
       {
-        name: 'event.list',
-        procedure: trpcMsw.event.list.query,
-        handler: () => [tennisClubMembershipEventIndex]
-      },
-      {
         name: 'event.create',
         procedure: trpcMsw.event.create.mutation,
         handler: () =>
