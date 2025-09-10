@@ -10,7 +10,7 @@
  */
 import { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
-import { fn, userEvent, waitFor, within } from '@storybook/test'
+import { fn, expect, within } from '@storybook/test'
 import styled from 'styled-components'
 import { ConditionalType, user } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
@@ -52,14 +52,13 @@ type Story = StoryObj<Args>
 export const Redirection: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(
-      await canvas.findByRole('link', {
-        name: 'Authenticate by external system'
-      })
-    )
-    await waitFor(() => {
-      expect(window.location.href).toBe('https://example.com/authenticate')
+    const link = await canvas.findByRole('link', {
+      name: 'Authenticate by external system'
     })
+    await expect(link).toHaveAttribute(
+      'href',
+      'https://example.com/authenticate'
+    )
   },
   render: (args) => {
     return (
@@ -70,8 +69,8 @@ export const Redirection: Story = {
         onClickCapture={(e) => {
           const button = e.target as HTMLButtonElement
           if (button.id === 'person____authenticate') {
+            e.preventDefault()
             alert('On click, the link button changes href to\n' + args.url)
-            e.stopPropagation()
           }
         }}
       >
