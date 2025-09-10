@@ -15,6 +15,7 @@ import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 import { precacheFile } from '../features/files/useFileUpload'
+import { isValidAlphaNumericId } from '../features/users/utils'
 
 type UserWithFullUrlFiles = Omit<User, 'signature' | 'avatar'> & {
   signature?: FullDocumentUrl
@@ -29,6 +30,12 @@ setQueryDefaults<
     const {
       queryKey: [, input]
     } = params[0]
+
+    if (!isValidAlphaNumericId(input.input)) {
+      throw new Error(
+        `Invalid user id ${input.input}: must be alphanumeric strings`
+      )
+    }
 
     const queryOptions = trpcOptionsProxy.user.get.queryOptions(input.input)
 
@@ -60,6 +67,15 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
     const {
       queryKey: [, input]
     } = params[0]
+
+    if (
+      !Array.isArray(input.input) ||
+      !input.input.every(isValidAlphaNumericId)
+    ) {
+      throw new Error(
+        `Invalid user id ${input.input}: must be alphanumeric strings`
+      )
+    }
 
     const queryOptions = trpcOptionsProxy.user.list.queryOptions(input.input)
 

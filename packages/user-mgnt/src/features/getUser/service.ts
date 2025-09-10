@@ -15,6 +15,7 @@ import {
   OPENCRVS_SPECIFICATION_URL
 } from '@opencrvs/commons/types'
 import { getFromFhir } from '../createUser/service'
+import mongoose from 'mongoose'
 
 /**
  * Users can have a signature extension that contains the storage key to their signature image.
@@ -40,4 +41,8 @@ export async function getPractitionerSignature(
   )
 
   return findSignatureStorageKey(practitioner.extension)
+}
+
+export function isValidObjectId(id: string): boolean {
+  return mongoose.Types.ObjectId.isValid(id)
 }

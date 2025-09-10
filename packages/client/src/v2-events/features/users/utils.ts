@@ -12,11 +12,20 @@
 import _ from 'lodash'
 import { EventDocument, EventIndex } from '@opencrvs/commons/client'
 
+export function isValidAlphaNumericId(id: unknown): id is string {
+  return (
+    typeof id === 'string' && /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/.test(id)
+  )
+}
+
 export function findUserIdsFromDocument(eventDocument: EventDocument) {
   return _.uniq(
     eventDocument.actions
       .map((action) => ('createdBy' in action ? action.createdBy : undefined))
-      .filter((maybeUserId): maybeUserId is string => Boolean(maybeUserId))
+      .filter(
+        (maybeUserId): maybeUserId is string =>
+          Boolean(maybeUserId) && isValidAlphaNumericId(maybeUserId)
+      )
   )
 }
 

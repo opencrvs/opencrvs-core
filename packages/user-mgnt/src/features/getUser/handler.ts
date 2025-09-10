@@ -10,9 +10,9 @@
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { unauthorized } from '@hapi/boom'
+import { badRequest, unauthorized } from '@hapi/boom'
 import User from '@user-mgnt/model/user'
-import { getPractitionerSignature } from './service'
+import { getPractitionerSignature, isValidObjectId } from './service'
 import { logger } from '@opencrvs/commons'
 
 interface IVerifyPayload {
@@ -33,6 +33,9 @@ export default async function getUser(
   let criteria = {}
 
   if (userId) {
+    if (!isValidObjectId(userId)) {
+      throw badRequest('Invalid userId')
+    }
     criteria = { ...criteria, _id: userId }
   }
   if (practitionerId) {
