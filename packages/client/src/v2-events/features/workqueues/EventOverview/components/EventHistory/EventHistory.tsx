@@ -214,8 +214,10 @@ function ActionCreator({ action }: { action: ActionDocument }) {
 function ActionRole({ action }: { action: ActionDocument }) {
   const intl = useIntl()
   const role = action.createdByRole
+  const { getActionCreator } = useActionCreator()
+  const { type } = getActionCreator(action)
 
-  if (action.type === ActionType.DUPLICATE_DETECTED) {
+  if (type === 'system') {
     return null
   }
 
@@ -230,6 +232,7 @@ function ActionLocation({ action }: { action: ActionDocument }) {
   const { getUser, getLocation } = useEventOverviewContext()
   const { canAccessOffice } = usePermissions()
   const navigate = useNavigate()
+  const { getActionCreator } = useActionCreator()
 
   const user = getUser(action.createdBy)
   const locationName = action.createdAtLocation
@@ -239,8 +242,9 @@ function ActionLocation({ action }: { action: ActionDocument }) {
   const hasAccessToOffice = canAccessOffice({
     id: user.primaryOfficeId
   })
+  const { type } = getActionCreator(action)
 
-  if (action.type === ActionType.DUPLICATE_DETECTED) {
+  if (type === 'system') {
     return null
   }
 
