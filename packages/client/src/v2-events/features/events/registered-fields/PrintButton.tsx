@@ -11,7 +11,7 @@
 
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { useParams } from 'react-router-dom'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Button, Icon } from '@opencrvs/components'
 import { getAcceptedActions, SystemRole } from '@opencrvs/commons/client'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
@@ -21,6 +21,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
+import { ROUTES } from '@client/v2-events/routes'
 
 interface PrintButtonProps {
   id: string
@@ -45,42 +46,30 @@ export const PrintButton = {
     onChange
   }: PrintButtonProps) => {
     const intl = useIntl()
-    const { eventId } = useParams()
+    // const { eventId } = useParams()
+    const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
     const { getEvent } = useEvents()
-
-    // Only proceed if we have an eventId
-    if (!eventId) {
-      return (
-        <Button
-          disabled={true}
-          id={id}
-          size="large"
-          style={{ cursor: 'pointer' }}
-          type="secondary"
-        >
-          {intl.formatMessage(addedButtonLabel)}
-        </Button>
-      )
-    }
-
-    const event = getEvent.getFromCache(eventId)
-
-    const { eventConfiguration } = useEventConfiguration(event.type)
-
+    const { certificateTemplates, language } = useAppConfig()
     const { getUsers } = useUsers()
     const { getLocations } = useLocations()
-    const { certificateTemplates, language } = useAppConfig()
-
-    // Get users and locations for the certificate
+    const event = getEvent.getFromCache(eventId)
     const actions = getAcceptedActions(event)
     const userIds = getUserIdsFromActions(actions, [SystemRole.enum.HEALTH])
+    // Get users and locations for the certificate
     const [users] = getUsers.useSuspenseQuery(userIds)
     const [locations] = getLocations.useSuspenseQuery()
+    const { eventConfiguration } = useEventConfiguration(event.type)
+
+    console.log('eventId :>> ', eventId)
 
     // Find the certificate template configuration
     const certificateConfig = certificateTemplates.find(
       (cert) => cert.id === template
     )
+
+    console.log('PrintB certificateTemplates :>> ', certificateTemplates)
+    console.log('certificateConfig :>> ', certificateConfig)
+    console.log('template :>> ', template)
 
     const { preparePdfCertificate } = usePrintableCertificate({
       event,
@@ -92,12 +81,11 @@ export const PrintButton = {
     })
 
     const handlePrint = async () => {
-      if (!certificateConfig || !language) {
+      if (!certificateConfig || !language || !preparePdfCertificate) {
+        console.log('must return ------------->')
         return
       }
-      if (!preparePdfCertificate) {
-        return
-      }
+
       // Follow the new print flow: prepare first, then mutate, then print in the prepared window
       const openPreparedPdf = await preparePdfCertificate(event)
       // Defer recording print action to the dedicated review flow; button just opens prepared PDF
@@ -116,7 +104,7 @@ export const PrintButton = {
       <Button
         disabled={disabled || !certificateConfig}
         id={id}
-        size="large"
+        size="medium"
         type="secondary"
         onClick={handlePrint}
       >

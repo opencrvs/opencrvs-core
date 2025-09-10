@@ -49,6 +49,7 @@ export async function clientCredentialsHandler(
   const token = await createToken(
     result.systemId,
     result.scope,
+    undefined,
     isNotificationAPIUser
       ? WEB_USER_JWT_AUDIENCES.concat([NOTIFICATION_API_USER_AUDIENCE])
       : WEB_USER_JWT_AUDIENCES,

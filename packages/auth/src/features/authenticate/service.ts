@@ -120,12 +120,13 @@ export async function authenticateSystem(
 export async function createToken(
   userId: string,
   scope: string[],
+  role: string | number | undefined,
   audience: string[],
   issuer: string,
   temporary?: boolean,
   userType: TokenUserType = TokenUserType.enum.user
 ): Promise<string> {
-  return sign({ scope, userType }, cert, {
+  return sign({ scope, userType, role }, cert, {
     subject: userId,
     algorithm: 'RS256',
     expiresIn: temporary
@@ -223,6 +224,7 @@ export async function generateAndSendVerificationCode(
 const tokenPayload = t.type({
   sub: t.string,
   scope: t.array(t.string),
+  role: t.string,
   iat: t.number,
   exp: t.number,
   aud: t.array(t.string)

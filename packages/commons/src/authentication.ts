@@ -176,6 +176,7 @@ export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
+  role: string
   scope: Scope[]
   userType: TokenUserType
 }

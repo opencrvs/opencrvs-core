@@ -51,6 +51,7 @@ export default async function authenticateSuperUserHandler(
   const token = await createToken(
     result.userId,
     SUPER_ADMIN_SCOPES,
+    result.role,
     WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER
   )

@@ -15,6 +15,7 @@ export async function refreshToken(payload: ITokenPayload): Promise<string> {
   return createToken(
     payload.sub,
     payload.scope,
+    payload.role,
     WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER
   )

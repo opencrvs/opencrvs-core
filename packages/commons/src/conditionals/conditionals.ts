@@ -180,6 +180,25 @@ export const user = Object.assign(userSerializer, {
       },
       required: ['$user']
     }),
+  hasRole: (roleId: string) => {
+    console.log('roleId :>> ', roleId)
+    return defineConditional({
+      type: 'object',
+      properties: {
+        $user: {
+          type: 'object',
+          required: ['role'],
+          properties: {
+            role: {
+              type: 'string',
+              const: roleId
+            }
+          }
+        }
+      },
+      required: ['$user']
+    })
+  },
   isOnline: () =>
     defineConditional({
       type: 'object',

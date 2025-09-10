@@ -16,6 +16,7 @@ import { publicCert } from '@config/server'
 const tokenPayload = t.type({
   sub: t.string,
   scope: t.array(t.string),
+  role: t.string,
   iat: t.number,
   exp: t.number,
   aud: t.array(t.string)

@@ -74,6 +74,7 @@ export default async function authenticateHandler(
     response.token = await createToken(
       result.userId,
       scopes,
+      role,
       WEB_USER_JWT_AUDIENCES,
       JWT_ISSUER
     )

@@ -25,6 +25,7 @@ export interface ITokenPayload {
   exp: string
   algorithm: string
   scope: Scope[]
+  role: string
   /** The record ID that the token has access to */
   recordId?: UUID
 }

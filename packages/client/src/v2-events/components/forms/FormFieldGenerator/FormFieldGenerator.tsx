@@ -52,6 +52,13 @@ function mapFieldsToValues(
         systemVariables
       })
 
+      console.log(
+        'Field defaultValue resolution:',
+        field.id,
+        field.defaultValue,
+        fieldInitialValue
+      )
+
       return { ...memo, [field.id]: fieldInitialValue }
     }, {})
 }

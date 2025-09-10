@@ -44,6 +44,7 @@ export const useWorkqueue = (workqueueSlug: string) => {
   const legacyUser = useSelector(getUserDetails)
   const { getUser } = useUsers()
   const [user] = getUser.useSuspenseQuery(legacyUser?.id ?? '')
+
   const { useGetEventCounts } = useEvents()
 
   const { searchEvent } = useEvents()

@@ -683,6 +683,7 @@ describe('"user" conditionals', () => {
     $user: {
       scope: ['record.register', 'record.registration-correct'],
       exp: '1739881718',
+      role: 'LOCAL_REGISTRAR',
       algorithm: 'RS256',
       userType: TokenUserType.enum.user,
       sub: '677b33fea7efb08730f3abfa33'
@@ -707,6 +708,11 @@ describe('"user" conditionals', () => {
   it('validates "user.isOnline" conditional', () => {
     expect(validate(user.isOnline(), userParams)).toBe(true)
     expect(validate(user.isOnline(), offlineUserParams)).toBe(false)
+  })
+
+  it.only('validates "user.hasRole" conditional', () => {
+    expect(validate(user.hasRole('LOCAL_REGISTRAR'), userParams)).toBe(true)
+    expect(validate(user.hasRole('NOTHING_REGISTRAR'), userParams)).toBe(false)
   })
 })
 

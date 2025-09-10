@@ -20,6 +20,7 @@ export interface ITokenPayload {
   subject: string
   exp: string
   algorithm: string
+  role: string
   scope: string[]
 }
 

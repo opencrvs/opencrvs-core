@@ -45,6 +45,7 @@ export default async function authenticateHandler(
   const token = await createToken(
     userId,
     scope,
+    undefined,
     WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER
   )
