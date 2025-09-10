@@ -22,7 +22,6 @@ import {
   DisplayableAction
 } from './ActionType'
 import { EventIndex } from './EventIndex'
-import { CreatedAction } from './ActionDocument'
 
 type AlwaysAllowed = null
 
