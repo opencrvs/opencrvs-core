@@ -9,17 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-
-export const SystemRole = z.enum([
-  'HEALTH',
-  'NATIONAL_ID',
-  'RECORD_SEARCH',
-  'IMPORT',
-  'REINDEX',
-  'WEBHOOK'
-])
-
-export const REINDEX_USER_ID = '__ANONYMOUS_REINDEX_USER__'
-
-export type SystemRole = z.infer<typeof SystemRole>
+export { DeclarationUpdate } from './DeclarationUpdate'
+export { RequestCorrection } from './RequestCorrection'
+export { PrintCertificate } from './PrintCertificate'
+export { ActionTypeSpecificContent } from './ActionTypeSpecificContent'

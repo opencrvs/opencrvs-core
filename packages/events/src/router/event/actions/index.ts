@@ -33,7 +33,10 @@ import {
   ActionInputWithType,
   EventConfig
 } from '@opencrvs/commons/events'
-import { TokenUserType } from '@opencrvs/commons/authentication'
+import {
+  TokenUserType,
+  TokenWithBearer
+} from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
@@ -173,7 +176,7 @@ type ActionProcedure = {
 export async function defaultRequestHandler(
   input: ActionInputWithType,
   user: TrpcUserContext,
-  token: string,
+  token: TokenWithBearer,
   event: EventDocument,
   configuration: EventConfig,
   actionConfirmationResponseSchema?: z.ZodType

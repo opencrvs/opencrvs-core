@@ -120,9 +120,6 @@ const handlers = {
     trpcMsw.event.get.query(() => {
       spies.eventGet++
       return createdEvent
-    }),
-    trpcMsw.event.list.query(() => {
-      return []
     })
   ],
   files: [

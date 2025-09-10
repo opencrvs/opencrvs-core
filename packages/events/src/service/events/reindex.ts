@@ -12,16 +12,18 @@ import { Readable, Transform, PassThrough } from 'node:stream'
 import fetch from 'node-fetch'
 import { JsonStreamStringify } from 'json-stream-stringify'
 import { EventDocument } from '@opencrvs/commons/events'
-import { logger } from '@opencrvs/commons'
+import { logger, TokenWithBearer } from '@opencrvs/commons'
 import {
   STREAM_BATCH_SIZE,
   streamEventDocuments
 } from '@events/storage/postgres/events/events'
 import { env } from '@events/environment'
-import { indexEventsInBulk } from '../indexing/indexing'
+import { ensureIndexExists, indexEventsInBulk } from '../indexing/indexing'
+import { getEventConfigurations } from '../config/config'
+
 import { getInMemoryEventConfigurations } from '../config/config'
 
-async function reindexSearch(token: string) {
+async function reindexSearch(token: TokenWithBearer) {
   const configurations = await getInMemoryEventConfigurations(token)
   let buffer: EventDocument[] = []
 
@@ -59,7 +61,13 @@ async function reindexSearch(token: string) {
   })
 }
 
-export async function reindex(token: string) {
+export async function reindex(token: TokenWithBearer) {
+  const configurations = await getEventConfigurations(token)
+  for (const configuration of configurations) {
+    logger.info(`Ensuring index exists for: ${configuration.id}`)
+    await ensureIndexExists(configuration, { overwrite: true })
+  }
+
   const objStream = Readable.from(streamEventDocuments())
 
   // Stream to reindex endpoint in country config. PassThrough forks the stream.
@@ -85,8 +93,7 @@ export async function reindex(token: string) {
     {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
       // Converts object stream to JSON string stream so that it can
       // be sent to the country config reindex endpoint
