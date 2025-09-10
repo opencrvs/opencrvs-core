@@ -30,7 +30,7 @@ export async function getActionConfirmationToken(
 
   const params = new URLSearchParams({
     grant_type: grantType,
-    subject_token: token,
+    subject_token: token.replace('Bearer ', ''),
     subject_token_type,
     requested_token_type,
     event_id: eventId,
