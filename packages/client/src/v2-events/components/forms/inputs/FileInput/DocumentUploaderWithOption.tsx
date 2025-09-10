@@ -200,6 +200,8 @@ function DocumentUploaderWithOption({
     setSelectedOption(remainingOptions[0].value)
   }
 
+  console.log({ error })
+
   const errorMessage = error || unselectedOptionError || fileChangeError || ''
 
   return (
@@ -233,10 +235,10 @@ function DocumentUploaderWithOption({
           />
         </DropdownContainer>
         <DocumentUploader
-          disabled={Boolean(error)}
+          disabled={Boolean(fileChangeError)}
           id={name}
           name={name}
-          onChange={error ? undefined : handleFileChange}
+          onChange={fileChangeError ? undefined : handleFileChange}
         >
           {intl.formatMessage(messages.uploadFile)}
         </DocumentUploader>
