@@ -305,8 +305,7 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
           'event.actions.validate.request': false,
           'event.config.get': false,
           'event.create': false,
-          'event.get': false,
-          'event.list': false
+          'event.get': false
         })
       })
     })

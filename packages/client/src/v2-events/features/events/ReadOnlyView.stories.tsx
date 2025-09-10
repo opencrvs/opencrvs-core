@@ -213,9 +213,6 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
           }),
           tRPCMsw.event.get.query(() => {
             return eventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
           })
         ],
         user: [

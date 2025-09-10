@@ -21,12 +21,10 @@ import {
   findScope,
   getAssignedUserFromActions,
   getScopes,
-  inScope,
   Scope,
   TokenUserType,
   WorkqueueCountInput,
   ConfigurableScopeType,
-  IAuthHeader,
   UUID,
   EventDocument,
   ConfigurableScopes,
@@ -67,11 +65,11 @@ function getAuthorizedEntitiesFromScopes(scopes: ConfigurableScopes[]) {
  * @returns Object containing authorized entities (e.g. events) based on found scopes
  * @throws {TRPCError} If no matching configurable scopes are found
  */
-function inConfigurableScopes(
-  authHeader: IAuthHeader,
+function getAuthorizedEntities(
+  token: string,
   configurableScopes: ConfigurableScopeType[]
 ) {
-  const userScopes = getScopes(authHeader)
+  const userScopes = getScopes(token)
   const foundScopes = configurableScopes
     .map((scope) => findScope(userScopes, scope))
     .filter((scope) => scope !== undefined)
@@ -85,6 +83,11 @@ function inConfigurableScopes(
 
 type CtxWithAuthorizedEntities = TrpcContext & {
   authorizedEntities?: { events?: string[] }
+}
+
+function inScope(token: string, scopes: Scope[]) {
+  const tokenScopes = getScopes(token)
+  return scopes.some((scope) => tokenScopes.includes(scope))
 }
 
 /**
@@ -105,19 +108,18 @@ export function requiresAnyOfScopes(
     CtxWithAuthorizedEntities,
     unknown
   > = async (opts) => {
-    const token = setBearerForToken(opts.ctx.token)
-    const authHeader = { Authorization: token }
+    const { token } = opts.ctx
 
-    // If the user has any of the allowd plain scopes, allow access
-    if (inScope(authHeader, scopes)) {
+    // If the user has any of the allowed plain scopes, allow access
+    if (inScope(token, scopes)) {
       return opts.next()
     }
 
     // If the user has any of the allowed configurable scopes, allow the user to continue
     // and add the authorized entities to the TrpcContext which are checked in later middleware
     if (configurableScopes) {
-      const authorizedEntities = inConfigurableScopes(
-        authHeader,
+      const authorizedEntities = getAuthorizedEntities(
+        token,
         configurableScopes
       )
 
@@ -239,8 +241,7 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
   TrpcContext,
   WorkqueueCountInput
 > = async ({ next, ctx, input }) => {
-  const scopes = getScopes({ Authorization: setBearerForToken(ctx.token) })
-
+  const scopes = getScopes(ctx.token)
   const workqueueScope = findScope(scopes, 'workqueue')
 
   if (!workqueueScope) {

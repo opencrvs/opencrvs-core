@@ -73,9 +73,6 @@ export const handlers = {
         footballClubMembershipEvent,
         libraryMembershipEvent
       ]
-    }),
-    tRPCMsw.event.list.query(() => {
-      return [tennisClubMembershipEventIndex]
     })
   ],
   eventLocations: [
@@ -1248,9 +1245,6 @@ export const handlers = {
   event: [
     tRPCMsw.event.get.query(() => {
       return tennisClubMembershipEventDocument
-    }),
-    tRPCMsw.event.list.query(() => {
-      return [tennisClubMembershipEventIndex]
     }),
     tRPCMsw.event.search.query((input) => {
       return { results: [], total: 0 }

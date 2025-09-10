@@ -220,7 +220,9 @@ export function SystemList() {
   }
 
   const systemToLabel = (system: System) => {
-    return systemTypeLabels[system.type]
+    return system.type !== 'REINDEX'
+      ? systemTypeLabels[system.type]
+      : 'INVALID_SYSTEM_TYPE__REINDEX'
   }
 
   return (

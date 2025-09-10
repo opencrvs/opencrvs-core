@@ -119,9 +119,6 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
         event: [
           tRPCMsw.event.get.query(() => {
             return createdEvent
-          }),
-          tRPCMsw.event.list.query(() => {
-            return []
           })
         ],
         files: [
@@ -231,9 +228,6 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
           event: [
             tRPCMsw.event.get.query(() => {
               return createdEvent
-            }),
-            tRPCMsw.event.list.query(() => {
-              return []
             })
           ],
           files: [
