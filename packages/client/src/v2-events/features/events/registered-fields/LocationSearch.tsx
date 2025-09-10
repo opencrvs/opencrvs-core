@@ -22,6 +22,16 @@ interface SearchLocation {
   displayLabel: string
 }
 
+function filterActiveLocations(locations: Location[]) {
+  return locations.filter((location) => {
+    if (!location.validUntil) {
+      return true
+    }
+    const now = new Date()
+    return location.validUntil > now
+  })
+}
+
 function useAdministrativeAreas(
   searchableResource: ('locations' | 'facilities' | 'offices')[]
 ) {
@@ -41,7 +51,11 @@ function useAdministrativeAreas(
     return false
   })
 
-  return locationListBasedOnSearchableResource.map((location) => ({
+  const filteredActiveLocations = filterActiveLocations(
+    locationListBasedOnSearchableResource
+  )
+
+  return filteredActiveLocations.map((location) => ({
     id: location.id,
     searchableText: location.name.toLowerCase(),
     displayLabel: location.name
