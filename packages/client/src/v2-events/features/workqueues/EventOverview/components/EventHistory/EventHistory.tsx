@@ -75,7 +75,7 @@ const messages = defineMessages({
   system: {
     id: 'v2.event.history.system',
     defaultMessage: 'System',
-    description: 'Name for sytem initiated actions in the event history'
+    description: 'Name for system initiated actions in the event history'
   },
   systemDefaultName: {
     id: 'v2.event.history.systemDefaultName',
@@ -106,12 +106,17 @@ const SystemName = styled.div`
   }
 `
 
+interface ActionCreator {
+  type: 'user' | 'system' | 'integration'
+  name: string
+}
+
 function useActionCreator() {
   const intl = useIntl()
   const { getUser } = useEventOverviewContext()
   const { systems } = useSelector(getOfflineData)
 
-  const getActionCreator = (action: ActionDocument) => {
+  const getActionCreator = (action: ActionDocument): ActionCreator => {
     if (action.createdByUserType === 'system') {
       const system = systems.find((s) => s._id === action.createdBy)
       return {
@@ -119,7 +124,7 @@ function useActionCreator() {
         name: system?.name ?? intl.formatMessage(messages.systemDefaultName)
       } as const
     }
-    if (action.type === 'DUPLICATE_DETECTED') {
+    if (action.type === ActionType.DUPLICATE_DETECTED) {
       return {
         type: 'system',
         name: intl.formatMessage(messages.system)
@@ -174,7 +179,7 @@ function User({ action }: { action: ActionDocument }) {
   )
 }
 
-function System({ action }: { action: ActionDocument }) {
+function Integration({ action }: { action: ActionDocument }) {
   const { getActionCreator } = useActionCreator()
 
   const { type, name } = getActionCreator(action)
@@ -196,7 +201,7 @@ function System({ action }: { action: ActionDocument }) {
 function ActionCreator({ action }: { action: ActionDocument }) {
   const intl = useIntl()
   if (action.createdByUserType === 'system') {
-    return <System action={action} />
+    return <Integration action={action} />
   }
   if (action.type === ActionType.DUPLICATE_DETECTED) {
     return (
