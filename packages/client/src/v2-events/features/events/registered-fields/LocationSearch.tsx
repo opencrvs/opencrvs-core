@@ -9,14 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useSelector } from 'react-redux'
 import { IntlShape, useIntl } from 'react-intl'
 import { Location } from '@events/service/locations/locations'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
 import { FieldPropsWithoutReferenceValue } from '@opencrvs/commons/client'
-import { getOfflineData } from '@client/offline/selectors'
-import { getListOfLocations } from '@client/utils/validate'
-import { generateLocations } from '@client/utils/locationUtils'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 
@@ -29,19 +25,27 @@ interface SearchLocation {
 function useAdministrativeAreas(
   searchableResource: ('locations' | 'facilities' | 'offices')[]
 ) {
-  const offlineCountryConfig = useSelector(getOfflineData)
-  const intl = useIntl()
-  const locationList = generateLocations(
-    searchableResource.reduce((locations, resource) => {
-      return {
-        ...locations,
-        ...getListOfLocations(offlineCountryConfig, resource)
-      }
-    }, {}),
-    intl
-  )
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
 
-  return locationList
+  const locationListBasedOnSearchableResource = locations.filter((location) => {
+    if (searchableResource.includes('locations')) {
+      return location.locationType === 'ADMIN_STRUCTURE'
+    }
+    if (searchableResource.includes('facilities')) {
+      return location.locationType === 'HEALTH_FACILITY'
+    }
+    if (searchableResource.includes('offices')) {
+      return location.locationType === 'CRVS_OFFICE'
+    }
+    return false
+  })
+
+  return locationListBasedOnSearchableResource.map((location) => ({
+    id: location.id,
+    searchableText: location.name.toLowerCase(),
+    displayLabel: location.name
+  }))
 }
 
 function LocationSearchInput({
