@@ -113,14 +113,6 @@ export const SaveAndExit: Story = {
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [
-              getCurrentEventState(
-                undeclaredDraftEvent,
-                tennisClubMembershipEvent
-              )
-            ]
           })
         ],
         workqueues: [
@@ -251,14 +243,6 @@ export const DraftShownInForm: Story = {
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [
-              getCurrentEventState(
-                undeclaredDraftEvent,
-                tennisClubMembershipEvent
-              )
-            ]
           }),
           tRPCMsw.event.search.query((input) => {
             return {

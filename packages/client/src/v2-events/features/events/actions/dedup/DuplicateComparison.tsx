@@ -15,6 +15,7 @@ import {
   DeclarationFormConfig,
   EventIndex,
   EventState,
+  FieldConfig,
   FieldType,
   isFieldDisplayedOnReview,
   isPageVisible
@@ -33,7 +34,7 @@ import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { noop } from '@client/v2-events'
 import { useEventConfiguration } from '../../useEventConfiguration'
-import { ValueOutput } from '../../components/Output'
+import { Output, ValueOutput } from '../../components/Output'
 import { AdministrativeArea } from '../../registered-fields'
 import { DocumentViewer } from '../../components/DocumentViewer'
 import { duplicateMessages } from './ReviewDuplicate'
@@ -132,7 +133,10 @@ export function DuplicateComparison({
     FieldType.FILE,
     FieldType.FILE_WITH_OPTIONS,
     FieldType.BULLET_LIST,
-    FieldType.DIVIDER
+    FieldType.DIVIDER,
+    FieldType.PAGE_HEADER,
+    FieldType.PARAGRAPH,
+    FieldType.BULLET_LIST
   ]
 
   const comparisonData: ComparisonDeclaration[] =
@@ -154,16 +158,38 @@ export function DuplicateComparison({
             ({ type }) =>
               !hideFieldTypes.some((typeToHide) => type === typeToHide)
           )
+          // Refer to 'findPreviousValueWithSameLabel' in Output.tsx for explanation
+          .reduce<FieldConfig[]>((acc, field) => {
+            const fieldWithSameLabelDontExist = !acc.find(
+              (f) => f.label.id === field.label.id
+            )
+            if (fieldWithSameLabelDontExist) {
+              acc.push(field)
+            }
+            return acc
+          }, [])
           .map((field) => ({
             label: intl.formatMessage(field.label),
-            rightValue: ValueOutput({
-              config: field,
-              value: potentialDuplicateDeclaration[field.id]
-            }),
-            leftValue: ValueOutput({
-              config: field,
-              value: originalDeclaration[field.id]
-            })
+            rightValue: (
+              <Output
+                displayEmptyAsDash={true}
+                field={field}
+                formConfig={eventConfiguration.declaration}
+                previousForm={potentialDuplicateDeclaration}
+                showPreviouslyMissingValuesAsChanged={false}
+                value={potentialDuplicateDeclaration[field.id]}
+              />
+            ),
+            leftValue: (
+              <Output
+                displayEmptyAsDash={true}
+                field={field}
+                formConfig={eventConfiguration.declaration}
+                previousForm={originalDeclaration}
+                showPreviouslyMissingValuesAsChanged={false}
+                value={originalDeclaration[field.id]}
+              />
+            )
           }))
       }))
       .filter(({ data }) => data.length > 0)

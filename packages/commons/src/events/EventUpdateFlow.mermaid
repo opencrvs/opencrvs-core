@@ -2,7 +2,7 @@ flowchart TD
  subgraph subGraph0["Events service"]
     direction TB
         A["event.get()"]
-        B["event.list()"]
+        B["event.search()"]
         C["event.actions[action]"]
   end
     D["Client"] -- ActionInput --> C
