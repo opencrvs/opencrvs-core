@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 7889fece-0d3c-43a5-a128-deae17afa8b2
+                transactionId: b474e94d-47fa-4ea2-8b71-a1df642b993c
                 type: birth
       responses:
         "200":
@@ -395,7 +395,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: d46cf74e-eca7-427e-bb13-845371c2dfb2
+                transactionId: afee4432-d118-4ebc-a570-2f676f6195fb
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -5444,25 +5444,30 @@ components:
             type:
               type: string
               enum:
-                - PRINT_BUTTON
+                - BUTTON
+            defaultValue:
+              type: number
             configuration:
               type: object
               properties:
-                template:
+                icon:
                   type: string
-                  description: Template ID from countryconfig templates to use for printing
-                buttonLabel:
-                  description: Label for the print button
+                  description: Icon for the button. You can find icons from OpenCRVS UI-Kit.
+                loading:
+                  type: boolean
+                  description: Whether the button is in a loading state and shows a spinner
+                text:
+                  description: Text to display on the button
                   allOf:
                     - $ref: "#/components/schemas/TranslationConfig"
               required:
-                - template
+                - text
           required:
             - id
             - label
             - type
             - configuration
-          description: Print button field for printing certificates
+          description: Generic button without any built-in functionality
         - type: object
           properties:
             id:
@@ -5545,30 +5550,25 @@ components:
             type:
               type: string
               enum:
-                - BUTTON
-            defaultValue:
-              type: number
+                - PRINT_BUTTON
             configuration:
               type: object
               properties:
-                icon:
+                template:
                   type: string
-                  description: Icon for the button. You can find icons from OpenCRVS UI-Kit.
-                loading:
-                  type: boolean
-                  description: Whether the button is in a loading state and shows a spinner
-                text:
-                  description: Text to display on the button
+                  description: Template ID from countryconfig templates to use for printing
+                buttonLabel:
+                  description: Label for the print button
                   allOf:
                     - $ref: "#/components/schemas/TranslationConfig"
               required:
-                - text
+                - template
           required:
             - id
             - label
             - type
             - configuration
-          description: Generic button without any built-in functionality
+          description: Print button field for printing certificates
         - type: object
           properties:
             id:

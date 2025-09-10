@@ -3794,24 +3794,29 @@ components:
                 away
             type:
               type: string
-              const: PRINT_BUTTON
+              const: BUTTON
+            defaultValue:
+              type: number
             configuration:
               type: object
               properties:
-                template:
+                icon:
                   type: string
-                  description: Template ID from countryconfig templates to use for printing
-                buttonLabel:
+                  description: Icon for the button. You can find icons from OpenCRVS UI-Kit.
+                loading:
+                  type: boolean
+                  description: Whether the button is in a loading state and shows a spinner
+                text:
                   $ref: "#/components/schemas/TranslationConfig"
-                  description: Label for the print button
+                  description: Text to display on the button
               required:
-                - template
+                - text
           required:
             - id
             - label
             - type
             - configuration
-          description: Print button field for printing certificates
+          description: Generic button without any built-in functionality
         - type: object
           properties:
             id:
@@ -3893,29 +3898,24 @@ components:
                 away
             type:
               type: string
-              const: BUTTON
-            defaultValue:
-              type: number
+              const: PRINT_BUTTON
             configuration:
               type: object
               properties:
-                icon:
+                template:
                   type: string
-                  description: Icon for the button. You can find icons from OpenCRVS UI-Kit.
-                loading:
-                  type: boolean
-                  description: Whether the button is in a loading state and shows a spinner
-                text:
+                  description: Template ID from countryconfig templates to use for printing
+                buttonLabel:
                   $ref: "#/components/schemas/TranslationConfig"
-                  description: Text to display on the button
+                  description: Label for the print button
               required:
-                - text
+                - template
           required:
             - id
             - label
             - type
             - configuration
-          description: Generic button without any built-in functionality
+          description: Print button field for printing certificates
         - type: object
           properties:
             id:
