@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: a8c11905-cc07-4d97-ab20-6a5a5338256e
+                transactionId: 7889fece-0d3c-43a5-a128-deae17afa8b2
                 type: birth
       responses:
         "200":
@@ -395,7 +395,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: c1289818-6434-4d9c-9be5-ed28efb545b6
+                transactionId: d46cf74e-eca7-427e-bb13-845371c2dfb2
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1884,9 +1884,10 @@ components:
                                 type: string
                                 description: The value of the option
                               label:
-                                description: The label of the option
-                                allOf:
+                                anyOf:
+                                  - type: string
                                   - $ref: "#/components/schemas/TranslationConfig"
+                                description: The label of the option
                             required:
                               - value
                               - label
@@ -2023,9 +2024,10 @@ components:
                                 type: string
                                 description: The value of the option
                               label:
-                                description: The label of the option
-                                allOf:
+                                anyOf:
+                                  - type: string
                                   - $ref: "#/components/schemas/TranslationConfig"
+                                description: The label of the option
                             required:
                               - value
                               - label
@@ -3401,9 +3403,10 @@ components:
                     type: string
                     description: The value of the option
                   label:
-                    description: The label of the option
-                    allOf:
+                    anyOf:
+                      - type: string
                       - $ref: "#/components/schemas/TranslationConfig"
+                    description: The label of the option
                 required:
                   - value
                   - label
@@ -3717,9 +3720,10 @@ components:
                     type: string
                     description: The value of the option
                   label:
-                    description: The label of the option
-                    allOf:
+                    anyOf:
+                      - type: string
                       - $ref: "#/components/schemas/TranslationConfig"
+                    description: The label of the option
                 required:
                   - value
                   - label
@@ -5187,9 +5191,10 @@ components:
                     type: string
                     description: The value of the option
                   label:
-                    description: The label of the option
-                    allOf:
+                    anyOf:
+                      - type: string
                       - $ref: "#/components/schemas/TranslationConfig"
+                    description: The label of the option
                 required:
                   - value
                   - label

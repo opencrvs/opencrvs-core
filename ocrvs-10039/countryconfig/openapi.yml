@@ -238,7 +238,9 @@ components:
                                 type: string
                                 description: The value of the option
                               label:
-                                $ref: "#/components/schemas/TranslationConfig"
+                                anyOf:
+                                  - type: string
+                                  - $ref: "#/components/schemas/TranslationConfig"
                                 description: The label of the option
                             required:
                               - value
@@ -389,7 +391,9 @@ components:
                                 type: string
                                 description: The value of the option
                               label:
-                                $ref: "#/components/schemas/TranslationConfig"
+                                anyOf:
+                                  - type: string
+                                  - $ref: "#/components/schemas/TranslationConfig"
                                 description: The label of the option
                             required:
                               - value
@@ -1767,7 +1771,9 @@ components:
                     type: string
                     description: The value of the option
                   label:
-                    $ref: "#/components/schemas/TranslationConfig"
+                    anyOf:
+                      - type: string
+                      - $ref: "#/components/schemas/TranslationConfig"
                     description: The label of the option
                 required:
                   - value
@@ -2079,7 +2085,9 @@ components:
                     type: string
                     description: The value of the option
                   label:
-                    $ref: "#/components/schemas/TranslationConfig"
+                    anyOf:
+                      - type: string
+                      - $ref: "#/components/schemas/TranslationConfig"
                     description: The label of the option
                 required:
                   - value
@@ -3535,7 +3543,9 @@ components:
                     type: string
                     description: The value of the option
                   label:
-                    $ref: "#/components/schemas/TranslationConfig"
+                    anyOf:
+                      - type: string
+                      - $ref: "#/components/schemas/TranslationConfig"
                     description: The label of the option
                 required:
                   - value
