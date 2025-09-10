@@ -51,7 +51,7 @@ import {
 } from '@events/service/events/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
-import { getEventActionToken } from '@events/service/auth'
+import { getActionConfirmationToken } from '@events/service/auth'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -193,7 +193,7 @@ export async function defaultRequestHandler(
   })
 
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
-  const eventActionToken = await getEventActionToken(
+  const eventActionToken = await getActionConfirmationToken(
     { eventId: input.eventId, actionId: requestedAction.id },
     token
   )

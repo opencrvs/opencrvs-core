@@ -19,7 +19,7 @@ export async function getAnonymousToken() {
   return token as string
 }
 
-export async function getEventActionToken(
+export async function getActionConfirmationToken(
   { eventId, actionId }: { eventId: UUID; actionId: UUID },
   token: string
 ) {
