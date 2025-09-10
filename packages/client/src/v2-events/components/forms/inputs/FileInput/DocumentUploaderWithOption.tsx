@@ -235,7 +235,7 @@ function DocumentUploaderWithOption({
           />
         </DropdownContainer>
         <DocumentUploader
-          disabled={Boolean(fileChangeError)}
+          disabled={Boolean(fileChangeError) || !selectedOption}
           id={name}
           name={name}
           onChange={fileChangeError ? undefined : handleFileChange}
