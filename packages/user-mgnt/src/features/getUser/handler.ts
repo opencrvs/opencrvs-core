@@ -12,8 +12,8 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { badRequest, unauthorized } from '@hapi/boom'
 import User from '@user-mgnt/model/user'
-import { getPractitionerSignature, isValidObjectId } from './service'
-import { logger } from '@opencrvs/commons'
+import { getPractitionerSignature } from './service'
+import { logger, isValidObjectId } from '@opencrvs/commons'
 
 interface IVerifyPayload {
   userId: string

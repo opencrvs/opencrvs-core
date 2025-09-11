@@ -10,12 +10,16 @@
  */
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { FullDocumentUrl, ResolvedUser, User } from '@opencrvs/commons/client'
+import {
+  FullDocumentUrl,
+  isValidObjectId,
+  ResolvedUser,
+  User
+} from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 import { precacheFile } from '../features/files/useFileUpload'
-import { isValidAlphaNumericId } from '../features/users/utils'
 
 type UserWithFullUrlFiles = Omit<User, 'signature' | 'avatar'> & {
   signature?: FullDocumentUrl
@@ -31,7 +35,7 @@ setQueryDefaults<
       queryKey: [, input]
     } = params[0]
 
-    if (!isValidAlphaNumericId(input.input)) {
+    if (!isValidObjectId(input.input)) {
       throw new Error(
         `Invalid user id ${input.input}: must be alphanumeric strings`
       )
@@ -68,10 +72,7 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
       queryKey: [, input]
     } = params[0]
 
-    if (
-      !Array.isArray(input.input) ||
-      !input.input.every(isValidAlphaNumericId)
-    ) {
+    if (!Array.isArray(input.input) || !input.input.every(isValidObjectId)) {
       throw new Error(
         `Invalid user id ${input.input}: must be alphanumeric strings`
       )

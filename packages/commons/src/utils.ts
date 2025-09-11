@@ -10,6 +10,7 @@
  */
 
 import { NameFieldValue } from './events/CompositeFieldValue'
+import mongoose from 'mongoose'
 import * as z from 'zod'
 
 export function getOrThrow<T>(x: T, message: string) {
@@ -67,4 +68,8 @@ export function omitKeyDeep(obj: any, keyToRemove: string): any {
     }
   }
   return newObj
+}
+
+export function isValidObjectId(id: string): boolean {
+  return mongoose.Types.ObjectId.isValid(id)
 }
