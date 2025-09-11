@@ -41,16 +41,15 @@ jobs:
         id: set_skip_flag
         run: |
           SKIP=false
-          LABELS=$(jq -r '.pull_request.labels // [] | .[].name' $GITHUB_EVENT_PATH)
+          mapfile -t LABELS < <(jq -r '.pull_request.labels // [] | .[].name' $GITHUB_EVENT_PATH)
 
-          echo "All labels:"
-
-          for label in $LABELS; do
-          echo "- $label"
-            if [[ "$label" == "skip-e2e" ]]; then
-              SKIP=true
-            fi
-          done
+              echo "All labels on this PR:"
+              for label in "${LABELS[@]}"; do
+                echo "- $label"
+                if [[ "$label" == "Skip e2e" ]]; then
+                  SKIP=true
+                fi
+              done
 
           echo "SKIP_E2E=$SKIP" >> $GITHUB_OUTPUT
 
