@@ -16,7 +16,7 @@ export const Location = z.object({
   id: UUID,
   name: z.string(),
   parentId: UUID.nullable(),
-  validUntil: z.date().nullable(),
+  validUntil: z.string().nullable(),
   locationType: z
     .enum(['HEALTH_FACILITY', 'CRVS_OFFICE', 'ADMIN_STRUCTURE'])
     .nullable()
