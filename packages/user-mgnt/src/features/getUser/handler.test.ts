@@ -188,7 +188,7 @@ describe('getUser tests', () => {
     })
   })
 
-  it('returns 401 for an invalid userid', async () => {
+  it('returns 400 for an invalid userid', async () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/getUser',
@@ -198,6 +198,6 @@ describe('getUser tests', () => {
       }
     })
 
-    expect(res.result.statusCode).toEqual(401)
+    expect(res.result.statusCode).toEqual(400)
   })
 })
