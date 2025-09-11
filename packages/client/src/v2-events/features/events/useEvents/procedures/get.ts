@@ -57,17 +57,10 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
 
     const eventDocument = EventDocument.parse(response)
 
-    const cacheResponse = await Promise.allSettled([
+    await Promise.all([
       cacheFiles(eventDocument),
       cacheUsersFromEventDocument(eventDocument)
     ])
-
-    cacheResponse.forEach((result) => {
-      if (result.status === 'rejected') {
-        // eslint-disable-next-line no-console
-        console.error('Error caching files or users', result.reason)
-      }
-    })
 
     updateLocalEventIndex(eventDocument.id, eventDocument)
 
