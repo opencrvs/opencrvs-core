@@ -30,7 +30,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check_skip_e2e_flag:
+  check_skip_e2e_label:
     runs-on: ubuntu-24.04
     outputs:
       skip_e2e: ${{ steps.set_skip_flag.outputs.SKIP_E2E }}
@@ -60,8 +60,8 @@ jobs:
           echo "SKIP_E2E=$SKIP" >> $GITHUB_OUTPUT
 
   generate_stack_name_and_branch:
-    needs: check_skip_e2e_flag
-    if: ${{ needs.check_skip_e2e_flag.outputs.skip_e2e != 'true' }}
+    needs: check_skip_e2e_label
+    if: ${{ needs.check_skip_e2e_label.outputs.skip_e2e != 'true' }}
     runs-on: ubuntu-24.04
     outputs:
       branch_name: ${{ steps.set_branch_and_pr_number.outputs.BRANCH_NAME }}
@@ -186,8 +186,8 @@ jobs:
 
   trigger-e2e:
     runs-on: ubuntu-24.04
-    needs: [check_skip_e2e_flag, generate_stack_name_and_branch, trigger-build]
-    if: ${{ needs.check_skip_e2e_flag.outputs.skip_e2e != 'true' }}
+    needs: [check_skip_e2e_label, generate_stack_name_and_branch, trigger-build]
+    if: ${{ needs.check_skip_e2e_label.outputs.skip_e2e != 'true' }}
     outputs:
       run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
       deployment_link: ${{ steps.print-links.outputs.deployment_link }}
