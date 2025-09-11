@@ -228,7 +228,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
 
     await step("Prepopulate Recommender's details", async () => {
       const accordion = await canvas.findByTestId(
-        'accordion-v2.event.tennis-club-membership.search.recommender'
+        'accordion-event.tennis-club-membership.search.recommender'
       )
       await within(accordion).findByRole('button', { name: 'Hide' })
       await expect(
