@@ -30,8 +30,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  check_skip_e2e_flag:
+    runs-on: ubuntu-24.04
+    outputs:
+      skip_e2e: ${{ steps.set_skip_flag.outputs.SKIP_E2E }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check for skip-e2e label
+        id: set_skip_flag
+        run: |
+          SKIP=false
+          LABELS=$(jq -r '.pull_request.labels[].name' $GITHUB_EVENT_PATH || echo "")
+          for label in $LABELS; do
+            if [[ "$label" == "skip-e2e" ]]; then
+              SKIP=true
+            fi
+          done
+
+          echo "SKIP_E2E=$SKIP" >> $GITHUB_OUTPUT
+
+          if [ "$SKIP" == "true" ]; then
+            echo "skip-e2e label detected — skipping e2e"
+            exit 0
+          fi
+
   generate_stack_name_and_branch:
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-e2e') }}
+    needs: check_skip_e2e_flag
     runs-on: ubuntu-24.04
     outputs:
       branch_name: ${{ steps.set_branch_and_pr_number.outputs.BRANCH_NAME }}
