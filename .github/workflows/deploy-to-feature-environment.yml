@@ -185,9 +185,9 @@ jobs:
     secrets: inherit
 
   trigger-e2e:
-    if: always()
     runs-on: ubuntu-24.04
-    needs: [generate_stack_name_and_branch, trigger-build]
+    needs: [check_skip_e2e_flag, generate_stack_name_and_branch, trigger-build]
+    if: ${{ needs.check_skip_e2e_flag.outputs.skip_e2e != 'true' }}
     outputs:
       run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
       deployment_link: ${{ steps.print-links.outputs.deployment_link }}
