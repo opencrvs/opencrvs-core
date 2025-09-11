@@ -20,7 +20,20 @@ setQueryDefaults(trpcOptionsProxy.locations.get, {
       throw new Error('queryFn is not a function')
     }
     return queryOptions.queryFn(...params)
-  }
+  },
+  staleTime: 1000 * 60 * 60 * 24 // keep it in cache 24 hours
+})
+
+setQueryDefaults(trpcOptionsProxy.locations.getActiveLocations, {
+  queryFn: async (...params) => {
+    const queryOptions =
+      trpcOptionsProxy.locations.getActiveLocations.queryOptions()
+    if (typeof queryOptions.queryFn !== 'function') {
+      throw new Error('queryFn is not a function')
+    }
+    return queryOptions.queryFn(...params)
+  },
+  staleTime: 1000 * 60 * 60 * 24 // keep it in cache 24 hours
 })
 
 export function useLocations() {
@@ -28,19 +41,11 @@ export function useLocations() {
   return {
     getLocations: {
       useSuspenseQuery: () => {
+        const { queryFn, ...rest } =
+          trpcOptionsProxy.locations.getActiveLocations.queryOptions()
         return [
           useSuspenseQuery({
-            ...trpc.locations.get.queryOptions(),
-            queryKey: trpc.locations.get.queryKey()
-          }).data
-        ]
-      }
-    },
-    getActiveLocations: {
-      useSuspenseQuery: () => {
-        return [
-          useSuspenseQuery({
-            ...trpc.locations.getActiveLocations.queryOptions(),
+            ...rest,
             queryKey: trpc.locations.getActiveLocations.queryKey()
           }).data
         ]
