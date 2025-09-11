@@ -55,11 +55,13 @@ jobs:
 
           if [ "$SKIP" == "true" ]; then
             echo "skip-e2e label detected — skipping e2e"
-            exit 0
           fi
+
+          echo "SKIP_E2E=$SKIP" >> $GITHUB_OUTPUT
 
   generate_stack_name_and_branch:
     needs: check_skip_e2e_flag
+    if: ${{ needs.check_skip_e2e_flag.outputs.skip_e2e != 'true' }}
     runs-on: ubuntu-24.04
     outputs:
       branch_name: ${{ steps.set_branch_and_pr_number.outputs.BRANCH_NAME }}
