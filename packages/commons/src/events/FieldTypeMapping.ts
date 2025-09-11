@@ -41,7 +41,8 @@ import {
   SelectDateRangeField,
   TimeField,
   HttpField,
-  ButtonField
+  ButtonField,
+  RedirectTriggerField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -125,6 +126,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.OFFICE:
     case FieldType.PHONE:
     case FieldType.ID:
+    case FieldType.REDIRECT_TRIGGER:
       schema = required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
@@ -203,6 +205,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.PHONE:
     case FieldType.BUTTON:
     case FieldType.HTTP:
+    case FieldType.REDIRECT_TRIGGER:
     case FieldType.ID:
       return null
     case FieldType.ADDRESS:
@@ -438,6 +441,13 @@ export const isHttpFieldType = (field: {
   value: FieldValue
 }): field is { value: undefined; config: HttpField } => {
   return field.config.type === FieldType.HTTP
+}
+
+export const isRedirectTriggerFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: RedirectTriggerField } => {
+  return field.config.type === FieldType.REDIRECT_TRIGGER
 }
 
 export type NonInteractiveFieldType =

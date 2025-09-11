@@ -41,7 +41,8 @@ export const FieldType = {
   SIGNATURE: 'SIGNATURE',
   DATA: 'DATA',
   BUTTON: 'BUTTON',
-  HTTP: 'HTTP'
+  HTTP: 'HTTP',
+  REDIRECT_TRIGGER: 'REDIRECT_TRIGGER'
 } as const
 
 /**

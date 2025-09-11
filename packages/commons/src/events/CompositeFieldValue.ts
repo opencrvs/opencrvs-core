@@ -107,3 +107,8 @@ export const HttpFieldUpdateValue = z
   })
   .or(z.null())
   .or(z.undefined())
+
+export const RedirectTriggerFieldValue = z.record(z.string())
+export type RedirectTriggerFieldValue = z.infer<
+  typeof RedirectTriggerFieldValue
+>
