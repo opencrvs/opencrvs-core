@@ -233,10 +233,10 @@ function DocumentUploaderWithOption({
           />
         </DropdownContainer>
         <DocumentUploader
-          disabled={Boolean(error)}
+          disabled={!selectedOption}
           id={name}
           name={name}
-          onChange={error ? undefined : handleFileChange}
+          onChange={handleFileChange}
         >
           {intl.formatMessage(messages.uploadFile)}
         </DocumentUploader>
