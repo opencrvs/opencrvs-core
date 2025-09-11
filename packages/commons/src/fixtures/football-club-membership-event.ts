@@ -148,7 +148,7 @@ export const footballClubMembershipEvent = defineConfig({
                 id: 'correction.requester.relationship',
                 type: 'RADIO_GROUP',
                 label: {
-                  id: 'v2.correction.corrector.title',
+                  id: 'correction.corrector.title',
                   defaultMessage: 'Who is requesting a change to this record?',
                   description: 'The title for the corrector form'
                 },
@@ -176,7 +176,7 @@ export const footballClubMembershipEvent = defineConfig({
                   {
                     value: 'REGISTRAR',
                     label: {
-                      id: 'v2.correction.corrector.me',
+                      id: 'correction.corrector.me',
                       defaultMessage: 'Me (Registrar)',
                       description:
                         'Label for registrar option in certificate correction form'

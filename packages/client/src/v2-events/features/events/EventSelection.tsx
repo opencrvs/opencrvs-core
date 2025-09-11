@@ -37,7 +37,7 @@ const messages = defineMessages({
     description: 'The title that appears on the select vital event page'
   },
   registerNewEventHeading: {
-    id: 'v2.register.selectVitalEvent.registerNewEventHeading',
+    id: 'v2.register.selectVitalEvent.registerNewEventHeader',
     defaultMessage: 'What type of event do you want to declare?',
     description: 'The section heading on the page'
   },

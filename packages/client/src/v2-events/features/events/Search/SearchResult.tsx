@@ -161,20 +161,9 @@ const messages = defineMessages({
     description: 'The no result text'
   },
   noResultFor: {
-    id: 'v2.search.noResultFor',
+    id: 'v2.search.noResultForSearchTerm',
     defaultMessage: 'No results for "{searchTerm}"',
     description: 'The no result text'
-  },
-  noResultsOutbox: {
-    defaultMessage: 'No records require processing',
-    description: 'Text to display if there is no items in outbox',
-    id: 'v2.constants.noResultsOutbox'
-  },
-  searchResult: {
-    defaultMessage: 'Search results',
-    description:
-      'The label for search result header in advancedSearchResult page',
-    id: 'v2.advancedSearchResult.table.searchResult'
   },
   eventStatus: {
     id: `v2.events.status`,

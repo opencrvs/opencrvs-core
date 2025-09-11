@@ -44,7 +44,7 @@ const modalMessages = defineMessages({
     description: 'Title for delete declaration confirmation modal'
   },
   deleteDeclarationDescription: {
-    id: 'v2.register.form.modal.desc.deleteDeclarationConfirm',
+    id: 'v2.register.form.modal.description.deleteDeclarationConfirm',
     defaultMessage: `Are you certain you want to delete this draft declaration form? Please note, this action can't be undone.`,
     description: 'Description for delete declaration confirmation modal'
   }
