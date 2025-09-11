@@ -81,7 +81,6 @@ const systemSchema = new Schema({
     enum: [
       types.HEALTH,
       types.NATIONAL_ID,
-      types.IMPORT,
       types.RECORD_SEARCH,
       types.WEBHOOK,
       types.IMPORT_EXPORT

@@ -982,7 +982,6 @@ export const enum GQLSystemType {
   HEALTH = 'HEALTH',
   RECORD_SEARCH = 'RECORD_SEARCH',
   WEBHOOK = 'WEBHOOK',
-  IMPORT = 'IMPORT',
   IMPORT_EXPORT = 'IMPORT_EXPORT'
 }
 

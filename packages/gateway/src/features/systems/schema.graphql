@@ -25,7 +25,6 @@ enum SystemType {
   HEALTH
   RECORD_SEARCH
   WEBHOOK
-  IMPORT
   IMPORT_EXPORT
 }
 

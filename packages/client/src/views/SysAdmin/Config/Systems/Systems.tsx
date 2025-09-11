@@ -216,7 +216,6 @@ export function SystemList() {
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
     NATIONAL_ID: intl.formatMessage(integrationMessages.nationalId),
     WEBHOOK: intl.formatMessage(integrationMessages.webhook),
-    IMPORT: intl.formatMessage(integrationMessages.import),
     IMPORT_EXPORT: intl.formatMessage(integrationMessages.importExport)
   }
 
