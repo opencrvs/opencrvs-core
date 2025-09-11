@@ -22,29 +22,29 @@ import { useActionAnnotation } from './useActionAnnotation'
 
 const modalMessages = defineMessages({
   cancel: {
-    id: 'v2.exitModal.cancel',
+    id: 'exitModal.cancel',
     defaultMessage: 'Cancel'
   },
   confirm: {
-    id: 'v2.buttons.confirm',
+    id: 'buttons.confirm',
     defaultMessage: 'Confirm'
   },
   exitWithoutSavingTitle: {
-    id: 'v2.exitModal.exitWithoutSaving',
+    id: 'exitModal.exitWithoutSaving',
     defaultMessage: 'Exit without saving changes?'
   },
   exitWithoutSavingDescription: {
-    id: 'v2.exitModal.exitWithoutSavingDescription',
+    id: 'exitModal.exitWithoutSavingDescription',
     defaultMessage:
       'You have unsaved changes on your declaration form. Are you sure you want to exit without saving?'
   },
   deleteDeclarationTitle: {
-    id: 'v2.register.form.modal.title.deleteDeclarationConfirm',
+    id: 'register.form.modal.title.deleteDeclarationConfirm',
     defaultMessage: 'Delete draft?',
     description: 'Title for delete declaration confirmation modal'
   },
   deleteDeclarationDescription: {
-    id: 'v2.register.form.modal.description.deleteDeclarationConfirm',
+    id: 'register.form.modal.description.deleteDeclarationConfirm',
     defaultMessage: `Are you certain you want to delete this draft declaration form? Please note, this action can't be undone.`,
     description: 'Description for delete declaration confirmation modal'
   }

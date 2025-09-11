@@ -178,6 +178,54 @@ async function extractMessages() {
     (key) => !translations.find(({ id }) => id === key)
   )
 
+  console.log('CIHAN DESCRIPTIONS', messagesParsedFromApp.length)
+  const withoutDuplicates = Array.from(
+    new Set(messagesParsedFromApp.map((i) => i.id))
+  )
+  console.log('CIHAN DESCRIPTIONS WITHOUT DUPLICATES', withoutDuplicates.length)
+
+  // do this to country_config files
+  const countryConfigFiles = await promisify(glob)(
+    `${COUNTRY_CONFIG_PATH}/src/**/*.@(tsx|ts)`
+  )
+
+  const messagesParsedFromApp2: MessageDescriptor[] = countryConfigFiles
+    .map((f) => {
+      const contents = fs.readFileSync(f).toString()
+      return findObjectLiteralsWithIdAndDefaultMessage(f, contents)
+    })
+    .flat()
+
+  console.log('CIHAN DESCRIPTIONS 2', messagesParsedFromApp2.length)
+  const withoutDuplicates2 = Array.from(
+    new Set(messagesParsedFromApp2.map((i) => i.id))
+  )
+  console.log(
+    'CIHAN DESCRIPTIONS WITHOUT DUPLICATES 2',
+    withoutDuplicates2.length
+  )
+
+  const allUsedIds = [...withoutDuplicates, ...withoutDuplicates2]
+  console.log('ALL USED IDS', allUsedIds.length)
+  const allUsedIdsWithoutDuplicates = Array.from(new Set(allUsedIds))
+  console.log(
+    'ALL USED IDS WITHOUT DUPLICATES',
+    allUsedIdsWithoutDuplicates.length
+  )
+
+  // Write all used ids without duplicates to a file
+  const usedIdsFilePath = `${COUNTRY_CONFIG_PATH}/src/translations/used-ids.txt`
+  try {
+    fs.writeFileSync(
+      usedIdsFilePath,
+      allUsedIdsWithoutDuplicates.join('\n'),
+      'utf8'
+    )
+    console.log(`Wrote all used translation ids to ${usedIdsFilePath}`)
+  } catch (err) {
+    console.error(`Failed to write used ids to file: ${usedIdsFilePath}`, err)
+  }
+
   if (outdated) {
     const extraKeys = translations
       .map(({ id }) => id)
@@ -189,6 +237,7 @@ async function extractMessages() {
       '\n'
     )
     console.log(extraKeys.join('\n'))
+    console.log('How many? ', extraKeys.length)
   }
 
   if (missingKeys.length > 0) {

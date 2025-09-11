@@ -33,23 +33,23 @@ export const eventHistoryStatusMessage = {
 const messages = defineMessages({
   'event.history.modal.timeFormat': {
     defaultMessage: 'MMMM dd, yyyy · hh.mm a',
-    id: 'v2.configuration.timeFormat',
+    id: 'configuration.timeFormat',
     description: 'Time format for timestamps in event history'
   },
   comment: {
     defaultMessage: 'Comment',
     description: 'Label for rejection comment',
-    id: 'v2.constants.comment'
+    id: 'constants.comment'
   },
   reason: {
     defaultMessage: 'Reason',
     description: 'Label for rejection correction reason',
-    id: 'v2.constants.reason'
+    id: 'constants.reason'
   },
   duplicateOf: {
     defaultMessage: 'Duplicate of',
     description: 'table header for `duplicate of` in record audit',
-    id: 'v2.constants.duplicateOf'
+    id: 'constants.duplicateOf'
   }
 })
 

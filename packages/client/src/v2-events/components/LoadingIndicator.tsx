@@ -24,7 +24,7 @@ const messages = defineMessages({
   noConnection: {
     defaultMessage: 'No connection',
     description: 'No Connection hover text',
-    id: 'v2.constants.noConnection'
+    id: 'constants.noConnection'
   }
 })
 

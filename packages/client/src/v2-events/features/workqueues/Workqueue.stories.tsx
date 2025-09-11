@@ -247,7 +247,7 @@ export const NoResults: Story = {
               {
                 ...recent,
                 emptyMessage: {
-                  id: 'v2.workqueues.recent.emptyMessage',
+                  id: 'workqueues.recent.emptyMessage',
                   defaultMessage: 'No recent records',
                   description: 'Empty message for recent workqueue'
                 }
@@ -309,7 +309,7 @@ export const Draft: Story = {
               {
                 ...recent,
                 emptyMessage: {
-                  id: 'v2.workqueues.recent.emptyMessage',
+                  id: 'workqueues.recent.emptyMessage',
                   defaultMessage: 'No recent records',
                   description: 'Empty message for recent workqueue'
                 }

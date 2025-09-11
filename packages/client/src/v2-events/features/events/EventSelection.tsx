@@ -32,29 +32,29 @@ import { useActionAnnotation } from './useActionAnnotation'
 
 const messages = defineMessages({
   registerNewEventTitle: {
-    id: 'v2.register.selectVitalEvent.registerNewEventTitle',
+    id: 'register.selectVitalEvent.registerNewEventTitle',
     defaultMessage: 'New declaration',
     description: 'The title that appears on the select vital event page'
   },
   registerNewEventHeading: {
-    id: 'v2.register.selectVitalEvent.registerNewEventHeader',
+    id: 'register.selectVitalEvent.registerNewEventHeader',
     defaultMessage: 'What type of event do you want to declare?',
     description: 'The section heading on the page'
   },
   continueButton: {
     defaultMessage: 'Continue',
     description: 'Continue Button Text',
-    id: 'v2.buttons.continue'
+    id: 'buttons.continue'
   },
   errorMessage: {
-    id: 'v2.register.selectVitalEvent.errorMessage',
+    id: 'register.selectVitalEvent.errorMessage',
     defaultMessage: 'Please select the type of event',
     description: 'Error Message to show when no event is being selected'
   },
   exitButton: {
     defaultMessage: 'EXIT',
     description: 'Label for Exit button on EventTopBar',
-    id: 'v2.buttons.exit'
+    id: 'buttons.exit'
   }
 })
 
@@ -63,7 +63,7 @@ const constantsMessages = defineMessages({
     defaultMessage: 'Skip to main content',
     description:
       'Label for a keyboard accessibility link which skips to the main content',
-    id: 'v2.constants.skipToMainContent'
+    id: 'constants.skipToMainContent'
   }
 })
 

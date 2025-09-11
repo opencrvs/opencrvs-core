@@ -29,12 +29,12 @@ const messagesToDefine = {
   edit: {
     defaultMessage: 'Edit',
     description: 'Edit button text',
-    id: 'v2.buttons.edit'
+    id: 'buttons.edit'
   },
   event: {
     defaultMessage: 'Event',
     description: 'Label for Event of event in work queue list item',
-    id: 'v2.constants.event'
+    id: 'constants.event'
   }
 }
 

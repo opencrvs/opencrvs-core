@@ -150,18 +150,18 @@ function changeSortedColumn(
 
 const messages = defineMessages({
   noRecord: {
-    id: 'v2.search.noRecord',
+    id: 'search.noRecord',
     defaultMessage:
       'No records {slug, select, draft {in my draft} outbox {require processing} other {{title}}}',
     description: 'The no record text'
   },
   noResult: {
-    id: 'v2.search.noResult',
+    id: 'search.noResult',
     defaultMessage: 'No result',
     description: 'The no result text'
   },
   noResultFor: {
-    id: 'v2.search.noResultForSearchTerm',
+    id: 'search.noResultForSearchTerm',
     defaultMessage: 'No results for "{searchTerm}"',
     description: 'The no result text'
   },

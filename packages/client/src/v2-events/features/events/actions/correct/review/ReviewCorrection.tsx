@@ -45,28 +45,28 @@ import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Eve
 
 const reviewCorrectionMessages = defineMessages({
   actionModalCancel: {
-    id: 'v2.actionModal.cancel',
+    id: 'actionModal.cancel',
     defaultMessage: 'Cancel',
     description: 'The label for cancel button of action modal'
   },
   actionModalDescription: {
-    id: 'v2.actionModal.description',
+    id: 'actionModal.description',
     defaultMessage:
       'The informant will be notified of this decision and a record of this decision will be recorded',
     description: 'The description for action modal'
   },
   approveCorrection: {
-    id: 'v2.modal.approveCorrection',
+    id: 'modal.approveCorrection',
     defaultMessage: 'Approve correction?',
     description: 'The title for approve correction modal'
   },
   rejectCorrection: {
-    id: 'v2.modal.rejectCorrection',
+    id: 'modal.rejectCorrection',
     defaultMessage: 'Reject correction?',
     description: 'The title for reject correction modal'
   },
   actionModalConfirm: {
-    id: 'v2.actionModal.confirm',
+    id: 'actionModal.confirm',
     defaultMessage: 'Confirm',
     description: 'The label for confirm button of action modal'
   },

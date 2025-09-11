@@ -64,49 +64,49 @@ const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 const messages = defineMessages({
   timeFormat: {
     defaultMessage: 'MMMM dd, yyyy · hh.mm a',
-    id: 'v2.configuration.timeFormat',
+    id: 'configuration.timeFormat',
     description: 'Time format for timestamps in event history'
   },
   role: {
-    id: 'v2.event.history.role',
+    id: 'event.history.role',
     defaultMessage:
       '{role, select, LOCAL_REGISTRAR {Local Registrar} SOCIAL_WORKER {Social Worker} FIELD_AGENT {Field Agent} POLICE_OFFICER {Police Officer} REGISTRATION_AGENT {Registration Agent} HEALTHCARE_WORKER {Healthcare Worker} LOCAL_LEADER {Local Leader} HOSPITAL_CLERK {Hospital Clerk} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} COMMUNITY_LEADER {Community Leader} HEALTH {Health integration} IMPORT {Import integration} NATIONAL_ID {National ID integration} RECORD_SEARCH {Record search integration} WEBHOOK {Webhook} other {Unknown}}',
     description: 'Role of the user in the event history'
   },
   systemDefaultName: {
-    id: 'v2.event.history.systemDefaultName',
+    id: 'event.history.systemDefaultName',
     defaultMessage: 'System integration',
     description: 'Fallback for system integration name in the event history'
   },
   action: {
     defaultMessage: 'Action',
     description: 'Action Label',
-    id: 'v2.constants.label.action'
+    id: 'constants.label.action'
   },
   by: {
     defaultMessage: 'By',
     description: 'Label for By (the person who performed the action)',
-    id: 'v2.constants.by'
+    id: 'constants.by'
   },
   date: {
     defaultMessage: 'Date',
     description: 'Date Label',
-    id: 'v2.constants.label.date'
+    id: 'constants.label.date'
   },
   history: {
     defaultMessage: 'History',
     description: 'History heading',
-    id: 'v2.constants.history'
+    id: 'constants.history'
   },
   labelRole: {
     defaultMessage: 'Role',
     description: 'Role label',
-    id: 'v2.constants.role'
+    id: 'constants.role'
   },
   location: {
     defaultMessage: 'Location',
     description: 'Label for location',
-    id: 'v2.constants.location'
+    id: 'constants.location'
   }
 })
 

@@ -29,12 +29,12 @@ export const tennisClubMembershipEvent = defineConfig({
   label: {
     defaultMessage: 'Tennis club membership application',
     description: 'This is what this event is referred as in the system',
-    id: 'v2.event.tennis-club-membership.label'
+    id: 'event.tennis-club-membership.label'
   },
   title: {
     defaultMessage: '{applicant.name.firstname} {applicant.name.surname}',
     description: 'This is the title of the summary',
-    id: 'v2.event.tennis-club-membership.title'
+    id: 'event.tennis-club-membership.title'
   },
   summary: {
     fields: [
@@ -60,7 +60,7 @@ export const tennisClubMembershipEvent = defineConfig({
     {
       type: ActionType.READ,
       label: {
-        id: 'v2.event.tennis-club-membership.action.read.label',
+        id: 'event.tennis-club-membership.action.read.label',
         defaultMessage: 'Read',
         description: 'Title of the read only page'
       },
@@ -106,7 +106,7 @@ export const tennisClubMembershipEvent = defineConfig({
       },
       correctionForm: {
         label: {
-          id: 'v2.event.tennis-club-membership.action.request-correction.label',
+          id: 'event.tennis-club-membership.action.request-correction.label',
           defaultMessage: 'Request correction',
           description:
             'This is shown as the action name anywhere the user can trigger the action from'
@@ -153,7 +153,7 @@ export const tennisClubMembershipEvent = defineConfig({
                   {
                     value: 'ANOTHER_AGENT',
                     label: {
-                      id: 'v2.correction.corrector.anotherAgent',
+                      id: 'correction.corrector.anotherAgent',
                       defaultMessage:
                         'Another registration agent or field agent',
                       description:
@@ -172,7 +172,7 @@ export const tennisClubMembershipEvent = defineConfig({
                   {
                     value: 'OTHER',
                     label: {
-                      id: 'v2.correction.corrector.others',
+                      id: 'correction.corrector.others',
                       defaultMessage: 'Someone else',
                       description:
                         'Label for someone else option in certificate correction form'
@@ -186,7 +186,7 @@ export const tennisClubMembershipEvent = defineConfig({
             id: 'identity-check',
             type: PageTypes.enum.VERIFICATION,
             title: {
-              id: 'v2.event.birth.action.correction.form.section.requester.identity.verify.title',
+              id: 'event.birth.action.correction.form.section.requester.identity.verify.title',
               defaultMessage: 'Verify ID',
               description: 'This is the title of the section'
             },
@@ -196,7 +196,7 @@ export const tennisClubMembershipEvent = defineConfig({
                 label: {
                   defaultMessage: 'Verified',
                   description: 'This is the label for the verification button',
-                  id: 'v2.event.birth.action.correction.form.verify'
+                  id: 'event.birth.action.correction.form.verify'
                 }
               },
               cancel: {
@@ -204,21 +204,21 @@ export const tennisClubMembershipEvent = defineConfig({
                   defaultMessage: 'Identity does not match',
                   description:
                     'This is the label for the verification cancellation button',
-                  id: 'v2.event.birth.action.correction.form.cancel'
+                  id: 'event.birth.action.correction.form.cancel'
                 },
                 confirmation: {
                   title: {
                     defaultMessage: 'Correct without proof of ID?',
                     description:
                       'This is the title for the verification cancellation modal',
-                    id: 'v2.event.birth.action.correction.form.cancel.confirmation.title'
+                    id: 'event.birth.action.correction.form.cancel.confirmation.title'
                   },
                   body: {
                     defaultMessage:
                       'Please be aware that if you proceed, you will be responsible for making a change to this record without the necessary proof of identification',
                     description:
                       'This is the body for the verification cancellation modal',
-                    id: 'v2.event.birth.action.correction.form.cancel.confirmation.body'
+                    id: 'event.birth.action.correction.form.cancel.confirmation.body'
                   }
                 }
               }
@@ -323,7 +323,7 @@ export const tennisClubMembershipEvent = defineConfig({
     {
       type: ActionType.PRINT_CERTIFICATE,
       label: {
-        id: 'v2.event.tennis-club-membership.action.collect-certificate.label',
+        id: 'event.tennis-club-membership.action.collect-certificate.label',
         defaultMessage: 'Print certificate',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
@@ -372,7 +372,7 @@ export const tennisClubMembershipEvent = defineConfig({
     {
       type: ActionType.ARCHIVE,
       label: {
-        id: 'v2.event.tennis-club-membership.action.archive.label',
+        id: 'event.tennis-club-membership.action.archive.label',
         defaultMessage: 'Archive',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
@@ -381,7 +381,7 @@ export const tennisClubMembershipEvent = defineConfig({
     {
       type: ActionType.REJECT,
       label: {
-        id: 'v2.event.tennis-club-membership.action.reject.label',
+        id: 'event.tennis-club-membership.action.reject.label',
         defaultMessage: 'Reject',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
@@ -393,7 +393,7 @@ export const tennisClubMembershipEvent = defineConfig({
       title: {
         defaultMessage: 'Registration details',
         description: 'The title of Registration details accordion',
-        id: 'v2.advancedSearch.form.registrationDetails'
+        id: 'advancedSearch.form.registrationDetails'
       },
       fields: [
         event('legalStatuses.REGISTERED.createdAtLocation').exact(),
@@ -406,7 +406,7 @@ export const tennisClubMembershipEvent = defineConfig({
       title: {
         defaultMessage: "Applicant's details",
         description: 'Applicant details search field section title',
-        id: 'v2.event.tennis-club-membership.search.applicants'
+        id: 'event.tennis-club-membership.search.applicants'
       },
       fields: [
         field('applicant.name').fuzzy(),
@@ -418,7 +418,7 @@ export const tennisClubMembershipEvent = defineConfig({
       title: {
         defaultMessage: "Recommender's details",
         description: 'Recommender details search field section title',
-        id: 'v2.event.tennis-club-membership.search.recommender'
+        id: 'event.tennis-club-membership.search.recommender'
       },
       fields: [field('recommender.name').fuzzy()]
     }
