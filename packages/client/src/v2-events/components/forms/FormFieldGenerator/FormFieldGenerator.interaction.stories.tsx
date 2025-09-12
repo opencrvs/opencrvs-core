@@ -170,6 +170,110 @@ export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
+const tennisFamilyMembership = [
+  {
+    id: `tennis.membership.parent.firstname`,
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('parent firstname')
+  },
+  {
+    id: `tennis.membership.parent.surname`,
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('parent surname')
+  },
+  {
+    id: `tennis.membership.child.firstname`,
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('child firstname')
+  },
+  {
+    id: `tennis.membership.child.surname`,
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('child surname'),
+    parent: field('tennis.membership.parent.surname'),
+    value: field('tennis.membership.parent.surname')
+  }
+]
+
+const tennisFamilyMembershipDeclaration = {
+  'tennis.membership.parent.firstname': 'Roger',
+  'tennis.membership.parent.surname': '',
+  'tennis.membership.child.firstname': 'Lenny',
+  'tennis.membership.child.surname': ''
+} satisfies EventState
+
+/**
+ * Test case for a bug where values of the parent field were not being copied to the dependent field, when the parent field is changed.
+ */
+export const UpdateParentFieldValues: StoryObj<typeof FormFieldGenerator> = {
+  name: 'Updating values of the parent field should update the child field value too',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        fields={tennisFamilyMembership}
+        id="my-form"
+        initialValues={tennisFamilyMembershipDeclaration}
+        onChange={(data) => {
+          args.onChange(data)
+        }}
+      />
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Renders the form with correct initial values', async () => {
+      await canvas.findByText('parent firstname')
+      await canvas.findByDisplayValue('Roger')
+
+      await canvas.findByText('child firstname')
+      await canvas.findByDisplayValue('Lenny')
+    })
+
+    await step('fills in parent surname input', async () => {
+      await userEvent.type(
+        await canvas.findByTestId(
+          'text__tennis____membership____parent____surname'
+        ),
+        'Federer'
+      )
+      await userEvent.click(await canvas.findByText('parent firstname'))
+    })
+
+    await step(
+      'Renders the child surname with correct values from parent surname field',
+      async () => {
+        await expect(
+          canvas.getByTestId('text__tennis____membership____child____surname')
+        ).toHaveValue('Federer')
+      }
+    )
+
+    await step('change parent surname value', async () => {
+      await userEvent.type(
+        await canvas.findByTestId(
+          'text__tennis____membership____parent____surname'
+        ),
+        ' The GOAT'
+      )
+      await userEvent.click(await canvas.findByText('parent firstname'))
+    })
+
+    await step(
+      'Renders the child surname with correct values from parent surname field',
+      async () => {
+        await expect(
+          canvas.getByTestId('text__tennis____membership____child____surname')
+        ).toHaveValue('Federer The GOAT')
+      }
+    )
+  }
+}
+
 const tennisStyleFields = [
   {
     id: 'tennis.style',
