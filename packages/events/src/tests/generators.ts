@@ -96,9 +96,7 @@ export function seeder() {
     addLocations(
       locations.map((location) => ({
         ...location,
-        validUntil: location.validUntil
-          ? location.validUntil.toISOString()
-          : null
+        validUntil: location.validUntil ? location.validUntil : null
       }))
     )
 
