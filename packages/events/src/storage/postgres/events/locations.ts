@@ -11,9 +11,10 @@
 
 import { sql } from 'kysely'
 import { chunk } from 'lodash'
-import { logger, UUID } from '@opencrvs/commons'
+import { Location, logger, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { Locations, NewLocations } from './schema/app/Locations'
+import LocationType from './schema/app/LocationType'
 
 const INSERT_MAX_CHUNK_SIZE = 10000
 
@@ -59,25 +60,40 @@ export async function setLocations(locations: NewLocations[]) {
   return addLocations(locations)
 }
 
-export async function getLocations() {
+export async function getLocations({
+  locationType,
+  locationIds
+}: { locationType?: LocationType; locationIds?: UUID[] } = {}) {
   const db = getClient()
 
-  return db
+  let query = db
     .selectFrom('locations')
-    .selectAll()
+    .select(['id', 'name', 'parentId', 'validUntil', 'locationType'])
     .where('deletedAt', 'is', null)
-    .$narrowType<{ deletedAt: null }>()
-    .execute()
+    .$narrowType<{
+      deletedAt: null
+      validUntil: Location['validUntil']
+    }>()
+
+  if (locationType) {
+    query = query.where('locationType', '=', locationType)
+  }
+
+  if (locationIds && locationIds.length > 0) {
+    query = query.where('id', 'in', locationIds)
+  }
+
+  return query.execute()
 }
 
-export async function getChildLocations(id: string) {
+export async function getChildLocations(parentId: string) {
   const db = getClient()
 
   const { rows } = await sql<Locations>`
     WITH RECURSIVE r AS (
       SELECT id, parent_id
       FROM app.locations
-      WHERE id = ${id} AND deleted_at IS NULL
+      WHERE id = ${parentId} AND deleted_at IS NULL
       UNION ALL
       SELECT l.id, l.parent_id
       FROM app.locations l
@@ -86,7 +102,7 @@ export async function getChildLocations(id: string) {
     SELECT l.*
     FROM app.locations l
     JOIN r ON r.id = l.id
-    WHERE l.id <> ${id} AND l.deleted_at IS NULL;
+    WHERE l.id <> ${parentId} AND l.deleted_at IS NULL;
   `.execute(db)
   return rows
 }
@@ -103,4 +119,29 @@ export async function isLeafLocation(id: UUID) {
     .executeTakeFirst()
 
   return !result
+}
+
+export async function getLeafLocationIds({
+  locationType
+}: { locationType?: LocationType } = {}) {
+  const db = getClient()
+
+  const query = db
+    .selectFrom('locations as l')
+    .select(['l.id'])
+    .where(({ not, exists, selectFrom }) =>
+      not(
+        exists(
+          selectFrom('locations as c')
+            .select('c.id')
+            .whereRef('c.parentId', '=', 'l.id')
+        )
+      )
+    )
+
+  if (locationType) {
+    query.where('locationType', '=', locationType)
+  }
+
+  return query.execute()
 }

@@ -10,7 +10,6 @@
  */
 import React from 'react'
 import { IntlShape } from 'react-intl'
-import { Location } from '@events/service/locations/locations'
 import { useSelector } from 'react-redux'
 import {
   EventState,
@@ -21,6 +20,7 @@ import {
   FieldConfig,
   FieldPropsWithoutReferenceValue,
   FieldType,
+  Location,
   not,
   AdministrativeAreas,
   alwaysTrue,
