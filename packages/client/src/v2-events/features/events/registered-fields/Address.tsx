@@ -336,15 +336,20 @@ function AddressInput(props: Props) {
       values,
       adminLevelIds
     )
-
-    onChange({
+    const addressValue = {
       ...values,
       administrativeArea:
         values.addressType === AddressType.DOMESTIC
           ? leafAdminLevelValue
           : undefined,
       streetLevelDetails: addressLines
-    } as AddressFieldValue)
+    }
+
+    const cleanedAddressValue = Object.fromEntries(
+      Object.entries(addressValue).filter(([_, v]) => v != null)
+    )
+
+    onChange(cleanedAddressValue as AddressFieldValue)
   }
 
   return (
