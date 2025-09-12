@@ -28,7 +28,7 @@ export function useLocations() {
   const trpc = useTRPC()
   return {
     getLocations: {
-      useSuspenseQuery: () => {
+      useSuspenseQuery: (isActive?: boolean) => {
         // We intentionally remove `queryFn` here because we already set a global default
         // via `setQueryDefaults`. Passing it again would override caching/persistence.
         // The `...rest` spread carries over things like staleTime, gcTime, enabled, etc.
@@ -38,7 +38,7 @@ export function useLocations() {
         return [
           useSuspenseQuery({
             ...rest,
-            queryKey: trpc.locations.get.queryKey()
+            queryKey: trpc.locations.get.queryKey(isActive)
           }).data
         ]
       }

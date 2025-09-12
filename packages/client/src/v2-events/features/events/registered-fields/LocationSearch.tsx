@@ -33,7 +33,7 @@ function useAdministrativeAreas(
   searchableResource: ('locations' | 'facilities' | 'offices')[]
 ) {
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const [locations] = getLocations.useSuspenseQuery(true) // get only active locations for input fields
   const locationsBasedOnSearchableResource = locations.filter((location) =>
     searchableResource.some(
       (resource) => location.locationType === resourceTypeMap[resource]
