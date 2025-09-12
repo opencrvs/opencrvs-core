@@ -19,6 +19,8 @@ ENV NPM_CONFIG_LOGLEVEL=warn
 # Increase wait timeout from default 30sec to 90sec
 # https://github.com/ufoscout/docker-compose-wait#additional-configuration-options
 ENV WAIT_TIMEOUT=90
+# Also wait 15sec before checking for hosts/paths availability
+ENV WAIT_BEFORE=15
 
 WORKDIR /app/packages/migration
 
