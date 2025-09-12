@@ -54,7 +54,8 @@ import {
   SelectDateRangeValue,
   isTimeFieldType,
   isButtonFieldType,
-  isHttpFieldType
+  isHttpFieldType,
+  isQueryParamReaderFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -86,6 +87,7 @@ import { DateRangeField } from '@client/v2-events/features/events/registered-fie
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
+import { QueryParamReader } from '../inputs/QueryParamReader'
 import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
 
 interface GeneratedInputFieldProps<T extends FieldConfig> {
@@ -620,6 +622,15 @@ export const GeneratedInputField = React.memo(
           key={fieldDefinition.id}
           configuration={field.config.configuration}
           parentValue={form[field.config.configuration.trigger.$$field]}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isQueryParamReaderFieldType(field)) {
+      return (
+        <QueryParamReader.Input
+          configuration={field.config.configuration}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )

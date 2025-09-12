@@ -604,15 +604,15 @@ const HttpField = BaseField.extend({
       .default(15000)
       .describe('Request timeout in milliseconds')
   })
-}).describe('HTTP request function triggered by a button click')
+}).describe('HTTP request function triggered by a button click or other event')
 
 export type HttpField = z.infer<typeof HttpField>
 
 const QueryParamReaderField = BaseField.extend({
   type: z.literal(FieldType.QUERY_PARAM_READER),
   configuration: z.object({
-    param: z.string(),
-    map: z.record(z.string())
+    params: z.array(z.string()).describe('required params to trigger'),
+    map: z.record(z.string()).optional()
   })
 })
 

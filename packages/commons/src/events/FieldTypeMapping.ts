@@ -71,7 +71,8 @@ import {
   AddressType,
   NameFieldValue,
   NameFieldUpdateValue,
-  HttpFieldUpdateValue
+  HttpFieldUpdateValue,
+  QueryParamReaderFieldUpdateValue
 } from './CompositeFieldValue'
 
 /**
@@ -126,7 +127,6 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.OFFICE:
     case FieldType.PHONE:
     case FieldType.ID:
-    case FieldType.QUERY_PARAM_READER:
       schema = required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
@@ -156,6 +156,9 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       break
     case FieldType.HTTP:
       schema = HttpFieldUpdateValue
+      break
+    case FieldType.QUERY_PARAM_READER:
+      schema = QueryParamReaderFieldUpdateValue
       break
   }
 
@@ -443,10 +446,13 @@ export const isHttpFieldType = (field: {
   return field.config.type === FieldType.HTTP
 }
 
-export const isQueryParamTriggerFieldType = (field: {
+export const isQueryParamReaderFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: undefined; config: QueryParamReaderField } => {
+}): field is {
+  value: undefined
+  config: QueryParamReaderField
+} => {
   return field.config.type === FieldType.QUERY_PARAM_READER
 }
 

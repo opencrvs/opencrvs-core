@@ -108,7 +108,11 @@ export const HttpFieldUpdateValue = z
   .or(z.null())
   .or(z.undefined())
 
-export const RedirectTriggerFieldValue = z.record(z.string())
-export type RedirectTriggerFieldValue = z.infer<
-  typeof RedirectTriggerFieldValue
+export const QueryParamReaderFieldValue = z
+  .record(z.string(), z.string())
+  .nullish()
+export type QueryParamReaderFieldValue = z.infer<
+  typeof QueryParamReaderFieldValue
 >
+
+export const QueryParamReaderFieldUpdateValue = z.record(z.string(), z.string())
