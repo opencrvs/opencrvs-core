@@ -22,6 +22,7 @@ import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 
 import { Location } from '../events/locations'
+import { TokenUserType } from '../authentication'
 
 const ajv = new Ajv({
   $data: true,
@@ -135,6 +136,26 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
   return result
 }
 
+// TODO: to be removed when the right solution is implemented
+const mockUser = [
+  {
+    scope: ['record.register', 'record.registration-correct'],
+    exp: '1739881718',
+    algorithm: 'RS256',
+    userType: TokenUserType.enum.user,
+    sub: '677b33fea7efb08730f3abfa33',
+    role: 'LOCAL_REGISTRAR'
+  },
+  {
+    scope: ['record.register', 'record.registration-correct'],
+    exp: '1739881718',
+    algorithm: 'RS256',
+    userType: TokenUserType.enum.user,
+    sub: '677b33fea7efb08730f3abfa33',
+    role: 'NATIONAL_REGISTRAR'
+  }
+]
+
 export function isOnline() {
   if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
     return navigator.onLine
@@ -193,7 +214,9 @@ function isFieldConditionMet(
     $now: formatISO(new Date(), {
       representation: 'date'
     }),
-    $online: isOnline()
+    $online: isOnline(),
+    // TODO: to be removed when the right solution is implemented
+    $user: mockUser[0]
   })
 
   return validConditionals.includes(conditionalType)

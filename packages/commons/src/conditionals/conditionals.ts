@@ -180,7 +180,7 @@ export const user = Object.assign(userSerializer, {
       },
       required: ['$user']
     }),
-  hasRole: (roleId: string) =>
+  hasRole: (role: string) =>
     defineConditional({
       type: 'object',
       properties: {
@@ -190,7 +190,7 @@ export const user = Object.assign(userSerializer, {
           properties: {
             role: {
               type: 'string',
-              const: roleId
+              const: role
             }
           }
         }
