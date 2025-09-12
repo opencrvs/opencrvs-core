@@ -7,12 +7,17 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 name: Publish images from any branch or tag
-run-name: Publish images from ${{ inputs.branch_tag_name }}
+run-name: Publish images from ${{ inputs.branch_tag_name || github.ref_name }}
 on:
+  push:
+    branches:
+      - develop
+      - main
+    tags:
+      - '*'
   workflow_call:
     inputs:
       branch_tag_name:
-        description: Branch or Tag to build from
         required: true
         type: string
       publish_release:
@@ -20,10 +25,13 @@ on:
         required: false
         default: false
       skip_security_check:
-        description: Skip security scan
         type: boolean
         required: false
         default: false
+      build_arm:
+        type: boolean
+        default: false
+        required: false
     outputs:
       build_status:
         description: build job output
@@ -42,24 +50,28 @@ on:
         type: boolean
         required: false
         default: false
-  push:
-    branches:
-      - develop
-      - main
+      build_arm:
+        description: Build ARM images
+        type: boolean
+        default: false
+        required: false
 jobs:
   base:
     strategy:
       fail-fast: false
       matrix:
-        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+        runner: ${{ 
+          ((github.ref_type == 'tag' || inputs.build_arm == true) && fromJSON('["ubuntu-24.04", "ubuntu-24.04-arm"]')) || 
+          fromJSON('["ubuntu-24.04"]') 
+          }}
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: github.event_name == 'workflow_dispatch'
         with:
           ref: ${{ github.event.inputs.branch_tag_name }}
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: github.event_name == 'push' || github.event_name == 'pull_request'
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -139,12 +151,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
       - name: Create and push multi-arch manifest
+        env:
+          BUILD_ARM: ${{ github.ref_type == 'tag' || inputs.build_arm == true }}
         run: |
+          REPO="ghcr.io/opencrvs/ocrvs-base"
           for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
+            if [[ "$BUILD_ARM" == "true" ]]; then
+              MANIFEST_LIST="$REPO:$TAG-amd64 $REPO:$TAG-arm64"
+            else
+              MANIFEST_LIST="$REPO:$TAG-amd64"
+            fi
             echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-base:$TAG"
-            docker manifest create ghcr.io/opencrvs/ocrvs-base:$TAG \
-              ghcr.io/opencrvs/ocrvs-base:$TAG-amd64 \
-              ghcr.io/opencrvs/ocrvs-base:$TAG-arm64
+            docker manifest create ghcr.io/opencrvs/ocrvs-base:$TAG $MANIFEST_LIST
             docker manifest push ghcr.io/opencrvs/ocrvs-base:$TAG
           done
   build:
@@ -152,7 +170,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+        runner: ${{ 
+          ((github.ref_type == 'tag' || inputs.build_arm == true) && fromJSON('["ubuntu-24.04", "ubuntu-24.04-arm"]')) || 
+          fromJSON('["ubuntu-24.04"]') 
+          }}
         service: ${{ fromJSON(needs.base.outputs.services) }}
         exclude:
           # metabase/metabase:v0.50.30.1 doesn't support arm arch
@@ -161,12 +182,12 @@ jobs:
             runner: 'ubuntu-24.04-arm'
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: github.event_name == 'workflow_dispatch'
         with:
           ref: '${{ github.event.inputs.branch_tag_name }}'
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: github.event_name == 'push' || github.event_name == 'pull_request'
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -226,13 +247,21 @@ jobs:
           password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
 
       - name: Create and push multi-arch manifest
+        env:
+          BUILD_ARM: ${{ github.ref_type == 'tag' || inputs.build_arm == true }}
         run: |
+          REPO_PREFIX="ghcr.io/opencrvs/ocrvs"
+
           for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
-            echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG"
-            docker manifest create ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG \
-              ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-amd64 \
-              ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-arm64
-            docker manifest push ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG
+            # Create manifest list based on whether ARM build exists
+            if [[ "$BUILD_ARM" == "true" ]]; then
+              MANIFEST_LIST="${REPO_PREFIX}-${{ matrix.service }}:$TAG-amd64 ${REPO_PREFIX}-${{ matrix.service }}:$TAG-arm64"
+            else
+              MANIFEST_LIST="${REPO_PREFIX}-${{ matrix.service }}:$TAG-amd64"
+            fi
+            echo "[🔁 pushing ] ${REPO_PREFIX}-${{ matrix.service }}:$TAG"
+            docker manifest create ${REPO_PREFIX}-${{ matrix.service }}:$TAG $MANIFEST_LIST
+            docker manifest push ${REPO_PREFIX}-${{ matrix.service }}:$TAG
           done
 
   merge-dashboards-manifest:
