@@ -38,7 +38,7 @@ export function useLocations() {
         return [
           useSuspenseQuery({
             ...rest,
-            queryKey: trpc.locations.get.queryKey(isActive)
+            queryKey: trpc.locations.get.queryKey({ isActive })
           }).data
         ]
       }
