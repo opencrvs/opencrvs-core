@@ -78,22 +78,13 @@ jobs:
 
       - name: Set version and branch
         id: set-version-and-branch
+        env:
+          BRANCH: ${{ inputs.branch_tag_name || github.ref_name }}
         run: |
           export VERSION=`git log -1 --pretty=format:%h`
           echo "Pushing version $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-          # the event_name is the event that triggered the caller workflow
-          # and not "workflow_call" like how it was supposed to be when
-          # another workflow is calling this one
-
-          if [ "${{ github.event_name }}" == 'push' ]; then
-            BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
-          elif [ "${{ github.event_name }}" == 'pull_request' ]; then
-            BRANCH=${{ github.event.pull_request.head.ref }}
-          else
-            BRANCH=${{ inputs.branch_tag_name }}
-          fi
           ESCAPED_BRANCH=$(echo $BRANCH | sed 's/[^a-zA-Z0-9_.-]/-/g')
           echo "from branch $BRANCH"
           echo "branch=$ESCAPED_BRANCH" >> $GITHUB_OUTPUT
