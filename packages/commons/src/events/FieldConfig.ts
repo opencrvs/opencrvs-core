@@ -608,15 +608,15 @@ const HttpField = BaseField.extend({
 
 export type HttpField = z.infer<typeof HttpField>
 
-const RedirectTriggerField = BaseField.extend({
-  type: z.literal(FieldType.REDIRECT_TRIGGER),
+const QueryParamReaderField = BaseField.extend({
+  type: z.literal(FieldType.QUERY_PARAM_READER),
   configuration: z.object({
     param: z.string(),
     map: z.record(z.string())
   })
 })
 
-export type RedirectTriggerField = z.infer<typeof RedirectTriggerField>
+export type QueryParamReaderField = z.infer<typeof QueryParamReaderField>
 
 /** @knipignore */
 export type FieldConfig =
@@ -650,7 +650,7 @@ export type FieldConfig =
   | z.infer<typeof DataField>
   | z.infer<typeof ButtonField>
   | z.infer<typeof HttpField>
-  | z.infer<typeof RedirectTriggerField>
+  | z.infer<typeof QueryParamReaderField>
 
 /** @knipignore */
 /**
@@ -687,7 +687,7 @@ export type FieldConfigInput =
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
-  | z.input<typeof RedirectTriggerField>
+  | z.input<typeof QueryParamReaderField>
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
  *  referenced quite extensively througout various other schemas. Leaving the

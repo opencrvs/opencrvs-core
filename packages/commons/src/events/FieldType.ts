@@ -42,7 +42,7 @@ export const FieldType = {
   DATA: 'DATA',
   BUTTON: 'BUTTON',
   HTTP: 'HTTP',
-  REDIRECT_TRIGGER: 'REDIRECT_TRIGGER'
+  QUERY_PARAM_READER: 'QUERY_PARAM_READER'
 } as const
 
 /**
