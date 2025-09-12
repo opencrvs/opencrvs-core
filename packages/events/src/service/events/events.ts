@@ -302,14 +302,6 @@ export function buildAction(
         requestId: input.requestId
       }
     }
-    case ActionType.DUPLICATE_DETECTED:
-      return {
-        ...commonAttributes,
-        createdBy: 'system',
-        createdByUserType: TokenUserType.enum.system,
-        createdByRole: '',
-        createdAtLocation: undefined
-      }
     case ActionType.REJECT:
     case ActionType.ARCHIVE:
     case ActionType.PRINT_CERTIFICATE:
@@ -318,6 +310,7 @@ export function buildAction(
     case ActionType.NOTIFY:
     case ActionType.DECLARE:
     case ActionType.VALIDATE:
+    case ActionType.DUPLICATE_DETECTED:
     case ActionType.MARK_AS_NOT_DUPLICATE:
     case ActionType.MARK_AS_DUPLICATE:
     case ActionType.REQUEST_CORRECTION: {
