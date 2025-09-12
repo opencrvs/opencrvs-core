@@ -21,7 +21,7 @@ setQueryDefaults(trpcOptionsProxy.locations.get, {
     }
     return queryOptions.queryFn(...params)
   },
-  staleTime: 1000 * 60 * 60 * 24 // keep it in cache 24 hours
+  staleTime: 1000 * 60 * 60 * 24 * 7 // keep it in cache 7 days
 })
 
 setQueryDefaults(trpcOptionsProxy.locations.getActiveLocations, {
@@ -33,7 +33,7 @@ setQueryDefaults(trpcOptionsProxy.locations.getActiveLocations, {
     }
     return queryOptions.queryFn(...params)
   },
-  staleTime: 1000 * 60 * 60 * 24 // keep it in cache 24 hours
+  staleTime: 1000 * 60 * 60 * 24 * 7 // keep it in cache 7 days
 })
 
 export function useLocations() {
