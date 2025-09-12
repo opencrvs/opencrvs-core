@@ -26,7 +26,7 @@ import {
   AdvancedSearch,
   SearchResult
 } from '@client/v2-events/features/events/Search'
-import { EventSelectionIndex } from '@client/v2-events/features/events/EventSelection'
+import { EventSelectionIndex } from '@client/v2-events/features/events/index'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
 import { EventOverviewLayout } from '@client/v2-events/layouts'

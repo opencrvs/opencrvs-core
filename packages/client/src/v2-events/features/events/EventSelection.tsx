@@ -12,6 +12,7 @@
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { Spinner } from '@opencrvs/components'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -21,9 +22,11 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { RadioButton } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
+import { ActionType, isActionInScope } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
-import { withSuspense } from '@client/v2-events/components/withSuspense'
+
 import { createTemporaryId } from '@client/v2-events/utils'
+import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfigurations } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
@@ -67,16 +70,21 @@ const constantsMessages = defineMessages({
   }
 })
 
-function EventSelector() {
+export function EventSelector() {
   const intl = useIntl()
   const navigate = useNavigate()
   const [eventType, setEventType] = useState('')
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
   const eventConfigurations = useEventConfigurations()
   const events = useEvents()
+  const scopes = useSelector(getScope) ?? []
   const clearForm = useEventFormData((state) => state.clear)
   const clearAnnotation = useActionAnnotation((state) => state.clear)
   const createEvent = events.createEvent()
+
+  const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>
+    isActionInScope(scopes, ActionType.CREATE, id)
+  )
 
   function handleContinue() {
     if (eventType === '') {
@@ -117,7 +125,7 @@ function EventSelector() {
         gap={16}
         id="select_vital_event_view"
       >
-        {eventConfigurations.map((event) => (
+        {allowedEventConfigurations.map((event) => (
           <RadioButton
             key={`${event.id}event`}
             id={`select_${event.id}_event`}
@@ -148,7 +156,7 @@ function EventSelector() {
   )
 }
 
-function EventSelection() {
+export function EventSelection() {
   const intl = useIntl()
   const { closeActionView } = useEventFormNavigation()
 
@@ -193,5 +201,3 @@ function EventSelection() {
     </Frame>
   )
 }
-
-export const EventSelectionIndex = withSuspense(EventSelection)
