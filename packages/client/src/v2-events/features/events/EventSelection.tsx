@@ -20,7 +20,11 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { RadioButton } from '@opencrvs/components/lib/Radio'
+import {
+  RadioButton,
+  RadioGroup,
+  RadioSize
+} from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { ActionType, isActionInScope } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
@@ -119,27 +123,20 @@ export function EventSelector() {
           {intl.formatMessage(messages.errorMessage)}
         </ErrorText>
       )}
-      <Stack
-        alignItems="left"
-        direction="column"
-        gap={16}
-        id="select_vital_event_view"
-      >
-        {allowedEventConfigurations.map((event) => (
-          <RadioButton
-            key={`${event.id}event`}
-            id={`select_${event.id}_event`}
-            label={intl.formatMessage(event.label)}
-            name={`${event.id}event`}
-            selected={eventType === event.id ? event.id : ''}
-            size="large"
-            value={event.id}
-            onChange={() => {
-              setEventType(event.id)
-              setNoEventSelectedError(false)
-            }}
-          />
-        ))}
+      <Stack alignItems="left" direction="column" gap={16}>
+        <RadioGroup
+          name="eventType"
+          options={allowedEventConfigurations.map((event) => ({
+            value: event.id,
+            label: intl.formatMessage(event.label)
+          }))}
+          size={RadioSize.LARGE}
+          value={eventType}
+          onChange={(val) => {
+            setEventType(val)
+            setNoEventSelectedError(false)
+          }}
+        />
 
         <Button
           key="select-vital-event-continue"
