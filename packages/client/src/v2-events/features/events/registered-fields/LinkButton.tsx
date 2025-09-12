@@ -14,6 +14,14 @@ import { useIntl } from 'react-intl'
 import { TranslationConfig } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 
+function setRedirectURI(url: string) {
+  const parsed = new URL(url)
+  if (!parsed.searchParams.has('redirect_uri')) {
+    parsed.searchParams.set('redirect_uri', window.location.href)
+  }
+  return parsed.toString()
+}
+
 function LinkButtonInput({
   id,
   disabled,
@@ -27,14 +35,9 @@ function LinkButtonInput({
   disabled?: boolean
 }) {
   const intl = useIntl()
+  const url = setRedirectURI(configuration.url)
   return (
-    <Button
-      disabled={disabled}
-      element="a"
-      href={configuration.url}
-      id={id}
-      type="secondary"
-    >
+    <Button disabled={disabled} element="a" href={url} id={id} type="secondary">
       {intl.formatMessage(configuration.text)}
     </Button>
   )
