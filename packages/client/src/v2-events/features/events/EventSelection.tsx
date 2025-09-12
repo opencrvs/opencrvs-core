@@ -20,11 +20,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import {
-  RadioButton,
-  RadioGroup,
-  RadioSize
-} from '@opencrvs/components/lib/Radio'
+import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { ActionType, isActionInScope } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
