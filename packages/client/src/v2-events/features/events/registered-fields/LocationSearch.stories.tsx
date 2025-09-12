@@ -59,7 +59,7 @@ export const LocationSearchInputWithActiveLocations: StoryObj<
     onChange: fn()
   },
   play: async ({ canvasElement, step, args }) => {
-    await step('Active locations are only visible', async () => {
+    await step('Locations starting with "i" are visible', async () => {
       const canvas = within(canvasElement)
       const input =
         await canvas.findByTestId<HTMLInputElement>('location-search')
@@ -74,14 +74,13 @@ export const LocationSearchInputWithActiveLocations: StoryObj<
         canvas.findByText('Ibombo Rural Health Centre')
       ).resolves.toBeInTheDocument()
 
-      // Not present:
-      void expect(
-        canvas.queryByText('Ipongo Rural Health Centre')
-      ).not.toBeInTheDocument()
+      await expect(
+        canvas.findByText('Ipongo Rural Health Centre')
+      ).resolves.toBeInTheDocument()
 
-      void expect(
-        canvas.queryByText('Itumbwe Health Post')
-      ).not.toBeInTheDocument()
+      await expect(
+        canvas.findByText('Itumbwe Health Post')
+      ).resolves.toBeInTheDocument()
     })
   }
 }
