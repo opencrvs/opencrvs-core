@@ -19,6 +19,8 @@ import { getListOfLocations } from '@client/utils/validate'
 import { generateLocations } from '@client/utils/locationUtils'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { IAdminStructureItem } from '@client/utils/referenceApi'
+import { getAdminLevelHierarchy } from './Address'
 
 interface SearchLocation {
   id: string
@@ -91,51 +93,63 @@ function toCertificateVariables(
   context: {
     intl: IntlShape
     locations: Location[]
+    adminLevels?: IAdminStructureItem[]
   }
 ) {
+  const { intl, locations, adminLevels = [] } = context
+  const appConfigAdminLevels = adminLevels.map((level) => level.id)
+
   if (!value) {
     return {
       name: '',
-      district: '',
-      province: '',
+      ...Object.fromEntries(adminLevels.map((level) => [level, ''])),
       country: ''
     }
   }
 
-  const country = context.intl.formatMessage({
+  const country = intl.formatMessage({
     id: `countries.${window.config.COUNTRY}`,
     defaultMessage: 'Farajaland',
     description: 'Country name'
   })
 
   const locationId = value.toString()
-  const location = context.locations.find((loc) => loc.id === locationId)
+  const location = locations.find((loc) => loc.id === locationId)
 
-  const district = context.locations.find(
-    (loc) => loc.id === location?.parentId
-  )
-  const province = context.locations.find(
-    (loc) => loc.id === district?.parentId
+  const adminLevelHierarchy = getAdminLevelHierarchy(
+    locationId,
+    locations,
+    appConfigAdminLevels,
+    'withNames'
   )
 
   return {
     name: location?.name || '',
-    district: district?.name || '',
-    province: province?.name || '',
-    country: country
+    ...adminLevelHierarchy,
+    country
   }
 }
 
 function LocationSearchOutput({ value }: { value: Stringifiable }) {
   const intl = useIntl()
   const { getLocations } = useLocations()
+  const { config } = useSelector(getOfflineData)
   const [locations] = getLocations.useSuspenseQuery()
-  const { name, district, province, country } = toCertificateVariables(value, {
+  const adminLevels = config.ADMIN_STRUCTURE
+
+  const certificateVars = toCertificateVariables(value, {
     intl,
-    locations
+    locations,
+    adminLevels
   })
 
-  return [name, district, province, country]
+  const { name, country } = certificateVars
+
+  const resolvedAdminLevels = adminLevels
+    .map((level) => certificateVars[level.id])
+    .filter(Boolean)
+
+  return [name, ...resolvedAdminLevels, country]
     .filter((loc) => loc !== '')
     .join(', ')
 }

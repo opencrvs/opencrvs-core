@@ -134,7 +134,7 @@ type OutputMode = 'withIds' | 'withNames'
 /*
 Function to traverse the administrative leverl hierarchy from an arbitrary / leaf point
 */
-function getAdminLevelHierarchy(
+export function getAdminLevelHierarchy(
   locationUuid: string | undefined,
   locations: Location[],
   adminStructure: string[],

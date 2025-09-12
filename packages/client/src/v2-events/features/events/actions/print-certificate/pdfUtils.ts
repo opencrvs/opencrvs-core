@@ -72,7 +72,8 @@ export const stringifyEventMetadata = ({
   metadata,
   intl,
   locations,
-  users
+  users,
+  adminLevels
 }: {
   metadata: NonNullable<
     EventMetadata & {
@@ -83,6 +84,7 @@ export const stringifyEventMetadata = ({
   intl: IntlShape
   locations: Location[]
   users: User[]
+  adminLevels: IAdminStructureItem[]
 }) => {
   return {
     modifiedAt: DateField.toCertificateVariables(metadata.modifiedAt, {
@@ -112,7 +114,8 @@ export const stringifyEventMetadata = ({
       metadata.createdAtLocation,
       {
         intl,
-        locations
+        locations,
+        adminLevels
       }
     ),
     updatedAt: DateField.toCertificateVariables(metadata.updatedAt, {
@@ -131,7 +134,8 @@ export const stringifyEventMetadata = ({
       metadata.updatedAtLocation,
       {
         intl,
-        locations
+        locations,
+        adminLevels
       }
     ),
     flags: [],
@@ -148,7 +152,7 @@ export const stringifyEventMetadata = ({
             ),
             createdAtLocation: LocationSearch.toCertificateVariables(
               metadata.legalStatuses.DECLARED.createdAtLocation,
-              { intl, locations }
+              { intl, locations, adminLevels }
             ),
             acceptedAt: DateField.toCertificateVariables(
               metadata.legalStatuses.DECLARED.acceptedAt,
@@ -171,7 +175,7 @@ export const stringifyEventMetadata = ({
             ),
             createdAtLocation: LocationSearch.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.createdAtLocation,
-              { intl, locations }
+              { intl, locations, adminLevels }
             ),
             acceptedAt: DateField.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.acceptedAt,
@@ -324,7 +328,8 @@ export function compileSvg({
         metadata: $metadata,
         intl,
         locations,
-        users
+        users,
+        adminLevels
       })
 
       if (isEqual($metadata, obj)) {
@@ -351,7 +356,8 @@ export function compileSvg({
             action.data.createdAtLocation,
             {
               intl,
-              locations
+              locations,
+              adminLevels
             }
           ),
           createdByRole: action.data.createdByRole
