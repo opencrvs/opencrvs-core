@@ -24,18 +24,6 @@ setQueryDefaults(trpcOptionsProxy.locations.get, {
   staleTime: 1000 * 60 * 60 * 24 * 7 // keep it in cache 7 days
 })
 
-setQueryDefaults(trpcOptionsProxy.locations.getActiveLocations, {
-  queryFn: async (...params) => {
-    const queryOptions =
-      trpcOptionsProxy.locations.getActiveLocations.queryOptions()
-    if (typeof queryOptions.queryFn !== 'function') {
-      throw new Error('queryFn is not a function')
-    }
-    return queryOptions.queryFn(...params)
-  },
-  staleTime: 1000 * 60 * 60 * 24 * 7 // keep it in cache 7 days
-})
-
 export function useLocations() {
   const trpc = useTRPC()
   return {
@@ -46,11 +34,11 @@ export function useLocations() {
         // The `...rest` spread carries over things like staleTime, gcTime, enabled, etc.
         // Then we re-attach the queryKey explicitly so React Query can identify this cache.
         const { queryFn, ...rest } =
-          trpcOptionsProxy.locations.getActiveLocations.queryOptions()
+          trpcOptionsProxy.locations.get.queryOptions()
         return [
           useSuspenseQuery({
             ...rest,
-            queryKey: trpc.locations.getActiveLocations.queryKey()
+            queryKey: trpc.locations.get.queryKey()
           }).data
         ]
       }
