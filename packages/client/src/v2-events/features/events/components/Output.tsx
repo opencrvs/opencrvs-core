@@ -13,6 +13,8 @@ import React from 'react'
 import styled from 'styled-components'
 import * as _ from 'lodash'
 import { isUndefined } from 'lodash'
+import ReactDOMServer from 'react-dom/server'
+import { IntlProvider } from 'react-intl'
 import {
   FieldConfig,
   FieldValue,
@@ -223,6 +225,15 @@ function findPreviousValueWithSameLabel(
   return { value: undefined, field: undefined }
 }
 
+function isEffectivelyEmpty(children: React.ReactNode) {
+  const html = ReactDOMServer.renderToStaticMarkup(
+    <IntlProvider locale="en" messages={{}}>
+      {children}
+    </IntlProvider>
+  )
+  return html.trim() === ''
+}
+
 export function Output({
   field,
   value,
@@ -287,15 +298,31 @@ export function Output({
   if (hasPreviousValue && !_.isEqual(previousValue, value)) {
     const valueOutput = <ValueOutput config={field} value={value} />
 
+    if (isEffectivelyEmpty(valueOutput)) {
+      if (displayEmptyAsDash) {
+        return '-'
+      }
+
+      return null
+    }
+
+    const previousValueOutput = (
+      <ValueOutput config={previousValueField ?? field} value={previousValue} />
+    )
+
     return (
       <>
-        <Deleted>
-          <ValueOutput
-            config={previousValueField ?? field}
-            value={previousValue}
-          />
-        </Deleted>
-        <br />
+        {!isEffectivelyEmpty(previousValueOutput) && (
+          <>
+            <Deleted>
+              <ValueOutput
+                config={previousValueField ?? field}
+                value={previousValue}
+              />
+            </Deleted>
+            <br />
+          </>
+        )}
         {valueOutput}
       </>
     )
@@ -307,8 +334,12 @@ export function Output({
     )
     return (
       <>
-        <Deleted>{deleted}</Deleted>
-
+        {isEffectivelyEmpty(deleted) ? (
+          // For a deleted 'dash', we dont want to overline the dash
+          <DeletedEmpty>{'-'}</DeletedEmpty>
+        ) : (
+          <Deleted>{deleted}</Deleted>
+        )}
         <br />
         <ValueOutput config={field} value={value} />
       </>
