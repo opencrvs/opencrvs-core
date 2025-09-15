@@ -52,7 +52,7 @@ const fields = [
     label: {
       defaultMessage: 'Date of birth',
       description: 'This is the label for the field',
-      id: 'v2.event.birth.action.declare.form.section.person.field.dob.label'
+      id: 'event.birth.action.declare.form.section.person.field.dob.label'
     },
     conditionals: [
       {
@@ -69,7 +69,7 @@ const fields = [
     label: {
       defaultMessage: 'Exact date of birth unknown',
       description: 'This is the label for the field',
-      id: 'v2.event.birth.action.declare.form.section.person.field.age.checkbox.label'
+      id: 'event.birth.action.declare.form.section.person.field.age.checkbox.label'
     }
   },
   {
@@ -79,7 +79,7 @@ const fields = [
     label: {
       defaultMessage: 'Age of the member',
       description: 'This is the label for the field',
-      id: 'v2.event.birth.action.declare.form.section.tennis-member.field.age.label'
+      id: 'event.birth.action.declare.form.section.tennis-member.field.age.label'
     },
     conditionals: [
       {
