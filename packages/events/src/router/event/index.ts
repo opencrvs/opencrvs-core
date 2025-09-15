@@ -43,7 +43,6 @@ import { unassignRecord } from '@events/service/events/actions/unassign'
 import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
 import {
   processAction,
-  deleteUnreferencedFilesFromPreviousDrafts,
   createEvent,
   deleteEvent,
   getEventById,
@@ -211,21 +210,6 @@ export const eventRouter = router({
           user,
           transactionId: input.transactionId
         })
-
-        const event = await getEventById(eventId)
-        const configuration = await getEventConfigurationById({
-          token: ctx.token,
-          eventType: event.type
-        })
-
-        if (previousDraft) {
-          await deleteUnreferencedFilesFromPreviousDrafts(ctx.token, {
-            event,
-            configuration,
-            currentDraft,
-            previousDraft
-          })
-        }
 
         return currentDraft
       })

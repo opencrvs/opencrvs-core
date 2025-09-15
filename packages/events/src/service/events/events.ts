@@ -20,7 +20,6 @@ import {
   ActionUpdate,
   AsyncRejectActionDocument,
   DisplayableAction,
-  Draft,
   EventConfig,
   EventDocument,
   EventInput,
@@ -45,7 +44,6 @@ import {
 import { indexEvent } from '@events/service/indexing/indexing'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import * as eventsRepo from '@events/storage/postgres/events/events'
-import { getUnreferencedDraftFiles } from '../files/utils'
 
 class EventNotFoundError extends TRPCError {
   constructor(id: string) {
@@ -217,42 +215,6 @@ function extractFileValues(
   return fileValues
 }
 
-/**
- *
- * Deletes files from external source that are referenced in previous drafts but not in the current draft.
- *
- */
-export async function deleteUnreferencedFilesFromPreviousDrafts(
-  token: string,
-  {
-    event,
-    currentDraft,
-    previousDraft,
-    configuration
-  }: {
-    event: EventDocument
-    currentDraft?: Draft
-    previousDraft: Draft
-    configuration: EventConfig
-  }
-): Promise<void> {
-  const unreferencedFiles = getUnreferencedDraftFiles({
-    event,
-    currentDraft,
-    previousDraft,
-    configuration
-  })
-
-  for (const file of unreferencedFiles) {
-    const isDeleted = await deleteFile(file.value, token)
-
-    if (!isDeleted) {
-      // eslint-disable-next-line no-console
-      console.error(`Unable to delete unused file: ${JSON.stringify(file)}`)
-    }
-  }
-}
-
 export function buildAction(
   input: ActionInputWithType,
   status: ActionStatus,
@@ -402,22 +364,8 @@ export async function addAction(
 
   const updatedEvent = await getEventById(eventId)
 
-  const previousDraft = await draftsRepo.findLatestDraftForAction(
-    event.id,
-    user.id,
-    input.type
-  )
-
   if (input.type !== ActionType.READ && input.type !== ActionType.ASSIGN) {
     await draftsRepo.deleteDraftsByEventId(input.eventId)
-  }
-
-  if (previousDraft) {
-    await deleteUnreferencedFilesFromPreviousDrafts(token, {
-      event: updatedEvent,
-      configuration,
-      previousDraft
-    })
   }
 
   await cleanupUnreferencedFiles(updatedEvent, token)
