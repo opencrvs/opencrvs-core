@@ -70,7 +70,7 @@ const constantsMessages = defineMessages({
   }
 })
 
-export function EventSelector() {
+function EventSelector() {
   const intl = useIntl()
   const navigate = useNavigate()
   const [eventType, setEventType] = useState('')
