@@ -282,13 +282,19 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
     scope.includes('record.reject-registration')
 
   if (!hasConfirmAndRejectScope) {
-    throw new TRPCError({ code: 'FORBIDDEN' })
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Missing required scopes for action confirmation'
+    })
   }
 
   const isActionConfirmationToken = grantedEventId && grantedActionId
 
   if (!isActionConfirmationToken) {
-    throw new TRPCError({ code: 'FORBIDDEN' })
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Missing required claims for action confirmation'
+    })
   }
 
   if (grantedEventId !== input.eventId || grantedActionId !== input.actionId) {
