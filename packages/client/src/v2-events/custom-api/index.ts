@@ -240,6 +240,7 @@ export async function makeCorrectionOnRequest({
           declarationMixedUpAnnotation
         )
       : {}
+
   const response =
     await trpcClient.event.actions.correction.request.request.mutate({
       eventId,
@@ -248,14 +249,19 @@ export async function makeCorrectionOnRequest({
       annotation,
       keepAssignment: true
     })
+
   const requestId = response.actions.find(
     (a) => a.transactionId === transactionId
   )?.id
+
   if (!requestId) {
     throw new Error(
       `Request ID not found in response for eventId: ${eventId}, transactionId: ${transactionId}`
     )
   }
+
+  console.log('requestId', requestId)
+
   return trpcClient.event.actions.correction.approve.request.mutate({
     type: ActionType.APPROVE_CORRECTION,
     transactionId: getUUID(),

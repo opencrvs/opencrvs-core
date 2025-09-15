@@ -570,45 +570,51 @@ export function getAcceptedActions(event: EventDocument): ActionDocument[] {
   }))
 }
 
+// Action types that are not taken into the aggregate values
+const EXCLUDED_ACTIONS = [
+  ActionType.REQUEST_CORRECTION,
+  ActionType.PRINT_CERTIFICATE,
+  ActionType.REJECT_CORRECTION
+]
+
 export function aggregateActionDeclarations(
   event: EventDocument,
   config: EventConfig
 ): EventState {
-  /*
-   * Types that are not taken into the aggregate values (e.g. while printing certificate
-   * stop auto filling collector form with previous print action data)
-   */
-  const excludedActions = [
-    ActionType.REQUEST_CORRECTION,
-    ActionType.PRINT_CERTIFICATE,
-    ActionType.REJECT_CORRECTION
-  ]
+  const allAcceptedActions = getAcceptedActions(event)
+  const aggregatedActions = allAcceptedActions
+    .filter((a) => !EXCLUDED_ACTIONS.some((type) => type === a.type))
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  const acceptedActions = getAcceptedActions(event).sort((a, b) =>
-    a.createdAt.localeCompare(b.createdAt)
+  console.log('correction actions')
+  console.log(
+    allAcceptedActions.filter(
+      (a) =>
+        a.type === ActionType.REQUEST_CORRECTION ||
+        a.type === ActionType.APPROVE_CORRECTION ||
+        a.type === ActionType.REJECT_CORRECTION
+    )
   )
 
-  const aggregatedDeclaration = acceptedActions.reduce(
+  const aggregatedDeclaration = aggregatedActions.reduce(
     (declaration, action) => {
-      if (
-        excludedActions.some((excludedAction) => excludedAction === action.type)
-      ) {
-        return declaration
-      }
-
       /*
        * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
        * details in the correction. To do this, we find the original request that this
        * approval is for and merge its details with the current data of the record.
        */
-
       if (action.type === ActionType.APPROVE_CORRECTION) {
-        const requestAction = acceptedActions.find(
+        console.log('action', action)
+        const requestAction = allAcceptedActions.find(
           ({ id }) => id === action.requestId
         )
+
+        console.log('requestAction', requestAction)
+
         if (!requestAction) {
           return declaration
         }
+
         return getCompleteActionDeclaration(declaration, event, requestAction)
       }
 
@@ -616,6 +622,8 @@ export function aggregateActionDeclarations(
     },
     {}
   )
+
+  // console.log('aggregatedDeclaration', aggregatedDeclaration)
 
   return getOnlyVisibleFormValues(
     config.declaration.pages.flatMap(({ fields }) => fields),

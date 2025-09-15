@@ -303,6 +303,9 @@ export function getDefaultActionProcedures(
           eventType: event.type
         })
 
+        // Add a 10 second timeout
+        // await new Promise((resolve) => setTimeout(resolve, 5000))
+
         if (isDuplicateAction) {
           return ctx.event
         }

@@ -67,6 +67,7 @@ function EventOverviewFull({
   const draft = getRemoteDraftByEventId(eventIndex.id, {
     refetchOnMount: 'always'
   })
+
   const eventWithDrafts = draft
     ? dangerouslyGetCurrentEventStateWithDrafts({
         event,
@@ -98,6 +99,8 @@ function EventOverviewFull({
 
   const { getEventTitle } = useEventTitle()
   const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
+
+  // console.log('eventIndex', eventIndex.declaration['child.name'])
 
   return (
     <Content
