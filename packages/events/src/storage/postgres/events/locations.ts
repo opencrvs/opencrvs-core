@@ -122,8 +122,8 @@ export async function isLeafLocation(id: UUID) {
 }
 
 export async function getLeafLocationIds({
-  locationType
-}: { locationType?: LocationType } = {}) {
+  locationTypes
+}: { locationTypes?: LocationType[] } = {}) {
   const db = getClient()
 
   const query = db
@@ -139,8 +139,8 @@ export async function getLeafLocationIds({
       )
     )
 
-  if (locationType) {
-    query.where('locationType', '=', locationType)
+  if (locationTypes && locationTypes.length > 0) {
+    query.where('locationType', 'in', locationTypes)
   }
 
   return query.execute()

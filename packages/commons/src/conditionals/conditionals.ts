@@ -15,6 +15,7 @@ import { ITokenPayload as TokenPayload, Scope } from '../authentication'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { userSerializer } from '../events/serializers/user/serializer'
 import { omitKeyDeep } from '../utils'
+import { UUID } from '../uuid'
 
 /** @knipignore */
 export type JSONSchema = {
@@ -63,7 +64,7 @@ export type FormConditionalParameters = {
   $online: boolean
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   $form: EventState | Record<string, any>
-  $locations?: Array<string>
+  $locations?: Array<{ id: UUID }>
 }
 
 export type ConditionalParameters =

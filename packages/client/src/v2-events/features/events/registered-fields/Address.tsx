@@ -28,7 +28,9 @@ import {
   isFieldDisplayedOnReview,
   AddressField,
   AdministrativeArea,
-  DefaultAddressFieldValue
+  DefaultAddressFieldValue,
+  UUID,
+  LocationType
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -37,6 +39,39 @@ import { getOfflineData } from '@client/offline/selectors'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { IAdminStructureItem } from '@client/utils/referenceApi'
 import { getUserDetails } from '@client/profile/profileSelectors'
+
+export function getLeafLocationIds(
+  locations: Location[],
+  locationTypes?: LocationType[]
+): { id: UUID }[] {
+  const nonLeafs = new Set<string>()
+  const idToType = new Map<string, LocationType | null>() // remember each location's type
+
+  for (const loc of locations) {
+    idToType.set(loc.id, loc.locationType)
+
+    if (loc.parentId) {
+      nonLeafs.add(loc.parentId)
+    }
+  }
+
+  const result: { id: UUID }[] = []
+  for (const loc of locations) {
+    // candidate leaf if it never appears as a parent
+    if (!nonLeafs.has(loc.id)) {
+      const type = loc.locationType ? idToType.get(loc.locationType) : null
+      if (
+        !locationTypes ||
+        locationTypes.length === 0 ||
+        (type && locationTypes.some((lt) => lt === type))
+      ) {
+        result.push({ id: loc.id })
+      }
+    }
+  }
+
+  return result
+}
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -132,7 +167,7 @@ function isDomesticAddress() {
 
 type OutputMode = 'withIds' | 'withNames'
 /*
-Function to traverse the administrative leverl hierarchy from an arbitrary / leaf point
+Function to traverse the administrative level hierarchy from an arbitrary / leaf point
 */
 function getAdminLevelHierarchy(
   locationUuid: string | undefined,

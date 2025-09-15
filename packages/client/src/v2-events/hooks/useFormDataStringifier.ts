@@ -8,10 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Location } from '@events/service/locations/locations'
 import { IntlShape, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { EventState, FieldConfig, FieldValue } from '@opencrvs/commons/client'
+import {
+  EventState,
+  FieldConfig,
+  FieldValue,
+  Location
+} from '@opencrvs/commons/client'
 import { getRegisteredFieldByFieldConfig } from '@client/v2-events/features/events/registered-fields'
 import { IAdminStructureItem } from '@client/utils/referenceApi'
 import { getOfflineData } from '@client/offline/selectors'
