@@ -11,10 +11,9 @@
 
 import { sql } from 'kysely'
 import { chunk } from 'lodash'
-import { Location, logger, UUID } from '@opencrvs/commons'
+import { Location, LocationType, logger, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { Locations, NewLocations } from './schema/app/Locations'
-import LocationType from './schema/app/LocationType'
 
 const INSERT_MAX_CHUNK_SIZE = 10000
 
@@ -121,6 +120,16 @@ export async function isLeafLocation(id: UUID) {
   return !result
 }
 
+/**
+ * Get the leaf location IDs from a list of locations.
+ *
+ * A leaf location is defined as a location that does not have any children in the provided list.
+ * e.g. if a location is a parent of another location in the list, it is not considered a leaf. ADMIN_STRUCTURE might have CRVS_OFFICE children, but can be a leaf if we only consider ADMIN_STRUCTURE locations.
+ *
+ * @param locations - The list of locations to search.
+ * @param locationTypes - The types of locations to include.
+ * @returns The list of leaf location IDs.
+ */
 export async function getLeafLocationIds({
   locationTypes
 }: { locationTypes?: LocationType[] } = {}) {
@@ -136,7 +145,7 @@ export async function getLeafLocationIds({
             .select('c.id')
             .whereRef('c.parentId', '=', 'l.id')
             .$if(!!locationTypes && !!locationTypes.length, (qb) =>
-              // @ts-expect-error -- does not understand check
+              // @ts-expect-error -- query builder cannot infer the type from the condition above.
               qb.where('c.locationType', 'in', locationTypes)
             )
         )

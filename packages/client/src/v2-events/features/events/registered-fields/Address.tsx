@@ -40,12 +40,22 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { IAdminStructureItem } from '@client/utils/referenceApi'
 import { getUserDetails } from '@client/profile/profileSelectors'
 
+/**
+ * Get the leaf location IDs from a list of locations.
+ *
+ * A leaf location is defined as a location that does not have any children in the provided list.
+ * e.g. if a location is a parent of another location in the list, it is not considered a leaf. ADMIN_STRUCTURE might have CRVS_OFFICE children, but can be a leaf if we only consider ADMIN_STRUCTURE locations.
+ *
+ * @param locations - The list of locations to search.
+ * @param locationTypes - The types of locations to include.
+ * @returns The list of leaf location IDs.
+ */
 export function getLeafLocationIds(
   locations: Location[],
   locationTypes?: LocationType[]
 ): { id: UUID }[] {
   const nonLeafs = new Set<string>()
-  const idToType = new Map<string, LocationType | null>() // remember each location's type
+  const idToType = new Map<string, LocationType | null>()
 
   for (const loc of locations) {
     idToType.set(loc.id, loc.locationType)

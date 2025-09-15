@@ -24,7 +24,6 @@ export async function setLocations(locations: Location[]) {
       id,
       name,
       parentId,
-      // @todo: check
       validUntil: validUntil ? new Date(validUntil).toISOString() : null,
       locationType
     }))
