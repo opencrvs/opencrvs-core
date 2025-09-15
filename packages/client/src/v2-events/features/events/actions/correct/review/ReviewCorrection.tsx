@@ -16,7 +16,6 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import {
   ActionType,
   EventState,
@@ -39,7 +38,6 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { getScope } from '@client/profile/profileSelectors'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 
@@ -71,12 +69,12 @@ const reviewCorrectionMessages = defineMessages({
     description: 'The label for confirm button of action modal'
   },
   correctionRequest: {
-    id: 'v2-events.correction.correctionRequest',
+    id: 'correction.correctionRequest',
     defaultMessage: 'Correction request',
     description: 'Correction request text'
   },
   rejectReason: {
-    id: 'v2-events.correction.correctionReject.reason',
+    id: 'correction.correctionReject.reason',
     defaultMessage: 'Reason for rejection',
     description: 'Correction request rejection reason'
   }
