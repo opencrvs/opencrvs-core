@@ -28,7 +28,8 @@ import {
   UnassignActionInput,
   ACTION_SCOPE_MAP,
   MarkAsDuplicateActionInput,
-  MarkNotDuplicateActionInput
+  MarkNotDuplicateActionInput,
+  ActionDocument
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { EventIdParam } from '@events/router/middleware'
@@ -54,6 +55,7 @@ import { findRecordsByQuery } from '@events/service/indexing/indexing'
 import { reindex } from '@events/service/events/reindex'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
+import { cleanupUnreferencedFiles } from '@events/service/files'
 import { UserContext } from '../../context'
 import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
@@ -210,6 +212,19 @@ export const eventRouter = router({
           user,
           transactionId: input.transactionId
         })
+
+        const event = await getEventById(eventId)
+
+        const actionFromDraft = ActionDocument.safeParse({
+          ...currentDraft.action,
+          id: currentDraft.id
+        })
+
+        if (actionFromDraft.success) {
+          event.actions.push(actionFromDraft.data)
+        }
+
+        await cleanupUnreferencedFiles(event, ctx.token)
 
         return currentDraft
       })
