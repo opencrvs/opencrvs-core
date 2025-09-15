@@ -15,7 +15,7 @@ import { EventDocument } from './EventDocument'
 import { getAcceptedActions } from './utils'
 import { uniq } from 'lodash'
 
-export function getFilepathsFromEvent(
+export function getFilePathsFromEvent(
   event: EventDocument
 ): FullDocumentPath[] {
   const acceptedActions = getAcceptedActions(event)

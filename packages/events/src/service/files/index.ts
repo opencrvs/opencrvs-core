@@ -11,7 +11,7 @@
 import fetch from 'node-fetch'
 import {
   FullDocumentPath,
-  getFilepathsFromEvent,
+  getFilePathsFromEvent,
   joinUrlPaths,
   EventDocument
 } from '@opencrvs/commons'
@@ -74,7 +74,7 @@ export async function cleanupUnreferencedFiles(
   event: EventDocument,
   token: string
 ) {
-  const referencedFiles = getFilepathsFromEvent(event)
+  const referencedFiles = getFilePathsFromEvent(event)
   const filesSavedInMinio = await listFiles(event.id, token)
 
   filesSavedInMinio.forEach(async (file: string) => {
