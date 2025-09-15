@@ -12,7 +12,7 @@ import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import { z } from 'zod'
 import { OpenApiMeta } from 'trpc-to-openapi'
-import { UUID } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -202,6 +202,7 @@ export async function defaultRequestHandler(
   )
   const { responseStatus, body } = await requestActionConfirmation(
     input.type,
+    input.transactionId,
     eventWithRequestedAction,
     setBearerForToken(eventActionToken)
   )
@@ -224,12 +225,30 @@ export async function defaultRequestHandler(
   // If we immediately get a rejected response, we can mark the action as rejected
   if (responseStatus === ActionConfirmationResponse.Rejected) {
     status = ActionStatus.Rejected
+
+    logger.debug(
+      {
+        transactionId: input.transactionId,
+        actionType: input.type,
+        eventId: event.id
+      },
+      `Action immediately rejected (status: "${responseStatus}")`
+    )
   }
 
   // If we immediately get a success response, we mark the action as succeeded
   // and also validate the payload received from the notify API
   if (responseStatus === ActionConfirmationResponse.Success) {
     status = ActionStatus.Accepted
+
+    logger.debug(
+      {
+        transactionId: input.transactionId,
+        actionType: input.type,
+        eventId: event.id
+      },
+      `Action immediately accepted (status: "${responseStatus}")`
+    )
     if (actionConfirmationResponseSchema) {
       try {
         parsedBody = actionConfirmationResponseSchema.parse(body)
@@ -365,11 +384,31 @@ export function getDefaultActionProcedures(
         if (confirmationAction) {
           // Action is already rejected, so we throw an error
           if (confirmationAction.status === ActionStatus.Rejected) {
+            logger.debug(
+              {
+                eventType: event.type,
+                actionType,
+                eventId: event.id,
+                transactionId: input.transactionId
+              },
+              `Action already rejected`
+            )
+
             throw new TRPCError({
               code: 'BAD_REQUEST',
               message: 'Action has already been rejected.'
             })
           }
+
+          logger.debug(
+            {
+              eventType: event.type,
+              actionType,
+              eventId: event.id,
+              transactionId: input.transactionId
+            },
+            `Accepting`
+          )
 
           // Action is already confirmed, so we just return the event
           return getEventById(input.eventId)
