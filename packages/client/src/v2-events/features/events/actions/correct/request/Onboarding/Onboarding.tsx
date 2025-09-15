@@ -26,7 +26,7 @@ const messages = defineMessages({
   title: {
     defaultMessage: 'Correct Record',
     description: 'Label for correct record button in dropdown menu',
-    id: 'v2.action.correct'
+    id: 'action.correct'
   }
 })
 

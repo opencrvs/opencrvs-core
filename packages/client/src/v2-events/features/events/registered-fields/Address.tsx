@@ -55,7 +55,7 @@ const COUNTRY_FIELD = {
   conditionals: [],
   required: true,
   label: {
-    id: 'v2.field.address.country.label',
+    id: 'field.address.country.label',
     defaultMessage: 'Country',
     description: 'This is the label for the field'
   },
@@ -73,7 +73,7 @@ const ADDRESS_TYPE_FIELD = {
   label: {
     defaultMessage: '',
     description: 'empty string',
-    id: 'v2.messages.emptyString'
+    id: 'messages.emptyString'
   },
   type: FieldType.TEXT
 } as const satisfies FieldConfigWithoutAddress
@@ -89,7 +89,7 @@ const ADMINISTRATIVE_AREA_FIELD = {
   label: {
     defaultMessage: '',
     description: 'empty string',
-    id: 'v2.messages.emptyString'
+    id: 'messages.emptyString'
   },
   type: FieldType.TEXT
 } as const satisfies FieldConfigWithoutAddress
@@ -105,7 +105,7 @@ const STREET_LEVEL_DETAILS_FIELD = {
   label: {
     defaultMessage: '',
     description: 'empty string',
-    id: 'v2.messages.emptyString'
+    id: 'messages.emptyString'
   },
   type: FieldType.TEXT
 } as const satisfies FieldConfigWithoutAddress

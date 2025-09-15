@@ -28,12 +28,12 @@ const messages = defineMessages({
   cancel: {
     defaultMessage: 'Cancel',
     description: 'Cancel button text in the modal',
-    id: 'v2.buttons.cancel'
+    id: 'buttons.cancel'
   },
   confirm: {
     defaultMessage: 'Confirm',
     description: 'Confirm button text',
-    id: 'v2.buttons.confirm'
+    id: 'buttons.confirm'
   }
 })
 

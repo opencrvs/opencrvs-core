@@ -65,7 +65,7 @@ const streetAddressConfigs = [
     required: false,
     parent: createFieldCondition('country'),
     label: {
-      id: 'v2.field.address.town.label',
+      id: 'field.address.town.label',
       defaultMessage: 'Town',
       description: 'This is the label for the field'
     },
@@ -85,7 +85,7 @@ const streetAddressConfigs = [
     required: false,
     parent: createFieldCondition('country'),
     label: {
-      id: 'v2.field.address.residentialArea.label',
+      id: 'field.address.residentialArea.label',
       defaultMessage: 'Residential Area',
       description: 'This is the label for the field'
     },
@@ -105,7 +105,7 @@ const streetAddressConfigs = [
     required: false,
     parent: createFieldCondition('country'),
     label: {
-      id: 'v2.field.address.street.label',
+      id: 'field.address.street.label',
       defaultMessage: 'Street',
       description: 'This is the label for the field'
     },
@@ -125,7 +125,7 @@ const streetAddressConfigs = [
     required: false,
     parent: createFieldCondition('country'),
     label: {
-      id: 'v2.field.address.number.label',
+      id: 'field.address.number.label',
       defaultMessage: 'Number',
       description: 'This is the label for the field'
     },
@@ -145,7 +145,7 @@ const streetAddressConfigs = [
     required: false,
     parent: createFieldCondition('country'),
     label: {
-      id: 'v2.field.address.postcodeOrZip.label',
+      id: 'field.address.postcodeOrZip.label',
       defaultMessage: 'Postcode / Zip',
       description: 'This is the label for the field'
     },
@@ -171,7 +171,7 @@ const streetAddressConfigs = [
     parent: createFieldCondition('country'),
     required: true,
     label: {
-      id: 'v2.field.address.state.label',
+      id: 'field.address.state.label',
       defaultMessage: 'State',
       description: 'This is the label for the field'
     },
@@ -188,7 +188,7 @@ const streetAddressConfigs = [
     ],
     required: true,
     label: {
-      id: 'v2.field.address.district2.label',
+      id: 'field.address.district2.label',
       defaultMessage: 'District',
       description: 'This is the label for the field'
     },
@@ -205,7 +205,7 @@ const streetAddressConfigs = [
     ],
     required: false,
     label: {
-      id: 'v2.field.address.cityOrTown.label',
+      id: 'field.address.cityOrTown.label',
       defaultMessage: 'City / Town',
       description: 'This is the label for the field'
     },
@@ -222,7 +222,7 @@ const streetAddressConfigs = [
     ],
     required: false,
     label: {
-      id: 'v2.field.address.addressLine1.label',
+      id: 'field.address.addressLine1.label',
       defaultMessage: 'Address Line 1',
       description: 'This is the label for the field'
     },
@@ -239,7 +239,7 @@ const streetAddressConfigs = [
     ],
     required: false,
     label: {
-      id: 'v2.field.address.addressLine2.label',
+      id: 'field.address.addressLine2.label',
       defaultMessage: 'Address Line 2',
       description: 'This is the label for the field'
     },
@@ -256,7 +256,7 @@ const streetAddressConfigs = [
     ],
     required: false,
     label: {
-      id: 'v2.field.address.addressLine3.label',
+      id: 'field.address.addressLine3.label',
       defaultMessage: 'Address Line 3',
       description: 'This is the label for the field'
     },
@@ -273,7 +273,7 @@ const streetAddressConfigs = [
     ],
     required: false,
     label: {
-      id: 'v2.field.address.postcodeOrZip.label',
+      id: 'field.address.postcodeOrZip.label',
       defaultMessage: 'Postcode / Zip',
       description: 'This is the label for the field'
     },

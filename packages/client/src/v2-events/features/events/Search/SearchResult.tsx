@@ -150,44 +150,33 @@ function changeSortedColumn(
 
 const messages = defineMessages({
   noRecord: {
-    id: 'v2.search.noRecord',
+    id: 'search.noRecord',
     defaultMessage:
       'No records {slug, select, draft {in my draft} outbox {require processing} other {{title}}}',
     description: 'The no record text'
   },
   noResult: {
-    id: 'v2.search.noResult',
+    id: 'search.noResult',
     defaultMessage: 'No result',
     description: 'The no result text'
   },
   noResultFor: {
-    id: 'v2.search.noResultFor',
+    id: 'search.noResultForSearchTerm',
     defaultMessage: 'No results for "{searchTerm}"',
     description: 'The no result text'
   },
-  noResultsOutbox: {
-    defaultMessage: 'No records require processing',
-    description: 'Text to display if there is no items in outbox',
-    id: 'v2.constants.noResultsOutbox'
-  },
-  searchResult: {
-    defaultMessage: 'Search results',
-    description:
-      'The label for search result header in advancedSearchResult page',
-    id: 'v2.advancedSearchResult.table.searchResult'
-  },
   eventStatus: {
-    id: `v2.events.status`,
+    id: 'events.status',
     defaultMessage:
       '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARK_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
   },
   waitingForAction: {
-    id: `v2.events.outbox.waitingForAction`,
+    id: 'events.outbox.waitingForAction',
     defaultMessage:
       'Waiting to {action, select, DECLARE {send} REGISTER {register} VALIDATE {send for approval} NOTIFY {send} REJECT {send for updates} ARCHIVE {archive} PRINT_CERTIFICATE {certify} REQUEST_CORRECTION {request correction} APPROVE_CORRECTION {approve correction} REJECT_CORRECTION {reject correction} ASSIGN {assign} UNASSIGN {unassign} other {action}}'
   },
   processingAction: {
-    id: `v2.events.outbox.processingAction`,
+    id: 'events.outbox.processingAction',
     defaultMessage:
       '{action, select, DECLARE {Sending} REGISTER {Registering} VALIDATE {Sending for approval} NOTIFY {Sending} REJECT {Sending for updates} ARCHIVE {Archiving} PRINT_CERTIFICATE {Certifying} REQUEST_CORRECTION {Requesting correction} APPROVE_CORRECTION {Approving correction} REJECT_CORRECTION {Rejecting correction} ASSIGN {Assigning} UNASSIGN {Unassigning} other {Processing action}}'
   }
