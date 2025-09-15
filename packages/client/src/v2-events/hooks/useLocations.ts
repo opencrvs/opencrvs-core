@@ -10,6 +10,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query'
+import { LocationType, UUID } from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 
@@ -28,7 +29,11 @@ export function useLocations() {
   const trpc = useTRPC()
   return {
     getLocations: {
-      useQuery: (isActive?: boolean) => {
+      useQuery: (
+        isActive?: boolean,
+        locationIds?: UUID[],
+        locationType?: LocationType
+      ) => {
         // We intentionally remove `queryFn` here because we already set a global default
         // via `setQueryDefaults`. Passing it again would override caching/persistence.
         // The `...rest` spread carries over things like staleTime, gcTime, enabled, etc.
@@ -39,7 +44,11 @@ export function useLocations() {
         return [
           useQuery({
             ...rest,
-            queryKey: trpc.locations.get.queryKey({ isActive })
+            queryKey: trpc.locations.get.queryKey({
+              isActive,
+              locationIds,
+              locationType
+            })
           }).data ?? []
         ]
       }
