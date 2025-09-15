@@ -57,7 +57,7 @@ export const Redirection: Story = {
     })
     await expect(link).toHaveAttribute(
       'href',
-      'https://example.com/authenticate'
+      `https://example.com/authenticate?redirect_uri=${encodeURIComponent(window.location.href)}`
     )
   },
   render: (args) => {
@@ -70,7 +70,12 @@ export const Redirection: Story = {
           const button = e.target as HTMLButtonElement
           if (button.id === 'person____authenticate') {
             e.preventDefault()
-            alert('On click, the link button changes href to\n' + args.url)
+            alert(
+              'On click, the link button changes href to\n' +
+                args.url +
+                '?redirect_uri=' +
+                window.location.href
+            )
           }
         }}
       >
