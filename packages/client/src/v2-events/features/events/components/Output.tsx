@@ -97,19 +97,19 @@ export function ValueOutput(
     isTextFieldType(field) ||
     isTextAreaFieldType(field)
   ) {
-    return Text.Output({ value: field.value })
+    return <Text.Output value={field.value} />
   }
 
   if (isDateFieldType(field)) {
-    return DateField.Output({ value: field.value })
+    return <DateField.Output value={field.value} />
   }
 
   if (isTimeFieldType(field)) {
-    return TimeField.Output({ value: field.value })
+    return <TimeField.Output value={field.value} />
   }
 
   if (isDateRangeFieldType(field)) {
-    return DateRangeField.Output({ value: field.value })
+    return <DateRangeField.Output value={field.value} />
   }
 
   if (isPageHeaderFieldType(field)) {
@@ -121,15 +121,15 @@ export function ValueOutput(
   }
 
   if (isNumberFieldType(field)) {
-    return Number.Output(field)
+    return <Number.Output {...field} />
   }
 
   if (isFileFieldType(field)) {
-    return File.Output(field)
+    return <File.Output {...field} />
   }
 
   if (isFileFieldWithOptionType(field)) {
-    return FileWithOption.Output(field)
+    return <FileWithOption.Output {...field} />
   }
 
   if (isBulletListFieldType(field)) {
@@ -137,21 +137,17 @@ export function ValueOutput(
   }
 
   if (isSelectFieldType(field) || isSelectDateRangeFieldType(field)) {
-    return Select.Output({
-      options: field.config.options,
-      value: field.value
-    })
+    return <Select.Output options={field.config.options} value={field.value} />
   }
 
   if (isCountryFieldType(field)) {
-    return SelectCountry.Output({ value: field.value })
+    return <SelectCountry.Output value={field.value} />
   }
 
   if (isCheckboxFieldType(field)) {
-    return Checkbox.Output({
-      required: field.config.required,
-      value: field.value
-    })
+    return (
+      <Checkbox.Output required={field.config.required} value={field.value} />
+    )
   }
 
   if (isAddressFieldType(field)) {
@@ -166,22 +162,21 @@ export function ValueOutput(
   }
 
   if (isRadioGroupFieldType(field)) {
-    return RadioGroup.Output({
-      options: field.config.options,
-      value: field.value
-    })
+    return (
+      <RadioGroup.Output options={field.config.options} value={field.value} />
+    )
   }
 
   if (isNameFieldType(field)) {
-    return Name.Output({ value: field.value, configuration: field.config })
+    return <Name.Output configuration={field.config} value={field.value} />
   }
 
   if (isAdministrativeAreaFieldType(field)) {
-    return AdministrativeArea.Output({ value: field.value })
+    return <AdministrativeArea.Output value={field.value} />
   }
 
   if (isOfficeFieldType(field) || isLocationFieldType(field)) {
-    return LocationSearch.Output({ value: field.value })
+    return <LocationSearch.Output value={field.value} />
   }
 
   if (isDividerFieldType(field)) {
@@ -189,7 +184,7 @@ export function ValueOutput(
   }
 
   if (isFacilityFieldType(field)) {
-    return LocationSearch.Output({ value: field.value })
+    return <LocationSearch.Output value={field.value} />
   }
 }
 
@@ -271,78 +266,54 @@ export function Output({
 
   if (!hasValue) {
     if (previousValue) {
-      return ValueOutput({
-        config: previousValueField ?? field,
-        value: previousValue
-      })
+      return (
+        <ValueOutput
+          config={previousValueField ?? field}
+          value={previousValue}
+        />
+      )
     }
 
     if (displayEmptyAsDash) {
       return '-'
     }
 
-    return ValueOutput({ config: field, value: '' })
+    return <ValueOutput config={field} value={''} />
   }
 
   const hasPreviousValue = previousValue !== undefined
 
   // Note, checking for previousValue !== value is not enough, as we have composite fields.
   if (hasPreviousValue && !_.isEqual(previousValue, value)) {
-    const valueOutput = ValueOutput({
-      config: field,
-      value
-    })
-
-    if (valueOutput === null) {
-      if (displayEmptyAsDash) {
-        return '-'
-      }
-
-      return null
-    }
-
-    const previousValueOutput = ValueOutput({
-      config: previousValueField ?? field,
-      value: previousValue
-    })
+    const valueOutput = <ValueOutput config={field} value={value} />
 
     return (
       <>
-        {previousValueOutput !== null && (
-          <>
-            <Deleted>
-              <ValueOutput
-                config={previousValueField ?? field}
-                value={previousValue}
-              />
-            </Deleted>
-            <br />
-          </>
-        )}
+        <Deleted>
+          <ValueOutput
+            config={previousValueField ?? field}
+            value={previousValue}
+          />
+        </Deleted>
+        <br />
         {valueOutput}
       </>
     )
   }
 
   if (!hasPreviousValue && showPreviouslyMissingValuesAsChanged) {
-    const deleted = ValueOutput({
-      config: { ...field, required: true },
-      value: undefined
-    })
-
+    const deleted = (
+      <ValueOutput config={{ ...field, required: true }} value={undefined} />
+    )
     return (
       <>
-        {deleted ? (
-          <Deleted>{deleted}</Deleted>
-        ) : (
-          // For a deleted 'dash', we dont want to overline the dash
-          <DeletedEmpty>{'-'}</DeletedEmpty>
-        )}
+        <Deleted>{deleted}</Deleted>
+
         <br />
         <ValueOutput config={field} value={value} />
       </>
     )
   }
 
-  return ValueOutput({ config: field, value })
+  return <ValueOutput config={field} value={value} />
 }
