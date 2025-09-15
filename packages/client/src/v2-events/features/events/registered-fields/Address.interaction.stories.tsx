@@ -51,6 +51,235 @@ function isInternationalAddress() {
   )
 }
 
+function isDomesticAddress() {
+  return and(
+    not(createFieldCondition('country').isUndefined()),
+    createFieldCondition('addressType').isEqualTo(AddressType.DOMESTIC)
+  )
+}
+
+const streetAddressConfigs = [
+  {
+    id: 'town',
+    required: false,
+    parent: createFieldCondition('country'),
+    label: {
+      id: 'v2.field.address.town.label',
+      defaultMessage: 'Town',
+      description: 'This is the label for the field'
+    },
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: and(
+          isDomesticAddress(),
+          not(createFieldCondition('district').isUndefined())
+        )
+      }
+    ],
+    type: FieldType.TEXT
+  },
+  {
+    id: 'residentialArea',
+    required: false,
+    parent: createFieldCondition('country'),
+    label: {
+      id: 'v2.field.address.residentialArea.label',
+      defaultMessage: 'Residential Area',
+      description: 'This is the label for the field'
+    },
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: and(
+          isDomesticAddress(),
+          not(createFieldCondition('district').isUndefined())
+        )
+      }
+    ],
+    type: FieldType.TEXT
+  },
+  {
+    id: 'street',
+    required: false,
+    parent: createFieldCondition('country'),
+    label: {
+      id: 'v2.field.address.street.label',
+      defaultMessage: 'Street',
+      description: 'This is the label for the field'
+    },
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: and(
+          isDomesticAddress(),
+          not(createFieldCondition('district').isUndefined())
+        )
+      }
+    ],
+    type: FieldType.TEXT
+  },
+  {
+    id: 'number',
+    required: false,
+    parent: createFieldCondition('country'),
+    label: {
+      id: 'v2.field.address.number.label',
+      defaultMessage: 'Number',
+      description: 'This is the label for the field'
+    },
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: and(
+          isDomesticAddress(),
+          not(createFieldCondition('district').isUndefined())
+        )
+      }
+    ],
+    type: FieldType.TEXT
+  },
+  {
+    id: 'zipCode',
+    required: false,
+    parent: createFieldCondition('country'),
+    label: {
+      id: 'v2.field.address.postcodeOrZip.label',
+      defaultMessage: 'Postcode / Zip',
+      description: 'This is the label for the field'
+    },
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: and(
+          isDomesticAddress(),
+          not(createFieldCondition('district').isUndefined())
+        )
+      }
+    ],
+    type: FieldType.TEXT
+  },
+  {
+    id: 'state',
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: isInternationalAddress()
+      }
+    ],
+    parent: createFieldCondition('country'),
+    required: true,
+    label: {
+      id: 'v2.field.address.state.label',
+      defaultMessage: 'State',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'district2',
+    parent: createFieldCondition('country'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: isInternationalAddress()
+      }
+    ],
+    required: true,
+    label: {
+      id: 'v2.field.address.district2.label',
+      defaultMessage: 'District',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'cityOrTown',
+    parent: createFieldCondition('country'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: isInternationalAddress()
+      }
+    ],
+    required: false,
+    label: {
+      id: 'v2.field.address.cityOrTown.label',
+      defaultMessage: 'City / Town',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'addressLine1',
+    parent: createFieldCondition('country'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: isInternationalAddress()
+      }
+    ],
+    required: false,
+    label: {
+      id: 'v2.field.address.addressLine1.label',
+      defaultMessage: 'Address Line 1',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'addressLine2',
+    parent: createFieldCondition('country'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: isInternationalAddress()
+      }
+    ],
+    required: false,
+    label: {
+      id: 'v2.field.address.addressLine2.label',
+      defaultMessage: 'Address Line 2',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'addressLine3',
+    parent: createFieldCondition('country'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: isInternationalAddress()
+      }
+    ],
+    required: false,
+    label: {
+      id: 'v2.field.address.addressLine3.label',
+      defaultMessage: 'Address Line 3',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'postcodeOrZip',
+    parent: createFieldCondition('country'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: isInternationalAddress()
+      }
+    ],
+    required: false,
+    label: {
+      id: 'v2.field.address.postcodeOrZip.label',
+      defaultMessage: 'Postcode / Zip',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  }
+]
+
 export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
   name: 'Domestic',
   parameters: {
@@ -76,9 +305,7 @@ export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
       'Admin structure dropdowns are shown gradually as the inputs are filled',
       async () => {
         // Verify that `District` select is not visible initially
-        await expect(
-          canvas.queryByTestId('location__district')
-        ).not.toBeVisible()
+        await expect(canvas.queryByTestId('location__district')).toBeNull()
 
         // Select a province
         const province = await canvas.findByTestId('location__province')
@@ -122,58 +349,7 @@ export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
               description: 'The title for the address input'
             },
             configuration: {
-              streetAddressForm: [
-                {
-                  id: 'town',
-                  required: false,
-                  label: {
-                    id: 'v2.field.address.town.label',
-                    defaultMessage: 'Town',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                },
-                {
-                  id: 'residentialArea',
-                  required: false,
-                  label: {
-                    id: 'v2.field.address.residentialArea.label',
-                    defaultMessage: 'Residential Area',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                },
-                {
-                  id: 'street',
-                  required: false,
-                  label: {
-                    id: 'v2.field.address.street.label',
-                    defaultMessage: 'Street',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                },
-                {
-                  id: 'number',
-                  required: false,
-                  label: {
-                    id: 'v2.field.address.number.label',
-                    defaultMessage: 'Number',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                },
-                {
-                  id: 'zipCode',
-                  required: false,
-                  label: {
-                    id: 'v2.field.address.postcodeOrZip.label',
-                    defaultMessage: 'Postcode / Zip',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                }
-              ]
+              streetAddressForm: streetAddressConfigs
             }
           }
         ]}
@@ -266,127 +442,154 @@ export const GenericAddressFields: StoryObj<typeof FormFieldGenerator> = {
               description: 'The title for the address input'
             },
             configuration: {
-              streetAddressForm: [
-                {
-                  id: 'state',
-                  conditionals: [
-                    {
-                      type: ConditionalType.SHOW,
-                      conditional: isInternationalAddress()
-                    }
-                  ],
-                  parent: createFieldCondition('country'),
-                  required: true,
-                  label: {
-                    id: 'v2.field.address.state.label',
-                    defaultMessage: 'State',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                },
-                {
-                  id: 'district2',
-                  parent: createFieldCondition('country'),
-                  conditionals: [
-                    {
-                      type: ConditionalType.SHOW,
-                      conditional: isInternationalAddress()
-                    }
-                  ],
-                  required: true,
-                  label: {
-                    id: 'v2.field.address.district2.label',
-                    defaultMessage: 'District',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                },
-                {
-                  id: 'cityOrTown',
-                  parent: createFieldCondition('country'),
-                  conditionals: [
-                    {
-                      type: ConditionalType.SHOW,
-                      conditional: isInternationalAddress()
-                    }
-                  ],
-                  required: false,
-                  label: {
-                    id: 'v2.field.address.cityOrTown.label',
-                    defaultMessage: 'City / Town',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                },
-                {
-                  id: 'addressLine1',
-                  parent: createFieldCondition('country'),
-                  conditionals: [
-                    {
-                      type: ConditionalType.SHOW,
-                      conditional: isInternationalAddress()
-                    }
-                  ],
-                  required: false,
-                  label: {
-                    id: 'v2.field.address.addressLine1.label',
-                    defaultMessage: 'Address Line 1',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                },
-                {
-                  id: 'addressLine2',
-                  parent: createFieldCondition('country'),
-                  conditionals: [
-                    {
-                      type: ConditionalType.SHOW,
-                      conditional: isInternationalAddress()
-                    }
-                  ],
-                  required: false,
-                  label: {
-                    id: 'v2.field.address.addressLine2.label',
-                    defaultMessage: 'Address Line 2',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                },
-                {
-                  id: 'addressLine3',
-                  parent: createFieldCondition('country'),
-                  conditionals: [
-                    {
-                      type: ConditionalType.SHOW,
-                      conditional: isInternationalAddress()
-                    }
-                  ],
-                  required: false,
-                  label: {
-                    id: 'v2.field.address.addressLine3.label',
-                    defaultMessage: 'Address Line 3',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                },
-                {
-                  id: 'postcodeOrZip',
-                  parent: createFieldCondition('country'),
-                  conditionals: [
-                    {
-                      type: ConditionalType.SHOW,
-                      conditional: isInternationalAddress()
-                    }
-                  ],
-                  required: false,
-                  label: {
-                    id: 'v2.field.address.postcodeOrZip.label',
-                    defaultMessage: 'Postcode / Zip',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                }
-              ]
+              streetAddressForm: streetAddressConfigs
+            }
+          }
+        ]}
+        id="my-form"
+        onChange={(data) => {
+          args.onChange(data)
+        }}
+      />
+    )
+  }
+}
+
+export const AddressFieldInteractionDomesticToInterntaional: StoryObj<
+  typeof FormFieldGenerator
+> = {
+  name: 'Switch between Domestic and International',
+  parameters: {
+    layout: 'centered'
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await canvas.findByText(/Address/)
+
+    await step('Select domestic country: Bangladesh', async () => {
+      const country = await canvas.findByTestId('location__country')
+      await userEvent.click(country)
+      await selectEvent.select(country, 'Bangladesh')
+    })
+
+    await step('International fields are not visible', async () => {
+      await expect(canvas.queryByTestId('text__state')).toBeNull()
+      await expect(canvas.queryByTestId('text__district2')).toBeNull()
+      await expect(canvas.queryByTestId('text__cityOrTown')).toBeNull()
+    })
+
+    await step(
+      'Admin structure dropdowns are shown gradually as the inputs are filled',
+      async () => {
+        // Verify that `District` select is not visible initially
+        await expect(canvas.queryByTestId('location__district')).toBeNull()
+
+        // Select a province
+        const province = await canvas.findByTestId('location__province')
+        await userEvent.click(province)
+        await selectEvent.select(province, 'Central')
+
+        // Verify that `District` becomes visible
+        const district = await canvas.findByTestId('location__district')
+        await expect(district).toBeInTheDocument()
+      }
+    )
+
+    await step('Select International country: Finland', async () => {
+      const country = await canvas.findByTestId('location__country')
+      await userEvent.click(country)
+      await selectEvent.select(country, 'Finland')
+    })
+
+    await step('Domestic fields are not visible', async () => {
+      await expect(canvas.queryByTestId('location__province')).toBeNull()
+      await expect(canvas.queryByTestId('location__district')).toBeNull()
+    })
+
+    await step('Fill up international fields', async () => {
+      await userEvent.type(await canvas.findByTestId('text__state'), 'Dhaka')
+      await userEvent.type(
+        await canvas.findByTestId('text__district2'),
+        'Dhaka North'
+      )
+      await userEvent.type(
+        await canvas.findByTestId('text__cityOrTown'),
+        'Mohakhali'
+      )
+      await userEvent.type(
+        await canvas.findByTestId('text__addressLine1'),
+        'DOHS'
+      )
+      await userEvent.type(
+        await canvas.findByTestId('text__addressLine2'),
+        'Road 4'
+      )
+      await userEvent.type(
+        await canvas.findByTestId('text__addressLine3'),
+        'House 142'
+      )
+      await userEvent.type(
+        await canvas.findByTestId('text__postcodeOrZip'),
+        '3300'
+      )
+    })
+
+    await step('Select domestic country: Bangladesh', async () => {
+      const country = await canvas.findByTestId('location__country')
+      await userEvent.click(country)
+      await selectEvent.select(country, 'Bangladesh')
+    })
+
+    await step(
+      'Admin structure dropdowns are shown gradually as the inputs are filled',
+      async () => {
+        // Verify that `District` select is not visible initially
+        await expect(canvas.queryByTestId('location__district')).toBeNull()
+
+        // Select a province
+        const province = await canvas.findByTestId('location__province')
+        await userEvent.click(province)
+        await selectEvent.select(province, 'Central')
+
+        // Verify that `District` becomes visible
+        const district = await canvas.findByTestId('location__district')
+        await expect(district).toBeInTheDocument()
+
+        // Select a district
+        await userEvent.click(district)
+        await selectEvent.select(district, 'Ibombo')
+      }
+    )
+
+    await step('Fill up domestic fields', async () => {
+      await userEvent.type(await canvas.findByTestId('text__town'), 'Dhaka')
+      await userEvent.type(
+        await canvas.findByTestId('text__residentialArea'),
+        'Mohakhali'
+      )
+      await userEvent.type(await canvas.findByTestId('text__street'), 'Road 4')
+      await userEvent.type(
+        await canvas.findByTestId('text__number'),
+        'House 142'
+      )
+      await userEvent.type(await canvas.findByTestId('text__zipCode'), '3300')
+    })
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        fields={[
+          {
+            id: 'storybook.address',
+            type: FieldType.ADDRESS,
+            label: {
+              id: 'storybook.address.label',
+              defaultMessage: 'Address',
+              description: 'The title for the address input'
+            },
+            configuration: {
+              streetAddressForm: streetAddressConfigs
             }
           }
         ]}
