@@ -18,7 +18,8 @@ import {
   EventDocument,
   EventConfig,
   ArchiveActionInput,
-  MarkAsDuplicateActionInput
+  MarkAsDuplicateActionInput,
+  ActionStatus
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
 
@@ -251,7 +252,8 @@ export async function makeCorrectionOnRequest({
     })
 
   const requestId = response.actions.find(
-    (a) => a.transactionId === transactionId
+    (a) =>
+      a.transactionId === transactionId && a.status === ActionStatus.Accepted
   )?.id
 
   if (!requestId) {
@@ -259,8 +261,6 @@ export async function makeCorrectionOnRequest({
       `Request ID not found in response for eventId: ${eventId}, transactionId: ${transactionId}`
     )
   }
-
-  console.log('requestId', requestId)
 
   return trpcClient.event.actions.correction.approve.request.mutate({
     type: ActionType.APPROVE_CORRECTION,

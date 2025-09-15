@@ -586,16 +586,6 @@ export function aggregateActionDeclarations(
     .filter((a) => !EXCLUDED_ACTIONS.some((type) => type === a.type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  console.log('correction actions')
-  console.log(
-    allAcceptedActions.filter(
-      (a) =>
-        a.type === ActionType.REQUEST_CORRECTION ||
-        a.type === ActionType.APPROVE_CORRECTION ||
-        a.type === ActionType.REJECT_CORRECTION
-    )
-  )
-
   const aggregatedDeclaration = aggregatedActions.reduce(
     (declaration, action) => {
       /*
@@ -604,12 +594,9 @@ export function aggregateActionDeclarations(
        * approval is for and merge its details with the current data of the record.
        */
       if (action.type === ActionType.APPROVE_CORRECTION) {
-        console.log('action', action)
         const requestAction = allAcceptedActions.find(
           ({ id }) => id === action.requestId
         )
-
-        console.log('requestAction', requestAction)
 
         if (!requestAction) {
           return declaration

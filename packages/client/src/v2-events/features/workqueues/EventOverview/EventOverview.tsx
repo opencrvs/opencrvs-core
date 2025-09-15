@@ -100,8 +100,6 @@ function EventOverviewFull({
   const { getEventTitle } = useEventTitle()
   const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
 
-  // console.log('eventIndex', eventIndex.declaration['child.name'])
-
   return (
     <Content
       icon={() => <IconWithName flags={flags} name={''} status={status} />}
