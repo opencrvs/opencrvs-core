@@ -135,6 +135,10 @@ export async function getLeafLocationIds({
           selectFrom('locations as c')
             .select('c.id')
             .whereRef('c.parentId', '=', 'l.id')
+            .$if(!!locationTypes && !!locationTypes.length, (qb) =>
+              // @ts-expect-error -- does not understand check
+              qb.where('c.locationType', 'in', locationTypes)
+            )
         )
       )
     )

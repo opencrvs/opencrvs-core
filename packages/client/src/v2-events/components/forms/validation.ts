@@ -45,7 +45,9 @@ export function getValidationErrorsForForm(
       return errorsForAllFields
     }
 
-    const context = locations ? { locations } : undefined
+    const context = locations
+      ? { leafAdminStructureLocationIds: locations }
+      : undefined
 
     return {
       ...errorsForAllFields,

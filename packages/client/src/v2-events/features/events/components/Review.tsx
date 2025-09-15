@@ -318,7 +318,9 @@ function FormReview({
                 formConfig
               })
 
-              const context = locations ? { locations } : undefined
+              const context = locations
+                ? { leafAdminStructureLocationIds: locations }
+                : undefined
 
               const error = runFieldValidations({
                 field,

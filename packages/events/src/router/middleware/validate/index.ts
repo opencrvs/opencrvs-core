@@ -350,7 +350,7 @@ export const validateAction: MiddlewareFunction<
 
   const t0 = performance.now()
   const leafAdminStructureLocationIds = await getLeafLocationIds({
-    locationType: LocationType.enum.ADMIN_STRUCTURE
+    locationTypes: [LocationType.enum.ADMIN_STRUCTURE]
   })
 
   const t1 = performance.now()
