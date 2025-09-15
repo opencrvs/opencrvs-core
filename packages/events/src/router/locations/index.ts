@@ -10,7 +10,7 @@
  */
 
 import { z } from 'zod'
-import { Location, SCOPES } from '@opencrvs/commons'
+import { Location, LocationType, SCOPES, UUID } from '@opencrvs/commons'
 import { router, systemProcedure } from '@events/router/trpc'
 import {
   getLocations,
@@ -39,9 +39,23 @@ export const locationRouter = router({
       await syncLocations()
     }),
   get: systemProcedure
-    .input(z.object({ isActive: z.boolean().optional() }).optional())
+    .input(
+      z
+        .object({
+          isActive: z.boolean().optional(),
+          locationIds: z.array(UUID).optional(),
+          locationType: LocationType.optional()
+        })
+        .optional()
+    )
     .output(z.array(Location))
-    .query(async ({ input }) => getLocations({ isActive: input?.isActive })),
+    .query(async ({ input }) =>
+      getLocations({
+        isActive: input?.isActive,
+        locationIds: input?.locationIds,
+        locationType: input?.locationType
+      })
+    ),
   set: systemProcedure
     .use(
       requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])
