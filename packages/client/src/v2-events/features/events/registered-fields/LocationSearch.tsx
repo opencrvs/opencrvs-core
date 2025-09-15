@@ -20,7 +20,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { IAdminStructureItem } from '@client/utils/referenceApi'
-import { getAdminLevelHierarchy } from './Address'
+import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 
 interface SearchLocation {
   id: string
