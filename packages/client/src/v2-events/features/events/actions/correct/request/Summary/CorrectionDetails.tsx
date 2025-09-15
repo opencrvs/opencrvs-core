@@ -41,17 +41,17 @@ import { DeclarationComparisonTable } from './DeclarationComparisonTable'
 
 const messages = defineMessages({
   correctionSubmittedBy: {
-    id: 'v2.correction.submittedBy',
+    id: 'correction.submittedBy',
     defaultMessage: 'Submitter',
     description: 'Correction submitted by label'
   },
   correctionRequesterOffice: {
-    id: 'v2.correction.requesterOffice',
+    id: 'correction.requesterOffice',
     defaultMessage: 'Office',
     description: 'Correction requester office label'
   },
   correctionSubmittedOn: {
-    id: 'v2.correction.submittedOn',
+    id: 'correction.submittedOn',
     defaultMessage: 'Submitted on',
     description: 'Correction submitted on label'
   }
