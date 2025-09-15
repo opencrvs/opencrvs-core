@@ -456,7 +456,7 @@ export const GenericAddressFields: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const AddressFieldInteractionDomesticToInterntaional: StoryObj<
+export const AddressFieldInteractionDomesticToInternational: StoryObj<
   typeof FormFieldGenerator
 > = {
   name: 'Switch between Domestic and International',
