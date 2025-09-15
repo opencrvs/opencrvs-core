@@ -37,7 +37,11 @@ import {
 } from '@opencrvs/commons/events'
 import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
-import { deleteFile, fileExists } from '@events/service/files'
+import {
+  cleanupUnreferencedFiles,
+  deleteFile,
+  fileExists
+} from '@events/service/files'
 import { indexEvent } from '@events/service/indexing/indexing'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import * as eventsRepo from '@events/storage/postgres/events/events'
@@ -422,6 +426,8 @@ export async function addAction(
       previousDraft
     })
   }
+
+  await cleanupUnreferencedFiles(updatedEvent, token)
 
   return updatedEvent
 }

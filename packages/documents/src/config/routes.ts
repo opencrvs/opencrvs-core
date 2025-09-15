@@ -16,13 +16,23 @@ import {
 import { vsExportUploaderHandler } from '@documents/features/uploadVSExportFile/handler'
 import {
   createPreSignedUrl,
-  createPresignedUrlsInBulk
+  createPresignedUrlsInBulk,
+  listFiles
 } from '@documents/features/getDocument/handler'
 import { svgUploadHandler } from '@documents/features/uploadSvg/handler'
 import { deleteDocument } from '@documents/features/deleteDocument/handler'
 
 export const getRoutes = () => {
   const routes = [
+    // list files in directory
+    {
+      method: 'GET',
+      path: `/list-files/{prefix*}`,
+      handler: listFiles,
+      config: {
+        tags: ['api']
+      }
+    },
     // get presigned URL
     {
       method: 'GET',
