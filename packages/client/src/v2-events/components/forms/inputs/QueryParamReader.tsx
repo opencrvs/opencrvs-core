@@ -22,16 +22,15 @@ function deleteAllParams(params: URLSearchParams) {
   return params
 }
 
-function hasAllRequiredParams(
+function prepareParamsFromMap(
   params: URLSearchParams,
-  requiredParams: string[]
+  map: NonNullable<QueryParamReaderField['configuration']['map']>
 ) {
-  for (const param of requiredParams) {
-    if (!params.has(param)) {
-      return false
-    }
+  const result: Record<string, string> = {}
+  for (const [key, entry] of Object.entries(map)) {
+    result[key] = params.get(entry) || ''
   }
-  return true
+  return result
 }
 
 function QueryParamReaderInput({
@@ -42,17 +41,18 @@ function QueryParamReaderInput({
   onChange: (params: QueryParamReaderFieldValue) => void
 }) {
   const [searchParams, setSearchParams] = useSearchParams()
-  const { params: requiredParams } = configuration
+  const { map } = configuration
 
   useEffect(() => {
     if (searchParams.size === 0) {
       return
     }
-    if (hasAllRequiredParams(searchParams, requiredParams)) {
-      onChange(Object.fromEntries(searchParams))
-    }
+    const paramsObject = map
+      ? prepareParamsFromMap(searchParams, map)
+      : Object.fromEntries(searchParams)
+    onChange(paramsObject)
     setSearchParams(deleteAllParams(searchParams), { replace: true })
-  }, [onChange, requiredParams, searchParams, setSearchParams])
+  }, [onChange, searchParams, setSearchParams, map])
   return null
 }
 

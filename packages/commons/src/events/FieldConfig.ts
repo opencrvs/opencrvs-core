@@ -611,8 +611,10 @@ export type HttpField = z.infer<typeof HttpField>
 const QueryParamReaderField = BaseField.extend({
   type: z.literal(FieldType.QUERY_PARAM_READER),
   configuration: z.object({
-    params: z.array(z.string()).describe('required params to trigger'),
-    map: z.record(z.string()).optional()
+    map: z
+      .record(z.string())
+      .optional()
+      .describe('Maps query params to config keys')
   })
 })
 
