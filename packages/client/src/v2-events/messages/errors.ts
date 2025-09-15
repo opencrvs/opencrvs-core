@@ -19,7 +19,7 @@ const messagesToDefine: IErrorMessages = {
   queryError: {
     defaultMessage: 'An error occurred while searching',
     description: 'The error message shown when a search query fails',
-    id: 'v2.error.search'
+    id: 'error.search'
   }
 }
 

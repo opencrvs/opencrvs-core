@@ -44,7 +44,7 @@ describe('getAdvancedSearchFieldErrors', () => {
             message: {
               defaultMessage: 'Invalid date field',
               description: 'Error message when date field is invalid',
-              id: 'v2.error.invalidDate'
+              id: 'error.invalidDate'
             }
           }
         ]
