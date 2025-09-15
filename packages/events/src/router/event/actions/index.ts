@@ -341,7 +341,6 @@ export function getDefaultActionProcedures(
     accept: systemProcedure
       .input(inputSchema.merge(acceptInputFields))
       .use(middleware.requireActionConfirmationAuthorization)
-      .use(middleware.validateAction)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, actionId } = input
