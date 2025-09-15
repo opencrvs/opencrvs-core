@@ -546,7 +546,7 @@ export const AddressFieldInteractionDomesticToInternational: StoryObj<
       'Admin structure dropdowns are shown gradually as the inputs are filled',
       async () => {
         // Verify that `District` select is not visible initially
-        await expect(canvas.queryByTestId('location__district')).toBeNull()
+        await expect(canvas.queryByTestId('text__district')).toBeNull()
 
         // Select a province
         const province = await canvas.findByTestId('location__province')
