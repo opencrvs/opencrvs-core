@@ -77,7 +77,8 @@ const ACTION_FILTERS: {
   [ActionType.VALIDATE]: (flags) =>
     !flags.includes(InherentFlags.POTENTIAL_DUPLICATE),
   [ActionType.REGISTER]: (flags) =>
-    !flags.includes(InherentFlags.POTENTIAL_DUPLICATE)
+    !flags.includes(InherentFlags.POTENTIAL_DUPLICATE),
+  [ActionType.REJECT]: (flags) => !flags.includes(InherentFlags.REJECTED)
 }
 
 /**

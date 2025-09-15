@@ -42,6 +42,49 @@ export const LocationSearchInput: StoryObj<typeof LocationSearch.Input> = {
   }
 }
 
+export const LocationSearchInputWithActiveLocations: StoryObj<
+  typeof LocationSearch.Input
+> = {
+  name: 'LocationSearch with active locations',
+  render: (props) => {
+    return <LocationSearch.Input {...props} />
+  },
+  parameters: {
+    chromatic: { disableSnapshot: true }
+  },
+  args: {
+    id: 'location-search',
+    searchableResource: ['facilities'],
+    value: 'abc',
+    onChange: fn()
+  },
+  play: async ({ canvasElement, step, args }) => {
+    await step('Locations starting with "i" are visible', async () => {
+      const canvas = within(canvasElement)
+      const input =
+        await canvas.findByTestId<HTMLInputElement>('location-search')
+
+      await userEvent.type(input, 'i')
+      input.blur()
+
+      await expect(args.onChange).toHaveBeenCalled()
+      await expect(args.onChange).toHaveBeenCalledWith(undefined)
+
+      await expect(
+        canvas.findByText('Ibombo Rural Health Centre')
+      ).resolves.toBeInTheDocument()
+
+      await expect(
+        canvas.findByText('Ipongo Rural Health Centre')
+      ).resolves.toBeInTheDocument()
+
+      await expect(
+        canvas.findByText('Itumbwe Health Post')
+      ).resolves.toBeInTheDocument()
+    })
+  }
+}
+
 export const LocationSearchInputInvalid: StoryObj<typeof LocationSearch.Input> =
   {
     name: 'LocationSearch with invalid value',

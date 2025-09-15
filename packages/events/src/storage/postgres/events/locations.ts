@@ -61,8 +61,13 @@ export async function setLocations(locations: NewLocations[]) {
 
 export async function getLocations({
   locationType,
-  locationIds
-}: { locationType?: LocationType; locationIds?: UUID[] } = {}) {
+  locationIds,
+  isActive
+}: {
+  locationType?: LocationType
+  locationIds?: UUID[]
+  isActive?: boolean
+} = {}) {
   const db = getClient()
 
   let query = db
@@ -80,6 +85,12 @@ export async function getLocations({
 
   if (locationIds && locationIds.length > 0) {
     query = query.where('id', 'in', locationIds)
+  }
+
+  if (isActive) {
+    query = query.where((eb) =>
+      eb.or([eb('validUntil', 'is', null), eb('validUntil', '>', 'now()')])
+    )
   }
 
   return query.execute()

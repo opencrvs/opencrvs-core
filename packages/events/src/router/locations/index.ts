@@ -39,8 +39,9 @@ export const locationRouter = router({
       await syncLocations()
     }),
   get: systemProcedure
+    .input(z.object({ isActive: z.boolean().optional() }).optional())
     .output(z.array(Location))
-    .query(async () => getLocations()),
+    .query(async ({ input }) => getLocations({ isActive: input?.isActive })),
   set: systemProcedure
     .use(
       requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])

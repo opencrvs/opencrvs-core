@@ -48,6 +48,7 @@ export async function syncLocations() {
 export async function getLocations(params?: {
   locationType?: LocationType
   locationIds?: UUID[]
+  isActive?: boolean
 }) {
   const locations = await locationsRepo.getLocations(params)
 
