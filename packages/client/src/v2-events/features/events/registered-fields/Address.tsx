@@ -312,7 +312,7 @@ function AddressInput(props: Props) {
   const { onChange, defaultValue, value, ...otherProps } = props
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const [locations] = getLocations.useQuery()
   const userDetails = useSelector(getUserDetails)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
@@ -416,7 +416,7 @@ function AddressOutput({
   configuration?: AddressField
 }) {
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const [locations] = getLocations.useQuery()
   const { config } = useSelector(getOfflineData)
   const customAddressFields = configuration?.configuration
     ?.streetAddressForm as FieldConfigWithoutAddress[]

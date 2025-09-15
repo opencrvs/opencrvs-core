@@ -10,9 +10,11 @@
  */
 import React from 'react'
 import { IntlShape, useIntl } from 'react-intl'
-import { Location } from '@events/service/locations/locations'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
-import { FieldPropsWithoutReferenceValue } from '@opencrvs/commons/client'
+import {
+  FieldPropsWithoutReferenceValue,
+  Location
+} from '@opencrvs/commons/client'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 
@@ -22,18 +24,20 @@ interface SearchLocation {
   displayLabel: string
 }
 
-const resourceTypeMap: Record<'locations' | 'facilities' | 'offices', string> =
-  {
-    locations: 'ADMIN_STRUCTURE',
-    facilities: 'HEALTH_FACILITY',
-    offices: 'CRVS_OFFICE'
-  }
+const resourceTypeMap: Record<
+  'locations' | 'facilities' | 'offices',
+  'ADMIN_STRUCTURE' | 'HEALTH_FACILITY' | 'CRVS_OFFICE'
+> = {
+  locations: 'ADMIN_STRUCTURE',
+  facilities: 'HEALTH_FACILITY',
+  offices: 'CRVS_OFFICE'
+}
 
 function useAdministrativeAreas(
   searchableResource: ('locations' | 'facilities' | 'offices')[]
 ) {
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery(true) // get only active locations for input fields
+  const [locations] = getLocations.useQuery(true) // get only active locations for input fields
   const locationsBasedOnSearchableResource = locations.filter((location) =>
     searchableResource.some(
       (resource) => location.locationType === resourceTypeMap[resource]
@@ -132,7 +136,7 @@ function toCertificateVariables(
 function LocationSearchOutput({ value }: { value: Stringifiable }) {
   const intl = useIntl()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const [locations] = getLocations.useQuery()
   const { name, district, province, country } = toCertificateVariables(value, {
     intl,
     locations

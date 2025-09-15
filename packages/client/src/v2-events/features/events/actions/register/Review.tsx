@@ -68,7 +68,7 @@ export function Review() {
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const [locations] = getLocations.useQuery()
 
   const registerMutation = events.actions.register
 

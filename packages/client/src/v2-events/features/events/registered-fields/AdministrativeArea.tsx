@@ -10,8 +10,10 @@
  */
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Location } from '@events/service/locations/locations'
-import { FieldPropsWithoutReferenceValue } from '@opencrvs/commons/client'
+import {
+  Location,
+  FieldPropsWithoutReferenceValue
+} from '@opencrvs/commons/client'
 import { getAdminStructureLocations } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
@@ -60,7 +62,7 @@ function AdministrativeAreaInput({
 
 function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const [locations] = getLocations.useQuery()
 
   const location = value.toString()
     ? locations.find((l) => l.id === value.toString())
