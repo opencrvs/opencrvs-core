@@ -17,67 +17,67 @@ const confirmModalMessages = {
   complete: {
     declare: {
       title: {
-        id: 'v2.review.declare.confirmModal.title',
+        id: 'review.declare.confirmModal.title',
         defaultMessage: 'Send for review?',
         description: 'The title for review action modal when declaring'
       },
       description: {
-        id: 'v2.review.declare.confirmModal.description',
+        id: 'review.declare.confirmModal.description',
         defaultMessage: 'This declaration will be sent for review',
         description: 'The description for review action modal when declaring'
       },
       onConfirm: {
-        id: 'v2.review.declare.confirmModal.confirm',
+        id: 'review.declare.confirmModal.confirm',
         defaultMessage: 'Confirm',
         description: 'The label for modal confirm button when declaring'
       },
       onCancel: {
-        id: 'v2.review.declare.confirmModal.cancel',
+        id: 'review.declare.confirmModal.cancel',
         defaultMessage: 'Cancel',
         description: 'The label for modal cancel button when declaring'
       }
     },
     validate: {
       title: {
-        id: 'v2.review.validate.confirmModal.title',
+        id: 'review.validate.confirmModal.title',
         defaultMessage: 'Send for approval?',
         description: 'The title for review action modal when validating'
       },
       description: {
-        id: 'v2.review.validate.confirmModal.description',
+        id: 'review.validate.confirmModal.description',
         defaultMessage:
           'This declaration will be sent for approval prior to registration.',
         description: 'The description for review action modal when validating'
       },
       onConfirm: {
-        id: 'v2.review.validate.confirmModal.confirm',
+        id: 'review.validate.confirmModal.confirm',
         defaultMessage: 'Confirm',
         description: 'The label for modal confirm button when validating'
       },
       onCancel: {
-        id: 'v2.review.validate.confirmModal.cancel',
+        id: 'review.validate.confirmModal.cancel',
         defaultMessage: 'Cancel',
         description: 'The label for modal cancel button when validating'
       }
     },
     register: {
       title: {
-        id: 'v2.review.register.confirmModal.title',
+        id: 'review.register.confirmModal.title',
         defaultMessage: 'Register the {event}?',
         description: 'The title for review action modal when registering'
       },
       description: {
-        id: 'v2.review.register.confirmModal.description',
+        id: 'review.register.confirmModal.description',
         defaultMessage: '‎', // intentionally empty, as the description is not used in v1
         description: 'The description for review action modal when registering'
       },
       onConfirm: {
-        id: 'v2.review.register.confirmModal.confirm',
+        id: 'review.register.confirmModal.confirm',
         defaultMessage: 'Register',
         description: 'The label for modal confirm button when registering'
       },
       onCancel: {
-        id: 'v2.review.register.confirmModal.cancel',
+        id: 'review.register.confirmModal.cancel',
         defaultMessage: 'Cancel',
         description: 'The label for modal cancel button when registering'
       }
@@ -86,23 +86,23 @@ const confirmModalMessages = {
   incomplete: {
     declare: {
       title: {
-        id: 'v2.review.declare.incomplete.confirmModal.title',
+        id: 'review.declare.incomplete.confirmModal.title',
         defaultMessage: 'Send for review?',
         description: 'The title for review action modal when declaring'
       },
       description: {
-        id: 'v2.review.declare.incomplete.confirmModal.description',
+        id: 'review.declare.incomplete.confirmModal.description',
         defaultMessage: 'This incomplete declaration will be sent for review.',
         description:
           'The description for review action modal when declaring incomplete'
       },
       onConfirm: {
-        id: 'v2.review.declare.incomplete.confirmModal.confirm',
+        id: 'review.declare.incomplete.confirmModal.confirm',
         defaultMessage: 'Confirm',
         description: 'The label for modal confirm button when declaring'
       },
       onCancel: {
-        id: 'v2.review.declare.incomplete.confirmModal.cancel',
+        id: 'review.declare.incomplete.confirmModal.cancel',
         defaultMessage: 'Cancel',
         description: 'The label for modal cancel button when declaring'
       }
@@ -111,17 +111,17 @@ const confirmModalMessages = {
 }
 const registerMessages = {
   title: {
-    id: 'v2.review.register.title',
+    id: 'review.register.title',
     defaultMessage: 'Register event',
     description: 'The title shown when reviewing a record to register'
   },
   onConfirm: {
-    id: 'v2.review.register.confirm',
+    id: 'review.register.confirm',
     defaultMessage: 'Register',
     description: 'The label for register button of review action'
   },
   onReject: {
-    id: 'v2.review.register.reject',
+    id: 'review.register.reject',
     defaultMessage: 'Reject',
     description: 'The label for reject button of review action'
   }
@@ -129,17 +129,17 @@ const registerMessages = {
 
 const validateMessages = {
   title: {
-    id: 'v2.review.validate.title',
+    id: 'review.validate.title',
     defaultMessage: 'Send for approval',
     description: 'The title shown when reviewing a record to validate'
   },
   onConfirm: {
-    id: 'v2.review.validate.confirm',
+    id: 'review.validate.confirm',
     defaultMessage: 'Send for approval',
     description: 'The label for review action button when validating'
   },
   onReject: {
-    id: 'v2.review.validate.reject',
+    id: 'review.validate.reject',
     defaultMessage: 'Reject',
     description: 'The label for reject button of review action'
   }
@@ -147,7 +147,7 @@ const validateMessages = {
 
 const declareMessages = {
   onConfirm: {
-    id: 'v2.review.declare.confirm',
+    id: 'review.declare.confirm',
     defaultMessage: 'Send for review',
     description: 'The label for review action button when declaring'
   }
@@ -158,7 +158,7 @@ export const reviewMessages = {
     register: {
       title: registerMessages.title,
       description: {
-        id: 'v2.review.register.description.complete',
+        id: 'review.register.description.complete',
         defaultMessage:
           'By clicking register, you confirm that the information entered is correct and the event can be registered.',
         description:
@@ -171,7 +171,7 @@ export const reviewMessages = {
     validate: {
       title: validateMessages.title,
       description: {
-        id: 'v2.review.validate.description.complete',
+        id: 'review.validate.description.complete',
         defaultMessage:
           'The informant will receive an email with a registration number that they can use to collect the certificate',
         description: 'The description for validate action when form is complete'
@@ -182,13 +182,13 @@ export const reviewMessages = {
     },
     declare: {
       title: {
-        id: 'v2.review.declare.title.complete',
+        id: 'review.declare.title.complete',
         defaultMessage: 'Declaration complete',
         description:
           'The title shown when reviewing an incomplete record to declare'
       },
       description: {
-        id: 'v2.review.declare.description.complete',
+        id: 'review.declare.description.complete',
         defaultMessage:
           'The informant will receive an email with a registration number that they can use to collect the certificate',
         description: 'The description for declare action when form is complete'
@@ -201,7 +201,7 @@ export const reviewMessages = {
     register: {
       title: registerMessages.title,
       description: {
-        id: 'v2.reviewAction.register.description.incomplete',
+        id: 'reviewAction.register.description.incomplete',
         defaultMessage: 'Please add mandatory information before registering',
         description:
           'The description for registration action when form is incomplete'
@@ -213,7 +213,7 @@ export const reviewMessages = {
     validate: {
       title: validateMessages.title,
       description: {
-        id: 'v2.review.validate.description.incomplete',
+        id: 'review.validate.description.incomplete',
         defaultMessage:
           'Please add mandatory information before sending for approval',
         description: 'The description for validate action when form is complete'
@@ -224,13 +224,13 @@ export const reviewMessages = {
     },
     declare: {
       title: {
-        id: 'v2.review.declare.title.incomplete',
+        id: 'review.declare.title.incomplete',
         defaultMessage: 'Declaration incomplete',
         description:
           'The title shown when reviewing an incomplete record to declare'
       },
       description: {
-        id: 'v2.review.declare.description.incomplete',
+        id: 'review.declare.description.incomplete',
         defaultMessage:
           'The informant will receive an email with a tracking ID that they can use to provide the additional mandatory information required for registration',
         description: 'The description for declare action when form is complete'
