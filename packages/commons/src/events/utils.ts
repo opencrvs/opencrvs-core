@@ -610,8 +610,6 @@ export function aggregateActionDeclarations(
     {}
   )
 
-  // console.log('aggregatedDeclaration', aggregatedDeclaration)
-
   return getOnlyVisibleFormValues(
     config.declaration.pages.flatMap(({ fields }) => fields),
     aggregatedDeclaration
