@@ -36,8 +36,9 @@ import { Output } from '@client/v2-events/features/events/components/Output'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { getOfflineData } from '@client/offline/selectors'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { IAdminStructureItem } from '@client/utils/referenceApi'
+import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -131,53 +132,8 @@ function isDomesticAddress() {
   )
 }
 
-type OutputMode = 'withIds' | 'withNames'
-/*
-Function to traverse the administrative level hierarchy from an arbitrary / leaf point
-*/
-function getAdminLevelHierarchy(
-  locationUuid: string | undefined,
-  locations: Location[],
-  adminStructure: string[],
-  outputMode: OutputMode = 'withIds'
-) {
-  // Collect location objects from leaf to root
-  const collectedLocations: Location[] = []
-
-  let current = locationUuid
-    ? locations.find((l) => l.id === locationUuid.toString())
-    : null
-
-  while (current) {
-    collectedLocations.push(current)
-    if (!current.parentId) {
-      break
-    }
-    const parentId = current.parentId
-    current = locations.find((l) => l.id === parentId)
-  }
-
-  // Reverse so root is first, leaf is last
-  collectedLocations.reverse()
-
-  // Map collected locations to the provided admin structure
-  const hierarchy: Partial<Record<string, string>> = {}
-  for (
-    let i = 0;
-    i < adminStructure.length && i < collectedLocations.length;
-    i++
-  ) {
-    hierarchy[adminStructure[i]] =
-      outputMode === 'withNames'
-        ? collectedLocations[i].name
-        : collectedLocations[i].id
-  }
-
-  return hierarchy
-}
-
 function generateAdminStructureFields(
-  inputArray: IAdminStructureItem[]
+  inputArray: AdminStructureItem[]
 ): AdministrativeArea[] {
   return inputArray.map((item, index) => {
     const { id, label } = item
@@ -337,15 +293,20 @@ function AddressInput(props: Props) {
       values,
       adminLevelIds
     )
-
-    onChange({
+    const addressValue = {
       ...values,
       administrativeArea:
         values.addressType === AddressType.DOMESTIC
           ? leafAdminLevelValue
           : undefined,
       streetLevelDetails: addressLines
-    } as AddressFieldValue)
+    }
+
+    const cleanedAddressValue = Object.fromEntries(
+      Object.entries(addressValue).filter(([_, v]) => v != null)
+    )
+
+    onChange(cleanedAddressValue as AddressFieldValue)
   }
 
   return (
@@ -456,7 +417,7 @@ function toCertificateVariables(
   context: {
     intl: IntlShape
     locations: Location[]
-    adminLevels?: IAdminStructureItem[]
+    adminLevels?: AdminStructureItem[]
   }
 ) {
   /*
