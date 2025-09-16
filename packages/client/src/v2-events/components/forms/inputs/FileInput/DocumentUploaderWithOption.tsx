@@ -69,6 +69,7 @@ function DocumentUploaderWithOption({
   onChange,
   name,
   description,
+  disabled,
   acceptedFileTypes = [],
   options,
   error,
@@ -78,6 +79,7 @@ function DocumentUploaderWithOption({
 }: {
   name: string
   description?: string
+  disabled?: boolean
   acceptedFileTypes?: MimeType[]
   options: SelectOption[]
   value: FileFieldWithOptionValue
@@ -173,6 +175,7 @@ function DocumentUploaderWithOption({
       <File.Input
         acceptedFileTypes={acceptedFileTypes}
         description={description}
+        disabled={disabled}
         error={error}
         label={
           typeof onlyOption.label === 'string'
@@ -222,6 +225,7 @@ function DocumentUploaderWithOption({
       <Flex>
         <DropdownContainer>
           <Select.Input
+            disabled={disabled}
             id={name}
             options={remainingOptions}
             type={'SELECT'}
@@ -233,7 +237,7 @@ function DocumentUploaderWithOption({
           />
         </DropdownContainer>
         <DocumentUploader
-          disabled={!selectedOption}
+          disabled={!selectedOption || disabled}
           id={name}
           name={name}
           onChange={handleFileChange}

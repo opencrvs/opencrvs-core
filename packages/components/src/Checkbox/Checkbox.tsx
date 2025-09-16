@@ -125,6 +125,7 @@ export const Checkbox = ({
   name,
   id,
   selected,
+  disabled,
   label,
   value,
   onChange,
@@ -137,6 +138,7 @@ export const Checkbox = ({
         role="checkbox"
         size={size === 'large' ? 40 : 16}
         type="checkbox"
+        disabled={disabled}
         checked={selected}
         name={name}
         value={value}

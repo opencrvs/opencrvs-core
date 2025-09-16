@@ -27,6 +27,7 @@ function CheckboxInput({
 
   return (
     <CheckboxComponent
+      disabled={props.disabled}
       id={props.id}
       label={intl.formatMessage(label)}
       name={props.id}

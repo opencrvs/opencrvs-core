@@ -108,6 +108,7 @@ interface IProps {
   touched?: boolean
   className?: string
   buttonLabel: string
+  disabled?: boolean
 }
 export class LocationSearch extends React.Component<IProps, IState> {
   searchTimeout: NodeJS.Timeout | undefined
@@ -270,6 +271,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
               data-testid={
                 this.props.id ? this.props.id : 'locationSearchInput'
               }
+              disabled={this.props.disabled}
               type="text"
               autoComplete="off"
               onFocus={this.onFocus}
@@ -292,7 +294,10 @@ export class LocationSearch extends React.Component<IProps, IState> {
             <SearchButton
               id="location-search-btn"
               onClick={this.props.searchButtonHandler}
-              disabled={!(this.state.selectedItem && this.state.selectedText)}
+              disabled={
+                !(this.state.selectedItem && this.state.selectedText) ||
+                this.props.disabled
+              }
             >
               {this.props.buttonLabel}
             </SearchButton>
@@ -301,6 +306,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
         {!this.state.selectedItem &&
           this.state.selectedText &&
           this.props.errorMessage &&
+          !this.props.disabled &&
           !this.state.isFocused && (
             <InputError id="location-search-error">
               {this.props.errorMessage}

@@ -185,7 +185,7 @@ function DateRangeInput({
       <DateFieldComponent
         {...props}
         data-testid={`${props.id}`}
-        disabled={dateRange.isDateRangeActive}
+        disabled={dateRange.isDateRangeActive || props.disabled}
         value={dateRange.exact}
         onBlur={(e) => {
           const segmentType = String(e.target.id.split('-').pop())

@@ -221,7 +221,7 @@ function getLeafAdministrativeLevel(
  * - In search mode, only displays admin structure and town/village fields.
  */
 function AddressInput(props: Props) {
-  const { onChange, defaultValue, value, ...otherProps } = props
+  const { onChange, defaultValue, disabled, value, ...otherProps } = props
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
@@ -285,7 +285,9 @@ function AddressInput(props: Props) {
     adminLevelIds
   )
 
-  const fields = [COUNTRY_FIELD, ...adminStructure, ...addressFields]
+  const fields = [COUNTRY_FIELD, ...adminStructure, ...addressFields].map(
+    (x) => ({ ...x, disabled })
+  )
 
   const handleChange = (values: EventState) => {
     const addressLines = extractAddressLines(values, adminLevelIds)

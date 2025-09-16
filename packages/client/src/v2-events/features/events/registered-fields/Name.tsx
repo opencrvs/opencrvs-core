@@ -28,6 +28,7 @@ interface Props {
   configuration?: NameField['configuration']
   validation: FieldConfig['validation']
   value?: NameFieldValue
+  disabled?: boolean
 }
 
 const defailtNameFieldValue: NameFieldValue = {
@@ -110,7 +111,7 @@ function FocusNameInputsOnHash({
 }
 
 function NameInput(props: Props) {
-  const { id, onChange, value = {}, configuration } = props
+  const { id, onChange, disabled, value = {}, configuration } = props
 
   const { maxLength, order } = configuration || {}
 
@@ -136,6 +137,7 @@ function NameInput(props: Props) {
           type: FieldType.TEXT,
           configuration: { maxLength },
           required: nameConfig.firstname?.required,
+          disabled,
           label: nameConfig.firstname?.label || {
             defaultMessage: 'First name(s)',
             description: 'This is the label for the firstname field',
@@ -149,6 +151,7 @@ function NameInput(props: Props) {
           type: FieldType.TEXT,
           configuration: { maxLength },
           required: nameConfig.middlename?.required,
+          disabled,
           label: nameConfig.middlename?.label || {
             defaultMessage: 'Middle name',
             description: 'This is the label for the middlename field',
@@ -161,6 +164,7 @@ function NameInput(props: Props) {
           id: 'surname',
           type: FieldType.TEXT,
           required: nameConfig.surname?.required,
+          disabled,
           configuration: { maxLength },
           label: nameConfig.surname?.label || {
             defaultMessage: 'Last name',

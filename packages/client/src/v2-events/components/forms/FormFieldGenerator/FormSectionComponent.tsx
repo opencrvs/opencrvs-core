@@ -412,7 +412,8 @@ export function FormSectionComponent({
 
         const isDisabled =
           !isFieldEnabled(field, completeForm) ||
-          (isCorrection && field.uncorrectable)
+          (isCorrection && field.uncorrectable) ||
+          field.disabled
 
         const visibleError = errors[field.id]?.errors[0]?.message
         const error = visibleError ? intl.formatMessage(visibleError) : ''
