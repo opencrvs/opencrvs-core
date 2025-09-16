@@ -31,26 +31,18 @@ type SupportedActionTypes =
   | typeof ActionType.REQUEST_CORRECTION
 
 /**
- * Creates an optimistic update function for event actions with proper typing.
+ * Optimistically update an event by creating a placeholder/temporary action, before the actual mutation completes.
  *
- * This function provides type-safe handling of requestId based on the action type:
- * - For actions that require requestId (APPROVE_CORRECTION, REJECT_CORRECTION),
- *   the function will automatically include the requestId if present in variables
- * - For other actions, requestId will be ignored
- *
- * @param options - Configuration for the optimistic update
- * @param options.actionType - The type of action being performed
- * @param options.status - Optional status override for the action
- * @param options.declaration - Optional declaration override
- * @param options.useUpdateLocalEventIndex - Whether to update the local event index
- * @returns A function that performs the optimistic update
+ * @param actionType - The type of action being performed
+ * @param status - Optional status override for the action (defaults to ActionStatus.Accepted)
+ * @param useUpdateLocalEventIndex - Whether to update the local event index instead of the full event data (defaults to false)
+ * @returns A function that performs the optimistic update and returns the created optimistic action
  */
-export function updateEventOptimistically<T extends ActionInput>(options: {
-  actionType: SupportedActionTypes
-  status?: ActionStatus
-  declaration?: Record<string, unknown>
-  useUpdateLocalEventIndex?: boolean
-}) {
+export function updateEventOptimistically<T extends ActionInput>(
+  actionType: SupportedActionTypes,
+  status: ActionStatus = ActionStatus.Accepted,
+  useUpdateLocalEventIndex: boolean = false
+) {
   return (variables: T) => {
     const localEvent = queryClient.getQueryData(
       trpcOptionsProxy.event.get.queryKey(variables.eventId)
@@ -65,6 +57,8 @@ export function updateEventOptimistically<T extends ActionInput>(options: {
       return
     }
 
+    // Unfortunately I was not able to get the typing correct without casting as ActionDocument
+    // but I think the solution is otherwise neat so let's go with it for now.
     const optimisticAction = {
       ...variables,
       id: createTemporaryId(),
@@ -73,9 +67,9 @@ export function updateEventOptimistically<T extends ActionInput>(options: {
       createdByUserType: 'user' as const,
       createdBy: '@todo',
       createdAtLocation: '@todo' as UUID,
-      status: options.status || ActionStatus.Requested,
+      status,
       createdByRole: '@todo',
-      type: options.actionType
+      type: actionType
     } as ActionDocument
 
     const optimisticEvent = {
@@ -83,7 +77,7 @@ export function updateEventOptimistically<T extends ActionInput>(options: {
       actions: [...localEvent.actions, optimisticAction]
     }
 
-    if (options.useUpdateLocalEventIndex) {
+    if (useUpdateLocalEventIndex) {
       updateLocalEventIndex(optimisticEvent.id, optimisticEvent)
     } else {
       setEventData(optimisticEvent.id, optimisticEvent)

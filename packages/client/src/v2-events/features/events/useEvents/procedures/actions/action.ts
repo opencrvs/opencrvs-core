@@ -122,10 +122,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  onMutate: updateEventOptimistically({
-    actionType: ActionType.DECLARE,
-    useUpdateLocalEventIndex: true
-  }),
+  onMutate: updateEventOptimistically(
+    ActionType.DECLARE,
+    ActionStatus.Requested
+  ),
   meta: { actionType: ActionType.DECLARE }
 })
 
@@ -215,11 +215,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve.request, {
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.APPROVE_CORRECTION },
-  onMutate: updateEventOptimistically({
-    actionType: ActionType.APPROVE_CORRECTION,
-    status: ActionStatus.Accepted,
-    declaration: {}
-  })
+  onMutate: updateEventOptimistically(ActionType.APPROVE_CORRECTION)
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject.request, {
@@ -273,10 +269,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onMutate: updateEventOptimistically({
-    actionType: ActionType.MARK_AS_NOT_DUPLICATE,
-    status: ActionStatus.Accepted
-  }),
+  onMutate: updateEventOptimistically(ActionType.MARK_AS_NOT_DUPLICATE),
   onSuccess: updateLocalEvent,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.MARK_AS_NOT_DUPLICATE }
@@ -344,21 +337,18 @@ queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.APPROVE_CORRECTION },
   onMutate: (variables) => {
-    const optimisticAction = updateEventOptimistically({
-      actionType: ActionType.REQUEST_CORRECTION
-    })(variables)
-
-    console.log('optimisticAction', JSON.stringify(optimisticAction, null, 2))
+    const optimisticAction = updateEventOptimistically(
+      ActionType.REQUEST_CORRECTION
+    )(variables)
 
     if (!optimisticAction) {
       return
     }
 
-    console.log('optimisticAction.id', optimisticAction.id)
-
-    updateEventOptimistically({
-      actionType: ActionType.APPROVE_CORRECTION
-    })({ ...variables, requestId: optimisticAction.id })
+    updateEventOptimistically(ActionType.APPROVE_CORRECTION)({
+      ...variables,
+      requestId: optimisticAction.id
+    })
   }
 })
 
