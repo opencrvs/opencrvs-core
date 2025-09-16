@@ -11,7 +11,6 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import { TRPCError } from '@trpc/server/unstable-core-do-not-import'
 import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -124,19 +123,16 @@ export const eventRouter = router({
       })
     }),
   get: publicProcedure
-    .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.READ]))
     .input(UUID)
-    .query(async ({ input, ctx }) => {
-      const event = await getEventById(input)
-
-      if (!ctx.authorizedEntities?.events?.includes(event.type)) {
-        throw new TRPCError({ code: 'FORBIDDEN' })
-      }
+    .use(middleware.userCanReadEvent)
+    .query(async ({ ctx }) => {
+      const event = ctx.event
 
       const configuration = await getEventConfigurationById({
         token: ctx.token,
         eventType: event.type
       })
+
       const updatedEvent = await processAction(
         {
           type: ActionType.READ,
