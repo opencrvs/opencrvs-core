@@ -97,7 +97,7 @@ function toCertificateVariables(
   }
 ) {
   const { intl, locations, adminLevels = [] } = context
-  const appConfigAdminLevels = adminLevels.map((level) => level.id).reverse()
+  const appConfigAdminLevels = adminLevels.map((level) => level.id)
 
   if (!value) {
     return {
@@ -148,6 +148,7 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
   const resolvedAdminLevels = adminLevels
     .map((level) => certificateVars[level.id])
     .filter(Boolean)
+    .reverse()
 
   return [name, ...resolvedAdminLevels, country]
     .filter((loc) => loc !== '')
