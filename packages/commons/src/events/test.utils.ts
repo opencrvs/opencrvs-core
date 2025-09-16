@@ -19,7 +19,6 @@ import {
   ActionStatus,
   EventState,
   PrintCertificateAction,
-  ActionUpdate,
   DuplicateDetectedAction
 } from './ActionDocument'
 import {
@@ -209,7 +208,10 @@ export function mapFieldTypeToMockValue(
   }
 }
 
-function fieldConfigsToActionPayload(fields: FieldConfig[], rng: () => number) {
+function fieldConfigsToActionPayload(
+  fields: FieldConfig[],
+  rng: () => number
+): EventState {
   return fields.reduce(
     (acc, field, i) => ({
       ...acc,
@@ -713,48 +715,42 @@ export function eventPayloadGenerator(
   }
 }
 
-export function generateActionDocument({
+export function generateActionDocument<T extends ActionType>({
   configuration,
   action,
   rng = () => 0.1,
-  defaults = {},
-  user = {},
-  annotation,
+  defaults,
   declarationOverrides
 }: {
   configuration: EventConfig
-  action: ActionType
+  action: T
   rng?: () => number
-  defaults?: Partial<ActionDocument>
-  user?: Partial<{
-    signature: string
-    primaryOfficeId: UUID
-    role: TestUserRole
-    id: string
-  }>
-  annotation?: ActionUpdate
+  defaults?: Partial<Extract<ActionDocument, { type: T }>>
   declarationOverrides?: Partial<EventState>
 }): ActionDocument {
   const actionBase = {
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
-    createdAt: new Date(Date.now() - 500).toISOString(),
-    createdBy: user.id ?? getUUID(),
-    createdByUserType: TokenUserType.Enum.user,
-    createdByRole: TestUserRole.Enum.FIELD_AGENT,
-    id: getUUID(),
+    createdAt: defaults?.createdAt ?? new Date(Date.now() - 500).toISOString(),
+    createdBy: defaults?.createdBy ?? getUUID(),
+    createdByUserType: defaults?.createdByUserType ?? TokenUserType.Enum.user,
+    createdByRole: defaults?.createdByRole ?? TestUserRole.Enum.FIELD_AGENT,
+    id: defaults?.id ?? getUUID(),
     createdAtLocation:
-      user.primaryOfficeId ?? ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID),
-    declaration: generateActionDeclarationInput(
-      configuration,
-      action,
-      rng,
-      declarationOverrides
-    ),
-    annotation: annotation ?? {},
-    status: ActionStatus.Accepted,
-    transactionId: getUUID(),
-    ...defaults
+      defaults?.createdAtLocation ??
+      ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID),
+    declaration:
+      defaults?.declaration ??
+      generateActionDeclarationInput(
+        configuration,
+        action,
+        rng,
+        declarationOverrides
+      ),
+    annotation: defaults?.annotation ?? {},
+    status: defaults?.status ?? ActionStatus.Accepted,
+    transactionId: defaults?.transactionId ?? getUUID(),
+    originalActionId: defaults?.originalActionId
   } satisfies ActionBase
 
   switch (action) {
@@ -768,8 +764,16 @@ export function generateActionDocument({
       return { ...actionBase, type: action }
     case ActionType.UNASSIGN:
       return { ...actionBase, type: action }
-    case ActionType.ASSIGN:
-      return { ...actionBase, assignedTo: getUUID(), type: action }
+    case ActionType.ASSIGN: {
+      const assignActionDefaults = defaults as
+        | Partial<Extract<ActionDocument, { type: 'ASSIGN' }>>
+        | undefined
+      return {
+        ...actionBase,
+        assignedTo: assignActionDefaults?.assignedTo ?? getUUID(),
+        type: action
+      }
+    }
     case ActionType.VALIDATE:
       return { ...actionBase, type: action }
     case ActionType.ARCHIVE:
@@ -780,12 +784,16 @@ export function generateActionDocument({
       return { ...actionBase, type: action }
     case ActionType.NOTIFY:
       return { ...actionBase, type: action }
-    case ActionType.PRINT_CERTIFICATE:
+    case ActionType.PRINT_CERTIFICATE: {
+      const printActionDefaults = defaults as
+        | Partial<PrintCertificateAction>
+        | undefined
       return {
         ...actionBase,
         type: action,
-        content: (defaults as Partial<PrintCertificateAction>).content
+        content: printActionDefaults?.content
       }
+    }
     case ActionType.REQUEST_CORRECTION:
       return { ...actionBase, type: action }
     case ActionType.APPROVE_CORRECTION:
@@ -802,16 +810,18 @@ export function generateActionDocument({
         ...actionBase,
         type: action
       }
-    case ActionType.DUPLICATE_DETECTED:
+    case ActionType.DUPLICATE_DETECTED: {
+      const duplicateActionDefaults = defaults as
+        | Partial<DuplicateDetectedAction>
+        | undefined
       return {
         ...actionBase,
         type: action,
         content: {
-          duplicates:
-            (defaults as Partial<DuplicateDetectedAction>).content
-              ?.duplicates ?? []
+          duplicates: duplicateActionDefaults?.content?.duplicates ?? []
         }
       }
+    }
     case ActionType.DELETE:
     default:
       throw new Error(`Unsupported action type: ${action}`)
@@ -847,7 +857,10 @@ export function generateEventDocument({
         configuration,
         action,
         rng,
-        user,
+        defaults: {
+          createdBy: user?.id,
+          createdAtLocation: user?.primaryOfficeId
+        },
         declarationOverrides
       })
     ),

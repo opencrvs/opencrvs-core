@@ -180,11 +180,13 @@ const actions = [
   generateActionDocument({
     configuration: tennisClubMembershipEvent,
     action: ActionType.DECLARE,
-    annotation: {
-      'review.signature': {
-        type: 'image/png',
-        originalFilename: 'signature.png',
-        path: '/ocrvs/signature.png'
+    defaults: {
+      annotation: {
+        'review.signature': {
+          type: 'image/png',
+          originalFilename: 'signature.png',
+          path: '/ocrvs/signature.png'
+        }
       }
     }
   })
