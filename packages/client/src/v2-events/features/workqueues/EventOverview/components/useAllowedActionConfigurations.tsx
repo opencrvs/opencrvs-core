@@ -26,7 +26,8 @@ import {
   workqueueActions,
   Draft,
   isActionInScope,
-  configurableEventScopeAllowed
+  configurableEventScopeAllowed,
+  canUserReadEvent
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -94,67 +95,67 @@ function getAvailableAssignmentActions(
 
 export const actionLabels = {
   [ActionType.READ]: {
-    id: 'v2.action.view.record',
+    id: 'action.view.record',
     description: 'Label for view record',
     defaultMessage: 'View'
   },
   [ActionType.ASSIGN]: {
     defaultMessage: 'Assign',
     description: `Label for the ${ActionType.ASSIGN} action in the action menu`,
-    id: 'v2.action.assign.label'
+    id: 'action.assign.label'
   },
   [ActionType.UNASSIGN]: {
     defaultMessage: 'Unassign',
     description: `Label for the ${ActionType.UNASSIGN} action in the action menu`,
-    id: 'v2.action.unassign.label'
+    id: 'action.unassign.label'
   },
   [ActionType.DECLARE]: {
     defaultMessage: 'Declare',
     description:
       'This is shown as the action name anywhere the user can trigger the action from',
-    id: 'v2.event.birth.action.declare.label'
+    id: 'event.birth.action.declare.label'
   },
   [ActionType.VALIDATE]: {
     defaultMessage: 'Review',
     description:
       'This is shown as the action name anywhere the user can trigger the action from',
-    id: 'v2.event.birth.action.validate.label'
+    id: 'event.birth.action.validate.label'
   },
   [ActionType.ARCHIVE]: {
     defaultMessage: 'Archive',
     description: 'Label for archive record button in dropdown menu',
-    id: 'v2.event.birth.action.archive.label'
+    id: 'event.birth.action.archive.label'
   },
   [ActionType.REGISTER]: {
     defaultMessage: 'Review',
     description: 'Label for review record button in dropdown menu',
-    id: 'v2.event.birth.action.register.label'
+    id: 'event.birth.action.register.label'
   },
   [ActionType.MARK_AS_DUPLICATE]: {
     defaultMessage: 'Review',
     description: 'Label for review potential duplicate button in dropdown menu',
-    id: 'v2.event.birth.action.mark-as-duplicate.label'
+    id: 'event.birth.action.mark-as-duplicate.label'
   },
   [ActionType.PRINT_CERTIFICATE]: {
     defaultMessage: 'Print',
     description:
       'This is shown as the action name anywhere the user can trigger the action from',
-    id: 'v2.event.birth.action.collect-certificate.label'
+    id: 'event.birth.action.collect-certificate.label'
   },
   [ActionType.DELETE]: {
     defaultMessage: 'Delete',
     description: 'Label for delete button in dropdown menu',
-    id: 'v2.event.birth.action.delete.label'
+    id: 'event.birth.action.delete.label'
   },
   [ActionType.REQUEST_CORRECTION]: {
     defaultMessage: 'Correct record',
     description: 'Label for request correction button in dropdown menu',
-    id: 'v2.event.birth.action.request-correction.label'
+    id: 'event.birth.action.request-correction.label'
   },
   [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
     defaultMessage: 'Review',
     description: 'Label for review correction button in dropdown menu',
-    id: 'v2.event.action.review-correction.label'
+    id: 'event.action.review-correction.label'
   }
 } as const
 
@@ -529,7 +530,15 @@ export function useAllowedActionConfigurations(
         ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
         workqueueActions.safeParse(action).success
     )
-    .filter(isActionAllowed)
+    .filter(
+      (action) =>
+        isActionAllowed(action) ||
+        (action === ActionType.READ &&
+          canUserReadEvent(event, {
+            userId: authentication.sub,
+            scopes: authentication.scope
+          }))
+    )
     // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
     .map((a) => ({ ...config[a], type: a }))
     .filter((a: ActionConfig) => !a.hidden)

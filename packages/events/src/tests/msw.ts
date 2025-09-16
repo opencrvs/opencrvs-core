@@ -40,6 +40,9 @@ const handlers = [
   http.delete(`${env.DOCUMENTS_URL}/files/:filePath*`, () => {
     return HttpResponse.json({ ok: true })
   }),
+  http.get(`${env.DOCUMENTS_URL}/list-files/:eventId*`, () => {
+    return HttpResponse.json([])
+  }),
   http.post(
     `${env.COUNTRY_CONFIG_URL}/trigger/events/:event/actions/:action`,
     (ctx) => {

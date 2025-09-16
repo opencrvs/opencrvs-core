@@ -13,7 +13,7 @@ import { IntlShape, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { EventState, FieldConfig, FieldValue } from '@opencrvs/commons/client'
 import { getRegisteredFieldByFieldConfig } from '@client/v2-events/features/events/registered-fields'
-import { IAdminStructureItem } from '@client/utils/referenceApi'
+import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getOfflineData } from '@client/offline/selectors'
 import { useLocations } from './useLocations'
 interface RecursiveStringRecord {
@@ -55,7 +55,7 @@ function formDataStringifierFactory(stringifier: FieldStringifier) {
 export const getFormDataStringifier = (
   intl: IntlShape,
   locations: Location[],
-  adminLevels?: IAdminStructureItem[]
+  adminLevels?: AdminStructureItem[]
 ) => {
   const stringifier = (fieldConfig: FieldConfig, value: FieldValue) => {
     const field = getRegisteredFieldByFieldConfig(fieldConfig)

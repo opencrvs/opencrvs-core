@@ -56,6 +56,24 @@ const locations = [
     locationType: 'ADMIN_STRUCTURE'
   }
 ] as Location[]
+const adminLevels = [
+  {
+    id: 'province',
+    label: {
+      id: 'v2.field.address.province.label',
+      defaultMessage: 'Province',
+      description: 'Label for province in address'
+    }
+  },
+  {
+    id: 'district',
+    label: {
+      id: 'v2.field.address.district.label',
+      defaultMessage: 'District',
+      description: 'Label for district in address'
+    }
+  }
+]
 const userId = '677fb08730f3abfa33072769'
 
 describe('stringifyEventMetadata', () => {
@@ -96,7 +114,8 @@ describe('stringifyEventMetadata', () => {
       },
       locations,
       users,
-      intl: createIntl({ locale: 'en' })
+      intl: createIntl({ locale: 'en' }),
+      adminLevels
     })
     expect(stringified).toMatchSnapshot()
   })
@@ -178,7 +197,7 @@ function expectRenderOutput(template: string, output: string) {
       {
         id: 'province',
         label: {
-          id: 'v2.field.address.province.label',
+          id: 'field.address.province.label',
           defaultMessage: 'Province',
           description: 'Label for province in address'
         }
@@ -186,7 +205,7 @@ function expectRenderOutput(template: string, output: string) {
       {
         id: 'district',
         label: {
-          id: 'v2.field.address.district.label',
+          id: 'field.address.district.label',
           defaultMessage: 'District',
           description: 'Label for district in address'
         }
