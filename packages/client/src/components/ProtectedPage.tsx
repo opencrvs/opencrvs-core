@@ -173,7 +173,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   }
 
   renderLoadingScreen() {
-    return <LoadingBar />
+    return <LoadingBar message="Loading records..." />
   }
 
   conditionalRenderUponSecuredState() {
