@@ -18,11 +18,8 @@ import {
   omitHiddenFields,
   runFieldValidations,
   runStructuralValidations,
-  Location,
-  LocationType,
   UUID
 } from '@opencrvs/commons/client'
-import { getLeafLocationIds } from '../../hooks/useLocations'
 
 interface FieldErrors {
   errors: {

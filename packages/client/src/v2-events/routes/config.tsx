@@ -13,7 +13,7 @@ import React, { useEffect } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
 import { useSelector } from 'react-redux'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType, LocationType } from '@opencrvs/commons/client'
 import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
@@ -64,7 +64,7 @@ function PrefetchQueries() {
     void queryClient.prefetchQuery({
       queryKey: trpcOptionsProxy.locations.get.queryKey({
         isActive: true,
-        locationType: 'HEALTH_FACILITY'
+        locationType: LocationType.Enum.HEALTH_FACILITY
       })
     })
 

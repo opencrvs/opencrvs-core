@@ -1287,7 +1287,8 @@ export const handlers = {
         entry: [
           {
             fullUrl:
-              'http://localhost:2021/location/5ef450bc-712d-48ad-93f3-8da0fa453baa/_history/8ae119de-682a-40fa-be03-9de10fc07d53',
+              // @NOTE: Addresss component uses both V1 and V2. It should use only V2 api in the long run. Meanwhile, ensure ids match.
+              'http://localhost:2021/location/62a0ccb4-880d-4f30-8882-f256007dfff9/_history/8ae119de-682a-40fa-be03-9de10fc07d53',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1352,11 +1353,11 @@ export const handlers = {
                 lastUpdated: '2025-02-05T07:52:42.267+00:00',
                 versionId: '8ae119de-682a-40fa-be03-9de10fc07d53'
               },
-              id: '5ef450bc-712d-48ad-93f3-8da0fa453baa'
+              id: '62a0ccb4-880d-4f30-8882-f256007dfff9'
             },
             request: {
               method: 'PUT',
-              url: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+              url: 'Location/62a0ccb4-880d-4f30-8882-f256007dfff9'
             }
           },
           {
@@ -1375,7 +1376,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+                reference: 'Location/62a0ccb4-880d-4f30-8882-f256007dfff9'
               },
               type: {
                 coding: [
@@ -1452,7 +1453,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+                reference: 'Location/62a0ccb4-880d-4f30-8882-f256007dfff9'
               },
               type: {
                 coding: [
@@ -1714,7 +1715,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+                reference: 'Location/62a0ccb4-880d-4f30-8882-f256007dfff9'
               },
               type: {
                 coding: [
@@ -2010,7 +2011,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+                reference: 'Location/62a0ccb4-880d-4f30-8882-f256007dfff9'
               },
               type: {
                 coding: [
