@@ -169,7 +169,6 @@ function DataInput({
             if (!config) {
               return null
             }
-            console.log({ value, config })
 
             return (
               <React.Fragment key={config.id}>

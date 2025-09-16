@@ -10,17 +10,36 @@
  */
 
 import React, { useState } from 'react'
-import { FieldValue, HttpField, HttpFieldValue } from '@opencrvs/commons/client'
+import { HttpFieldValue, SearchQuery } from '@opencrvs/commons/client'
 import { TextInput } from '@opencrvs/components'
 import { Http, Props } from './Http'
 
-function SearchInput({ onChange }: Omit<Props, 'configuration'>) {
+function replaceTerm<T>(term: string, query: T): T {
+  if (typeof query === 'string') {
+    return query.replace('{term}', term) as T
+  } else if (Array.isArray(query)) {
+    return query.map((q) => replaceTerm(term, q)) as T
+  } else if (typeof query === 'object' && query !== null) {
+    const newObj: Record<string, unknown> = {}
+    for (const key in query) {
+      newObj[key] = replaceTerm(term, query[key])
+    }
+    return newObj as T
+  }
+  return query
+}
+
+function SearchInput({
+  onChange,
+  configuration
+}: Omit<Props, 'configuration'> & {
+  configuration: SearchQuery
+}) {
   const [inputState, setInputState] = useState('')
   const [buttonPressed, setButtonPressed] = useState(0)
   const [httpState, setHttpState] = useState<HttpFieldValue | null>(null)
 
   const onHTTPChange = (value: HttpFieldValue) => {
-    console.log(value)
     onChange(value)
     setHttpState(value)
   }
@@ -44,17 +63,7 @@ function SearchInput({ onChange }: Omit<Props, 'configuration'>) {
             'Content-Type': 'application/json'
           },
           body: {
-            query: {
-              type: 'or',
-              clauses: [
-                {
-                  'legalStatuses.REGISTERED.registrationNumber': {
-                    term: inputState,
-                    type: 'exact'
-                  }
-                }
-              ]
-            },
+            query: replaceTerm(inputState, configuration.query),
             limit: 10,
             offset: 0
           }

@@ -14,11 +14,7 @@ import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
 import { http, HttpResponse } from 'msw'
 import React from 'react'
 import styled from 'styled-components'
-import {
-  field,
-  FieldType,
-  tennisClubMembershipEvent
-} from '@opencrvs/commons/client'
+import { field, FieldType } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 
@@ -143,6 +139,21 @@ export const SearchWithRegistrationNumber: StoryObj<typeof FormFieldGenerator> =
                 defaultMessage: 'Birth registration number',
                 description: 'BRN for child',
                 id: 'event.birth.child.brn.label'
+              },
+              configuration: {
+                query: {
+                  type: 'or',
+                  clauses: [
+                    {
+                      'legalStatuses.REGISTERED.registrationNumber': {
+                        term: '{term}',
+                        type: 'exact'
+                      }
+                    }
+                  ]
+                },
+                limit: 10,
+                offset: 0
               }
             },
             {

@@ -34,6 +34,7 @@ import {
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
+import { SearchQuery } from './EventIndex'
 extendZodWithOpenApi(z)
 
 const FieldId = z.string().describe('Unique identifier for the field')
@@ -610,7 +611,7 @@ export type HttpField = z.infer<typeof HttpField>
 
 const SearchField = HttpField.extend({
   type: z.literal(FieldType.SEARCH),
-  configuration: z.void()
+  configuration: SearchQuery
 })
 
 export type SearchField = z.infer<typeof SearchField>
