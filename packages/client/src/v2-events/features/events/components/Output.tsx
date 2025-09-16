@@ -13,8 +13,6 @@ import React from 'react'
 import styled from 'styled-components'
 import * as _ from 'lodash'
 import { isUndefined } from 'lodash'
-import ReactDOMServer from 'react-dom/server'
-import { IntlProvider } from 'react-intl'
 import {
   FieldConfig,
   FieldValue,
@@ -233,7 +231,7 @@ function isEmptyValue(field: FieldConfig, value: unknown) {
     'isEmptyValue' in module &&
     typeof module.isEmptyValue === 'function'
   ) {
-    return module.isEmptyValue(value)
+    return Boolean(value) ? module.isEmptyValue(value) : true
   }
   return !Boolean(value)
 }
