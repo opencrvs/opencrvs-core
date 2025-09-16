@@ -13,7 +13,10 @@ import { useSelector } from 'react-redux'
 import { IntlShape, useIntl } from 'react-intl'
 import { Location } from '@events/service/locations/locations'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
-import { FieldPropsWithoutReferenceValue } from '@opencrvs/commons/client'
+import {
+  FieldPropsWithoutReferenceValue,
+  joinValues
+} from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { getListOfLocations } from '@client/utils/validate'
 import { generateLocations } from '@client/utils/locationUtils'
@@ -150,9 +153,7 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
     .filter(Boolean)
     .reverse()
 
-  return [name, ...resolvedAdminLevels, country]
-    .filter((loc) => loc !== '')
-    .join(', ')
+  return joinValues([name, ...resolvedAdminLevels, country], ', ')
 }
 
 export const LocationSearch = {

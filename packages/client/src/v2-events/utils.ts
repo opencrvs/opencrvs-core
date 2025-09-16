@@ -284,7 +284,7 @@ type OutputMode = 'withIds' | 'withNames'
 Function to traverse the administrative level hierarchy from an arbitrary / leaf point
 */
 export function getAdminLevelHierarchy(
-  locationUuid: string | undefined,
+  locationId: string | undefined,
   locations: Location[],
   adminStructure: string[],
   outputMode: OutputMode = 'withIds'
@@ -292,8 +292,8 @@ export function getAdminLevelHierarchy(
   // Collect location objects from leaf to root
   const collectedLocations: Location[] = []
 
-  let current = locationUuid
-    ? locations.find((l) => l.id === locationUuid.toString())
+  let current = locationId
+    ? locations.find((l) => l.id === locationId.toString())
     : null
 
   while (current) {
