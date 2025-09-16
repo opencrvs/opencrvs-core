@@ -13,7 +13,8 @@ import { IntlShape, useIntl } from 'react-intl'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
 import {
   FieldPropsWithoutReferenceValue,
-  Location
+  Location,
+  LocationType
 } from '@opencrvs/commons/client'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
@@ -26,7 +27,7 @@ interface SearchLocation {
 
 const resourceTypeMap: Record<
   'locations' | 'facilities' | 'offices',
-  'ADMIN_STRUCTURE' | 'HEALTH_FACILITY' | 'CRVS_OFFICE'
+  LocationType
 > = {
   locations: 'ADMIN_STRUCTURE',
   facilities: 'HEALTH_FACILITY',
@@ -37,10 +38,17 @@ function useAdministrativeAreas(
   searchableResource: ('locations' | 'facilities' | 'offices')[]
 ) {
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery({
-    isActive: true,
-    locationType: 'HEALTH_FACILITY'
-  }) // get only active locations for input fields
+
+  // Run queries for each resource type
+  const results = searchableResource.map((resource) => {
+    const [resourceLocations] = getLocations.useSuspenseQuery({
+      isActive: true,
+      locationType: resourceTypeMap[resource]
+    })
+    return resourceLocations
+  })
+
+  const locations = results.flat()
   const locationsBasedOnSearchableResource = locations.filter((location) =>
     searchableResource.some(
       (resource) => location.locationType === resourceTypeMap[resource]
