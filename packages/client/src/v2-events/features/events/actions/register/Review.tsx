@@ -92,15 +92,12 @@ export function Review() {
   const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form,
     annotation,
     reviewFields: reviewConfig.fields,
-    locations: adminStructureLocations
+    locations
   })
 
   const messages = getTranslations(incomplete)
@@ -218,7 +215,7 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
-        locations={adminStructureLocations}
+        locations={locations}
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}

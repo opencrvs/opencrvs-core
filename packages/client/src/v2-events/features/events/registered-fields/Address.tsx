@@ -41,6 +41,21 @@ import { IAdminStructureItem } from '@client/utils/referenceApi'
 import { getUserDetails } from '@client/profile/profileSelectors'
 
 /**
+ *
+ * @returns given the type of location, check if it matches the provided types. When no types are provided, always returns true.
+ */
+function matchesType(
+  type: LocationType | null,
+  locationTypes?: LocationType[]
+) {
+  return (
+    !locationTypes ||
+    locationTypes.length === 0 ||
+    (type !== null && locationTypes.includes(type))
+  )
+}
+
+/**
  * Get the leaf location IDs from a list of locations.
  *
  * A leaf location is defined as a location that does not have any children in the provided list.
@@ -54,29 +69,24 @@ export function getLeafLocationIds(
   locations: Location[],
   locationTypes?: LocationType[]
 ): Array<{ id: UUID }> {
-  const nonLeafs = new Set<string>()
-  const idToType = new Map<string, LocationType | null>()
+  const nonLeafLocationIds = new Set<string>()
 
-  for (const loc of locations) {
-    idToType.set(loc.id, loc.locationType)
-
-    if (loc.parentId) {
-      nonLeafs.add(loc.parentId)
+  for (const location of locations) {
+    if (
+      location.parentId &&
+      matchesType(location.locationType, locationTypes)
+    ) {
+      nonLeafLocationIds.add(location.parentId)
     }
   }
 
   const result: { id: UUID }[] = []
   for (const loc of locations) {
-    // candidate leaf if it never appears as a parent
-    if (!nonLeafs.has(loc.id)) {
-      const type = loc.locationType ? idToType.get(loc.locationType) : null
-      if (
-        !locationTypes ||
-        locationTypes.length === 0 ||
-        (type && locationTypes.some((lt) => lt === type))
-      ) {
-        result.push({ id: loc.id })
-      }
+    if (
+      !nonLeafLocationIds.has(loc.id) &&
+      matchesType(loc.locationType, locationTypes)
+    ) {
+      result.push({ id: loc.id })
     }
   }
 
