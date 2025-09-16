@@ -97,7 +97,7 @@ function toCertificateVariables(
   }
 ) {
   const { intl, locations, adminLevels = [] } = context
-  const appConfigAdminLevels = adminLevels.map((level) => level.id)
+  const appConfigAdminLevels = adminLevels.map((level) => level.id).reverse()
 
   if (!value) {
     return {
