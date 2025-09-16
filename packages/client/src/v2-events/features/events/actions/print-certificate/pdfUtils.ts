@@ -39,7 +39,7 @@ import { isMobileDevice } from '@client/utils/commonUtils'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { LocationSearch } from '@client/v2-events/features/events/registered-fields'
-import { IAdminStructureItem } from '@client/utils/referenceApi'
+import { AdminStructureItem } from '@client/utils/referenceApi'
 
 interface FontFamilyTypes {
   normal: string
@@ -84,7 +84,7 @@ export const stringifyEventMetadata = ({
   intl: IntlShape
   locations: Location[]
   users: User[]
-  adminLevels: IAdminStructureItem[]
+  adminLevels: AdminStructureItem[]
 }) => {
   return {
     modifiedAt: DateField.toCertificateVariables(metadata.modifiedAt, {
@@ -239,7 +239,7 @@ export function compileSvg({
   review: boolean
   language: LanguageConfig
   config: EventConfig
-  adminLevels: IAdminStructureItem[]
+  adminLevels: AdminStructureItem[]
 }): string {
   const intl = createIntl(
     {

@@ -19,7 +19,7 @@ import { getListOfLocations } from '@client/utils/validate'
 import { generateLocations } from '@client/utils/locationUtils'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { IAdminStructureItem } from '@client/utils/referenceApi'
+import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 
 interface SearchLocation {
@@ -93,7 +93,7 @@ function toCertificateVariables(
   context: {
     intl: IntlShape
     locations: Location[]
-    adminLevels?: IAdminStructureItem[]
+    adminLevels?: AdminStructureItem[]
   }
 ) {
   const { intl, locations, adminLevels = [] } = context

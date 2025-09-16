@@ -35,7 +35,7 @@ import { Output } from '@client/v2-events/features/events/components/Output'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { getOfflineData } from '@client/offline/selectors'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { IAdminStructureItem } from '@client/utils/referenceApi'
+import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 
@@ -132,7 +132,7 @@ function isDomesticAddress() {
 }
 
 function generateAdminStructureFields(
-  inputArray: IAdminStructureItem[]
+  inputArray: AdminStructureItem[]
 ): AdministrativeArea[] {
   return inputArray.map((item, index) => {
     const { id, label } = item
@@ -416,7 +416,7 @@ function toCertificateVariables(
   context: {
     intl: IntlShape
     locations: Location[]
-    adminLevels?: IAdminStructureItem[]
+    adminLevels?: AdminStructureItem[]
   }
 ) {
   /*
