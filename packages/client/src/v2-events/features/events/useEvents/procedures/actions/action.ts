@@ -41,7 +41,8 @@ import {
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   addMarkAsNotDuplicateActionOptimistically,
-  updateEventOptimistically
+  updateEventOptimistically,
+  correctEventOptimistically
 } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   createEventActionMutationFn,
@@ -222,6 +223,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.request.request, {
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve.request, {
+  // TODO CIHAN: add onMutate
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.correction.approve.request
   ),
@@ -235,6 +237,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve.request, {
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject.request, {
+  // TODO CIHAN: add onMutate
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.correction.reject.request
   ),
@@ -293,9 +296,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onMutate: addMarkAsNotDuplicateActionOptimistically(
-    ActionType.MARK_AS_NOT_DUPLICATE
-  ),
+  onMutate: addMarkAsNotDuplicateActionOptimistically(),
   onSuccess: updateLocalEvent,
   onError: errorToastOnConflict,
   meta: {
@@ -373,7 +374,8 @@ queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.APPROVE_CORRECTION
-  }
+  },
+  onMutate: correctEventOptimistically()
 })
 
 /**

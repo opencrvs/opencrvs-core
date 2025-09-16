@@ -73,7 +73,7 @@ export function updateEventOptimistically<T extends ActionInput>(
 
 export function addMarkAsNotDuplicateActionOptimistically<
   T extends ActionInput
->(actionType: typeof ActionType.MARK_AS_NOT_DUPLICATE) {
+>() {
   return (variables: T) => {
     const localEvent = queryClient.getQueryData(
       trpcOptionsProxy.event.get.queryKey(variables.eventId)
@@ -89,7 +89,7 @@ export function addMarkAsNotDuplicateActionOptimistically<
         ...localEvent.actions,
         {
           id: createTemporaryId(),
-          type: actionType,
+          type: ActionType.MARK_AS_NOT_DUPLICATE,
           /*
            * These need to be casted or otherwise branded
            * types like FullDocumentPath causes an error here.
@@ -107,6 +107,66 @@ export function addMarkAsNotDuplicateActionOptimistically<
         }
       ]
     }
+    setEventData(optimisticEvent.id, optimisticEvent)
+  }
+}
+
+export function correctEventOptimistically<T extends ActionInput>() {
+  return (variables: T) => {
+    const localEvent = queryClient.getQueryData(
+      trpcOptionsProxy.event.get.queryKey(variables.eventId)
+    )
+
+    if (!localEvent) {
+      return
+    }
+
+    console.log('variables', variables)
+    const requestId = createTemporaryId()
+
+    const optimisticEvent: EventDocument = {
+      ...localEvent,
+      actions: [
+        ...localEvent.actions,
+        {
+          id: requestId,
+          type: ActionType.REQUEST_CORRECTION,
+          /*
+           * These need to be casted or otherwise branded
+           * types like FullDocumentPath causes an error here.
+           * This is because we are effectively trying to force an input type to an output type
+           */
+          declaration: (variables.declaration ||
+            {}) as ActionDocument['declaration'],
+          createdAt: new Date().toISOString(),
+          createdByUserType: 'user',
+          createdBy: '@todo',
+          createdAtLocation: '@todo' as UUID,
+          status: ActionStatus.Accepted,
+          transactionId: variables.transactionId,
+          createdByRole: '@todo'
+        },
+        {
+          id: requestId,
+          type: ActionType.APPROVE_CORRECTION,
+          /*
+           * These need to be casted or otherwise branded
+           * types like FullDocumentPath causes an error here.
+           * This is because we are effectively trying to force an input type to an output type
+           */
+          declaration: {},
+          createdAt: new Date().toISOString(),
+          createdByUserType: 'user',
+          createdBy: '@todo',
+          createdAtLocation: '@todo' as UUID,
+          status: ActionStatus.Accepted,
+          transactionId: variables.transactionId,
+          createdByRole: '@todo',
+          requestId
+        }
+      ]
+    }
+
     setEventData(optimisticEvent.id, optimisticEvent)
   }
 }

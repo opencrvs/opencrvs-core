@@ -303,6 +303,9 @@ export function getDefaultActionProcedures(
           eventType: event.type
         })
 
+        // TODO CIHAN: remove
+        await new Promise((resolve) => setTimeout(resolve, 5000))
+
         if (isDuplicateAction) {
           return ctx.event
         }
