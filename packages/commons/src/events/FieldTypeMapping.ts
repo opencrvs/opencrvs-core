@@ -41,6 +41,7 @@ import {
   SelectDateRangeField,
   TimeField,
   HttpField,
+  SearchField,
   ButtonField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
@@ -153,6 +154,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       schema = ButtonFieldValue
       break
     case FieldType.HTTP:
+    case FieldType.SEARCH:
       schema = HttpFieldUpdateValue
       break
   }
@@ -203,6 +205,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.PHONE:
     case FieldType.BUTTON:
     case FieldType.HTTP:
+    case FieldType.SEARCH:
     case FieldType.ID:
       return null
     case FieldType.ADDRESS:
@@ -438,6 +441,13 @@ export const isHttpFieldType = (field: {
   value: FieldValue
 }): field is { value: undefined; config: HttpField } => {
   return field.config.type === FieldType.HTTP
+}
+
+export const isSearchFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: SearchField } => {
+  return field.config.type === FieldType.SEARCH
 }
 
 export type NonInteractiveFieldType =

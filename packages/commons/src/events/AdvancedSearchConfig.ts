@@ -123,16 +123,16 @@ export const EventFieldConfigSchema = BaseField.extend({
   fieldType: z.literal('event')
 })
 
-export const SearchField = z.discriminatedUnion('fieldType', [
+export const AdvancedSearchField = z.discriminatedUnion('fieldType', [
   FieldConfigSchema,
   EventFieldConfigSchema
 ])
 
-export type SearchField = z.infer<typeof SearchField>
+export type AdvancedSearchField = z.infer<typeof AdvancedSearchField>
 
 export const AdvancedSearchConfig = z.object({
   title: TranslationConfig.describe('Advanced search tab title'),
-  fields: z.array(SearchField).describe('Advanced search fields.')
+  fields: z.array(AdvancedSearchField).describe('Advanced search fields.')
 })
 
 export type AdvancedSearchConfig = z.infer<typeof AdvancedSearchConfig>

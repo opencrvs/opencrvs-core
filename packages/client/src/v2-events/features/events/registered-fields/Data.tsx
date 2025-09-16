@@ -11,13 +11,15 @@
 import React from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import styled from 'styled-components'
+import { get } from 'lodash'
 import {
   EventState,
   FieldProps,
   FieldType,
   FieldConfig,
   isFieldVisible,
-  TranslationConfig
+  TranslationConfig,
+  FieldReference
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 
@@ -95,6 +97,15 @@ const Subtitle = styled.div`
   margin: 0 0 2rem;
 `
 
+function isFieldReference(entry: unknown): entry is FieldReference {
+  return (
+    Boolean(entry) &&
+    typeof entry === 'object' &&
+    entry !== null &&
+    '$$field' in entry
+  )
+}
+
 /**
  * This is a read-only form field, that is used to display a collection of form fields from the main 'declaration' form data.
  */
@@ -102,10 +113,10 @@ function DataInput({
   configuration,
   label,
   formData,
-  declarationFields
+  allKnownFields
 }: FieldProps<'DATA'> & {
   formData: EventState
-  declarationFields: FieldConfig[]
+  allKnownFields: FieldConfig[]
 }) {
   const intl = useIntl()
   const { subtitle, data } = configuration
@@ -115,14 +126,34 @@ function DataInput({
     if ('fieldId' in entry) {
       return {
         value: formData[entry.fieldId],
-        config: declarationFields.find((f) => f.id === entry.fieldId)
+        config: allKnownFields.find((f) => f.id === entry.fieldId)
       }
+    }
+
+    const value = entry.value
+
+    if (isFieldReference(value)) {
+      const resolvedValue = value.$$subfield
+        ? get(formData[value.$$field], value.$$subfield)
+        : formData[value.$$field]
+
+      return getFieldFromDataEntry({
+        intl,
+        formData,
+        entry: {
+          label: entry.label,
+          value: resolvedValue ? String(resolvedValue) : ''
+        }
+      })
     }
 
     return getFieldFromDataEntry({
       intl,
       formData,
-      entry
+      entry: {
+        label: entry.label,
+        value
+      }
     })
   })
 
@@ -138,6 +169,7 @@ function DataInput({
             if (!config) {
               return null
             }
+            console.log({ value, config })
 
             return (
               <React.Fragment key={config.id}>

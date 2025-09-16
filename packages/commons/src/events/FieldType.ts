@@ -41,6 +41,7 @@ export const FieldType = {
   SIGNATURE: 'SIGNATURE',
   DATA: 'DATA',
   BUTTON: 'BUTTON',
+  SEARCH: 'SEARCH',
   HTTP: 'HTTP'
 } as const
 

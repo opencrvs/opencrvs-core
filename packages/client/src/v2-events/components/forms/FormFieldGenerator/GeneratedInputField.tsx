@@ -54,7 +54,8 @@ import {
   SelectDateRangeValue,
   isTimeFieldType,
   isButtonFieldType,
-  isHttpFieldType
+  isHttpFieldType,
+  isSearchFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -84,6 +85,7 @@ import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileIn
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
+import { Search } from '@client/v2-events/features/events/registered-fields/Search'
 import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
 import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
@@ -104,8 +106,8 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   error: string
   form: EventState
   disabled?: boolean
-  eventConfig?: EventConfig
   readonlyMode?: boolean
+  allKnownFields: FieldConfig[]
 }
 
 export const GeneratedInputField = React.memo(
@@ -115,10 +117,10 @@ export const GeneratedInputField = React.memo(
     onFieldValueChange,
     error,
     touched,
+    allKnownFields,
     value,
     form,
     disabled,
-    eventConfig,
     readonlyMode
   }: GeneratedInputFieldProps<T>) => {
     const intl = useIntl()
@@ -581,16 +583,10 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isDataFieldType(field)) {
-      // If no event config or declare form fields found, don't render the data field.
-      // This should never actually happen, but we don't want to throw an error either.
-      if (!eventConfig) {
-        return null
-      }
-
       return (
         <Data.Input
           {...field.config}
-          declarationFields={getDeclarationFields(eventConfig)}
+          allKnownFields={allKnownFields}
           formData={form}
         />
       )
@@ -620,6 +616,14 @@ export const GeneratedInputField = React.memo(
           key={fieldDefinition.id}
           configuration={field.config.configuration}
           parentValue={form[field.config.configuration.trigger.$$field]}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+    if (isSearchFieldType(field)) {
+      return (
+        <Search.Input
+          key={fieldDefinition.id}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )

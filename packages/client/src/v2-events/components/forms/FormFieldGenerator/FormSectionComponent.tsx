@@ -210,10 +210,7 @@ export function FormSectionComponent({
   const allFieldsWithDotSeparator: FieldConfig[] = useMemo(() => {
     if (eventConfig) {
       const allConfigFields = getAllUniqueFields(eventConfig)
-      return allConfigFields.map((field) => ({
-        ...field,
-        id: makeFormFieldIdFormikCompatible(field.id)
-      }))
+      return allConfigFields
     }
     return fieldsWithDotSeparator
   }, [eventConfig, fieldsWithDotSeparator])
@@ -420,9 +417,9 @@ export function FormSectionComponent({
             <Field name={field.id}>
               {({ field: formikField }: FieldProps) => (
                 <GeneratedInputField
+                  allKnownFields={allFieldsWithDotSeparator}
                   disabled={isDisabled}
                   error={isDisabled ? '' : error}
-                  eventConfig={eventConfig}
                   fieldDefinition={field}
                   form={completeForm}
                   readonlyMode={readonlyMode}

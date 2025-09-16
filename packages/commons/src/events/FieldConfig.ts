@@ -551,7 +551,7 @@ const Address = BaseField.extend({
 export const DataEntry = z.union([
   z.object({
     label: TranslationConfig,
-    value: TranslationConfig.or(z.string())
+    value: TranslationConfig.or(z.string()).or(FieldReference)
   }),
   z.object({
     fieldId: z.string()
@@ -597,7 +597,7 @@ const HttpField = BaseField.extend({
     url: z.string().describe('URL to send the HTTP request to'),
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
     headers: z.record(z.string()).optional(),
-    body: z.record(z.string()).optional(),
+    body: z.record(z.any()).optional(),
     params: z.record(z.string()).optional(),
     timeout: z
       .number()
@@ -607,6 +607,13 @@ const HttpField = BaseField.extend({
 }).describe('HTTP request function triggered by a button click')
 
 export type HttpField = z.infer<typeof HttpField>
+
+const SearchField = HttpField.extend({
+  type: z.literal(FieldType.SEARCH),
+  configuration: z.void()
+})
+
+export type SearchField = z.infer<typeof SearchField>
 
 /** @knipignore */
 export type FieldConfig =
@@ -640,6 +647,7 @@ export type FieldConfig =
   | z.infer<typeof DataField>
   | z.infer<typeof ButtonField>
   | z.infer<typeof HttpField>
+  | z.infer<typeof SearchField>
 
 /** @knipignore */
 /**
@@ -676,6 +684,7 @@ export type FieldConfigInput =
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
+  | z.input<typeof SearchField>
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
  *  referenced quite extensively througout various other schemas. Leaving the

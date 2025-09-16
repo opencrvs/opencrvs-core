@@ -160,6 +160,7 @@ function mapFieldTypeToElasticsearch(
           option: { type: 'keyword' }
         }
       }
+    case FieldType.SEARCH:
     case FieldType.HTTP:
       /**
        * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
