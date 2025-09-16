@@ -49,7 +49,7 @@ export async function requestActionConfirmation(
       transactionId,
       url: actionConfirmationUrl
     },
-    `Requesting confirmation 📩`
+    `Requesting confirmation`
   )
 
   try {
