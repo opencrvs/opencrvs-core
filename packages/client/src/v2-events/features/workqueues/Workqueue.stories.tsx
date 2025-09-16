@@ -19,18 +19,13 @@ import {
   EventStatus,
   generateEventDocument,
   generateEventDraftDocument,
-  generateUuid,
   generateWorkqueues,
-  tennisClubMembershipEvent,
-  UUID
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { libraryMembershipEvent } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import {
-  tennisClubMembershipEventIndex,
-  tennisClubMembershipEventDocument
-} from '@client/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { WorkqueueIndex } from './index'
 
 const meta: Meta<typeof WorkqueueIndex> = {
@@ -247,7 +242,7 @@ export const NoResults: Story = {
               {
                 ...recent,
                 emptyMessage: {
-                  id: 'v2.workqueues.recent.emptyMessage',
+                  id: 'workqueues.recent.emptyMessage',
                   defaultMessage: 'No recent records',
                   description: 'Empty message for recent workqueue'
                 }
@@ -309,7 +304,7 @@ export const Draft: Story = {
               {
                 ...recent,
                 emptyMessage: {
-                  id: 'v2.workqueues.recent.emptyMessage',
+                  id: 'workqueues.recent.emptyMessage',
                   defaultMessage: 'No recent records',
                   description: 'Empty message for recent workqueue'
                 }

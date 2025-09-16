@@ -105,7 +105,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
                   id: 'town',
                   required: false,
                   label: {
-                    id: 'v2.field.address.town.label',
+                    id: 'field.address.town.label',
                     defaultMessage: 'Town',
                     description: 'This is the label for the field'
                   },
@@ -115,7 +115,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
                   id: 'residentialArea',
                   required: false,
                   label: {
-                    id: 'v2.field.address.residentialArea.label',
+                    id: 'field.address.residentialArea.label',
                     defaultMessage: 'Residential Area',
                     description: 'This is the label for the field'
                   },
@@ -125,7 +125,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
                   id: 'street',
                   required: false,
                   label: {
-                    id: 'v2.field.address.street.label',
+                    id: 'field.address.street.label',
                     defaultMessage: 'Street',
                     description: 'This is the label for the field'
                   },
@@ -135,7 +135,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
                   id: 'number',
                   required: false,
                   label: {
-                    id: 'v2.field.address.number.label',
+                    id: 'field.address.number.label',
                     defaultMessage: 'Number',
                     description: 'This is the label for the field'
                   },
@@ -145,7 +145,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
                   id: 'zipCode',
                   required: false,
                   label: {
-                    id: 'v2.field.address.postcodeOrZip.label',
+                    id: 'field.address.postcodeOrZip.label',
                     defaultMessage: 'Postcode / Zip',
                     description: 'This is the label for the field'
                   },
