@@ -37,7 +37,10 @@ function useAdministrativeAreas(
   searchableResource: ('locations' | 'facilities' | 'offices')[]
 ) {
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useQuery(true, [], 'HEALTH_FACILITY') // get only active locations for input fields
+  const [locations] = getLocations.useSuspenseQuery({
+    isActive: true,
+    locationType: 'HEALTH_FACILITY'
+  }) // get only active locations for input fields
   const locationsBasedOnSearchableResource = locations.filter((location) =>
     searchableResource.some(
       (resource) => location.locationType === resourceTypeMap[resource]
@@ -136,7 +139,7 @@ function toCertificateVariables(
 function LocationSearchOutput({ value }: { value: Stringifiable }) {
   const intl = useIntl()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useQuery()
+  const [locations] = getLocations.useSuspenseQuery()
   const { name, district, province, country } = toCertificateVariables(value, {
     intl,
     locations

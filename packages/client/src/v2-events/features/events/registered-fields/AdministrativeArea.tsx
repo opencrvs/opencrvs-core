@@ -62,7 +62,7 @@ function AdministrativeAreaInput({
 
 function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useQuery()
+  const [locations] = getLocations.useSuspenseQuery()
 
   const location = value.toString()
     ? locations.find((l) => l.id === value.toString())

@@ -59,7 +59,7 @@ export function Review() {
   const { closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useQuery()
+  const [locations] = getLocations.useSuspenseQuery()
 
   const event = events.getEvent.getFromCache(eventId)
 

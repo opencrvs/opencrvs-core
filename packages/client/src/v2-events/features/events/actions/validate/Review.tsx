@@ -61,7 +61,7 @@ export function Review() {
   const navigate = useNavigate()
   const { closeActionView } = useEventFormNavigation()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useQuery()
+  const [locations] = getLocations.useSuspenseQuery()
 
   const event = events.getEvent.findFromCache(eventId).data
 

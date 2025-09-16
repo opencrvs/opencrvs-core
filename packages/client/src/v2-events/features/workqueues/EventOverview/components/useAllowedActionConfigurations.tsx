@@ -194,7 +194,7 @@ function useViewableActionConfigurations(
   const intl = useIntl()
   const { getUser } = useUsers()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useQuery()
+  const [locations] = getLocations.useSuspenseQuery()
   const assignedToUser = getUser.useQuery(event.assignedTo || '', {
     enabled: !!event.assignedTo
   })

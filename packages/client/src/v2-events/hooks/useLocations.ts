@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { LocationType, UUID } from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
@@ -29,11 +29,15 @@ export function useLocations() {
   const trpc = useTRPC()
   return {
     getLocations: {
-      useQuery: (
-        isActive?: boolean,
-        locationIds?: UUID[],
+      useSuspenseQuery: ({
+        isActive,
+        locationIds,
+        locationType
+      }: {
+        isActive?: boolean
+        locationIds?: UUID[]
         locationType?: LocationType
-      ) => {
+      } = {}) => {
         // We intentionally remove `queryFn` here because we already set a global default
         // via `setQueryDefaults`. Passing it again would override caching/persistence.
         // The `...rest` spread carries over things like staleTime, gcTime, enabled, etc.
@@ -42,14 +46,14 @@ export function useLocations() {
           trpcOptionsProxy.locations.get.queryOptions()
 
         return [
-          useQuery({
+          useSuspenseQuery({
             ...rest,
             queryKey: trpc.locations.get.queryKey({
               isActive,
               locationIds,
               locationType
             })
-          }).data ?? []
+          }).data
         ]
       }
     }

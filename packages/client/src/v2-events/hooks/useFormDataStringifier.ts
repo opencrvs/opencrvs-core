@@ -91,7 +91,7 @@ export const getFormDataStringifier = (
 export function useFormDataStringifier() {
   const intl = useIntl()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useQuery()
+  const [locations] = getLocations.useSuspenseQuery()
   const { config } = useSelector(getOfflineData)
   const adminLevels = config.ADMIN_STRUCTURE
 

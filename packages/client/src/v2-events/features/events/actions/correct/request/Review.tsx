@@ -46,7 +46,7 @@ export function Review() {
   const navigate = useNavigate()
   const events = useEvents()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useQuery()
+  const [locations] = getLocations.useSuspenseQuery()
 
   const event = events.getEvent.getFromCache(eventId)
 
