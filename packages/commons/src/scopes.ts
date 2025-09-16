@@ -317,28 +317,34 @@ const SearchScope = z.object({
 
 export type SearchScope = z.infer<typeof SearchScope>
 
-// These scopes are used to check if the user has the necessary permissions to perform actions on a record.
-// Each of these is configured with allowed event types (ids), e.g. 'birth', 'death', 'tennis-club-membership'.
-const RecordScope = z.object({
-  type: z.enum([
-    'record.create',
-    'record.read',
-    'record.declare',
-    'record.notify',
-    'record.declared.validate',
-    'record.declared.reject',
-    'record.declared.archive',
-    'record.declared.review-duplicates',
-    'record.register',
-    'record.registered.print-certified-copies',
-    'record.registered.request-correction',
-    'record.registered.correct',
-    'record.unassign-others'
-  ]),
-  options: z.object({
-    event: z.array(z.string())
+export const RecordScopeType = z.enum([
+  'record.create',
+  'record.read',
+  'record.declare',
+  'record.notify',
+  'record.declared.validate',
+  'record.declared.reject',
+  'record.declared.archive',
+  'record.declared.review-duplicates',
+  'record.register',
+  'record.registered.print-certified-copies',
+  'record.registered.request-correction',
+  'record.registered.correct',
+  'record.unassign-others'
+])
+export type RecordScopeType = z.infer<typeof RecordScopeType>
+
+export const RecordScope = z
+  .object({
+    type: RecordScopeType,
+    options: z.object({
+      event: z.array(z.string()).describe('Event type, e.g. birth, death')
+    })
   })
-})
+  .describe(
+    "Scopes used to check user's permission to perform actions on a record."
+  )
+export type RecordScope = z.infer<typeof RecordScope>
 
 const ConfigurableRawScopes = z.discriminatedUnion('type', [
   SearchScope,
