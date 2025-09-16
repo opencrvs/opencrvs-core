@@ -42,17 +42,20 @@ function QueryParamReaderInput({
 }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const { map } = configuration
+  const searchString = searchParams.toString()
 
   useEffect(() => {
-    if (searchParams.size === 0) {
+    if (!searchString) {
       return
     }
+    const params = new URLSearchParams(searchString)
     const paramsObject = map
-      ? prepareParamsFromMap(searchParams, map)
-      : Object.fromEntries(searchParams)
+      ? prepareParamsFromMap(params, map)
+      : Object.fromEntries(params)
+
     onChange(paramsObject)
-    setSearchParams(deleteAllParams(searchParams), { replace: true })
-  }, [onChange, searchParams, setSearchParams, map])
+    setSearchParams(new URLSearchParams(), { replace: true })
+  }, [map, onChange, searchString, setSearchParams])
   return null
 }
 
