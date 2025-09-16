@@ -18,10 +18,7 @@ import {
 import {
   ActionType,
   getDeclaration,
-  getCurrentEventState,
-  ActionDocument,
-  getAcceptedActions,
-  isMetaAction
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
@@ -80,14 +77,10 @@ export function Review() {
     )
   }
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
-
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form,
-    locations: adminStructureLocations
+    locations
   })
 
   return (
@@ -96,7 +89,7 @@ export function Review() {
         form={form}
         formConfig={formConfig}
         isCorrection={true}
-        locations={adminStructureLocations}
+        locations={locations}
         previousFormValues={previousFormValues}
         title={intlWithData.formatMessage(
           actionConfig.label,

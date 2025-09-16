@@ -53,7 +53,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 export function getLeafLocationIds(
   locations: Location[],
   locationTypes?: LocationType[]
-): { id: UUID }[] {
+): Array<{ id: UUID }> {
   const nonLeafs = new Set<string>()
   const idToType = new Map<string, LocationType | null>()
 

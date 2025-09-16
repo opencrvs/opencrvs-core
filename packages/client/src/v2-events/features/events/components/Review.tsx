@@ -36,11 +36,13 @@ import {
   isFieldDisplayedOnReview,
   isPageVisible,
   runFieldValidations,
-  Location
+  Location,
+  LocationType
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { getLeafLocationIds } from '../registered-fields'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -319,7 +321,12 @@ function FormReview({
               })
 
               const context = locations
-                ? { leafAdminStructureLocationIds: locations }
+                ? {
+                    leafAdminStructureLocationIds: getLeafLocationIds(
+                      locations,
+                      [LocationType.enum.ADMIN_STRUCTURE]
+                    )
+                  }
                 : undefined
 
               const error = runFieldValidations({

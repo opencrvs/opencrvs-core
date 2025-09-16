@@ -8,9 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { generateUuid, SCOPES } from '@opencrvs/commons'
+import { generateUuid, Location, LocationType, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { Location } from '@events/service/locations/locations'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -52,7 +51,7 @@ test('Creates single location', async () => {
       parentId: null,
       name: 'Location foobar',
       validUntil: null,
-      locationType: 'ADMIN_STRUCTURE'
+      locationType: LocationType.enum.ADMIN_STRUCTURE
     }
   ]
 
