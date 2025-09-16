@@ -67,6 +67,7 @@ function EventOverviewFull({
   const draft = getRemoteDraftByEventId(eventIndex.id, {
     refetchOnMount: 'always'
   })
+
   const eventWithDrafts = draft
     ? dangerouslyGetCurrentEventStateWithDrafts({
         event,
