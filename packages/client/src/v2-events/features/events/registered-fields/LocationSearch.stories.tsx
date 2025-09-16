@@ -14,7 +14,8 @@ import React from 'react'
 import { within, expect, fn } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { LocationSearch } from './LocationSearch'
+// NOTE: If you do not import from index, you might encounter: ReferenceError: Cannot access 'LocationSearch' before initialization
+import { LocationSearch } from '.'
 
 const meta: Meta<typeof LocationSearch.Output> = {
   title: 'Inputs/LocationSearch',

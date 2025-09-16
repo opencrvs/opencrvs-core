@@ -17,9 +17,9 @@ import {
   getAcceptedActions,
   getUUID,
   SCOPES,
-  TENNIS_CLUB_MEMBERSHIP
+  TENNIS_CLUB_MEMBERSHIP,
+  createPrng
 } from '@opencrvs/commons'
-import { createPrng } from '@opencrvs/commons/client'
 import {
   createSystemTestClient,
   createTestClient,
