@@ -244,6 +244,7 @@ export async function defaultRequestHandler(
     logger.debug(
       {
         transactionId: input.transactionId,
+        eventType: event.type,
         actionType: input.type,
         eventId: event.id
       },

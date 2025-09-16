@@ -43,13 +43,13 @@ export async function requestActionConfirmation(
 
   logger.debug(
     {
+      url: actionConfirmationUrl,
       eventType: event.type,
       actionType,
       eventId: event.id,
-      transactionId,
-      url: actionConfirmationUrl
+      transactionId
     },
-    `Requesting confirmation`
+    `Action confirmation request`
   )
 
   try {
@@ -72,11 +72,11 @@ export async function requestActionConfirmation(
 
     logger.debug(
       {
+        url: actionConfirmationUrl,
         eventType: event.type,
         actionType,
         eventId: event.id,
-        transactionId,
-        url: actionConfirmationUrl
+        transactionId
       },
       `Action confirmation response: ${statusCode} - ${responseStatus}`
     )
