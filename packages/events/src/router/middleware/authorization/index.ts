@@ -29,9 +29,10 @@ import {
   EventDocument,
   ConfigurableScopes,
   getAuthorizedEventsFromScopes,
-  getTokenPayload
+  getTokenPayload,
+  canUserReadEvent
 } from '@opencrvs/commons'
-import { getEventById } from '@events/service/events/events'
+import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
 import { ActionConfirmationResponseSchema } from '@events/router/event/actions'
 
@@ -302,4 +303,43 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
   }
 
   return next()
+}
+
+export const userCanReadEvent: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext & { event: EventDocument },
+  UUID
+> = async ({ next, ctx, input }) => {
+  const event = await getEventById(input)
+
+  const createAction = event.actions.find(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  if (!createAction) {
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: `Event ${event.id} is missing ${ActionType.CREATE} action`
+    })
+  }
+
+  const canRead = canUserReadEvent(
+    {
+      createdBy: createAction.createdBy,
+      type: event.type
+    },
+    {
+      userId: ctx.user.id,
+      scopes: getScopes(ctx.token)
+    }
+  )
+
+  if (canRead) {
+    return next({ ctx: { ...ctx, event } })
+  }
+
+  // Throw not found to avoid leaking the existence of the event
+  throw new EventNotFoundError(input)
 }

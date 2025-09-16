@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn, within } from '@storybook/test'
+import { fn, expect, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { userEvent } from '@storybook/testing-library'
@@ -122,16 +122,23 @@ export const FileInputWithOptionTest: StoryObj<typeof FormFieldGenerator> = {
     await step(
       'Prevents upload of a file with an invalid file type',
       async () => {
-        await userEvent.click(fileInput)
+        await expect(fileInput.hasAttribute('disabled')).toBeTruthy()
+      }
+    )
 
-        const svgFile = new File(['treeSvg'], 'tree.svg', {
-          type: MimeType.enum['image/svg+xml']
-        })
+    await step(
+      'Allow upload of a file when a valid file type is selected',
+      async () => {
+        // we use older react-select which does not have aria-labels set
+        const selectControl = canvasElement.querySelector(
+          '.react-select__control'
+        ) as HTMLElement
 
-        await userEvent.upload(input, svgFile)
-        await canvas.findByText(
-          'File format not supported. Please attach jpeg (max 1mb)'
-        )
+        // Open dropdown and select
+        await userEvent.click(selectControl)
+        await userEvent.click(await canvas.findByText('Forest'))
+
+        await expect(fileInput.hasAttribute('disabled')).toBeFalsy()
       }
     )
 
@@ -153,18 +160,6 @@ export const FileInputWithOptionTest: StoryObj<typeof FormFieldGenerator> = {
         const validFile = new File(['a'.repeat(512 * 512)], 'valid.jpg', {
           type: MimeType.enum['image/jpeg']
         })
-
-        await userEvent.upload(input, validFile)
-        await canvas.findByText('Please select the type of document first')
-
-        // we use older react-select which does not have aria-labels set
-        const selectControl = canvasElement.querySelector(
-          '.react-select__control'
-        ) as HTMLElement
-
-        // Open dropdown and select
-        await userEvent.click(selectControl)
-        await userEvent.click(await canvas.findByText('Forest'))
 
         await userEvent.upload(input, validFile)
 

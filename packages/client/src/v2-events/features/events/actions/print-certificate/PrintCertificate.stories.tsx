@@ -77,7 +77,7 @@ const printActionWithSelections = generateActionDocument({
       [CERT_TEMPLATE_ID]: 'tennis-club-membership-certificate',
       'collector.requesterId': 'OTHER',
       'collector.identity.verify': true,
-      templateId: 'v2.tennis-club-membership-certificate'
+      templateId: 'tennis-club-membership-certificate'
     }
   }
 })
@@ -128,7 +128,7 @@ export const FormSetupWithDraft: Story = {
             [CERT_TEMPLATE_ID]: 'tennis-club-membership-certified-certificate',
             'collector.requesterId': 'INFORMANT',
             'collector.identity.verify': true,
-            templateId: 'v2.tennis-club-membership-certified-certificate'
+            templateId: 'tennis-club-membership-certified-certificate'
           }
         })
       ]
@@ -158,7 +158,7 @@ export const Review: Story = {
             [CERT_TEMPLATE_ID]: 'tennis-club-membership-certified-certificate',
             'collector.requesterId': 'INFORMANT',
             'collector.identity.verify': true,
-            templateId: 'v2.tennis-club-membership-certified-certificate'
+            templateId: 'tennis-club-membership-certified-certificate'
           }
         })
       ]
