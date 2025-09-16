@@ -348,14 +348,9 @@ export const validateAction: MiddlewareFunction<
 > = async ({ input, next, ctx }) => {
   const actionType = input.type
 
-  const t0 = performance.now()
   const leafAdminStructureLocationIds = await getLeafLocationIds({
     locationTypes: [LocationType.enum.ADMIN_STRUCTURE]
   })
-
-  const t1 = performance.now()
-  console.log(`Fetching locations took ${t1 - t0} milliseconds.`)
-
   const event = await getEventById(input.eventId)
   const eventConfig = await getEventConfigurationById({
     eventType: event.type,
@@ -394,8 +389,6 @@ export const validateAction: MiddlewareFunction<
   const declarationUpdateAction = DeclarationUpdateActions.safeParse(actionType)
 
   if (declarationUpdateAction.success) {
-    const t2 = performance.now()
-    console.log(`Starting validation in ${t2 - t1} milliseconds.`)
     const errors = validateDeclarationUpdateAction({
       eventConfig,
       event,
@@ -404,8 +397,6 @@ export const validateAction: MiddlewareFunction<
       actionType: declarationUpdateAction.data,
       context: { leafAdminStructureLocationIds: leafAdminStructureLocationIds }
     })
-    const t3 = performance.now()
-    console.log(`Validation took ${t3 - t2} milliseconds.`)
 
     throwWhenNotEmpty(errors)
     return next()
