@@ -18,7 +18,8 @@ import {
   EventDocument,
   EventConfig,
   ArchiveActionInput,
-  MarkAsDuplicateActionInput
+  MarkAsDuplicateActionInput,
+  ActionStatus
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
 
@@ -240,6 +241,7 @@ export async function makeCorrectionOnRequest({
           declarationMixedUpAnnotation
         )
       : {}
+
   const response =
     await trpcClient.event.actions.correction.request.request.mutate({
       eventId,
@@ -248,14 +250,18 @@ export async function makeCorrectionOnRequest({
       annotation,
       keepAssignment: true
     })
+
   const requestId = response.actions.find(
-    (a) => a.transactionId === transactionId
+    (a) =>
+      a.transactionId === transactionId && a.status === ActionStatus.Accepted
   )?.id
+
   if (!requestId) {
     throw new Error(
       `Request ID not found in response for eventId: ${eventId}, transactionId: ${transactionId}`
     )
   }
+
   return trpcClient.event.actions.correction.approve.request.mutate({
     type: ActionType.APPROVE_CORRECTION,
     transactionId: getUUID(),
