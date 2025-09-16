@@ -28,7 +28,7 @@ import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/fea
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
 const verifiedMessage = {
-  id: 'v2.verified',
+  id: 'verified',
   defaultMessage: 'Verified',
   description: 'This is the label for the verification field'
 }

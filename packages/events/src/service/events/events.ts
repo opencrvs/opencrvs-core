@@ -20,7 +20,6 @@ import {
   ActionUpdate,
   AsyncRejectActionDocument,
   DisplayableAction,
-  Draft,
   EventConfig,
   EventDocument,
   EventInput,
@@ -37,13 +36,16 @@ import {
 } from '@opencrvs/commons/events'
 import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
-import { deleteFile, fileExists } from '@events/service/files'
+import {
+  cleanupUnreferencedFiles,
+  deleteFile,
+  fileExists
+} from '@events/service/files'
 import { indexEvent } from '@events/service/indexing/indexing'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import * as eventsRepo from '@events/storage/postgres/events/events'
-import { getUnreferencedDraftFiles } from '../files/utils'
 
-class EventNotFoundError extends TRPCError {
+export class EventNotFoundError extends TRPCError {
   constructor(id: string) {
     super({
       code: 'NOT_FOUND',
@@ -213,42 +215,6 @@ function extractFileValues(
   return fileValues
 }
 
-/**
- *
- * Deletes files from external source that are referenced in previous drafts but not in the current draft.
- *
- */
-export async function deleteUnreferencedFilesFromPreviousDrafts(
-  token: string,
-  {
-    event,
-    currentDraft,
-    previousDraft,
-    configuration
-  }: {
-    event: EventDocument
-    currentDraft?: Draft
-    previousDraft: Draft
-    configuration: EventConfig
-  }
-): Promise<void> {
-  const unreferencedFiles = getUnreferencedDraftFiles({
-    event,
-    currentDraft,
-    previousDraft,
-    configuration
-  })
-
-  for (const file of unreferencedFiles) {
-    const isDeleted = await deleteFile(file.value, token)
-
-    if (!isDeleted) {
-      // eslint-disable-next-line no-console
-      console.error(`Unable to delete unused file: ${JSON.stringify(file)}`)
-    }
-  }
-}
-
 export function buildAction(
   input: ActionInputWithType,
   status: ActionStatus,
@@ -302,14 +268,6 @@ export function buildAction(
         requestId: input.requestId
       }
     }
-    case ActionType.DUPLICATE_DETECTED:
-      return {
-        ...commonAttributes,
-        createdBy: 'system',
-        createdByUserType: TokenUserType.enum.system,
-        createdByRole: '',
-        createdAtLocation: undefined
-      }
     case ActionType.REJECT:
     case ActionType.ARCHIVE:
     case ActionType.PRINT_CERTIFICATE:
@@ -318,6 +276,7 @@ export function buildAction(
     case ActionType.NOTIFY:
     case ActionType.DECLARE:
     case ActionType.VALIDATE:
+    case ActionType.DUPLICATE_DETECTED:
     case ActionType.MARK_AS_NOT_DUPLICATE:
     case ActionType.MARK_AS_DUPLICATE:
     case ActionType.REQUEST_CORRECTION: {
@@ -405,23 +364,11 @@ export async function addAction(
 
   const updatedEvent = await getEventById(eventId)
 
-  const previousDraft = await draftsRepo.findLatestDraftForAction(
-    event.id,
-    user.id,
-    input.type
-  )
-
   if (input.type !== ActionType.READ && input.type !== ActionType.ASSIGN) {
     await draftsRepo.deleteDraftsByEventId(input.eventId)
   }
 
-  if (previousDraft) {
-    await deleteUnreferencedFilesFromPreviousDrafts(token, {
-      event: updatedEvent,
-      configuration,
-      previousDraft
-    })
-  }
+  await cleanupUnreferencedFiles(updatedEvent, token)
 
   return updatedEvent
 }
