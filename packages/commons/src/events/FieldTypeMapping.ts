@@ -462,6 +462,7 @@ export type NonInteractiveFieldType =
   | Paragraph
   | BulletList
   | DataField
+  | QueryParamReaderField
 
 export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
 
@@ -474,6 +475,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.PARAGRAPH ||
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
-    field.type === FieldType.HTTP
+    field.type === FieldType.HTTP ||
+    field.type === FieldType.QUERY_PARAM_READER
   )
 }
