@@ -133,10 +133,14 @@ export function TRPCProvider({
             return mutation.state.status !== 'success'
           },
           shouldDehydrateQuery: (query) => {
-            // Stale time compares the values through a function like this: Math.max(updatedAt + (staleTime || 0) - Date.now(), 0);
-            // If the result is > 0, the query is fresh, otherwise it's stale. The main point goal is to avoid dehydrating large amounts of data (say locations) which will block the thread constantly (every second by default)
-            // @ts-expect-error - staleTime is not recognized for some reason, even when it's available through trpc.
-            if (query.isStaleByTime(query.options.staleTime)) {
+            if (
+              // success is the default condition. We want to avoid dehydrating failed or loading queries.
+              query.state.status === 'success' &&
+              // Stale time compares the values through a function like this: Math.max(updatedAt + (staleTime || 0) - Date.now(), 0);
+              // If the result is > 0, the query is fresh, otherwise it's stale. The main point goal is to avoid dehydrating large amounts of data (say locations) which will block the thread constantly (every second by default)
+              // @ts-expect-error - staleTime is not recognized for some reason, even when it's available through trpc.
+              query.isStaleByTime(query.options.staleTime)
+            ) {
               return true
             }
 
