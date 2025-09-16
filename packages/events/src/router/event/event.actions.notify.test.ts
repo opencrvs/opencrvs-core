@@ -19,6 +19,7 @@ import {
   SCOPES,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
+import { createPrng } from '@opencrvs/commons/client'
 import {
   createSystemTestClient,
   createTestClient,
@@ -210,11 +211,12 @@ describe('event.actions.notify', () => {
 
       const parentId = generateUuid(rng)
 
-      const locationPayload = generator.locations.set([
-        { id: parentId },
-        { parentId: parentId },
-        { parentId: parentId }
-      ])
+      const locationRng = createPrng(843)
+
+      const locationPayload = generator.locations.set(
+        [{ id: parentId }, { parentId: parentId }, { parentId: parentId }],
+        locationRng
+      )
 
       await dataSeedingClient.locations.set(locationPayload)
 

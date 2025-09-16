@@ -16,6 +16,7 @@ import {
   ActionStatus,
   ActionType,
   AddressType,
+  createPrng,
   EventStatus,
   generateActionDocument,
   getCurrentEventState,
@@ -888,8 +889,9 @@ test('Returns multiple documents after creation', async () => {
 test('Returns correctly based on registration location even when a parent location level is used for searching', async () => {
   const { user, generator, seed, locations } = await setupTestCase()
 
+  const locationRng = createPrng(842)
   const parentLocation = {
-    ...generator.locations.set(1)[0],
+    ...generator.locations.set(1, locationRng)[0],
     name: 'Parent location'
   }
 

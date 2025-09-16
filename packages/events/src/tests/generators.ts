@@ -16,7 +16,8 @@ import {
   TestUserRole,
   EventConfig,
   Location,
-  LocationType
+  LocationType,
+  generateUuid
 } from '@opencrvs/commons'
 import { addLocations } from '@events/storage/postgres/events/locations'
 
@@ -56,10 +57,10 @@ export function payloadGenerator(
 
   const locations = {
     /** Create test data by providing count or desired locations */
-    set: (input: Array<Partial<Location>> | number) => {
+    set: (input: Array<Partial<Location>> | number, prng: () => number) => {
       if (typeof input === 'number') {
         return Array.from({ length: input }).map((_, i) => ({
-          id: getUUID(),
+          id: generateUuid(prng),
           name: `Location name ${i}`,
           parentId: null,
           validUntil: null,
@@ -68,7 +69,7 @@ export function payloadGenerator(
       }
 
       return input.map((location, i) => ({
-        id: location.id ?? getUUID(),
+        id: location.id ?? generateUuid(prng),
         name: location.name ?? `Location name ${i}`,
         parentId: location.parentId ?? null,
         validUntil: null,

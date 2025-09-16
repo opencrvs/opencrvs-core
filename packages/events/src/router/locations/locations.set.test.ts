@@ -8,7 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { generateUuid, Location, LocationType, SCOPES } from '@opencrvs/commons'
+import {
+  createPrng,
+  generateUuid,
+  Location,
+  LocationType,
+  SCOPES
+} from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
@@ -25,8 +31,9 @@ test('Allows national system admin to set locations', async () => {
   const { user, generator } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
+  const locationRng = createPrng(846)
   await expect(
-    dataSeedingClient.locations.set(generator.locations.set(1))
+    dataSeedingClient.locations.set(generator.locations.set(1, locationRng))
   ).resolves.toEqual(undefined)
 })
 
@@ -72,12 +79,10 @@ test('Creates multiple locations', async () => {
 
   const parentId = generateUuid(rng)
 
-  const locationPayload = generator.locations.set([
-    { id: parentId },
-    { parentId: parentId },
-    { parentId: parentId },
-    {}
-  ])
+  const locationPayload = generator.locations.set(
+    [{ id: parentId }, { parentId: parentId }, { parentId: parentId }, {}],
+    rng
+  )
 
   await dataSeedingClient.locations.set(locationPayload)
 
@@ -91,8 +96,8 @@ test('seeding locations is additive, not destructive', async () => {
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
   const initialLocations = await dataSeedingClient.locations.get()
-
-  const initialPayload = generator.locations.set(5)
+  const locationRng = createPrng(847)
+  const initialPayload = generator.locations.set(5, locationRng)
 
   await dataSeedingClient.locations.set(initialPayload)
 
