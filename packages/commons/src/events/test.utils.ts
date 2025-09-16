@@ -170,9 +170,14 @@ export function mapFieldTypeToMockValue(
       return {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        // @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
-        // @TODO:  Find a way to give out context aware mock values in the future.
-        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '27160bbd-32d1-4625-812f-860226bfb92a',
+        street: '123 Tennis Club Avenue',
+        number: '123',
+        zipCode: 'Z12345',
+        urbanOrRural: 'URBAN' as const,
+        town: 'Tennisville',
+        residentialArea: 'Example Residential Area',
         streetLevelDetails: {
           town: 'Example Town',
           residentialArea: 'Example Residential Area',
