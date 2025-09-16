@@ -324,12 +324,10 @@ function AddressInput(props: Props) {
 function AddressOutput({
   value,
   lineSeparator,
-  fields,
   configuration
 }: {
   value?: AddressFieldValue
   lineSeparator?: React.ReactNode
-  fields?: Array<AddressFieldIdentifier>
   configuration?: AddressField
 }) {
   const { getLocations } = useLocations()

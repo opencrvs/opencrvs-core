@@ -43,10 +43,8 @@ const meta: Meta<typeof FormFieldGenerator> = {
 
 export default meta
 
-// @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
-// @TODO:  Find a way to give out context aware mock values in the future.
 const leafAdminStructureLocationId =
-  '27160bbd-32d1-4625-812f-860226bfb92a' as UUID
+  '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
 
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
@@ -187,7 +185,7 @@ export const AddressReviewInvalid: StoryObj<typeof Review> = {
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+            administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054d' as UUID // random uuid
           } as AddressFieldValue
         }}
         formConfig={declarationForm}

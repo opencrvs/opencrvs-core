@@ -158,7 +158,6 @@ export function ValueOutput(
     return (
       <Address.Output
         configuration={field.config}
-        fields={searchMode === true ? ['country'] : undefined}
         lineSeparator={searchMode === true ? ', ' : undefined}
         value={field.value}
       />
