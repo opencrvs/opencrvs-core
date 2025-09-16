@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { AppRouter } from '@gateway/v2-events/events/router'
-import { onlineManager, QueryClient } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/react-query'
 import {
   PersistQueryClientProvider,
   type PersistedClient,
@@ -27,10 +27,8 @@ import {
 } from '@trpc/tanstack-react-query'
 import React from 'react'
 import superjson from 'superjson'
-import { useSelector } from 'react-redux'
 import { storage } from '@client/storage'
 import { getToken } from '@client/utils/authUtils'
-import { getUserDetails } from '@client/profile/profileSelectors'
 
 const { TRPCProvider: TRPCProviderRaw, useTRPC } =
   createTRPCContext<AppRouter>()
