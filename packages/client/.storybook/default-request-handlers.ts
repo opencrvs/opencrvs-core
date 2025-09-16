@@ -114,7 +114,9 @@ export const handlers = {
           validUntil: null
         },
         {
-          id: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+          // @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
+          // @TODO:  Find a way to give out context aware mock values in the future.
+          id: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
           name: 'Isango',
           locationType: 'ADMIN_STRUCTURE',
           parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,

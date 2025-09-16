@@ -43,6 +43,11 @@ const meta: Meta<typeof FormFieldGenerator> = {
 
 export default meta
 
+// @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
+// @TODO:  Find a way to give out context aware mock values in the future.
+const leafAdminStructureLocationId =
+  '27160bbd-32d1-4625-812f-860226bfb92a' as UUID
+
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
@@ -97,7 +102,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
             defaultValue: {
               country: 'FAR',
               addressType: AddressType.DOMESTIC,
-              administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID
+              administrativeArea: leafAdminStructureLocationId
             },
             configuration: {
               streetAddressForm: [
@@ -227,7 +232,7 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+            administrativeArea: leafAdminStructureLocationId,
             streetLevelDetails: {
               town: 'Example Town',
               residentialArea: 'Example Residential Area',
@@ -242,7 +247,7 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+            administrativeArea: leafAdminStructureLocationId,
             streetLevelDetails: {
               town: 'Example Village'
             }
@@ -270,7 +275,7 @@ export const AddressInCopy: StoryObj<typeof Review> = {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+        administrativeArea: leafAdminStructureLocationId,
         streetLevelDetails: {
           town: 'Example Town',
           residentialArea: 'Example Residential Area',
