@@ -10,6 +10,7 @@
  */
 import { uniq, isString, get, uniqBy, mergeWith } from 'lodash'
 import { v4 as uuid } from 'uuid'
+import { Location } from '@events/service/locations/locations'
 import {
   ResolvedUser,
   ActionDocument,
@@ -281,6 +282,51 @@ export function mergeWithoutNullsOrUndefined<T>(
     }
     return undefined
   })
+}
+
+type OutputMode = 'withIds' | 'withNames'
+/*
+Function to traverse the administrative level hierarchy from an arbitrary / leaf point
+*/
+export function getAdminLevelHierarchy(
+  locationId: string | undefined,
+  locations: Location[],
+  adminStructure: string[],
+  outputMode: OutputMode = 'withIds'
+) {
+  // Collect location objects from leaf to root
+  const collectedLocations: Location[] = []
+
+  let current = locationId
+    ? locations.find((l) => l.id === locationId.toString())
+    : null
+
+  while (current) {
+    collectedLocations.push(current)
+    if (!current.parentId) {
+      break
+    }
+    const parentId = current.parentId
+    current = locations.find((l) => l.id === parentId)
+  }
+
+  // Reverse so root is first, leaf is last
+  collectedLocations.reverse()
+
+  // Map collected locations to the provided admin structure
+  const hierarchy: Partial<Record<string, string>> = {}
+  for (
+    let i = 0;
+    i < adminStructure.length && i < collectedLocations.length;
+    i++
+  ) {
+    hierarchy[adminStructure[i]] =
+      outputMode === 'withNames'
+        ? collectedLocations[i].name
+        : collectedLocations[i].id
+  }
+
+  return hierarchy
 }
 
 export const logout = async () => {
