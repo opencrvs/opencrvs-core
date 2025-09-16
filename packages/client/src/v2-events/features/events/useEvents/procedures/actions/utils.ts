@@ -9,12 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  ActionDocument,
   ActionInput,
   ActionStatus,
   ActionType,
   EventDocument,
-  getCurrentEventState,
   UUID
 } from '@opencrvs/commons/client'
 
@@ -49,13 +47,7 @@ export function updateEventOptimistically<T extends ActionInput>(
         {
           id: createTemporaryId(),
           type: actionType,
-          /*
-           * These need to be casted or otherwise branded
-           * types like FullDocumentPath causes an error here.
-           * This is because we are effectively trying to force an input type to an output type
-           */
-          declaration: (variables.declaration ||
-            {}) as ActionDocument['declaration'],
+          declaration: variables.declaration || {},
           createdAt: new Date().toISOString(),
           createdByUserType: 'user',
           createdBy: '@todo',
@@ -90,13 +82,7 @@ export function addMarkAsNotDuplicateActionOptimistically<
         {
           id: createTemporaryId(),
           type: ActionType.MARK_AS_NOT_DUPLICATE,
-          /*
-           * These need to be casted or otherwise branded
-           * types like FullDocumentPath causes an error here.
-           * This is because we are effectively trying to force an input type to an output type
-           */
-          declaration: (variables.declaration ||
-            {}) as ActionDocument['declaration'],
+          declaration: variables.declaration || {},
           createdAt: new Date().toISOString(),
           createdByUserType: 'user',
           createdBy: '@todo',
@@ -107,6 +93,45 @@ export function addMarkAsNotDuplicateActionOptimistically<
         }
       ]
     }
+
+    setEventData(optimisticEvent.id, optimisticEvent)
+  }
+}
+
+export function approveCorrectionOptimistically<T extends ActionInput>() {
+  return (variables: T) => {
+    const localEvent = queryClient.getQueryData(
+      trpcOptionsProxy.event.get.queryKey(variables.eventId)
+    )
+
+    if (!localEvent) {
+      return
+    }
+
+    if (!('requestId' in variables)) {
+      return
+    }
+
+    const optimisticEvent: EventDocument = {
+      ...localEvent,
+      actions: [
+        ...localEvent.actions,
+        {
+          id: createTemporaryId(),
+          type: ActionType.APPROVE_CORRECTION,
+          declaration: {},
+          createdAt: new Date().toISOString(),
+          createdByUserType: 'user',
+          createdBy: '@todo',
+          createdAtLocation: '@todo' as UUID,
+          status: ActionStatus.Accepted,
+          transactionId: variables.transactionId,
+          createdByRole: '@todo',
+          requestId: variables.requestId
+        }
+      ]
+    }
+
     setEventData(optimisticEvent.id, optimisticEvent)
   }
 }
@@ -121,7 +146,6 @@ export function correctEventOptimistically<T extends ActionInput>() {
       return
     }
 
-    console.log('variables', variables)
     const requestId = createTemporaryId()
 
     const optimisticEvent: EventDocument = {
@@ -131,13 +155,7 @@ export function correctEventOptimistically<T extends ActionInput>() {
         {
           id: requestId,
           type: ActionType.REQUEST_CORRECTION,
-          /*
-           * These need to be casted or otherwise branded
-           * types like FullDocumentPath causes an error here.
-           * This is because we are effectively trying to force an input type to an output type
-           */
-          declaration: (variables.declaration ||
-            {}) as ActionDocument['declaration'],
+          declaration: variables.declaration || {},
           createdAt: new Date().toISOString(),
           createdByUserType: 'user',
           createdBy: '@todo',
@@ -147,13 +165,8 @@ export function correctEventOptimistically<T extends ActionInput>() {
           createdByRole: '@todo'
         },
         {
-          id: requestId,
+          id: createTemporaryId(),
           type: ActionType.APPROVE_CORRECTION,
-          /*
-           * These need to be casted or otherwise branded
-           * types like FullDocumentPath causes an error here.
-           * This is because we are effectively trying to force an input type to an output type
-           */
           declaration: {},
           createdAt: new Date().toISOString(),
           createdByUserType: 'user',

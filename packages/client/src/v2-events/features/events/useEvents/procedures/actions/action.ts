@@ -27,7 +27,8 @@ import {
   omitHiddenPaginatedFields,
   deepMerge,
   EventState,
-  EventConfig
+  EventConfig,
+  ApproveCorrectionActionInput
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -42,7 +43,8 @@ import {
 import {
   addMarkAsNotDuplicateActionOptimistically,
   updateEventOptimistically,
-  correctEventOptimistically
+  correctEventOptimistically,
+  approveCorrectionOptimistically
 } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   createEventActionMutationFn,
@@ -223,7 +225,6 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.request.request, {
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve.request, {
-  // TODO CIHAN: add onMutate
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.correction.approve.request
   ),
@@ -233,11 +234,11 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve.request, {
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.APPROVE_CORRECTION
-  }
+  },
+  onMutate: approveCorrectionOptimistically()
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject.request, {
-  // TODO CIHAN: add onMutate
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.correction.reject.request
   ),
