@@ -354,8 +354,9 @@ function FormReview({
           const displayedFields = fields.filter(
             ({ valueDisplay, errorDisplay, type }) => {
               if (
-                type === FieldType.DIVIDER ||
-                type === FieldType.BULLET_LIST
+                FieldTypesToHideInReview.some(
+                  (typeToHide) => type === typeToHide
+                )
               ) {
                 return false
               }
