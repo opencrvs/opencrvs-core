@@ -217,6 +217,20 @@ export const handlers = {
           locationType: 'HEALTH_FACILITY',
           parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
           validUntil: null
+        },
+        {
+          id: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+          name: 'Ibombo District Office',
+          locationType: 'CRVS_OFFICE',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
+        },
+        {
+          id: '62a0ccb4-4f30-4f30-8882-f256007dff9f' as UUID,
+          name: 'Isamba District Office',
+          locationType: 'CRVS_OFFICE',
+          parentId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
+          validUntil: null
         }
       ]
     })
