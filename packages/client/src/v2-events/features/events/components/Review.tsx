@@ -350,18 +350,24 @@ function FormReview({
             }
           )
 
-          if (!shouldDisplayPage) {
-            return <React.Fragment key={`Section_${page.id}`}></React.Fragment>
-          }
-
           // Only display fields that have a non-undefined/null value or have an validation error
           const displayedFields = fields.filter(
-            ({ valueDisplay, errorDisplay }) => {
-              // Explicitly check for undefined and null, so that e.g. number 0 and empty string outputs are shown
+            ({ valueDisplay, errorDisplay, type }) => {
+              if (
+                type === FieldType.DIVIDER ||
+                type === FieldType.BULLET_LIST
+              ) {
+                return false
+              }
+              // Explicitly check for null, so that e.g. number 0 and empty string outputs are shown
               const hasValue = valueDisplay !== null
               return hasValue || Boolean(errorDisplay)
             }
           )
+
+          if (!shouldDisplayPage || displayedFields.length === 0) {
+            return <React.Fragment key={`Section_${page.id}`}></React.Fragment>
+          }
 
           const hasCorrectableFields = displayedFields.some(
             (field) => !field.uncorrectable
