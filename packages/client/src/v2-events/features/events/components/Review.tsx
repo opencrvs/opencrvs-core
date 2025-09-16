@@ -37,12 +37,13 @@ import {
   isPageVisible,
   runFieldValidations,
   Location,
-  LocationType
+  LocationType,
+  UUID
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { getLeafLocationIds } from '../registered-fields'
+import { getLeafLocationIds } from '../../../hooks/useLocations'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -278,7 +279,7 @@ function FormReview({
   formConfig,
   form,
   previousForm,
-  locations,
+  locationIds,
   onEdit,
   showPreviouslyMissingValuesAsChanged,
   readonlyMode,
@@ -288,7 +289,7 @@ function FormReview({
   formConfig: FormConfig
   form: EventState
   previousForm: EventState
-  locations?: Location[]
+  locationIds?: Array<{ id: UUID }>
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
   readonlyMode?: boolean
@@ -320,12 +321,9 @@ function FormReview({
                 formConfig
               })
 
-              const context = locations
+              const context = locationIds
                 ? {
-                    leafAdminStructureLocationIds: getLeafLocationIds(
-                      locations,
-                      [LocationType.enum.ADMIN_STRUCTURE]
-                    )
+                    leafAdminStructureLocationIds: locationIds
                   }
                 : undefined
 
@@ -466,7 +464,7 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   form,
-  locations,
+  locationIds,
   annotation,
   onEdit,
   children,
@@ -481,7 +479,7 @@ function ReviewComponent({
   children?: React.ReactNode
   formConfig: FormConfig
   form: EventState
-  locations?: Location[]
+  locationIds?: Array<{ id: UUID }>
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
@@ -527,7 +525,7 @@ function ReviewComponent({
             formConfig={formConfig}
             isCorrection={isCorrection}
             isReviewCorrection={isReviewCorrection}
-            locations={locations}
+            locationIds={locationIds}
             previousForm={previousForm}
             readonlyMode={readonlyMode}
             showPreviouslyMissingValuesAsChanged={

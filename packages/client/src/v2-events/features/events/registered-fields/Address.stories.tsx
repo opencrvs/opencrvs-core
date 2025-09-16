@@ -186,7 +186,7 @@ export const AddressReviewInvalid: StoryObj<typeof Review> = {
           } as AddressFieldValue
         }}
         formConfig={declarationForm}
-        locations={locations}
+        locationIds={locations}
         title="My address form with address output"
         // eslint-disable-next-line no-console
         onEdit={(values) => console.log(values)}

@@ -43,7 +43,7 @@ import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitMod
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { getScope } from '@client/profile/profileSelectors'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useSuspenseLeafLevelLocations } from '@client/v2-events/hooks/useLocations'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 /**
@@ -60,8 +60,7 @@ export function Review() {
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { closeActionView } = useEventFormNavigation()
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locationIds = useSuspenseLeafLevelLocations()
 
   const event = events.getEvent.findFromCache(eventId).data
 
@@ -111,7 +110,7 @@ export function Review() {
     scopes,
     reviewFields: reviewConfig.fields,
     status: currentEventState.status,
-    locations,
+    locationIds,
     eventType: event.type
   })
 
@@ -226,7 +225,7 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
-        locations={locations}
+        locationIds={locationIds}
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}

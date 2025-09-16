@@ -29,7 +29,6 @@ import {
   AddressField,
   AdministrativeArea,
   DefaultAddressFieldValue,
-  UUID,
   LocationType
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -39,59 +38,6 @@ import { getOfflineData } from '@client/offline/selectors'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { IAdminStructureItem } from '@client/utils/referenceApi'
 import { getUserDetails } from '@client/profile/profileSelectors'
-
-/**
- *
- * @returns given the type of location, check if it matches the provided types. When no types are provided, always returns true.
- */
-function matchesType(
-  type: LocationType | null,
-  locationTypes?: LocationType[]
-) {
-  return (
-    !locationTypes ||
-    locationTypes.length === 0 ||
-    (type !== null && locationTypes.includes(type))
-  )
-}
-
-/**
- * Get the leaf location IDs from a list of locations.
- *
- * A leaf location is defined as a location that does not have any children in the provided list.
- * e.g. if a location is a parent of another location in the list, it is not considered a leaf. ADMIN_STRUCTURE might have CRVS_OFFICE children, but can be a leaf if we only consider ADMIN_STRUCTURE locations.
- *
- * @param locations - The list of locations to search.
- * @param locationTypes - The types of locations to include.
- * @returns The list of leaf location IDs.
- */
-export function getLeafLocationIds(
-  locations: Location[],
-  locationTypes?: LocationType[]
-): Array<{ id: UUID }> {
-  const nonLeafLocationIds = new Set<string>()
-
-  for (const location of locations) {
-    if (
-      location.parentId &&
-      matchesType(location.locationType, locationTypes)
-    ) {
-      nonLeafLocationIds.add(location.parentId)
-    }
-  }
-
-  const result: { id: UUID }[] = []
-  for (const loc of locations) {
-    if (
-      !nonLeafLocationIds.has(loc.id) &&
-      matchesType(loc.locationType, locationTypes)
-    ) {
-      result.push({ id: loc.id })
-    }
-  }
-
-  return result
-}
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -438,7 +384,7 @@ function AddressOutput({
 
   const administrativeArea = value.administrativeArea
   const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
+    (location) => location.locationType === LocationType.enum.ADMIN_STRUCTURE
   )
 
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
