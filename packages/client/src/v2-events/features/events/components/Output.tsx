@@ -224,7 +224,7 @@ function findPreviousValueWithSameLabel(
   return { value: undefined, field: undefined }
 }
 
-function isEmptyValue(field: FieldConfig, value: unknown) {
+export function isEmptyValue(field: FieldConfig, value: unknown) {
   const module = getRegisteredFieldByFieldConfig(field)
   if (
     module &&
