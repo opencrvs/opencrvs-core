@@ -41,7 +41,9 @@ export function useWorkboxCacheReady(cachePrefix = CACHE_NAME) {
       }
     }
 
-    void checkCache()
+    void navigator.serviceWorker.ready.then(() => {
+      void checkCache()
+    })
 
     return () => {
       cancelled = true
