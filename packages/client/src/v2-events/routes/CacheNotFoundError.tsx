@@ -45,24 +45,24 @@ const ButtonContainer = styled.div`
 `
 const serviceWorkerCacheMessages = {
   header: {
-    id: 'serviceWorker.cacheKey.WorkBoxRuntime.error.header',
+    id: 'v2.serviceWorker.cacheKey.WorkBoxRuntime.error.header',
     description: 'Header shown when WorkBox runtime cache key is missing',
     defaultMessage: '⚠️ Application Cache Error'
   },
   content: {
-    id: 'serviceWorker.cacheKey.WorkBoxRuntime.error.content',
+    id: 'v2.serviceWorker.cacheKey.WorkBoxRuntime.error.content',
     description: 'Content shown when WorkBox runtime cache key is missing',
     defaultMessage:
       'Something went wrong with loading the app. Reload this page, or log out and log back in to continue.'
   },
   logout: {
-    id: 'serviceWorker.cacheKey.WorkBoxRuntime.error.button.logout',
+    id: 'v2.serviceWorker.cacheKey.WorkBoxRuntime.error.button.logout',
     description:
       'Button label for logging out when WorkBox runtime cache key is missing',
     defaultMessage: 'Log out'
   },
   reload: {
-    id: 'serviceWorker.cacheKey.WorkBoxRuntime.error.button.reload',
+    id: 'v2.serviceWorker.cacheKey.WorkBoxRuntime.error.button.reload',
     description:
       'Button label for reload when WorkBox runtime cache key is missing',
     defaultMessage: 'Reload'
@@ -90,7 +90,7 @@ export const CacheNotFoundError = () => {
             <TertiaryButton onClick={() => window.location.reload()}>
               {intl.formatMessage(serviceWorkerCacheMessages.reload)}
             </TertiaryButton>
-            <TertiaryButton onClick={logout}>
+            <TertiaryButton onClick={async () => logout()}>
               {intl.formatMessage(serviceWorkerCacheMessages.logout)}
             </TertiaryButton>
           </ButtonContainer>

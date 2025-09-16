@@ -13,7 +13,7 @@ import React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
 import { expect, waitFor, within } from '@storybook/test'
 import { Outlet } from 'react-router-dom'
-import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
+import { LoadingBar } from '@opencrvs/components'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { TRPCErrorBoundary } from '@client/v2-events/routes/TRPCErrorBoundary'
 import { NavigationHistoryProvider } from '../components/NavigationStack'
@@ -48,7 +48,7 @@ export const WorkboxCacheKeyCheck: Story = {
         Component: () => {
           const cacheReady = useWorkboxCacheReady('fake-key')
           if (cacheReady === null) {
-            return <LoadingBar message="Loading Cache..." />
+            return <LoadingBar message={'Loading Cache...'} />
           }
 
           if (!cacheReady) {
