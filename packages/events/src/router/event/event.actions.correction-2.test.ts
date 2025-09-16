@@ -188,6 +188,7 @@ describe('Overwriting parent field', () => {
       'child.dob': '2020-05-15',
       'mother.name': { firstname: 'Jane', surname: 'Doe' },
       'mother.dob': '1990-03-22',
+      'mother.idType': 'NID',
       'mother.nid': 'ID123456789',
       'informant.relation': 'FATHER',
       'informant.name': { firstname: 'Rok', surname: 'Doe' },

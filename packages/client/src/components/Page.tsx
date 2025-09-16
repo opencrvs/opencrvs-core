@@ -122,7 +122,7 @@ class Component extends React.Component<IFullProps> {
     } else {
       return (
         <>
-          <LoadingBar />
+          <LoadingBar message="Loading records..." />
         </>
       )
     }

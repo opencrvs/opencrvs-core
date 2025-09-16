@@ -16,6 +16,13 @@ import {
   StrictMatcherOptions
 } from '.'
 
+export function not(clause: ClauseInput): ClauseInput {
+  return {
+    type: 'not',
+    clause
+  }
+}
+
 export function and(...clauses: ClauseInput[]): ClauseInput {
   return {
     type: 'and',
