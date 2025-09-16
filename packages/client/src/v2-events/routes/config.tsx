@@ -14,7 +14,6 @@ import { Outlet, RouteObject } from 'react-router-dom'
 
 import { useSelector } from 'react-redux'
 import { ActionType } from '@opencrvs/commons/client'
-import { LoadingBar } from '@opencrvs/components'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import { router as correctionReviewRouter } from '@client/v2-events/features/events/actions/correct/review/router'
@@ -48,10 +47,8 @@ import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { SearchLayout } from '../layouts/search'
 import { useWorkqueues } from '../hooks/useWorkqueue'
 import { ReviewDuplicateIndex } from '../features/events/actions/dedup/ReviewDuplicate'
-import { useWorkboxCacheReady } from '../hooks/useWorkboxCacheReady'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
-import { CacheNotFoundError } from './CacheNotFoundError'
 
 function PrefetchQueries() {
   const workqueues = useWorkqueues()
@@ -80,20 +77,11 @@ export const routesConfig = {
   path: ROUTES.V2.path,
   Component: () => {
     const currentUser = useSelector(getUserDetails)
-    const cacheReady = useWorkboxCacheReady()
 
     if (!currentUser) {
       throw new Error(
         'V2 routes cannot be initialised without user details. Make sure user details are fetched before the routes are rendered'
       )
-    }
-
-    if (cacheReady === null) {
-      return <LoadingBar message={'Loading Cache'} />
-    }
-
-    if (!cacheReady) {
-      return <CacheNotFoundError />
     }
     return (
       <NavigationHistoryProvider>
