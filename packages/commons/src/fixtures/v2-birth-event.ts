@@ -18,6 +18,7 @@ import { FieldType } from '../events/FieldType'
 import { BIRTH_EVENT } from '../events/Constants'
 import { ActionType } from '../events/ActionType'
 import { TranslationConfig } from 'src/events/TranslationConfig'
+import { createFieldConditionals } from '../conditionals/conditionals'
 
 function generateTranslationConfig(message: string): TranslationConfig {
   return {
@@ -76,11 +77,51 @@ const mother = defineFormPage({
       conditionals: []
     },
     {
+      id: 'mother.idType',
+      type: FieldType.SELECT,
+      required: true,
+      label: generateTranslationConfig('Type of ID'),
+      options: [
+        {
+          value: 'NID',
+          label: generateTranslationConfig('National ID')
+        },
+        {
+          value: 'PASSPORT',
+          label: generateTranslationConfig('Passport')
+        },
+        {
+          value: 'NONE',
+          label: generateTranslationConfig('None')
+        }
+      ],
+      conditionals: []
+    },
+    {
       id: 'mother.nid',
       type: FieldType.ID,
       required: true,
-      label: generateTranslationConfig('ID Number'),
-      conditionals: [],
+      label: generateTranslationConfig('National ID'),
+      conditionals: [
+        {
+          type: 'SHOW',
+          conditional: createFieldConditionals('mother.idType').isEqualTo('NID')
+        }
+      ],
+      validation: []
+    },
+    {
+      id: 'mother.passport',
+      type: FieldType.ID,
+      required: true,
+      label: generateTranslationConfig('Passport'),
+      conditionals: [
+        {
+          type: 'SHOW',
+          conditional:
+            createFieldConditionals('mother.idType').isEqualTo('PASSPORT')
+        }
+      ],
       validation: []
     }
   ]
