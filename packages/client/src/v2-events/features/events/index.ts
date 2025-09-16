@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { EventSelection } from './EventSelection'
 
-export * from './workqueue'
-export * from './navigation'
-export * from './errors'
+export const EventSelectionIndex = withSuspense(EventSelection)
