@@ -15,13 +15,6 @@ import {
   QueryParamReaderFieldValue
 } from '@opencrvs/commons/client'
 
-function deleteAllParams(params: URLSearchParams) {
-  for (const key of params.keys()) {
-    params.delete(key)
-  }
-  return params
-}
-
 function prepareParamsFromMap(
   params: URLSearchParams,
   map: NonNullable<QueryParamReaderField['configuration']['map']>
