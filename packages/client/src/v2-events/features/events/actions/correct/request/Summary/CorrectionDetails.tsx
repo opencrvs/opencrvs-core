@@ -136,14 +136,15 @@ function buildCorrectionDetails(
         .map((field) => ({
           label: field.label,
           id: field.id,
-          valueDisplay: Output({
-            field,
-            value: annotation[field.id],
-            showPreviouslyMissingValuesAsChanged: false
-          }),
+          valueDisplay: (
+            <Output
+              field={field}
+              showPreviouslyMissingValuesAsChanged={false}
+              value={annotation[field.id]}
+            />
+          ),
           pageId: page.id
         }))
-        .filter((f) => f.valueDisplay)
     })
 
   if (correctionRequestAction) {

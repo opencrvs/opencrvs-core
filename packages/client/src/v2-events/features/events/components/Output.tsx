@@ -64,7 +64,8 @@ import {
   Paragraph,
   Number,
   Text,
-  TimeField
+  TimeField,
+  getRegisteredFieldByFieldConfig
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
@@ -225,13 +226,16 @@ function findPreviousValueWithSameLabel(
   return { value: undefined, field: undefined }
 }
 
-function isEffectivelyEmpty(children: React.ReactNode) {
-  const html = ReactDOMServer.renderToStaticMarkup(
-    <IntlProvider locale="en" messages={{}}>
-      {children}
-    </IntlProvider>
-  )
-  return html.trim() === ''
+function isEmptyValue(field: FieldConfig, value: unknown) {
+  const module = getRegisteredFieldByFieldConfig(field)
+  if (
+    module &&
+    'isEmptyValue' in module &&
+    typeof module.isEmptyValue === 'function'
+  ) {
+    return module.isEmptyValue(value)
+  }
+  return !Boolean(value)
 }
 
 export function Output({
@@ -298,7 +302,7 @@ export function Output({
   if (hasPreviousValue && !_.isEqual(previousValue, value)) {
     const valueOutput = <ValueOutput config={field} value={value} />
 
-    if (isEffectivelyEmpty(valueOutput)) {
+    if (isEmptyValue(field, value)) {
       if (displayEmptyAsDash) {
         return '-'
       }
@@ -312,7 +316,7 @@ export function Output({
 
     return (
       <>
-        {!isEffectivelyEmpty(previousValueOutput) && (
+        {!isEmptyValue(field, previousValue) && (
           <>
             <Deleted>
               <ValueOutput
@@ -334,7 +338,7 @@ export function Output({
     )
     return (
       <>
-        {isEffectivelyEmpty(deleted) ? (
+        {isEmptyValue(field, previousValue) ? (
           // For a deleted 'dash', we dont want to overline the dash
           <DeletedEmpty>{'-'}</DeletedEmpty>
         ) : (
