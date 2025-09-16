@@ -50,7 +50,7 @@ const Progress = styled.div`
   background: ${({ theme }) => theme.colors.primary};
   animation: ${ProgressAnimation} 300s ease;
 `
-export const LoadingBar = () => (
+export const LoadingBar = ({ message }: { message: string }) => (
   <ProgressBackground>
     <img
       src="/images/logo-90x90.svg"
@@ -68,7 +68,7 @@ export const LoadingBar = () => (
         <Progress id="progress" />
       </ProgressBar>
       <Text variant="reg16" element="p">
-        Loading records...
+        {message}
       </Text>
     </Stack>
   </ProgressBackground>
