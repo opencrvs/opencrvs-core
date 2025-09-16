@@ -9,13 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  ActionDocument,
   ActionInput,
   ActionStatus,
   ActionType,
-  EventDocument,
   UUID
 } from '@opencrvs/commons/client'
-
 import {
   findLocalEventConfig,
   setEventData,
@@ -24,13 +23,39 @@ import {
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
 
-export function updateEventOptimistically<T extends ActionInput>(
-  actionType: typeof ActionType.DECLARE
-) {
+type SupportedActionTypes =
+  | typeof ActionType.DECLARE
+  | typeof ActionType.MARK_AS_DUPLICATE
+  | typeof ActionType.MARK_AS_NOT_DUPLICATE
+  | typeof ActionType.APPROVE_CORRECTION
+  | typeof ActionType.REQUEST_CORRECTION
+
+/**
+ * Creates an optimistic update function for event actions with proper typing.
+ *
+ * This function provides type-safe handling of requestId based on the action type:
+ * - For actions that require requestId (APPROVE_CORRECTION, REJECT_CORRECTION),
+ *   the function will automatically include the requestId if present in variables
+ * - For other actions, requestId will be ignored
+ *
+ * @param options - Configuration for the optimistic update
+ * @param options.actionType - The type of action being performed
+ * @param options.status - Optional status override for the action
+ * @param options.declaration - Optional declaration override
+ * @param options.useUpdateLocalEventIndex - Whether to update the local event index
+ * @returns A function that performs the optimistic update
+ */
+export function updateEventOptimistically<T extends ActionInput>(options: {
+  actionType: SupportedActionTypes
+  status?: ActionStatus
+  declaration?: Record<string, unknown>
+  useUpdateLocalEventIndex?: boolean
+}) {
   return (variables: T) => {
     const localEvent = queryClient.getQueryData(
       trpcOptionsProxy.event.get.queryKey(variables.eventId)
     )
+
     if (!localEvent) {
       return
     }
@@ -40,146 +65,30 @@ export function updateEventOptimistically<T extends ActionInput>(
       return
     }
 
-    const optimisticEvent: EventDocument = {
+    const optimisticAction = {
+      ...variables,
+      id: createTemporaryId(),
+      declaration: variables.declaration || {},
+      createdAt: new Date().toISOString(),
+      createdByUserType: 'user' as const,
+      createdBy: '@todo',
+      createdAtLocation: '@todo' as UUID,
+      status: options.status || ActionStatus.Requested,
+      createdByRole: '@todo',
+      type: options.actionType
+    } as ActionDocument
+
+    const optimisticEvent = {
       ...localEvent,
-      actions: [
-        ...localEvent.actions,
-        {
-          id: createTemporaryId(),
-          type: actionType,
-          declaration: variables.declaration || {},
-          createdAt: new Date().toISOString(),
-          createdByUserType: 'user',
-          createdBy: '@todo',
-          createdAtLocation: '@todo' as UUID,
-          status: ActionStatus.Requested,
-          transactionId: variables.transactionId,
-          createdByRole: '@todo'
-        }
-      ]
+      actions: [...localEvent.actions, optimisticAction]
     }
 
-    updateLocalEventIndex(optimisticEvent.id, optimisticEvent)
-  }
-}
-
-export function addMarkAsNotDuplicateActionOptimistically<
-  T extends ActionInput
->() {
-  return (variables: T) => {
-    const localEvent = queryClient.getQueryData(
-      trpcOptionsProxy.event.get.queryKey(variables.eventId)
-    )
-
-    if (!localEvent) {
-      return
+    if (options.useUpdateLocalEventIndex) {
+      updateLocalEventIndex(optimisticEvent.id, optimisticEvent)
+    } else {
+      setEventData(optimisticEvent.id, optimisticEvent)
     }
 
-    const optimisticEvent: EventDocument = {
-      ...localEvent,
-      actions: [
-        ...localEvent.actions,
-        {
-          id: createTemporaryId(),
-          type: ActionType.MARK_AS_NOT_DUPLICATE,
-          declaration: variables.declaration || {},
-          createdAt: new Date().toISOString(),
-          createdByUserType: 'user',
-          createdBy: '@todo',
-          createdAtLocation: '@todo' as UUID,
-          status: ActionStatus.Accepted,
-          transactionId: variables.transactionId,
-          createdByRole: '@todo'
-        }
-      ]
-    }
-
-    setEventData(optimisticEvent.id, optimisticEvent)
-  }
-}
-
-export function approveCorrectionOptimistically<T extends ActionInput>() {
-  return (variables: T) => {
-    const localEvent = queryClient.getQueryData(
-      trpcOptionsProxy.event.get.queryKey(variables.eventId)
-    )
-
-    if (!localEvent) {
-      return
-    }
-
-    if (!('requestId' in variables)) {
-      return
-    }
-
-    const optimisticEvent: EventDocument = {
-      ...localEvent,
-      actions: [
-        ...localEvent.actions,
-        {
-          id: createTemporaryId(),
-          type: ActionType.APPROVE_CORRECTION,
-          declaration: {},
-          createdAt: new Date().toISOString(),
-          createdByUserType: 'user',
-          createdBy: '@todo',
-          createdAtLocation: '@todo' as UUID,
-          status: ActionStatus.Accepted,
-          transactionId: variables.transactionId,
-          createdByRole: '@todo',
-          requestId: variables.requestId
-        }
-      ]
-    }
-
-    setEventData(optimisticEvent.id, optimisticEvent)
-  }
-}
-
-export function correctEventOptimistically<T extends ActionInput>() {
-  return (variables: T) => {
-    const localEvent = queryClient.getQueryData(
-      trpcOptionsProxy.event.get.queryKey(variables.eventId)
-    )
-
-    if (!localEvent) {
-      return
-    }
-
-    const requestId = createTemporaryId()
-
-    const optimisticEvent: EventDocument = {
-      ...localEvent,
-      actions: [
-        ...localEvent.actions,
-        {
-          id: requestId,
-          type: ActionType.REQUEST_CORRECTION,
-          declaration: variables.declaration || {},
-          createdAt: new Date().toISOString(),
-          createdByUserType: 'user',
-          createdBy: '@todo',
-          createdAtLocation: '@todo' as UUID,
-          status: ActionStatus.Accepted,
-          transactionId: variables.transactionId,
-          createdByRole: '@todo'
-        },
-        {
-          id: createTemporaryId(),
-          type: ActionType.APPROVE_CORRECTION,
-          declaration: {},
-          createdAt: new Date().toISOString(),
-          createdByUserType: 'user',
-          createdBy: '@todo',
-          createdAtLocation: '@todo' as UUID,
-          status: ActionStatus.Accepted,
-          transactionId: variables.transactionId,
-          createdByRole: '@todo',
-          requestId
-        }
-      ]
-    }
-
-    setEventData(optimisticEvent.id, optimisticEvent)
+    return optimisticAction
   }
 }

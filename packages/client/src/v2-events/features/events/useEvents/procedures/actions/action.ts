@@ -20,6 +20,7 @@ import { useSyncExternalStore } from 'react'
 import { isEmpty } from 'lodash'
 import {
   ActionType,
+  ActionStatus,
   ActionUpdate,
   EventDocument,
   getCurrentEventState,
@@ -27,8 +28,7 @@ import {
   omitHiddenPaginatedFields,
   deepMerge,
   EventState,
-  EventConfig,
-  ApproveCorrectionActionInput
+  EventConfig
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -40,12 +40,7 @@ import {
   deleteLocalEvent,
   updateLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
-import {
-  addMarkAsNotDuplicateActionOptimistically,
-  updateEventOptimistically,
-  correctEventOptimistically,
-  approveCorrectionOptimistically
-} from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
+import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   createEventActionMutationFn,
   MutationType,
@@ -127,10 +122,11 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  onMutate: updateEventOptimistically(ActionType.DECLARE),
-  meta: {
-    actionType: ActionType.DECLARE
-  }
+  onMutate: updateEventOptimistically({
+    actionType: ActionType.DECLARE,
+    useUpdateLocalEventIndex: true
+  }),
+  meta: { actionType: ActionType.DECLARE }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
@@ -141,9 +137,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.REGISTER
-  }
+  meta: { actionType: ActionType.REGISTER }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.notify.request, {
@@ -154,9 +148,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.notify.request, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.NOTIFY
-  }
+  meta: { actionType: ActionType.NOTIFY }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.validate.request, {
@@ -167,9 +159,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.validate.request, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.VALIDATE
-  }
+  meta: { actionType: ActionType.VALIDATE }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.reject.request, {
@@ -180,9 +170,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.reject.request, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.REJECT
-  }
+  meta: { actionType: ActionType.REJECT }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.archive.request, {
@@ -193,9 +181,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.archive.request, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.ARCHIVE
-  }
+  meta: { actionType: ActionType.ARCHIVE }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
@@ -206,9 +192,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.PRINT_CERTIFICATE
-  }
+  meta: { actionType: ActionType.PRINT_CERTIFICATE }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.correction.request.request, {
@@ -219,9 +203,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.request.request, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.REQUEST_CORRECTION
-  }
+  meta: { actionType: ActionType.REQUEST_CORRECTION }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve.request, {
@@ -232,10 +214,12 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve.request, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.APPROVE_CORRECTION
-  },
-  onMutate: approveCorrectionOptimistically()
+  meta: { actionType: ActionType.APPROVE_CORRECTION },
+  onMutate: updateEventOptimistically({
+    actionType: ActionType.APPROVE_CORRECTION,
+    status: ActionStatus.Accepted,
+    declaration: {}
+  })
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject.request, {
@@ -246,9 +230,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject.request, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.REJECT_CORRECTION
-  }
+  meta: { actionType: ActionType.REJECT_CORRECTION }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.assignment.assign, {
@@ -259,9 +241,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.assign, {
   retryDelay,
   onSuccess: onAssign,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.ASSIGN
-  }
+  meta: { actionType: ActionType.ASSIGN }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
@@ -273,9 +253,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
   retryDelay,
   onSuccess: cleanUpOnUnassign,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.UNASSIGN
-  }
+  meta: { actionType: ActionType.UNASSIGN }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markAsDuplicate, {
@@ -286,9 +264,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markAsDuplicate, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.MARK_AS_DUPLICATE
-  }
+  meta: { actionType: ActionType.MARK_AS_DUPLICATE }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
@@ -297,12 +273,13 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onMutate: addMarkAsNotDuplicateActionOptimistically(),
+  onMutate: updateEventOptimistically({
+    actionType: ActionType.MARK_AS_NOT_DUPLICATE,
+    status: ActionStatus.Accepted
+  }),
   onSuccess: updateLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.MARK_AS_NOT_DUPLICATE
-  }
+  meta: { actionType: ActionType.MARK_AS_NOT_DUPLICATE }
 })
 
 type CustomMutationKeys = keyof typeof customApi
@@ -329,9 +306,7 @@ queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.DECLARE
-  }
+  meta: { actionType: ActionType.DECLARE }
 })
 
 queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
@@ -340,9 +315,7 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.DECLARE
-  }
+  meta: { actionType: ActionType.DECLARE }
 })
 
 queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
@@ -351,9 +324,7 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.REGISTER
-  }
+  meta: { actionType: ActionType.REGISTER }
 })
 
 queryClient.setMutationDefaults(customMutationKeys.archiveOnDuplicate, {
@@ -362,9 +333,7 @@ queryClient.setMutationDefaults(customMutationKeys.archiveOnDuplicate, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.MARK_AS_DUPLICATE
-  }
+  meta: { actionType: ActionType.MARK_AS_DUPLICATE }
 })
 
 queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
@@ -373,10 +342,24 @@ queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.APPROVE_CORRECTION
-  },
-  onMutate: correctEventOptimistically()
+  meta: { actionType: ActionType.APPROVE_CORRECTION },
+  onMutate: (variables) => {
+    const optimisticAction = updateEventOptimistically({
+      actionType: ActionType.REQUEST_CORRECTION
+    })(variables)
+
+    console.log('optimisticAction', JSON.stringify(optimisticAction, null, 2))
+
+    if (!optimisticAction) {
+      return
+    }
+
+    console.log('optimisticAction.id', optimisticAction.id)
+
+    updateEventOptimistically({
+      actionType: ActionType.APPROVE_CORRECTION
+    })({ ...variables, requestId: optimisticAction.id })
+  }
 })
 
 /**
