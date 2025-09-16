@@ -240,7 +240,7 @@ export function hasDraftWorkqueue(scopes: Scope[]) {
 
 export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
   name: {
-    id: 'v2.workqueues.outbox.title',
+    id: 'workqueues.outbox.title',
     defaultMessage: 'Outbox',
     description: 'Title of outbox workqueue'
   },
@@ -251,7 +251,7 @@ export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
 
 export const WORKQUEUE_DRAFT: WorkqueueConfigWithoutQuery = {
   name: {
-    id: 'v2.workqueues.draft.title',
+    id: 'workqueues.draft.title',
     defaultMessage: 'My drafts',
     description: 'Title of draft workqueue'
   },
@@ -263,7 +263,7 @@ export const WORKQUEUE_DRAFT: WorkqueueConfigWithoutQuery = {
 export const emptyMessage = {
   defaultMessage: '',
   description: 'empty string',
-  id: 'v2.messages.emptyString'
+  id: 'messages.emptyString'
 }
 
 export function mergeWithoutNullsOrUndefined<T>(

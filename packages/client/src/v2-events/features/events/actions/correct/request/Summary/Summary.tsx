@@ -46,12 +46,12 @@ import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
   submitCorrectionRequest: {
-    id: 'v2-events.buttons.submitCorrectionRequest',
+    id: 'buttons.submitCorrectionRequest',
     defaultMessage: 'Submit correction request',
     description: 'Submit correction request button text'
   },
   makeCorrection: {
-    id: 'v2-events.buttons.makeCorrection',
+    id: 'buttons.correctRecord',
     defaultMessage: 'Correct record',
     description: 'Record corrected button text'
   }

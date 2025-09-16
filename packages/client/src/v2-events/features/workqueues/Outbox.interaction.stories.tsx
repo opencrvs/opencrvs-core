@@ -28,7 +28,6 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { wrapHandlersWithSpies } from '@client/tests/v2-events/declaration.utils'
 import { ReviewIndex } from '../events/actions/declare/Review'
-import { tennisClubMembershipEventIndex } from '../events/fixtures'
 
 const generator = testDataGenerator()
 
