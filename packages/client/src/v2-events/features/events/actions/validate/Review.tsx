@@ -104,10 +104,6 @@ export function Review() {
 
   const scopes = useSelector(getScope) ?? undefined
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
-
   const reviewActionConfiguration = useReviewActionConfig({
     formConfig,
     declaration: form,
@@ -115,7 +111,7 @@ export function Review() {
     scopes,
     reviewFields: reviewConfig.fields,
     status: currentEventState.status,
-    locations: adminStructureLocations,
+    locations,
     eventType: event.type
   })
 
@@ -230,7 +226,7 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
-        locations={adminStructureLocations}
+        locations={locations}
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}

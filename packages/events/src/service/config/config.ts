@@ -51,13 +51,13 @@ export async function getEventConfigurations(token: TokenWithBearer) {
  * @returns in-memory event configurations when running in production-like environment.
  */
 export async function getInMemoryEventConfigurations(token: TokenWithBearer) {
-  // if (!env.isProduction) {
-  //   logger.info(
-  //     `Running in ${process.env.NODE_ENV} mode. Fetching event configurations from API`
-  //   )
-  //   // In development, we should always fetch the latest configurations
-  //   return getEventConfigurations(token)
-  // }
+  if (!env.isProduction) {
+    logger.info(
+      `Running in ${process.env.NODE_ENV} mode. Fetching event configurations from API`
+    )
+    // In development, we should always fetch the latest configurations
+    return getEventConfigurations(token)
+  }
 
   if (inMemoryEventConfigurations) {
     logger.info('Returning in-memory event configurations')

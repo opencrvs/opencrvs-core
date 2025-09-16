@@ -77,17 +77,13 @@ export function Review() {
 
   const { isActionAllowed } = useUserAllowedActions(event.type)
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
-
   const reviewActionConfiguration = useReviewActionConfig({
     eventType: event.type,
     formConfig,
     declaration: form,
     annotation,
     reviewFields: reviewConfig.fields,
-    locations: adminStructureLocations
+    locations
   })
 
   async function handleEdit({
@@ -202,7 +198,7 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
-        locations={adminStructureLocations}
+        locations={locations}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
         onAnnotationChange={(values) => setAnnotation(values)}

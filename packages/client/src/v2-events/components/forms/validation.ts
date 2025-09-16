@@ -18,8 +18,10 @@ import {
   omitHiddenFields,
   runFieldValidations,
   runStructuralValidations,
-  Location
+  Location,
+  LocationType
 } from '@opencrvs/commons/client'
+import { getLeafLocationIds } from '../../features/events/registered-fields'
 
 interface FieldErrors {
   errors: {
@@ -46,7 +48,11 @@ export function getValidationErrorsForForm(
     }
 
     const context = locations
-      ? { leafAdminStructureLocationIds: locations }
+      ? {
+          leafAdminStructureLocationIds: getLeafLocationIds(locations, [
+            LocationType.enum.ADMIN_STRUCTURE
+          ])
+        }
       : undefined
 
     return {
