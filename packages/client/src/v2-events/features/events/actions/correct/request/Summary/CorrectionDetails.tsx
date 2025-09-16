@@ -123,14 +123,15 @@ function buildCorrectionDetails(
           {
             id: page.id,
             label: page.title,
-            valueDisplay: value
-              ? intl.formatMessage(correctionMessages.verifyIdentity)
-              : intl.formatMessage(correctionMessages.cancelVerifyIdentity),
+            valueDisplay: value ? (
+              <>{intl.formatMessage(correctionMessages.verifyIdentity)}</>
+            ) : (
+              <>{intl.formatMessage(correctionMessages.cancelVerifyIdentity)}</>
+            ),
             pageId: page.id
           }
         ]
       }
-
       return page.fields
         .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
         .map((field) => ({
