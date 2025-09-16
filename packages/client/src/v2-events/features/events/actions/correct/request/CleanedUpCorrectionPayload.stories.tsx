@@ -26,7 +26,8 @@ import {
   defineDeclarationForm,
   generateUuid,
   generateActionDocument,
-  generateTranslationConfig
+  generateTranslationConfig,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -64,6 +65,15 @@ const recommenderOtherThanClubMembers = and(
   not(field('recommender.relation').inArray(['MEMBER'])),
   not(field('recommender.relation').isFalsy())
 )
+
+export const mockUser = {
+  scope: ['record.register', 'record.registration-correct'],
+  exp: '1739881718',
+  algorithm: 'RS256',
+  userType: TokenUserType.enum.user,
+  sub: '677b33fea7efb08730f3abfa33',
+  role: 'LOCAL_REGISTRAR'
+}
 
 const overriddenEventConfig = {
   ...tennisClubMembershipEvent,
@@ -172,7 +182,8 @@ const overriddenEvent = {
   actions: [
     generateActionDocument({
       configuration: overriddenEventConfig,
-      action: ActionType.CREATE
+      action: ActionType.CREATE,
+      context: { user: mockUser }
     }),
     generateActionDocument({
       configuration: overriddenEventConfig,
@@ -183,17 +194,20 @@ const overriddenEvent = {
           'recommender.name': { firstname: 'Mohammed', surname: 'Rahim' },
           'recommender.dob': '1978-05-12'
         }
-      }
+      },
+      context: { user: mockUser }
     }),
     generateActionDocument({
       configuration: overriddenEventConfig,
       action: ActionType.VALIDATE,
-      defaults: { declaration: {} }
+      defaults: { declaration: {} },
+      context: { user: mockUser }
     }),
     generateActionDocument({
       configuration: overriddenEventConfig,
       action: ActionType.REGISTER,
-      defaults: { declaration: {} }
+      defaults: { declaration: {} },
+      context: { user: mockUser }
     })
   ]
 }
@@ -289,7 +303,8 @@ export const CleanedUpCorrectionPayload: Story = {
                     defaults: {
                       annotation: payload.annotation,
                       declaration: payload.declaration
-                    }
+                    },
+                    context: { user: mockUser }
                   })
                 ]
               }
@@ -301,7 +316,8 @@ export const CleanedUpCorrectionPayload: Story = {
               ...overriddenEvent.actions,
               generateActionDocument({
                 configuration: overriddenEventConfig,
-                action: ActionType.APPROVE_CORRECTION
+                action: ActionType.APPROVE_CORRECTION,
+                context: { user: mockUser }
               })
             ]
           }))

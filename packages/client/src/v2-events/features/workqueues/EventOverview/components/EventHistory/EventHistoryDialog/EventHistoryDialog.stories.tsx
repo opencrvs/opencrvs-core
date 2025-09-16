@@ -15,7 +15,10 @@ import {
   getUUID,
   tennisClubMembershipEvent,
   generateActionDocument,
-  createPrng
+  createPrng,
+  FullDocumentPath,
+  TokenUserType,
+  UUID
 } from '@opencrvs/commons/client'
 import { EventHistoryDialog } from './EventHistoryDialog'
 
@@ -64,6 +67,26 @@ const requestCorrectionAction = {
     'correction.request.reason': 'My reason',
     'identity-check': true
   }
+}
+
+const mockUser = {
+  id: '67bda93bfc07dee78ae558cf',
+  name: [
+    {
+      use: 'en',
+      given: ['Kalusha'],
+      family: 'Bwalya'
+    }
+  ],
+  scope: ['record.register', 'record.registration-correct'],
+  role: 'SOCIAL_WORKER',
+  exp: '1739881718',
+  algorithm: 'RS256',
+  userType: TokenUserType.enum.user,
+  signature: 'signature.png' as FullDocumentPath,
+  sub: '677b33fea7efb08730f3abfa33',
+  avatar: undefined,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 }
 
 const fullEvent = {
@@ -138,6 +161,7 @@ export const Read: Story = {
 const createAction = generateActionDocument({
   configuration: tennisClubMembershipEvent,
   action: ActionType.CREATE,
+  context: { user: mockUser },
   rng: prng,
   defaults: {
     id: generateUuid(prng)
@@ -151,6 +175,7 @@ const notifyAction = generateActionDocument({
   defaults: {
     id: generateUuid(prng)
   },
+  context: { user: mockUser },
   declarationOverrides: {
     'applicant.email': null
   }
@@ -159,6 +184,7 @@ const notifyAction = generateActionDocument({
 const declareAction = generateActionDocument({
   configuration: tennisClubMembershipEvent,
   action: ActionType.DECLARE,
+  context: { user: mockUser },
   rng: prng,
   defaults: {
     id: generateUuid(prng)
@@ -168,6 +194,7 @@ const declareAction = generateActionDocument({
 const validateAction = generateActionDocument({
   configuration: tennisClubMembershipEvent,
   action: ActionType.VALIDATE,
+  context: { user: mockUser },
   rng: prng,
   defaults: {
     id: generateUuid(prng)
@@ -180,6 +207,7 @@ const validateAction = generateActionDocument({
 const registerAction = generateActionDocument({
   configuration: tennisClubMembershipEvent,
   action: ActionType.REGISTER,
+  context: { user: mockUser },
   rng: prng,
   defaults: {
     id: generateUuid(prng)

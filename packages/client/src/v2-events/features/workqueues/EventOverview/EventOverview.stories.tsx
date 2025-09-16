@@ -24,7 +24,9 @@ import {
   tennisClubMembershipEvent,
   getCurrentEventState,
   UUID,
-  SystemRole
+  SystemRole,
+  FullDocumentPath,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -64,6 +66,26 @@ const defaultEvent = {
   )
 }
 
+const mockUser = {
+  id: '67bda93bfc07dee78ae558cf',
+  name: [
+    {
+      use: 'en',
+      given: ['Kalusha'],
+      family: 'Bwalya'
+    }
+  ],
+  scope: ['record.register', 'record.registration-correct'],
+  role: 'SOCIAL_WORKER',
+  exp: '1739881718',
+  algorithm: 'RS256',
+  userType: TokenUserType.enum.user,
+  signature: 'signature.png' as FullDocumentPath,
+  sub: '677b33fea7efb08730f3abfa33',
+  avatar: undefined,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+}
+
 export const Overview: Story = {
   parameters: {
     offline: {
@@ -81,7 +103,9 @@ export const Overview: Story = {
           tRPCMsw.event.search.query(() => {
             return {
               results: [
-                getCurrentEventState(defaultEvent, tennisClubMembershipEvent)
+                getCurrentEventState(defaultEvent, tennisClubMembershipEvent, {
+                  user: mockUser
+                })
               ],
               total: 1
             }
@@ -93,6 +117,7 @@ export const Overview: Story = {
               generateEventDraftDocument({
                 eventId: defaultEvent.id,
                 actionType: ActionType.REGISTER,
+                context: { user: mockUser },
                 declaration: {
                   'applicant.name': {
                     firstname: 'Riku',
@@ -124,6 +149,7 @@ export const WithAcceptedRegisterEvent: Story = {
               generateEventDraftDocument({
                 eventId: tennisClubMembershipEventDocument.id,
                 actionType: ActionType.REGISTER,
+                context: { user: mockUser },
                 declaration: {
                   'applicant.name': {
                     firstname: 'Riku',

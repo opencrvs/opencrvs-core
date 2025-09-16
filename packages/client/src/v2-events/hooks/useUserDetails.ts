@@ -28,7 +28,9 @@ export function useUserDetails() {
     const provinceId = district?.partOf.split('/')[1]
 
     return {
-      name: `${userDetails.name[0].firstNames} ${userDetails.name[0].familyName}`,
+      // name: `${userDetails.name[0].firstNames} ${userDetails.name[0].familyName}`,
+      firstname: userDetails.name[0].firstNames,
+      surname: userDetails.name[0].familyName,
       role: userDetails.role.id,
       district: districtId ?? '',
       province: provinceId ?? ''
@@ -36,7 +38,9 @@ export function useUserDetails() {
   }
 
   return {
-    name: `${userDetails?.name[0].firstNames} ${userDetails?.name[0].familyName}`,
+    // name: `${userDetails?.name[0].firstNames} ${userDetails?.name[0].familyName}`,
+    firstname: userDetails?.name[0].firstNames,
+    surname: userDetails?.name[0].familyName,
     role: userDetails?.role.id,
     district: '',
     province: ''

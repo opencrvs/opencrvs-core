@@ -17,9 +17,12 @@ import {
   ActionType,
   eventQueryDataGenerator,
   EventStatus,
+  FullDocumentPath,
   generateEventDocument,
   InherentFlags,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  TokenUserType,
+  UUID
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes'
@@ -42,12 +45,33 @@ export default meta
 
 type Story = StoryObj<typeof ActionCta>
 
+const mockUser = {
+  id: '67bda93bfc07dee78ae558cf',
+  name: [
+    {
+      use: 'en',
+      given: ['Kalusha'],
+      family: 'Bwalya'
+    }
+  ],
+  scope: ['record.register', 'record.registration-correct'],
+  role: 'SOCIAL_WORKER',
+  exp: '1739881718',
+  algorithm: 'RS256',
+  userType: TokenUserType.enum.user,
+  signature: 'signature.png' as FullDocumentPath,
+  sub: '677b33fea7efb08730f3abfa33',
+  avatar: undefined,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+}
+
 function createRejectedEventByStatus(status: EventStatus) {
   const user = testDataGenerator().user
 
   const event = generateEventDocument({
     configuration: tennisClubMembershipEvent,
-    actions: [ActionType.CREATE]
+    actions: [ActionType.CREATE],
+    context: { user: mockUser }
   })
 
   const eventQueryData = eventQueryDataGenerator(

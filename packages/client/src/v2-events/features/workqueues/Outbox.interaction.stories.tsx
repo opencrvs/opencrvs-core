@@ -20,7 +20,8 @@ import {
   getCurrentEventState,
   footballClubMembershipEvent,
   FullDocumentPath,
-  UUID
+  UUID,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -32,9 +33,30 @@ import { tennisClubMembershipEventIndex } from '../events/fixtures'
 
 const generator = testDataGenerator()
 
+const mockUser = {
+  id: '67bda93bfc07dee78ae558cf',
+  name: [
+    {
+      use: 'en',
+      given: ['Kalusha'],
+      family: 'Bwalya'
+    }
+  ],
+  scope: ['record.register', 'record.registration-correct'],
+  role: 'SOCIAL_WORKER',
+  exp: '1739881718',
+  algorithm: 'RS256',
+  userType: TokenUserType.enum.user,
+  signature: 'signature.png' as FullDocumentPath,
+  sub: '677b33fea7efb08730f3abfa33',
+  avatar: undefined,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+}
+
 const declareEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [ActionType.CREATE, ActionType.DECLARE],
+  context: { user: mockUser }
 })
 
 const meta: Meta<typeof ReviewIndex> = {
@@ -43,7 +65,8 @@ const meta: Meta<typeof ReviewIndex> = {
     useEventFormData.setState({
       formValues: getCurrentEventState(
         declareEventDocument,
-        tennisClubMembershipEvent
+        tennisClubMembershipEvent,
+        { user: mockUser }
       ).declaration
     })
   }
@@ -55,7 +78,8 @@ const OUTBOX_FREEZE_TIME = 5 * 1000 // 5 seconds
 
 const createdEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [ActionType.CREATE],
+  context: { user: mockUser }
 })
 
 type Story = StoryObj<typeof ReviewIndex>
@@ -84,21 +108,6 @@ const declarationTrpcMsw = {
       }
     }
   ])
-}
-
-const mockUser = {
-  id: '67bda93bfc07dee78ae558cf',
-  name: [
-    {
-      use: 'en',
-      given: ['Kalusha'],
-      family: 'Bwalya'
-    }
-  ],
-  role: 'SOCIAL_WORKER',
-  signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined,
-  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 }
 
 export const Outbox: Story = {
@@ -160,7 +169,8 @@ export const Outbox: Story = {
       const searchResult = await canvas.findByTestId('search-result')
       const { firstname, surname } = getCurrentEventState(
         declareEventDocument,
-        tennisClubMembershipEvent
+        tennisClubMembershipEvent,
+        { user: mockUser }
       ).declaration['applicant.name'] as { firstname: string; surname: string }
 
       await expect(searchResult).toHaveTextContent(`${firstname} ${surname}`)

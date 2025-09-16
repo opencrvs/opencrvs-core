@@ -15,7 +15,8 @@ import {
   generateEventDocument,
   generateEventDraftDocument,
   footballClubMembershipEvent,
-  EventDocument
+  EventDocument,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
@@ -100,14 +101,29 @@ export function wrapHandlersWithSpies<
   }
 }
 
+export const mockUser = {
+  scope: ['record.register', 'record.registration-correct'],
+  exp: '1739881718',
+  algorithm: 'RS256',
+  userType: TokenUserType.enum.user,
+  sub: '677b33fea7efb08730f3abfa33',
+  role: 'LOCAL_REGISTRAR'
+}
+
 const eventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [ActionType.CREATE],
+  context: {
+    user: mockUser
+  }
 })
 const eventId = eventDocument.id
 const draft = generateEventDraftDocument({
   eventId,
-  actionType: ActionType.REGISTER
+  actionType: ActionType.REGISTER,
+  context: {
+    user: mockUser
+  }
 })
 
 /**
@@ -137,7 +153,10 @@ export const createDeclarationTrpcMsw = (
         handler: () =>
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
-            actions: [ActionType.CREATE]
+            actions: [ActionType.CREATE],
+            context: {
+              user: mockUser
+            }
           })
       },
       {
@@ -146,7 +165,10 @@ export const createDeclarationTrpcMsw = (
         handler: () =>
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
-            actions: [ActionType.CREATE, ActionType.NOTIFY]
+            actions: [ActionType.CREATE, ActionType.NOTIFY],
+            context: {
+              user: mockUser
+            }
           })
       },
       {
@@ -155,7 +177,10 @@ export const createDeclarationTrpcMsw = (
         handler: () =>
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
-            actions: [ActionType.CREATE, ActionType.DECLARE]
+            actions: [ActionType.CREATE, ActionType.DECLARE],
+            context: {
+              user: mockUser
+            }
           })
       },
       {
@@ -168,7 +193,10 @@ export const createDeclarationTrpcMsw = (
               ActionType.CREATE,
               ActionType.DECLARE,
               ActionType.VALIDATE
-            ]
+            ],
+            context: {
+              user: mockUser
+            }
           })
       },
       {
@@ -182,7 +210,10 @@ export const createDeclarationTrpcMsw = (
               ActionType.DECLARE,
               ActionType.VALIDATE,
               ActionType.REGISTER
-            ]
+            ],
+            context: {
+              user: mockUser
+            }
           })
       },
       {
@@ -196,7 +227,10 @@ export const createDeclarationTrpcMsw = (
               ActionType.DECLARE,
               ActionType.VALIDATE,
               ActionType.ARCHIVE
-            ]
+            ],
+            context: {
+              user: mockUser
+            }
           })
       },
       {
@@ -210,7 +244,10 @@ export const createDeclarationTrpcMsw = (
               ActionType.DECLARE,
               ActionType.VALIDATE,
               ActionType.MARK_AS_DUPLICATE
-            ]
+            ],
+            context: {
+              user: mockUser
+            }
           })
       },
       {
@@ -224,7 +261,10 @@ export const createDeclarationTrpcMsw = (
               ActionType.DECLARE,
               ActionType.VALIDATE,
               ActionType.REJECT
-            ]
+            ],
+            context: {
+              user: mockUser
+            }
           })
       }
     ]),

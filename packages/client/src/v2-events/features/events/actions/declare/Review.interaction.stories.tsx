@@ -21,7 +21,8 @@ import {
   generateEventDraftDocument,
   getCurrentEventState,
   FullDocumentPath,
-  UUID
+  UUID,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -41,9 +42,30 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const mockUser = {
+  id: '67bda93bfc07dee78ae558cf',
+  name: [
+    {
+      use: 'en',
+      given: ['Kalusha'],
+      family: 'Bwalya'
+    }
+  ],
+  scope: ['record.register', 'record.registration-correct'],
+  role: 'SOCIAL_WORKER',
+  exp: '1739881718',
+  algorithm: 'RS256',
+  userType: TokenUserType.enum.user,
+  signature: 'signature.png' as FullDocumentPath,
+  sub: '677b33fea7efb08730f3abfa33',
+  avatar: undefined,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+}
+
 const createdEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [ActionType.CREATE],
+  context: { user: mockUser }
 })
 const declarationTrpcMsw = createDeclarationTrpcMsw(
   tRPCMsw,
@@ -52,7 +74,8 @@ const declarationTrpcMsw = createDeclarationTrpcMsw(
 
 const declaredEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [ActionType.CREATE, ActionType.DECLARE],
+  context: { user: mockUser }
 })
 
 const meta: Meta<typeof ReviewIndex> = {
@@ -66,7 +89,8 @@ const meta: Meta<typeof ReviewIndex> = {
     useEventFormData.setState({
       formValues: getCurrentEventState(
         declaredEventDocument,
-        tennisClubMembershipEvent
+        tennisClubMembershipEvent,
+        { user: mockUser }
       ).declaration
     })
   }
@@ -75,21 +99,6 @@ const meta: Meta<typeof ReviewIndex> = {
 export default meta
 
 type Story = StoryObj<typeof ReviewIndex>
-
-const mockUser = {
-  id: '67bda93bfc07dee78ae558cf',
-  name: [
-    {
-      use: 'en',
-      given: ['Kalusha'],
-      family: 'Bwalya'
-    }
-  ],
-  role: 'SOCIAL_WORKER',
-  signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined,
-  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-}
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
@@ -125,7 +134,8 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
       drafts: [
         generateEventDraftDocument({
           eventId: declarationTrpcMsw.eventDocument.id,
-          actionType: ActionType.DECLARE
+          actionType: ActionType.DECLARE,
+          context: { user: mockUser }
         })
       ]
     },
@@ -139,7 +149,8 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
               results: [
                 getCurrentEventState(
                   declarationTrpcMsw.eventDocument,
-                  tennisClubMembershipEvent
+                  tennisClubMembershipEvent,
+                  { user: mockUser }
                 )
               ]
             }
@@ -162,7 +173,8 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
               results: [
                 getCurrentEventState(
                   declarationTrpcMsw.eventDocument,
-                  tennisClubMembershipEvent
+                  tennisClubMembershipEvent,
+                  { user: mockUser }
                 )
               ],
               total: 1
@@ -224,7 +236,8 @@ const msw = {
           results: [
             getCurrentEventState(
               declarationTrpcMsw.eventDocument,
-              tennisClubMembershipEvent
+              tennisClubMembershipEvent,
+              { user: mockUser }
             )
           ],
           total: 1
@@ -370,7 +383,8 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
 
 const eventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [ActionType.CREATE],
+  context: { user: mockUser }
 })
 
 const eventId = eventDocument.id
@@ -419,7 +433,8 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
               results: [
                 getCurrentEventState(
                   declarationTrpcMsw.eventDocument,
-                  tennisClubMembershipEvent
+                  tennisClubMembershipEvent,
+                  { user: mockUser }
                 )
               ],
               total: 1
@@ -556,7 +571,8 @@ export const ChangeFieldInReview: Story = {
             return [
               generateEventDraftDocument({
                 eventId,
-                actionType: ActionType.DECLARE
+                actionType: ActionType.DECLARE,
+                context: { user: mockUser }
               })
             ]
           })

@@ -23,7 +23,8 @@ import {
   generateEventDocument,
   generateTranslationConfig,
   MimeType,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
@@ -107,7 +108,17 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 const createdEvent = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [ActionType.CREATE],
+  context: {
+    user: {
+      scope: ['record.register', 'record.registration-correct'],
+      exp: '1739881718',
+      algorithm: 'RS256',
+      userType: TokenUserType.enum.user,
+      sub: '677b33fea7efb08730f3abfa33',
+      role: 'LOCAL_REGISTRAR'
+    }
+  }
 })
 
 export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {

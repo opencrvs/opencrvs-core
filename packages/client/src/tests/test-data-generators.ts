@@ -12,7 +12,8 @@ import {
   createPrng,
   eventPayloadGenerator,
   getUUID,
-  SCOPES
+  SCOPES,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { FetchUserQuery, Status } from '@client/utils/gateway'
 
@@ -262,5 +263,17 @@ export function testDataGenerator(rngSeed?: number) {
     }
   }
 
-  return { event: eventPayloadGenerator(prng), user }
+  return {
+    event: eventPayloadGenerator(prng, {
+      user: {
+        scope: ['record.register', 'record.registration-correct'],
+        exp: '1739881718',
+        algorithm: 'RS256',
+        userType: TokenUserType.enum.user,
+        sub: '677b33fea7efb08730f3abfa33',
+        role: 'LOCAL_REGISTRAR'
+      }
+    }),
+    user
+  }
 }

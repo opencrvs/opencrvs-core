@@ -13,7 +13,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   CertificateTemplateConfig,
   event,
-  SelectField
+  FullDocumentPath,
+  SelectField,
+  TokenUserType,
+  UUID
 } from '@opencrvs/commons/client'
 
 import {
@@ -28,6 +31,26 @@ import {
 
 // Mock templates array
 let mockTemplates: CertificateTemplateConfig[] = []
+
+const mockUser = {
+  id: '67bda93bfc07dee78ae558cf',
+  name: [
+    {
+      use: 'en',
+      given: ['Kalusha'],
+      family: 'Bwalya'
+    }
+  ],
+  scope: ['record.register', 'record.registration-correct'],
+  role: 'SOCIAL_WORKER',
+  exp: '1739881718',
+  algorithm: 'RS256',
+  userType: TokenUserType.enum.user,
+  signature: 'signature.png' as FullDocumentPath,
+  sub: '677b33fea7efb08730f3abfa33',
+  avatar: undefined,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+}
 
 // Mock the useAppConfig hook
 vi.mock('@client/v2-events/hooks/useAppConfig', () => ({
@@ -123,7 +146,8 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
 
       const printAction = generateActionDocument({
         configuration: tennisClubMembershipEvent,
-        action: ActionType.PRINT_CERTIFICATE
+        action: ActionType.PRINT_CERTIFICATE,
+        context: { user: mockUser }
       })
 
       const eventDocumentWithOnePrint = {
@@ -203,7 +227,8 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
         action: ActionType.PRINT_CERTIFICATE,
         defaults: {
           content: { templateId: 'tennis-club-membership-certificate' }
-        }
+        },
+        context: { user: mockUser }
       })
       const printAction2 = generateActionDocument({
         configuration: tennisClubMembershipEvent,
@@ -212,7 +237,8 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
           content: {
             templateId: 'tennis-club-membership-certificate'
           }
-        }
+        },
+        context: { user: mockUser }
       })
 
       const eventWithExcessivePrints = {
@@ -261,7 +287,8 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
         action: ActionType.PRINT_CERTIFICATE,
         defaults: {
           content: { templateId: 'tennis-club-membership-certificate' }
-        }
+        },
+        context: { user: mockUser }
       })
       const eventWithBasicPrint = {
         ...testEventDocument,
@@ -297,12 +324,14 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
 
       const printAction1 = generateActionDocument({
         configuration: tennisClubMembershipEvent,
-        action: ActionType.PRINT_CERTIFICATE
+        action: ActionType.PRINT_CERTIFICATE,
+        context: { user: mockUser }
       })
 
       const printAction2 = generateActionDocument({
         configuration: tennisClubMembershipEvent,
-        action: ActionType.PRINT_CERTIFICATE
+        action: ActionType.PRINT_CERTIFICATE,
+        context: { user: mockUser }
       })
 
       const eventWithTwoPrintActions = {
@@ -357,7 +386,8 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
           content: {
             templateId: 'tennis-club-membership-certificate'
           }
-        }
+        },
+        context: { user: mockUser }
       })
 
       const eventWithSpecificPrint = {

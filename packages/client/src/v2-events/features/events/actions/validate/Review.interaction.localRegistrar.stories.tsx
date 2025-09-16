@@ -19,7 +19,8 @@ import {
   generateEventDocument,
   getCurrentEventState,
   UUID,
-  FullDocumentPath
+  FullDocumentPath,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -40,9 +41,30 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const mockUser = {
+  id: '67bda93bfc07dee78ae558cf',
+  name: [
+    {
+      use: 'en',
+      given: ['Kalusha'],
+      family: 'Bwalya'
+    }
+  ],
+  scope: ['record.register', 'record.registration-correct'],
+  role: 'SOCIAL_WORKER',
+  exp: '1739881718',
+  algorithm: 'RS256',
+  userType: TokenUserType.enum.user,
+  signature: 'signature.png' as FullDocumentPath,
+  sub: '677b33fea7efb08730f3abfa33',
+  avatar: undefined,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+}
+
 const declareEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [ActionType.CREATE, ActionType.DECLARE],
+  context: { user: mockUser }
 })
 
 const declarationTrpcMsw = createDeclarationTrpcMsw(
@@ -83,27 +105,13 @@ export default meta
 
 type Story = StoryObj<typeof Review>
 
-const mockUser = {
-  id: '67bda93bfc07dee78ae558cf',
-  name: [
-    {
-      use: 'en',
-      given: ['Kalusha'],
-      family: 'Bwalya'
-    }
-  ],
-  role: 'SOCIAL_WORKER',
-  signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined,
-  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-}
-
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
       formValues: getCurrentEventState(
         declareEventDocument,
-        tennisClubMembershipEvent
+        tennisClubMembershipEvent,
+        { user: mockUser }
       ).declaration
     })
   },

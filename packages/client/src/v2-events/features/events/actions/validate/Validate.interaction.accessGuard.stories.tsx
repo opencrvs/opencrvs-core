@@ -13,7 +13,10 @@ import { within, expect, waitFor } from '@storybook/test'
 import {
   ActionType,
   tennisClubMembershipEvent,
-  generateEventDocument
+  generateEventDocument,
+  TokenUserType,
+  FullDocumentPath,
+  UUID
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -21,6 +24,26 @@ import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { Review } from './index'
 
 const generator = testDataGenerator()
+
+const mockUser = {
+  id: '67bda93bfc07dee78ae558cf',
+  name: [
+    {
+      use: 'en',
+      given: ['Kalusha'],
+      family: 'Bwalya'
+    }
+  ],
+  scope: ['record.register', 'record.registration-correct'],
+  role: 'SOCIAL_WORKER',
+  exp: '1739881718',
+  algorithm: 'RS256',
+  userType: TokenUserType.enum.user,
+  signature: 'signature.png' as FullDocumentPath,
+  sub: '677b33fea7efb08730f3abfa33',
+  avatar: undefined,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+}
 
 const meta: Meta<typeof Review> = {
   title: 'Validate/Interaction/AcccessGuard',
@@ -40,7 +63,8 @@ type Story = StoryObj<typeof Review>
 
 const createdEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [ActionType.CREATE],
+  context: { user: mockUser }
 })
 
 export const PreventAccessForCreated: Story = {
@@ -77,7 +101,8 @@ export const PreventAccessForCreated: Story = {
 
 const notifiedEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.NOTIFY]
+  actions: [ActionType.CREATE, ActionType.NOTIFY],
+  context: { user: mockUser }
 })
 
 export const PreventAccessForNotified: Story = {
@@ -114,7 +139,8 @@ export const PreventAccessForNotified: Story = {
 
 const validatedEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE]
+  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE],
+  context: { user: mockUser }
 })
 
 export const PreventAccessForValidated: Story = {
@@ -156,7 +182,8 @@ const registeredEventDocument = generateEventDocument({
     ActionType.DECLARE,
     ActionType.VALIDATE,
     ActionType.REGISTER
-  ]
+  ],
+  context: { user: mockUser }
 })
 
 export const PreventAccessForRegistered: Story = {
@@ -198,7 +225,8 @@ const rejectedValidatedEventDocument = generateEventDocument({
     ActionType.DECLARE,
     ActionType.VALIDATE,
     ActionType.REJECT
-  ]
+  ],
+  context: { user: mockUser }
 })
 
 export const AllowAccessForRejectedValidated: Story = {
@@ -236,7 +264,8 @@ export const AllowAccessForRejectedValidated: Story = {
 
 const declaredEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [ActionType.CREATE, ActionType.DECLARE],
+  context: { user: mockUser }
 })
 
 export const AllowAccessForDeclared: Story = {
@@ -271,7 +300,8 @@ export const AllowAccessForDeclared: Story = {
 
 const rejectedDeclaredEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.REJECT]
+  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.REJECT],
+  context: { user: mockUser }
 })
 
 export const PreventAccessForRejectedDeclared: Story = {
