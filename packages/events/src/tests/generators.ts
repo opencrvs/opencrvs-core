@@ -14,9 +14,10 @@ import {
   eventPayloadGenerator,
   UUID,
   TestUserRole,
-  EventConfig
+  EventConfig,
+  Location,
+  LocationType
 } from '@opencrvs/commons'
-import { Location } from '@events/service/locations/locations'
 import { addLocations } from '@events/storage/postgres/events/locations'
 
 interface Name {
@@ -62,7 +63,7 @@ export function payloadGenerator(
           name: `Location name ${i}`,
           parentId: null,
           validUntil: null,
-          locationType: 'ADMIN_STRUCTURE'
+          locationType: LocationType.Enum.ADMIN_STRUCTURE
         })) as Location[]
       }
 
@@ -71,7 +72,7 @@ export function payloadGenerator(
         name: location.name ?? `Location name ${i}`,
         parentId: location.parentId ?? null,
         validUntil: null,
-        locationType: 'ADMIN_STRUCTURE'
+        locationType: LocationType.Enum.ADMIN_STRUCTURE
       })) as Location[]
     }
   }
