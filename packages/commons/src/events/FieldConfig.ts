@@ -611,7 +611,13 @@ export type HttpField = z.infer<typeof HttpField>
 
 const SearchField = HttpField.extend({
   type: z.literal(FieldType.SEARCH),
-  configuration: SearchQuery
+  configuration: SearchQuery.pick({
+    query: true,
+    limit: true,
+    offset: true
+  }).extend({
+    validation: ValidationConfig
+  })
 })
 
 export type SearchField = z.infer<typeof SearchField>

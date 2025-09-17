@@ -10,7 +10,12 @@
  */
 
 import React, { useState } from 'react'
-import { HttpFieldValue, SearchQuery } from '@opencrvs/commons/client'
+import {
+  HttpFieldValue,
+  isConditionMet,
+  SearchField,
+  validateValue
+} from '@opencrvs/commons/client'
 import { TextInput } from '@opencrvs/components'
 import { Http, Props } from './Http'
 
@@ -33,7 +38,7 @@ function SearchInput({
   onChange,
   configuration
 }: Omit<Props, 'configuration'> & {
-  configuration: SearchQuery
+  configuration: SearchField['configuration']
 }) {
   const [inputState, setInputState] = useState('')
   const [buttonPressed, setButtonPressed] = useState(0)
@@ -43,6 +48,7 @@ function SearchInput({
     onChange(value)
     setHttpState(value)
   }
+  const valid = validateValue(configuration.validation.validator, inputState)
 
   return (
     <div>
@@ -64,14 +70,18 @@ function SearchInput({
           },
           body: {
             query: replaceTerm(inputState, configuration.query),
-            limit: 10,
-            offset: 0
+            limit: configuration.limit ?? 100,
+            offset: configuration.offset ?? 0
           }
         }}
         parentValue={buttonPressed}
         onChange={onHTTPChange}
       />
-      <button onClick={() => setButtonPressed(buttonPressed + 1)}>
+      {!valid && <div data-testid="search-input-error">Invalid input</div>}
+      <button
+        disabled={!valid}
+        onClick={() => setButtonPressed(buttonPressed + 1)}
+      >
         Confirm
       </button>
     </div>
