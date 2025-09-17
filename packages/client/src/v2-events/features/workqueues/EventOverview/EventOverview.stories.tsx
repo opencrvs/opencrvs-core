@@ -395,7 +395,7 @@ export const WithVariousUserRoles: Story = {
           createdBy: 'system-123',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.IMPORT,
+          createdByRole: SystemRole.enum.IMPORT_EXPORT,
           declaration: {}
         },
         {

@@ -76,9 +76,14 @@ function stringify(value: string, context: { locations: Location[] }) {
   return name ?? EMPTY_TOKEN
 }
 
+function isAdministrativeAreaEmpty(value: Stringifiable) {
+  return !value.toString()
+}
+
 export const AdministrativeArea = {
   Input: AdministrativeAreaInput,
   Output: AdministrativeAreaOutput,
   stringify,
-  toCertificateVariables: LocationSearch.toCertificateVariables
+  toCertificateVariables: LocationSearch.toCertificateVariables,
+  isEmptyValue: isAdministrativeAreaEmpty
 }
