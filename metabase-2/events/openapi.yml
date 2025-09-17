@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 78b7e929-9688-4118-9963-9023de0e352b
+                transactionId: e9c18983-08d7-4052-9377-d580b925b35d
                 type: birth
       responses:
         "200":
@@ -395,7 +395,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: b4dea73e-9c41-4297-8d7d-e89ffc7d7e97
+                transactionId: 5e862072-7a90-411b-9946-aa656b20eaff
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -5741,6 +5741,17 @@ components:
             type:
               type: string
               enum:
+                - not
+            clause:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - type
+            - clause
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
                 - and
             clauses:
               type: array
@@ -5801,6 +5812,8 @@ components:
                 boost:
                   type: number
                   default: 1
+                value:
+                  type: string
               required:
                 - boost
               default:
