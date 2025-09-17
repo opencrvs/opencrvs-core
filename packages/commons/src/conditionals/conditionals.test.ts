@@ -685,7 +685,8 @@ describe('"user" conditionals', () => {
       exp: '1739881718',
       algorithm: 'RS256',
       userType: TokenUserType.enum.user,
-      sub: '677b33fea7efb08730f3abfa33'
+      sub: '677b33fea7efb08730f3abfa33',
+      role: 'LOCAL_REGISTRAR'
     },
     $now: formatISO(new Date(), { representation: 'date' }),
     $online: true
