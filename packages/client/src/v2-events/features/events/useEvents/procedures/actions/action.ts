@@ -337,6 +337,8 @@ queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.APPROVE_CORRECTION },
   onMutate: (variables) => {
+    // Since the 'makeCorrectionOnRequest' requires two actions (REQUEST_CORRECTION and APPROVE_CORRECTION),
+    // we need to update the event optimistically with both actions.
     const optimisticAction = updateEventOptimistically(
       ActionType.REQUEST_CORRECTION
     )(variables)
@@ -345,6 +347,7 @@ queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
       return
     }
 
+    // For the APPROVE_CORRECTION action, we need to pass the id of the REQUEST_CORRECTION action as 'requestId', so that the actions are properly matched.
     updateEventOptimistically(ActionType.APPROVE_CORRECTION)({
       ...variables,
       requestId: optimisticAction.id
