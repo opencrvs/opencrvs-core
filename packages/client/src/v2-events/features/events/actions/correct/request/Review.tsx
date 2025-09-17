@@ -32,7 +32,7 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
-import { useSuspenseLeafLevelLocations } from '@client/v2-events/hooks/useLocations'
+import { useSuspenseAdminLeafLevelLocations } from '@client/v2-events/hooks/useLocations'
 import { hasFieldChanged } from '../utils'
 
 export function Review() {
@@ -43,9 +43,7 @@ export function Review() {
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
-  const locationIds = useSuspenseLeafLevelLocations([
-    LocationType.enum.ADMIN_STRUCTURE
-  ])
+  const locationIds = useSuspenseAdminLeafLevelLocations()
 
   const event = events.getEvent.getFromCache(eventId)
 

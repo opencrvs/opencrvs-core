@@ -13,10 +13,8 @@ import { v4 as uuid } from 'uuid'
 import {
   EventState,
   DeclarationFormConfig,
-  Scope,
   FieldConfig,
   EventStatus,
-  Location,
   ActionType,
   UUID
 } from '@opencrvs/commons/client'
@@ -30,7 +28,6 @@ export function useReviewActionConfig({
   declaration,
   annotation,
   reviewFields,
-  scopes,
   status,
   locationIds,
   eventType
@@ -39,7 +36,6 @@ export function useReviewActionConfig({
   declaration: EventState
   annotation?: EventState
   reviewFields: FieldConfig[]
-  scopes?: Scope[]
   status: EventStatus
   locationIds: Array<{ id: UUID }>
   eventType: string

@@ -43,7 +43,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { useSuspenseLeafLevelLocations } from '@client/v2-events/hooks/useLocations'
+import { useSuspenseAdminLeafLevelLocations } from '@client/v2-events/hooks/useLocations'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
@@ -59,9 +59,7 @@ export function Review() {
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const { closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
-  const locationIds = useSuspenseLeafLevelLocations([
-    LocationType.enum.ADMIN_STRUCTURE
-  ])
+  const locationIds = useSuspenseAdminLeafLevelLocations()
 
   const event = events.getEvent.getFromCache(eventId)
 

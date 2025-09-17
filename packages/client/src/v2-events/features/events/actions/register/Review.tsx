@@ -43,7 +43,7 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { useSuspenseLeafLevelLocations } from '@client/v2-events/hooks/useLocations'
+import { useSuspenseAdminLeafLevelLocations } from '@client/v2-events/hooks/useLocations'
 import { reviewMessages } from '../messages'
 
 function getTranslations(hasErrors: boolean) {
@@ -69,9 +69,7 @@ export function Review() {
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
-  const locationIds = useSuspenseLeafLevelLocations([
-    LocationType.enum.ADMIN_STRUCTURE
-  ])
+  const locationIds = useSuspenseAdminLeafLevelLocations()
 
   const registerMutation = events.actions.register
 

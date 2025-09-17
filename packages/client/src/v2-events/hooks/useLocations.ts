@@ -118,15 +118,15 @@ export function getLeafLocationIds(
  * Helper for minimising the number of locations passed to components.
  * System provides AVJ helper which only uses (admin) leaf locations. Before we have time to restructure rest of the code we try to avoid a situation where 100k+ locations are passed to components, since we do not develop regularly against such large datasets.
  *
- * @param locationTypes - The types of locations to include.
  * @returns array of leaf location IDs within the specified types. When no types are provided, returns leaf locations based on all types.
  */
-export function useSuspenseLeafLevelLocations(locationTypes?: LocationType[]) {
+export function useSuspenseAdminLeafLevelLocations() {
+  const locationType = LocationType.Enum.ADMIN_STRUCTURE
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
 
   return useMemo(
-    () => getLeafLocationIds(locations, locationTypes),
-    [locations, locationTypes]
+    () => getLeafLocationIds(locations, [locationType]),
+    [locations, locationType]
   )
 }
