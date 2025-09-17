@@ -24,7 +24,7 @@ import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
 
 /**
- * Optimistically update an event by adding 'dummy' action for the event, before the actual mutation completes.
+ * Optimistically update an event by adding a 'dummy' action for the event, before the actual mutation completes.
  *
  * @param actionType - The type of action being performed
  * @param status - Optional status override for the action (defaults to ActionStatus.Accepted)
