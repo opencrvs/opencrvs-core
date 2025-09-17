@@ -731,26 +731,22 @@ export function generateActionDocument<T extends ActionType>({
   const actionBase = {
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
-    createdAt: defaults?.createdAt ?? new Date(Date.now() - 500).toISOString(),
-    createdBy: defaults?.createdBy ?? getUUID(),
-    createdByUserType: defaults?.createdByUserType ?? TokenUserType.Enum.user,
-    createdByRole: defaults?.createdByRole ?? TestUserRole.Enum.FIELD_AGENT,
-    id: defaults?.id ?? getUUID(),
-    createdAtLocation:
-      defaults?.createdAtLocation ??
-      ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID),
-    declaration:
-      defaults?.declaration ??
-      generateActionDeclarationInput(
-        configuration,
-        action,
-        rng,
-        declarationOverrides
-      ),
-    annotation: defaults?.annotation ?? {},
-    status: defaults?.status ?? ActionStatus.Accepted,
-    transactionId: defaults?.transactionId ?? getUUID(),
-    originalActionId: defaults?.originalActionId
+    createdAt: new Date(Date.now() - 500).toISOString(),
+    createdBy: getUUID(),
+    createdByUserType: TokenUserType.Enum.user,
+    createdByRole: TestUserRole.Enum.FIELD_AGENT,
+    id: getUUID(),
+    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    declaration: generateActionDeclarationInput(
+      configuration,
+      action,
+      rng,
+      declarationOverrides
+    ),
+    annotation: {},
+    status: ActionStatus.Accepted,
+    transactionId: getUUID(),
+    ...defaults
   } satisfies ActionBase
 
   switch (action) {
