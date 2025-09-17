@@ -190,9 +190,7 @@ function isFieldConditionMet(
 
   const validConditionals = getConditionalActionsForField(field, {
     $form: form,
-    $now: formatISO(new Date(), {
-      representation: 'date'
-    }),
+    $now: formatISO(new Date(), { representation: 'date' }),
     $online: isOnline()
   })
 

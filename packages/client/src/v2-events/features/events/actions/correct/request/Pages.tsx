@@ -21,7 +21,6 @@ import {
   isNonInteractiveFieldType,
   PageConfig
 } from '@opencrvs/commons/client'
-import { getCurrentEventState } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'

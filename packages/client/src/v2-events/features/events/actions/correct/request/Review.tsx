@@ -18,10 +18,7 @@ import {
 import {
   ActionType,
   getDeclaration,
-  getCurrentEventState,
-  ActionDocument,
-  getAcceptedActions,
-  isMetaAction
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
