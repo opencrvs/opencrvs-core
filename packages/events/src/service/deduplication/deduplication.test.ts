@@ -17,7 +17,7 @@ import {
   Clause
 } from '@opencrvs/commons'
 import { v2BirthEvent } from '@opencrvs/commons/fixtures'
-import { field, and, or } from '@opencrvs/commons/events/deduplication'
+import { field, and, or, not } from '@opencrvs/commons/events/deduplication'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
 import { encodeEventIndex } from '@events/service/indexing/utils'
@@ -30,7 +30,18 @@ const similarNamedChild = field('child.name').fuzzyMatches()
 const childDobWithin5Days = field('child.dob').dateRangeMatches({ days: 5 })
 const similarNamedMother = field('mother.name').fuzzyMatches()
 const similarAgedMother = field('mother.dob').dateRangeMatches({ days: 365 })
+const differentMotherIdTypes = not(field('mother.idType').strictMatches())
+const motherIdNotProvided = field('mother.idType').strictMatches({
+  value: 'NONE'
+})
 const sameMotherNid = field('mother.nid').strictMatches()
+const sameMotherPassport = field('mother.passport').strictMatches()
+const motherIdMatchesIfGiven = or(
+  differentMotherIdTypes,
+  motherIdNotProvided,
+  sameMotherNid,
+  sameMotherPassport
+)
 const childDobWithin9Months = field('child.dob').dateRangeMatches({
   days: 270
 })
@@ -52,12 +63,12 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES = {
       childDobWithin5Days,
       similarNamedMother,
       similarAgedMother,
-      sameMotherNid
+      motherIdMatchesIfGiven
     ),
     and(
       similarNamedMother,
       similarAgedMother,
-      sameMotherNid,
+      motherIdMatchesIfGiven,
       childDobWithin9Months
     ),
     and(
@@ -65,7 +76,7 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES = {
       childDobWithin3Years,
       similarNamedMother,
       similarAgedMother,
-      sameMotherNid
+      motherIdMatchesIfGiven
     )
   )
 }
@@ -182,10 +193,11 @@ describe('deduplication query input conversion', () => {
     ).toMatchSnapshot()
   })
 
-  it('should convert sameMotherNid to strict query', () => {
+  it('should convert motherIdMatchesIfGiven to strict query', () => {
     const encodedEventIndex = encodeEventIndex(
       eventQueryDataGenerator({
         declaration: {
+          'mother.idType': 'NID',
           'mother.nid': '1232314352'
         }
       }),
@@ -194,7 +206,7 @@ describe('deduplication query input conversion', () => {
     expect(
       generateElasticsearchQuery(
         encodedEventIndex,
-        Clause.parse(sameMotherNid),
+        Clause.parse(motherIdMatchesIfGiven),
         v2BirthEvent
       )
     ).toMatchSnapshot()
@@ -366,6 +378,42 @@ describe('deduplication tests', () => {
         ],
         'mother.dob': ['2000-11-12', '2000-11-12'],
         'mother.nid': ['23412387', '23412387']
+      })
+    ).resolves.toHaveLength(1)
+  })
+
+  it('finds a duplicate if mother id types are different', async () => {
+    await expect(
+      findDuplicates({
+        'child.name': [
+          { firstname: 'John', surname: 'Smith' },
+          { firstname: 'John', surname: 'Smith' }
+        ],
+        'child.dob': ['2011-11-11', '2011-11-11'],
+        'mother.name': [
+          { firstname: 'Mother', surname: 'Smith' },
+          { firstname: 'Mothera', surname: 'Smith' }
+        ],
+        'mother.dob': ['2000-11-11', '2000-11-12'],
+        'mother.idType': ['NID', 'PASSPORT']
+      })
+    ).resolves.toHaveLength(1)
+  })
+
+  it('finds a duplicate if both of the records do not have mother id', async () => {
+    await expect(
+      findDuplicates({
+        'child.name': [
+          { firstname: 'John', surname: 'Smith' },
+          { firstname: 'John', surname: 'Smith' }
+        ],
+        'child.dob': ['2011-11-11', '2011-11-11'],
+        'mother.name': [
+          { firstname: 'Mother', surname: 'Smith' },
+          { firstname: 'Mothera', surname: 'Smith' }
+        ],
+        'mother.dob': ['2000-11-11', '2000-11-12'],
+        'mother.idType': ['NONE', 'NONE']
       })
     ).resolves.toHaveLength(1)
   })

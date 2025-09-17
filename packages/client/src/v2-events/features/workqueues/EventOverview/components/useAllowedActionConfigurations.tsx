@@ -26,7 +26,8 @@ import {
   workqueueActions,
   Draft,
   isActionInScope,
-  configurableEventScopeAllowed
+  configurableEventScopeAllowed,
+  canUserReadEvent
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -529,7 +530,15 @@ export function useAllowedActionConfigurations(
         ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
         workqueueActions.safeParse(action).success
     )
-    .filter(isActionAllowed)
+    .filter(
+      (action) =>
+        isActionAllowed(action) ||
+        (action === ActionType.READ &&
+          canUserReadEvent(event, {
+            userId: authentication.sub,
+            scopes: authentication.scope
+          }))
+    )
     // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
     .map((a) => ({ ...config[a], type: a }))
     .filter((a: ActionConfig) => !a.hidden)

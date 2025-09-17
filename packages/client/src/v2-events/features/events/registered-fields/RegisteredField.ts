@@ -12,7 +12,7 @@
 import { Location } from '@events/service/locations/locations'
 import { IntlShape } from 'react-intl'
 import { FieldConfigInput, User } from '@opencrvs/commons/client'
-import { IAdminStructureItem } from '@client/utils/referenceApi'
+import { AdminStructureItem } from '@client/utils/referenceApi'
 
 export interface RegisteredFieldModule<T extends FieldConfigInput> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,5 +34,5 @@ export interface StringifierContext<F extends FieldConfigInput> {
   locations: Location[]
   users?: User[]
   config?: F
-  adminLevels?: IAdminStructureItem[]
+  adminLevels?: AdminStructureItem[]
 }
