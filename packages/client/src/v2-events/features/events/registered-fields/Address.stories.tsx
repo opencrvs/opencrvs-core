@@ -241,6 +241,11 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
           }
         }}
         formConfig={declarationForm}
+        locationIds={[
+          {
+            id: leafAdminStructureLocationId
+          }
+        ]}
         previousFormValues={{
           'applicant.address': {
             country: 'FAR',
