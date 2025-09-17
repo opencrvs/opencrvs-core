@@ -42,6 +42,9 @@ const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
   border-radius: 4px;
   ${({ theme }) => theme.fonts.reg19};
   padding-left: 40px;
+
+  color: ${({ theme }) => theme.colors.copy};
+  background: ${({ theme }) => theme.colors.white};
   border: 1.5px solid
     ${({ theme, error, touched }) =>
       error && touched ? theme.colors.negative : theme.colors.copy};
@@ -51,7 +54,14 @@ const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
     border: 1.5px solid ${({ theme }) => theme.colors.grey600};
     box-shadow: 0 0 0px 4px ${({ theme }) => theme.colors.yellow};
   }
+
+  &:disabled {
+    color: ${({ theme }) => theme.colors.disabled};
+    border: 1.5px solid ${({ theme }) => theme.colors.disabled};
+    box-shadow: none;
+  }
 `
+
 const DropDownWrapper = styled.ul`
   background: ${({ theme }) => theme.colors.white};
   box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54);
@@ -265,7 +275,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
       <>
         <LocationSearchContainer>
           <Wrapper className={this.props.className}>
-            <Icon name="MapPin" size="medium" />
+            <Icon name="MapPin" size="medium" disabled={this.props.disabled} />
             <SearchTextInput
               id={this.props.id ? this.props.id : 'locationSearchInput'}
               data-testid={

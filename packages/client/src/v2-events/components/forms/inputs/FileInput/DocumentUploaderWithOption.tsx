@@ -213,6 +213,7 @@ function DocumentUploaderWithOption({
         </div>
       )}
       <DocumentListPreview
+        disabled={disabled}
         documents={files}
         dropdownOptions={options}
         processingDocuments={filesBeingProcessed}
@@ -248,6 +249,7 @@ function DocumentUploaderWithOption({
 
       {previewImage && (
         <DocumentPreview
+          disableDelete={disabled}
           goBack={() => setPreviewImage(null)}
           previewImage={previewImage}
           title={getLabelForDocumentOption(previewImage.option)}

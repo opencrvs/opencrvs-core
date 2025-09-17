@@ -211,6 +211,7 @@ function DateRangeInput({
       <DateRangeBody>
         {dateRange.isDateRangeActive && (
           <Checkbox
+            disabled={props.disabled}
             id={props.id + '-date_range_checkbox'}
             label={dateRangeLabel || ''}
             name={props.id + 'date_range_toggle'}
@@ -221,6 +222,7 @@ function DateRangeInput({
         )}
 
         <NoShrinkLink
+          disabled={props.disabled}
           id={props.id + '-date_range_button'}
           onClick={handleLinkOnClick}
         >
