@@ -11,9 +11,10 @@
 
 import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
-import { ConditionalParameters, JSONSchema } from './conditionals'
-import { formatISO, isAfter, isBefore } from 'date-fns'
 import { ErrorMapCtx, z, ZodIssueOptionalMessage } from 'zod'
+import { formatISO, isAfter, isBefore } from 'date-fns'
+
+import { ConditionalParameters, JSONSchema } from './conditionals'
 import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
@@ -21,7 +22,6 @@ import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
-
 import { Location } from '../events/locations'
 
 const ajv = new Ajv({
