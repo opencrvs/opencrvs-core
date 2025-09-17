@@ -18,7 +18,6 @@ import {
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import * as Validate from './index'
 
@@ -51,11 +50,10 @@ const actions = [
           firstname: 'Euan',
           surname: 'Millar'
         }
+      },
+      annotation: {
+        'review.comment': 'asdasdasdasdasdasd'
       }
-    },
-
-    annotation: {
-      'review.comment': 'asdasdasdasdasdasd'
     }
   })
 ]

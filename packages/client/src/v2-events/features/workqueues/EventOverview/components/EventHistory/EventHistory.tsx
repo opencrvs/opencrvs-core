@@ -72,7 +72,7 @@ const messages = defineMessages({
     description: 'Role of the user in the event history'
   },
   system: {
-    id: 'v2.event.history.system',
+    id: 'event.history.system',
     defaultMessage: 'System',
     description: 'Name for system initiated actions in the event history'
   },
