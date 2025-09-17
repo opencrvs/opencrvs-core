@@ -68,30 +68,33 @@ export function PrintCertificate({
     const fields = page.fields
       .filter((f) => isFieldVisible(f, annotation))
       .map((field) => {
-        const valueDisplay = Output({
-          field,
-          value: annotation[field.id],
-          showPreviouslyMissingValuesAsChanged: false
-        })
+        const valueDisplay = (
+          <Output
+            field={field}
+            showPreviouslyMissingValuesAsChanged={false}
+            value={annotation[field.id]}
+          />
+        )
 
         return {
           label: intl.formatMessage(field.label),
           value: valueDisplay
         }
       })
-      .filter((f) => f.value)
 
     if (page.type === PageTypes.enum.VERIFICATION) {
-      const value = Output({
-        field: {
-          id: page.id,
-          label: page.title,
-          type: FieldType.CHECKBOX,
-          defaultValue: false
-        },
-        value: annotation[page.id],
-        showPreviouslyMissingValuesAsChanged: false
-      })
+      const value = (
+        <Output
+          field={{
+            id: page.id,
+            label: page.title,
+            type: FieldType.CHECKBOX,
+            defaultValue: false
+          }}
+          showPreviouslyMissingValuesAsChanged={false}
+          value={annotation[page.id]}
+        />
+      )
 
       return [{ label: intl.formatMessage(verifiedMessage), value }, ...fields]
     }
