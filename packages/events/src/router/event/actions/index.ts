@@ -230,6 +230,8 @@ export async function defaultRequestHandler(
 
     if (actionConfirmationResponseSchema) {
       try {
+        // @todo: this functionality is now probably a bit broken.
+        // would be best to just merge the two schemas and parse the body in one go, but I didnt figure out the correct zod typing for that
         parsedBody = actionConfirmationResponseSchema.parse(body)
       } catch {
         throw new TRPCError({
