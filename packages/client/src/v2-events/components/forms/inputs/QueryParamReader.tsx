@@ -46,7 +46,7 @@ function QueryParamReaderInput({
       ? prepareParamsFromMap(params, map)
       : Object.fromEntries(params)
 
-    onChange(paramsObject)
+    void Promise.resolve().then(() => onChange(paramsObject))
     setSearchParams(new URLSearchParams(), { replace: true })
   }, [map, onChange, searchString, setSearchParams])
   return null
