@@ -4181,6 +4181,16 @@ components:
           properties:
             type:
               type: string
+              const: not
+            clause:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - type
+            - clause
+        - type: object
+          properties:
+            type:
+              type: string
               const: and
             clauses:
               type: array
@@ -4239,6 +4249,8 @@ components:
                 boost:
                   type: number
                   default: 1
+                value:
+                  type: string
               required:
                 - boost
               default:
