@@ -248,9 +248,10 @@ test('Returns events based on the updatedAt column', async () => {
   const oldEventCreateAction = generateActionDocument({
     configuration: tennisClubMembershipEvent,
     action: ActionType.CREATE,
-    user,
     defaults: {
-      createdAt: oldEventCreatedAt
+      createdAt: oldEventCreatedAt,
+      createdBy: user.id,
+      createdAtLocation: user.primaryOfficeId
     }
   })
 
@@ -261,9 +262,10 @@ test('Returns events based on the updatedAt column', async () => {
     generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action,
-      user,
       defaults: {
-        status: ActionStatus.Requested
+        status: ActionStatus.Requested,
+        createdBy: user.id,
+        createdAtLocation: user.primaryOfficeId
       }
     })
   )
