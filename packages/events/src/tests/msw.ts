@@ -60,7 +60,14 @@ const handlers = [
       role: 'REGISTRATION_AGENT',
       signature: '/ocrvs/signature.png'
     })
-  })
+  }),
+  // token exchange for `event.actions.register.confirm` and `event.actions.register.reject`
+  // query params such as `subject_token`, `subject_token_type` omitted for simplicity
+  http.post(`${env.AUTH_URL}/token`, () =>
+    HttpResponse.json({
+      access_token: 'some-token'
+    })
+  )
 ]
 
 export const mswServer = setupServer(...handlers)

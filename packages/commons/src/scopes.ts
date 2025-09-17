@@ -33,6 +33,9 @@ export const SCOPES = {
   NATIONALID: 'nationalId',
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
+  RECORD_IMPORT: 'record.import',
+  RECORD_EXPORT: 'record.export',
+  RECORD_REINDEX: 'record.reindex',
 
   // declare
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
@@ -123,11 +126,7 @@ export const SCOPES = {
   CONFIG_UPDATE_ALL: 'config.update:all',
 
   // data seeding
-  USER_DATA_SEEDING: 'user.data-seeding',
-
-  // systems / integrations
-  RECORD_IMPORT: 'record.import',
-  RECORD_REINDEX: 'record.reindex'
+  USER_DATA_SEEDING: 'user.data-seeding'
 } as const
 
 // Legacy scopes
