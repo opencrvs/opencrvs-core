@@ -22,21 +22,22 @@ import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/Navigat
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
 import { joinValues } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
+import { storage } from '@client/storage'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { useCountryConfigWorkqueueConfigurations } from '@client/v2-events/features/events/useCountryConfigWorkqueueConfigurations'
 import { ROUTES } from '@client/v2-events/routes'
+import { removeToken } from '@client/utils/authUtils'
 import * as routes from '@client/navigation/routes'
-import { getIndividualNameObj } from '@client/utils/userUtils'
+import {
+  getIndividualNameObj,
+  removeUserDetails
+} from '@client/utils/userUtils'
 import { getOfflineData } from '@client/offline/selectors'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { getLanguage } from '@client/i18n/selectors'
 import { Avatar } from '@client/components/Avatar'
-import {
-  hasDraftWorkqueue,
-  logout,
-  WORKQUEUE_DRAFT
-} from '@client/v2-events/utils'
+import { hasDraftWorkqueue, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
 import { hasOutboxWorkqueue, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -90,6 +91,15 @@ export const Sidebar = ({
   const avatar = <Avatar avatar={userDetails?.avatar} name={name} />
 
   const runningVer = String(localStorage.getItem('running-version'))
+
+  const logout = async () => {
+    await storage.removeItem(SCREEN_LOCK)
+    await removeToken()
+    await removeUserDetails()
+    window.location.assign(
+      `${window.config.LOGIN_URL}?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
+    )
+  }
 
   return (
     <LeftNavigation
