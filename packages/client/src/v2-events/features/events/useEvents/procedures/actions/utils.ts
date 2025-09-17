@@ -28,13 +28,13 @@ import { createTemporaryId } from '@client/v2-events/utils'
  *
  * @param actionType - The type of action being performed
  * @param status - Optional status override for the action (defaults to ActionStatus.Accepted)
- * @param useUpdateLocalEventIndex - Whether to update the local event index instead of the full event data (defaults to false)
+ * @param onlyUpdateLocalEventIndex - Whether to update the local event index instead of the full event data (defaults to false)
  * @returns A function that performs the optimistic update and returns the created optimistic action
  */
 export function updateEventOptimistically<T extends ActionInput>(
   actionType: ActionType,
   status: ActionStatus = ActionStatus.Accepted,
-  useUpdateLocalEventIndex: boolean = false
+  onlyUpdateLocalEventIndex: boolean = false
 ) {
   return (variables: T) => {
     const localEvent = queryClient.getQueryData(
@@ -70,7 +70,7 @@ export function updateEventOptimistically<T extends ActionInput>(
       actions: [...localEvent.actions, optimisticAction]
     }
 
-    if (useUpdateLocalEventIndex) {
+    if (onlyUpdateLocalEventIndex) {
       updateLocalEventIndex(optimisticEvent.id, optimisticEvent)
     } else {
       setEventData(optimisticEvent.id, optimisticEvent)
