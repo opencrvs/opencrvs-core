@@ -21,7 +21,6 @@ import {
   FieldType,
   FieldValue,
   isFieldEnabled,
-  isFieldVisible,
   AddressType,
   TranslationConfig,
   IndexMap,
@@ -40,6 +39,7 @@ import {
   makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
+import { useConditionals } from '@client/v2-events/hooks/useConditionals'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -197,6 +197,7 @@ export function FormSectionComponent({
   const intl = useIntl()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
+  const { isFieldVisible } = useConditionals()
 
   const fieldsWithFormikSeparator = fieldsWithDotSeparator.map((field) => ({
     ...field,

@@ -122,10 +122,13 @@ export async function createToken(
   scope: string[],
   audience: string[],
   issuer: string,
-  temporary?: boolean,
-  userType: TokenUserType = TokenUserType.enum.user
+  temporary = false,
+  userType: TokenUserType = TokenUserType.enum.user,
+  role?: string | number
 ): Promise<string> {
-  return sign({ scope, userType }, cert, {
+  console.log('CIHAN ROLE', role)
+  // @todo: use actual role
+  return sign({ scope, userType, role }, cert, {
     subject: userId,
     algorithm: 'RS256',
     expiresIn: temporary

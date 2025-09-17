@@ -183,6 +183,7 @@ export interface ITokenPayload {
   userType: TokenUserType
   eventId?: UUID
   actionId?: UUID
+  role: string
 }
 
 /**

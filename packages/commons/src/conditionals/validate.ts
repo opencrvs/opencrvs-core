@@ -22,6 +22,7 @@ import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 
 import { Location } from '../events/locations'
+import { ITokenPayload } from 'src/authentication'
 
 const ajv = new Ajv({
   $data: true,
@@ -129,7 +130,6 @@ ajv.addKeyword({
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
-
   const result = validator(data) as boolean
 
   return result
@@ -161,6 +161,7 @@ function getConditionalActionsForField(
   if (!field.conditionals) {
     return []
   }
+
   return field.conditionals
     .filter((conditional) => validate(conditional.conditional, values))
     .map((conditional) => conditional.type)
@@ -175,10 +176,18 @@ export function areConditionsMet(
   )
 }
 
+// @todo: move this to a better location
+export type Context = {
+  user: ITokenPayload
+  locations?: Array<Location>
+}
+
 function isFieldConditionMet(
   field: FieldConfig,
   form: ActionUpdate | EventState,
-  conditionalType: ConditionalType
+  conditionalType: ConditionalType,
+  // @todo: maybe make it mandatory?
+  context?: Context
 ) {
   const hasRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === conditionalType
@@ -190,10 +199,9 @@ function isFieldConditionMet(
 
   const validConditionals = getConditionalActionsForField(field, {
     $form: form,
-    $now: formatISO(new Date(), {
-      representation: 'date'
-    }),
-    $online: isOnline()
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $online: isOnline(),
+    $user: context?.user
   })
 
   return validConditionals.includes(conditionalType)
@@ -201,9 +209,10 @@ function isFieldConditionMet(
 
 export function isFieldVisible(
   field: FieldConfig,
-  form: ActionUpdate | EventState
+  form: ActionUpdate | EventState,
+  context?: Context
 ) {
-  return isFieldConditionMet(field, form, ConditionalType.SHOW)
+  return isFieldConditionMet(field, form, ConditionalType.SHOW, context)
 }
 
 export function getOnlyVisibleFormValues(
