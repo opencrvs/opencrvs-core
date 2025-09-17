@@ -29,10 +29,12 @@ import {
   EventDocument,
   ConfigurableScopes,
   getAuthorizedEventsFromScopes,
+  getTokenPayload,
   canUserReadEvent
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
+import { ActionConfirmationResponseSchema } from '@events/router/event/actions'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -254,6 +256,52 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
   if (input.some(({ slug }) => !availableWorkqueues.includes(slug))) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
+  return next()
+}
+
+/**
+ * Checks that the token has been exchanged for the specific `eventId` and `actionId` in the input.
+ *
+ * Registrars token can be exchanged in auth into a more specific token with `eventId` and `actionId`.
+ * This is useful when tokens need to be exposed outside of core of OpenCRVS, e.g. countryconfig or external systems.
+ */
+export const requireActionConfirmationAuthorization: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  ActionConfirmationResponseSchema
+> = async ({ next, ctx, input }) => {
+  const {
+    eventId: grantedEventId,
+    actionId: grantedActionId,
+    scope
+  } = getTokenPayload(ctx.token)
+
+  const hasConfirmAndRejectScope =
+    scope.includes('record.confirm-registration') &&
+    scope.includes('record.reject-registration')
+
+  if (!hasConfirmAndRejectScope) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Missing required scopes for action confirmation'
+    })
+  }
+
+  const isActionConfirmationToken = grantedEventId && grantedActionId
+
+  if (!isActionConfirmationToken) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Missing required claims for action confirmation'
+    })
+  }
+
+  if (grantedEventId !== input.eventId || grantedActionId !== input.actionId) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
   return next()
 }
 

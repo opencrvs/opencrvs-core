@@ -136,14 +136,26 @@ export async function createToken(
   })
 }
 
-export async function createTokenForRecordValidation(
-  userId: UUID,
+type ActionConfirmationInput = {
+  eventId: UUID
+  actionId: UUID
+}
+
+type LegacyRecordValidationInput = {
   recordId: UUID
+}
+
+export async function createTokenForActionConfirmation(
+  input: ActionConfirmationInput | LegacyRecordValidationInput,
+  userId: UUID
 ) {
   return sign(
     {
       scope: ['record.confirm-registration', 'record.reject-registration'],
-      recordId
+      eventId: 'eventId' in input ? input.eventId : undefined,
+      actionId: 'actionId' in input ? input.actionId : undefined,
+      recordId: 'recordId' in input ? input.recordId : undefined,
+      userType: TokenUserType.enum.user
     },
     cert,
     {
@@ -151,8 +163,8 @@ export async function createTokenForRecordValidation(
       algorithm: 'RS256',
       expiresIn: '7 days',
       audience: [
-        'opencrvs:gateway-user', // to get to the gateway
-        'opencrvs:user-mgnt-user', // to allow the gateway to connect the 'sub' to an actual user
+        'opencrvs:gateway-user',
+        'opencrvs:user-mgnt-user',
         'opencrvs:auth-user',
         'opencrvs:hearth-user',
         'opencrvs:notification-user',
