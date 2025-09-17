@@ -40,6 +40,7 @@ import {
   makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
+import { useUserContext } from '@client/v2-events/hooks/useUserDetails'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -197,6 +198,7 @@ export function FormSectionComponent({
   const intl = useIntl()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
+  const userContext = useUserContext()
 
   const fieldsWithFormikSeparator = fieldsWithDotSeparator.map((field) => ({
     ...field,
@@ -390,7 +392,7 @@ export function FormSectionComponent({
   const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
     const fieldErrors = errors[field.id]?.errors
     const hasErrors = fieldErrors && fieldErrors.length > 0
-    return isFieldVisible(field, completeForm) && hasErrors
+    return isFieldVisible(field, completeForm, userContext) && hasErrors
   })
 
   useEffect(() => {
@@ -405,12 +407,12 @@ export function FormSectionComponent({
   return (
     <section className={className}>
       {fieldsWithFormikSeparator.map((field) => {
-        if (!isFieldVisible(field, completeForm)) {
+        if (!isFieldVisible(field, completeForm, userContext)) {
           return null
         }
 
         const isDisabled =
-          !isFieldEnabled(field, completeForm) ||
+          !isFieldEnabled(field, completeForm, userContext) ||
           (isCorrection && field.uncorrectable)
 
         const visibleError = errors[field.id]?.errors[0]?.message

@@ -46,3 +46,12 @@ export function useUserDetails() {
     province: ''
   }
 }
+
+export function useUserContext() {
+  const userDetails = useUserDetails()
+
+  console.log('userDetails :>> ', userDetails)
+  return {
+    user: userDetails
+  }
+}

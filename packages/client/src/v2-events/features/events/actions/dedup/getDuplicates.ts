@@ -13,9 +13,11 @@ import { TRPCClientError } from '@trpc/client'
 import { trpcClient } from '@client/v2-events/trpc'
 import { cacheFiles } from '@client/v2-events/features/files/cache'
 import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+import { useUserContext } from '@client/v2-events/hooks/useUserDetails'
 import { setEventData } from '../../useEvents/api'
 
 export async function prefetchPotentialDuplicates(eventId: string) {
+  const userContext = useUserContext()
   try {
     const potentialDuplicates = await trpcClient.event.getDuplicates.query({
       eventId
@@ -25,7 +27,7 @@ export async function prefetchPotentialDuplicates(eventId: string) {
         cacheFiles(eventDocument),
         cacheUsersFromEventDocument(eventDocument)
       ])
-      setEventData(eventDocument.id, eventDocument)
+      setEventData(eventDocument.id, eventDocument, userContext)
     }
   } catch (error) {
     if (error instanceof TRPCClientError && error.data?.httpStatus === 403) {

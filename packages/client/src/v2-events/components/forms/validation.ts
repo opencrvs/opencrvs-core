@@ -35,6 +35,9 @@ export interface Errors {
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
   values: EventState,
+  context: {
+    user: ITokenPayload
+  },
   locations?: Location[]
 ) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
@@ -45,15 +48,12 @@ export function getValidationErrorsForForm(
     ) {
       return errorsForAllFields
     }
-
-    const context = locations ? { locations } : undefined
-
     return {
       ...errorsForAllFields,
       [field.id]: runFieldValidations({
         field,
         values,
-        context
+        context: { user: context.user, locations }
       })
     }
   }, {})
@@ -122,13 +122,14 @@ export function validationErrorsInActionFormExist({
       const fieldErrors = getValidationErrorsForForm(
         page.fields,
         formWithoutHiddenFields,
+        context,
         locations
       )
       return Object.values(fieldErrors).some((field) => field.errors.length > 0)
     })
 
   const hasAnnotationValidationErrors = Object.values(
-    getValidationErrorsForForm(reviewFields, visibleAnnotationFields)
+    getValidationErrorsForForm(reviewFields, visibleAnnotationFields, context)
   ).some((field) => field.errors.length > 0)
 
   return hasValidationErrors || hasAnnotationValidationErrors

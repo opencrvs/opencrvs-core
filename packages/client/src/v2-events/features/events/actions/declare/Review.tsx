@@ -43,6 +43,7 @@ import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitMod
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserContext } from '@client/v2-events/hooks/useUserDetails'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
@@ -59,12 +60,13 @@ export function Review() {
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
+  const userContext = useUserContext()
 
   const event = events.getEvent.getFromCache(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  const currentEventState = getCurrentEventState(event, config)
+  const currentEventState = getCurrentEventState(event, config, userContext)
 
   const formConfig = getDeclaration(config)
   const reviewConfig = getActionReview(config, ActionType.DECLARE)

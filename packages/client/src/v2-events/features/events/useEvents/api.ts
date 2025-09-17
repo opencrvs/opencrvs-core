@@ -23,6 +23,7 @@ import {
   EventIndex,
   findLastAssignmentAction,
   getCurrentEventState,
+  ITokenPayload,
   User
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
@@ -120,7 +121,11 @@ export function setEventSearchQuery(updatedEventIndex: EventIndex | undefined) {
   )
 }
 
-export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
+export function updateLocalEventIndex(
+  id: string,
+  updatedEvent: EventDocument,
+  context: { user: ITokenPayload }
+) {
   const config = findLocalEventConfig(updatedEvent.type)
 
   if (!config) {
@@ -128,7 +133,7 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
       `Event configuration for type ${updatedEvent.type} not found`
     )
   }
-  const updatedEventIndex = getCurrentEventState(updatedEvent, config)
+  const updatedEventIndex = getCurrentEventState(updatedEvent, config, context)
   // Update the local event index with the updated event
   setEventSearchQuery(updatedEventIndex)
 
@@ -207,8 +212,12 @@ export function clearPendingDraftCreationRequests(eventId: string) {
     })
 }
 
-export function setEventData(id: string, data: EventDocument) {
-  updateLocalEventIndex(id, data)
+export function setEventData(
+  id: string,
+  data: EventDocument,
+  context: { user: ITokenPayload }
+) {
+  updateLocalEventIndex(id, data, context)
   queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
   updateDraftsWithEvent(id, data)
 }
@@ -248,8 +257,11 @@ async function deleteEventData(updatedEvent: EventDocument) {
   await removeCachedFiles(updatedEvent)
 }
 
-export function updateLocalEvent(data: EventDocument) {
-  setEventData(data.id, data)
+export function updateLocalEvent(
+  data: EventDocument,
+  context: { user: ITokenPayload }
+) {
+  setEventData(data.id, data, context)
 }
 
 export async function deleteLocalEvent(updatedEvent: EventDocument) {
@@ -258,8 +270,11 @@ export async function deleteLocalEvent(updatedEvent: EventDocument) {
   return refetchAllSearchQueries()
 }
 
-export async function onAssign(updatedEvent: EventDocument) {
-  setEventData(updatedEvent.id, updatedEvent)
+export async function onAssign(
+  updatedEvent: EventDocument,
+  context: { user: ITokenPayload }
+) {
+  setEventData(updatedEvent.id, updatedEvent, context)
   await invalidateWorkqueues()
 
   const lastAssignment = findLastAssignmentAction(updatedEvent.actions)
@@ -275,8 +290,11 @@ export async function refetchDraftsList() {
   })
 }
 
-export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
+export async function cleanUpOnUnassign(
+  updatedEvent: EventDocument,
+  context: { user: ITokenPayload }
+) {
   await deleteEventData(updatedEvent)
-  updateLocalEventIndex(updatedEvent.id, updatedEvent)
+  updateLocalEventIndex(updatedEvent.id, updatedEvent, context)
   await invalidateWorkqueues()
 }

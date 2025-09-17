@@ -29,7 +29,9 @@ import {
   TranslationConfig,
   UUID,
   DisplayableAction,
-  ClientSpecificAction
+  ClientSpecificAction,
+  FullDocumentPath,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { AssignmentStatus } from '@client/v2-events/utils'
@@ -283,7 +285,31 @@ export function createStoriesFromScenarios(
                 tRPCMsw.event.search.query(() => ({
                   total: 1,
                   results: [
-                    getCurrentEventState(event, tennisClubMembershipEvent)
+                    getCurrentEventState(event, tennisClubMembershipEvent, {
+                      user: {
+                        id: '67bda93bfc07dee78ae558cf',
+                        name: [
+                          {
+                            use: 'en',
+                            given: ['Kalusha'],
+                            family: 'Bwalya'
+                          }
+                        ],
+                        scope: [
+                          'record.register',
+                          'record.registration-correct'
+                        ],
+                        role: 'SOCIAL_WORKER',
+                        exp: '1739881718',
+                        algorithm: 'RS256',
+                        userType: TokenUserType.enum.user,
+                        signature: 'signature.png' as FullDocumentPath,
+                        sub: '677b33fea7efb08730f3abfa33',
+                        avatar: undefined,
+                        primaryOfficeId:
+                          '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+                      }
+                    })
                   ]
                 })),
                 tRPCMsw.event.get.query(() => {

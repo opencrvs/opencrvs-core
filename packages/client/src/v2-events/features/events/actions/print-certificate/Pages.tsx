@@ -31,6 +31,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
+import { useUserContext } from '@client/v2-events/hooks/useUserDetails'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -43,12 +44,13 @@ export function Pages() {
   const { modal } = useEventFormNavigation()
   const { setAnnotation, getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
+  const userContext = useUserContext()
   const events = useEvents()
   const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const eventIndex = getCurrentEventState(event, configuration)
+  const eventIndex = getCurrentEventState(event, configuration, userContext)
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
     event.type,
     eventIndex.declaration,

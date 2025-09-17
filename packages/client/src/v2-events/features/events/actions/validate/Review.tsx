@@ -44,6 +44,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { getScope } from '@client/profile/profileSelectors'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useUserContext } from '@client/v2-events/hooks/useUserDetails'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 /**
@@ -57,6 +58,7 @@ export function Review() {
   )
   const events = useEvents()
   const drafts = useDrafts()
+  const userContext = useUserContext()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { closeActionView } = useEventFormNavigation()
@@ -98,7 +100,7 @@ export function Review() {
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
-  const currentEventState = getCurrentEventState(event, config)
+  const currentEventState = getCurrentEventState(event, config, userContext)
   const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 

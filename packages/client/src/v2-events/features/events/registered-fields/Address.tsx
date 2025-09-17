@@ -37,6 +37,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { IAdminStructureItem } from '@client/utils/referenceApi'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { useUserContext } from '@client/v2-events/hooks/useUserDetails'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -371,6 +372,7 @@ function AddressOutput({
   configuration?: AddressField
 }) {
   const { getLocations } = useLocations()
+  const userContext = useUserContext()
   const [locations] = getLocations.useSuspenseQuery()
   const { config } = useSelector(getOfflineData)
   const customAddressFields = configuration?.configuration
@@ -430,7 +432,8 @@ function AddressOutput({
         field.value &&
         isFieldDisplayedOnReview(
           field.field satisfies FieldConfig,
-          addressValues
+          addressValues,
+          userContext
         )
     )
 

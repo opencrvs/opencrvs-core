@@ -13,6 +13,7 @@ import {
   deepMerge,
   EventDocument,
   getCurrentEventState,
+  ITokenPayload,
   RequestedCorrectionAction
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -20,10 +21,12 @@ import { CorrectionDetails } from '@client/v2-events/features/events/actions/cor
 
 export function RequestCorrection({
   action,
-  fullEvent
+  fullEvent,
+  context
 }: {
   action: RequestedCorrectionAction
   fullEvent: EventDocument
+  context: { user: ITokenPayload }
 }) {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
@@ -37,7 +40,8 @@ export function RequestCorrection({
 
   const eventIndex = getCurrentEventState(
     eventBeforeCorrectionRequest,
-    eventConfiguration
+    eventConfiguration,
+    context
   )
 
   if (!action.annotation) {

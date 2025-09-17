@@ -39,6 +39,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserContext } from '@client/v2-events/hooks/useUserDetails'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
 import { AvailableActionTypes, getPreviousDeclarationActionType } from './utils'
@@ -56,14 +57,15 @@ function useActionGuard(
   event: EventDocument,
   configuration: EventConfig
 ) {
-  const eventState = getCurrentEventState(event, configuration)
+  const userContext = useUserContext()
+  const eventState = getCurrentEventState(event, configuration, userContext)
   const availableActions = getAvailableActionsForEvent(eventState)
   const { isActionAllowed } = useUserAllowedActions(event.type)
 
   // If the action is not available for the event, redirect to the overview page
   if (!availableActions.includes(actionType)) {
     throw new Error(
-      `Action ${actionType} not available for the event ${event.id} with status ${getCurrentEventState(event, configuration).status} ${eventState.flags.length > 0 ? `(flags: ${eventState.flags.join(', ')})` : ''}`
+      `Action ${actionType} not available for the event ${event.id} with status ${getCurrentEventState(event, configuration, userContext).status} ${eventState.flags.length > 0 ? `(flags: ${eventState.flags.join(', ')})` : ''}`
     )
   }
 
@@ -93,6 +95,7 @@ function DeclarationActionComponent({
 
   const events = useEvents()
   const navigate = useNavigate()
+  const userContext = useUserContext()
   const { setLocalDraft, getLocalDraftOrDefault, getRemoteDraftByEventId } =
     useDrafts()
 
@@ -188,9 +191,10 @@ function DeclarationActionComponent({
       dangerouslyGetCurrentEventStateWithDrafts({
         event,
         draft: mergedDraft,
-        configuration
+        configuration,
+        context: userContext
       }),
-    [mergedDraft, event, configuration]
+    [mergedDraft, event, configuration, userContext]
   )
 
   const actionAnnotation = useMemo(() => {

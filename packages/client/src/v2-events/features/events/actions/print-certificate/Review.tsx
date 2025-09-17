@@ -55,6 +55,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useOnlineStatus } from '@client/utils'
 import { getScope } from '@client/profile/profileSelectors'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserContext } from '@client/v2-events/hooks/useUserDetails'
 
 const CertificateContainer = styled.div`
   svg {
@@ -163,6 +164,7 @@ export function Review() {
   }
   const intl = useIntl()
   const navigate = useNavigate()
+  const userContext = useUserContext()
   const isOnline = useOnlineStatus()
   const [modal, openModal] = useModal()
 
@@ -203,7 +205,8 @@ export function Review() {
    */
   const validationErrorExist = validationErrorsInActionFormExist({
     formConfig,
-    form: annotation
+    form: annotation,
+    context: userContext
   })
 
   if (validationErrorExist) {

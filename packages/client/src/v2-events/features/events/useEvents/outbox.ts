@@ -17,6 +17,7 @@ import {
 } from '@opencrvs/commons/client'
 import { EventState } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
+import { useUserContext } from '@client/v2-events/hooks/useUserDetails'
 import { useEventConfigurations } from '../useEventConfiguration'
 
 const MutationVariables = z.object({
@@ -34,6 +35,7 @@ function assignmentMutation(mutationKey: MutationKey) {
 export function useOutbox() {
   const trpc = useTRPC()
   const eventConfigurations = useEventConfigurations()
+  const userContext = useUserContext()
 
   const pendingMutations = useMutationState({
     filters: {
@@ -69,7 +71,11 @@ export function useOutbox() {
         return null
       }
 
-      const eventState = getCurrentEventState(event, eventConfiguration)
+      const eventState = getCurrentEventState(
+        event,
+        eventConfiguration,
+        userContext
+      )
 
       return {
         // Merge the declaration from mutation to get optimistic declaration

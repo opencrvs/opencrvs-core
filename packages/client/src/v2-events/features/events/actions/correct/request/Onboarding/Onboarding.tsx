@@ -21,6 +21,7 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { useUserContext } from '@client/v2-events/hooks/useUserDetails'
 
 const messages = defineMessages({
   title: {
@@ -38,6 +39,7 @@ export function Onboarding() {
   const events = useEvents()
   const annotation = useActionAnnotation((state) => state.getAnnotation())
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
+  const userContext = useUserContext()
 
   const event = events.getEvent.getFromCache(eventId)
 
@@ -59,7 +61,7 @@ export function Onboarding() {
   }
 
   const formPages = actionConfiguration.correctionForm.pages
-  const eventIndex = getCurrentEventState(event, configuration)
+  const eventIndex = getCurrentEventState(event, configuration, userContext)
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id

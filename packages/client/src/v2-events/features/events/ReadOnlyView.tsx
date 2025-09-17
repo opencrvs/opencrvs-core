@@ -27,11 +27,13 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { useUserContext } from '@client/v2-events/hooks/useUserDetails'
 
 function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
   const event = events.getEvent.viewEvent(eventId)
+  const userContext = useUserContext()
 
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(event.id)
@@ -40,12 +42,12 @@ function ReadonlyView() {
   )
 
   const eventStateWithDraft = useMemo(() => {
-    const eventState = getCurrentEventState(event, configuration)
+    const eventState = getCurrentEventState(event, configuration, userContext)
 
     return draft
       ? applyDraftToEventIndex(eventState, draft, configuration)
       : eventState
-  }, [draft, event, configuration])
+  }, [draft, event, configuration, userContext])
 
   const { title, fields } = getActionReview(configuration, ActionType.READ)
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()

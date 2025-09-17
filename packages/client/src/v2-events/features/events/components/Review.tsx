@@ -41,6 +41,7 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { useUserContext } from '@client/v2-events/hooks/useUserDetails'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -294,6 +295,7 @@ function FormReview({
   isReviewCorrection?: boolean
 }) {
   const intl = useIntl()
+  const userContext = useUserContext()
   const visiblePages = formConfig.pages.filter((page) =>
     isPageVisible(page, form)
   )
@@ -303,7 +305,9 @@ function FormReview({
       <ReviewContainter>
         {visiblePages.map((page) => {
           const fields = page.fields
-            .filter((field) => isFieldDisplayedOnReview(field, form))
+            .filter((field) =>
+              isFieldDisplayedOnReview(field, form, userContext)
+            )
             .map((field) => {
               const value = form[field.id]
               const previousValue = previousForm[field.id]
@@ -317,13 +321,13 @@ function FormReview({
                 previousForm,
                 formConfig
               })
-
-              const context = locations ? { locations } : undefined
-
               const error = runFieldValidations({
                 field,
                 values: form,
-                context
+                context: {
+                  user: userContext,
+                  locations
+                }
               })
 
               const errorDisplay =

@@ -22,6 +22,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { reviewMessages } from '@client/v2-events/features/events/actions/messages'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserContext } from '@client/v2-events/hooks/useUserDetails'
 
 export function useReviewActionConfig({
   formConfig,
@@ -39,10 +40,12 @@ export function useReviewActionConfig({
   locations: Location[]
 }) {
   const events = useEvents()
+  const userContext = useUserContext()
   const { isActionAllowed } = useUserAllowedActions(eventType)
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form: declaration,
+    context: userContext,
     annotation,
     reviewFields,
     locations

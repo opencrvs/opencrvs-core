@@ -32,9 +32,11 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useUserContext } from '@client/v2-events/hooks/useUserDetails'
 
 export function Pages() {
   const events = useEvents()
+  const userContext = useUserContext()
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const setFormValues = useEventFormData((state) => state.setFormValues)
@@ -47,7 +49,7 @@ export function Pages() {
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const eventIndex = getCurrentEventState(event, configuration)
+  const eventIndex = getCurrentEventState(event, configuration, userContext)
   const declarationPages = getDeclarationPages(configuration)
 
   const currentPageId =
