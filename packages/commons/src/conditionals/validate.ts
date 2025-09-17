@@ -20,9 +20,9 @@ import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
+import { ITokenPayload } from '../authentication'
 
 import { Location } from '../events/locations'
-import { ITokenPayload } from 'src/authentication'
 
 const ajv = new Ajv({
   $data: true,
