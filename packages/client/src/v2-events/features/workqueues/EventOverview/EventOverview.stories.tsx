@@ -621,7 +621,12 @@ export const WithVariousUserRoles: Story = {
   }
 }
 
-const userOverrides = {
+const actionDefaults = {
+  createdAt: getRandomDatetime(
+    createPrng(73),
+    new Date('2024-03-01'),
+    new Date('2024-04-01')
+  ),
   createdBy: refData.user.id.localRegistrar,
   createdByRole: TestUserRole.Enum.LOCAL_REGISTRAR,
   createdAtLocation: refData.user.localRegistrar().primaryOffice.id as UUID
@@ -633,34 +638,31 @@ const duplicateEvent = {
     generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action: ActionType.CREATE,
-      defaults: {
-        ...userOverrides
-      }
+      defaults: actionDefaults
     }),
     generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action: ActionType.ASSIGN,
       defaults: {
-        ...userOverrides,
+        ...actionDefaults,
         assignedTo: refData.user.id.localRegistrar
       }
     }),
     generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action: ActionType.DECLARE,
-      defaults: {
-        ...userOverrides
-      }
+      defaults: actionDefaults
     }),
     generateActionDocument({
       configuration: tennisClubMembershipEvent,
-      action: ActionType.DUPLICATE_DETECTED
+      action: ActionType.DUPLICATE_DETECTED,
+      defaults: actionDefaults
     }),
     generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action: ActionType.ASSIGN,
       defaults: {
-        ...userOverrides,
+        ...actionDefaults,
         assignedTo: refData.user.id.localRegistrar
       }
     })

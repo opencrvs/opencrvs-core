@@ -131,6 +131,31 @@ export function generateRandomName(rng: () => number) {
   }
 }
 
+export function generateUuid(rng: () => number = () => 0.1) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.floor(rng() * 16)
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+
+    return v.toString(16)
+  }) as UUID
+}
+
+export function generateTrackingId(rng: () => number): string {
+  const uuid = generateUuid(rng).replace(/-/g, '')
+  const trackingId = uuid.slice(0, 6).toUpperCase()
+  return trackingId
+}
+
+export function generateRegistrationNumber(rng: () => number): string {
+  const uuid = generateUuid(rng).replace(/-/g, '')
+  const registrationNumber = uuid.slice(0, 12).toUpperCase()
+  return registrationNumber
+}
+
+export function generateRandomSignature(rng: () => number): string {
+  return `/random-bucket/${generateUuid(rng)}.png`
+}
+
 /**
  * Quick-and-dirty mock data generator for event actions.
  */
@@ -732,7 +757,7 @@ export function generateActionDocument<T extends ActionType>({
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
-    createdBy: getUUID(),
+    createdBy: generateUuid(rng),
     createdByUserType: TokenUserType.Enum.user,
     createdByRole: TestUserRole.Enum.FIELD_AGENT,
     id: getUUID(),
@@ -954,31 +979,6 @@ export function createPrng(seed: number) {
     state = (MULTIPLIER * state + INCREMENT) % MODULUS
     return state / MODULUS
   }
-}
-
-export function generateUuid(rng: () => number = () => 0.1) {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = Math.floor(rng() * 16)
-    const v = c === 'x' ? r : (r & 0x3) | 0x8
-
-    return v.toString(16)
-  }) as UUID
-}
-
-export function generateTrackingId(rng: () => number): string {
-  const uuid = generateUuid(rng).replace(/-/g, '')
-  const trackingId = uuid.slice(0, 6).toUpperCase()
-  return trackingId
-}
-
-export function generateRegistrationNumber(rng: () => number): string {
-  const uuid = generateUuid(rng).replace(/-/g, '')
-  const registrationNumber = uuid.slice(0, 12).toUpperCase()
-  return registrationNumber
-}
-
-export function generateRandomSignature(rng: () => number): string {
-  return `/random-bucket/${generateUuid(rng)}.png`
 }
 
 /**
