@@ -136,15 +136,25 @@ export async function createToken(
   })
 }
 
+type ActionConfirmationInput = {
+  eventId: UUID
+  actionId: UUID
+}
+
+type LegacyRecordValidationInput = {
+  recordId: UUID
+}
+
 export async function createTokenForActionConfirmation(
-  { eventId, actionId }: { eventId: UUID; actionId: UUID },
+  input: ActionConfirmationInput | LegacyRecordValidationInput,
   userId: UUID
 ) {
   return sign(
     {
       scope: ['record.confirm-registration', 'record.reject-registration'],
-      eventId,
-      actionId,
+      eventId: 'eventId' in input ? input.eventId : undefined,
+      actionId: 'actionId' in input ? input.actionId : undefined,
+      recordId: 'recordId' in input ? input.recordId : undefined,
       userType: TokenUserType.enum.user
     },
     cert,
