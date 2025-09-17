@@ -34,7 +34,10 @@ export async function tokenExchangeHandler(
   const subjectToken = request.query.subject_token
   const subjectTokenType = request.query.subject_token_type
   const requestedTokenType = request.query.requested_token_type
-  // @deprecated - kept for backward compatibility
+  /**
+   * @deprecated
+   * @TODO record_id is only needed for V1 (pre-1.9) - remove when we drop support for that version
+   */
   const recordId = request.query.record_id
   const eventId = request.query.event_id
   const actionId = request.query.action_id
