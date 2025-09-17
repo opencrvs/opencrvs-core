@@ -29,35 +29,57 @@ const ActionConfirmationResponseCodes = {
 
 export async function requestActionConfirmation(
   actionType: ActionType,
+  transactionId: string,
   event: EventDocument,
   token: string
 ): Promise<{
   responseStatus: ActionConfirmationResponse
   body: Record<string, unknown> | undefined
 }> {
-  try {
-    const res = await fetch(
-      new URL(
-        `/trigger/events/${event.type}/actions/${actionType}`,
-        env.COUNTRY_CONFIG_URL
-      ),
-      {
-        method: 'POST',
-        body: JSON.stringify(event),
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: token
-        }
-      }
-    )
+  const actionConfirmationUrl = new URL(
+    `/trigger/events/${event.type}/actions/${actionType}`,
+    env.COUNTRY_CONFIG_URL
+  )
 
-    const status = res.status
+  logger.debug(
+    {
+      url: actionConfirmationUrl,
+      eventType: event.type,
+      actionType,
+      eventId: event.id,
+      transactionId
+    },
+    `Action confirmation request`
+  )
+
+  try {
+    const res = await fetch(actionConfirmationUrl, {
+      method: 'POST',
+      body: JSON.stringify(event),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    })
+
+    const statusCode = res.status
     const responseStatus =
-      status in ActionConfirmationResponseCodes
+      statusCode in ActionConfirmationResponseCodes
         ? ActionConfirmationResponseCodes[
-            status as keyof typeof ActionConfirmationResponseCodes
+            statusCode as keyof typeof ActionConfirmationResponseCodes
           ]
         : ActionConfirmationResponse.UnexpectedFailure
+
+    logger.debug(
+      {
+        url: actionConfirmationUrl,
+        eventType: event.type,
+        actionType,
+        eventId: event.id,
+        transactionId
+      },
+      `Action confirmation response: ${statusCode} - ${responseStatus}`
+    )
 
     return {
       responseStatus,
