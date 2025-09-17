@@ -156,8 +156,13 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
   return joinValues([name, ...resolvedAdminLevels, country], ', ')
 }
 
+function isLocationEmpty(value: Stringifiable) {
+  return !value.toString()
+}
+
 export const LocationSearch = {
   Input: LocationSearchInput,
   Output: LocationSearchOutput,
-  toCertificateVariables: toCertificateVariables
+  toCertificateVariables: toCertificateVariables,
+  isEmptyValue: isLocationEmpty
 }
