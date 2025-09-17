@@ -19,10 +19,7 @@ import {
   generateEventDocument,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import {
-  tennisClubMembershipEventIndex,
-  tennisClubMembershipEventDocument
-} from '@client/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
