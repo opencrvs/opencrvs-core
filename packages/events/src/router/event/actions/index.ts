@@ -228,6 +228,8 @@ export async function defaultRequestHandler(
     status = ActionStatus.Accepted
     parsedInput = inputSchema.partial().parse(body)
 
+    // @todo: should parsedInput be also validated with the same validation as in 'middleware.validateAction()'? I'm not sure!
+
     if (actionConfirmationResponseSchema) {
       try {
         // @todo: this functionality is now probably a bit broken.
