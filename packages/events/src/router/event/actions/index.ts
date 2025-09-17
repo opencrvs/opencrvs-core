@@ -179,6 +179,9 @@ export async function defaultRequestHandler(
   token: TokenWithBearer,
   event: EventDocument,
   configuration: EventConfig,
+  // @todo: would be neat to improve the type for inputSchema & actionConfirmationResponseSchema all around
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  inputSchema: z.ZodObject<any>,
   actionConfirmationResponseSchema?: z.ZodType
 ) {
   await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
@@ -217,10 +220,14 @@ export async function defaultRequestHandler(
     status = ActionStatus.Rejected
   }
 
+  let parsedInput
+
   // If we immediately get a success response, we mark the action as succeeded
   // and also validate the payload received from the notify API
   if (responseStatus === ActionConfirmationResponse.Success) {
     status = ActionStatus.Accepted
+    parsedInput = inputSchema.partial().parse(body)
+
     if (actionConfirmationResponseSchema) {
       try {
         parsedBody = actionConfirmationResponseSchema.parse(body)
@@ -242,7 +249,8 @@ export async function defaultRequestHandler(
       ...strippedInput,
       declaration: {},
       originalActionId: requestedAction.id,
-      ...parsedBody
+      ...parsedBody,
+      ...parsedInput
     },
     { event, user, token, status, configuration }
   )
@@ -317,6 +325,7 @@ export function getDefaultActionProcedures(
           token,
           event,
           configuration,
+          inputSchema,
           actionConfirmationResponseSchema
         )
       }),
