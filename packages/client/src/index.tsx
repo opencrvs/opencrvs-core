@@ -72,6 +72,10 @@ const router = createBrowserRouter(routesConfig, {
   }
 })
 
-root.render(<App router={router} store={store} />)
+console.debug('Waiting for service worker to be ready...')
+void navigator.serviceWorker.ready.then(() => {
+  console.debug('Service worker is ready')
+  root.render(<App router={router} store={store} />)
+})
 
 new SubmissionController(store).start()
