@@ -8,12 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
 import { http, HttpResponse } from 'msw'
 import { fn } from '@storybook/test'
-import { Field } from 'formik'
-import { Outlet, useSearchParams } from 'react-router-dom'
 import {
   ConditionalType,
   field,
