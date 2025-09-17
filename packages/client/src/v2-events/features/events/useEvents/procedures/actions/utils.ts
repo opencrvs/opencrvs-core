@@ -23,13 +23,6 @@ import {
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
 
-type SupportedActionTypes =
-  | typeof ActionType.DECLARE
-  | typeof ActionType.MARK_AS_DUPLICATE
-  | typeof ActionType.MARK_AS_NOT_DUPLICATE
-  | typeof ActionType.APPROVE_CORRECTION
-  | typeof ActionType.REQUEST_CORRECTION
-
 /**
  * Optimistically update an event by creating a placeholder/temporary action, before the actual mutation completes.
  *
@@ -39,7 +32,7 @@ type SupportedActionTypes =
  * @returns A function that performs the optimistic update and returns the created optimistic action
  */
 export function updateEventOptimistically<T extends ActionInput>(
-  actionType: SupportedActionTypes,
+  actionType: ActionType,
   status: ActionStatus = ActionStatus.Accepted,
   useUpdateLocalEventIndex: boolean = false
 ) {
