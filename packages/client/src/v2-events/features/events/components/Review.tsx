@@ -36,14 +36,12 @@ import {
   isFieldDisplayedOnReview,
   isPageVisible,
   runFieldValidations,
-  Location,
-  LocationType,
-  UUID
+  UUID,
+  FieldTypesToHideInReview
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { getLeafLocationIds } from '../../../hooks/useLocations'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -312,14 +310,18 @@ function FormReview({
               const previousValue = previousForm[field.id]
 
               // previousForm, formConfig are used to find previous values with the same label if required
-              const valueDisplay = Output({
-                field,
-                previousValue,
-                showPreviouslyMissingValuesAsChanged,
-                value,
-                previousForm,
-                formConfig
-              })
+              const valueDisplay = (
+                <Output
+                  field={field}
+                  formConfig={formConfig}
+                  previousForm={previousForm}
+                  previousValue={previousValue}
+                  showPreviouslyMissingValuesAsChanged={
+                    showPreviouslyMissingValuesAsChanged
+                  }
+                  value={value}
+                />
+              )
 
               const context = locationIds
                 ? {
@@ -343,33 +345,17 @@ function FormReview({
               return { ...field, valueDisplay, errorDisplay }
             })
 
-          const shouldDisplayPage = fields.some(
-            ({ type, valueDisplay, errorDisplay }) => {
-              if (
-                type === FieldType.FILE ||
-                type === FieldType.FILE_WITH_OPTIONS
-              ) {
-                return true
-              }
-
-              // If page doesn't have any file inputs, we only want to display it if it has any fields with content
-              return valueDisplay || errorDisplay
-            }
-          )
-
-          if (!shouldDisplayPage) {
-            return <React.Fragment key={`Section_${page.id}`}></React.Fragment>
-          }
-
           // Only display fields that have a non-undefined/null value or have an validation error
           const displayedFields = fields.filter(
-            ({ valueDisplay, errorDisplay }) => {
-              // Explicitly check for undefined and null, so that e.g. number 0 and empty string outputs are shown
-              const hasValue =
-                valueDisplay !== undefined && valueDisplay !== null
-              return hasValue || Boolean(errorDisplay)
-            }
+            ({ type }) =>
+              !FieldTypesToHideInReview.some(
+                (typeToHide) => type === typeToHide
+              )
           )
+
+          if (displayedFields.length === 0) {
+            return <React.Fragment key={`Section_${page.id}`}></React.Fragment>
+          }
 
           const hasCorrectableFields = displayedFields.some(
             (field) => !field.uncorrectable

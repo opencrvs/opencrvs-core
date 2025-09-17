@@ -17,6 +17,7 @@ import {
   EventState,
   FieldConfig,
   FieldType,
+  FieldTypesToHideInReview,
   isFieldDisplayedOnReview,
   isPageVisible
 } from '@opencrvs/commons/client'
@@ -130,13 +131,9 @@ export function DuplicateComparison({
   const potentialDuplicateDeclaration = potentialDuplicateEvent.declaration
 
   const hideFieldTypes = [
+    ...FieldTypesToHideInReview,
     FieldType.FILE,
-    FieldType.FILE_WITH_OPTIONS,
-    FieldType.BULLET_LIST,
-    FieldType.DIVIDER,
-    FieldType.PAGE_HEADER,
-    FieldType.PARAGRAPH,
-    FieldType.BULLET_LIST
+    FieldType.FILE_WITH_OPTIONS
   ]
 
   const comparisonData: ComparisonDeclaration[] =
