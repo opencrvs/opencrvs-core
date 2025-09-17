@@ -15,9 +15,9 @@ export const SystemRole = z.enum([
   'HEALTH',
   'NATIONAL_ID',
   'RECORD_SEARCH',
-  'IMPORT',
   'REINDEX',
-  'WEBHOOK'
+  'WEBHOOK',
+  'IMPORT_EXPORT'
 ])
 
 export const REINDEX_USER_ID = '__ANONYMOUS_REINDEX_USER__'
