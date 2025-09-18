@@ -177,8 +177,8 @@ export function areConditionsMet(
 }
 
 // @todo: move this to a better location
-export type Context = {
-  user: ITokenPayload
+export type UserContext = {
+  user?: ITokenPayload
   locations?: Array<Location>
 }
 
@@ -187,7 +187,7 @@ function isFieldConditionMet(
   form: ActionUpdate | EventState,
   conditionalType: ConditionalType,
   // @todo: maybe make it mandatory?
-  context?: Context
+  context?: UserContext
 ) {
   const hasRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === conditionalType
@@ -210,7 +210,7 @@ function isFieldConditionMet(
 export function isFieldVisible(
   field: FieldConfig,
   form: ActionUpdate | EventState,
-  context?: Context
+  context?: UserContext
 ) {
   return isFieldConditionMet(field, form, ConditionalType.SHOW, context)
 }

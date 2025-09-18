@@ -27,7 +27,8 @@ import {
   Draft,
   isActionInScope,
   configurableEventScopeAllowed,
-  canUserReadEvent
+  canUserReadEvent,
+  ITokenPayload
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -41,7 +42,6 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { getScope } from '@client/profile/profileSelectors'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { ITokenPayload } from '@client/utils/authUtils'
 import { useModal } from '@client/hooks/useModal'
 import { AssignModal } from '@client/v2-events/components/AssignModal'
 import { useOnlineStatus } from '@client/utils'

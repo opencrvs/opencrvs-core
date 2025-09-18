@@ -22,9 +22,7 @@ function getContext(): Context {
   const tokenPayload = getTokenPayload(token)
 
   // @todo: add locations?
-  return {
-    user: tokenPayload
-  }
+  return { user: tokenPayload ?? undefined }
 }
 
 export function useConditionals() {
