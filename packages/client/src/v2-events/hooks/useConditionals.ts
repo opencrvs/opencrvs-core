@@ -10,14 +10,14 @@
  */
 import {
   ActionUpdate,
-  Context,
+  UserContext,
   EventState,
   FieldConfig,
   isFieldVisible
 } from '@opencrvs/commons/client'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 
-function getContext(): Context {
+function getContext(): UserContext {
   const token = getToken()
   const tokenPayload = getTokenPayload(token)
 
