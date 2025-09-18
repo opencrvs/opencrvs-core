@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
 
   redis:
-    platform: linux/x86_64
+    platform: linux/x86_64 # Required for MacOS
     image: public.ecr.aws/bitnami/redis:8.2
     restart: unless-stopped
     environment:
