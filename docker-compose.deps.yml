@@ -14,11 +14,8 @@ services:
     restart: unless-stopped
 
   redis:
-    platform: linux/x86_64 # Required for MacOS
-    image: public.ecr.aws/bitnami/redis:8.2
+    image: redis:8
     restart: unless-stopped
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.16.4
