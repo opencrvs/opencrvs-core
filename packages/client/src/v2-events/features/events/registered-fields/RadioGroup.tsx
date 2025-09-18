@@ -37,7 +37,10 @@ function RadioGroupInput({
   const selectedOption = options.find((option) => option.value === value)
   const formattedOptions = options.map((option: SelectOption) => ({
     value: option.value,
-    label: intl.formatMessage(option.label)
+    label:
+      typeof option.label === 'string'
+        ? option.label
+        : intl.formatMessage(option.label)
   }))
 
   const inputValue = selectedOption?.value ?? ''
@@ -69,7 +72,15 @@ function RadioGroupOutput({
   const intl = useIntlWithFormData()
   const selectedOption = options.find((option) => option.value === value)
 
-  return selectedOption ? intl.formatMessage(selectedOption.label) : ''
+  if (!selectedOption) {
+    return ''
+  }
+
+  if (typeof selectedOption.label === 'string') {
+    return selectedOption.label
+  }
+
+  return intl.formatMessage(selectedOption.label)
 }
 
 function stringify(
@@ -90,11 +101,18 @@ function stringify(
     return value
   }
 
-  return intl.formatMessage(option.label)
+  return typeof option.label === 'string'
+    ? option.label
+    : intl.formatMessage(option.label)
+}
+
+function isRadioGroupEmpty(value: Stringifiable) {
+  return !value.toString()
 }
 
 export const RadioGroup = {
   Input: RadioGroupInput,
   Output: RadioGroupOutput,
+  isEmptyValue: isRadioGroupEmpty,
   stringify
 }

@@ -21,7 +21,8 @@ import {
   EventStatus,
   getActionReview,
   getCurrentEventState,
-  getDeclaration
+  getDeclaration,
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -41,6 +42,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
@@ -56,6 +58,8 @@ export function Review() {
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const { closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
 
   const event = events.getEvent.getFromCache(eventId)
 
@@ -73,12 +77,17 @@ export function Review() {
 
   const { isActionAllowed } = useUserAllowedActions(event.type)
 
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
+
   const reviewActionConfiguration = useReviewActionConfig({
     eventType: event.type,
     formConfig,
     declaration: form,
     annotation,
-    reviewFields: reviewConfig.fields
+    reviewFields: reviewConfig.fields,
+    locations: adminStructureLocations
   })
 
   async function handleEdit({
@@ -145,16 +154,25 @@ export function Review() {
       (close) => <ReviewComponent.ActionModal.Reject close={close} />
     )
     if (confirmedRejection) {
-      const { rejectAction, message } = confirmedRejection
+      const { rejectAction, message, isDuplicate } = confirmedRejection
 
       if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
-        events.actions.reject.mutate({
-          eventId,
-          declaration: {},
-          transactionId: uuid(),
-          annotation: {},
-          content: { reason: message }
-        })
+        if (isDuplicate) {
+          events.customActions.archiveOnDuplicate.mutate({
+            eventId,
+            declaration: {},
+            transactionId: uuid(),
+            content: { reason: message }
+          })
+        } else {
+          events.actions.reject.mutate({
+            eventId,
+            declaration: {},
+            transactionId: uuid(),
+            annotation: {},
+            content: { reason: message }
+          })
+        }
       }
 
       if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
@@ -184,6 +202,7 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
+        locations={adminStructureLocations}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
         onAnnotationChange={(values) => setAnnotation(values)}
@@ -197,7 +216,8 @@ export function Review() {
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleDeclaration}
           onReject={
-            currentEventState.status === EventStatus.enum.NOTIFIED
+            currentEventState.status === EventStatus.enum.NOTIFIED &&
+            !currentEventState.flags.includes(InherentFlags.REJECTED)
               ? handleRejection
               : undefined
           }

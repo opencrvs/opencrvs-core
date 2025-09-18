@@ -119,9 +119,6 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
         event: [
           tRPCMsw.event.get.query(() => {
             return createdEvent
-          }),
-          tRPCMsw.event.list.query(() => {
-            return []
           })
         ],
         files: [
@@ -231,9 +228,6 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
           event: [
             tRPCMsw.event.get.query(() => {
               return createdEvent
-            }),
-            tRPCMsw.event.list.query(() => {
-              return []
             })
           ],
           files: [
@@ -315,7 +309,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
               {
                 name: 'Apply'
               },
-              { timeout: 1000 }
+              { timeout: 2000 }
             )
           ).toBeDisabled()
         }

@@ -74,7 +74,7 @@ test(`${ActionType.APPROVE_CORRECTION} prevents forbidden access if missing requ
 test(`${ActionType.APPROVE_CORRECTION} allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.registered.correct[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.registered.correct[event=birth|death|tennis-club-membership]'
   ])
 
   await expect(
@@ -105,7 +105,7 @@ test(`${ActionType.REJECT_CORRECTION} prevents forbidden access if missing requi
 test(`${ActionType.REJECT_CORRECTION} allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.registered.correct[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.registered.correct[event=birth|death|tennis-club-membership]'
   ])
 
   await expect(
@@ -320,7 +320,8 @@ describe('when a correction request exists', () => {
         ...generateActionDeclarationInput(
           tennisClubMembershipEvent,
           ActionType.DECLARE,
-          rng
+          rng,
+          { locations: [] }
         ),
         'applicant.name': {
           firstname: 'Johnny',

@@ -65,9 +65,6 @@ export const ContinuingAndGoingBack: Story = {
           }),
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
           })
         ]
       }
@@ -240,7 +237,7 @@ export const RedirectAfterPrint: Story = {
             [CERT_TEMPLATE_ID]: 'tennis-club-membership-certified-certificate',
             'collector.requesterId': 'INFORMANT',
             'collector.identity.verify': true,
-            templateId: 'v2.tennis-club-membership-certified-certificate'
+            templateId: 'tennis-club-membership-certified-certificate'
           }
         })
       ]

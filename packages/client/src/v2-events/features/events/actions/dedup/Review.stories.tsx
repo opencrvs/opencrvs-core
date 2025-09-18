@@ -9,17 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
-import { AppRouter } from '@events/router'
-import { userEvent, within } from '@storybook/test'
+import { userEvent, within, expect } from '@storybook/test'
 import {
   ActionType,
   createPrng,
   generateActionDocument,
   generateUuid,
   tennisClubMembershipEvent,
-  generateTrackingId
+  generateTrackingId,
+  defineDeclarationForm,
+  FieldType,
+  generateTranslationConfig,
+  ConditionalType,
+  field
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { ReviewDuplicateIndex } from './ReviewDuplicate'
@@ -31,14 +33,6 @@ const meta: Meta<typeof ReviewDuplicateIndex> = {
 export default meta
 
 type Story = StoryObj<typeof ReviewDuplicateIndex>
-const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [
-    httpLink({
-      url: '/api/events'
-    })
-  ],
-  transformer: { input: superjson, output: superjson }
-})
 
 const prng = createPrng(123123)
 const duplicates = [
@@ -47,13 +41,56 @@ const duplicates = [
     trackingId: generateTrackingId(prng)
   }
 ]
+const overriddenEventConfig = {
+  ...tennisClubMembershipEvent,
+  declaration: defineDeclarationForm({
+    ...tennisClubMembershipEvent.declaration,
+    pages: tennisClubMembershipEvent.declaration.pages.map((x) => {
+      x.fields = x.fields.filter((f) => f.type !== FieldType.EMAIL)
+      if (x.id === 'applicant') {
+        x.fields.push({
+          id: 'applicant.contactMethod',
+          type: FieldType.SELECT,
+          label: generateTranslationConfig('Contact Method'),
+          options: [
+            { label: generateTranslationConfig('Email'), value: 'EMAIL' },
+            { label: generateTranslationConfig('Phone'), value: 'PHONE' }
+          ]
+        })
+        x.fields.push({
+          id: 'applicant.contact',
+          type: FieldType.PHONE,
+          label: generateTranslationConfig('Contact'),
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional: field('applicant.contactMethod').isEqualTo('PHONE')
+            }
+          ]
+        })
+        x.fields.push({
+          id: 'applicant.contact',
+          type: FieldType.EMAIL,
+          label: generateTranslationConfig('Contact'),
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional: field('applicant.contactMethod').isEqualTo('EMAIL')
+            }
+          ]
+        })
+      }
+      return x
+    })
+  })
+}
 const actions = [
   generateActionDocument({
-    configuration: tennisClubMembershipEvent,
+    configuration: overriddenEventConfig,
     action: ActionType.CREATE
   }),
   generateActionDocument({
-    configuration: tennisClubMembershipEvent,
+    configuration: overriddenEventConfig,
     action: ActionType.DECLARE,
     defaults: {
       declaration: {
@@ -79,15 +116,14 @@ const actions = [
           zipCode: '123456'
         },
         'recommender.none': true
+      },
+      annotation: {
+        'review.comment': 'asdasdasdasdasdasd'
       }
-    },
-
-    annotation: {
-      'review.comment': 'asdasdasdasdasdasd'
     }
   }),
   generateActionDocument({
-    configuration: tennisClubMembershipEvent,
+    configuration: overriddenEventConfig,
     action: ActionType.DUPLICATE_DETECTED,
     defaults: {
       content: {
@@ -99,7 +135,7 @@ const actions = [
 
 const mockOriginalEvent = {
   trackingId: generateTrackingId(prng),
-  type: tennisClubMembershipEvent.id,
+  type: overriddenEventConfig.id,
   actions,
   createdAt: new Date(Date.now()).toISOString(),
   id: generateUuid(prng),
@@ -109,7 +145,7 @@ const mockOriginalEvent = {
 
 const mockDuplicateEvent = {
   trackingId: duplicates[0].trackingId,
-  type: tennisClubMembershipEvent.id,
+  type: overriddenEventConfig.id,
   actions: actions.slice(0, 2),
   createdAt: new Date(Date.now()).toISOString(),
   id: duplicates[0].id,
@@ -148,5 +184,72 @@ export const ReviewComparison: Story = {
       name: /243D49/i
     })
     await userEvent.click(comparisonTab)
+  }
+}
+
+// Both events applicant.contactMethod is different
+// but applicant.contact has the same label "Contact"
+// This is to test that both fields are shown in the same comparison row
+// and not just one of them
+export const DuplicateWithSameLabels: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.buildPath({
+        eventId: mockOriginalEvent.id
+      })
+    },
+    offline: {
+      events: [
+        {
+          ...mockOriginalEvent,
+          actions: mockOriginalEvent.actions.map((x) => {
+            if (x.type === ActionType.DECLARE) {
+              return {
+                ...x,
+                declaration: {
+                  ...x.declaration,
+                  'applicant.contactMethod': 'EMAIL',
+                  'applicant.contact': 'abc@gmail.com'
+                }
+              }
+            }
+            return x
+          })
+        },
+        {
+          ...mockDuplicateEvent,
+          actions: mockDuplicateEvent.actions.map((x) => {
+            if (x.type === ActionType.DECLARE) {
+              return {
+                ...x,
+                declaration: {
+                  ...x.declaration,
+                  'applicant.contactMethod': 'PHONE',
+                  'applicant.contact': '0912345678'
+                }
+              }
+            }
+            return x
+          })
+        }
+      ]
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const comparisonTab = await canvas.findByRole('button', {
+      name: /243D49/i
+    })
+    await userEvent.click(comparisonTab)
+
+    const els = await canvas.findAllByText('Contact Method')
+    await expect(els).toHaveLength(1) // only appears once
+
+    await expect(canvas.getByText('Email')).toBeInTheDocument()
+    await expect(canvas.getByText('abc@gmail.com')).toBeInTheDocument()
+
+    await expect(canvas.getByText('Phone')).toBeInTheDocument()
+    await expect(canvas.getByText('0912345678')).toBeInTheDocument()
   }
 }

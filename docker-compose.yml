@@ -27,16 +27,6 @@ services:
     environment:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
       - GATEWAY_URL_INTERNAL=http://gateway:7070
-  dashboards:
-    image: ghcr.io/opencrvs/ocrvs-dashboards:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/dashboards/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
-
   login:
     image: ghcr.io/opencrvs/ocrvs-login:${VERSION}
     #platform: linux/amd64
@@ -272,6 +262,8 @@ services:
       - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
       - EVENTS_MONGO_URL=mongodb://mongo1/events
       - SEARCH_URL=http://search:9090/
+      - EVENTS_URL=http://events:5555/
+      - AUTH_URL=http://auth:4040/
       - ES_HOST=elasticsearch:9200
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086

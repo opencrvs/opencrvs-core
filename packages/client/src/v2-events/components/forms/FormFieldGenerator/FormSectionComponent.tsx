@@ -163,7 +163,7 @@ function getUpdatedChildValueOnChange({
     fieldReference.$$field
   )
 
-  return fieldReference.$$subfield
+  return fieldReference.$$subfield && fieldReference.$$subfield.length > 0
     ? get(fieldValues[referenceKeyInFormikFormat], fieldReference.$$subfield)
     : fieldValues[referenceKeyInFormikFormat]
 }
@@ -194,7 +194,6 @@ export function FormSectionComponent({
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not -
   useOnlineStatus()
-
   const intl = useIntl()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
@@ -257,8 +256,13 @@ export function FormSectionComponent({
       fieldErrors: AllProps['errors']
     ) => {
       // this can be any field. Even though we call this only when parent triggers the change.
+
+      const childFieldOcrvsId = makeFormikFieldIdOpenCRVSCompatible(
+        childField.id
+      )
+
       const referenceToAnotherField = fieldsWithDotSeparator.find(
-        (f) => f.id === childField.id
+        (f) => f.id === childFieldOcrvsId
       )?.value as FieldReference | undefined
 
       const childFieldFormikId = makeFormFieldIdFormikCompatible(childField.id)

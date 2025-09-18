@@ -63,10 +63,6 @@ const router = {
          */
         const event = getEvent.findFromCache(createdEvent.id)
 
-        React.useEffect(() => {
-          void event.refetch()
-        }, [event, event.refetch])
-
         /*
          * Explicitly call the hook to trigger draft fetching
          */
@@ -120,9 +116,6 @@ const handlers = {
     trpcMsw.event.get.query(() => {
       spies.eventGet++
       return createdEvent
-    }),
-    trpcMsw.event.list.query(() => {
-      return []
     })
   ],
   files: [

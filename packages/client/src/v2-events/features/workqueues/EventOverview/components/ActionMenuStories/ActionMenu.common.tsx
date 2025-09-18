@@ -9,11 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { userEvent, expect, waitFor } from '@storybook/test'
+import { userEvent, expect, waitFor, screen } from '@storybook/test'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { screen } from '@testing-library/dom'
 import {
   Action,
   ActionStatus,
@@ -29,7 +28,9 @@ import {
   TranslationConfig,
   UUID,
   DisplayableAction,
-  ClientSpecificAction
+  ClientSpecificAction,
+  generateUuid,
+  createPrng
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { AssignmentStatus } from '@client/v2-events/utils'
@@ -38,6 +39,7 @@ import {
   setEventData,
   addLocalEventConfig
 } from '@client/v2-events/features/events/useEvents/api'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ActionMenu } from '../ActionMenu'
 import { actionLabels } from '../useAllowedActionConfigurations'
 
@@ -58,83 +60,149 @@ const actionProps: ActionBase = {
   transactionId: getUUID()
 }
 
-const mockActions: Record<
+const rng = createPrng(72)
+
+function getMockActions(
+  createdBy: string
+): Record<
   ActionType | DisplayableAction | 'ASSIGNED_TO_SELF' | 'ASSIGNED_TO_OTHERS',
   Action
-> = {
-  [ActionType.CREATE]: { ...actionProps, type: ActionType.CREATE },
-  [ActionType.DECLARE]: { ...actionProps, type: ActionType.DECLARE },
-  [ActionType.VALIDATE]: { ...actionProps, type: ActionType.VALIDATE },
-  [ActionType.REGISTER]: { ...actionProps, type: ActionType.REGISTER },
-  [AssignmentStatus.ASSIGNED_TO_OTHERS]: {
-    ...actionProps,
-    type: ActionType.ASSIGN,
-    assignedTo: 'some-other-user-id'
-  },
-  [AssignmentStatus.ASSIGNED_TO_SELF]: {
-    ...actionProps,
-    type: ActionType.ASSIGN,
-    assignedTo: generator.user.id.localRegistrar
-  },
-  [ActionType.UNASSIGN]: {
-    ...actionProps,
-    type: ActionType.UNASSIGN
-  },
-  [ActionType.READ]: { ...actionProps, type: ActionType.READ },
-  [ActionType.NOTIFY]: { ...actionProps, type: ActionType.NOTIFY },
-  [ActionType.REQUEST_CORRECTION]: {
-    ...actionProps,
-    type: ActionType.REQUEST_CORRECTION
-  },
-  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
-    ...actionProps,
-    type: ActionType.REQUEST_CORRECTION
-  },
-  [ActionType.APPROVE_CORRECTION]: {
-    ...actionProps,
-    type: ActionType.APPROVE_CORRECTION,
-    requestId: '827bf7e8-0e1e-4cef-66e71287a2c8-aee7'
-  },
-  [ActionType.REJECT_CORRECTION]: {
-    ...actionProps,
-    type: ActionType.REJECT_CORRECTION,
-    requestId: '827bf7e8-0e1e-66e71287a2c8-aee7-4cef',
-    content: { reason: 'No legal proof' }
-  },
-  [ActionType.DELETE]: {
-    ...actionProps,
-    type: ActionType.READ
-  },
-  [ActionType.PRINT_CERTIFICATE]: {
-    ...actionProps,
-    type: ActionType.PRINT_CERTIFICATE
-  },
-  [ActionType.MARK_AS_DUPLICATE]: {
-    ...actionProps,
-    type: ActionType.MARK_AS_DUPLICATE
-  },
-  [ActionType.ARCHIVE]: {
-    ...actionProps,
-    type: ActionType.ARCHIVE,
-    content: { reason: 'Archived' }
-  },
-  [ActionType.REJECT]: {
-    ...actionProps,
-    type: ActionType.REJECT,
-    content: { reason: 'Rejected' }
-  },
-  [ActionType.ASSIGN]: {
-    ...actionProps,
-    type: ActionType.ASSIGN,
-    assignedTo: generator.user.id.localRegistrar
-  },
-  [ActionType.DUPLICATE_DETECTED]: {
-    ...actionProps,
-    type: ActionType.MARK_AS_DUPLICATE
-  },
-  [ActionType.MARK_AS_NOT_DUPLICATE]: {
-    ...actionProps,
-    type: ActionType.MARK_AS_NOT_DUPLICATE
+> {
+  return {
+    [ActionType.CREATE]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.CREATE
+    },
+    [ActionType.DECLARE]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.DECLARE
+    },
+    [ActionType.VALIDATE]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.VALIDATE
+    },
+    [ActionType.REGISTER]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.REGISTER
+    },
+    [AssignmentStatus.ASSIGNED_TO_OTHERS]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.ASSIGN,
+      assignedTo: 'some-other-user-id'
+    },
+    [AssignmentStatus.ASSIGNED_TO_SELF]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.ASSIGN,
+      assignedTo: generator.user.id.localRegistrar
+    },
+    [ActionType.UNASSIGN]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.UNASSIGN
+    },
+    [ActionType.READ]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.READ
+    },
+    [ActionType.NOTIFY]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.NOTIFY
+    },
+    [ActionType.REQUEST_CORRECTION]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.REQUEST_CORRECTION
+    },
+    [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.REQUEST_CORRECTION
+    },
+    [ActionType.APPROVE_CORRECTION]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.APPROVE_CORRECTION,
+      requestId: '827bf7e8-0e1e-4cef-66e71287a2c8-aee7'
+    },
+    [ActionType.REJECT_CORRECTION]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.REJECT_CORRECTION,
+      requestId: '827bf7e8-0e1e-66e71287a2c8-aee7-4cef',
+      content: { reason: 'No legal proof' }
+    },
+    [ActionType.DELETE]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.READ
+    },
+    [ActionType.PRINT_CERTIFICATE]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.PRINT_CERTIFICATE
+    },
+    [ActionType.MARK_AS_DUPLICATE]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.MARK_AS_DUPLICATE
+    },
+    [ActionType.ARCHIVE]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.ARCHIVE,
+      content: { reason: 'Archived' }
+    },
+    [ActionType.REJECT]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.REJECT,
+      content: { reason: 'Rejected' }
+    },
+    [ActionType.ASSIGN]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.ASSIGN,
+      assignedTo: generator.user.id.localRegistrar
+    },
+    [ActionType.DUPLICATE_DETECTED]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.MARK_AS_DUPLICATE
+    },
+    [ActionType.MARK_AS_NOT_DUPLICATE]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.MARK_AS_NOT_DUPLICATE
+    }
   }
 }
 
@@ -144,17 +212,21 @@ export const enum UserRoles {
   REGISTRATION_AGENT = 'RegistrationAgent'
 }
 
-function getMockEvent(
-  actions: (keyof typeof mockActions)[],
+function getUserIdByRole(role: UserRoles) {
+  // eslint-disable-next-line no-nested-ternary
+  return role === UserRoles.LOCAL_REGISTRAR
+    ? generator.user.id.localRegistrar
+    : role === UserRoles.FIELD_AGENT
+      ? generator.user.id.fieldAgent
+      : generator.user.id.registrationAgent
+}
+
+export function getMockEvent(
+  actions: (keyof ReturnType<typeof getMockActions>)[],
   role: UserRoles
 ): EventDocument {
-  const userId =
-    // eslint-disable-next-line no-nested-ternary
-    role === UserRoles.LOCAL_REGISTRAR
-      ? generator.user.id.localRegistrar
-      : role === UserRoles.FIELD_AGENT
-        ? generator.user.id.fieldAgent
-        : generator.user.id.registrationAgent
+  const userId = getUserIdByRole(role)
+
   return {
     type: TENNIS_CLUB_MEMBERSHIP,
     id: 'b4c52c54-f6eb-45ee-be70-142838f8c8d4' as UUID,
@@ -162,9 +234,9 @@ function getMockEvent(
     updatedAt: '2025-04-18T10:40:59.442Z',
     trackingId: '75HT9J',
     actions: actions
-      .filter((action) => Object.keys(mockActions).includes(action))
+      .filter((action) => Object.keys(getMockActions(userId)).includes(action))
       .map((action) => {
-        const mockAction = mockActions[action]
+        const mockAction = getMockActions(userId)[action]
         if (
           mockAction.type === ActionType.ASSIGN &&
           action === AssignmentStatus.ASSIGNED_TO_SELF
@@ -215,10 +287,32 @@ export const getHiddenActions = () =>
 export interface Scenario {
   name: string
   recordDownloaded: boolean
-  actions: (keyof typeof mockActions)[]
+  actions: (keyof ReturnType<typeof getMockActions>)[]
   expected: Partial<Record<DisplayableAction, AssertType>>
 }
 
+async function checkMenuItems(
+  expected: Partial<Record<DisplayableAction, AssertType>>
+) {
+  // We want to ensure compiler knows that action labels is a subset of action types.
+  const actionLabelsAsPartial: IndexMap<TranslationConfig> = actionLabels
+
+  for (const [action, expectedState] of Object.entries(expected)) {
+    const label = actionLabelsAsPartial[action]?.defaultMessage
+    if (!label) {
+      continue
+    } else if (expectedState === AssertType.HIDDEN) {
+      await expect(screen.queryByText(label)).not.toBeInTheDocument()
+    } else {
+      const item = await screen.findByText(label)
+
+      await waitFor(async () => {
+        const isDisabled = item.hasAttribute('disabled')
+        await expect(isDisabled).toBe(expectedState === AssertType.DISABLED)
+      })
+    }
+  }
+}
 export function createStoriesFromScenarios(
   scenarios: Scenario[],
   role: UserRoles
@@ -284,7 +378,10 @@ export function createStoriesFromScenarios(
                   results: [
                     getCurrentEventState(event, tennisClubMembershipEvent)
                   ]
-                }))
+                })),
+                tRPCMsw.event.get.query(() => {
+                  return tennisClubMembershipEventDocument
+                })
               ]
             }
           }
@@ -311,31 +408,79 @@ export function createStoriesFromScenarios(
           await expect(actionButton).toBeVisible()
           await userEvent.click(actionButton)
 
-          // We want to ensure compiler knows that action labels is a subset of action types.
-          const actionLabelsAsPartial: IndexMap<TranslationConfig> =
-            actionLabels
-
-          for (const [action, expectedState] of Object.entries(expected)) {
-            const label = actionLabelsAsPartial[action]?.defaultMessage
-            if (!label) {
-              continue
-            } else if (expectedState === AssertType.HIDDEN) {
-              await expect(screen.queryByText(label)).not.toBeInTheDocument()
-            } else {
-              const item = await screen.findByText(label)
-
-              await waitFor(async () => {
-                const isDisabled = item.hasAttribute('disabled')
-                await expect(isDisabled).toBe(
-                  expectedState === AssertType.DISABLED
-                )
-              })
-            }
-          }
+          await checkMenuItems(expected)
         }
       } satisfies StoryObj<typeof ActionMenu>
       return acc
     },
     {} as Record<string, StoryObj<typeof ActionMenu>>
   )
+}
+
+/**
+ * @deprecated - Temporary story until we start working on 1.10 features
+ * Users (Field agent or similar) are not allowed to view details of an event they did not create.
+ * Once read scopes are implemented, we can remove this story and create it as part of the scenario builder.
+ */
+export function createdByOtherUserScenario({
+  event,
+  role,
+  expected
+}: {
+  event: EventDocument
+  role: UserRoles
+  expected: Partial<Record<DisplayableAction, AssertType>>
+}) {
+  return {
+    loaders: [
+      () => {
+        window.localStorage.setItem(
+          'opencrvs',
+          // eslint-disable-next-line no-nested-ternary
+          role === UserRoles.LOCAL_REGISTRAR
+            ? generator.user.token.localRegistrar
+            : role === UserRoles.FIELD_AGENT
+              ? generator.user.token.fieldAgent
+              : generator.user.token.registrationAgent
+        )
+
+        return {}
+      }
+    ],
+    name: 'CreatedByOther',
+    parameters: {
+      layout: 'centered',
+      chromatic: { disableSnapshot: true },
+      msw: {
+        handlers: {
+          event: [
+            tRPCMsw.event.search.query(() => ({
+              total: 1,
+              results: [getCurrentEventState(event, tennisClubMembershipEvent)]
+            })),
+            tRPCMsw.event.get.query(() => {
+              return tennisClubMembershipEventDocument
+            })
+          ]
+        }
+      }
+    },
+    render: () => (
+      <React.Suspense fallback={<span>{'Loading…'}</span>}>
+        <ActionMenu eventId={event.id} />
+      </React.Suspense>
+    ),
+    beforeEach: () => {
+      addLocalEventConfig(tennisClubMembershipEvent)
+      setEventData(event.id, event)
+    },
+    play: async () => {
+      const actionButton = await screen.findByRole('button', {
+        name: 'Action'
+      })
+
+      await userEvent.click(actionButton)
+      await checkMenuItems(expected)
+    }
+  }
 }

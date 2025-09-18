@@ -11,7 +11,6 @@
 
 import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import {
   useTypedParams,
@@ -35,7 +34,6 @@ import { Check } from '@opencrvs/components/lib/icons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -48,12 +46,12 @@ import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
   submitCorrectionRequest: {
-    id: 'v2-events.buttons.submitCorrectionRequest',
+    id: 'buttons.submitCorrectionRequest',
     defaultMessage: 'Submit correction request',
     description: 'Submit correction request button text'
   },
   makeCorrection: {
-    id: 'v2-events.buttons.makeCorrection',
+    id: 'buttons.correctRecord',
     defaultMessage: 'Correct record',
     description: 'Record corrected button text'
   }
@@ -82,7 +80,6 @@ export function Summary() {
   const [{ workqueue }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
-  const scopes = useSelector(getScope)
   const [showPrompt, setShowPrompt] = React.useState(false)
   const togglePrompt = () => setShowPrompt(!showPrompt)
   const eventFormNavigation = useEventFormNavigation()
@@ -133,14 +130,11 @@ export function Summary() {
       },
       transactionId: generateTransactionId(),
       annotation,
-      fullEvent: event
+      event
     }
 
     if (userMayCorrect) {
-      events.customActions.makeCorrectionOnRequest.mutate({
-        ...mutationPayload,
-        eventConfiguration
-      })
+      events.customActions.makeCorrectionOnRequest.mutate(mutationPayload)
     } else {
       events.actions.correction.request.mutate(mutationPayload)
     }
@@ -149,7 +143,6 @@ export function Summary() {
   }, [
     form,
     fields,
-    eventConfiguration,
     event,
     events.customActions.makeCorrectionOnRequest,
     events.actions.correction.request,

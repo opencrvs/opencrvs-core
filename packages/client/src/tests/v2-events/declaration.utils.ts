@@ -132,11 +132,6 @@ export const createDeclarationTrpcMsw = (
         handler: () => eventDocument
       },
       {
-        name: 'event.list',
-        procedure: trpcMsw.event.list.query,
-        handler: () => [tennisClubMembershipEventIndex]
-      },
-      {
         name: 'event.create',
         procedure: trpcMsw.event.create.mutation,
         handler: () =>
@@ -201,6 +196,20 @@ export const createDeclarationTrpcMsw = (
               ActionType.DECLARE,
               ActionType.VALIDATE,
               ActionType.ARCHIVE
+            ]
+          })
+      },
+      {
+        name: 'event.actions.duplicate.markAsDuplicate',
+        procedure: trpcMsw.event.actions.duplicate.markAsDuplicate.mutation,
+        handler: () =>
+          generateEventDocument({
+            configuration: tennisClubMembershipEvent,
+            actions: [
+              ActionType.CREATE,
+              ActionType.DECLARE,
+              ActionType.VALIDATE,
+              ActionType.MARK_AS_DUPLICATE
             ]
           })
       },

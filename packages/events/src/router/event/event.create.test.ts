@@ -31,7 +31,7 @@ describe('event.create', () => {
     test(`allows access with required scope`, async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
-        'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+        'record.create[event=birth|death|tennis-club-membership]'
       ])
 
       await expect(
@@ -42,7 +42,7 @@ describe('event.create', () => {
     test('dont allow access with API scope with incorrect event type', async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
-        'record.notify[event=some-event-type]'
+        `record.create[event=some-event-type]`
       ])
 
       await expect(
@@ -53,6 +53,7 @@ describe('event.create', () => {
     test('allows access with API scope with correct event type', async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
@@ -107,7 +108,7 @@ describe('event.create', () => {
   test('event with unknown type cannot be created', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, [
-      'record.declare[event=EVENT_TYPE_THAT_DOES_NOT_EXIST]'
+      'record.create[event=EVENT_TYPE_THAT_DOES_NOT_EXIST]'
     ])
     await expect(
       client.event.create(
@@ -128,15 +129,17 @@ describe('event.create', () => {
     })
 
     test('event created by system user should not have assignment action', async () => {
-      const { generator } = await setupTestCase()
-      let client = createSystemTestClient('test-system', [
-        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+      const { generator, user } = await setupTestCase()
+      const systemClient = createSystemTestClient('test-system', [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
-      const event = await client.event.create(generator.event.create())
+      const event = await systemClient.event.create(generator.event.create())
 
-      const { user } = await setupTestCase()
-      client = createTestClient(user)
-      const fetchedEvent = await client.event.get(event.id)
+      const userClient = createTestClient(user, [
+        `record.read[event=${TENNIS_CLUB_MEMBERSHIP}]`
+      ])
+
+      const fetchedEvent = await userClient.event.get(event.id)
 
       const fetchedEventWithoutReadAction = fetchedEvent.actions.slice(0, -1)
       expect(fetchedEventWithoutReadAction).toEqual(event.actions)

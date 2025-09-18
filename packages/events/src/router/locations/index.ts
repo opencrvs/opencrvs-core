@@ -12,7 +12,7 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { SCOPES } from '@opencrvs/commons'
-import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
+import { router, systemProcedure } from '@events/router/trpc'
 import {
   getLocations,
   getLocationById,
@@ -41,8 +41,8 @@ export const locationRouter = router({
     .mutation(async () => {
       await syncLocations()
     }),
-  list: publicProcedure.output(z.array(Location)).query(getLocations),
-  get: publicProcedure
+  list: systemProcedure.output(z.array(Location)).query(getLocations),
+  get: systemProcedure
     .input(z.string().uuid().brand<'UUID'>()) // branded UUID
     .output(Location)
     .query(async ({ input }) => {
@@ -62,7 +62,9 @@ export const locationRouter = router({
       } as Location
     }),
   set: systemProcedure
-    .use(requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING]))
+    .use(
+      requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])
+    )
     .input(z.array(Location).min(1))
     .output(z.void())
     .mutation(async ({ input }) => {

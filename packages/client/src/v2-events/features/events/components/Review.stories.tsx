@@ -103,12 +103,12 @@ export const ReviewWithoutChanges: Story = {
 
 const reviewActionMessages = {
   title: {
-    id: 'v2.changeModal.title',
+    id: 'changeModal.title',
     defaultMessage: 'This is a title',
     description: 'The title for review action'
   },
   description: {
-    id: 'v2.changeModal.description',
+    id: 'changeModal.description',
     defaultMessage: 'This is a description',
     description: 'The title for review action'
   },
@@ -226,9 +226,7 @@ export const ReviewWithValidationErrors: Story = {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        urbanOrRural: 'RURAL',
-        village: 'Tennisville'
+        administrativeArea: 'invalid-uuid'
       } as AddressFieldValue
     }
   },

@@ -17,6 +17,7 @@ import {
   createPrng,
   eventQueryDataGenerator,
   generateActionDeclarationInput,
+  generateActionDuplicateDeclarationInput,
   UUID,
   getCurrentEventState,
   getUUID,
@@ -62,7 +63,7 @@ describe('Declare action', () => {
   })
 
   test('prevents forbidden access if configurable scope does not have required event type allowed', async () => {
-    const client = createTestClient(user, ['record.declare[event=v2.death]'])
+    const client = createTestClient(user, ['record.declare[event=death]'])
 
     await expect(
       client.event.actions.declare.request(
@@ -73,9 +74,9 @@ describe('Declare action', () => {
 
   test('allows access if required scope is present', async () => {
     const client = createTestClient(user, [
-      'record.declare[event=v2.death|v2.birth|tennis-club-membership]'
+      'record.create[event=death|birth|tennis-club-membership]',
+      'record.declare[event=death|birth|tennis-club-membership]'
     ])
-
     await expect(
       client.event.actions.declare.request(
         generator.event.actions.declare(eventId, {})
@@ -338,10 +339,14 @@ test('deduplication check is performed after declaration', async () => {
 
   const newEvent = await client.event.create(generator.event.create())
   const existingEventId = getUUID()
-  const declaration = generateActionDeclarationInput(
+  const declaration = generateActionDuplicateDeclarationInput(
     tennisClubMembershipEvent,
     ActionType.DECLARE,
-    prng
+    prng,
+    // so that applicate.dob is generated
+    {
+      'applicant.dobUnknown': false
+    }
   )
   const existingEventIndex = eventQueryDataGenerator({
     id: existingEventId,

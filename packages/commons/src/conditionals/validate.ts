@@ -13,7 +13,7 @@ import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
 import { ConditionalParameters, JSONSchema } from './conditionals'
 import { formatISO, isAfter, isBefore } from 'date-fns'
-import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
+import { ErrorMapCtx, z, ZodIssueOptionalMessage } from 'zod'
 import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
@@ -21,10 +21,18 @@ import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 
+import { Location } from '../events/locations'
+
 const ajv = new Ajv({
   $data: true,
   allowUnionTypes: true,
   strict: false // Allow minContains and other newer features
+})
+
+const DataContext = z.object({
+  rootData: z.object({
+    $locations: z.array(Location)
+  })
 })
 
 // https://ajv.js.org/packages/ajv-formats.html
@@ -88,6 +96,34 @@ ajv.addKeyword({
     return clause === 'after'
       ? isAfter(date, offsetDate)
       : isBefore(date, offsetDate)
+  }
+})
+
+ajv.addKeyword({
+  keyword: 'isLeafLevelLocation',
+  type: 'string',
+  schemaType: 'boolean',
+  $data: true,
+  errors: true,
+  validate(
+    schema: {},
+    data: string,
+    _: unknown,
+    dataContext?: { rootData: unknown }
+  ) {
+    const context = DataContext.safeParse(dataContext)
+
+    if (!context.success) {
+      throw new Error('Validation context must contain $locations')
+    }
+
+    const locationToValidate = data
+
+    const locations = context.data.rootData.$locations
+
+    return !locations.some(
+      (location) => location.parentId === locationToValidate
+    )
   }
 })
 
@@ -207,7 +243,7 @@ export function isFieldDisplayedOnReview(
 
 export const errorMessages = {
   hiddenField: {
-    id: 'v2.error.hidden',
+    id: 'error.hidden',
     defaultMessage: 'Hidden or disabled field should not receive a value',
     description:
       'Error message when field is hidden or disabled, but a value was received'
@@ -215,32 +251,32 @@ export const errorMessages = {
   invalidDate: {
     defaultMessage: 'Invalid date field',
     description: 'Error message when date field is invalid',
-    id: 'v2.error.invalidDate'
+    id: 'error.invalidDate'
   },
   invalidEmail: {
     defaultMessage: 'Invalid email address',
     description: 'Error message when email address is invalid',
-    id: 'v2.error.invalidEmail'
+    id: 'error.invalidEmail'
   },
   requiredField: {
     defaultMessage: 'Required',
     description: 'Error message when required field is missing',
-    id: 'v2.error.required'
+    id: 'error.required'
   },
   invalidInput: {
     defaultMessage: 'Invalid input',
     description: 'Error message when generic field is invalid',
-    id: 'v2.error.invalid'
+    id: 'error.invalid'
   },
   unexpectedField: {
     defaultMessage: 'Unexpected field',
     description: 'Error message when field is not expected',
-    id: 'v2.error.unexpectedField'
+    id: 'error.unexpectedField'
   },
   correctionNotAllowed: {
     defaultMessage: 'Correction not allowed for field',
     description: 'Error message when correction is not allowed for field',
-    id: 'v2.error.correctionNotAllowed'
+    id: 'error.correctionNotAllowed'
   }
 }
 
@@ -296,8 +332,7 @@ function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
       for (const { issues } of issue.unionErrors) {
         for (const e of issues) {
           if (
-            zodToIntlErrorMap(e, _ctx).message.message.id !==
-            'v2.error.required'
+            zodToIntlErrorMap(e, _ctx).message.message.id !== 'error.required'
           ) {
             return createIntlError(errorMessages.invalidInput)
           }
@@ -393,10 +428,12 @@ export function runStructuralValidations({
 
 export function runFieldValidations({
   field,
-  values
+  values,
+  context
 }: {
   field: FieldConfig
   values: ActionUpdate
+  context?: { locations: Array<Location> }
 }) {
   if (
     !isFieldVisible(field, values) ||
@@ -410,6 +447,7 @@ export function runFieldValidations({
   const conditionalParameters = {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
+    $locations: context?.locations ?? [],
     $online: isOnline()
   }
 

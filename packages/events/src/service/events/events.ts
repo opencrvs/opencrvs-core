@@ -10,40 +10,42 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { z } from 'zod'
 import { NoResultError } from 'kysely'
+import { z } from 'zod'
+import { TokenUserType, TokenWithBearer, UUID } from '@opencrvs/commons'
 import {
   ActionInputWithType,
   ActionStatus,
+  ActionType,
   ActionUpdate,
-  Draft,
+  AsyncRejectActionDocument,
+  DisplayableAction,
+  EventConfig,
   EventDocument,
   EventInput,
+  EventStatus,
   FieldType,
   FieldUpdateValue,
   FileFieldValue,
-  getDeclarationFields,
   getAcceptedActions,
-  AsyncRejectActionDocument,
-  ActionType,
-  isWriteAction,
-  getStatusFromActions,
-  EventConfig,
-  EventStatus,
   getAvailableActionsForEvent,
   getCurrentEventState,
-  DisplayableAction
+  getDeclarationFields,
+  getStatusFromActions,
+  isWriteAction
 } from '@opencrvs/commons/events'
-import { TokenUserType, UUID } from '@opencrvs/commons'
-import { getEventConfigurationById } from '@events/service/config/config'
-import { deleteFile, fileExists } from '@events/service/files'
-import { indexEvent } from '@events/service/indexing/indexing'
-import * as eventsRepo from '@events/storage/postgres/events/events'
-import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { TrpcUserContext } from '@events/context'
-import { getUnreferencedDraftFiles } from '../files/utils'
+import { getEventConfigurationById } from '@events/service/config/config'
+import {
+  cleanupUnreferencedFiles,
+  deleteFile,
+  fileExists
+} from '@events/service/files'
+import { indexEvent } from '@events/service/indexing/indexing'
+import * as draftsRepo from '@events/storage/postgres/events/drafts'
+import * as eventsRepo from '@events/storage/postgres/events/events'
 
-class EventNotFoundError extends TRPCError {
+export class EventNotFoundError extends TRPCError {
   constructor(id: string) {
     super({
       code: 'NOT_FOUND',
@@ -78,10 +80,13 @@ function getValidFileValue(
   return validFieldValue.data
 }
 
-async function deleteEventAttachments(token: string, event: EventDocument) {
+async function deleteEventAttachments(
+  token: TokenWithBearer,
+  event: EventDocument
+) {
   const configuration = await getEventConfigurationById({
-    token,
-    eventType: event.type
+    eventType: event.type,
+    token
   })
 
   const actions = getAcceptedActions(event)
@@ -103,12 +108,12 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
 export async function throwConflictIfActionNotAllowed(
   eventId: UUID,
   actionType: ActionType,
-  token: string
+  token: TokenWithBearer
 ) {
   const event = await getEventById(eventId)
   const eventConfig = await getEventConfigurationById({
-    token,
-    eventType: event.type
+    eventType: event.type,
+    token
   })
   const eventIndex = getCurrentEventState(event, eventConfig)
 
@@ -123,7 +128,10 @@ export async function throwConflictIfActionNotAllowed(
   }
 }
 
-export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
+export async function deleteEvent(
+  eventId: UUID,
+  { token }: { token: TokenWithBearer }
+) {
   const event = await getEventById(eventId)
   const eventStatus = getStatusFromActions(event.actions)
 
@@ -207,42 +215,6 @@ function extractFileValues(
   return fileValues
 }
 
-/**
- *
- * Deletes files from external source that are referenced in previous drafts but not in the current draft.
- *
- */
-export async function deleteUnreferencedFilesFromPreviousDrafts(
-  token: string,
-  {
-    event,
-    currentDraft,
-    previousDraft,
-    configuration
-  }: {
-    event: EventDocument
-    currentDraft?: Draft
-    previousDraft: Draft
-    configuration: EventConfig
-  }
-): Promise<void> {
-  const unreferencedFiles = getUnreferencedDraftFiles({
-    event,
-    currentDraft,
-    previousDraft,
-    configuration
-  })
-
-  for (const file of unreferencedFiles) {
-    const isDeleted = await deleteFile(file.value, token)
-
-    if (!isDeleted) {
-      // eslint-disable-next-line no-console
-      console.error(`Unable to delete unused file: ${JSON.stringify(file)}`)
-    }
-  }
-}
-
 export function buildAction(
   input: ActionInputWithType,
   status: ActionStatus,
@@ -304,9 +276,9 @@ export function buildAction(
     case ActionType.NOTIFY:
     case ActionType.DECLARE:
     case ActionType.VALIDATE:
+    case ActionType.DUPLICATE_DETECTED:
     case ActionType.MARK_AS_NOT_DUPLICATE:
     case ActionType.MARK_AS_DUPLICATE:
-    case ActionType.DUPLICATE_DETECTED:
     case ActionType.REQUEST_CORRECTION: {
       return {
         ...commonAttributes
@@ -315,24 +287,36 @@ export function buildAction(
   }
 }
 
+/**
+ * Persists a new action for an event in the database.
+ *
+ * @param input - The action payload including type and related data.
+ * @param options - Context for the action being added.
+ * @param options.event - The event document the action belongs to.
+ * @param options.user - The user performing the action.
+ * @param options.token - Authentication token of the user.
+ * @param options.status - The resulting status of the action e.g - Accepted, Requested.
+ * @param options.configuration - Event configuration.
+ *
+ * @returns The updated event document with the new action included.
+ */
 export async function addAction(
   input: ActionInputWithType,
   {
+    event,
     user,
     token,
-    status
+    status,
+    configuration
   }: {
+    event: EventDocument
     user: TrpcUserContext
-    token: string
+    token: TokenWithBearer
     status: ActionStatus
+    configuration: EventConfig
   }
 ): Promise<EventDocument> {
-  const event = await getEventById(input.eventId)
-  const configuration = await getEventConfigurationById({
-    token,
-    eventType: event.type
-  })
-
+  const eventId = event.id
   // @TODO: Check that this works after making sure data incldues only declaration fields.
   const fieldConfigs = getDeclarationFields(configuration)
   const fileValuesInCurrentAction = extractFileValues(
@@ -378,28 +362,64 @@ export async function addAction(
     )
   }
 
-  const updatedEvent = await getEventById(input.eventId)
-
-  await indexEvent(updatedEvent, configuration)
-
-  const previousDraft = await draftsRepo.findLatestDraftForAction(
-    event.id,
-    user.id,
-    input.type
-  )
+  const updatedEvent = await getEventById(eventId)
 
   if (input.type !== ActionType.READ && input.type !== ActionType.ASSIGN) {
     await draftsRepo.deleteDraftsByEventId(input.eventId)
+    await cleanupUnreferencedFiles(updatedEvent, token)
   }
 
-  if (previousDraft) {
-    await deleteUnreferencedFilesFromPreviousDrafts(token, {
-      event: updatedEvent,
-      configuration,
-      previousDraft
-    })
-  }
+  return updatedEvent
+}
 
+function isEventIndexable(event: EventDocument) {
+  return getStatusFromActions(event.actions) !== EventStatus.enum.CREATED
+}
+
+export async function ensureEventIndexed(
+  event: EventDocument,
+  configuration: EventConfig
+) {
+  if (isEventIndexable(event)) {
+    await indexEvent(event, configuration)
+  }
+}
+
+/**
+ * Processes an action on an event:
+ *  - Adds the given action to the event
+ *  - Updates the event state accordingly
+ *  - Record an event in the database
+ *  - Indexes the event in Elasticsearch if it is no longer a draft
+ *
+ * Returns the updated event document.
+ */
+export async function processAction(
+  input: ActionInputWithType,
+  {
+    event,
+    user,
+    token,
+    status,
+    configuration
+  }: {
+    event: EventDocument
+    user: TrpcUserContext
+    token: TokenWithBearer
+    status: ActionStatus
+    configuration: EventConfig
+  }
+): Promise<EventDocument> {
+  const updatedEvent = await addAction(input, {
+    event,
+    user,
+    token,
+    status,
+    configuration
+  })
+
+  // Only send the event to Elasticsearch if it is not a draft
+  await ensureEventIndexed(updatedEvent, configuration)
   return updatedEvent
 }
 
@@ -412,7 +432,7 @@ type AsyncRejectActionInput = Omit<
   originalActionId: UUID
   createdAtLocation?: UUID
   createdByUserType: TokenUserType
-  token: string
+  token: TokenWithBearer
   eventType: string
 }
 
@@ -425,12 +445,12 @@ export async function addAsyncRejectAction({
   createdByRole,
   createdByUserType,
   createdAtLocation,
-  token,
-  eventType
+  eventType,
+  token
 }: AsyncRejectActionInput) {
   const configuration = await getEventConfigurationById({
-    token,
-    eventType
+    eventType,
+    token
   })
 
   await eventsRepo.createAction({

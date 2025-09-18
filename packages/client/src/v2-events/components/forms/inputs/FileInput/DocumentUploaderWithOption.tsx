@@ -124,7 +124,10 @@ function DocumentUploaderWithOption({
 
   const getLabelForDocumentOption = (docType: string) => {
     const label = options.find(({ value: val }) => val === docType)?.label
-    return label && intl.formatMessage(label)
+    if (!label) {
+      return undefined
+    }
+    return typeof label === 'string' ? label : intl.formatMessage(label)
   }
 
   const onComplete = (newFile: File | null) => {
@@ -171,7 +174,11 @@ function DocumentUploaderWithOption({
         acceptedFileTypes={acceptedFileTypes}
         description={description}
         error={error}
-        label={intl.formatMessage(onlyOption.label)}
+        label={
+          typeof onlyOption.label === 'string'
+            ? onlyOption.label
+            : intl.formatMessage(onlyOption.label)
+        }
         maxFileSize={maxFileSize}
         name={name}
         value={value[0]}
@@ -226,10 +233,10 @@ function DocumentUploaderWithOption({
           />
         </DropdownContainer>
         <DocumentUploader
-          disabled={Boolean(error)}
+          disabled={!selectedOption}
           id={name}
           name={name}
-          onChange={error ? undefined : handleFileChange}
+          onChange={handleFileChange}
         >
           {intl.formatMessage(messages.uploadFile)}
         </DocumentUploader>
@@ -273,12 +280,16 @@ function DocumentWithOptionOutput({
   return (
     <Wrapper>
       {value.map((file) => {
-        const label = config.options.find((x) => x.value === file.option)?.label
+        const label =
+          config.options.find((x) => x.value === file.option)?.label ||
+          file.option
         return (
           <SingleDocumentPreview
             key={file.originalFilename}
             attachment={file}
-            label={label ? intl.formatMessage(label) : file.option}
+            label={
+              typeof label === 'string' ? label : intl.formatMessage(label)
+            }
             onSelect={() => setPreviewImage(file)}
           />
         )

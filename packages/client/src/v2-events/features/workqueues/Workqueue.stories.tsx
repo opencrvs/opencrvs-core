@@ -19,18 +19,13 @@ import {
   EventStatus,
   generateEventDocument,
   generateEventDraftDocument,
-  generateUuid,
   generateWorkqueues,
-  tennisClubMembershipEvent,
-  UUID
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { libraryMembershipEvent } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import {
-  tennisClubMembershipEventIndex,
-  tennisClubMembershipEventDocument
-} from '@client/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { WorkqueueIndex } from './index'
 
 const meta: Meta<typeof WorkqueueIndex> = {
@@ -83,9 +78,6 @@ export const Workqueue: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
           }),
           tRPCMsw.event.search.query((input) => {
             return { results: queryData, total: queryData.length }
@@ -141,9 +133,6 @@ export const WorkqueueWithMultipleEventType: Story = {
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
           }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
           tRPCMsw.event.search.query((input) => {
             return {
               results: queryDataWithMultipleEventType,
@@ -182,9 +171,6 @@ export const WorkqueueWithPagination: Story = {
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.list.query(() => {
-            return queryData
           }),
           tRPCMsw.event.search.query((input) => {
             return { results: queryData, total: queryData.length }
@@ -227,11 +213,6 @@ export const ReadyToPrintWorkqueue: Story = {
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
           }),
-          tRPCMsw.event.list.query(() => {
-            return queryData.filter(
-              (record) => record.status === EventStatus.enum.REGISTERED
-            )
-          }),
           tRPCMsw.event.search.query((input) => {
             const results = queryData.filter(
               (record) => record.status === EventStatus.enum.REGISTERED
@@ -261,7 +242,7 @@ export const NoResults: Story = {
               {
                 ...recent,
                 emptyMessage: {
-                  id: 'v2.workqueues.recent.emptyMessage',
+                  id: 'workqueues.recent.emptyMessage',
                   defaultMessage: 'No recent records',
                   description: 'Empty message for recent workqueue'
                 }
@@ -275,9 +256,6 @@ export const NoResults: Story = {
           })
         ],
         events: [
-          tRPCMsw.event.list.query(() => {
-            return []
-          }),
           tRPCMsw.event.search.query((input) => {
             return { results: [], total: 0 }
           })
@@ -326,7 +304,7 @@ export const Draft: Story = {
               {
                 ...recent,
                 emptyMessage: {
-                  id: 'v2.workqueues.recent.emptyMessage',
+                  id: 'workqueues.recent.emptyMessage',
                   defaultMessage: 'No recent records',
                   description: 'Empty message for recent workqueue'
                 }
@@ -340,9 +318,6 @@ export const Draft: Story = {
           })
         ],
         events: [
-          tRPCMsw.event.list.query(() => {
-            return []
-          }),
           tRPCMsw.event.search.query((input) => {
             return { results: [], total: 0 }
           })

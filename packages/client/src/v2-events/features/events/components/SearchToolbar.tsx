@@ -103,7 +103,7 @@ const messages = {
     description: 'Search menu advanced search type'
   },
   placeHolderText: {
-    id: 'v2.home.header.searchTool.placeholder',
+    id: 'home.header.searchTool.placeholder',
     defaultMessage: 'Search by name, ID, or by using contact details.',
     description: 'Search tool placeholder'
   }

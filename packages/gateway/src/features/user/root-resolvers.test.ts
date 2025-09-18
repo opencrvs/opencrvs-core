@@ -328,7 +328,8 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              'record.declare[event=v2.birth|v2.death|tennis-club-membership]',
+              'record.create[event=birth|death|tennis-club-membership]',
+              'record.declare[event=birth|death|tennis-club-membership]',
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
               SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -358,7 +359,8 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              'record.declare[event=v2.birth|v2.death|tennis-club-membership]',
+              'record.create[event=birth|death|tennis-club-membership]',
+              'record.declare[event=birth|death|tennis-club-membership]',
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
               SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -427,7 +429,8 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              'record.declare[event=v2.birth|v2.death|tennis-club-membership]',
+              'record.create[event=birth|death|tennis-club-membership]',
+              'record.declare[event=birth|death|tennis-club-membership]',
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
               SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -457,7 +460,8 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              'record.declare[event=v2.birth|v2.death|tennis-club-membership]',
+              'record.create[event=birth|death|tennis-club-membership]',
+              'record.declare[event=birth|death|tennis-club-membership]',
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
               SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -548,7 +552,8 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              'record.declare[event=v2.birth|v2.death|tennis-club-membership]',
+              'record.create[event=birth|death|tennis-club-membership]',
+              'record.declare[event=birth|death|tennis-club-membership]',
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
               SCOPES.RECORD_DECLARE_MARRIAGE,

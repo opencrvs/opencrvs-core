@@ -16,20 +16,40 @@ import {
   getCurrentEventState,
   omitHiddenAnnotationFields,
   EventDocument,
-  EventConfig
+  EventConfig,
+  ArchiveActionInput,
+  MarkAsDuplicateActionInput,
+  ActionStatus
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
 
 // Defines custom API functions that are not part of the generated API from TRPC.
 
-export interface OnDeclareParams {
+export interface CustomMutationParams {
   eventId: string
   declaration: EventState
   transactionId: string
+  eventConfiguration: EventConfig
   annotation?: EventState
-  fullEvent?: EventDocument
-  eventConfiguration?: EventConfig
 }
+
+export interface CorrectionRequestParams extends CustomMutationParams {
+  event: EventDocument
+}
+
+export interface ArchiveOnDuplicateParams extends CustomMutationParams {
+  content: ArchiveActionInput['content'] &
+    Partial<MarkAsDuplicateActionInput['content']>
+}
+
+function hasPotentialDuplicates(
+  event: EventDocument,
+  eventConfiguration: EventConfig
+) {
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
+  return eventIndex.potentialDuplicates.length > 0
+}
+
 /**
  * Runs a sequence of actions from declare to register.
  *
@@ -38,16 +58,12 @@ export interface OnDeclareParams {
  */
 export async function registerOnDeclare({
   eventId,
+  eventConfiguration,
   declaration,
   transactionId,
   annotation
-}: {
-  eventId: string
-  transactionId: string
-  declaration: EventState
-  annotation?: EventState
-}) {
-  await trpcClient.event.actions.declare.request.mutate({
+}: CustomMutationParams) {
+  const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
     declaration,
     annotation,
     eventId,
@@ -55,14 +71,24 @@ export async function registerOnDeclare({
     keepAssignment: true
   })
 
+  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
+    return declaredEvent
+  }
+
   // update is a patch, no need to send again.
-  await trpcClient.event.actions.validate.request.mutate({
-    declaration: {},
-    annotation,
-    eventId,
-    transactionId,
-    keepAssignment: true
-  })
+  const validatedEvent = await trpcClient.event.actions.validate.request.mutate(
+    {
+      declaration: {},
+      annotation,
+      eventId,
+      transactionId,
+      keepAssignment: true
+    }
+  )
+
+  if (hasPotentialDuplicates(validatedEvent, eventConfiguration)) {
+    return validatedEvent
+  }
 
   const latestResponse = await trpcClient.event.actions.register.request.mutate(
     {
@@ -82,20 +108,24 @@ export async function registerOnDeclare({
  * Defining the function here, statically allows offline support.
  * Moving the function to one level up will break offline support since the definition needs to be static.
  */
-export async function validateOnDeclare(variables: {
-  eventId: string
-  declaration: EventState
-  transactionId: string
-  annotation?: EventState
-}) {
-  const { eventId, declaration, annotation } = variables
-  await trpcClient.event.actions.declare.request.mutate({
+export async function validateOnDeclare({
+  eventId,
+  transactionId,
+  eventConfiguration,
+  declaration,
+  annotation
+}: CustomMutationParams) {
+  const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
     declaration,
     annotation,
     eventId,
-    transactionId: variables.transactionId,
+    transactionId,
     keepAssignment: true
   })
+
+  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
+    return declaredEvent
+  }
 
   const latestResponse = await trpcClient.event.actions.validate.request.mutate(
     {
@@ -103,7 +133,7 @@ export async function validateOnDeclare(variables: {
       declaration: {},
       annotation,
       eventId,
-      transactionId: variables.transactionId
+      transactionId
     }
   )
 
@@ -116,21 +146,25 @@ export async function validateOnDeclare(variables: {
  * Defining the function here, statically allows offline support.
  * Moving the function to one level up will break offline support since the definition needs to be static.
  */
-export async function registerOnValidate(variables: {
-  eventId: string
-  declaration: EventState
-  transactionId: string
-  annotation?: EventState
-}) {
-  const { eventId, declaration, annotation } = variables
+export async function registerOnValidate({
+  eventId,
+  transactionId,
+  eventConfiguration,
+  declaration,
+  annotation
+}: CustomMutationParams) {
+  const maybeDuplicateEvent =
+    await trpcClient.event.actions.validate.request.mutate({
+      declaration,
+      annotation,
+      eventId,
+      transactionId,
+      keepAssignment: true
+    })
 
-  await trpcClient.event.actions.validate.request.mutate({
-    declaration,
-    annotation,
-    eventId,
-    transactionId: variables.transactionId,
-    keepAssignment: true
-  })
+  if (hasPotentialDuplicates(maybeDuplicateEvent, eventConfiguration)) {
+    return maybeDuplicateEvent
+  }
 
   const latestResponse = await trpcClient.event.actions.register.request.mutate(
     {
@@ -138,11 +172,36 @@ export async function registerOnValidate(variables: {
       declaration: {},
       annotation,
       eventId,
-      transactionId: variables.transactionId
+      transactionId
     }
   )
 
   return latestResponse
+}
+/**
+ * Runs markAsDuplicate and then archive on sequence.
+ */
+export async function archiveOnDuplicate({
+  eventId,
+  transactionId,
+  declaration,
+  content
+}: ArchiveOnDuplicateParams) {
+  await trpcClient.event.actions.duplicate.markAsDuplicate.mutate({
+    eventId,
+    transactionId,
+    declaration,
+    keepAssignment: true,
+    ...(content.duplicateOf
+      ? { content: { duplicateOf: content.duplicateOf } }
+      : {})
+  })
+  return trpcClient.event.actions.archive.request.mutate({
+    eventId,
+    transactionId,
+    declaration,
+    content: { reason: content.reason }
+  })
 }
 
 /**
@@ -155,31 +214,14 @@ export async function registerOnValidate(variables: {
  * Defining the function here, statically allows offline support.
  * Moving the function to one level up will break offline support since the definition needs to be static.
  */
-export async function makeCorrectionOnRequest(variables: {
-  eventId: string
-  declaration: EventState
-  transactionId: string
-  annotation?: EventState
-  fullEvent?: EventDocument
-  eventConfiguration?: EventConfig
-}) {
-  const {
-    eventId,
-    declaration,
-    annotation: declarationMixedUpAnnotation,
-    transactionId,
-    fullEvent,
-    eventConfiguration
-  } = variables
-
-  if (!fullEvent) {
-    throw new Error(`full event payload not provided for makeCorrectionRequest`)
-  }
-  if (!eventConfiguration) {
-    throw new Error(
-      `Event configuration not found for event: ${fullEvent.type}`
-    )
-  }
+export async function makeCorrectionOnRequest({
+  eventId,
+  declaration,
+  annotation: declarationMixedUpAnnotation,
+  transactionId,
+  event,
+  eventConfiguration
+}: CorrectionRequestParams) {
   // Let's find the REQUEST_CORRECTION action configuration. Because the annotation passed down here is mixed up
   // with declaration in the REQUEST_CORRECTION page form, we need to cleanup the annotation from declaration
   const actionConfiguration = eventConfiguration.actions.find(
@@ -187,7 +229,7 @@ export async function makeCorrectionOnRequest(variables: {
   )
 
   const originalDeclaration = getCurrentEventState(
-    fullEvent,
+    event,
     eventConfiguration
   ).declaration
 
@@ -199,6 +241,7 @@ export async function makeCorrectionOnRequest(variables: {
           declarationMixedUpAnnotation
         )
       : {}
+
   const response =
     await trpcClient.event.actions.correction.request.request.mutate({
       eventId,
@@ -207,14 +250,18 @@ export async function makeCorrectionOnRequest(variables: {
       annotation,
       keepAssignment: true
     })
+
   const requestId = response.actions.find(
-    (a) => a.transactionId === transactionId
+    (a) =>
+      a.transactionId === transactionId && a.status === ActionStatus.Accepted
   )?.id
+
   if (!requestId) {
     throw new Error(
       `Request ID not found in response for eventId: ${eventId}, transactionId: ${transactionId}`
     )
   }
+
   return trpcClient.event.actions.correction.approve.request.mutate({
     type: ActionType.APPROVE_CORRECTION,
     transactionId: getUUID(),

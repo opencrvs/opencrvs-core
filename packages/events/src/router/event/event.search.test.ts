@@ -36,11 +36,12 @@ import {
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
-
+import { Location } from '@events/service/locations/locations'
 test('User without any search scopes should not see any events', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
   ])
 
   const event = await client.event.create(generator.event.create())
@@ -87,7 +88,8 @@ test('Returns empty list when no events match search criteria', async () => {
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
     'search.death',
-    'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
   ])
 
   const initialData = {
@@ -246,9 +248,10 @@ test('Returns events based on the updatedAt column', async () => {
   const oldEventCreateAction = generateActionDocument({
     configuration: tennisClubMembershipEvent,
     action: ActionType.CREATE,
-    user,
     defaults: {
-      createdAt: oldEventCreatedAt
+      createdAt: oldEventCreatedAt,
+      createdBy: user.id,
+      createdAtLocation: user.primaryOfficeId
     }
   })
 
@@ -259,9 +262,10 @@ test('Returns events based on the updatedAt column', async () => {
     generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action,
-      user,
       defaults: {
-        status: ActionStatus.Requested
+        status: ActionStatus.Requested,
+        createdBy: user.id,
+        createdAtLocation: user.primaryOfficeId
       }
     })
   )
@@ -439,7 +443,8 @@ test.skip('Returns events that match the name field criteria of applicant', asyn
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
     'search.death',
-    'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
   ])
 
   const record1 = {
@@ -537,7 +542,8 @@ test('Should not match partially when searching with emails against name field',
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
     'search.death',
-    'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
   ])
 
   const record1 = {
@@ -585,7 +591,8 @@ test('Returns events that match date of birth of applicant', async () => {
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
     'search.death',
-    'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
   ])
 
   const record1 = {
@@ -663,7 +670,8 @@ test('Does not return events when searching with a similar but different date of
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
     'search.death',
-    'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
   ])
 
   const record1 = {
@@ -735,7 +743,8 @@ test('Returns single document after creation', async () => {
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
     'search.death',
-    'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
   ])
 
   const event = await client.event.create(generator.event.create())
@@ -785,7 +794,8 @@ test('Returns multiple documents after creation', async () => {
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
     'search.death',
-    'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
   ])
 
   const event1 = await client.event.create(generator.event.create())
@@ -883,13 +893,14 @@ test('Returns correctly based on registration location even when a parent locati
     name: 'Parent location'
   }
 
-  const newLocations = [
+  const newLocations: Location[] = [
     parentLocation,
     {
       ...locations[0],
       id: user.primaryOfficeId,
       name: 'Child location',
-      parentId: parentLocation.id
+      parentId: parentLocation.id,
+      locationType: 'ADMIN_STRUCTURE'
     }
   ]
 
@@ -897,7 +908,8 @@ test('Returns correctly based on registration location even when a parent locati
 
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
-    'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
   ])
 
   const event = await client.event.create(generator.event.create())
@@ -943,7 +955,8 @@ test('Returns no documents when search params are not matched', async () => {
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
     'search.death',
-    'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
   ])
 
   const event1 = await client.event.create(generator.event.create())
@@ -1033,7 +1046,8 @@ test('Throws error when search params are not matching proper schema', async () 
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
     'search.death',
-    'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
   ])
 
   const event = await client.event.create(generator.event.create())
@@ -1080,7 +1094,8 @@ test('Returns events assigned to a specific user', async () => {
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
     'search.death',
-    'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
   ])
 
   const WindmillVillage = {
@@ -1356,6 +1371,7 @@ test('User with my-jurisdiction scope only sees events created by system user to
   const { user, generator, locations } = await setupTestCase(5541)
 
   const client = createSystemTestClient('test-system', [
+    `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
     `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
   ])
 
@@ -1398,7 +1414,7 @@ test('User without an event in the scope should not be able to view events of th
   const { user, generator, locations } = await setupTestCase(5541)
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=v2.birth,access=my-jurisdiction]'
+    'search[event=birth,access=my-jurisdiction]'
   ])
 
   await createEvent(client, generator, [ActionType.DECLARE])
@@ -1480,9 +1496,10 @@ test('Does not return events of tennis club membership when scopes are not avail
   const { user, generator } = await setupTestCase()
 
   const client = createTestClient(user, [
-    'search[event=v2.birth,access=all]',
+    'search[event=birth,access=all]',
     'search.death',
-    'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
   ])
 
   await createEvent(client, generator, [ActionType.DECLARE])
@@ -1531,7 +1548,7 @@ test('User with both "all" and "my-jurisdiction" scopes sees all matching events
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
     'search[event=tennis-club-membership,access=all]',
-    'search[event=v2.birth,access=my-jurisdiction]'
+    'search[event=birth,access=my-jurisdiction]'
   ])
 
   const { generator: tennisGen, user: otherUser } = await setupTestCase(6008)
@@ -1608,7 +1625,8 @@ test('Returns paginated results when limit and size parameters are provided', as
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
-    'record.declare[event=v2.birth|v2.death|tennis-club-membership]'
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
   ])
 
   const totalNumberOfRecords = 5

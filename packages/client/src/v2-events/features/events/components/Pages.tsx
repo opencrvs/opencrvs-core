@@ -24,7 +24,7 @@ import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/fo
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
-import { AvailableActionTypes } from './Action/DeclarationAction'
+import { AvailableActionTypes } from './Action/utils'
 
 interface PagesProps {
   form: EventState

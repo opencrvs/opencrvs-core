@@ -31,78 +31,79 @@ import { Review as ReviewComponent } from '@client/v2-events/features/events/com
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { FormHeader } from '@client/v2-events/layouts/form/FormHeader'
+import { findLocalEventDocument } from '../../useEvents/api'
 import { DuplicateForm } from './DuplicateForm'
 import { DuplicateComparison } from './DuplicateComparison'
 
 export const duplicateMessages = {
   duplicateDeclarationDetails: {
-    id: 'v2.duplicates.content.header',
+    id: 'duplicates.content.header',
     defaultMessage: 'Declaration details',
     description: 'Declaration details header of two duplicate ones'
   },
   duplicateReviewHeader: {
-    id: 'v2.duplicates.review.header',
+    id: 'duplicates.review.header',
     defaultMessage: 'Potential {event} duplicate review',
     description: 'Review page header for duplicates declarations'
   },
   duplicateContentTitle: {
-    id: 'v2.duplicates.content.title',
+    id: 'duplicates.content.title',
     defaultMessage: 'Is {name} ({trackingId}) a duplicate?',
     description: 'Duplicates content title message'
   },
   duplicateContentSubtitle: {
-    id: 'v2.duplicates.content.subtitle',
+    id: 'duplicates.content.subtitle',
     defaultMessage:
       'This record was flagged as a potential duplicate of: {trackingIds}. Please review these by clicking on each tracking ID in the tab section to view a side-by-side comparison below, and confirm if this record is a duplicate.',
     description: 'Duplicates content subtitle message'
   },
   notDuplicateButton: {
-    id: 'v2.duplicates.button.notDuplicate',
+    id: 'duplicates.button.notDuplicate',
     defaultMessage: 'Not a duplicate',
     description: 'Not a duplicate button text'
   },
   markAsDuplicateButton: {
-    id: 'v2.duplicates.button.markAsDuplicate',
+    id: 'duplicates.button.markAsDuplicate',
     defaultMessage: 'Mark as duplicate',
     description: 'Mark as duplicate button text'
   },
   markAsDuplicateConfirmationTitle: {
-    id: 'v2.duplicates.content.markAsDuplicate',
+    id: 'duplicates.content.markAsDuplicate',
     defaultMessage: 'Mark {trackingId} as duplicate?',
     description: 'Mark as duplicate content confirmation title message'
   },
   duplicateDropdownMessage: {
-    id: 'v2.duplicates.content.duplicateDropdownMessage',
+    id: 'duplicates.content.duplicateDropdownMessage',
     defaultMessage: 'Duplicate of',
     description: 'Selecting from the duplicate trackingIds'
   },
   markAsDuplicateReason: {
-    id: 'v2.duplicates.content.markAsDuplicateReason',
+    id: 'duplicates.content.markAsDuplicateReason',
     defaultMessage: 'Please describe your reason',
     description: 'Review page header for duplicates declarations'
   },
   notDuplicateContentConfirmationTitle: {
-    id: 'v2.duplicates.content.notDuplicateConfirmationTitle',
+    id: 'duplicates.content.notDuplicateConfirmationTitle',
     defaultMessage: 'Are you sure {name} ({trackingId}) is not duplicate?',
     description: 'Not a duplicate content confirmation title message'
   },
   duplicateComparePageTitle: {
-    id: 'v2.duplicates.compare.title',
+    id: 'duplicates.compare.title',
     defaultMessage: 'Review {actualTrackingId} against {duplicateTrackingId}',
     description: 'Duplicate compare page title message'
   },
   duplicateComparePageSupportingDocuments: {
-    id: 'v2.duplicates.compare.supportingDocuments',
+    id: 'duplicates.compare.supportingDocuments',
     defaultMessage: 'Supporting documents',
     description: 'Supporting documents header for duplicates comparison'
   },
   registeredAt: {
-    id: 'v2.duplicates.content.registeredAt',
+    id: 'duplicates.content.registeredAt',
     defaultMessage: 'Registered at',
     description: 'Registered at label for duplicates comparison'
   },
   registeredBy: {
-    id: 'v2.duplicates.content.registeredBy',
+    id: 'duplicates.content.registeredBy',
     defaultMessage: 'Registered by',
     description: 'Registered by label for duplicates comparison'
   }
@@ -155,13 +156,13 @@ function ReviewDuplicate() {
   const potentialDuplicates = eventState.potentialDuplicates.reduce<
     Record<string, EventIndex>
   >((acc, { id, trackingId }) => {
-    const localEventDocument = events.getEvent.findFromCache(id).data
-    if (!localEventDocument) {
+    const localEvent = findLocalEventDocument(id)
+    if (!localEvent) {
       throw new Error(
         `Event with id ${id} and trackingId ${trackingId} not found in cache.`
       )
     }
-    acc[trackingId] = getCurrentEventState(localEventDocument, configuration)
+    acc[trackingId] = getCurrentEventState(localEvent, configuration)
     return acc
   }, {})
 

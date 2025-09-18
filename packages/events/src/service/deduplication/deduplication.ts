@@ -21,8 +21,7 @@ import {
   DateValue,
   FieldType,
   extractPotentialDuplicatesFromActions,
-  EventDocument,
-  getCurrentEventState
+  EventDocument
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
@@ -39,36 +38,64 @@ import {
 } from '@events/service/indexing/utils'
 import { TrpcContext } from '../../context'
 import { getEventsAuditTrailed } from '../../storage/postgres/events/events'
-import { getEventConfigurationById } from '../config/config'
 
+/**
+ * If the value referenced in a query is missing, the query resolves to null
+ * The `and` query resolves to null if any of the sub-queries is null,
+ * while the `or` query resolves to null if all of the sub-queries are null
+ */
 export function generateElasticsearchQuery(
   eventIndex: EncodedEventIndex,
   queryInput: ClauseOutput,
   eventConfig: EventConfig
 ): elasticsearch.estypes.QueryDslQueryContainer | null {
-  if (queryInput.type === 'and') {
+  if (queryInput.type === 'not') {
+    const resolvedQuery = generateElasticsearchQuery(
+      eventIndex,
+      queryInput.clause,
+      eventConfig
+    )
+    if (resolvedQuery === null) {
+      return null
+    }
     return {
       bool: {
-        must: queryInput.clauses
-          .map((clause) => {
-            return generateElasticsearchQuery(eventIndex, clause, eventConfig)
-          })
-          .filter(
-            (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
-          ),
+        must_not: resolvedQuery,
+        should: undefined
+      }
+    }
+  }
+  if (queryInput.type === 'and') {
+    const resolvedQueries = queryInput.clauses.map((clause) => {
+      return generateElasticsearchQuery(eventIndex, clause, eventConfig)
+    })
+
+    if (resolvedQueries.some((q) => q === null)) {
+      return null
+    }
+
+    return {
+      bool: {
+        must: resolvedQueries.filter(
+          (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
+        ),
         should: undefined
       }
     }
   } else if (queryInput.type === 'or') {
+    const resolvedQueries = queryInput.clauses.map((clause) => {
+      return generateElasticsearchQuery(eventIndex, clause, eventConfig)
+    })
+
+    if (resolvedQueries.every((q) => q === null)) {
+      return null
+    }
+
     return {
       bool: {
-        should: queryInput.clauses
-          .map((clause) =>
-            generateElasticsearchQuery(eventIndex, clause, eventConfig)
-          )
-          .filter(
-            (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
-          )
+        should: resolvedQueries.filter(
+          (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
+        )
       }
     }
   }
@@ -129,7 +156,7 @@ export function generateElasticsearchQuery(
 
       return {
         match_phrase: {
-          [queryKey]: queryValue.toString()
+          [queryKey]: queryInput.options.value ?? queryValue.toString()
         }
       }
     }
@@ -223,10 +250,6 @@ export async function getDuplicateEvents(
   ctx: TrpcContext
 ) {
   const duplicates = extractPotentialDuplicatesFromActions(event.actions)
-  const config = await getEventConfigurationById({
-    token: ctx.token,
-    eventType: event.type
-  })
 
   if (duplicates.length === 0) {
     return []
@@ -234,7 +257,5 @@ export async function getDuplicateEvents(
 
   const duplicateEventIds = duplicates.map(({ id }) => id)
 
-  const events = await getEventsAuditTrailed(ctx.user, duplicateEventIds)
-
-  return events.map((e) => getCurrentEventState(e, config))
+  return getEventsAuditTrailed(ctx.user, duplicateEventIds)
 }

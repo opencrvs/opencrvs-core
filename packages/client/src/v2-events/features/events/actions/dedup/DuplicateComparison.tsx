@@ -15,7 +15,11 @@ import {
   DeclarationFormConfig,
   EventIndex,
   EventState,
-  FieldType
+  FieldConfig,
+  FieldType,
+  FieldTypesToHideInReview,
+  isFieldDisplayedOnReview,
+  isPageVisible
 } from '@opencrvs/commons/client'
 import {
   ComparisonListView,
@@ -31,7 +35,7 @@ import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { noop } from '@client/v2-events'
 import { useEventConfiguration } from '../../useEventConfiguration'
-import { ValueOutput } from '../../components/Output'
+import { Output, ValueOutput } from '../../components/Output'
 import { AdministrativeArea } from '../../registered-fields'
 import { DocumentViewer } from '../../components/DocumentViewer'
 import { duplicateMessages } from './ReviewDuplicate'
@@ -123,30 +127,66 @@ export function DuplicateComparison({
   )
   const flattenedOriginalEvent = flattenEventIndex(originalEvent)
 
+  const originalDeclaration = originalEvent.declaration
+  const potentialDuplicateDeclaration = potentialDuplicateEvent.declaration
+
+  const hideFieldTypes = [
+    ...FieldTypesToHideInReview,
+    FieldType.FILE,
+    FieldType.FILE_WITH_OPTIONS
+  ]
+
   const comparisonData: ComparisonDeclaration[] =
     eventConfiguration.declaration.pages
+      .filter(
+        (page) =>
+          isPageVisible(page, originalDeclaration) ||
+          isPageVisible(page, potentialDuplicateDeclaration)
+      )
       .map((page) => ({
         title: intl.formatMessage(page.title),
         data: page.fields
           .filter(
-            ({ id }) =>
-              originalEvent.declaration[id] ||
-              potentialDuplicateEvent.declaration[id]
+            (field) =>
+              isFieldDisplayedOnReview(field, originalDeclaration) ||
+              isFieldDisplayedOnReview(field, potentialDuplicateDeclaration)
           )
           .filter(
             ({ type }) =>
-              type !== FieldType.FILE && type !== FieldType.FILE_WITH_OPTIONS
+              !hideFieldTypes.some((typeToHide) => type === typeToHide)
           )
+          // Refer to 'findPreviousValueWithSameLabel' in Output.tsx for explanation
+          .reduce<FieldConfig[]>((acc, field) => {
+            const fieldWithSameLabelDontExist = !acc.find(
+              (f) => f.label.id === field.label.id
+            )
+            if (fieldWithSameLabelDontExist) {
+              acc.push(field)
+            }
+            return acc
+          }, [])
           .map((field) => ({
             label: intl.formatMessage(field.label),
-            rightValue: ValueOutput({
-              config: field,
-              value: potentialDuplicateEvent.declaration[field.id]
-            }),
-            leftValue: ValueOutput({
-              config: field,
-              value: originalEvent.declaration[field.id]
-            })
+            rightValue: (
+              <Output
+                displayEmptyAsDash={true}
+                field={field}
+                formConfig={eventConfiguration.declaration}
+                previousForm={potentialDuplicateDeclaration}
+                showPreviouslyMissingValuesAsChanged={false}
+                value={potentialDuplicateDeclaration[field.id]}
+              />
+            ),
+            leftValue: (
+              <Output
+                displayEmptyAsDash={true}
+                field={field}
+                formConfig={eventConfiguration.declaration}
+                previousForm={originalDeclaration}
+                showPreviouslyMissingValuesAsChanged={false}
+                value={originalDeclaration[field.id]}
+              />
+            )
           }))
       }))
       .filter(({ data }) => data.length > 0)
@@ -307,15 +347,15 @@ export function DuplicateComparison({
               </Text>
               <DocumentViewer
                 comparisonView={true}
-                disabled={false}
-                form={originalEvent.declaration}
+                disabled={true}
+                form={originalDeclaration}
                 formConfig={eventConfiguration.declaration}
                 showInMobile={false}
                 onEdit={noop}
               />
               <MobileOnly>
                 <SupportingDocumentList
-                  declaration={originalEvent.declaration}
+                  declaration={originalDeclaration}
                   declarationConfig={eventConfiguration.declaration}
                 />
               </MobileOnly>
@@ -326,15 +366,15 @@ export function DuplicateComparison({
               </Text>
               <DocumentViewer
                 comparisonView={true}
-                disabled={false}
-                form={potentialDuplicateEvent.declaration}
+                disabled={true}
+                form={potentialDuplicateDeclaration}
                 formConfig={eventConfiguration.declaration}
                 showInMobile={false}
                 onEdit={noop}
               />
               <MobileOnly>
                 <SupportingDocumentList
-                  declaration={potentialDuplicateEvent.declaration}
+                  declaration={potentialDuplicateDeclaration}
                   declarationConfig={eventConfiguration.declaration}
                 />
               </MobileOnly>

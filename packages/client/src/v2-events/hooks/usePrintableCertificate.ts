@@ -34,6 +34,7 @@ import {
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { getOfflineData } from '@client/offline/selectors'
 import { useEventConfiguration } from '../features/events/useEventConfiguration'
 import { useEvents } from '../features/events/useEvents/useEvents'
 
@@ -86,6 +87,9 @@ export const usePrintableCertificate = ({
   )
   const { getEvent } = useEvents()
   const userDetails = useSelector(getUserDetails)
+  const { config: appConfig } = useSelector(getOfflineData)
+
+  const adminLevels = appConfig.ADMIN_STRUCTURE
 
   const actions = getEvent.getFromCache(event.id).actions
   if (!userDetails) {
@@ -148,7 +152,8 @@ export const usePrintableCertificate = ({
     locations,
     users,
     language,
-    config
+    config,
+    adminLevels
   })
 
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
@@ -183,7 +188,8 @@ export const usePrintableCertificate = ({
       review: false,
       users,
       language,
-      config
+      config,
+      adminLevels
     })
 
     const compiledSvgWithFonts = addFontsToSvg(compiledSvg, certificateFonts)

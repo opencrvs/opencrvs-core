@@ -12,7 +12,7 @@ import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import { z } from 'zod'
 import { OpenApiMeta } from 'trpc-to-openapi'
-import { UUID } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -30,20 +30,31 @@ import {
   ApproveCorrectionActionInput,
   RejectCorrectionActionInput,
   getPendingAction,
-  ActionInputWithType
+  ActionInputWithType,
+  EventConfig
 } from '@opencrvs/commons/events'
-import { TokenUserType } from '@opencrvs/commons/authentication'
+import {
+  TokenUserType,
+  TokenWithBearer
+} from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
-import { requiresAnyOfScopes } from '@events/router/middleware'
+import {
+  requiresAnyOfScopes,
+  setBearerForToken
+} from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
 
 import {
   getEventById,
   addAction,
   addAsyncRejectAction,
-  throwConflictIfActionNotAllowed
+  throwConflictIfActionNotAllowed,
+  ensureEventIndexed,
+  processAction
 } from '@events/service/events/events'
+import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
+import { getActionConfirmationToken } from '@events/service/auth'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -169,21 +180,31 @@ type ActionProcedure = {
 export async function defaultRequestHandler(
   input: ActionInputWithType,
   user: TrpcUserContext,
-  token: string,
+  token: TokenWithBearer,
+  event: EventDocument,
+  configuration: EventConfig,
   actionConfirmationResponseSchema?: z.ZodType
 ) {
   await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
 
   const eventWithRequestedAction = await addAction(input, {
+    event,
     user,
     token,
-    status: ActionStatus.Requested
+    status: ActionStatus.Requested,
+    configuration
   })
 
+  const requestedAction = getPendingAction(eventWithRequestedAction.actions)
+  const eventActionToken = await getActionConfirmationToken(
+    { eventId: input.eventId, actionId: requestedAction.id },
+    token
+  )
   const { responseStatus, body } = await requestActionConfirmation(
     input.type,
+    input.transactionId,
     eventWithRequestedAction,
-    token
+    setBearerForToken(eventActionToken)
   )
 
   // If we get an unexpected failure response, we just return HTTP 500 without saving the
@@ -192,8 +213,9 @@ export async function defaultRequestHandler(
       code: 'INTERNAL_SERVER_ERROR',
       message: 'Unexpected failure from notification API'
     })
-    // For Async flow, we just return the event with the requested action
+    // For Async flow, we just return the event with the requested action and ensure it is indexed
   } else if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
+    await ensureEventIndexed(eventWithRequestedAction, configuration)
     return eventWithRequestedAction
   }
 
@@ -203,12 +225,31 @@ export async function defaultRequestHandler(
   // If we immediately get a rejected response, we can mark the action as rejected
   if (responseStatus === ActionConfirmationResponse.Rejected) {
     status = ActionStatus.Rejected
+
+    logger.debug(
+      {
+        transactionId: input.transactionId,
+        actionType: input.type,
+        eventId: event.id
+      },
+      `Action immediately rejected (status: "${responseStatus}")`
+    )
   }
 
   // If we immediately get a success response, we mark the action as succeeded
   // and also validate the payload received from the notify API
   if (responseStatus === ActionConfirmationResponse.Success) {
     status = ActionStatus.Accepted
+
+    logger.debug(
+      {
+        transactionId: input.transactionId,
+        eventType: event.type,
+        actionType: input.type,
+        eventId: event.id
+      },
+      `Action immediately accepted (status: "${responseStatus}")`
+    )
     if (actionConfirmationResponseSchema) {
       try {
         parsedBody = actionConfirmationResponseSchema.parse(body)
@@ -223,22 +264,28 @@ export async function defaultRequestHandler(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { declaration, annotation, ...strippedInput } = input
 
-  const requestedAction = getPendingAction(eventWithRequestedAction.actions)
-
-  return addAction(
+  const updatedEvent = await processAction(
     {
       ...strippedInput,
       declaration: {},
       originalActionId: requestedAction.id,
       ...parsedBody
     },
-    {
-      user,
-      token,
-      status
-    }
+    { event, user, token, status, configuration }
   )
+
+  return updatedEvent
 }
+
+const ActionConfirmationResponseSchema = z.object({
+  eventId: UUID,
+  actionId: UUID,
+  transactionId: z.string()
+})
+
+export type ActionConfirmationResponseSchema = z.infer<
+  typeof ActionConfirmationResponseSchema
+>
 
 /**
  * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
@@ -258,7 +305,7 @@ export function getDefaultActionProcedures(
 
   const { actionConfirmationResponseSchema, inputSchema } = actionConfig
 
-  let acceptInputFields = z.object({ actionId: UUID })
+  let acceptInputFields = ActionConfirmationResponseSchema
 
   if (actionConfirmationResponseSchema) {
     acceptInputFields = acceptInputFields.merge(
@@ -266,7 +313,7 @@ export function getDefaultActionProcedures(
     )
   }
 
-  const requireScopesMiddleware = requiresAnyOfScopes(
+  const requireScopesForRequestMiddleware = requiresAnyOfScopes(
     [],
     ACTION_SCOPE_MAP[actionType]
   )
@@ -276,7 +323,7 @@ export function getDefaultActionProcedures(
   return {
     request: systemProcedure
       .meta(meta)
-      .use(requireScopesMiddleware)
+      .use(requireScopesForRequestMiddleware)
       .input(inputSchema)
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
@@ -286,6 +333,12 @@ export function getDefaultActionProcedures(
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user, isDuplicateAction, duplicates } = ctx
+        const { eventId } = input
+        const event = await getEventById(eventId)
+        const configuration = await getEventConfigurationById({
+          token,
+          eventType: event.type
+        })
 
         if (isDuplicateAction) {
           return ctx.event
@@ -299,14 +352,15 @@ export function getDefaultActionProcedures(
           input,
           user,
           token,
+          event,
+          configuration,
           actionConfirmationResponseSchema
         )
       }),
 
     accept: systemProcedure
-      .use(requireScopesMiddleware)
       .input(inputSchema.merge(acceptInputFields))
-      .use(middleware.validateAction)
+      .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, actionId } = input
@@ -315,6 +369,10 @@ export function getDefaultActionProcedures(
         const confirmationAction = event.actions.find(
           (a) => a.originalActionId === actionId
         )
+        const configuration = await getEventConfigurationById({
+          token,
+          eventType: event.type
+        })
 
         // Original action is not found
         if (!originalAction) {
@@ -327,35 +385,51 @@ export function getDefaultActionProcedures(
         if (confirmationAction) {
           // Action is already rejected, so we throw an error
           if (confirmationAction.status === ActionStatus.Rejected) {
+            logger.debug(
+              {
+                eventType: event.type,
+                actionType,
+                eventId: event.id,
+                transactionId: input.transactionId
+              },
+              `Action already rejected`
+            )
+
             throw new TRPCError({
               code: 'BAD_REQUEST',
               message: 'Action has already been rejected.'
             })
           }
 
+          logger.debug(
+            {
+              eventType: event.type,
+              actionType,
+              eventId: event.id,
+              transactionId: input.transactionId
+            },
+            `Accepting`
+          )
+
           // Action is already confirmed, so we just return the event
           return getEventById(input.eventId)
         }
 
-        return addAction(
+        return processAction(
           { ...input, originalActionId: actionId },
           {
+            event,
             user,
             token,
-            status: ActionStatus.Accepted
+            status: ActionStatus.Accepted,
+            configuration
           }
         )
       }),
 
     reject: systemProcedure
-      .use(requireScopesMiddleware)
-      .input(
-        z.object({
-          actionId: UUID,
-          eventId: UUID,
-          transactionId: z.string()
-        })
-      )
+      .input(ActionConfirmationResponseSchema)
+      .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input
         const event = await getEventById(eventId)

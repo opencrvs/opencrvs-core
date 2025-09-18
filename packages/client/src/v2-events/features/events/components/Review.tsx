@@ -35,7 +35,9 @@ import {
   FormConfig,
   isFieldDisplayedOnReview,
   isPageVisible,
-  runFieldValidations
+  runFieldValidations,
+  Location,
+  FieldTypesToHideInReview
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
@@ -140,59 +142,59 @@ const DeclarationDataContainer = styled.div``
 
 const reviewMessages = defineMessages({
   changeAllButton: {
-    id: 'v2.buttons.changeAll',
+    id: 'buttons.changeAll',
     defaultMessage: 'Change all',
     description: 'The label for the change all button'
   },
   changeButton: {
-    id: 'v2.buttons.change',
+    id: 'buttons.change',
     defaultMessage: 'Change',
     description: 'The label for the change button'
   },
   actionModalCancel: {
-    id: 'v2.actionModal.cancel',
+    id: 'actionModal.cancel',
     defaultMessage: 'Cancel',
     description: 'The label for cancel button of action modal'
   },
   actionModalPrimaryAction: {
-    id: 'v2.actionModal.PrimaryAction',
+    id: 'actionModal.PrimaryAction',
     defaultMessage: '{action, select, declare{Declare} other{{action}}}',
     description: 'The label for primary action button of action modal'
   },
   actionModalTitle: {
-    id: 'v2.actionModal.title',
+    id: 'actionModal.title',
     defaultMessage:
       '{action, select, declare{Declare} other{{action}}} the member?',
     description: 'The title for action modal'
   },
   actionModalDescription: {
-    id: 'v2.actionModal.description',
+    id: 'actionModal.description',
     defaultMessage:
       'The declarant will be notified of this action and a record of this decision will be recorded',
     description: 'The description for action modal'
   },
   actionModalIncompleteDescription: {
-    id: 'v2.actionModal.description.incomplete',
+    id: 'actionModal.description.incomplete',
     defaultMessage: 'This incomplete declaration will be sent for review.',
     description: 'The description for action modal when incomplete'
   },
   changeModalCancel: {
-    id: 'v2.changeModal.cancel',
+    id: 'changeModal.cancel',
     defaultMessage: 'Cancel',
     description: 'The label for cancel button of change modal'
   },
   changeModalContinue: {
-    id: 'v2.changeModal.continue',
+    id: 'changeModal.continue',
     defaultMessage: 'Continue',
     description: 'The label for continue button of change modal'
   },
   changeModalTitle: {
-    id: 'v2.changeModal.title',
+    id: 'changeModal.title',
     defaultMessage: 'Edit declaration?',
     description: 'The title for change modal'
   },
   changeModalDescription: {
-    id: 'v2.changeModal.description',
+    id: 'changeModal.description',
     defaultMessage: 'A record will be created of any changes you make',
     description: 'The description for change modal'
   },
@@ -212,33 +214,33 @@ const reviewMessages = defineMessages({
     id: 'review.documents.editDocuments'
   },
   rejectModalCancel: {
-    id: 'v2.rejectModal.cancel',
+    id: 'rejectModal.cancel',
     defaultMessage: 'Cancel',
     description: 'The label for cancel button of reject modal'
   },
   rejectModalArchive: {
-    id: 'v2.rejectModal.archive',
+    id: 'rejectModal.archive',
     defaultMessage: 'Archive',
     description: 'The label for archive button of reject modal'
   },
   rejectModalSendForUpdate: {
-    id: 'v2.rejectModal.sendForUpdate',
+    id: 'rejectModal.sendForUpdate',
     defaultMessage: 'Send For Update',
     description: 'The label for send For Update button of reject modal'
   },
   rejectModalTitle: {
-    id: 'v2.rejectModal.title',
+    id: 'rejectModal.title',
     defaultMessage: 'Reason for rejection?',
     description: 'The title for reject modal'
   },
   rejectModalDescription: {
-    id: 'v2.rejectModal.description',
+    id: 'rejectModal.description',
     defaultMessage:
       'Please describe the updates required to this record for follow up action.',
     description: 'The description for reject modal'
   },
   rejectModalMarkAsDuplicate: {
-    id: 'v2.rejectModal.markAsDuplicate',
+    id: 'rejectModal.markAsDuplicate',
     defaultMessage: 'Mark as a duplicate',
     description: 'The label for mark as duplicate checkbox of reject modal'
   }
@@ -275,6 +277,7 @@ function FormReview({
   formConfig,
   form,
   previousForm,
+  locations,
   onEdit,
   showPreviouslyMissingValuesAsChanged,
   readonlyMode,
@@ -284,6 +287,7 @@ function FormReview({
   formConfig: FormConfig
   form: EventState
   previousForm: EventState
+  locations?: Location[]
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
   readonlyMode?: boolean
@@ -306,18 +310,25 @@ function FormReview({
               const previousValue = previousForm[field.id]
 
               // previousForm, formConfig are used to find previous values with the same label if required
-              const valueDisplay = Output({
-                field,
-                previousValue,
-                showPreviouslyMissingValuesAsChanged,
-                value,
-                previousForm,
-                formConfig
-              })
+              const valueDisplay = (
+                <Output
+                  field={field}
+                  formConfig={formConfig}
+                  previousForm={previousForm}
+                  previousValue={previousValue}
+                  showPreviouslyMissingValuesAsChanged={
+                    showPreviouslyMissingValuesAsChanged
+                  }
+                  value={value}
+                />
+              )
+
+              const context = locations ? { locations } : undefined
 
               const error = runFieldValidations({
                 field,
-                values: form
+                values: form,
+                context
               })
 
               const errorDisplay =
@@ -330,33 +341,17 @@ function FormReview({
               return { ...field, valueDisplay, errorDisplay }
             })
 
-          const shouldDisplayPage = fields.some(
-            ({ type, valueDisplay, errorDisplay }) => {
-              if (
-                type === FieldType.FILE ||
-                type === FieldType.FILE_WITH_OPTIONS
-              ) {
-                return true
-              }
-
-              // If page doesn't have any file inputs, we only want to display it if it has any fields with content
-              return valueDisplay || errorDisplay
-            }
-          )
-
-          if (!shouldDisplayPage) {
-            return <React.Fragment key={`Section_${page.id}`}></React.Fragment>
-          }
-
           // Only display fields that have a non-undefined/null value or have an validation error
           const displayedFields = fields.filter(
-            ({ valueDisplay, errorDisplay }) => {
-              // Explicitly check for undefined and null, so that e.g. number 0 and empty string outputs are shown
-              const hasValue =
-                valueDisplay !== undefined && valueDisplay !== null
-              return hasValue || Boolean(errorDisplay)
-            }
+            ({ type }) =>
+              !FieldTypesToHideInReview.some(
+                (typeToHide) => type === typeToHide
+              )
           )
+
+          if (displayedFields.length === 0) {
+            return <React.Fragment key={`Section_${page.id}`}></React.Fragment>
+          }
 
           const hasCorrectableFields = displayedFields.some(
             (field) => !field.uncorrectable
@@ -451,6 +446,7 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   form,
+  locations,
   annotation,
   onEdit,
   children,
@@ -465,6 +461,7 @@ function ReviewComponent({
   children?: React.ReactNode
   formConfig: FormConfig
   form: EventState
+  locations?: Location[]
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
@@ -510,6 +507,7 @@ function ReviewComponent({
             formConfig={formConfig}
             isCorrection={isCorrection}
             isReviewCorrection={isReviewCorrection}
+            locations={locations}
             previousForm={previousForm}
             readonlyMode={readonlyMode}
             showPreviouslyMissingValuesAsChanged={

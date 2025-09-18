@@ -21,9 +21,6 @@ import {
   ActionType,
   EventDocument,
   EventState,
-  getCurrentEventState,
-  getDeclaration,
-  isFieldDisplayedOnReview,
   isFieldVisible,
   isPageVisible,
   PageConfig,
@@ -35,26 +32,29 @@ import { ColumnContentAlignment, Link } from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { Output } from '@client/v2-events/features/events/components/Output'
+import {
+  isEmptyValue,
+  Output
+} from '@client/v2-events/features/events/components/Output'
 import { ROUTES } from '@client/v2-events/routes'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getLocations } from '@client/offline/selectors'
-import { hasFieldChanged } from '../../utils'
+import { DeclarationComparisonTable } from './DeclarationComparisonTable'
 
 const messages = defineMessages({
   correctionSubmittedBy: {
-    id: 'v2.correction.submittedBy',
+    id: 'correction.submittedBy',
     defaultMessage: 'Submitter',
     description: 'Correction submitted by label'
   },
   correctionRequesterOffice: {
-    id: 'v2.correction.requesterOffice',
+    id: 'correction.requesterOffice',
     defaultMessage: 'Office',
     description: 'Correction requester office label'
   },
   correctionSubmittedOn: {
-    id: 'v2.correction.submittedOn',
+    id: 'correction.submittedOn',
     defaultMessage: 'Submitted on',
     description: 'Correction submitted on label'
   }
@@ -68,12 +68,6 @@ const Label = styled.label`
   margin: 0;
   padding: 0;
   ${({ theme }) => theme.fonts.bold14}
-`
-
-const TableHeader = styled.th`
-  text-transform: uppercase;
-  ${({ theme }) => theme.fonts.bold12}
-  display: inline-block;
 `
 
 /*
@@ -132,27 +126,30 @@ function buildCorrectionDetails(
           {
             id: page.id,
             label: page.title,
-            valueDisplay: value
-              ? intl.formatMessage(correctionMessages.verifyIdentity)
-              : intl.formatMessage(correctionMessages.cancelVerifyIdentity),
+            valueDisplay: value ? (
+              <>{intl.formatMessage(correctionMessages.verifyIdentity)}</>
+            ) : (
+              <>{intl.formatMessage(correctionMessages.cancelVerifyIdentity)}</>
+            ),
             pageId: page.id
           }
         ]
       }
-
       return page.fields
         .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
+        .filter((f) => !isEmptyValue(f, { ...form, ...annotation }[f.id]))
         .map((field) => ({
           label: field.label,
           id: field.id,
-          valueDisplay: Output({
-            field,
-            value: annotation[field.id],
-            showPreviouslyMissingValuesAsChanged: false
-          }),
+          valueDisplay: (
+            <Output
+              field={field}
+              showPreviouslyMissingValuesAsChanged={false}
+              value={annotation[field.id]}
+            />
+          ),
           pageId: page.id
         }))
-        .filter((f) => f.valueDisplay)
     })
 
   if (correctionRequestAction) {
@@ -210,9 +207,6 @@ export function CorrectionDetails({
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(event.type)
 
-  const eventIndex = getCurrentEventState(event, eventConfiguration)
-  const previousFormValues = eventIndex.declaration
-  const formConfig = getDeclaration(eventConfiguration)
   const navigate = useNavigate()
   const { getUser } = useUsers()
   const users = getUser.getAllCached()
@@ -296,79 +290,13 @@ export function CorrectionDetails({
           ? intl.formatMessage(correctionMessages.correctionSectionTitle)
           : intl.formatMessage(correctionMessages.makeCorrectionSectionTitle)}
       </CorrectionSectionTitle>
-
-      {formConfig.pages.map((page) => {
-        const changedFields = page.fields
-          .filter((field) => isFieldDisplayedOnReview(field, form))
-          .filter((f) => hasFieldChanged(f, form, previousFormValues))
-          .map((f) => {
-            const original = Output({
-              field: f,
-              value: previousFormValues[f.id],
-              showPreviouslyMissingValuesAsChanged: false,
-              previousForm: previousFormValues,
-              formConfig,
-              displayEmptyAsDash: true
-            })
-
-            const correction = Output({
-              field: f,
-              value: form[f.id],
-              showPreviouslyMissingValuesAsChanged: false,
-              displayEmptyAsDash: true
-            })
-
-            return {
-              fieldLabel: intl.formatMessage(f.label),
-              original,
-              correction
-            }
-          })
-
-        if (changedFields.length === 0) {
-          return
-        }
-
-        return (
-          <Table
-            key={`corrections-table-${page.id}`}
-            columns={[
-              {
-                label: (
-                  <TableHeader>{intl.formatMessage(page.title)}</TableHeader>
-                ),
-                width: 34,
-                key: 'fieldLabel'
-              },
-              {
-                label: (
-                  <TableHeader>
-                    {intl.formatMessage(
-                      correctionMessages.correctionSummaryOriginal
-                    )}
-                  </TableHeader>
-                ),
-                width: 33,
-                key: 'original'
-              },
-              {
-                label: (
-                  <TableHeader>
-                    {intl.formatMessage(
-                      correctionMessages.correctionSummaryCorrection
-                    )}
-                  </TableHeader>
-                ),
-                width: 33,
-                key: 'correction'
-              }
-            ]}
-            content={changedFields}
-            hideTableBottomBorder={true}
-            id={`corrections-table-${page.id}`}
-          ></Table>
-        )
-      })}
+      <DeclarationComparisonTable
+        action={correctionRequestAction}
+        eventConfig={eventConfiguration}
+        form={form}
+        fullEvent={event}
+        id={'corrections-table'}
+      />
     </>
   )
 }

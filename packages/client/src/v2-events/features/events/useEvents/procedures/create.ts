@@ -17,7 +17,6 @@ import type {
 import {
   ActionType,
   CreatedAction,
-  getCurrentEventState,
   ActionStatus,
   getUUID,
   EventInput,
@@ -25,10 +24,8 @@ import {
 } from '@opencrvs/commons/client'
 
 import {
-  findLocalEventConfig,
-  refetchEventsList,
-  setEventData,
-  setEventListData
+  refetchAllSearchQueries,
+  setEventData
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
 
@@ -88,20 +85,12 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
     }
 
     setEventData(newEvent.transactionId, optimisticEvent)
-    setEventListData((eventIndices) => {
-      const eventConfig = findLocalEventConfig(optimisticEvent.type)
-      return eventConfig
-        ? eventIndices?.concat(
-            getCurrentEventState(optimisticEvent, eventConfig)
-          )
-        : eventIndices
-    })
     return optimisticEvent
   },
   onSuccess: async (response, _variables, context) => {
     setEventData(response.id, response)
     setEventData(context.transactionId, response)
-    await refetchEventsList()
+    await refetchAllSearchQueries()
   }
 })
 
