@@ -183,7 +183,11 @@ export async function defaultRequestHandler(
   token: TokenWithBearer,
   event: EventDocument,
   configuration: EventConfig,
-  actionConfirmationResponseSchema?: z.ZodType
+  // @TODO: Could this be typed with the actual input schema, or could these actually be anything?
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  inputSchema: z.ZodObject<any>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  actionConfirmationResponseSchema?: z.ZodObject<any>
 ) {
   await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
 
@@ -200,12 +204,13 @@ export async function defaultRequestHandler(
     { eventId: input.eventId, actionId: requestedAction.id },
     token
   )
-  const { responseStatus, body } = await requestActionConfirmation(
-    input.type,
-    input.transactionId,
-    eventWithRequestedAction,
-    setBearerForToken(eventActionToken)
-  )
+  const { responseStatus, responseBody: confirmationResponse } =
+    await requestActionConfirmation(
+      input.type,
+      input.transactionId,
+      eventWithRequestedAction,
+      setBearerForToken(eventActionToken)
+    )
 
   // If we get an unexpected failure response, we just return HTTP 500 without saving the
   if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
@@ -241,18 +246,21 @@ export async function defaultRequestHandler(
   if (responseStatus === ActionConfirmationResponse.Success) {
     status = ActionStatus.Accepted
 
-    logger.debug(
-      {
-        transactionId: input.transactionId,
-        eventType: event.type,
-        actionType: input.type,
-        eventId: event.id
-      },
-      `Action immediately accepted (status: "${responseStatus}")`
-    )
     if (actionConfirmationResponseSchema) {
       try {
-        parsedBody = actionConfirmationResponseSchema.parse(body)
+        parsedBody = actionConfirmationResponseSchema
+          .merge(inputSchema.partial())
+          .parse(confirmationResponse)
+
+        logger.debug(
+          {
+            transactionId: input.transactionId,
+            eventType: event.type,
+            actionType: input.type,
+            eventId: event.id
+          },
+          `Action immediately accepted (status: "${responseStatus}")`
+        )
       } catch {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
@@ -277,16 +285,6 @@ export async function defaultRequestHandler(
   return updatedEvent
 }
 
-const ActionConfirmationResponseSchema = z.object({
-  eventId: UUID,
-  actionId: UUID,
-  transactionId: z.string()
-})
-
-export type ActionConfirmationResponseSchema = z.infer<
-  typeof ActionConfirmationResponseSchema
->
-
 /**
  * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
  * accepted or rejected, via the notify API. The notify APIs are HTTP APIs served by the countryconfig.
@@ -303,13 +301,18 @@ export function getDefaultActionProcedures(
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
-  const { actionConfirmationResponseSchema, inputSchema } = actionConfig
+  /**
+   * These fields aren't required in the synchronous flow as the action is processed immediately and we still have access to them.
+   */
+  let asyncInputFields = z.object({
+    eventId: UUID,
+    actionId: UUID,
+    transactionId: z.string()
+  })
 
-  let acceptInputFields = ActionConfirmationResponseSchema
-
-  if (actionConfirmationResponseSchema) {
-    acceptInputFields = acceptInputFields.merge(
-      actionConfirmationResponseSchema
+  if (actionConfig.actionConfirmationResponseSchema) {
+    asyncInputFields = asyncInputFields.merge(
+      actionConfig.actionConfirmationResponseSchema
     )
   }
 
@@ -324,7 +327,7 @@ export function getDefaultActionProcedures(
     request: systemProcedure
       .meta(meta)
       .use(requireScopesForRequestMiddleware)
-      .input(inputSchema)
+      .input(actionConfig.inputSchema)
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
@@ -335,7 +338,7 @@ export function getDefaultActionProcedures(
         const { token, user, isDuplicateAction, duplicates } = ctx
         const { eventId } = input
         const event = await getEventById(eventId)
-        const configuration = await getEventConfigurationById({
+        const eventConfiguration = await getEventConfigurationById({
           token,
           eventType: event.type
         })
@@ -353,13 +356,14 @@ export function getDefaultActionProcedures(
           user,
           token,
           event,
-          configuration,
-          actionConfirmationResponseSchema
+          eventConfiguration,
+          actionConfig.inputSchema,
+          actionConfig.actionConfirmationResponseSchema
         )
       }),
 
     accept: systemProcedure
-      .input(inputSchema.merge(acceptInputFields))
+      .input(actionConfig.inputSchema.merge(asyncInputFields))
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
@@ -428,7 +432,7 @@ export function getDefaultActionProcedures(
       }),
 
     reject: systemProcedure
-      .input(ActionConfirmationResponseSchema)
+      .input(asyncInputFields)
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input
