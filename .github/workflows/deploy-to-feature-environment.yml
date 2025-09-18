@@ -187,7 +187,6 @@ jobs:
             runtime="docker"
           fi
           echo "runtime=$runtime" >> $GITHUB_OUTPUT
-
   trigger-build:
     if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false) }}
     needs: generate_stack_name_and_branch
