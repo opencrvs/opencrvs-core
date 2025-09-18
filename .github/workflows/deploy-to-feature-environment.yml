@@ -178,7 +178,7 @@ jobs:
       - name: Identify deployment runtime
         id: identify_runtime
         run: |
-          if [[ -f .kube ]]; then
+          if [[ ! -f .kube ]]; then
             echo "Repository is not compatible with kubernetes"
             runtime="docker"
           elif (( stack_id % 10 < 7 )); then
