@@ -21,6 +21,7 @@
     "packages/login/public/robots.txt",
     ".env*",
     ".vs",
+    ".kube",
     "**/.DS_Store",
     "AUTHORS",
     "LICENSE",
