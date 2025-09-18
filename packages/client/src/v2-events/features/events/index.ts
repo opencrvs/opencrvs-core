@@ -8,18 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { EventSelection } from './EventSelection'
 
-import { z } from 'zod'
-
-export const SystemRole = z.enum([
-  'HEALTH',
-  'NATIONAL_ID',
-  'RECORD_SEARCH',
-  'REINDEX',
-  'WEBHOOK',
-  'IMPORT_EXPORT'
-])
-
-export const REINDEX_USER_ID = '__ANONYMOUS_REINDEX_USER__'
-
-export type SystemRole = z.infer<typeof SystemRole>
+export const EventSelectionIndex = withSuspense(EventSelection)

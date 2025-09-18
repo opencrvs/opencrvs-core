@@ -28,10 +28,13 @@ import {
   UUID,
   EventDocument,
   ConfigurableScopes,
-  getAuthorizedEventsFromScopes
+  getAuthorizedEventsFromScopes,
+  getTokenPayload,
+  canUserReadEvent
 } from '@opencrvs/commons'
-import { getEventById } from '@events/service/events/events'
+import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
+import { ActionConfirmationResponseSchema } from '@events/router/event/actions'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -254,4 +257,89 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
   return next()
+}
+
+/**
+ * Checks that the token has been exchanged for the specific `eventId` and `actionId` in the input.
+ *
+ * Registrars token can be exchanged in auth into a more specific token with `eventId` and `actionId`.
+ * This is useful when tokens need to be exposed outside of core of OpenCRVS, e.g. countryconfig or external systems.
+ */
+export const requireActionConfirmationAuthorization: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  ActionConfirmationResponseSchema
+> = async ({ next, ctx, input }) => {
+  const {
+    eventId: grantedEventId,
+    actionId: grantedActionId,
+    scope
+  } = getTokenPayload(ctx.token)
+
+  const hasConfirmAndRejectScope =
+    scope.includes('record.confirm-registration') &&
+    scope.includes('record.reject-registration')
+
+  if (!hasConfirmAndRejectScope) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Missing required scopes for action confirmation'
+    })
+  }
+
+  const isActionConfirmationToken = grantedEventId && grantedActionId
+
+  if (!isActionConfirmationToken) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Missing required claims for action confirmation'
+    })
+  }
+
+  if (grantedEventId !== input.eventId || grantedActionId !== input.actionId) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  return next()
+}
+
+export const userCanReadEvent: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext & { event: EventDocument },
+  UUID
+> = async ({ next, ctx, input }) => {
+  const event = await getEventById(input)
+
+  const createAction = event.actions.find(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  if (!createAction) {
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: `Event ${event.id} is missing ${ActionType.CREATE} action`
+    })
+  }
+
+  const canRead = canUserReadEvent(
+    {
+      createdBy: createAction.createdBy,
+      type: event.type
+    },
+    {
+      userId: ctx.user.id,
+      scopes: getScopes(ctx.token)
+    }
+  )
+
+  if (canRead) {
+    return next({ ctx: { ...ctx, event } })
+  }
+
+  // Throw not found to avoid leaking the existence of the event
+  throw new EventNotFoundError(input)
 }

@@ -32,7 +32,10 @@ import { ColumnContentAlignment, Link } from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { Output } from '@client/v2-events/features/events/components/Output'
+import {
+  isEmptyValue,
+  Output
+} from '@client/v2-events/features/events/components/Output'
 import { ROUTES } from '@client/v2-events/routes'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
@@ -41,17 +44,17 @@ import { DeclarationComparisonTable } from './DeclarationComparisonTable'
 
 const messages = defineMessages({
   correctionSubmittedBy: {
-    id: 'v2.correction.submittedBy',
+    id: 'correction.submittedBy',
     defaultMessage: 'Submitter',
     description: 'Correction submitted by label'
   },
   correctionRequesterOffice: {
-    id: 'v2.correction.requesterOffice',
+    id: 'correction.requesterOffice',
     defaultMessage: 'Office',
     description: 'Correction requester office label'
   },
   correctionSubmittedOn: {
-    id: 'v2.correction.submittedOn',
+    id: 'correction.submittedOn',
     defaultMessage: 'Submitted on',
     description: 'Correction submitted on label'
   }
@@ -123,27 +126,30 @@ function buildCorrectionDetails(
           {
             id: page.id,
             label: page.title,
-            valueDisplay: value
-              ? intl.formatMessage(correctionMessages.verifyIdentity)
-              : intl.formatMessage(correctionMessages.cancelVerifyIdentity),
+            valueDisplay: value ? (
+              <>{intl.formatMessage(correctionMessages.verifyIdentity)}</>
+            ) : (
+              <>{intl.formatMessage(correctionMessages.cancelVerifyIdentity)}</>
+            ),
             pageId: page.id
           }
         ]
       }
-
       return page.fields
         .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
+        .filter((f) => !isEmptyValue(f, { ...form, ...annotation }[f.id]))
         .map((field) => ({
           label: field.label,
           id: field.id,
-          valueDisplay: Output({
-            field,
-            value: annotation[field.id],
-            showPreviouslyMissingValuesAsChanged: false
-          }),
+          valueDisplay: (
+            <Output
+              field={field}
+              showPreviouslyMissingValuesAsChanged={false}
+              value={annotation[field.id]}
+            />
+          ),
           pageId: page.id
         }))
-        .filter((f) => f.valueDisplay)
     })
 
   if (correctionRequestAction) {

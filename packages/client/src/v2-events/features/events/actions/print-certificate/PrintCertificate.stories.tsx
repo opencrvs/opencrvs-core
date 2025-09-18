@@ -19,10 +19,7 @@ import {
   generateEventDocument,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import {
-  tennisClubMembershipEventIndex,
-  tennisClubMembershipEventDocument
-} from '@client/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -77,7 +74,7 @@ const printActionWithSelections = generateActionDocument({
       [CERT_TEMPLATE_ID]: 'tennis-club-membership-certificate',
       'collector.requesterId': 'OTHER',
       'collector.identity.verify': true,
-      templateId: 'v2.tennis-club-membership-certificate'
+      templateId: 'tennis-club-membership-certificate'
     }
   }
 })
@@ -128,7 +125,7 @@ export const FormSetupWithDraft: Story = {
             [CERT_TEMPLATE_ID]: 'tennis-club-membership-certified-certificate',
             'collector.requesterId': 'INFORMANT',
             'collector.identity.verify': true,
-            templateId: 'v2.tennis-club-membership-certified-certificate'
+            templateId: 'tennis-club-membership-certified-certificate'
           }
         })
       ]
@@ -158,7 +155,7 @@ export const Review: Story = {
             [CERT_TEMPLATE_ID]: 'tennis-club-membership-certified-certificate',
             'collector.requesterId': 'INFORMANT',
             'collector.identity.verify': true,
-            templateId: 'v2.tennis-club-membership-certified-certificate'
+            templateId: 'tennis-club-membership-certified-certificate'
           }
         })
       ]

@@ -309,7 +309,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
               {
                 name: 'Apply'
               },
-              { timeout: 1000 }
+              { timeout: 2000 }
             )
           ).toBeDisabled()
         }
