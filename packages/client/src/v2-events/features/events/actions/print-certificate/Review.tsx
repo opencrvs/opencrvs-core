@@ -47,7 +47,10 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
+import {
+  useLocations,
+  useSuspenseAdminLeafLevelLocations
+} from '@client/v2-events/hooks/useLocations'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -196,6 +199,7 @@ export function Review() {
     language
   })
 
+  const locationIds = useSuspenseAdminLeafLevelLocations()
   /**
    * If there are validation errors in the form, redirect to the
    * print certificate form page, since the user should not be able to
@@ -203,7 +207,8 @@ export function Review() {
    */
   const validationErrorExist = validationErrorsInActionFormExist({
     formConfig,
-    form: annotation
+    form: annotation,
+    locationIds
   })
 
   if (validationErrorExist) {
