@@ -44,24 +44,24 @@ function useAdministrativeAreas(
 ) {
   const { getLocations } = useLocations()
 
-  // Run queries for each resource type
-  const results = React.useMemo(() => {
-    return searchableResource.map((resource) => {
-      const [resourceLocations] = getLocations.useSuspenseQuery({
-        isActive: true,
-        locationType: resourceTypeMap[resource]
+  return React.useMemo(() => {
+    const locations = searchableResource
+      .map((resource) => {
+        // Run queries for each resource type
+        const [resourceLocations] = getLocations.useSuspenseQuery({
+          isActive: true,
+          locationType: resourceTypeMap[resource]
+        })
+        return resourceLocations
       })
-      return resourceLocations
-    })
+      .flat()
+
+    return locations.map((location) => ({
+      id: location.id,
+      searchableText: location.name.toLowerCase(),
+      displayLabel: location.name
+    }))
   }, [searchableResource, getLocations])
-
-  const locations = results.flat()
-
-  return locations.map((location) => ({
-    id: location.id,
-    searchableText: location.name.toLowerCase(),
-    displayLabel: location.name
-  }))
 }
 
 function LocationSearchInput({
