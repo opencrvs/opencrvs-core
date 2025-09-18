@@ -366,9 +366,8 @@ export async function addAction(
 
   if (input.type !== ActionType.READ && input.type !== ActionType.ASSIGN) {
     await draftsRepo.deleteDraftsByEventId(input.eventId)
+    await cleanupUnreferencedFiles(updatedEvent, token)
   }
-
-  await cleanupUnreferencedFiles(updatedEvent, token)
 
   return updatedEvent
 }
