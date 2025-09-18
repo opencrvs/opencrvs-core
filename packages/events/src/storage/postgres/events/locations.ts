@@ -137,7 +137,6 @@ export async function isLeafLocation(id: UUID) {
  * A leaf location is defined as a location that does not have any children in the provided list.
  * e.g. if a location is a parent of another location in the list, it is not considered a leaf. ADMIN_STRUCTURE might have CRVS_OFFICE children, but can be a leaf if we only consider ADMIN_STRUCTURE locations.
  *
- * @param locations - The list of locations to search.
  * @param locationTypes - The types of locations to include.
  * @returns The list of leaf location IDs.
  */
