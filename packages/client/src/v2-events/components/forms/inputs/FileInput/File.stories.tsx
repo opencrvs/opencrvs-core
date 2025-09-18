@@ -17,7 +17,11 @@ import { FieldType } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const StyledFormFieldGenerator = styled(FormFieldGenerator)`
+  width: 400px;
+`
+
+const meta: Meta<typeof StyledFormFieldGenerator> = {
   title: 'Inputs/File',
   args: { onChange: fn() },
   decorators: [
@@ -31,81 +35,81 @@ const meta: Meta<typeof FormFieldGenerator> = {
 
 export default meta
 
-const StyledFormFieldGenerator = styled(FormFieldGenerator)`
-  width: '400px';
-`
-
 export const FileInputWithOption: StoryObj<typeof FormFieldGenerator> = {
   name: 'File input with option',
   parameters: {
-    layout: 'centered'
-  },
-  render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        fields={[
-          {
-            id: 'storybook.file',
-            type: FieldType.FILE_WITH_OPTIONS,
-            configuration: {
-              maxFileSize: 5 * 1024 * 1024,
-              acceptedFileTypes: ['image/jpeg']
-            },
-            label: {
-              id: 'storybook.file.label',
-              defaultMessage: 'Upload your captured photo',
-              description: 'The title for the file input'
-            },
-            options: [
+    layout: 'centered',
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <StyledFormFieldGenerator
+            fields={[
               {
-                value: 'forest',
+                id: 'storybook.file',
+                type: FieldType.FILE_WITH_OPTIONS,
+                configuration: {
+                  maxFileSize: 5 * 1024 * 1024,
+                  acceptedFileTypes: ['image/jpeg']
+                },
                 label: {
-                  id: 'storybook.file.option.forest',
-                  defaultMessage: 'Forest',
-                  description: 'Option for a forest setting'
-                }
-              },
-              {
-                value: 'beach',
-                label: {
-                  id: 'storybook.file.option.beach',
-                  defaultMessage: 'Beach',
-                  description: 'Option for a beach setting'
-                }
-              },
-              {
-                value: 'mountain',
-                label: {
-                  id: 'storybook.file.option.mountain',
-                  defaultMessage: 'Mountain',
-                  description: 'Option for a mountain setting'
-                }
-              },
-              {
-                value: 'desert',
-                label: {
-                  id: 'storybook.file.option.desert',
-                  defaultMessage: 'Desert',
-                  description: 'Option for a desert setting'
-                }
-              },
-              {
-                value: 'city',
-                label: {
-                  id: 'storybook.file.option.city',
-                  defaultMessage: 'City',
-                  description: 'Option for a city setting'
-                }
+                  id: 'storybook.file.label',
+                  defaultMessage: 'Upload your captured photo',
+                  description: 'The title for the file input'
+                },
+                options: [
+                  {
+                    value: 'forest',
+                    label: {
+                      id: 'storybook.file.option.forest',
+                      defaultMessage: 'Forest',
+                      description: 'Option for a forest setting'
+                    }
+                  },
+                  {
+                    value: 'beach',
+                    label: {
+                      id: 'storybook.file.option.beach',
+                      defaultMessage: 'Beach',
+                      description: 'Option for a beach setting'
+                    }
+                  },
+                  {
+                    value: 'mountain',
+                    label: {
+                      id: 'storybook.file.option.mountain',
+                      defaultMessage: 'Mountain',
+                      description: 'Option for a mountain setting'
+                    }
+                  },
+                  {
+                    value: 'desert',
+                    label: {
+                      id: 'storybook.file.option.desert',
+                      defaultMessage: 'Desert',
+                      description: 'Option for a desert setting'
+                    }
+                  },
+                  {
+                    value: 'city',
+                    label: {
+                      id: 'storybook.file.option.city',
+                      defaultMessage: 'City',
+                      description: 'Option for a city setting'
+                    }
+                  }
+                ]
               }
-            ]
-          }
-        ]}
-        id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
-      />
-    )
+            ]}
+            id="my-form"
+            onChange={(data) => {
+              meta.args?.onChange(data) ?? (() => {})
+            }}
+          />
+        )
+      },
+      initialPath: '/event/123-kalsnk-213'
+    }
   }
 }
 
@@ -113,36 +117,39 @@ export const FileInputWithoutOption: StoryObj<typeof StyledFormFieldGenerator> =
   {
     name: 'File input without option',
     parameters: {
-      layout: 'centered'
-    },
-    render: function Component(args) {
-      return (
-        <StyledFormFieldGenerator
-          fields={[
-            {
-              id: 'storybook.file2',
-              type: FieldType.FILE,
-              label: {
-                id: 'storybook.file2.label',
-                defaultMessage: 'Upload your photo',
-                description: 'The title for the file input'
-              },
-              configuration: {
-                style: { width: args.width },
-                maxFileSize: 5 * 1024 * 1024,
-                fileName: {
-                  defaultMessage: 'Uploaded photo',
-                  description: 'The title for the file input',
-                  id: 'storybook.file.label'
+      layout: 'centered',
+      reactRouter: {
+        router: {
+          path: '/event/:eventId',
+          element: (
+            <StyledFormFieldGenerator
+              fields={[
+                {
+                  id: 'storybook.file2',
+                  type: FieldType.FILE,
+                  label: {
+                    id: 'storybook.file2.label',
+                    defaultMessage: 'Upload your photo',
+                    description: 'The title for the file input'
+                  },
+                  configuration: {
+                    maxFileSize: 5 * 1024 * 1024,
+                    fileName: {
+                      defaultMessage: 'Uploaded photo',
+                      description: 'The title for the file input',
+                      id: 'storybook.file.label'
+                    }
+                  }
                 }
-              }
-            }
-          ]}
-          id="my-form"
-          onChange={(data) => {
-            args.onChange(data)
-          }}
-        />
-      )
+              ]}
+              id="my-form"
+              onChange={(data) => {
+                meta.args?.onChange(data) ?? (() => {})
+              }}
+            />
+          )
+        },
+        initialPath: '/event/123-kalsnk-213'
+      }
     }
   }
