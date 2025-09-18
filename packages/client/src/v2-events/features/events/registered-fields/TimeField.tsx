@@ -21,7 +21,7 @@ import {
 const messages = defineMessages({
   timeFormat: {
     defaultMessage: 'HH:mm',
-    id: 'configuration.timeFormat',
+    id: 'v2.configuration.timeFormat',
     description: 'Default format for time values'
   }
 })

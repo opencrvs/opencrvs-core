@@ -19,23 +19,23 @@ import { useModal } from './useModal'
 
 const archiveMessages = {
   confirmationBody: {
-    id: 'recordAudit.archive.confirmation.body',
+    id: 'v2.recordAudit.archive.confirmation.body',
     defaultMessage:
       'This will remove the declaration from the workqueue and change the status to Archive. To revert this change you will need to search for the declaration.',
     description: 'Confirmation body for archiving a declaration'
   },
   confirmationTitle: {
-    id: 'recordAudit.archive.confirmation.title',
+    id: 'v2.recordAudit.archive.confirmation.title',
     defaultMessage: 'Archive declaration?',
     description: 'Confirmation title for archiving a declaration'
   },
   archive: {
-    id: 'buttons.archive',
+    id: 'v2.buttons.archive',
     defaultMessage: 'Archive',
     description: 'Archive button text'
   },
   cancel: {
-    id: 'buttons.cancel',
+    id: 'v2.buttons.cancel',
     defaultMessage: 'Cancel',
     description: 'Cancel button text'
   }

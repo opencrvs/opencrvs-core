@@ -12,7 +12,8 @@
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "test:compilation": "tsc --noEmit",
     "build": "tsc && copyfiles 'src/**/*.json' build/dist",
-    "build:clean": "rm -rf build"
+    "build:clean": "rm -rf build",
+    "extract:translations": "bash extract-translations.sh"
   },
   "dependencies": {
     "@hapi/boom": "^9.1.1",

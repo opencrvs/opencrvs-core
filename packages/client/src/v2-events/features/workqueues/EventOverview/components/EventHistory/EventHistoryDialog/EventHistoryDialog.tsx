@@ -25,7 +25,7 @@ import { useActionForHistory } from '@client/v2-events/features/events/actions/c
 import { ActionTypeSpecificContent } from './components'
 
 export const eventHistoryStatusMessage = {
-  id: 'events.history.status',
+  id: `v2.events.history.status`,
   defaultMessage:
     '{status, select, CREATE {Draft} NOTIFY {Sent incomplete} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} UPDATE {Updated} other {Unknown}}'
 }
@@ -33,23 +33,23 @@ export const eventHistoryStatusMessage = {
 const messages = defineMessages({
   'event.history.modal.timeFormat': {
     defaultMessage: 'MMMM dd, yyyy · hh.mm a',
-    id: 'configuration.timeFormat',
+    id: 'v2.configuration.timeFormat',
     description: 'Time format for timestamps in event history'
   },
   comment: {
     defaultMessage: 'Comment',
     description: 'Label for rejection comment',
-    id: 'constants.comment'
+    id: 'v2.constants.comment'
   },
   reason: {
     defaultMessage: 'Reason',
     description: 'Label for rejection correction reason',
-    id: 'constants.reason'
+    id: 'v2.constants.reason'
   },
   duplicateOf: {
     defaultMessage: 'Duplicate of',
     description: 'table header for `duplicate of` in record audit',
-    id: 'constants.duplicateOf'
+    id: 'v2.constants.duplicateOf'
   }
 })
 

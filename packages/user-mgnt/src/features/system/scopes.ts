@@ -20,23 +20,18 @@ const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
   HEALTH: [SCOPES.NOTIFICATION_API],
   NATIONAL_ID: [SCOPES.NATIONALID],
   RECORD_SEARCH: [SCOPES.RECORDSEARCH],
-  IMPORT_EXPORT: [
-    SCOPES.RECORD_IMPORT,
-    SCOPES.RECORD_EXPORT,
-    SCOPES.RECORDSEARCH,
-    SCOPES.USER_DATA_SEEDING
-  ], // TODO Should we call this MIGRATION or keep it generic?
+  IMPORT: [SCOPES.RECORD_IMPORT],
   WEBHOOK: [SCOPES.WEBHOOK],
   REINDEX: [SCOPES.RECORD_REINDEX]
 } satisfies Record<SystemRole, Scope[]>
 
 const DEFAULT_SYSTEM_INTEGRATION_ROLE_CONFIGURABLE_SCOPES = {
   HEALTH: ['record.create', 'record.notify'],
+  IMPORT: [],
   NATIONAL_ID: [],
   RECORD_SEARCH: [],
   WEBHOOK: [],
-  REINDEX: [],
-  IMPORT_EXPORT: []
+  REINDEX: []
 } satisfies Record<SystemRole, ConfigurableScopeType[]>
 
 export function getSystemIntegrationRoleScopes(

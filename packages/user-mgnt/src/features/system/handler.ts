@@ -70,13 +70,6 @@ export async function registerSystem(
       }
     }
 
-    if (type === types.IMPORT_EXPORT && !settings) {
-      settings = {
-        dailyQuota: 1000000, //Arbitrary high number, should we make this configurable?
-        webhook: []
-      }
-    }
-
     const authorization = request.headers.authorization as string
     const token = getTokenPayload(authorization.split(' ')[1])
     const userId = token.sub
@@ -134,9 +127,7 @@ export async function registerSystem(
       )
     }
 
-    if (
-      [types.WEBHOOK, types.RECORD_SEARCH, types.IMPORT_EXPORT].includes(type)
-    ) {
+    if (type === types.WEBHOOK || type === types.RECORD_SEARCH) {
       const systemDetails = {
         client_id,
         name: name || systemAdminUser.username,

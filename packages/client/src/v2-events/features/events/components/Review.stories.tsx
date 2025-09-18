@@ -103,12 +103,12 @@ export const ReviewWithoutChanges: Story = {
 
 const reviewActionMessages = {
   title: {
-    id: 'changeModal.title',
+    id: 'v2.changeModal.title',
     defaultMessage: 'This is a title',
     description: 'The title for review action'
   },
   description: {
-    id: 'changeModal.description',
+    id: 'v2.changeModal.description',
     defaultMessage: 'This is a description',
     description: 'The title for review action'
   },

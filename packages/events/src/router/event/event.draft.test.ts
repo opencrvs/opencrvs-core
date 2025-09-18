@@ -192,6 +192,9 @@ test('Creating a draft is idempotent', async () => {
 })
 
 describe('Delete document references in drafts as side-effect', () => {
+  const deleteUnreferencedDraftAttachmentsMock = vi.fn()
+  const fileExistMock = vi.fn()
+
   function mockListener({
     request
   }: {
@@ -201,6 +204,14 @@ describe('Delete document references in drafts as side-effect', () => {
   }) {
     if (!request.url.startsWith(`${env.DOCUMENTS_URL}/files`)) {
       return
+    }
+
+    if (request.method === 'DELETE') {
+      deleteUnreferencedDraftAttachmentsMock(request.url, request.body)
+    }
+
+    if (request.method === 'HEAD') {
+      fileExistMock(request.url, request.body)
     }
   }
   beforeEach(() => {
@@ -235,6 +246,10 @@ describe('Delete document references in drafts as side-effect', () => {
     await client.event.draft.create(getDraft(3))
     await client.event.draft.create(getDraft(4))
     await client.event.draft.create(getDraft(5))
+
+    // total 4 unreferenced draft attachments should be deleted
+    expect(deleteUnreferencedDraftAttachmentsMock.mock.calls).toHaveLength(4)
+    expect(deleteUnreferencedDraftAttachmentsMock.mock.calls).toMatchSnapshot()
 
     const drafts = await client.event.draft.list()
 

@@ -72,12 +72,6 @@ const router = createBrowserRouter(routesConfig, {
   }
 })
 
-// eslint-disable-next-line no-console
-console.debug('Waiting for service worker to be ready...')
-void navigator.serviceWorker.ready.then(() => {
-  // eslint-disable-next-line no-console
-  console.debug('Service worker is ready')
-  root.render(<App router={router} store={store} />)
-})
+root.render(<App router={router} store={store} />)
 
 new SubmissionController(store).start()

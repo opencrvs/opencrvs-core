@@ -129,17 +129,15 @@ describe('event.create', () => {
     })
 
     test('event created by system user should not have assignment action', async () => {
-      const { generator, user } = await setupTestCase()
-      const systemClient = createSystemTestClient('test-system', [
+      const { generator } = await setupTestCase()
+      let client = createSystemTestClient('test-system', [
         `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
-      const event = await systemClient.event.create(generator.event.create())
+      const event = await client.event.create(generator.event.create())
 
-      const userClient = createTestClient(user, [
-        `record.read[event=${TENNIS_CLUB_MEMBERSHIP}]`
-      ])
-
-      const fetchedEvent = await userClient.event.get(event.id)
+      const { user } = await setupTestCase()
+      client = createTestClient(user)
+      const fetchedEvent = await client.event.get(event.id)
 
       const fetchedEventWithoutReadAction = fetchedEvent.actions.slice(0, -1)
       expect(fetchedEventWithoutReadAction).toEqual(event.actions)

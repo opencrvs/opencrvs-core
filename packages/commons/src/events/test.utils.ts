@@ -19,6 +19,7 @@ import {
   ActionStatus,
   EventState,
   PrintCertificateAction,
+  ActionUpdate,
   DuplicateDetectedAction
 } from './ActionDocument'
 import {
@@ -131,31 +132,6 @@ export function generateRandomName(rng: () => number) {
   }
 }
 
-export function generateUuid(rng: () => number = () => 0.1) {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = Math.floor(rng() * 16)
-    const v = c === 'x' ? r : (r & 0x3) | 0x8
-
-    return v.toString(16)
-  }) as UUID
-}
-
-export function generateTrackingId(rng: () => number): string {
-  const uuid = generateUuid(rng).replace(/-/g, '')
-  const trackingId = uuid.slice(0, 6).toUpperCase()
-  return trackingId
-}
-
-export function generateRegistrationNumber(rng: () => number): string {
-  const uuid = generateUuid(rng).replace(/-/g, '')
-  const registrationNumber = uuid.slice(0, 12).toUpperCase()
-  return registrationNumber
-}
-
-export function generateRandomSignature(rng: () => number): string {
-  return `/random-bucket/${generateUuid(rng)}.png`
-}
-
 /**
  * Quick-and-dirty mock data generator for event actions.
  */
@@ -235,10 +211,7 @@ export function mapFieldTypeToMockValue(
   }
 }
 
-function fieldConfigsToActionPayload(
-  fields: FieldConfig[],
-  rng: () => number
-): EventState {
+function fieldConfigsToActionPayload(fields: FieldConfig[], rng: () => number) {
   return fields.reduce(
     (acc, field, i) => ({
       ...acc,
@@ -742,35 +715,45 @@ export function eventPayloadGenerator(
   }
 }
 
-export function generateActionDocument<T extends ActionType>({
+export function generateActionDocument({
   configuration,
   action,
   rng = () => 0.1,
-  defaults,
+  defaults = {},
+  user = {},
+  annotation,
   declarationOverrides
 }: {
   configuration: EventConfig
-  action: T
+  action: ActionType
   rng?: () => number
-  defaults?: Partial<Extract<ActionDocument, { type: T }>>
+  defaults?: Partial<ActionDocument>
+  user?: Partial<{
+    signature: string
+    primaryOfficeId: UUID
+    role: TestUserRole
+    id: string
+  }>
+  annotation?: ActionUpdate
   declarationOverrides?: Partial<EventState>
 }): ActionDocument {
   const actionBase = {
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
-    createdBy: generateUuid(rng),
+    createdBy: user.id ?? getUUID(),
     createdByUserType: TokenUserType.Enum.user,
     createdByRole: TestUserRole.Enum.FIELD_AGENT,
     id: getUUID(),
-    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    createdAtLocation:
+      user.primaryOfficeId ?? ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID),
     declaration: generateActionDeclarationInput(
       configuration,
       action,
       rng,
       declarationOverrides
     ),
-    annotation: {},
+    annotation: annotation ?? {},
     status: ActionStatus.Accepted,
     transactionId: getUUID(),
     ...defaults
@@ -787,16 +770,8 @@ export function generateActionDocument<T extends ActionType>({
       return { ...actionBase, type: action }
     case ActionType.UNASSIGN:
       return { ...actionBase, type: action }
-    case ActionType.ASSIGN: {
-      const assignActionDefaults = defaults as
-        | Partial<Extract<ActionDocument, { type: 'ASSIGN' }>>
-        | undefined
-      return {
-        ...actionBase,
-        assignedTo: assignActionDefaults?.assignedTo ?? getUUID(),
-        type: action
-      }
-    }
+    case ActionType.ASSIGN:
+      return { ...actionBase, assignedTo: getUUID(), type: action }
     case ActionType.VALIDATE:
       return { ...actionBase, type: action }
     case ActionType.ARCHIVE:
@@ -807,16 +782,12 @@ export function generateActionDocument<T extends ActionType>({
       return { ...actionBase, type: action }
     case ActionType.NOTIFY:
       return { ...actionBase, type: action }
-    case ActionType.PRINT_CERTIFICATE: {
-      const printActionDefaults = defaults as
-        | Partial<PrintCertificateAction>
-        | undefined
+    case ActionType.PRINT_CERTIFICATE:
       return {
         ...actionBase,
         type: action,
-        content: printActionDefaults?.content
+        content: (defaults as Partial<PrintCertificateAction>).content
       }
-    }
     case ActionType.REQUEST_CORRECTION:
       return { ...actionBase, type: action }
     case ActionType.APPROVE_CORRECTION:
@@ -833,18 +804,16 @@ export function generateActionDocument<T extends ActionType>({
         ...actionBase,
         type: action
       }
-    case ActionType.DUPLICATE_DETECTED: {
-      const duplicateActionDefaults = defaults as
-        | Partial<DuplicateDetectedAction>
-        | undefined
+    case ActionType.DUPLICATE_DETECTED:
       return {
         ...actionBase,
         type: action,
         content: {
-          duplicates: duplicateActionDefaults?.content?.duplicates ?? []
+          duplicates:
+            (defaults as Partial<DuplicateDetectedAction>).content
+              ?.duplicates ?? []
         }
       }
-    }
     case ActionType.DELETE:
     default:
       throw new Error(`Unsupported action type: ${action}`)
@@ -880,10 +849,7 @@ export function generateEventDocument({
         configuration,
         action,
         rng,
-        defaults: {
-          createdBy: user?.id,
-          createdAtLocation: user?.primaryOfficeId
-        },
+        user,
         declarationOverrides
       })
     ),
@@ -981,6 +947,31 @@ export function createPrng(seed: number) {
     state = (MULTIPLIER * state + INCREMENT) % MODULUS
     return state / MODULUS
   }
+}
+
+export function generateUuid(rng: () => number = () => 0.1) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.floor(rng() * 16)
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+
+    return v.toString(16)
+  }) as UUID
+}
+
+export function generateTrackingId(rng: () => number): string {
+  const uuid = generateUuid(rng).replace(/-/g, '')
+  const trackingId = uuid.slice(0, 6).toUpperCase()
+  return trackingId
+}
+
+export function generateRegistrationNumber(rng: () => number): string {
+  const uuid = generateUuid(rng).replace(/-/g, '')
+  const registrationNumber = uuid.slice(0, 12).toUpperCase()
+  return registrationNumber
+}
+
+export function generateRandomSignature(rng: () => number): string {
+  return `/random-bucket/${generateUuid(rng)}.png`
 }
 
 /**

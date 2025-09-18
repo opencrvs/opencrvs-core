@@ -12,7 +12,6 @@
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import { Spinner } from '@opencrvs/components'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -20,13 +19,11 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
+import { RadioButton } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
-import { ActionType, isActionInScope } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
-
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { createTemporaryId } from '@client/v2-events/utils'
-import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfigurations } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
@@ -35,29 +32,29 @@ import { useActionAnnotation } from './useActionAnnotation'
 
 const messages = defineMessages({
   registerNewEventTitle: {
-    id: 'register.selectVitalEvent.registerNewEventTitle',
+    id: 'v2.register.selectVitalEvent.registerNewEventTitle',
     defaultMessage: 'New declaration',
     description: 'The title that appears on the select vital event page'
   },
   registerNewEventHeading: {
-    id: 'register.selectVitalEvent.registerNewEventHeader',
+    id: 'v2.register.selectVitalEvent.registerNewEventHeading',
     defaultMessage: 'What type of event do you want to declare?',
     description: 'The section heading on the page'
   },
   continueButton: {
     defaultMessage: 'Continue',
     description: 'Continue Button Text',
-    id: 'buttons.continue'
+    id: 'v2.buttons.continue'
   },
   errorMessage: {
-    id: 'register.selectVitalEvent.errorMessage',
+    id: 'v2.register.selectVitalEvent.errorMessage',
     defaultMessage: 'Please select the type of event',
     description: 'Error Message to show when no event is being selected'
   },
   exitButton: {
     defaultMessage: 'EXIT',
     description: 'Label for Exit button on EventTopBar',
-    id: 'buttons.exit'
+    id: 'v2.buttons.exit'
   }
 })
 
@@ -66,7 +63,7 @@ const constantsMessages = defineMessages({
     defaultMessage: 'Skip to main content',
     description:
       'Label for a keyboard accessibility link which skips to the main content',
-    id: 'constants.skipToMainContent'
+    id: 'v2.constants.skipToMainContent'
   }
 })
 
@@ -77,14 +74,9 @@ function EventSelector() {
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
   const eventConfigurations = useEventConfigurations()
   const events = useEvents()
-  const scopes = useSelector(getScope) ?? []
   const clearForm = useEventFormData((state) => state.clear)
   const clearAnnotation = useActionAnnotation((state) => state.clear)
   const createEvent = events.createEvent()
-
-  const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>
-    isActionInScope(scopes, ActionType.CREATE, id)
-  )
 
   function handleContinue() {
     if (eventType === '') {
@@ -119,20 +111,27 @@ function EventSelector() {
           {intl.formatMessage(messages.errorMessage)}
         </ErrorText>
       )}
-      <Stack alignItems="left" direction="column" gap={16}>
-        <RadioGroup
-          name="eventType"
-          options={allowedEventConfigurations.map((event) => ({
-            value: event.id,
-            label: intl.formatMessage(event.label)
-          }))}
-          size={RadioSize.LARGE}
-          value={eventType}
-          onChange={(val) => {
-            setEventType(val)
-            setNoEventSelectedError(false)
-          }}
-        />
+      <Stack
+        alignItems="left"
+        direction="column"
+        gap={16}
+        id="select_vital_event_view"
+      >
+        {eventConfigurations.map((event) => (
+          <RadioButton
+            key={`${event.id}event`}
+            id={`select_${event.id}_event`}
+            label={intl.formatMessage(event.label)}
+            name={`${event.id}event`}
+            selected={eventType === event.id ? event.id : ''}
+            size="large"
+            value={event.id}
+            onChange={() => {
+              setEventType(event.id)
+              setNoEventSelectedError(false)
+            }}
+          />
+        ))}
 
         <Button
           key="select-vital-event-continue"
@@ -149,7 +148,7 @@ function EventSelector() {
   )
 }
 
-export function EventSelection() {
+function EventSelection() {
   const intl = useIntl()
   const { closeActionView } = useEventFormNavigation()
 
@@ -194,3 +193,5 @@ export function EventSelection() {
     </Frame>
   )
 }
+
+export const EventSelectionIndex = withSuspense(EventSelection)

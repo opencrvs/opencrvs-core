@@ -26,7 +26,7 @@ import { StringifierContext } from './RegisteredField'
 const messages = defineMessages({
   dateFormat: {
     defaultMessage: 'd MMMM y',
-    id: 'configuration.dateFormat',
+    id: 'v2.configuration.dateFormat',
     description: 'Default format for date values'
   }
 })

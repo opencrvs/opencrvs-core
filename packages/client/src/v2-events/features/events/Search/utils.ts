@@ -65,12 +65,12 @@ const defaultSearchFieldGenerator: Record<
     label: {
       defaultMessage: 'Place of registration',
       description: 'Label for place of registration field',
-      id: 'advancedSearch.registeredAtLocation'
+      id: 'v2.advancedSearch.registeredAtLocation'
     },
     helperText: {
       defaultMessage: 'Search for a province, district or registration office',
       description: 'Helper text for place of registration field',
-      id: 'advancedSearch.registeredAtLocation.helperText'
+      id: 'v2.advancedSearch.registeredAtLocation.helperText'
     },
     configuration: {
       searchableResource: ['locations', 'offices']
@@ -82,7 +82,7 @@ const defaultSearchFieldGenerator: Record<
     label: {
       defaultMessage: 'Date of the registration was accepted',
       description: 'Label for date of registration field',
-      id: 'advancedSearch.registeredAt'
+      id: 'v2.advancedSearch.registeredAt'
     }
   }),
   'event.updatedAt': (_) => {
@@ -93,12 +93,12 @@ const defaultSearchFieldGenerator: Record<
         label: {
           defaultMessage: 'Time period',
           description: 'Label for date of update field',
-          id: 'advancedSearch.updatedAt'
+          id: 'v2.advancedSearch.updatedAt'
         },
         helperText: {
           defaultMessage: 'Period of time since the record status changed',
           description: 'Helper text for date of update field',
-          id: 'advancedSearch.updatedAt.helperText'
+          id: 'v2.advancedSearch.updatedAt.helperText'
         },
         options: timePeriodOptions
       }
@@ -109,12 +109,12 @@ const defaultSearchFieldGenerator: Record<
         label: {
           defaultMessage: 'Time period',
           description: 'Label for date of update field',
-          id: 'advancedSearch.updatedAt'
+          id: 'v2.advancedSearch.updatedAt'
         },
         helperText: {
           defaultMessage: 'Period of time since the record status changed',
           description: 'Helper text for date of update field',
-          id: 'advancedSearch.updatedAt.helperText'
+          id: 'v2.advancedSearch.updatedAt.helperText'
         }
       }
     }
@@ -125,7 +125,7 @@ const defaultSearchFieldGenerator: Record<
     label: {
       defaultMessage: 'Tracking ID',
       description: 'Label for tracking ID field',
-      id: 'advancedSearch.trackingId'
+      id: 'v2.advancedSearch.trackingId'
     }
   }),
   'event.status': (_) => ({
@@ -134,7 +134,7 @@ const defaultSearchFieldGenerator: Record<
     label: {
       defaultMessage: 'Status of record',
       description: 'Label for status field',
-      id: 'advancedSearch.status'
+      id: 'v2.advancedSearch.status'
     },
     options: statusOptions
   })

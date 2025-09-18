@@ -72,12 +72,12 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
                   label: {
                     defaultMessage: 'ID',
                     description: 'This is the label for the field',
-                    id: 'event.tennis-club-membership.action.print.verify.id.label'
+                    id: 'v2.event.tennis-club-membership.action.print.verify.id.label'
                   },
                   value: {
                     defaultMessage: `National ID | {applicant.id}`,
                     description: 'This is the label for the field',
-                    id: 'event.tennis-club-membership.action.print.verify.id.label'
+                    id: 'v2.event.tennis-club-membership.action.print.verify.id.label'
                   }
                 }
               ]

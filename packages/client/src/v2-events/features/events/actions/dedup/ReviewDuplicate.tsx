@@ -37,73 +37,73 @@ import { DuplicateComparison } from './DuplicateComparison'
 
 export const duplicateMessages = {
   duplicateDeclarationDetails: {
-    id: 'duplicates.content.header',
+    id: 'v2.duplicates.content.header',
     defaultMessage: 'Declaration details',
     description: 'Declaration details header of two duplicate ones'
   },
   duplicateReviewHeader: {
-    id: 'duplicates.review.header',
+    id: 'v2.duplicates.review.header',
     defaultMessage: 'Potential {event} duplicate review',
     description: 'Review page header for duplicates declarations'
   },
   duplicateContentTitle: {
-    id: 'duplicates.content.title',
+    id: 'v2.duplicates.content.title',
     defaultMessage: 'Is {name} ({trackingId}) a duplicate?',
     description: 'Duplicates content title message'
   },
   duplicateContentSubtitle: {
-    id: 'duplicates.content.subtitle',
+    id: 'v2.duplicates.content.subtitle',
     defaultMessage:
       'This record was flagged as a potential duplicate of: {trackingIds}. Please review these by clicking on each tracking ID in the tab section to view a side-by-side comparison below, and confirm if this record is a duplicate.',
     description: 'Duplicates content subtitle message'
   },
   notDuplicateButton: {
-    id: 'duplicates.button.notDuplicate',
+    id: 'v2.duplicates.button.notDuplicate',
     defaultMessage: 'Not a duplicate',
     description: 'Not a duplicate button text'
   },
   markAsDuplicateButton: {
-    id: 'duplicates.button.markAsDuplicate',
+    id: 'v2.duplicates.button.markAsDuplicate',
     defaultMessage: 'Mark as duplicate',
     description: 'Mark as duplicate button text'
   },
   markAsDuplicateConfirmationTitle: {
-    id: 'duplicates.content.markAsDuplicate',
+    id: 'v2.duplicates.content.markAsDuplicate',
     defaultMessage: 'Mark {trackingId} as duplicate?',
     description: 'Mark as duplicate content confirmation title message'
   },
   duplicateDropdownMessage: {
-    id: 'duplicates.content.duplicateDropdownMessage',
+    id: 'v2.duplicates.content.duplicateDropdownMessage',
     defaultMessage: 'Duplicate of',
     description: 'Selecting from the duplicate trackingIds'
   },
   markAsDuplicateReason: {
-    id: 'duplicates.content.markAsDuplicateReason',
+    id: 'v2.duplicates.content.markAsDuplicateReason',
     defaultMessage: 'Please describe your reason',
     description: 'Review page header for duplicates declarations'
   },
   notDuplicateContentConfirmationTitle: {
-    id: 'duplicates.content.notDuplicateConfirmationTitle',
+    id: 'v2.duplicates.content.notDuplicateConfirmationTitle',
     defaultMessage: 'Are you sure {name} ({trackingId}) is not duplicate?',
     description: 'Not a duplicate content confirmation title message'
   },
   duplicateComparePageTitle: {
-    id: 'duplicates.compare.title',
+    id: 'v2.duplicates.compare.title',
     defaultMessage: 'Review {actualTrackingId} against {duplicateTrackingId}',
     description: 'Duplicate compare page title message'
   },
   duplicateComparePageSupportingDocuments: {
-    id: 'duplicates.compare.supportingDocuments',
+    id: 'v2.duplicates.compare.supportingDocuments',
     defaultMessage: 'Supporting documents',
     description: 'Supporting documents header for duplicates comparison'
   },
   registeredAt: {
-    id: 'duplicates.content.registeredAt',
+    id: 'v2.duplicates.content.registeredAt',
     defaultMessage: 'Registered at',
     description: 'Registered at label for duplicates comparison'
   },
   registeredBy: {
-    id: 'duplicates.content.registeredBy',
+    id: 'v2.duplicates.content.registeredBy',
     defaultMessage: 'Registered by',
     description: 'Registered by label for duplicates comparison'
   }

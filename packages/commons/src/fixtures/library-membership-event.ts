@@ -14,7 +14,7 @@ import { FieldType } from '../events/FieldType'
 
 const libraryMembershipForm = defineDeclarationForm({
   label: {
-    id: 'event.library-membership.action.declare.form.label',
+    id: 'v2.event.library-membership.action.declare.form.label',
     defaultMessage: 'Library membership application',
     description: 'This is what this form is referred as in the system'
   },
@@ -22,7 +22,7 @@ const libraryMembershipForm = defineDeclarationForm({
     {
       id: 'member',
       title: {
-        id: 'event.library-membership.action.declare.form.section.who.title',
+        id: 'v2.event.library-membership.action.declare.form.section.who.title',
         defaultMessage: 'Who is applying for the membership?',
         description: 'This is the title of the section'
       },
@@ -35,7 +35,7 @@ const libraryMembershipForm = defineDeclarationForm({
           label: {
             defaultMessage: "Member's first name",
             description: 'This is the label for the field',
-            id: 'event.library-membership.action.declare.form.section.who.field.firstname.label'
+            id: 'v2.event.library-membership.action.declare.form.section.who.field.firstname.label'
           }
         },
         {
@@ -46,7 +46,7 @@ const libraryMembershipForm = defineDeclarationForm({
           label: {
             defaultMessage: "Member's surname",
             description: 'This is the label for the field',
-            id: 'event.library-membership.action.declare.form.section.who.field.surname.label'
+            id: 'v2.event.library-membership.action.declare.form.section.who.field.surname.label'
           }
         }
       ]
@@ -67,7 +67,7 @@ export const libraryMembershipEvent = defineConfig({
   title: {
     defaultMessage: '{member.firstname} {member.surname}',
     description: 'This is the title of the summary',
-    id: 'event.library-membership.title'
+    id: 'v2.event.library-membership.title'
   },
   summary: { fields: [] },
   actions: [],

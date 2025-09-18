@@ -46,17 +46,17 @@ const messagesToDefine = {
   search: {
     defaultMessage: 'Search',
     description: 'Label for search button',
-    id: 'buttons.search'
+    id: 'v2.buttons.search'
   },
   hide: {
     defaultMessage: 'Hide',
     description: 'Label for hide button when accordion is closed',
-    id: 'advancedSearch.accordion.hide'
+    id: 'v2.advancedSearch.accordion.hide'
   },
   show: {
     defaultMessage: 'Show',
     description: 'Label for show button when accordion is closed',
-    id: 'advancedSearch.accordion.show'
+    id: 'v2.advancedSearch.accordion.show'
   }
 }
 

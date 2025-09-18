@@ -13,7 +13,6 @@ import { Nominal } from './nominal'
 import { z } from 'zod'
 
 import { RawScopes, Scope, SCOPES } from './scopes'
-import { UUID } from './uuid'
 export * from './scopes'
 
 export const DEFAULT_ROLES_DEFINITION = [
@@ -182,8 +181,6 @@ export interface ITokenPayload {
   scope: Scope[]
   role: string
   userType: TokenUserType
-  eventId?: UUID
-  actionId?: UUID
 }
 
 /**

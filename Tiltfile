@@ -80,6 +80,7 @@ docker_build("ghcr.io/opencrvs/ocrvs-gateway:local", ".",
 apps = [
     'auth',
     'config',
+    'dashboards',
     'documents',
     'events',
     'metrics',

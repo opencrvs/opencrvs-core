@@ -44,25 +44,25 @@ export const VerificationWizardModal: Story = {
           actions: {
             verify: {
               label: {
-                id: 'buttons.verify',
+                id: 'v2.buttons.verify',
                 defaultMessage: 'Verify',
                 description: 'Verify button label'
               }
             },
             cancel: {
               label: {
-                id: 'buttons.cancel',
+                id: 'v2.buttons.cancel',
                 defaultMessage: 'Cancel',
                 description: 'Cancel button label'
               },
               confirmation: {
                 title: {
-                  id: 'buttons.cancel',
+                  id: 'v2.buttons.cancel',
                   defaultMessage: 'Cancel',
                   description: 'Cancel button title'
                 },
                 body: {
-                  id: 'buttons.cancel',
+                  id: 'v2.buttons.cancel',
                   defaultMessage: 'Are you sure you want to cancel?',
                   description: 'Cancel button body'
                 }

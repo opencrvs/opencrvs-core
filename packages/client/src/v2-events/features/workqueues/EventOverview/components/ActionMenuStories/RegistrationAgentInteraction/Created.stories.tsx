@@ -18,9 +18,7 @@ import {
   createStoriesFromScenarios,
   AssertType,
   Scenario,
-  UserRoles,
-  getMockEvent,
-  createdByOtherUserScenario
+  UserRoles
 } from '../ActionMenu.common'
 
 export default {
@@ -48,17 +46,3 @@ const stories = createStoriesFromScenarios(
 )
 
 export const AssignedToSelf = stories['AssignedToSelf']
-
-// Created by some other user
-const event = getMockEvent([ActionType.CREATE], UserRoles.FIELD_AGENT)
-
-export const CreatedByOtherUser = createdByOtherUserScenario({
-  event,
-  role: UserRoles.LOCAL_REGISTRAR,
-  expected: {
-    ...getHiddenActions(),
-    [ActionType.READ]: AssertType.ENABLED,
-    [ActionType.DECLARE]: AssertType.DISABLED,
-    [ActionType.DELETE]: AssertType.DISABLED
-  }
-})

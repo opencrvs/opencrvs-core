@@ -16,10 +16,6 @@ RUN chmod +x /app/wait
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL=warn
 
-# Increase wait timeout from default 30sec to 90sec
-# https://github.com/ufoscout/docker-compose-wait#additional-configuration-options
-ENV WAIT_TIMEOUT=90
-
 WORKDIR /app/packages/migration
 
 COPY --chown=node:node packages/migration /app/packages/migration

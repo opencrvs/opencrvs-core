@@ -20,12 +20,12 @@ export const messages = defineMessages({
   back: {
     defaultMessage: 'Back',
     description: 'Back button text',
-    id: 'buttons.back'
+    id: 'v2.buttons.back'
   },
   backToReview: {
     defaultMessage: 'Back to review',
     description: 'Back to review button text',
-    id: 'buttons.backToReview'
+    id: 'v2.buttons.backToReview'
   }
 })
 

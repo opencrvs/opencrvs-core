@@ -30,38 +30,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check_skip_e2e_label:
-    runs-on: ubuntu-24.04
-    outputs:
-      skip_e2e: ${{ steps.set_skip_flag.outputs.SKIP_E2E }}
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Check for skip-e2e label
-        id: set_skip_flag
-        run: |
-          SKIP=false
-          mapfile -t LABELS < <(jq -r '.pull_request.labels // [] | .[].name' $GITHUB_EVENT_PATH)
-
-              echo "All labels on this PR:"
-              for label in "${LABELS[@]}"; do
-                echo "- $label"
-                if [[ "$label" == "Skip e2e" ]]; then
-                  SKIP=true
-                fi
-              done
-
-          echo "SKIP_E2E=$SKIP" >> $GITHUB_OUTPUT
-
-          if [ "$SKIP" == "true" ]; then
-            echo "skip-e2e label detected — skipping e2e"
-          fi
-
-          echo "SKIP_E2E=$SKIP" >> $GITHUB_OUTPUT
-
   generate_stack_name_and_branch:
-    needs: check_skip_e2e_label
-    if: ${{ needs.check_skip_e2e_label.outputs.skip_e2e != 'true' }}
     runs-on: ubuntu-24.04
     outputs:
       branch_name: ${{ steps.set_branch_and_pr_number.outputs.BRANCH_NAME }}
@@ -185,9 +154,9 @@ jobs:
     secrets: inherit
 
   trigger-e2e:
+    if: always()
     runs-on: ubuntu-24.04
-    needs: [check_skip_e2e_label, generate_stack_name_and_branch, trigger-build]
-    if: ${{ needs.check_skip_e2e_label.outputs.skip_e2e != 'true' }}
+    needs: [generate_stack_name_and_branch, trigger-build]
     outputs:
       run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
       deployment_link: ${{ steps.print-links.outputs.deployment_link }}

@@ -61,11 +61,7 @@ const StrictMatcher = Matcher.extend({
   type: z.literal('strict'),
   options: z
     .object({
-      boost: z.number().optional().default(1),
-      /**
-       * The constant value to be present in the field for both records
-       */
-      value: z.string().optional()
+      boost: z.number().optional().default(1)
     })
     .optional()
     .default({
@@ -92,16 +88,6 @@ export type DateRangeMatcherOptions = z.input<
   typeof DateRangeMatcher
 >['options']
 
-export type NotInput = {
-  type: 'not'
-  clause: ClauseInput
-}
-
-export type NotOutput = {
-  type: 'not'
-  clause: ClauseOutput
-}
-
 export type AndInput = {
   type: 'and'
   clauses: ClauseInput[]
@@ -122,12 +108,6 @@ export type OrOutput = {
   clauses: ClauseOutput[]
 }
 
-const Not = z.object({
-  type: z.literal('not'),
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  clause: z.lazy(() => Clause)
-})
-
 const And = z.object({
   type: z.literal('and'),
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -141,7 +121,6 @@ const Or = z.object({
 })
 
 export type ClauseInput =
-  | NotInput
   | AndInput
   | OrInput
   | z.input<typeof FuzzyMatcher>
@@ -149,7 +128,6 @@ export type ClauseInput =
   | z.input<typeof DateRangeMatcher>
 
 export type ClauseOutput =
-  | NotOutput
   | AndOutput
   | OrOutput
   | z.output<typeof FuzzyMatcher>
@@ -167,7 +145,6 @@ export type ClauseOutput =
 export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> = z
   .lazy(() =>
     z.discriminatedUnion('type', [
-      Not,
       And,
       Or,
       FuzzyMatcher,

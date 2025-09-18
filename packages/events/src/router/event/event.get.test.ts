@@ -9,14 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { TRPCError } from '@trpc/server'
-import {
-  ACTION_SCOPE_MAP,
-  ActionType,
-  generateUuid,
-  getUUID,
-  RecordScopeType,
-  TENNIS_CLUB_MEMBERSHIP
-} from '@opencrvs/commons'
+import { ActionType, generateUuid, getUUID } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 vi.mock('@events/service/indexing/indexing')
@@ -30,68 +23,27 @@ test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [])
 
-  const id = generateUuid()
-  await expect(client.event.get(id)).rejects.toMatchObject(
-    new TRPCError({
-      code: 'NOT_FOUND',
-      message: `Event not found with ID: ${id}`
-    })
+  await expect(client.event.get(generateUuid())).rejects.toMatchObject(
+    new TRPCError({ code: 'FORBIDDEN' })
   )
 })
 
-test('prevents access if required scope does not have correct event type configured', async () => {
+test('allows access if required scope does not have correct event type configured', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [
-    `record.declare[event=${TENNIS_CLUB_MEMBERSHIP}]`,
+    'record.declare[event=tennis-club-membership]',
     'record.read[event=birth]'
   ])
 
   await expect(client.event.get(generateUuid())).rejects.toMatchSnapshot()
 })
 
-test('allows access without required scope when user created the event', async () => {
+test('allows access with required scope', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`
-  ])
-
-  const readScopes = ACTION_SCOPE_MAP[ActionType.READ]
-  // Previously we failed to notice that more scopes were added to the read action, making some of the tests unhelpful.
-  // Make sure at least the create scope is not present for test to make sense.
-  expect(readScopes).not.toContain(RecordScopeType.enum['record.create'])
+  const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
   await expect(client.event.get(event.id)).resolves.not.toThrow()
-})
-
-test('prevents access without required scope when user did not create the event', async () => {
-  const { generator, users } = await setupTestCase()
-  const myClient = createTestClient(users[0], [
-    `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`
-  ])
-
-  const anotherClient = createTestClient(users[1])
-
-  const event = await anotherClient.event.create(generator.event.create())
-  await expect(myClient.event.get(event.id)).rejects.toMatchObject(
-    new TRPCError({
-      code: 'NOT_FOUND',
-      message: `Event not found with ID: ${event.id}`
-    })
-  )
-})
-
-test('allows access with required scope when user did not create the event', async () => {
-  const { generator, users } = await setupTestCase()
-  const myClient = createTestClient(users[0])
-
-  const event = await myClient.event.create(generator.event.create())
-
-  const anotherClient = createTestClient(users[1], [
-    `record.read[event=${TENNIS_CLUB_MEMBERSHIP}]`
-  ])
-
-  await expect(anotherClient.event.get(event.id)).resolves.not.toThrow()
 })
 
 test(`Returns 404 when not found`, async () => {

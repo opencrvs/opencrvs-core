@@ -29,7 +29,7 @@ const messages = defineMessages({
   retryButtonLabel: {
     defaultMessage: 'Retry',
     description: 'Label for retry button for outbox',
-    id: 'event.action.outbox-retry.label'
+    id: 'v2.event.action.outbox-retry.label'
   }
 })
 

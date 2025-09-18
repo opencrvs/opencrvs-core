@@ -464,7 +464,7 @@ export const mockOfflineData = {
       {
         id: 'province',
         label: {
-          id: 'field.address.province.label',
+          id: 'v2.field.address.province.label',
           defaultMessage: 'Province',
           description: 'Label for province in address'
         }
@@ -472,7 +472,7 @@ export const mockOfflineData = {
       {
         id: 'district',
         label: {
-          id: 'field.address.district.label',
+          id: 'v2.field.address.district.label',
           defaultMessage: 'District',
           description: 'Label for district in address'
         }

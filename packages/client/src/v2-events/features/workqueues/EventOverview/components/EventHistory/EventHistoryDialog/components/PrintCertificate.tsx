@@ -28,7 +28,7 @@ import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/fea
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
 const verifiedMessage = {
-  id: 'verified',
+  id: 'v2.verified',
   defaultMessage: 'Verified',
   description: 'This is the label for the verification field'
 }
@@ -68,33 +68,30 @@ export function PrintCertificate({
     const fields = page.fields
       .filter((f) => isFieldVisible(f, annotation))
       .map((field) => {
-        const valueDisplay = (
-          <Output
-            field={field}
-            showPreviouslyMissingValuesAsChanged={false}
-            value={annotation[field.id]}
-          />
-        )
+        const valueDisplay = Output({
+          field,
+          value: annotation[field.id],
+          showPreviouslyMissingValuesAsChanged: false
+        })
 
         return {
           label: intl.formatMessage(field.label),
           value: valueDisplay
         }
       })
+      .filter((f) => f.value)
 
     if (page.type === PageTypes.enum.VERIFICATION) {
-      const value = (
-        <Output
-          field={{
-            id: page.id,
-            label: page.title,
-            type: FieldType.CHECKBOX,
-            defaultValue: false
-          }}
-          showPreviouslyMissingValuesAsChanged={false}
-          value={annotation[page.id]}
-        />
-      )
+      const value = Output({
+        field: {
+          id: page.id,
+          label: page.title,
+          type: FieldType.CHECKBOX,
+          defaultValue: false
+        },
+        value: annotation[page.id],
+        showPreviouslyMissingValuesAsChanged: false
+      })
 
       return [{ label: intl.formatMessage(verifiedMessage), value }, ...fields]
     }

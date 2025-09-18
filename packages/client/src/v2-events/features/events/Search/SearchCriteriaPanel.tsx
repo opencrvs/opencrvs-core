@@ -21,6 +21,7 @@ import {
   FieldConfig
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
+import { constantsMessages } from '@client/v2-events/messages'
 import { filterEmptyValues } from '@client/v2-events/utils'
 import { ValueOutput } from '@client/v2-events/features/events/components/Output'
 import { getSearchParamsFieldConfigs, serializeSearchParams } from './utils'
@@ -29,12 +30,7 @@ const messagesToDefine = {
   edit: {
     defaultMessage: 'Edit',
     description: 'Edit button text',
-    id: 'buttons.edit'
-  },
-  event: {
-    defaultMessage: 'Event',
-    description: 'Label for Event of event in work queue list item',
-    id: 'constants.event'
+    id: 'v2.buttons.edit'
   }
 }
 
@@ -117,8 +113,8 @@ export function SearchCriteriaPanel({
     <>
       <SearchParamContainer>
         <Pill
-          key={messagesToDefine.event.id}
-          label={`${intl.formatMessage(messagesToDefine.event)}: ${convertPathToLabel(eventConfig.id)}`}
+          key={constantsMessages.event.id}
+          label={`${intl.formatMessage(constantsMessages.event)}: ${convertPathToLabel(eventConfig.id)}`}
           size="small"
           type="default"
         ></Pill>

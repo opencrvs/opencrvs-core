@@ -16,7 +16,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Any status',
       description: 'Option for form field: status of record',
-      id: 'advancedSearch.form.recordStatusAny'
+      id: 'v2.advancedSearch.form.recordStatusAny'
     }
   },
   {
@@ -24,7 +24,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Notified',
       description: 'Option for form field: status of record',
-      id: 'advancedSearch.form.recordStatusNotified'
+      id: 'v2.advancedSearch.form.recordStatusNotified'
     }
   },
   {
@@ -32,7 +32,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Declared',
       description: 'Option for form field: status of record',
-      id: 'advancedSearch.form.recordStatusDeclared'
+      id: 'v2.advancedSearch.form.recordStatusDeclared'
     }
   },
   {
@@ -40,7 +40,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Validated',
       description: 'Option for form field: status of record',
-      id: 'advancedSearch.form.recordStatusValidated'
+      id: 'v2.advancedSearch.form.recordStatusValidated'
     }
   },
   {
@@ -48,7 +48,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Registered',
       description: 'Option for form field: status of record',
-      id: 'advancedSearch.form.recordStatusRegistered'
+      id: 'v2.advancedSearch.form.recordStatusRegistered'
     }
   },
   {
@@ -56,7 +56,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Archived',
       description: 'Option for form field: status of record',
-      id: 'advancedSearch.form.recordStatusArchived'
+      id: 'v2.advancedSearch.form.recordStatusArchived'
     }
   }
 ]

@@ -237,7 +237,7 @@ export const RedirectAfterPrint: Story = {
             [CERT_TEMPLATE_ID]: 'tennis-club-membership-certified-certificate',
             'collector.requesterId': 'INFORMANT',
             'collector.identity.verify': true,
-            templateId: 'tennis-club-membership-certified-certificate'
+            templateId: 'v2.tennis-club-membership-certified-certificate'
           }
         })
       ]

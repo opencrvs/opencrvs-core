@@ -86,6 +86,9 @@ test('declared event can not be deleted', async () => {
 })
 
 describe('check unreferenced draft attachments are deleted while final action submission', () => {
+  const deleteUnreferencedDraftAttachmentsMock = vi.fn()
+  const fileExistMock = vi.fn()
+
   function mockListener({
     request
   }: {
@@ -95,6 +98,14 @@ describe('check unreferenced draft attachments are deleted while final action su
   }) {
     if (!request.url.startsWith(`${env.DOCUMENTS_URL}/files`)) {
       return
+    }
+
+    if (request.method === 'DELETE') {
+      deleteUnreferencedDraftAttachmentsMock(request.url, request.body)
+    }
+
+    if (request.method === 'HEAD') {
+      fileExistMock(request.url, request.body)
     }
   }
   beforeEach(() => {
@@ -145,6 +156,12 @@ describe('check unreferenced draft attachments are deleted while final action su
 
     // declaring final action submission
     await client.event.actions.declare.request(getDeclaration(6))
+
+    // file attachment exist api should be called once, only for (status: "Requested")
+    expect(fileExistMock.mock.calls).toHaveLength(1)
+
+    // total 4 unreferenced draft attachments should be deleted
+    expect(deleteUnreferencedDraftAttachmentsMock.mock.calls).toHaveLength(5)
 
     const updatedEvent = await client.event.get(event.id)
 

@@ -21,8 +21,7 @@ import {
   EventStatus,
   getActionReview,
   getCurrentEventState,
-  getDeclaration,
-  InherentFlags
+  getDeclaration
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -216,8 +215,7 @@ export function Review() {
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleDeclaration}
           onReject={
-            currentEventState.status === EventStatus.enum.NOTIFIED &&
-            !currentEventState.flags.includes(InherentFlags.REJECTED)
+            currentEventState.status === EventStatus.enum.NOTIFIED
               ? handleRejection
               : undefined
           }

@@ -34,7 +34,7 @@ export const footballClubMembershipEvent = defineConfig({
   title: {
     defaultMessage: '{applicant.name.firstname} {applicant.name.surname}',
     description: 'This is the title of the summary',
-    id: 'event.football-club-membership.title'
+    id: 'v2.event.football-club-membership.title'
   },
   summary: {
     fields: [
@@ -61,7 +61,7 @@ export const footballClubMembershipEvent = defineConfig({
         label: {
           defaultMessage: "Applicant's last name",
           description: 'Label for surname',
-          id: 'event.football-club-membership.summary.field.surname.label'
+          id: 'v2.event.football-club-membership.summary.field.surname.label'
         }
       },
       {
@@ -73,7 +73,7 @@ export const footballClubMembershipEvent = defineConfig({
     {
       type: ActionType.READ,
       label: {
-        id: 'event.football-club-membership.action.read.label',
+        id: 'v2.event.football-club-membership.action.read.label',
         defaultMessage: 'Read',
         description: 'Title of the read only page'
       },
@@ -148,7 +148,7 @@ export const footballClubMembershipEvent = defineConfig({
                 id: 'correction.requester.relationship',
                 type: 'RADIO_GROUP',
                 label: {
-                  id: 'correction.corrector.title',
+                  id: 'v2.correction.corrector.title',
                   defaultMessage: 'Who is requesting a change to this record?',
                   description: 'The title for the corrector form'
                 },
@@ -157,7 +157,7 @@ export const footballClubMembershipEvent = defineConfig({
                   {
                     value: 'INFORMANT',
                     label: {
-                      id: 'informant.name',
+                      id: 'v2.correction.corrector.informant',
                       defaultMessage: 'Informant',
                       description:
                         'Label for informant option in certificate correction form'
@@ -166,7 +166,7 @@ export const footballClubMembershipEvent = defineConfig({
                   {
                     value: 'ANOTHER_AGENT',
                     label: {
-                      id: 'correction.corrector.anotherAgent',
+                      id: 'v2.correction.corrector.anotherAgent',
                       defaultMessage:
                         'Another registration agent or field agent',
                       description:
@@ -176,7 +176,7 @@ export const footballClubMembershipEvent = defineConfig({
                   {
                     value: 'REGISTRAR',
                     label: {
-                      id: 'correction.corrector.me',
+                      id: 'v2.correction.corrector.me',
                       defaultMessage: 'Me (Registrar)',
                       description:
                         'Label for registrar option in certificate correction form'
@@ -185,7 +185,7 @@ export const footballClubMembershipEvent = defineConfig({
                   {
                     value: 'OTHER',
                     label: {
-                      id: 'correction.corrector.others',
+                      id: 'v2.correction.corrector.others',
                       defaultMessage: 'Someone else',
                       description:
                         'Label for someone else option in certificate correction form'
@@ -337,7 +337,7 @@ export const footballClubMembershipEvent = defineConfig({
     {
       type: ActionType.PRINT_CERTIFICATE,
       label: {
-        id: 'event.football-club-membership.action.collect-certificate.label',
+        id: 'v2.event.football-club-membership.action.collect-certificate.label',
         defaultMessage: 'Print certificate',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
@@ -386,7 +386,7 @@ export const footballClubMembershipEvent = defineConfig({
     {
       type: ActionType.ARCHIVE,
       label: {
-        id: 'event.football-club-membership.action.archive.label',
+        id: 'v2.event.football-club-membership.action.archive.label',
         defaultMessage: 'Archive',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
@@ -395,7 +395,7 @@ export const footballClubMembershipEvent = defineConfig({
     {
       type: ActionType.REJECT,
       label: {
-        id: 'event.football-club-membership.action.reject.label',
+        id: 'v2.event.football-club-membership.action.reject.label',
         defaultMessage: 'Reject',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
@@ -407,7 +407,7 @@ export const footballClubMembershipEvent = defineConfig({
       title: {
         defaultMessage: 'Registration details',
         description: 'The title of Registration details accordion',
-        id: 'advancedSearch.form.registrationDetails'
+        id: 'v2.advancedSearch.form.registrationDetails'
       },
       fields: [
         event('legalStatuses.REGISTERED.createdAtLocation').exact(),
@@ -420,7 +420,7 @@ export const footballClubMembershipEvent = defineConfig({
       title: {
         defaultMessage: "Applicant's details",
         description: 'Applicant details search field section title',
-        id: 'event.football-club-membership.search.applicants'
+        id: 'v2.event.football-club-membership.search.applicants'
       },
       fields: [
         field('applicant.name').fuzzy(),
@@ -432,7 +432,7 @@ export const footballClubMembershipEvent = defineConfig({
       title: {
         defaultMessage: "Recommender's details",
         description: 'Recommender details search field section title',
-        id: 'event.football-club-membership.search.recommender'
+        id: 'v2.event.football-club-membership.search.recommender'
       },
       fields: [field('recommender.name').fuzzy()]
     }

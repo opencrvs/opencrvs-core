@@ -106,13 +106,8 @@ function stringify(
     : intl.formatMessage(option.label)
 }
 
-function isRadioGroupEmpty(value: Stringifiable) {
-  return !value.toString()
-}
-
 export const RadioGroup = {
   Input: RadioGroupInput,
   Output: RadioGroupOutput,
-  isEmptyValue: isRadioGroupEmpty,
   stringify
 }

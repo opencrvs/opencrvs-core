@@ -84,5 +84,6 @@ exports[`getAvailableActions should return the correct actions for "VALIDATED" s
   "READ",
   "VALIDATE",
   "ARCHIVE",
+  "REJECT",
 ]
 `;

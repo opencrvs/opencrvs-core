@@ -220,11 +220,6 @@ const messagesToDefine = {
     defaultMessage: 'Import',
     description: 'Label for import type system'
   },
-  importExport: {
-    id: 'integrations.type.importExport',
-    defaultMessage: 'Import/Export',
-    description: 'Label for import/export type system'
-  },
   healthSystem: {
     id: 'integrations.type.healthSystem',
     defaultMessage: 'Health integration',

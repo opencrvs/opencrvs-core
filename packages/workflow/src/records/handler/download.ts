@@ -17,7 +17,7 @@ import * as z from 'zod'
 import { validateRequest } from '@workflow/utils/index'
 import { getValidRecordById } from '@workflow/records/index'
 import { getToken } from '@workflow/utils/auth-utils'
-import { getTokenPayload, logger, SCOPES } from '@opencrvs/commons'
+import { getTokenPayload, logger } from '@opencrvs/commons'
 import { toDownloaded } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundleToRoute } from '@workflow/records/search'
@@ -38,14 +38,8 @@ export async function downloadRecordHandler(
 
   const token = getToken(request)
   const tokenPayload = getTokenPayload(token)
-
   // Task history is fetched rather than the task only
   const record = await getValidRecordById(payload.id, token, true)
-
-  // For system users, skip assignment operations and return record as-is
-  if (tokenPayload.scope.includes(SCOPES.RECORD_EXPORT)) {
-    return record
-  }
 
   const task = getTaskFromSavedBundle(record)
   const businessStatus = getStatusFromTask(task)

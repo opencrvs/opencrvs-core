@@ -66,10 +66,3 @@ export const compositeFieldTypes = [
   FieldType.FILE_WITH_OPTIONS,
   FieldType.FILE
 ]
-
-export const FieldTypesToHideInReview = [
-  FieldType.BULLET_LIST,
-  FieldType.DIVIDER,
-  FieldType.PAGE_HEADER,
-  FieldType.PARAGRAPH
-]

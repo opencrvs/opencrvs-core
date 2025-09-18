@@ -256,7 +256,6 @@ export function FormSectionComponent({
       fieldErrors: AllProps['errors']
     ) => {
       // this can be any field. Even though we call this only when parent triggers the change.
-
       const childFieldOcrvsId = makeFormikFieldIdOpenCRVSCompatible(
         childField.id
       )

@@ -9,24 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import {
-  defineMessages,
-  injectIntl,
-  WrappedComponentProps as IntlShapeProps
-} from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from 'styled-components'
 import { ConnectionError } from '@opencrvs/components/lib/icons'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { errorMessages } from '@client/v2-events/messages'
+import { errorMessages, constantsMessages } from '@client/v2-events/messages'
 import { useOnlineStatus } from '@client/utils'
-
-const messages = defineMessages({
-  noConnection: {
-    defaultMessage: 'No connection',
-    description: 'No Connection hover text',
-    id: 'constants.noConnection'
-  }
-})
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -109,7 +97,7 @@ function LoadingIndicatorComp({
           <ConnectivityContainer>
             <NoConnectivity />
             <Text id="wait-connection-text">
-              {intl.formatMessage(messages.noConnection)}
+              {intl.formatMessage(constantsMessages.noConnection)}
             </Text>
           </ConnectivityContainer>
         )}

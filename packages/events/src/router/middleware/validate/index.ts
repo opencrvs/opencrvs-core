@@ -121,6 +121,7 @@ function validateDeclarationUpdateAction({
   event: EventDocument
   actionType: DeclarationUpdateActionType
   declarationUpdate: ActionUpdate
+  // @TODO: annotation is always specific to action. Is there ever a need for null?
   annotation?: ActionUpdate
   context: { locations: Array<Location> }
 }) {

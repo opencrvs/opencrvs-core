@@ -9,6 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import superjson from 'superjson'
+import { AppRouter } from '@events/router'
 import { userEvent, within, expect } from '@storybook/test'
 import {
   ActionType,
@@ -33,6 +36,14 @@ const meta: Meta<typeof ReviewDuplicateIndex> = {
 export default meta
 
 type Story = StoryObj<typeof ReviewDuplicateIndex>
+const tRPCMsw = createTRPCMsw<AppRouter>({
+  links: [
+    httpLink({
+      url: '/api/events'
+    })
+  ],
+  transformer: { input: superjson, output: superjson }
+})
 
 const prng = createPrng(123123)
 const duplicates = [
@@ -116,10 +127,11 @@ const actions = [
           zipCode: '123456'
         },
         'recommender.none': true
-      },
-      annotation: {
-        'review.comment': 'asdasdasdasdasdasd'
       }
+    },
+
+    annotation: {
+      'review.comment': 'asdasdasdasdasdasd'
     }
   }),
   generateActionDocument({

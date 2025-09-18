@@ -11,7 +11,7 @@
 import * as oauthResponse from './responses'
 import * as Hapi from '@hapi/hapi'
 import {
-  createTokenForActionConfirmation,
+  createTokenForRecordValidation,
   verifyToken
 } from '@auth/features/authenticate/service'
 import { pipe } from 'fp-ts/lib/function'
@@ -34,28 +34,10 @@ export async function tokenExchangeHandler(
   const subjectToken = request.query.subject_token
   const subjectTokenType = request.query.subject_token_type
   const requestedTokenType = request.query.requested_token_type
-  /**
-   * @deprecated
-   * @TODO record_id is only needed for V1 (pre-1.9) - remove when we drop support for that version
-   */
   const recordId = request.query.record_id
-  const eventId = request.query.event_id
-  const actionId = request.query.action_id
-
-  const hasEventIdAndActionId = eventId && actionId
-  const hasRecordId = recordId
-
-  if (hasEventIdAndActionId && hasRecordId) {
-    // both ways of identifying the record provided - ambiguous request
-    return oauthResponse.invalidRequest(h)
-  }
-
-  if (!hasEventIdAndActionId && !hasRecordId) {
-    // neither way of identifying the record provided - invalid request
-    return oauthResponse.invalidRequest(h)
-  }
 
   if (
+    !recordId ||
     !subjectToken ||
     subjectTokenType !== SUBJECT_TOKEN_TYPE ||
     requestedTokenType !== RECORD_TOKEN_TYPE
@@ -70,9 +52,9 @@ export async function tokenExchangeHandler(
   const { sub } = decodedOrError.right
 
   // @TODO: If in the future we have a fine grained access control for records, check here that the subject actually has access to the record requested
-  const recordToken = await createTokenForActionConfirmation(
-    { eventId, actionId, recordId },
-    sub as UUID
+  const recordToken = await createTokenForRecordValidation(
+    sub as UUID,
+    recordId
   )
 
   return oauthResponse.success(h, recordToken)

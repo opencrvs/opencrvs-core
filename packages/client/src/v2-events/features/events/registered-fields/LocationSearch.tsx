@@ -13,17 +13,12 @@ import { useSelector } from 'react-redux'
 import { IntlShape, useIntl } from 'react-intl'
 import { Location } from '@events/service/locations/locations'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
-import {
-  FieldPropsWithoutReferenceValue,
-  joinValues
-} from '@opencrvs/commons/client'
+import { FieldPropsWithoutReferenceValue } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { getListOfLocations } from '@client/utils/validate'
 import { generateLocations } from '@client/utils/locationUtils'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { AdminStructureItem } from '@client/utils/referenceApi'
-import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 
 interface SearchLocation {
   id: string
@@ -96,73 +91,57 @@ function toCertificateVariables(
   context: {
     intl: IntlShape
     locations: Location[]
-    adminLevels?: AdminStructureItem[]
   }
 ) {
-  const { intl, locations, adminLevels = [] } = context
-  const appConfigAdminLevels = adminLevels.map((level) => level.id)
-
   if (!value) {
     return {
       name: '',
-      ...Object.fromEntries(adminLevels.map((level) => [level, ''])),
+      district: '',
+      province: '',
       country: ''
     }
   }
 
-  const country = intl.formatMessage({
+  const country = context.intl.formatMessage({
     id: `countries.${window.config.COUNTRY}`,
     defaultMessage: 'Farajaland',
     description: 'Country name'
   })
 
   const locationId = value.toString()
-  const location = locations.find((loc) => loc.id === locationId)
+  const location = context.locations.find((loc) => loc.id === locationId)
 
-  const adminLevelHierarchy = getAdminLevelHierarchy(
-    locationId,
-    locations,
-    appConfigAdminLevels,
-    'withNames'
+  const district = context.locations.find(
+    (loc) => loc.id === location?.parentId
+  )
+  const province = context.locations.find(
+    (loc) => loc.id === district?.parentId
   )
 
   return {
     name: location?.name || '',
-    ...adminLevelHierarchy,
-    country
+    district: district?.name || '',
+    province: province?.name || '',
+    country: country
   }
 }
 
 function LocationSearchOutput({ value }: { value: Stringifiable }) {
   const intl = useIntl()
   const { getLocations } = useLocations()
-  const { config } = useSelector(getOfflineData)
   const [locations] = getLocations.useSuspenseQuery()
-  const adminLevels = config.ADMIN_STRUCTURE
-
-  const certificateVars = toCertificateVariables(value, {
+  const { name, district, province, country } = toCertificateVariables(value, {
     intl,
-    locations,
-    adminLevels
+    locations
   })
 
-  const { name, country } = certificateVars
-
-  const resolvedAdminLevels = adminLevels
-    .map((level) => certificateVars[level.id])
-    .filter(Boolean)
-    .reverse()
-
-  return joinValues([name, ...resolvedAdminLevels, country], ', ')
-}
-
-function isLocationEmpty(value: Stringifiable) {
-  return !value.toString()
+  return [name, district, province, country]
+    .filter((loc) => loc !== '')
+    .join(', ')
 }
 
 export const LocationSearch = {
   Input: LocationSearchInput,
   Output: LocationSearchOutput,
-  toCertificateVariables: toCertificateVariables,
-  isEmptyValue: isLocationEmpty
+  toCertificateVariables: toCertificateVariables
 }

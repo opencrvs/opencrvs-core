@@ -13,7 +13,6 @@ import {
   ConfigurableScopeType,
   findScope,
   getAuthorizedEventsFromScopes,
-  RecordScopeType,
   Scope
 } from '../scopes'
 import {
@@ -21,7 +20,6 @@ import {
   ActionType,
   DisplayableAction
 } from './ActionType'
-import { EventIndex } from './EventIndex'
 
 type AlwaysAllowed = null
 
@@ -55,7 +53,7 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.ASSIGN]: null,
   [ActionType.UNASSIGN]: null,
   [ActionType.DUPLICATE_DETECTED]: []
-} satisfies Record<DisplayableAction, RecordScopeType[] | AlwaysAllowed>
+} satisfies Record<DisplayableAction, ConfigurableScopeType[] | AlwaysAllowed>
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
@@ -110,31 +108,4 @@ export function isActionInScope(
     allowedConfigurableScopes,
     eventType
   )
-}
-
-/**
- * A shared utility to check if the user can read a record.
- * This will be removed in 1.10 and implemented by scopes.
- *
- * In order for us to limit the usage of 'record.read' scope, we allow users to view records they have created on system-level.
- *
- * @deprecated - Will be removed in 1.10
- */
-export function canUserReadEvent(
-  event: EventIndex | { createdBy: string; type: string },
-  {
-    userId,
-    scopes
-  }: {
-    userId: string
-    scopes: string[]
-  }
-) {
-  const createdByUser = event.createdBy === userId
-
-  if (createdByUser) {
-    return true
-  }
-
-  return isActionInScope(scopes, ActionType.READ, event.type)
 }

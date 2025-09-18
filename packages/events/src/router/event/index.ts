@@ -11,6 +11,7 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { TRPCError } from '@trpc/server/unstable-core-do-not-import'
 import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -27,8 +28,7 @@ import {
   UnassignActionInput,
   ACTION_SCOPE_MAP,
   MarkAsDuplicateActionInput,
-  MarkNotDuplicateActionInput,
-  ActionDocument
+  MarkNotDuplicateActionInput
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { EventIdParam } from '@events/router/middleware'
@@ -43,6 +43,7 @@ import { unassignRecord } from '@events/service/events/actions/unassign'
 import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
 import {
   processAction,
+  deleteUnreferencedFilesFromPreviousDrafts,
   createEvent,
   deleteEvent,
   getEventById,
@@ -54,7 +55,6 @@ import { findRecordsByQuery } from '@events/service/indexing/indexing'
 import { reindex } from '@events/service/events/reindex'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
-import { cleanupUnreferencedFiles } from '@events/service/files'
 import { UserContext } from '../../context'
 import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
@@ -124,16 +124,19 @@ export const eventRouter = router({
       })
     }),
   get: publicProcedure
+    .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.READ]))
     .input(UUID)
-    .use(middleware.userCanReadEvent)
-    .query(async ({ ctx }) => {
-      const event = ctx.event
+    .query(async ({ input, ctx }) => {
+      const event = await getEventById(input)
+
+      if (!ctx.authorizedEntities?.events?.includes(event.type)) {
+        throw new TRPCError({ code: 'FORBIDDEN' })
+      }
 
       const configuration = await getEventConfigurationById({
         token: ctx.token,
         eventType: event.type
       })
-
       const updatedEvent = await processAction(
         {
           type: ActionType.READ,
@@ -210,17 +213,19 @@ export const eventRouter = router({
         })
 
         const event = await getEventById(eventId)
-
-        const actionFromDraft = ActionDocument.safeParse({
-          ...currentDraft.action,
-          id: currentDraft.id
+        const configuration = await getEventConfigurationById({
+          token: ctx.token,
+          eventType: event.type
         })
 
-        if (actionFromDraft.success) {
-          event.actions.push(actionFromDraft.data)
+        if (previousDraft) {
+          await deleteUnreferencedFilesFromPreviousDrafts(ctx.token, {
+            event,
+            configuration,
+            currentDraft,
+            previousDraft
+          })
         }
-
-        await cleanupUnreferencedFiles(event, ctx.token)
 
         return currentDraft
       })

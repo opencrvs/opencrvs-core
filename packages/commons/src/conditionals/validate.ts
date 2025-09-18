@@ -266,7 +266,7 @@ export function isFieldDisplayedOnReview(
 
 export const errorMessages = {
   hiddenField: {
-    id: 'error.hidden',
+    id: 'v2.error.hidden',
     defaultMessage: 'Hidden or disabled field should not receive a value',
     description:
       'Error message when field is hidden or disabled, but a value was received'
@@ -274,32 +274,32 @@ export const errorMessages = {
   invalidDate: {
     defaultMessage: 'Invalid date field',
     description: 'Error message when date field is invalid',
-    id: 'error.invalidDate'
+    id: 'v2.error.invalidDate'
   },
   invalidEmail: {
     defaultMessage: 'Invalid email address',
     description: 'Error message when email address is invalid',
-    id: 'error.invalidEmail'
+    id: 'v2.error.invalidEmail'
   },
   requiredField: {
     defaultMessage: 'Required',
     description: 'Error message when required field is missing',
-    id: 'error.required'
+    id: 'v2.error.required'
   },
   invalidInput: {
     defaultMessage: 'Invalid input',
     description: 'Error message when generic field is invalid',
-    id: 'error.invalid'
+    id: 'v2.error.invalid'
   },
   unexpectedField: {
     defaultMessage: 'Unexpected field',
     description: 'Error message when field is not expected',
-    id: 'error.unexpectedField'
+    id: 'v2.error.unexpectedField'
   },
   correctionNotAllowed: {
     defaultMessage: 'Correction not allowed for field',
     description: 'Error message when correction is not allowed for field',
-    id: 'error.correctionNotAllowed'
+    id: 'v2.error.correctionNotAllowed'
   }
 }
 
@@ -355,7 +355,8 @@ function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
       for (const { issues } of issue.unionErrors) {
         for (const e of issues) {
           if (
-            zodToIntlErrorMap(e, _ctx).message.message.id !== 'error.required'
+            zodToIntlErrorMap(e, _ctx).message.message.id !==
+            'v2.error.required'
           ) {
             return createIntlError(errorMessages.invalidInput)
           }

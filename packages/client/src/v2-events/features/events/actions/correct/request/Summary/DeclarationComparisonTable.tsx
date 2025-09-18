@@ -100,25 +100,21 @@ export function DeclarationComparisonTableComponent({
             hasFieldChanged(f, latestDeclaration, previousDeclaration)
           )
           .map((f) => {
-            const previous = (
-              <Output
-                displayEmptyAsDash
-                field={f}
-                formConfig={declarationConfig}
-                previousForm={previousDeclaration}
-                showPreviouslyMissingValuesAsChanged={false}
-                value={previousDeclaration[f.id]}
-              />
-            )
+            const previous = Output({
+              field: f,
+              value: previousDeclaration[f.id],
+              showPreviouslyMissingValuesAsChanged: false,
+              previousForm: previousDeclaration,
+              formConfig: declarationConfig,
+              displayEmptyAsDash: true
+            })
 
-            const latest = (
-              <Output
-                displayEmptyAsDash
-                field={f}
-                showPreviouslyMissingValuesAsChanged={false}
-                value={latestDeclaration[f.id]}
-              />
-            )
+            const latest = Output({
+              field: f,
+              value: latestDeclaration[f.id],
+              showPreviouslyMissingValuesAsChanged: false,
+              displayEmptyAsDash: true
+            })
 
             return {
               fieldLabel: intl.formatMessage(f.label),

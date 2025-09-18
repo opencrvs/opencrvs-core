@@ -92,7 +92,7 @@ export const SearchResultIndex = () => {
       }
       title={intl.formatMessage(
         {
-          id: 'search.advancedSearch.result.title',
+          id: 'v2.search.advancedSearch.result.title',
           description: 'Advanced search result title',
           defaultMessage: 'Search results ({count})'
         },
