@@ -43,7 +43,8 @@ import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import {
   getOnlyVisibleFormValues,
   isConditionMet,
-  isFieldVisible
+  isFieldVisible,
+  UserContext
 } from '../conditionals/validate'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
@@ -579,7 +580,8 @@ const EXCLUDED_ACTIONS = [
 
 export function aggregateActionDeclarations(
   event: EventDocument,
-  config: EventConfig
+  config: EventConfig,
+  context?: UserContext
 ): EventState {
   const allAcceptedActions = getAcceptedActions(event)
   const aggregatedActions = allAcceptedActions
@@ -612,6 +614,7 @@ export function aggregateActionDeclarations(
 
   return getOnlyVisibleFormValues(
     config.declaration.pages.flatMap(({ fields }) => fields),
-    aggregatedDeclaration
+    aggregatedDeclaration,
+    context
   )
 }

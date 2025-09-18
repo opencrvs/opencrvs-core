@@ -39,6 +39,7 @@ import {
   FullDocumentPath,
   FullDocumentUrl
 } from '../../documents'
+import { UserContext } from 'src/conditionals/validate'
 
 export function getStatusFromActions(actions: Array<Action>) {
   return actions
@@ -186,7 +187,8 @@ export function extractPotentialDuplicatesFromActions(
  */
 export function getCurrentEventState(
   event: EventDocument,
-  config: EventConfig
+  config: EventConfig,
+  context?: UserContext
 ): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
@@ -206,7 +208,7 @@ export function getCurrentEventState(
   // Includes only accepted actions metadata. Sometimes (e.g. on updatedAt) we want to show the accepted timestamp rather than the request timestamp.
   const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
 
-  const declaration = aggregateActionDeclarations(event, config)
+  const declaration = aggregateActionDeclarations(event, config, context)
 
   return deepDropNulls({
     id: event.id,
