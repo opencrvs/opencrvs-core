@@ -11,7 +11,7 @@
 
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
-import { SCOPES } from '@opencrvs/commons'
+import { SCOPES, UUID } from '@opencrvs/commons'
 import { router, systemProcedure } from '@events/router/trpc'
 import {
   getLocations,
@@ -43,7 +43,7 @@ export const locationRouter = router({
     }),
   list: systemProcedure.output(z.array(Location)).query(getLocations),
   get: systemProcedure
-    .input(z.string().uuid().brand<'UUID'>()) // branded UUID
+    .input(UUID)
     .output(Location)
     .query(async ({ input }) => {
       const location = await getLocationById(input)
