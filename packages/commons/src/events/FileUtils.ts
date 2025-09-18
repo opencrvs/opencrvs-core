@@ -10,21 +10,27 @@
  */
 
 import { FullDocumentPath } from '../documents'
+import { ActionDocument, ActionStatus } from './ActionDocument'
 import { FileFieldValue, FileFieldWithOptionValue } from './CompositeFieldValue'
 import { EventDocument } from './EventDocument'
-import { getAcceptedActions } from './utils'
 import { uniq } from 'lodash'
 
 export function getFilePathsFromEvent(
   event: EventDocument
 ): FullDocumentPath[] {
-  const acceptedActions = getAcceptedActions(event)
-  const filepaths = acceptedActions.flatMap((action) => {
-    const declarationValues = Object.values(action.declaration)
-    const annotationValues = Object.values(action.annotation ?? {})
+  const filepaths = event.actions
+    .filter(
+      (action): action is ActionDocument =>
+        action.status !== ActionStatus.Rejected
+    )
+    .flatMap((action) => {
+      const declarationValues = Object.values(action.declaration)
+      const annotationValues = Object.values(action.annotation ?? {})
 
-    const actionFilePaths = [...declarationValues, ...annotationValues].flatMap(
-      (value) => {
+      const actionFilePaths = [
+        ...declarationValues,
+        ...annotationValues
+      ].flatMap((value) => {
         const fileParsed = FileFieldValue.safeParse(value)
         if (fileParsed.success) {
           return [fileParsed.data.path]
@@ -36,10 +42,9 @@ export function getFilePathsFromEvent(
         }
 
         return []
-      }
-    )
+      })
 
-    return actionFilePaths
-  })
+      return actionFilePaths
+    })
   return uniq(filepaths)
 }
