@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis:8.0
+    image: public.ecr.aws/bitnami/redis:8.2
     restart: unless-stopped
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
