@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { FullDocumentPath, joinUrlPaths } from '@opencrvs/commons'
+import {
+  FullDocumentPath,
+  getFilePathsFromEvent,
+  joinUrlPaths,
+  EventDocument
+} from '@opencrvs/commons'
 import { env } from '@events/environment'
 
 export async function deleteFile(path: FullDocumentPath, token: string) {
@@ -45,4 +50,38 @@ export async function fileExists(path: FullDocumentPath, token: string) {
   }
 
   return true
+}
+
+export async function listFiles(path: string, token: string) {
+  const res = await fetch(
+    new URL(joinUrlPaths('/list-files', path), env.DOCUMENTS_URL),
+    {
+      method: 'GET',
+      headers: {
+        Authorization: token
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(`Failed to list files in ${path}`)
+  }
+
+  return res.json() as Promise<string[]>
+}
+
+export async function cleanupUnreferencedFiles(
+  event: EventDocument,
+  token: string
+) {
+  const referencedFiles = getFilePathsFromEvent(event)
+  const filesSavedInMinio = await listFiles(event.id, token)
+
+  const filesToDelete = filesSavedInMinio.filter(
+    (file) => !referencedFiles.includes(file)
+  )
+
+  return Promise.all(
+    filesToDelete.map(async (file: string) => deleteFile(file, token))
+  )
 }

@@ -40,6 +40,9 @@ const handlers = [
   http.delete(`${env.DOCUMENTS_URL}/files/:filePath*`, () => {
     return HttpResponse.json({ ok: true })
   }),
+  http.get(`${env.DOCUMENTS_URL}/list-files/:eventId*`, () => {
+    return HttpResponse.json([])
+  }),
   http.post(
     `${env.COUNTRY_CONFIG_URL}/trigger/events/:event/actions/:action`,
     (ctx) => {
@@ -57,7 +60,14 @@ const handlers = [
       role: 'REGISTRATION_AGENT',
       signature: '/ocrvs/signature.png'
     })
-  })
+  }),
+  // token exchange for `event.actions.register.confirm` and `event.actions.register.reject`
+  // query params such as `subject_token`, `subject_token_type` omitted for simplicity
+  http.post(`${env.AUTH_URL}/token`, () =>
+    HttpResponse.json({
+      access_token: 'some-token'
+    })
+  )
 ]
 
 export const mswServer = setupServer(...handlers)

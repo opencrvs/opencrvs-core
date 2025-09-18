@@ -13,11 +13,8 @@ import {
   ActionInput,
   ActionStatus,
   ActionType,
-  EventDocument,
-  getCurrentEventState,
   UUID
 } from '@opencrvs/commons/client'
-
 import {
   findLocalEventConfig,
   setEventData,
@@ -26,13 +23,24 @@ import {
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
 
+/**
+ * Optimistically update an event by adding a 'dummy' action for the event, before the actual mutation completes.
+ *
+ * @param actionType - The type of action being performed
+ * @param status - Optional status override for the action (defaults to ActionStatus.Accepted)
+ * @param onlyUpdateLocalEventIndex - Whether to update the local event index instead of the full event data (defaults to false)
+ * @returns A function that performs the optimistic update and returns the created optimistic action
+ */
 export function updateEventOptimistically<T extends ActionInput>(
-  actionType: typeof ActionType.DECLARE
+  actionType: ActionType,
+  status: ActionStatus = ActionStatus.Accepted,
+  onlyUpdateLocalEventIndex: boolean = false
 ) {
   return (variables: T) => {
     const localEvent = queryClient.getQueryData(
       trpcOptionsProxy.event.get.queryKey(variables.eventId)
     )
+
     if (!localEvent) {
       return
     }
@@ -42,71 +50,32 @@ export function updateEventOptimistically<T extends ActionInput>(
       return
     }
 
-    const optimisticEvent: EventDocument = {
+    // Unfortunately I was not able to get the typing correct without casting as ActionDocument
+    // but I think the solution is otherwise neat so let's go with it for now.
+    const optimisticAction = {
+      ...variables,
+      id: createTemporaryId(),
+      declaration: variables.declaration || {},
+      createdAt: new Date().toISOString(),
+      createdByUserType: 'user' as const,
+      createdBy: '@todo',
+      createdAtLocation: '@todo' as UUID,
+      status,
+      createdByRole: '@todo',
+      type: actionType
+    } as ActionDocument
+
+    const optimisticEvent = {
       ...localEvent,
-      actions: [
-        ...localEvent.actions,
-        {
-          id: createTemporaryId(),
-          type: actionType,
-          /*
-           * These need to be casted or otherwise branded
-           * types like FullDocumentPath causes an error here.
-           * This is because we are effectively trying to force an input type to an output type
-           */
-          declaration: (variables.declaration ||
-            {}) as ActionDocument['declaration'],
-          createdAt: new Date().toISOString(),
-          createdByUserType: 'user',
-          createdBy: '@todo',
-          createdAtLocation: '@todo' as UUID,
-          status: ActionStatus.Requested,
-          transactionId: variables.transactionId,
-          createdByRole: '@todo'
-        }
-      ]
+      actions: [...localEvent.actions, optimisticAction]
     }
 
-    updateLocalEventIndex(optimisticEvent.id, optimisticEvent)
-  }
-}
-
-export function addMarkAsNotDuplicateActionOptimistically<
-  T extends ActionInput
->(actionType: typeof ActionType.MARK_AS_NOT_DUPLICATE) {
-  return (variables: T) => {
-    const localEvent = queryClient.getQueryData(
-      trpcOptionsProxy.event.get.queryKey(variables.eventId)
-    )
-
-    if (!localEvent) {
-      return
+    if (onlyUpdateLocalEventIndex) {
+      updateLocalEventIndex(optimisticEvent.id, optimisticEvent)
+    } else {
+      setEventData(optimisticEvent.id, optimisticEvent)
     }
 
-    const optimisticEvent: EventDocument = {
-      ...localEvent,
-      actions: [
-        ...localEvent.actions,
-        {
-          id: createTemporaryId(),
-          type: actionType,
-          /*
-           * These need to be casted or otherwise branded
-           * types like FullDocumentPath causes an error here.
-           * This is because we are effectively trying to force an input type to an output type
-           */
-          declaration: (variables.declaration ||
-            {}) as ActionDocument['declaration'],
-          createdAt: new Date().toISOString(),
-          createdByUserType: 'user',
-          createdBy: '@todo',
-          createdAtLocation: '@todo' as UUID,
-          status: ActionStatus.Accepted,
-          transactionId: variables.transactionId,
-          createdByRole: '@todo'
-        }
-      ]
-    }
-    setEventData(optimisticEvent.id, optimisticEvent)
+    return optimisticAction
   }
 }

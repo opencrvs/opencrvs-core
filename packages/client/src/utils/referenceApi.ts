@@ -110,7 +110,7 @@ export interface ICurrency {
   languagesAndCountry: string[]
 }
 
-export interface IAdminStructureItem {
+export interface AdminStructureItem {
   id: string
   label: TranslationConfig
 }
@@ -129,7 +129,7 @@ export interface IApplicationConfig {
     LATE_REGISTRATION_TARGET: number
     PRINT_IN_ADVANCE: boolean
   }
-  ADMIN_STRUCTURE: IAdminStructureItem[]
+  ADMIN_STRUCTURE: AdminStructureItem[]
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
   DEATH: {

@@ -114,7 +114,7 @@ export type DeclarationUpdateActionType = z.infer<
   typeof DeclarationUpdateActions
 >
 
-/** Actions which update annotation or status of an event. */
+/** Actions which only update annotation or status of an event. */
 export const annotationActions = ActionTypes.exclude(declarationActionValues)
 export type AnnotationActionType = z.infer<typeof annotationActions>
 

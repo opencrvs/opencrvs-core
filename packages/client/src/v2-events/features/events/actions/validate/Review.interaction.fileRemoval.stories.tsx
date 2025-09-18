@@ -180,11 +180,13 @@ const actions = [
   generateActionDocument({
     configuration: tennisClubMembershipEvent,
     action: ActionType.DECLARE,
-    annotation: {
-      'review.signature': {
-        type: 'image/png',
-        originalFilename: 'signature.png',
-        path: '/ocrvs/signature.png'
+    defaults: {
+      annotation: {
+        'review.signature': {
+          type: 'image/png',
+          originalFilename: 'signature.png',
+          path: '/ocrvs/signature.png'
+        }
       }
     }
   })
@@ -432,8 +434,19 @@ export const RemovingMultipleFilesDeletesAll: Story = {
       )
       await canvas.findByText('No supporting documents')
 
-      // Check for regression
-      await expect(canvas.queryByText('multi file')).not.toBeInTheDocument()
+      await expect(
+        canvas
+          .getByTestId('row-value-documents.singleFile')
+          .querySelector('del')
+      ).toHaveTextContent('single file')
+
+      await expect(
+        canvas.getByTestId('row-value-documents.multiFile').querySelector('del')
+      ).toHaveTextContent('multi file option 1')
+
+      await expect(
+        canvas.getByTestId('row-value-documents.multiFile').querySelector('del')
+      ).toHaveTextContent('multi file option 2')
 
       const sendForApprovalButton = await canvas.findByRole('button', {
         name: 'Send for approval'

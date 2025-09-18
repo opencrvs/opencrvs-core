@@ -22,12 +22,12 @@ import { AllowedRouteWithEventId } from './utils'
 
 const messages = defineMessages({
   saveExitButton: {
-    id: 'v2.buttons.saveExit',
+    id: 'buttons.saveExit',
     defaultMessage: 'Save & Exit',
     description: 'The label for the save and exit button'
   },
   exitButton: {
-    id: 'v2.buttons.exit',
+    id: 'buttons.exit',
     defaultMessage: 'Exit',
     description: 'The label for the exit button'
   }
