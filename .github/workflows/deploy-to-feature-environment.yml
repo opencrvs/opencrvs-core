@@ -278,7 +278,7 @@ jobs:
                 'countryconfig-image-tag': '${{ env.FARAJALAND_COMMIT_HASH }}',
                 stack: '${{  steps.generate_stack.outputs.stack  }}',
                 'keep-e2e': '${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}',
-                'branch': '${{ needs.generate_stack_name_and_branch.outputs.e2e_branch }}'
+                'branch': '${{ needs.generate_stack_name_and_branch.outputs.e2e_branch }}',
                 'runtime': '${{ needs.generate_stack_name_and_branch.outputs.runtime }}'
               }
             });
