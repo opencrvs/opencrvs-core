@@ -27,27 +27,27 @@ import {
   removeCached
 } from '@client/v2-events/cache'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
+import { waitUntilEventIsCreated } from '../events/useEvents/procedures/utils'
 
 interface UploadFileParams {
   file: File
+  eventId: string
   meta: {
     transactionId: string
-    path?: string
     referenceId: string
   }
 }
 
 async function uploadFile({
   file,
+  eventId,
   meta
 }: UploadFileParams): Promise<{ url: string }> {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('transactionId', meta.transactionId)
 
-  if (meta.path) {
-    formData.append('path', meta.path)
-  }
+  formData.append('path', eventId)
 
   const response = await fetch('/api/upload', {
     method: 'POST',
@@ -165,17 +165,19 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
   // Start with good enough: Components do not need to pass `eventId` explicitly, it is automatically derived from the URL params without forcing low-level components to know about events concept.
   const { eventId } = useParams()
 
+  if (!eventId) {
+    throw new Error("`eventId` not found in URL params. Can't upload files")
+  }
+
   const upload = useMutation({
-    mutationFn: async (variables: UploadFileParams) =>
-      uploadFile({ ...variables, meta: { ...variables.meta, path: eventId } }),
+    mutationFn: waitUntilEventIsCreated(async (variables: UploadFileParams) =>
+      uploadFile({ ...variables, meta: { ...variables.meta } })
+    ),
     mutationKey: [UPLOAD_MUTATION_KEY, fieldId],
-    onMutate: async ({ file, meta }) => {
+    onMutate: async ({ file, meta, eventId: dir }: UploadFileParams) => {
       const extension = file.name.split('.').pop()
       const temporaryFilename = `${meta.transactionId}.${extension}`
-      const filePathWithDirectory = joinValues(
-        [meta.path, temporaryFilename],
-        '/'
-      )
+      const filePathWithDirectory = joinValues([dir, temporaryFilename], '/')
       const path = getFullDocumentPath(filePathWithDirectory)
       const url = getUnsignedFileUrl(path)
       await cacheFile({ url, file })
@@ -213,10 +215,10 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
     uploadFile: (file: File, referenceId = 'default') => {
       return upload.mutate({
         file,
+        eventId,
         meta: {
           transactionId: uuid(),
-          referenceId,
-          path: eventId
+          referenceId
         }
       })
     }
