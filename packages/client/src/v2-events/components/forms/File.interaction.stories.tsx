@@ -17,6 +17,7 @@ import { userEvent } from '@storybook/testing-library'
 import { FieldType, MimeType } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { noop } from '@client/v2-events'
 
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: '400px';
@@ -105,7 +106,7 @@ export const FileInputWithOptionTest: StoryObj<
             ]}
             id="my-form"
             onChange={(data) => {
-              meta.args?.onChange(data) ?? (() => {})
+              meta.args?.onChange(data) ?? noop()
             }}
           />
         )
@@ -205,7 +206,7 @@ export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
             ]}
             id="my-form"
             onChange={(data) => {
-              meta.args?.onChange(data) ?? (() => {})
+              meta.args?.onChange(data) ?? noop()
             }}
           />
         )
