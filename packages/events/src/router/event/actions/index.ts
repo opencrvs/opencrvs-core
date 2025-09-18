@@ -246,28 +246,26 @@ export async function defaultRequestHandler(
   if (responseStatus === ActionConfirmationResponse.Success) {
     status = ActionStatus.Accepted
 
-    if (actionConfirmationResponseSchema) {
-      try {
-        parsedBody = actionConfirmationResponseSchema
-          .merge(inputSchema.partial())
-          .parse(confirmationResponse)
-
-        logger.debug(
-          {
-            transactionId: input.transactionId,
-            eventType: event.type,
-            actionType: input.type,
-            eventId: event.id
-          },
-          `Action immediately accepted (status: "${responseStatus}")`
-        )
-      } catch {
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Invalid payload received from notification API'
-        })
-      }
+    try {
+      parsedBody = (actionConfirmationResponseSchema ?? z.object({}))
+        .merge(inputSchema.partial())
+        .parse(confirmationResponse)
+    } catch {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Invalid payload received from notification API'
+      })
     }
+
+    logger.debug(
+      {
+        transactionId: input.transactionId,
+        eventType: event.type,
+        actionType: input.type,
+        eventId: event.id
+      },
+      `Action immediately accepted (status: "${responseStatus}")`
+    )
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { declaration, annotation, ...strippedInput } = input
