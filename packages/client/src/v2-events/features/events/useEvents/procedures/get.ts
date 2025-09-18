@@ -72,12 +72,18 @@ function viewEvent(id: string) {
   const trpc = useTRPC()
   const eventConfig = useEventConfigurations()
   const options = trpc.event.get.queryOptions(id)
-
   return useSuspenseQuery({
     // In this case we can use the queryFn as this is a ad-hoc query
     ...options,
     queryKey: [['view-event', id]],
-    queryFn: async () => trpcClient.event.get.query(id),
+    queryFn: async () => {
+      const eventDocument = await trpcClient.event.get.query(id)
+      await Promise.all([
+        cacheFiles(eventDocument),
+        cacheUsersFromEventDocument(eventDocument)
+      ])
+      return eventDocument
+    },
     meta: {
       eventConfig
     },
