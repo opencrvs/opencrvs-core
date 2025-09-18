@@ -286,6 +286,19 @@ export async function defaultRequestHandler(
 }
 
 /**
+ * These fields aren't required in the synchronous flow as the action is processed immediately and we still have access to them.
+ */
+const AsyncActionConfirmationResponseSchema = z.object({
+  eventId: UUID,
+  actionId: UUID,
+  transactionId: z.string()
+})
+
+export type AsyncActionConfirmationResponseSchema = z.infer<
+  typeof AsyncActionConfirmationResponseSchema
+>
+
+/**
  * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
  * accepted or rejected, via the notify API. The notify APIs are HTTP APIs served by the countryconfig.
  *
@@ -301,14 +314,7 @@ export function getDefaultActionProcedures(
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
-  /**
-   * These fields aren't required in the synchronous flow as the action is processed immediately and we still have access to them.
-   */
-  let asyncInputFields = z.object({
-    eventId: UUID,
-    actionId: UUID,
-    transactionId: z.string()
-  })
+  let asyncInputFields = AsyncActionConfirmationResponseSchema
 
   if (actionConfig.actionConfirmationResponseSchema) {
     asyncInputFields = asyncInputFields.merge(
