@@ -80,11 +80,10 @@ const actions = [
           zipCode: '123456'
         },
         'recommender.none': true
+      },
+      annotation: {
+        'review.comment': 'asdasdasdasdasdasd'
       }
-    },
-
-    annotation: {
-      'review.comment': 'asdasdasdasdasdasd'
     }
   }),
   generateActionDocument({

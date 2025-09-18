@@ -14,6 +14,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React from 'react'
 import superjson from 'superjson'
+import { userEvent, within } from '@storybook/test'
 import {
   ActionType,
   generateEventDraftDocument,
@@ -24,7 +25,10 @@ import {
   tennisClubMembershipEvent,
   getCurrentEventState,
   UUID,
-  SystemRole
+  SystemRole,
+  TestUserRole,
+  generateActionDocument,
+  ActionDocument
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -36,6 +40,9 @@ import { EventOverviewIndex } from './EventOverview'
 const meta: Meta<typeof EventOverviewIndex> = {
   title: 'EventOverview',
   component: EventOverviewIndex,
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR
+  },
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -56,6 +63,8 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   ],
   transformer: { input: superjson, output: superjson }
 })
+
+const refData = testDataGenerator()
 
 const defaultEvent = {
   ...tennisClubMembershipEventDocument,
@@ -151,7 +160,7 @@ export const WithRejectedAction: Story = {
           transactionId: getUUID(),
           createdAt: new Date().toISOString(),
           createdByUserType: 'user',
-          createdBy: testDataGenerator().user.id.localRegistrar,
+          createdBy: refData.user.id.localRegistrar,
           createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
           createdByRole: 'LOCAL_REGISTRAR',
           declaration: {},
@@ -264,7 +273,7 @@ export const WithSystemUserActions: Story = {
             new Date('2024-05-01'),
             new Date('2024-06-01')
           ),
-          createdBy: testDataGenerator().user.id.localRegistrar,
+          createdBy: refData.user.id.localRegistrar,
           createdByUserType: 'user' as const,
           createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
           createdByRole: 'LOCAL_REGISTRAR',
@@ -275,12 +284,12 @@ export const WithSystemUserActions: Story = {
           status: ActionStatus.Accepted,
           declaration: {},
           type: ActionType.ASSIGN,
-          createdBy: testDataGenerator().user.id.localRegistrar,
+          createdBy: refData.user.id.localRegistrar,
           createdByRole: 'LOCAL_REGISTRAR',
           createdByUserType: 'user' as const,
           createdAt: '2025-01-23T05:35:27.689Z',
           createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-          assignedTo: testDataGenerator().user.id.localRegistrar,
+          assignedTo: refData.user.id.localRegistrar,
           transactionId: 'aasdk342-asdkj3423-kn234k26'
         }
       ]
@@ -334,7 +343,7 @@ export const WithVariousUserRoles: Story = {
             new Date('2024-01-01'),
             new Date('2024-02-01')
           ),
-          createdBy: testDataGenerator().user.id.localRegistrar, // not necessary for this test
+          createdBy: refData.user.id.localRegistrar, // not necessary for this test
           createdAtLocation: 'loc-001' as UUID,
           createdByUserType: 'user' as const,
           createdByRole: 'LOCAL_REGISTRAR', // testing role
@@ -350,7 +359,7 @@ export const WithVariousUserRoles: Story = {
             new Date('2024-02-01'),
             new Date('2024-03-01')
           ),
-          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdBy: refData.user.id.fieldAgent,
           createdAtLocation: 'loc-002' as UUID,
           createdByUserType: 'user' as const,
           createdByRole: 'SOCIAL_WORKER',
@@ -609,5 +618,116 @@ export const WithVariousUserRoles: Story = {
         ]
       }
     }
+  }
+}
+
+const actionDefaults = {
+  createdAt: getRandomDatetime(
+    createPrng(73),
+    new Date('2024-03-01'),
+    new Date('2024-04-01')
+  ),
+  createdBy: refData.user.id.localRegistrar,
+  createdByRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+  createdAtLocation: refData.user.localRegistrar().primaryOffice.id as UUID
+} satisfies Partial<ActionDocument>
+
+const duplicateEvent = {
+  ...tennisClubMembershipEventDocument,
+  actions: [
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE,
+      defaults: actionDefaults
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.ASSIGN,
+      defaults: {
+        ...actionDefaults,
+        assignedTo: refData.user.id.localRegistrar
+      }
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: actionDefaults
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DUPLICATE_DETECTED,
+      defaults: actionDefaults
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.ASSIGN,
+      defaults: {
+        ...actionDefaults,
+        assignedTo: refData.user.id.localRegistrar
+      }
+    })
+  ]
+}
+export const WithDuplicateDetectedAction: Story = {
+  parameters: {
+    offline: {
+      events: [duplicateEvent]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+        eventId: duplicateEvent.id
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(duplicateEvent, tennisClubMembershipEvent)
+              ],
+              total: 1
+            }
+          })
+        ]
+      }
+    }
+  }
+}
+
+export const WithDuplicateDetectedActionModal: Story = {
+  parameters: {
+    offline: {
+      events: [duplicateEvent]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+        eventId: duplicateEvent.id
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(duplicateEvent, tennisClubMembershipEvent)
+              ],
+              total: 1
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(
+      await canvas.findByRole('button', {
+        name: 'Flagged as potential duplicate'
+      })
+    )
   }
 }
