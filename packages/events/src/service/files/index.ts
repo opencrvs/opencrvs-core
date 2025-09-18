@@ -67,7 +67,7 @@ export async function listFiles(path: string, token: string) {
     throw new Error(`Failed to list files in ${path}`)
   }
 
-  return res.json()
+  return res.json() as Promise<string[]>
 }
 
 export async function cleanupUnreferencedFiles(
@@ -77,9 +77,11 @@ export async function cleanupUnreferencedFiles(
   const referencedFiles = getFilePathsFromEvent(event)
   const filesSavedInMinio = await listFiles(event.id, token)
 
-  filesSavedInMinio.forEach(async (file: string) => {
-    if (!referencedFiles.includes(file)) {
-      await deleteFile(file, token)
-    }
-  })
+  const filesToDelete = filesSavedInMinio.filter(
+    (file) => !referencedFiles.includes(file)
+  )
+
+  return Promise.all(
+    filesToDelete.map(async (file: string) => deleteFile(file, token))
+  )
 }
