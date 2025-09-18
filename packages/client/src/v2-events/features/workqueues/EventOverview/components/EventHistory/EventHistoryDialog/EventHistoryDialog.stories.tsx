@@ -144,18 +144,6 @@ const createAction = generateActionDocument({
   }
 })
 
-const notifyAction = generateActionDocument({
-  configuration: tennisClubMembershipEvent,
-  action: ActionType.NOTIFY,
-  rng: prng,
-  defaults: {
-    id: generateUuid(prng)
-  },
-  declarationOverrides: {
-    'applicant.email': null
-  }
-})
-
 const declareAction = generateActionDocument({
   configuration: tennisClubMembershipEvent,
   action: ActionType.DECLARE,
