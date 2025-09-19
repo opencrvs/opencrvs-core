@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -389,30 +390,30 @@ const fields = [
 ] satisfies FieldConfig[]
 
 const declaration = {
-  'tennis-member.form.header': 'Membership Application Form',
-  'tennis-member.form.divider': undefined,
-  'tennis-member.applicant.firstname': 'John',
-  'tennis-member.applicant.middlename': 'Michael',
-  'tennis-member.applicant.surname': 'Doe',
-  'tennis-member.applicant.age': 30,
-  'tennis-member.applicant.bio': 'Short biography about the applicant...',
-  'tennis-member.applicant.photo': {
+  'form.header': 'Membership Application Form',
+  'form.divider': undefined,
+  'applicant.firstname': 'John',
+  'applicant.middlename': 'Michael',
+  'applicant.surname': 'Doe',
+  'applicant.age': 30,
+  'applicant.bio': 'Short biography about the applicant...',
+  'applicant.photo': {
     path: '/uploads/photo.png',
     type: 'image/png',
     originalFilename: 'profile.png'
   },
-  'tennis-member.applicant.signature': 'Signed by Applicant',
-  'tennis-member.applicant.email': 'applicant@example.com',
-  'tennis-member.applicant.phone': '+8801712345678',
-  'tennis-member.applicant.password': 'StrongPassword123!',
-  'tennis-member.applicant.nationalId': '1234567890',
-  'tennis-member.applicant.country': 'Bangladesh',
-  'tennis-member.applicant.region': 'Dhaka',
-  'tennis-member.applicant.address': {
+  'applicant.signature': 'Signed by Applicant',
+  'applicant.email': 'applicant@example.com',
+  'applicant.phone': '+8801712345678',
+  'applicant.password': 'StrongPassword123!',
+  'applicant.nationalId': '1234567890',
+  'applicant.country': 'Bangladesh',
+  'applicant.region': 'Dhaka',
+  'applicant.address': {
     country: 'Bangladesh',
     addressType: 'DOMESTIC'
   },
-  'tennis-member.applicant.documents': [
+  'applicant.documents': [
     {
       path: '/uploads/nid.png',
       type: 'image/png',
@@ -420,27 +421,26 @@ const declaration = {
       option: 'nidCopy'
     }
   ],
-  'tennis-member.membership.type': 'standard',
-  'tennis-member.membership.level': 'silver',
-  'tennis-member.membership.startDate': '2025-01-01',
-  'tennis-member.membership.startTime': '09:00',
-  'tennis-member.membership.duration': {
+  'membership.type': 'standard',
+  'membership.level': 'silver',
+  'membership.startDate': '2025-01-01',
+  'membership.startTime': '09:00',
+  'membership.duration': {
     start: '2025-01-01',
     end: '2025-12-31'
   },
-  'tennis-member.membership.trainingPeriod': 'last30Days',
-  'tennis-member.membership.facility': 'Gym Hall',
-  'tennis-member.membership.office': 'Head Office',
-  'tennis-member.membership.apiCheck': {
+  'membership.trainingPeriod': 'last30Days',
+  'membership.facility': 'Gym Hall',
+  'membership.office': 'Head Office',
+  'membership.apiCheck': {
     loading: false,
     data: null,
     error: null
   },
-  'tennis-member.club.rules':
-    'All members must follow club guidelines and regulations.',
-  'tennis-member.club.benefits': 'Exclusive access to facilities',
-  'tennis-member.club.dataSummary': undefined,
-  'tennis-member.consent.termsAccepted': false
+  'club.rules': 'All members must follow club guidelines and regulations.',
+  'club.benefits': 'Exclusive access to facilities',
+  'club.dataSummary': undefined,
+  'consent.termsAccepted': false
 } satisfies EventState
 
 export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
@@ -493,23 +493,9 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
-        fields={fields.map((f) => {
-          if (f.type === FieldType.DATE_RANGE) {
-            return {
-              ...f,
-              defaultValue: '2025-12-31',
-              disabled: false,
-              configuration: { ...f.configuration, notice: undefined }
-            }
-          }
-          return {
-            ...f,
-            // Make all fields disabled
-            disabled: false
-          }
-        })}
+        fields={fields}
         id="my-form"
-        initialValues={declaration}
+        initialValues={{ ...declaration, 'membership.duration': '2025-12-31' }}
         onChange={(data) => {
           args.onChange(data)
         }}
@@ -530,6 +516,106 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
 
       for (const f of formFields) {
         await expect(f).not.toBeDisabled()
+      }
+    })
+  }
+}
+export const EnabledFormFieldsByEnableCondition: StoryObj<
+  typeof FormFieldGenerator
+> = {
+  name: 'Enable state with every type of field with enable condition',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        fields={fields
+          .map((f) => {
+            if (f.id === 'applicant.age') {
+              return f
+            }
+            return {
+              ...f,
+              conditionals: [
+                {
+                  type: ConditionalType.ENABLE,
+                  conditional: field('applicant.age').isEqualTo(40)
+                }
+              ]
+            }
+          })
+          .filter(Boolean)}
+        id="my-form"
+        initialValues={{
+          ...declaration,
+          'membership.duration': '2025-12-31',
+          'applicant.age': 30
+        }}
+        onChange={(data) => {
+          args.onChange(data)
+        }}
+      />
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('All form fields should be disabled', async () => {
+      const formFields = [
+        ...(await canvas.findAllByRole('textbox')),
+        ...(await canvas.findAllByRole('spinbutton')),
+        ...(await canvas.findAllByRole('checkbox')),
+        ...(await canvas.findAllByRole('radio'))
+      ]
+
+      for (const f of formFields) {
+        const fieldToAvoid =
+          f.getAttribute('data-testid') === 'number__applicant____age'
+        if (!fieldToAvoid) {
+          await expect(f).toBeDisabled()
+        }
+      }
+    })
+
+    await step('All form fields should be enabled', async () => {
+      const ageInput = await canvas.findByTestId('number__applicant____age')
+      await userEvent.clear(ageInput)
+      await userEvent.type(ageInput, '40')
+      ageInput.blur()
+
+      const formFields = [
+        ...(await canvas.findAllByRole('textbox')),
+        ...(await canvas.findAllByRole('spinbutton')),
+        ...(await canvas.findAllByRole('checkbox')),
+        ...(await canvas.findAllByRole('radio'))
+      ]
+
+      for (const f of formFields) {
+        await expect(f).not.toBeDisabled()
+      }
+    })
+
+    await step('All form fields should be disabled again', async () => {
+      const ageInput = await canvas.findByTestId('number__applicant____age')
+      await userEvent.clear(ageInput)
+      await userEvent.type(ageInput, '10')
+      ageInput.blur()
+
+      const formFields = [
+        ...(await canvas.findAllByRole('textbox')),
+        ...(await canvas.findAllByRole('spinbutton')),
+        ...(await canvas.findAllByRole('checkbox')),
+        ...(await canvas.findAllByRole('radio'))
+      ]
+
+      for (const f of formFields) {
+        const fieldToAvoid =
+          f.getAttribute('data-testid') === 'number__applicant____age'
+        if (!fieldToAvoid) {
+          await expect(f).toBeDisabled()
+        }
       }
     })
   }
