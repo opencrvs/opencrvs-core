@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: df59d052-a9b9-4c4f-977b-82f727d32e2d
+                transactionId: e0cb7916-6b9d-46f3-9f1d-74a579d5f767
                 type: birth
       responses:
         "200":
@@ -395,7 +395,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 390ff852-2f34-412d-be8c-ea887d5d1240
+                transactionId: 349b7e19-0bd6-4675-8168-f5eabd50e197
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -4922,10 +4922,13 @@ components:
                       - locations
                       - facilities
                       - offices
+              required:
+                - searchableResource
           required:
             - id
             - label
             - type
+            - configuration
           description: Input field for a location
         - type: object
           properties:
