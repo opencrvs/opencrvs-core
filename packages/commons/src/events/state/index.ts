@@ -188,7 +188,7 @@ export function extractPotentialDuplicatesFromActions(
 export function getCurrentEventState(
   event: EventDocument,
   config: EventConfig,
-  context?: UserContext
+  context: UserContext
 ): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
@@ -225,7 +225,11 @@ export function getCurrentEventState(
     assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
     updatedBy: requestActionMetadata.createdBy,
     updatedAtLocation: requestActionMetadata.createdAtLocation,
-    declaration: omitHiddenPaginatedFields(config.declaration, declaration),
+    declaration: omitHiddenPaginatedFields(
+      config.declaration,
+      declaration,
+      context
+    ),
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),
@@ -244,11 +248,13 @@ export function getCurrentEventState(
 export function dangerouslyGetCurrentEventStateWithDrafts({
   event,
   draft,
-  configuration
+  configuration,
+  context
 }: {
   event: EventDocument
   draft: Draft
   configuration: EventConfig
+  context: UserContext
 }): EventIndex {
   const actions = event.actions
     .slice()
@@ -281,7 +287,7 @@ export function dangerouslyGetCurrentEventStateWithDrafts({
     actions: actionsWithDraft
   }
 
-  return getCurrentEventState(eventWithDraft, configuration)
+  return getCurrentEventState(eventWithDraft, configuration, context)
 }
 
 export function applyDeclarationToEventIndex(

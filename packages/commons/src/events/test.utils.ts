@@ -68,6 +68,7 @@ import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import { z } from 'zod'
 import { FullDocumentPath } from '../documents'
+import { UserContext } from 'src/conditionals/validate'
 
 /**
  * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
@@ -219,6 +220,8 @@ function fieldConfigsToActionPayload(fields: FieldConfig[], rng: () => number) {
   )
 }
 
+export const testContext: UserContext = {}
+
 export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType,
@@ -235,10 +238,14 @@ export function generateActionDeclarationInput(
 
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
-    return omitHiddenPaginatedFields(declarationConfig, {
-      ...declaration,
-      ...overrides
-    })
+    return omitHiddenPaginatedFields(
+      declarationConfig,
+      {
+        ...declaration,
+        ...overrides
+      },
+      testContext
+    )
   }
 
   // eslint-disable-next-line no-console
@@ -289,7 +296,11 @@ export function generateActionAnnotationInput(
     {}
   )
 
-  const fieldBasedPayload = omitHiddenFields(annotationFields, annotation)
+  const fieldBasedPayload = omitHiddenFields(
+    annotationFields,
+    annotation,
+    testContext
+  )
 
   return {
     ...fieldBasedPayload,

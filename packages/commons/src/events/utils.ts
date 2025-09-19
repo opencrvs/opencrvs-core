@@ -172,6 +172,7 @@ export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
 export function omitHiddenFields<T extends EventState | ActionUpdate>(
   fields: FieldConfig[],
   values: T,
+  context: UserContext,
   visibleVerificationPageIds: string[] = []
 ) {
   return omitBy<T>(values, (_, fieldId) => {
@@ -188,19 +189,20 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
     }
 
     // As long as one of the field configs is visible, the field should be included
-    return fieldConfigs.every((f) => !isFieldVisible(f, values))
+    return fieldConfigs.every((f) => !isFieldVisible(f, values, context))
   })
 }
 
 export function omitHiddenPaginatedFields(
   formConfig: FormConfig,
-  declaration: EventState
+  declaration: EventState,
+  context: UserContext
 ) {
   const visiblePagesFormFields = formConfig.pages
     .filter((p) => isPageVisible(p, declaration))
     .flatMap((p) => p.fields)
 
-  return omitHiddenFields(visiblePagesFormFields, declaration)
+  return omitHiddenFields(visiblePagesFormFields, declaration, context)
 }
 
 /**
@@ -291,7 +293,8 @@ export function getActionVerificationPageIds(
 export function omitHiddenAnnotationFields(
   actionConfig: ActionConfig,
   declaration: EventState,
-  annotation: ActionUpdate
+  annotation: ActionUpdate,
+  context: UserContext
 ) {
   const annotationFields = getActionAnnotationFields(actionConfig)
 
@@ -303,6 +306,7 @@ export function omitHiddenAnnotationFields(
   return omitHiddenFields(
     annotationFields,
     { ...declaration, ...annotation },
+    context,
     visibleVerificationPageIds
   )
 }
@@ -581,7 +585,7 @@ const EXCLUDED_ACTIONS = [
 export function aggregateActionDeclarations(
   event: EventDocument,
   config: EventConfig,
-  context?: UserContext
+  context: UserContext
 ): EventState {
   const allAcceptedActions = getAcceptedActions(event)
   const aggregatedActions = allAcceptedActions

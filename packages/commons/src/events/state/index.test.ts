@@ -16,7 +16,11 @@ import { ActionStatus, EventState } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { AddressType } from '../CompositeFieldValue'
 import { EventStatus, InherentFlags } from '../EventMetadata'
-import { generateActionDocument, generateEventDocument } from '../test.utils'
+import {
+  generateActionDocument,
+  generateEventDocument,
+  testContext
+} from '../test.utils'
 import { EventIndex } from '../EventIndex'
 import { TENNIS_CLUB_MEMBERSHIP } from '../Constants'
 import { TokenUserType } from '../../authentication'
@@ -30,7 +34,11 @@ describe('getCurrentEventState()', () => {
       actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
     })
 
-    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+    const state = getCurrentEventState(
+      event,
+      tennisClubMembershipEvent,
+      testContext
+    )
 
     expect(state.legalStatuses[EventStatus.enum.DECLARED]).toEqual({
       createdAt: event.actions[1].createdAt,
@@ -82,7 +90,11 @@ describe('getCurrentEventState()', () => {
       updatedAt: new Date(Date.now()).toISOString()
     }
 
-    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+    const state = getCurrentEventState(
+      event,
+      tennisClubMembershipEvent,
+      testContext
+    )
 
     expect(state.legalStatuses[EventStatus.enum.DECLARED]).toBe(undefined)
 
@@ -126,7 +138,11 @@ describe('getCurrentEventState()', () => {
       updatedAt: new Date(Date.now()).toISOString()
     }
 
-    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+    const state = getCurrentEventState(
+      event,
+      tennisClubMembershipEvent,
+      testContext
+    )
 
     const declareRequest = actions.find(
       (action) =>
@@ -280,7 +296,11 @@ describe('getCurrentEventState()', () => {
       updatedAt: new Date(Date.now()).toISOString()
     }
 
-    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+    const state = getCurrentEventState(
+      event,
+      tennisClubMembershipEvent,
+      testContext
+    )
 
     expect(state).toStrictEqual({
       createdAt: createAction.createdAt,
@@ -403,7 +423,11 @@ describe('getCurrentEventState()', () => {
       updatedAt: new Date(Date.now()).toISOString()
     }
 
-    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+    const state = getCurrentEventState(
+      event,
+      tennisClubMembershipEvent,
+      testContext
+    )
     expect(state).toStrictEqual({
       createdAt: createAction.createdAt,
       createdBy: createAction.createdBy,
@@ -459,7 +483,7 @@ describe('getCurrentEventState()', () => {
     })
 
     expect(
-      getCurrentEventState(event1, tennisClubMembershipEvent).flags
+      getCurrentEventState(event1, tennisClubMembershipEvent, testContext).flags
     ).toEqual([
       InherentFlags.PENDING_CERTIFICATION,
       InherentFlags.CORRECTION_REQUESTED
@@ -471,7 +495,7 @@ describe('getCurrentEventState()', () => {
     })
 
     expect(
-      getCurrentEventState(event2, tennisClubMembershipEvent).flags
+      getCurrentEventState(event2, tennisClubMembershipEvent, testContext).flags
     ).toEqual([InherentFlags.PENDING_CERTIFICATION])
 
     const event3 = generateEventDocument({
@@ -485,7 +509,8 @@ describe('getCurrentEventState()', () => {
     })
 
     expect(
-      getCurrentEventState(event3, tennisClubMembershipEvent).flags.length
+      getCurrentEventState(event3, tennisClubMembershipEvent, testContext).flags
+        .length
     ).toEqual(0)
   })
 
@@ -506,7 +531,11 @@ describe('getCurrentEventState()', () => {
       }
     })
 
-    const eventState1 = getCurrentEventState(event1, tennisClubMembershipEvent)
+    const eventState1 = getCurrentEventState(
+      event1,
+      tennisClubMembershipEvent,
+      testContext
+    )
 
     expect(eventState1.declaration['applicant.dobUnknown']).toBe(false)
     expect(eventState1.declaration['applicant.dob']).toBe('2000-01-01')
@@ -528,7 +557,11 @@ describe('getCurrentEventState()', () => {
       }
     })
 
-    const eventState2 = getCurrentEventState(event2, tennisClubMembershipEvent)
+    const eventState2 = getCurrentEventState(
+      event2,
+      tennisClubMembershipEvent,
+      testContext
+    )
 
     expect(eventState2.declaration['applicant.dobUnknown']).toBe(true)
     expect(eventState2.declaration['applicant.dob']).toBe(undefined)
@@ -610,7 +643,8 @@ describe('correction requests', () => {
           }
         ]
       },
-      tennisClubMembershipEvent
+      tennisClubMembershipEvent,
+      testContext
     )
 
     const applicantName = state.declaration['applicant.name'] as {
@@ -708,7 +742,8 @@ describe('correction requests', () => {
           }
         ]
       },
-      tennisClubMembershipEvent
+      tennisClubMembershipEvent,
+      testContext
     )
 
     const applicantName = state.declaration['applicant.name'] as {
@@ -782,7 +817,8 @@ describe('address state transitions', () => {
         id: getUUID(),
         updatedAt: new Date().toISOString()
       },
-      tennisClubMembershipEvent
+      tennisClubMembershipEvent,
+      testContext
     )
 
     expect(state.declaration).toEqual(initialForm)
@@ -816,7 +852,8 @@ describe('address state transitions', () => {
         id: getUUID(),
         updatedAt: new Date().toISOString()
       },
-      tennisClubMembershipEvent
+      tennisClubMembershipEvent,
+      testContext
     )
 
     expect(state.declaration).toEqual({

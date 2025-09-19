@@ -186,8 +186,7 @@ function isFieldConditionMet(
   field: FieldConfig,
   form: ActionUpdate | EventState,
   conditionalType: ConditionalType,
-  // @todo: maybe make it mandatory?
-  context?: UserContext
+  context: UserContext
 ) {
   const hasRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === conditionalType
@@ -201,7 +200,7 @@ function isFieldConditionMet(
     $form: form,
     $now: formatISO(new Date(), { representation: 'date' }),
     $online: isOnline(),
-    $user: context?.user
+    $user: context.user
   })
 
   return validConditionals.includes(conditionalType)
@@ -210,17 +209,18 @@ function isFieldConditionMet(
 export function isFieldVisible(
   field: FieldConfig,
   form: ActionUpdate | EventState,
-  context?: UserContext
+  context: UserContext
 ) {
   return isFieldConditionMet(field, form, ConditionalType.SHOW, context)
 }
 
 export function getOnlyVisibleFormValues(
   field: FieldConfig[],
-  form: EventState
+  form: EventState,
+  context: UserContext
 ) {
   return field.reduce((acc, f) => {
-    if (isFieldVisible(f, form) && form[f.id] !== undefined) {
+    if (isFieldVisible(f, form, context) && form[f.id] !== undefined) {
       acc[f.id] = form[f.id]
     }
     return acc
@@ -234,19 +234,21 @@ function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
 
 export function isFieldEnabled(
   field: FieldConfig,
-  form: ActionUpdate | EventState
+  form: ActionUpdate | EventState,
+  context: UserContext
 ) {
-  return isFieldConditionMet(field, form, ConditionalType.ENABLE)
+  return isFieldConditionMet(field, form, ConditionalType.ENABLE, context)
 }
 
 // Fields are displayed on review if both the 'ConditionalType.SHOW' and 'ConditionalType.DISPLAY_ON_REVIEW' conditions are met
 export function isFieldDisplayedOnReview(
   field: FieldConfig,
-  form: ActionUpdate | EventState
+  form: ActionUpdate | EventState,
+  context: UserContext
 ) {
   return (
-    isFieldVisible(field, form) &&
-    isFieldConditionMet(field, form, ConditionalType.DISPLAY_ON_REVIEW)
+    isFieldVisible(field, form, context) &&
+    isFieldConditionMet(field, form, ConditionalType.DISPLAY_ON_REVIEW, context)
   )
 }
 
@@ -411,13 +413,15 @@ export function validateFieldInput({
 
 export function runStructuralValidations({
   field,
-  values
+  values,
+  context
 }: {
   field: FieldConfig
   values: ActionUpdate
+  context: UserContext
 }) {
   if (
-    !isFieldVisible(field, values) ||
+    !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
     return {
@@ -442,10 +446,10 @@ export function runFieldValidations({
 }: {
   field: FieldConfig
   values: ActionUpdate
-  context?: { locations: Array<Location> }
+  context: UserContext
 }) {
   if (
-    !isFieldVisible(field, values) ||
+    !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
     return {
@@ -456,8 +460,9 @@ export function runFieldValidations({
   const conditionalParameters = {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
-    $locations: context?.locations ?? [],
-    $online: isOnline()
+    $locations: context.locations ?? [],
+    $online: isOnline(),
+    $user: context.user
   }
 
   const fieldValidationResult = validateFieldInput({
