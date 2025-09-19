@@ -78,7 +78,7 @@ export function useActionForHistory() {
           x.createdBy === action.createdBy
       )
       if (approveAction) {
-        return ['CORRECTED']
+        return 'CORRECTED'
       }
     }
 
@@ -90,11 +90,11 @@ export function useActionForHistory() {
       if (
         hasDeclarationChanged(actions, { ...action, type: parsedAction.data })
       ) {
-        return [DECLARATION_ACTION_UPDATE, action.type]
+        return DECLARATION_ACTION_UPDATE
       }
     }
 
-    return [action.type]
+    return action.type
   }
 
   return { getActionTypeForHistory }
