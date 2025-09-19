@@ -16,7 +16,6 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { useSelector } from 'react-redux'
 import {
   getCurrentEventState,
   ActionType,
@@ -41,9 +40,8 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { getScope } from '@client/profile/profileSelectors'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useSuspenseAdminLeafLevelLocations } from '@client/v2-events/hooks/useLocations'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 /**
@@ -60,8 +58,7 @@ export function Review() {
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { closeActionView } = useEventFormNavigation()
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locationIds = useSuspenseAdminLeafLevelLocations()
 
   const event = events.getEvent.findFromCache(eventId).data
 
@@ -102,20 +99,13 @@ export function Review() {
   const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 
-  const scopes = useSelector(getScope) ?? undefined
-
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
-
   const reviewActionConfiguration = useReviewActionConfig({
     formConfig,
     declaration: form,
     annotation,
-    scopes,
     reviewFields: reviewConfig.fields,
     status: currentEventState.status,
-    locations: adminStructureLocations,
+    locationIds,
     eventType: event.type
   })
 
@@ -230,7 +220,7 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
-        locations={adminStructureLocations}
+        locationIds={locationIds}
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
