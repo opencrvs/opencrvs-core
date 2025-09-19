@@ -88,8 +88,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     id,
     onAllFieldsValidated,
     isCorrection = false,
-    parentId,
-    locations
+    parentId
   }) => {
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
@@ -142,8 +141,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         validate={(values) =>
           getValidationErrorsForForm(
             fields,
-            makeFormikFieldIdsOpenCRVSCompatible(values),
-            locations ?? []
+            makeFormikFieldIdsOpenCRVSCompatible(values)
           )
         }
         validateOnMount={true}

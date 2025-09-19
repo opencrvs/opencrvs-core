@@ -35,7 +35,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { useContext } from '@client/v2-events/hooks/useConditionals'
+import { useContext } from '@client/v2-events/hooks/useContext'
 import { hasFieldChanged } from '../utils'
 
 export function Review() {
@@ -88,9 +88,7 @@ export function Review() {
 
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
-    form,
-    context: userContext,
-    locations: adminStructureLocations
+    form
   })
 
   return (

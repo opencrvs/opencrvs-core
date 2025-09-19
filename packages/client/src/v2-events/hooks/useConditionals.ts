@@ -10,7 +10,6 @@
  */
 import {
   ActionUpdate,
-  UserContext,
   EventState,
   FieldConfig,
   isFieldVisible,
@@ -24,23 +23,8 @@ import {
   omitHiddenFields,
   runFieldValidations
 } from '@opencrvs/commons/client'
-import { getToken, getTokenPayload } from '@client/utils/authUtils'
-import { useLocations } from './useLocations'
 
-// @todo move this to separate file called useContext.ts
-export function useContext(): UserContext {
-  const token = getToken()
-  const tokenPayload = getTokenPayload(token)
-
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
-
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
-
-  return { user: tokenPayload ?? undefined, locations: adminStructureLocations }
-}
+import { useContext } from './useContext'
 
 // @todo: rename to useValidationFunctionsWithContext()
 // also rename this file
