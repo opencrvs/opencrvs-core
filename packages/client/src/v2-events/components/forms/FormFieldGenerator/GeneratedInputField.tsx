@@ -88,7 +88,10 @@ import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
 import { QueryParamReader } from '../inputs/QueryParamReader'
-import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
+import {
+  makeFormikFieldIdsOpenCRVSCompatible,
+  parseFieldReferencesInConfiguration
+} from './utils'
 
 interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
@@ -620,7 +623,10 @@ export const GeneratedInputField = React.memo(
       return (
         <Http.Input
           key={fieldDefinition.id}
-          configuration={field.config.configuration}
+          configuration={parseFieldReferencesInConfiguration(
+            field.config.configuration,
+            form
+          )}
           parentValue={form[field.config.configuration.trigger.$$field]}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />

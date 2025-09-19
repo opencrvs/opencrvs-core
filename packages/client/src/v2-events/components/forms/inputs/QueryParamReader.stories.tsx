@@ -67,14 +67,6 @@ const defaultFields: FieldConfig[] = [
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
-      },
-      params: {
-        auth_token: field('applicant.query-param-reader')
-          .get('auth_token')
-          .toString(),
-        client_session: field('applicant.query-param-reader')
-          .get('client_session')
-          .toString()
       }
     }
   },
@@ -114,6 +106,129 @@ const defaultFields: FieldConfig[] = [
   }
 ]
 
+const testQueryParamReader = {
+  id: 'test.query-param-reader',
+  type: FieldType.QUERY_PARAM_READER,
+  label: {
+    id: 'event.query-param-reader.label',
+    defaultMessage: 'Query param reader',
+    description: 'This is the label for the query param reader field'
+  },
+  configuration: {}
+}
+
+const testQueryParamReaderWithMap = {
+  id: 'test.query-param-reader',
+  type: FieldType.QUERY_PARAM_READER,
+  label: {
+    id: 'event.query-param-reader.label',
+    defaultMessage: 'Query param reader',
+    description: 'This is the label for the query param reader field'
+  },
+  configuration: {
+    map: {
+      auth_token: 'token',
+      client_session: 'session'
+    }
+  }
+}
+
+const testHttpFetch = {
+  id: 'test.http-fetch',
+  type: FieldType.HTTP,
+  label: {
+    defaultMessage: 'Fetch test information',
+    description: 'Fetch test information',
+    id: 'test.http-fetch.label'
+  },
+  configuration: {
+    trigger: field('test.query-param-reader'),
+    url: '/api/test',
+    timeout: 5000,
+    method: 'GET' as const,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    params: {
+      token: field('test.query-param-reader').get('auth_token'),
+      session: field('test.query-param-reader').get('client_session')
+    }
+  }
+}
+
+const testHttpFetchAfterMap = {
+  id: 'test.http-fetch',
+  type: FieldType.HTTP,
+  label: {
+    defaultMessage: 'Fetch test information',
+    description: 'Fetch test information',
+    id: 'test.http-fetch.label'
+  },
+  configuration: {
+    trigger: field('test.query-param-reader'),
+    url: '/api/test',
+    timeout: 5000,
+    method: 'GET' as const,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    params: {
+      token: field('test.query-param-reader').get('token'),
+      session: field('test.query-param-reader').get('session')
+    }
+  }
+}
+
+const tokenTextField = {
+  id: 'test.token',
+  type: FieldType.TEXT,
+  parent: field('test.http-fetch'),
+  label: {
+    defaultMessage: 'Token',
+    description: 'Token label',
+    id: 'token.label'
+  },
+  conditionals: [
+    {
+      type: ConditionalType.ENABLE,
+      conditional: never()
+    }
+  ],
+  value: field('test.http-fetch').get('data.token')
+}
+
+const sessionTextField = {
+  id: 'test.session',
+  type: FieldType.TEXT,
+  parent: field('test.http-fetch'),
+  label: {
+    defaultMessage: 'Session',
+    description: 'Session label',
+    id: 'session.label'
+  },
+  conditionals: [
+    {
+      type: ConditionalType.ENABLE,
+      conditional: never()
+    }
+  ],
+  value: field('test.http-fetch').get('data.session')
+}
+
+const forwardedParams: FieldConfig[] = [
+  testQueryParamReader,
+  testHttpFetch,
+  tokenTextField,
+  sessionTextField
+]
+
+const forwardedParamsWithMap: FieldConfig[] = [
+  testQueryParamReaderWithMap,
+  testHttpFetchAfterMap,
+  tokenTextField,
+  sessionTextField
+]
+
 function Form(args: Args) {
   return (
     <FormFieldGenerator
@@ -143,6 +258,62 @@ export const Default: StoryObj<Args> = {
         userInfoApi: [
           http.get('/api/user-info', () =>
             HttpResponse.json({ firstName: 'John', familyName: 'Doe' })
+          )
+        ]
+      }
+    }
+  }
+}
+
+export const WithForwardedParams: StoryObj<Args> = {
+  name: 'With Forwarded Params',
+  parameters: {
+    chromatic: {
+      disableSnapshot: true
+    },
+    layout: 'centered',
+    reactRouter: {
+      router: {
+        path: '/',
+        element: <Form fields={forwardedParams} onChange={fn()} />
+      },
+      initialPath: '/?auth_token=123&client_session=abc'
+    },
+    msw: {
+      handlers: {
+        userInfoApi: [
+          http.get('/api/test', ({ request }) =>
+            HttpResponse.json(
+              Object.fromEntries(new URL(request.url).searchParams)
+            )
+          )
+        ]
+      }
+    }
+  }
+}
+
+export const WithForwardedParamsThroughMap: StoryObj<Args> = {
+  name: 'With Forwarded Params Through Map',
+  parameters: {
+    chromatic: {
+      disableSnapshot: true
+    },
+    layout: 'centered',
+    reactRouter: {
+      router: {
+        path: '/',
+        element: <Form fields={forwardedParamsWithMap} onChange={fn()} />
+      },
+      initialPath: '/?auth_token=123&client_session=abc'
+    },
+    msw: {
+      handlers: {
+        userInfoApi: [
+          http.get('/api/test', ({ request }) =>
+            HttpResponse.json(
+              Object.fromEntries(new URL(request.url).searchParams)
+            )
           )
         ]
       }

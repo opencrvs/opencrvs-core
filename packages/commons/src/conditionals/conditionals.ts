@@ -239,7 +239,7 @@ function getDateRangeToFieldReference(
 }
 
 type FieldReference = { $$field: string }
-function isFieldReference(value: unknown): value is FieldReference {
+export function isFieldReference(value: unknown): value is FieldReference {
   return typeof value === 'object' && value !== null && '$$field' in value
 }
 
