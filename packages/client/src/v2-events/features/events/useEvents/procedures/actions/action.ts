@@ -53,6 +53,7 @@ import {
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
 import { ToastKey } from '@client/v2-events/routes/Toaster'
+import { useConditionals } from '@client/v2-events/hooks/useConditionals'
 
 function retryUnlessConflict(
   _failureCount: number,
@@ -89,7 +90,7 @@ function getCleanedDeclarationDiff(
 
   // If there's no original declaration, just clean the update and return it
   if (isEmpty(originalDeclaration)) {
-    return omitHiddenPaginatedFields(
+    return useConditionals().omitHiddenPaginatedFields(
       eventConfiguration.declaration,
       declarationDiff
     )
@@ -101,7 +102,7 @@ function getCleanedDeclarationDiff(
 
   // Remove any hidden/paginated fields from the merged declaration
   // (Ensures we only consider fields relevant to the event configuration)
-  const cleanedDeclaration = omitHiddenPaginatedFields(
+  const cleanedDeclaration = useConditionals().omitHiddenPaginatedFields(
     eventConfiguration.declaration,
     merged
   )
@@ -426,11 +427,14 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     )
 
     const originalDeclaration = params.fullEvent
-      ? getCurrentEventState(params.fullEvent, eventConfiguration).declaration
+      ? useConditionals().getCurrentEventState(
+          params.fullEvent,
+          eventConfiguration
+        ).declaration
       : {}
 
     const annotation = actionConfiguration
-      ? omitHiddenAnnotationFields(
+      ? useConditionals().omitHiddenAnnotationFields(
           actionConfiguration,
           originalDeclaration,
           params.annotation
@@ -480,7 +484,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
 
       const originalDeclaration =
         'event' in params
-          ? getCurrentEventState(
+          ? useConditionals().getCurrentEventState(
               /*
                * typescript is somehow unable to infer the type of params.event to
                * be EventDocument

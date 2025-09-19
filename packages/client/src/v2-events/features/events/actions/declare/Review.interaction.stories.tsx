@@ -21,7 +21,8 @@ import {
   generateEventDraftDocument,
   getCurrentEventState,
   FullDocumentPath,
-  UUID
+  UUID,
+  testContext
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -66,7 +67,8 @@ const meta: Meta<typeof ReviewIndex> = {
     useEventFormData.setState({
       formValues: getCurrentEventState(
         declaredEventDocument,
-        tennisClubMembershipEvent
+        tennisClubMembershipEvent,
+        testContext
       ).declaration
     })
   }
@@ -139,7 +141,8 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
               results: [
                 getCurrentEventState(
                   declarationTrpcMsw.eventDocument,
-                  tennisClubMembershipEvent
+                  tennisClubMembershipEvent,
+                  testContext
                 )
               ]
             }
@@ -162,7 +165,8 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
               results: [
                 getCurrentEventState(
                   declarationTrpcMsw.eventDocument,
-                  tennisClubMembershipEvent
+                  tennisClubMembershipEvent,
+                  testContext
                 )
               ],
               total: 1
@@ -224,7 +228,8 @@ const msw = {
           results: [
             getCurrentEventState(
               declarationTrpcMsw.eventDocument,
-              tennisClubMembershipEvent
+              tennisClubMembershipEvent,
+              testContext
             )
           ],
           total: 1
@@ -419,7 +424,8 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
               results: [
                 getCurrentEventState(
                   declarationTrpcMsw.eventDocument,
-                  tennisClubMembershipEvent
+                  tennisClubMembershipEvent,
+                  testContext
                 )
               ],
               total: 1

@@ -13,11 +13,21 @@ import {
   UserContext,
   EventState,
   FieldConfig,
-  isFieldVisible
+  isFieldVisible,
+  getCurrentEventState,
+  EventConfig,
+  EventDocument,
+  ActionConfig,
+  omitHiddenAnnotationFields,
+  FormConfig,
+  omitHiddenPaginatedFields,
+  omitHiddenFields,
+  runFieldValidations
 } from '@opencrvs/commons/client'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
+import { useLocations } from './useLocations'
 
-function getContext(): UserContext {
+export function getContext(): UserContext {
   const token = getToken()
   const tokenPayload = getTokenPayload(token)
 
@@ -28,8 +38,41 @@ function getContext(): UserContext {
 export function useConditionals() {
   const context = getContext()
 
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
+
   return {
     isFieldVisible: (field: FieldConfig, form: ActionUpdate | EventState) =>
-      isFieldVisible(field, form, context)
+      isFieldVisible(field, form, context),
+    getCurrentEventState: (event: EventDocument, config: EventConfig) =>
+      getCurrentEventState(event, config, context),
+    omitHiddenFields: (fields: FieldConfig[], values: T) =>
+      omitHiddenFields(fields, values, context),
+    omitHiddenAnnotationFields: (
+      actionConfig: ActionConfig,
+      declaration: EventState,
+      annotation: ActionUpdate
+    ) =>
+      omitHiddenAnnotationFields(
+        actionConfig,
+        declaration,
+        annotation,
+        context
+      ),
+    omitHiddenPaginatedFields: (
+      formConfig: FormConfig,
+      declaration: EventState
+    ) => omitHiddenPaginatedFields(formConfig, declaration, context),
+    runFieldValidations: ({
+      field,
+      values
+    }: {
+      field: FieldConfig
+      values: ActionUpdate
+    }) => runFieldValidations({ field, values, context })
   }
 }

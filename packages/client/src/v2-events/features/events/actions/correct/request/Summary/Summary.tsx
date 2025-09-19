@@ -21,7 +21,7 @@ import {
   generateTransactionId,
   isFieldVisible,
   getDeclarationFields,
-  getCurrentEventState,
+  // getCurrentEventState,
   EventDocument,
   ActionType
 } from '@opencrvs/commons/client'
@@ -41,6 +41,10 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import {
+  getContext,
+  useConditionals
+} from '@client/v2-events/hooks/useConditionals'
 import { hasFieldChanged } from '../../utils'
 import { CorrectionDetails } from './CorrectionDetails'
 
@@ -86,10 +90,15 @@ export function Summary() {
   const navigate = useNavigate()
   const intl = useIntl()
 
+  const userContext = getContext()
+
   const events = useEvents()
   const event: EventDocument = events.getEvent.getFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const eventIndex = useConditionals().getCurrentEventState(
+    event,
+    eventConfiguration
+  )
 
   const previousFormValues = eventIndex.declaration
   const getFormValues = useEventFormData((state) => state.getFormValues)
@@ -110,13 +119,13 @@ export function Summary() {
           return false
         }
 
-        return hasFieldChanged(field, form, previousFormValues)
+        return hasFieldChanged(field, form, previousFormValues, userContext)
       })
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
-      const wasVisible = isFieldVisible(field, previousFormValues)
-      const isHidden = !isFieldVisible(field, form)
+      const wasVisible = isFieldVisible(field, previousFormValues, userContext)
+      const isHidden = !isFieldVisible(field, form, userContext)
       return wasVisible && isHidden
     })
 
@@ -150,7 +159,8 @@ export function Summary() {
     annotation,
     previousFormValues,
     navigate,
-    userMayCorrect
+    userMayCorrect,
+    userContext
   ])
 
   return (

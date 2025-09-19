@@ -22,12 +22,12 @@ import {
   generateWorkqueues,
   getCurrentEventState,
   tennisClubMembershipEvent,
-  UUID
+  UUID,
+  testContext
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
 import { ReadonlyViewIndex } from './ReadOnlyView'
 
 const generator = testDataGenerator()
@@ -146,7 +146,11 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
             return {
               total: 1,
               results: [
-                getCurrentEventState(eventDocument, tennisClubMembershipEvent)
+                getCurrentEventState(
+                  eventDocument,
+                  tennisClubMembershipEvent,
+                  testContext
+                )
               ]
             }
           })

@@ -19,7 +19,8 @@ import {
   generateEventDocument,
   getCurrentEventState,
   FullDocumentPath,
-  UUID
+  UUID,
+  testContext
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -102,7 +103,8 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     useEventFormData.setState({
       formValues: getCurrentEventState(
         validatedEventDocument,
-        tennisClubMembershipEvent
+        tennisClubMembershipEvent,
+        testContext
       ).declaration
     })
   },

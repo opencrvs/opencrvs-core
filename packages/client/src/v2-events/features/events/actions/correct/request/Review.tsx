@@ -35,6 +35,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { getContext } from '@client/v2-events/hooks/useConditionals'
 import { hasFieldChanged } from '../utils'
 
 export function Review() {
@@ -47,13 +48,14 @@ export function Review() {
   const events = useEvents()
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
+  const userContext = getContext()
 
   const event = events.getEvent.getFromCache(eventId)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const eventIndex = getCurrentEventState(event, configuration)
+  const eventIndex = getCurrentEventState(event, configuration, userContext)
 
   const formConfig = getDeclaration(configuration)
 
@@ -64,7 +66,7 @@ export function Review() {
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)
   const changedFields = formFields.filter((f) =>
-    hasFieldChanged(f, form, previousFormValues)
+    hasFieldChanged(f, form, previousFormValues, userContext)
   )
   const anyValuesHaveChanged = changedFields.length > 0
 
@@ -87,6 +89,7 @@ export function Review() {
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form,
+    context: userContext,
     locations: adminStructureLocations
   })
 

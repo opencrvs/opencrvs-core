@@ -18,8 +18,10 @@ import {
   omitHiddenFields,
   runFieldValidations,
   runStructuralValidations,
-  Location
+  Location,
+  UserContext
 } from '@opencrvs/commons/client'
+import { useConditionals } from '@client/v2-events/hooks/useConditionals'
 
 interface FieldErrors {
   errors: {
@@ -44,15 +46,11 @@ export function getValidationErrorsForForm(
     ) {
       return errorsForAllFields
     }
-
-    const context = locations ? { locations } : undefined
-
     return {
       ...errorsForAllFields,
-      [field.id]: runFieldValidations({
+      [field.id]: useConditionals().runFieldValidations({
         field,
-        values,
-        context
+        values
       })
     }
   }, {})
@@ -60,7 +58,8 @@ export function getValidationErrorsForForm(
 
 export function getStructuralValidationErrorsForForm(
   fields: FieldConfig[],
-  values: EventState
+  values: EventState,
+  context: UserContext
 ) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
     if (
@@ -75,7 +74,8 @@ export function getStructuralValidationErrorsForForm(
       ...errorsForAllFields,
       [field.id]: runStructuralValidations({
         field,
-        values
+        values,
+        context
       })
     }
   }, {})
@@ -84,20 +84,23 @@ export function getStructuralValidationErrorsForForm(
 export function validationErrorsInActionFormExist({
   formConfig,
   form,
+  context,
   annotation,
-  reviewFields = [],
-  locations
+  reviewFields = []
 }: {
   formConfig: FormConfig
   form: EventState
+  context: UserContext
   annotation?: EventState
   reviewFields?: FieldConfig[]
-  locations?: Location[]
 }): boolean {
   // We don't want to validate hidden fields
-  const formWithoutHiddenFields = omitHiddenPaginatedFields(formConfig, form)
+  const formWithoutHiddenFields = useConditionals().omitHiddenPaginatedFields(
+    formConfig,
+    form
+  )
 
-  const visibleAnnotationFields = omitHiddenFields(
+  const visibleAnnotationFields = useConditionals().omitHiddenFields(
     reviewFields,
     annotation ?? {}
   )
@@ -108,13 +111,13 @@ export function validationErrorsInActionFormExist({
       const fieldErrors = getValidationErrorsForForm(
         page.fields,
         formWithoutHiddenFields,
-        locations
+        context
       )
       return Object.values(fieldErrors).some((field) => field.errors.length > 0)
     })
 
   const hasAnnotationValidationErrors = Object.values(
-    getValidationErrorsForForm(reviewFields, visibleAnnotationFields)
+    getValidationErrorsForForm(reviewFields, visibleAnnotationFields, context)
   ).some((field) => field.errors.length > 0)
 
   return hasValidationErrors || hasAnnotationValidationErrors

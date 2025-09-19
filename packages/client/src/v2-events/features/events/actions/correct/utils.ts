@@ -15,15 +15,17 @@ import {
   isFieldVisible,
   isMetaAction,
   EventDocument,
-  ActionType
+  ActionType,
+  UserContext
 } from '@opencrvs/commons/client'
 
 export function hasFieldChanged(
   f: FieldConfig,
   form: EventState,
-  previousFormValues: EventState
+  previousFormValues: EventState,
+  context: UserContext
 ) {
-  const isVisible = isFieldVisible(f, form)
+  const isVisible = isFieldVisible(f, form, context)
 
   const prevValue = previousFormValues[f.id]
   const currValue = form[f.id]

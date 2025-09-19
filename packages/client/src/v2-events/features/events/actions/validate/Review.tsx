@@ -44,6 +44,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { getScope } from '@client/profile/profileSelectors'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { getContext } from '@client/v2-events/hooks/useConditionals'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 /**
@@ -62,6 +63,8 @@ export function Review() {
   const { closeActionView } = useEventFormNavigation()
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
+
+  const userContext = getContext()
 
   const event = events.getEvent.findFromCache(eventId).data
 
@@ -98,7 +101,7 @@ export function Review() {
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
-  const currentEventState = getCurrentEventState(event, config)
+  const currentEventState = getCurrentEventState(event, config, userContext)
   const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 

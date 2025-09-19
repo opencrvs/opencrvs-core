@@ -19,9 +19,11 @@ import {
   EventConfig,
   ArchiveActionInput,
   MarkAsDuplicateActionInput,
-  ActionStatus
+  ActionStatus,
+  UserContext
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
+import { useConditionals } from '../hooks/useConditionals'
 
 // Defines custom API functions that are not part of the generated API from TRPC.
 
@@ -46,7 +48,10 @@ function hasPotentialDuplicates(
   event: EventDocument,
   eventConfiguration: EventConfig
 ) {
-  const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const eventIndex = useConditionals().getCurrentEventState(
+    event,
+    eventConfiguration
+  )
   return eventIndex.potentialDuplicates.length > 0
 }
 
@@ -228,14 +233,14 @@ export async function makeCorrectionOnRequest({
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
 
-  const originalDeclaration = getCurrentEventState(
+  const originalDeclaration = useConditionals().getCurrentEventState(
     event,
     eventConfiguration
   ).declaration
 
   const annotation =
     actionConfiguration && declarationMixedUpAnnotation
-      ? omitHiddenAnnotationFields(
+      ? useConditionals().omitHiddenAnnotationFields(
           actionConfiguration,
           originalDeclaration,
           declarationMixedUpAnnotation

@@ -40,6 +40,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getLocations } from '@client/offline/selectors'
+import { getContext } from '@client/v2-events/hooks/useConditionals'
 import { DeclarationComparisonTable } from './DeclarationComparisonTable'
 
 const messages = defineMessages({
@@ -117,6 +118,8 @@ function buildCorrectionDetails(
   locations: ReturnType<typeof getLocations>,
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
+  const userContext = getContext()
+
   const details: CorrectionDetail[] = correctionFormPages
     .filter((page) => isPageVisible(page, annotation))
     .flatMap((page) => {
@@ -136,7 +139,9 @@ function buildCorrectionDetails(
         ]
       }
       return page.fields
-        .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
+        .filter((f) =>
+          isFieldVisible(f, { ...form, ...annotation }, userContext)
+        )
         .filter((f) => !isEmptyValue(f, { ...form, ...annotation }[f.id]))
         .map((field) => ({
           label: field.label,

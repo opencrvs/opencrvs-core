@@ -20,6 +20,7 @@ import {
   generateWorkqueues,
   getCurrentEventState,
   tennisClubMembershipEvent,
+  testContext,
   UUID
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -134,7 +135,8 @@ export const SaveAndExit: Story = {
               results: [
                 getCurrentEventState(
                   undeclaredDraftEvent,
-                  tennisClubMembershipEvent
+                  tennisClubMembershipEvent,
+                  testContext
                 )
               ],
               total: 1
@@ -249,7 +251,8 @@ export const DraftShownInForm: Story = {
               results: [
                 getCurrentEventState(
                   undeclaredDraftEvent,
-                  tennisClubMembershipEvent
+                  tennisClubMembershipEvent,
+                  testContext
                 )
               ],
               total: 1
