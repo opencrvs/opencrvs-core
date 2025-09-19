@@ -41,7 +41,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
-import { useConditionals } from '@client/v2-events/hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
 import { useContext } from '@client/v2-events/hooks/useContext'
 import { hasFieldChanged } from '../../utils'
 import { CorrectionDetails } from './CorrectionDetails'
@@ -93,7 +93,7 @@ export function Summary() {
   const events = useEvents()
   const event: EventDocument = events.getEvent.getFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const eventIndex = useConditionals().getCurrentEventState(
+  const eventIndex = useValidationFunctionsWithContext().getCurrentEventState(
     event,
     eventConfiguration
   )

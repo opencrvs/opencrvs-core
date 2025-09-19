@@ -23,7 +23,7 @@ import {
   UserContext
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
-import { useConditionals } from '../hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '../hooks/useConditionals'
 
 // Defines custom API functions that are not part of the generated API from TRPC.
 
@@ -48,7 +48,7 @@ function hasPotentialDuplicates(
   event: EventDocument,
   eventConfiguration: EventConfig
 ) {
-  const eventIndex = useConditionals().getCurrentEventState(
+  const eventIndex = useValidationFunctionsWithContext().getCurrentEventState(
     event,
     eventConfiguration
   )
@@ -233,14 +233,15 @@ export async function makeCorrectionOnRequest({
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
 
-  const originalDeclaration = useConditionals().getCurrentEventState(
-    event,
-    eventConfiguration
-  ).declaration
+  const originalDeclaration =
+    useValidationFunctionsWithContext().getCurrentEventState(
+      event,
+      eventConfiguration
+    ).declaration
 
   const annotation =
     actionConfiguration && declarationMixedUpAnnotation
-      ? useConditionals().omitHiddenAnnotationFields(
+      ? useValidationFunctionsWithContext().omitHiddenAnnotationFields(
           actionConfiguration,
           originalDeclaration,
           declarationMixedUpAnnotation

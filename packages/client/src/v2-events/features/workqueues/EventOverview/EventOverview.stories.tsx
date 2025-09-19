@@ -30,6 +30,7 @@ import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { testDataGenerator } from '@client/tests/test-data-generators'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
 import { setEventData } from '../../events/useEvents/api'
 import { EventOverviewIndex } from './EventOverview'
 
@@ -81,7 +82,10 @@ export const Overview: Story = {
           tRPCMsw.event.search.query(() => {
             return {
               results: [
-                getCurrentEventState(defaultEvent, tennisClubMembershipEvent)
+                useValidationFunctionsWithContext().getCurrentEventState(
+                  defaultEvent,
+                  tennisClubMembershipEvent
+                )
               ],
               total: 1
             }

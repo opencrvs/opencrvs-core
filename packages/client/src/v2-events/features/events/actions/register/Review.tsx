@@ -43,6 +43,7 @@ import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitMod
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useContext } from '@client/v2-events/hooks/useContext'
 import { reviewMessages } from '../messages'
 
 function getTranslations(hasErrors: boolean) {
@@ -62,6 +63,7 @@ export function Review() {
   )
   const events = useEvents()
   const drafts = useDrafts()
+  const userContext = useContext()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { closeActionView: closeActionView } = useEventFormNavigation()
@@ -88,7 +90,7 @@ export function Review() {
   const reviewConfig = getActionReview(config, ActionType.REGISTER)
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
-  const currentEventState = getCurrentEventState(event, config)
+  const currentEventState = getCurrentEventState(event, config, userContext)
   const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 
@@ -99,8 +101,7 @@ export function Review() {
     formConfig,
     form,
     annotation,
-    reviewFields: reviewConfig.fields,
-    locations: adminStructureLocations
+    reviewFields: reviewConfig.fields
   })
 
   const messages = getTranslations(incomplete)

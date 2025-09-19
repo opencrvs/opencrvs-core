@@ -26,6 +26,7 @@ import {
   User
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
 import { removeCachedFiles } from '../../files/cache'
 import { MutationType } from './procedures/utils'
 
@@ -128,7 +129,11 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
       `Event configuration for type ${updatedEvent.type} not found`
     )
   }
-  const updatedEventIndex = getCurrentEventState(updatedEvent, config)
+  const updatedEventIndex =
+    useValidationFunctionsWithContext().getCurrentEventState(
+      updatedEvent,
+      config
+    )
   // Update the local event index with the updated event
   setEventSearchQuery(updatedEventIndex)
 

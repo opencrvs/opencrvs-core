@@ -40,16 +40,22 @@ import {
   Errors,
   getStructuralValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
+import { useContext } from '@client/v2-events/hooks/useContext'
 import { statusOptions, timePeriodOptions } from './EventMetadataSearchOptions'
 
 export function getAdvancedSearchFieldErrors(
   sections: AdvancedSearchConfigWithFieldsResolved[],
   values: EventState
 ) {
+  const userContext = useContext()
   return sections.reduce(
     (acc, section) => ({
       ...acc,
-      ...getStructuralValidationErrorsForForm(section.fields, values)
+      ...getStructuralValidationErrorsForForm(
+        section.fields,
+        values,
+        userContext
+      )
     }),
     {} as Errors
   )

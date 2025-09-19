@@ -44,6 +44,7 @@ import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitMod
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useContext } from '@client/v2-events/hooks/useContext'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
@@ -54,6 +55,8 @@ export function Review() {
   const events = useEvents()
   const drafts = useDrafts()
   const navigate = useNavigate()
+  const userContext = useContext()
+
   const [modal, openModal] = useModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const { closeActionView } = useEventFormNavigation()
@@ -65,7 +68,7 @@ export function Review() {
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  const currentEventState = getCurrentEventState(event, config)
+  const currentEventState = getCurrentEventState(event, config, userContext)
 
   const formConfig = getDeclaration(config)
   const reviewConfig = getActionReview(config, ActionType.DECLARE)
@@ -86,8 +89,7 @@ export function Review() {
     formConfig,
     declaration: form,
     annotation,
-    reviewFields: reviewConfig.fields,
-    locations: adminStructureLocations
+    reviewFields: reviewConfig.fields
   })
 
   async function handleEdit({

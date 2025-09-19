@@ -40,6 +40,7 @@ import {
   addLocalEventConfig
 } from '@client/v2-events/features/events/useEvents/api'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
 import { ActionMenu } from '../ActionMenu'
 import { actionLabels } from '../useAllowedActionConfigurations'
 
@@ -376,7 +377,10 @@ export function createStoriesFromScenarios(
                 tRPCMsw.event.search.query(() => ({
                   total: 1,
                   results: [
-                    getCurrentEventState(event, tennisClubMembershipEvent)
+                    useValidationFunctionsWithContext().getCurrentEventState(
+                      event,
+                      tennisClubMembershipEvent
+                    )
                   ]
                 })),
                 tRPCMsw.event.get.query(() => {
@@ -456,7 +460,12 @@ export function createdByOtherUserScenario({
           event: [
             tRPCMsw.event.search.query(() => ({
               total: 1,
-              results: [getCurrentEventState(event, tennisClubMembershipEvent)]
+              results: [
+                useValidationFunctionsWithContext().getCurrentEventState(
+                  event,
+                  tennisClubMembershipEvent
+                )
+              ]
             })),
             tRPCMsw.event.get.query(() => {
               return tennisClubMembershipEventDocument

@@ -17,7 +17,7 @@ import {
   runStructuralValidations,
   UserContext
 } from '@opencrvs/commons/client'
-import { useConditionals } from '@client/v2-events/hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
 
 interface FieldErrors {
   errors: {
@@ -43,7 +43,7 @@ export function getValidationErrorsForForm(
     }
     return {
       ...errorsForAllFields,
-      [field.id]: useConditionals().runFieldValidations({
+      [field.id]: useValidationFunctionsWithContext().runFieldValidations({
         field,
         values
       })
@@ -88,15 +88,17 @@ export function validationErrorsInActionFormExist({
   reviewFields?: FieldConfig[]
 }): boolean {
   // We don't want to validate hidden fields
-  const formWithoutHiddenFields = useConditionals().omitHiddenPaginatedFields(
-    formConfig,
-    form
-  )
+  const formWithoutHiddenFields =
+    useValidationFunctionsWithContext().omitHiddenPaginatedFields(
+      formConfig,
+      form
+    )
 
-  const visibleAnnotationFields = useConditionals().omitHiddenFields(
-    reviewFields,
-    annotation ?? {}
-  )
+  const visibleAnnotationFields =
+    useValidationFunctionsWithContext().omitHiddenFields(
+      reviewFields,
+      annotation ?? {}
+    )
 
   const hasValidationErrors = formConfig.pages
     .filter((page) => isPageVisible(page, form))

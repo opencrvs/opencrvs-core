@@ -21,7 +21,7 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { useConditionals } from '@client/v2-events/hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
 
 const messages = defineMessages({
   title: {
@@ -40,7 +40,7 @@ export function Onboarding() {
   const annotation = useActionAnnotation((state) => state.getAnnotation())
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
-  const userContext = useConditionals()
+  const userContext = useValidationFunctionsWithContext()
 
   const event = events.getEvent.getFromCache(eventId)
 

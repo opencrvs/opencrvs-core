@@ -17,6 +17,7 @@ import {
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
 
 export function RequestCorrection({
   action,
@@ -35,7 +36,7 @@ export function RequestCorrection({
     actions: fullEvent.actions.slice(0, index)
   }
 
-  const eventIndex = getCurrentEventState(
+  const eventIndex = useValidationFunctionsWithContext().getCurrentEventState(
     eventBeforeCorrectionRequest,
     eventConfiguration
   )

@@ -23,6 +23,7 @@ import {
 
 import { ROUTES } from '@client/v2-events/routes'
 import { CoreWorkqueues, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
 import { useEventConfigurations } from '../events/useEventConfiguration'
 import { SearchResultComponent } from '../events/Search/SearchResult'
 import { useDrafts } from '../drafts/useDrafts'
@@ -55,7 +56,11 @@ export function Draft() {
         `Event configuration not found for ${event.type}`
       )
 
-      const currentEventState = getCurrentEventState(event, configuration)
+      const currentEventState =
+        useValidationFunctionsWithContext().getCurrentEventState(
+          event,
+          configuration
+        )
       return draft
         ? applyDraftToEventIndex(currentEventState, draft, configuration)
         : currentEventState

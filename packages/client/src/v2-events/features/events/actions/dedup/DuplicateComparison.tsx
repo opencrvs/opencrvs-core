@@ -34,6 +34,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { noop } from '@client/v2-events'
+import { useContext } from '@client/v2-events/hooks/useContext'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { Output, ValueOutput } from '../../components/Output'
 import { AdministrativeArea } from '../../registered-fields'
@@ -104,6 +105,7 @@ function SupportingDocumentList({
 function UserFullName({ userId }: { userId: string }) {
   const intl = useIntl()
   const users = useUsers()
+
   const user = users.getUser.useQuery(userId).data
   if (!user) {
     return null
@@ -119,6 +121,8 @@ export function DuplicateComparison({
   potentialDuplicateEvent: EventIndex
 }) {
   const intl = useIntl()
+  const userContext = useContext()
+
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const { eventConfiguration } = useEventConfiguration(originalEvent.type)
 
@@ -148,8 +152,16 @@ export function DuplicateComparison({
         data: page.fields
           .filter(
             (field) =>
-              isFieldDisplayedOnReview(field, originalDeclaration) ||
-              isFieldDisplayedOnReview(field, potentialDuplicateDeclaration)
+              isFieldDisplayedOnReview(
+                field,
+                originalDeclaration,
+                userContext
+              ) ||
+              isFieldDisplayedOnReview(
+                field,
+                potentialDuplicateDeclaration,
+                userContext
+              )
           )
           .filter(
             ({ type }) =>

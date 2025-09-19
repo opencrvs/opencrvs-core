@@ -24,6 +24,7 @@ import {
   Draft
 } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
 import { useDrafts } from '../../drafts/useDrafts'
 import { useEventConfigurations } from '../useEventConfiguration'
 import { prefetchPotentialDuplicates } from '../actions/dedup/getDuplicates'
@@ -64,7 +65,11 @@ function buildDraftedEventResult(
   draft: Draft,
   configuration: EventConfig
 ) {
-  const currentEventState = getCurrentEventState(event, configuration)
+  const currentEventState =
+    useValidationFunctionsWithContext().getCurrentEventState(
+      event,
+      configuration
+    )
   return {
     results: [applyDraftToEventIndex(currentEventState, draft, configuration)],
     total: 1

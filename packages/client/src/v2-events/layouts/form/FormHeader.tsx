@@ -18,6 +18,7 @@ import { getCurrentEventState } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
 import { AllowedRouteWithEventId } from './utils'
 
 const messages = defineMessages({
@@ -58,7 +59,10 @@ export function FormHeader({
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const eventIndex = getCurrentEventState(event, configuration)
+  const eventIndex = useValidationFunctionsWithContext().getCurrentEventState(
+    event,
+    configuration
+  )
 
   const onExit = useCallback(async () => {
     await exit(eventIndex)

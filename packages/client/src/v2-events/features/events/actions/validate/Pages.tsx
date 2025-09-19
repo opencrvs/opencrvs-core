@@ -33,7 +33,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useConditionals } from '@client/v2-events/hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
 
 export function Pages() {
   const events = useEvents()
@@ -46,7 +46,7 @@ export function Pages() {
   const { modal, closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
-  const userContext = useConditionals()
+  const userContext = useValidationFunctionsWithContext()
 
   const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(

@@ -26,13 +26,13 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
-import { useConditionals } from '@client/v2-events/hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
 import { ReviewCorrection } from './ReviewCorrection'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REVIEW_CORRECTION.REVIEW)
   const events = useEvents()
-  const userContext = useConditionals()
+  const userContext = useValidationFunctionsWithContext()
 
   const event = events.getEvent.getFromCache(eventId)
 

@@ -23,6 +23,7 @@ import {
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
 import { Pages } from '../components/Pages'
 import { useEventFormData } from '../useEventFormData'
 import { tennisClubMembershipEventDocument } from '../fixtures'
@@ -91,7 +92,10 @@ const parameters = {
         tRPCMsw.event.search.query((input) => {
           return {
             results: [
-              getCurrentEventState(createdEvent, tennisClubMembershipEvent)
+              useValidationFunctionsWithContext().getCurrentEventState(
+                createdEvent,
+                tennisClubMembershipEvent
+              )
             ],
             total: 1
           }
