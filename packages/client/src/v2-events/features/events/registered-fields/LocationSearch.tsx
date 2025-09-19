@@ -43,22 +43,21 @@ function useAdministrativeAreas(
   searchableResource: ('locations' | 'facilities' | 'offices')[]
 ) {
   const { getLocations } = useLocations()
+  const resourceLocations = searchableResource.flatMap((resource) => {
+    const [locations] = getLocations.useSuspenseQuery({
+      isActive: true,
+      locationType: resourceTypeMap[resource]
+    })
+    return locations
+  })
 
   return React.useMemo(() => {
-    return searchableResource.flatMap((resource) => {
-      // Run queries for each resource type
-      const [resourceLocations] = getLocations.useSuspenseQuery({
-        isActive: true,
-        locationType: resourceTypeMap[resource]
-      })
-
-      return resourceLocations.map((location) => ({
-        id: location.id,
-        searchableText: location.name.toLowerCase(),
-        displayLabel: location.name
-      }))
-    })
-  }, [searchableResource, getLocations])
+    return resourceLocations.map((location) => ({
+      id: location.id,
+      searchableText: location.name.toLowerCase(),
+      displayLabel: location.name
+    }))
+  }, [resourceLocations])
 }
 
 function LocationSearchInput({
@@ -74,6 +73,7 @@ function LocationSearchInput({
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
 }) {
   const locationList = useAdministrativeAreas(searchableResource)
+
   const selectedLocation = locationList.find(
     (location) => location.id === value
   )
