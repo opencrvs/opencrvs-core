@@ -8,20 +8,25 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useLocation, useSearchParams } from 'react-router-dom'
 import {
   QueryParamReaderField,
   QueryParamReaderFieldValue
 } from '@opencrvs/commons/client'
 
+/**
+ *  For params like ?input1=1&input2=2,
+ *  and map = { input1: 'output1', input2: 'output2' }
+ *  will result in { output1: '1', output2: '2' }
+ */
 function prepareParamsFromMap(
   params: URLSearchParams,
   map: NonNullable<QueryParamReaderField['configuration']['map']>
 ) {
   const result: Record<string, string> = {}
   for (const [key, entry] of Object.entries(map)) {
-    result[key] = params.get(entry) || ''
+    result[entry] = params.get(key) || ''
   }
   return result
 }
@@ -35,6 +40,8 @@ function QueryParamReaderInput({
 }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const { map } = configuration
+  const onChangeRef = useRef(onChange)
+  onChangeRef.current = onChange
   const searchString = searchParams.toString()
 
   useEffect(() => {
@@ -46,9 +53,9 @@ function QueryParamReaderInput({
       ? prepareParamsFromMap(params, map)
       : Object.fromEntries(params)
 
-    void Promise.resolve().then(() => onChange(paramsObject))
+    void Promise.resolve().then(() => onChangeRef.current(paramsObject))
     setSearchParams(new URLSearchParams(), { replace: true })
-  }, [map, onChange, searchString, setSearchParams])
+  }, [map, onChangeRef, searchString, setSearchParams])
   return null
 }
 
