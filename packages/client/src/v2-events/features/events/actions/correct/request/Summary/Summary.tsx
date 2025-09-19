@@ -42,7 +42,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import {
-  getContext,
+  useContext,
   useConditionals
 } from '@client/v2-events/hooks/useConditionals'
 import { hasFieldChanged } from '../../utils'
@@ -90,7 +90,7 @@ export function Summary() {
   const navigate = useNavigate()
   const intl = useIntl()
 
-  const userContext = getContext()
+  const userContext = useContext()
 
   const events = useEvents()
   const event: EventDocument = events.getEvent.getFromCache(eventId)

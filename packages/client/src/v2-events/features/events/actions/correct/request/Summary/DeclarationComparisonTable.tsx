@@ -26,7 +26,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
-import { getContext } from '@client/v2-events/hooks/useConditionals'
+import { useContext } from '@client/v2-events/hooks/useConditionals'
 import { hasFieldChanged } from '../../utils'
 
 const TableHeader = styled.th`
@@ -64,7 +64,7 @@ export function DeclarationComparisonTableComponent({
   eventConfig,
   id
 }: DeclarationComparisonTableProps) {
-  const userContext = getContext()
+  const userContext = useContext()
   const index = fullEvent.actions.findIndex((a) => a.id === action?.id)
   // When action is not found or provided, we compare the full event
   const eventBeforeUpdate =

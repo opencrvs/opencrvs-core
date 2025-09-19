@@ -41,10 +41,9 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { getScope } from '@client/profile/profileSelectors'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { getContext } from '@client/v2-events/hooks/useConditionals'
+import { useContext } from '@client/v2-events/hooks/useConditionals'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 /**
@@ -64,7 +63,7 @@ export function Review() {
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
 
-  const userContext = getContext()
+  const userContext = useContext()
 
   const event = events.getEvent.findFromCache(eventId).data
 
@@ -105,8 +104,6 @@ export function Review() {
   const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 
-  const scopes = useSelector(getScope) ?? undefined
-
   const adminStructureLocations = locations.filter(
     (location) => location.locationType === 'ADMIN_STRUCTURE'
   )
@@ -115,10 +112,8 @@ export function Review() {
     formConfig,
     declaration: form,
     annotation,
-    scopes,
     reviewFields: reviewConfig.fields,
     status: currentEventState.status,
-    locations: adminStructureLocations,
     eventType: event.type
   })
 

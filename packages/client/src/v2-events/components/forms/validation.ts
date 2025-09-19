@@ -12,13 +12,9 @@ import { MessageDescriptor } from 'react-intl'
 import {
   FieldConfig,
   EventState,
-  omitHiddenPaginatedFields,
   isPageVisible,
   FormConfig,
-  omitHiddenFields,
-  runFieldValidations,
   runStructuralValidations,
-  Location,
   UserContext
 } from '@opencrvs/commons/client'
 import { useConditionals } from '@client/v2-events/hooks/useConditionals'
@@ -35,8 +31,7 @@ export interface Errors {
 
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
-  values: EventState,
-  locations?: Location[]
+  values: EventState
 ) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
     if (
@@ -84,13 +79,11 @@ export function getStructuralValidationErrorsForForm(
 export function validationErrorsInActionFormExist({
   formConfig,
   form,
-  context,
   annotation,
   reviewFields = []
 }: {
   formConfig: FormConfig
   form: EventState
-  context: UserContext
   annotation?: EventState
   reviewFields?: FieldConfig[]
 }): boolean {
@@ -110,14 +103,13 @@ export function validationErrorsInActionFormExist({
     .some((page) => {
       const fieldErrors = getValidationErrorsForForm(
         page.fields,
-        formWithoutHiddenFields,
-        context
+        formWithoutHiddenFields
       )
       return Object.values(fieldErrors).some((field) => field.errors.length > 0)
     })
 
   const hasAnnotationValidationErrors = Object.values(
-    getValidationErrorsForForm(reviewFields, visibleAnnotationFields, context)
+    getValidationErrorsForForm(reviewFields, visibleAnnotationFields)
   ).some((field) => field.errors.length > 0)
 
   return hasValidationErrors || hasAnnotationValidationErrors

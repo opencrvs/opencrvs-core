@@ -35,7 +35,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { getContext } from '@client/v2-events/hooks/useConditionals'
+import { useContext } from '@client/v2-events/hooks/useConditionals'
 import { hasFieldChanged } from '../utils'
 
 export function Review() {
@@ -48,7 +48,7 @@ export function Review() {
   const events = useEvents()
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
-  const userContext = getContext()
+  const userContext = useContext()
 
   const event = events.getEvent.getFromCache(eventId)
 

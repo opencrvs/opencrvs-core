@@ -29,18 +29,14 @@ export function useReviewActionConfig({
   declaration,
   annotation,
   reviewFields,
-  scopes,
   status,
-  locations,
   eventType
 }: {
   formConfig: DeclarationFormConfig
   declaration: EventState
   annotation?: EventState
   reviewFields: FieldConfig[]
-  scopes?: Scope[]
   status: EventStatus
-  locations: Location[]
   eventType: string
 }) {
   const events = useEvents()
@@ -48,8 +44,7 @@ export function useReviewActionConfig({
     formConfig,
     form: declaration,
     annotation,
-    reviewFields,
-    locations
+    reviewFields
   })
 
   const { isActionAllowed } = useUserAllowedActions(eventType)

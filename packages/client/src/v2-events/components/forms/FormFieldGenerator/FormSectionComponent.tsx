@@ -40,7 +40,7 @@ import {
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
 import {
-  getContext,
+  useContext,
   useConditionals
 } from '@client/v2-events/hooks/useConditionals'
 import {
@@ -201,7 +201,7 @@ export function FormSectionComponent({
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
   const { isFieldVisible } = useConditionals()
-  const userContext = getContext()
+  const userContext = useContext()
 
   const fieldsWithFormikSeparator = fieldsWithDotSeparator.map((field) => ({
     ...field,

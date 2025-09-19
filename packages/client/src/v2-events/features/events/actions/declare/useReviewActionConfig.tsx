@@ -13,10 +13,8 @@ import { v4 as uuid } from 'uuid'
 import {
   EventState,
   DeclarationFormConfig,
-  Scope,
   FieldConfig,
-  ActionType,
-  Location
+  ActionType
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -28,15 +26,13 @@ export function useReviewActionConfig({
   declaration,
   annotation,
   reviewFields,
-  eventType,
-  locations
+  eventType
 }: {
   formConfig: DeclarationFormConfig
   declaration: EventState
   annotation?: EventState
   reviewFields: FieldConfig[]
   eventType: string
-  locations: Location[]
 }) {
   const events = useEvents()
   const { isActionAllowed } = useUserAllowedActions(eventType)
@@ -44,8 +40,7 @@ export function useReviewActionConfig({
     formConfig,
     form: declaration,
     annotation,
-    reviewFields,
-    locations
+    reviewFields
   })
 
   const userMayDeclare = isActionAllowed(ActionType.DECLARE)

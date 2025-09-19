@@ -27,16 +27,9 @@ import {
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { useLocations } from './useLocations'
 
-export function getContext(): UserContext {
+export function useContext(): UserContext {
   const token = getToken()
   const tokenPayload = getTokenPayload(token)
-
-  // @todo: add locations?
-  return { user: tokenPayload ?? undefined }
-}
-
-export function useConditionals() {
-  const context = getContext()
 
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
@@ -44,6 +37,12 @@ export function useConditionals() {
   const adminStructureLocations = locations.filter(
     (location) => location.locationType === 'ADMIN_STRUCTURE'
   )
+
+  return { user: tokenPayload ?? undefined, locations: adminStructureLocations }
+}
+
+export function useConditionals() {
+  const context = useContext()
 
   return {
     isFieldVisible: (field: FieldConfig, form: ActionUpdate | EventState) =>
