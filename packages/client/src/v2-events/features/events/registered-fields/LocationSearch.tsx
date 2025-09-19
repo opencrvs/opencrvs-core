@@ -44,6 +44,7 @@ function useAdministrativeAreas(
 ) {
   const { getLocations } = useLocations()
   const resourceLocations = searchableResource.flatMap((resource) => {
+    // Run queries for each resource type
     const [locations] = getLocations.useSuspenseQuery({
       isActive: true,
       locationType: resourceTypeMap[resource]
