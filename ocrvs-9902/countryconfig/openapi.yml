@@ -675,9 +675,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -858,9 +855,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -968,9 +962,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -1071,9 +1062,6 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
-              default: false
-            disabled:
               type: boolean
               default: false
             conditionals:
@@ -1184,9 +1172,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -1284,9 +1269,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -1381,9 +1363,6 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
-              default: false
-            disabled:
               type: boolean
               default: false
             conditionals:
@@ -1499,9 +1478,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -1612,9 +1588,6 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
-              default: false
-            disabled:
               type: boolean
               default: false
             conditionals:
@@ -1729,9 +1702,6 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
-              default: false
-            disabled:
               type: boolean
               default: false
             conditionals:
@@ -1852,9 +1822,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -1961,9 +1928,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -2052,9 +2016,6 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
-              default: false
-            disabled:
               type: boolean
               default: false
             conditionals:
@@ -2162,9 +2123,6 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
-              default: false
-            disabled:
               type: boolean
               default: false
             conditionals:
@@ -2325,9 +2283,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -2416,9 +2371,6 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
-              default: false
-            disabled:
               type: boolean
               default: false
             conditionals:
@@ -2511,9 +2463,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -2603,9 +2552,6 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
-              default: false
-            disabled:
               type: boolean
               default: false
             conditionals:
@@ -2745,9 +2691,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -2836,9 +2779,6 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
-              default: false
-            disabled:
               type: boolean
               default: false
             conditionals:
@@ -2952,9 +2892,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -3039,9 +2976,6 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
-              default: false
-            disabled:
               type: boolean
               default: false
             conditionals:
@@ -3148,9 +3082,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -3241,9 +3172,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -3332,9 +3260,6 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
-              default: false
-            disabled:
               type: boolean
               default: false
             conditionals:
@@ -3448,9 +3373,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -3546,9 +3468,6 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
-              default: false
-            disabled:
               type: boolean
               default: false
             conditionals:
@@ -3693,9 +3612,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -3812,9 +3728,6 @@ components:
             required:
               type: boolean
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -3917,9 +3830,6 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
-              default: false
-            disabled:
               type: boolean
               default: false
             conditionals:
