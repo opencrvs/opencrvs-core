@@ -225,7 +225,8 @@ export const setupTestCase = async (
   const eventsDb = getClient()
 
   const seed = seeder()
-  await seed.locations(generator.locations.set(5))
+  const locationRng = createPrng(10123)
+  await seed.locations(generator.locations.set(5, locationRng))
 
   const locations = await getLocations()
 

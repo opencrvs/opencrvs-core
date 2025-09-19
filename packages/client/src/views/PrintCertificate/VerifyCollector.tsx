@@ -68,7 +68,7 @@ type IFullProps = IStateProps & IDispatchProps & IOwnProps
 
 class VerifyCollectorComponent extends React.Component<IFullProps> {
   handleVerification = (hasShowedVerifiedDocument: boolean) => {
-    const isIssueUrl = window.location.href.includes('issue')
+    const isIssueUrl = window.location.pathname.includes('issue')
 
     const event = this.props.declaration!.event
     const eventDate = getEventDate(this.props.declaration!.data, event)
@@ -204,7 +204,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   render() {
     const { collector } = this.props.router.params
     const { intl } = this.props
-    const isIssueUrl = window.location.href.includes('issue')
+    const isIssueUrl = window.location.pathname.includes('issue')
     const titleMessage = isIssueUrl
       ? intl.formatMessage(issueMessages.issueCertificate)
       : intl.formatMessage(messages.certificateCollectionTitle)

@@ -43,6 +43,9 @@ const meta: Meta<typeof FormFieldGenerator> = {
 
 export default meta
 
+const leafAdminStructureLocationId =
+  '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
@@ -97,7 +100,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
             defaultValue: {
               country: 'FAR',
               addressType: AddressType.DOMESTIC,
-              administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID
+              administrativeArea: leafAdminStructureLocationId
             },
             configuration: {
               streetAddressForm: [
@@ -182,11 +185,11 @@ export const AddressReviewInvalid: StoryObj<typeof Review> = {
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+            administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054d' as UUID // random uuid
           } as AddressFieldValue
         }}
         formConfig={declarationForm}
-        locations={locations}
+        locationIds={locations}
         title="My address form with address output"
         // eslint-disable-next-line no-console
         onEdit={(values) => console.log(values)}
@@ -227,7 +230,7 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+            administrativeArea: leafAdminStructureLocationId,
             streetLevelDetails: {
               town: 'Example Town',
               residentialArea: 'Example Residential Area',
@@ -238,11 +241,16 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
           }
         }}
         formConfig={declarationForm}
+        locationIds={[
+          {
+            id: leafAdminStructureLocationId
+          }
+        ]}
         previousFormValues={{
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+            administrativeArea: leafAdminStructureLocationId,
             streetLevelDetails: {
               town: 'Example Village'
             }
@@ -270,7 +278,7 @@ export const AddressInCopy: StoryObj<typeof Review> = {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+        administrativeArea: leafAdminStructureLocationId,
         streetLevelDetails: {
           town: 'Example Town',
           residentialArea: 'Example Residential Area',

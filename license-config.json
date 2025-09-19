@@ -52,7 +52,8 @@
     "packages/commons/src/events/EventUpdateFlow.mermaid",
     "packages/events/src/storage/postgres/events/schema/**/*.ts",
     "packages/events/.kanelrc.js",
-    "packages/events/src/tests/extract-dump.sh"
+    "packages/events/src/tests/extract-dump.sh",
+    ".kube"
   ],
   "license": "license-header.txt",
   "licenseFormats": {
