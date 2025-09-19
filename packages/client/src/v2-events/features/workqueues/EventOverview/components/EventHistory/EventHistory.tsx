@@ -31,10 +31,16 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import * as routes from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
 import { useEventOverviewContext } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
-import { getUsersFullName } from '@client/v2-events/utils'
+import {
+  ExtendedActionDocument,
+  getUsersFullName
+} from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
-import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
+import {
+  hasDeclarationChanged,
+  useActionForHistory
+} from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import {
   EventHistoryDialog,
@@ -301,6 +307,42 @@ function ActionLocation({ action }: { action: ActionDocument }) {
   )
 }
 
+function appendUpdateAction({
+  actions
+}: {
+  actions: ActionDocument[]
+}): ExtendedActionDocument[] {
+  const newActions = []
+
+  for (const action of actions) {
+    if (
+      action.type === 'VALIDATE' ||
+      action.type === 'REGISTER' ||
+      action.type === 'DECLARE'
+    ) {
+      const changed = hasDeclarationChanged(actions, action)
+      if (changed) {
+        newActions.push(
+          {
+            ...action,
+            type: 'UPDATE' as const
+          },
+          {
+            ...action,
+            declaration: {}
+          }
+        )
+        continue
+      }
+      newActions.push(action)
+      continue
+    }
+    newActions.push(action)
+  }
+
+  return newActions
+}
+
 export function EventHistorySkeleton() {
   const intl = useIntl()
   return (
@@ -327,24 +369,36 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const { getActionTypeForHistory } = useActionForHistory()
   const { getActionCreator } = useActionCreator()
 
-  const onHistoryRowClick = (item: ActionDocument, userName: string) => {
+  const history = getAcceptedActions(fullEvent)
+
+  const historyWithUpdatedActions = appendUpdateAction({
+    actions: history
+  })
+
+  const modifiedFullEvent = {
+    ...fullEvent,
+    actions: historyWithUpdatedActions
+  }
+
+  const visibleHistoryWithUpdatedActions = historyWithUpdatedActions.filter(
+    ({ type }) => type !== ActionType.CREATE
+  )
+
+  const onHistoryRowClick = (
+    item: ExtendedActionDocument,
+    userName: string
+  ) => {
     void openModal<void>((close) => (
       <EventHistoryDialog
         action={item}
         close={close}
-        fullEvent={fullEvent}
+        fullEvent={modifiedFullEvent}
         userName={userName}
       />
     ))
   }
 
-  const history = getAcceptedActions(fullEvent)
-
-  const visibleHistory = history.filter(
-    ({ type }) => type !== ActionType.CREATE
-  )
-
-  const historyRows = visibleHistory
+  const historyRows = visibleHistoryWithUpdatedActions
     .map((x) => {
       if (x.type === ActionType.REQUEST_CORRECTION) {
         const immediateApprovedCorrection = visibleHistory.find(
@@ -450,11 +504,13 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
           noResultText=""
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
         />
-        {visibleHistory.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
+        {visibleHistoryWithUpdatedActions.length >
+          DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
           <Pagination
             currentPage={currentPageNumber}
             totalPages={Math.ceil(
-              visibleHistory.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+              visibleHistoryWithUpdatedActions.length /
+                DEFAULT_HISTORY_RECORD_PAGE_SIZE
             )}
             onPageChange={(page) => setCurrentPageNumber(page)}
           />

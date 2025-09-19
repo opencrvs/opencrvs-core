@@ -30,7 +30,7 @@ function getPreviousActions(arr: ActionDocument[], id: string) {
   const index = arr.findIndex((item) => item.id === id)
   return index === -1 ? arr : take(arr, index)
 }
-function hasDeclarationChanged(
+export function hasDeclarationChanged(
   actions: ActionDocument[],
   action: Extract<
     Action,
@@ -79,18 +79,6 @@ export function useActionForHistory() {
       )
       if (approveAction) {
         return 'CORRECTED'
-      }
-    }
-
-    const parsedAction = DeclarationActions.exclude([
-      ActionType.NOTIFY
-    ]).safeParse(action.type)
-
-    if (parsedAction.success) {
-      if (
-        hasDeclarationChanged(actions, { ...action, type: parsedAction.data })
-      ) {
-        return DECLARATION_ACTION_UPDATE
       }
     }
 

@@ -30,8 +30,13 @@ import {
   joinValues,
   UUID,
   SystemRole,
+  ActionType,
   Location
 } from '@opencrvs/commons/client'
+
+export type ExtendedActionDocument = Omit<ActionDocument, 'type'> & {
+  type: ActionType | 'UPDATE'
+}
 
 export function getUsersFullName(
   names: ResolvedUser['name'],

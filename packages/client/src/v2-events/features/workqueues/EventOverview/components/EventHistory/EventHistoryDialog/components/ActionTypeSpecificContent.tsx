@@ -28,7 +28,10 @@ export function ActionTypeSpecificContent({
 }) {
   const { type } = action
 
-  const isDeclarationAction = DeclarationActions.safeParse(type).success
+  const isDeclarationAction =
+    // @ts-ignore
+    type === 'UPDATE' || DeclarationActions.safeParse(type).success
+
   if (isDeclarationAction) {
     return <DeclarationUpdate action={action} fullEvent={fullEvent} />
   }
