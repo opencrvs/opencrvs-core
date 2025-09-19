@@ -21,7 +21,6 @@ import {
   UUID
 } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
-import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { ActionTypeSpecificContent } from './components'
 
 export const eventHistoryStatusMessage = {
@@ -107,19 +106,20 @@ export function EventHistoryDialog({
   action,
   userName,
   close,
-  fullEvent
+  fullEvent,
+  status,
+  hideChangesFields
 }: {
   action: ActionDocument
   userName: string
   close: () => void
   fullEvent: EventDocument
+  status: string
+  hideChangesFields?: boolean
 }) {
   const intl = useIntl()
-  const { getActionTypeForHistory } = useActionForHistory()
   const history = getAcceptedActions(fullEvent)
-  const title = intl.formatMessage(eventHistoryStatusMessage, {
-    status: getActionTypeForHistory(history, action)
-  })
+  const title = intl.formatMessage(eventHistoryStatusMessage, { status })
 
   const comments = prepareComments(action)
   const reason = prepareReason(action)
@@ -193,7 +193,11 @@ export function EventHistoryDialog({
           noResultText=" "
         />
       )}
-      <ActionTypeSpecificContent action={action} fullEvent={fullEvent} />
+      <ActionTypeSpecificContent
+        action={action}
+        fullEvent={fullEvent}
+        hideChangesFields={hideChangesFields}
+      />
     </ResponsiveModal>
   )
 }

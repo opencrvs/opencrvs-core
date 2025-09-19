@@ -37,6 +37,7 @@ interface BaseDeclarationComparisonTableProps {
   fullEvent: EventDocument
   eventConfig: EventConfig
   id: string
+  hideChangesFields?: boolean
 }
 
 type DeclarationComparisonTableProps =
@@ -61,6 +62,7 @@ export function DeclarationComparisonTableComponent({
   form,
   fullEvent,
   eventConfig,
+  hideChangesFields,
   id
 }: DeclarationComparisonTableProps) {
   const index = fullEvent.actions.findIndex((a) => a.id === action?.id)
@@ -127,7 +129,7 @@ export function DeclarationComparisonTableComponent({
             }
           })
 
-        if (changedFields.length === 0) {
+        if (changedFields.length === 0 || hideChangesFields) {
           return null
         }
 

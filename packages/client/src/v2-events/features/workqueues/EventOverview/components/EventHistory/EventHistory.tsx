@@ -327,12 +327,19 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const { getActionTypeForHistory } = useActionForHistory()
   const { getActionCreator } = useActionCreator()
 
-  const onHistoryRowClick = (item: ActionDocument, userName: string) => {
+  const onHistoryRowClick = (
+    item: ActionDocument,
+    userName: string,
+    status: string,
+    hideChangesFields?: boolean
+  ) => {
     void openModal<void>((close) => (
       <EventHistoryDialog
         action={item}
         close={close}
         fullEvent={fullEvent}
+        hideChangesFields={hideChangesFields}
+        status={status}
         userName={userName}
       />
     ))
@@ -380,28 +387,43 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       (currentPageNumber - 1) * DEFAULT_HISTORY_RECORD_PAGE_SIZE,
       currentPageNumber * DEFAULT_HISTORY_RECORD_PAGE_SIZE
     )
-    .map((action) => {
+    .flatMap((action) => {
       const { name: actionCreatorName } = getActionCreator(action)
+      const actionTypes = getActionTypeForHistory(history, action)
 
-      return {
-        action: (
-          <Link
-            font="bold14"
-            onClick={() => onHistoryRowClick(action, actionCreatorName)}
-          >
-            {intl.formatMessage(eventHistoryStatusMessage, {
-              status: getActionTypeForHistory(history, action)
-            })}
-          </Link>
-        ),
-        date: format(
-          new Date(action.createdAt),
-          intl.formatMessage(messages.timeFormat)
-        ),
-        user: <ActionCreator action={action} />,
-        role: <ActionRole action={action} />,
-        location: <ActionLocation action={action} />
-      }
+      return actionTypes.map((status, index) => {
+        let updatedAction = action
+        if (index === 1) {
+          updatedAction = {
+            ...action,
+            declaration: {}
+          }
+        }
+        return {
+          action: (
+            <Link
+              font="bold14"
+              onClick={() =>
+                onHistoryRowClick(
+                  updatedAction,
+                  actionCreatorName,
+                  status,
+                  index === 1
+                )
+              }
+            >
+              {intl.formatMessage(eventHistoryStatusMessage, { status })}
+            </Link>
+          ),
+          date: format(
+            new Date(action.createdAt),
+            intl.formatMessage(messages.timeFormat)
+          ),
+          user: <ActionCreator action={action} />,
+          role: <ActionRole action={action} />,
+          location: <ActionLocation action={action} />
+        }
+      })
     })
 
   const columns = [

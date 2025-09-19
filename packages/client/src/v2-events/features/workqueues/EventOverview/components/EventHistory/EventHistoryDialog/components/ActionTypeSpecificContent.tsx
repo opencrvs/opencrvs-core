@@ -21,16 +21,24 @@ import { DeclarationUpdate } from './DeclarationUpdate'
 
 export function ActionTypeSpecificContent({
   action,
-  fullEvent
+  fullEvent,
+  hideChangesFields
 }: {
   action: ActionDocument
   fullEvent: EventDocument
+  hideChangesFields?: boolean
 }) {
   const { type } = action
 
   const isDeclarationAction = DeclarationActions.safeParse(type).success
   if (isDeclarationAction) {
-    return <DeclarationUpdate action={action} fullEvent={fullEvent} />
+    return (
+      <DeclarationUpdate
+        action={action}
+        fullEvent={fullEvent}
+        hideChangesFields={hideChangesFields}
+      />
+    )
   }
 
   if (type === ActionType.REQUEST_CORRECTION) {

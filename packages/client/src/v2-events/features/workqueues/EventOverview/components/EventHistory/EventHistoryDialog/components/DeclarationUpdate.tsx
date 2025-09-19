@@ -26,10 +26,12 @@ import { DeclarationComparisonTable } from '@client/v2-events/features/events/ac
  */
 export function DeclarationUpdateComponent({
   action,
-  fullEvent
+  fullEvent,
+  hideChangesFields
 }: {
   action: ActionDocument
   fullEvent: EventDocument
+  hideChangesFields?: boolean
 }) {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
@@ -46,6 +48,7 @@ export function DeclarationUpdateComponent({
       action={action}
       eventConfig={eventConfiguration}
       fullEvent={fullEvent}
+      hideChangesFields={hideChangesFields}
       id={'declaration-update'}
     />
   )
