@@ -358,8 +358,7 @@ export const ReviewWithConditionallyHiddenFields: Story = {
                     }
                   ]
                 },
-                // By default, checkboxes are hidden unless selected
-                // I.e. this should be hidden
+                // These fields should be shown, since there are no conditions
                 {
                   id: 'has-it-been-a-nice-day',
                   type: FieldType.CHECKBOX,
@@ -370,7 +369,6 @@ export const ReviewWithConditionallyHiddenFields: Story = {
                     id: 'has-it-been-a-nice-day.label'
                   }
                 },
-                // This field should be shown, since its selected
                 {
                   id: 'are-you-feeling-all-right',
                   type: FieldType.CHECKBOX,
