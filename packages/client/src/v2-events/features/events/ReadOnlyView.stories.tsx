@@ -27,7 +27,6 @@ import {
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
 import { ReadonlyViewIndex } from './ReadOnlyView'
 
 const generator = testDataGenerator()
@@ -61,11 +60,6 @@ const eventDocument = generateEventDocument({
 })
 
 const eventId = eventDocument.id
-const draft = generateEventDraftDocument({
-  eventId,
-  actionType: ActionType.DECLARE,
-  rng
-})
 const modifiedDraft = generateEventDraftDocument({
   eventId: eventDocument.id,
   actionType: ActionType.REGISTER,

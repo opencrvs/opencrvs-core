@@ -14,7 +14,8 @@ import React from 'react'
 import { within, expect, fn } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { LocationSearch } from './LocationSearch'
+// NOTE: If you do not import from index, you might encounter: ReferenceError: Cannot access 'LocationSearch' before initialization
+import { LocationSearch } from '.'
 
 const meta: Meta<typeof LocationSearch.Output> = {
   title: 'Inputs/LocationSearch',
@@ -39,6 +40,49 @@ export const LocationSearchInput: StoryObj<typeof LocationSearch.Input> = {
     id: 'location-search',
     searchableResource: ['locations', 'facilities', 'offices'],
     value: ''
+  }
+}
+
+export const LocationSearchInputWithActiveLocations: StoryObj<
+  typeof LocationSearch.Input
+> = {
+  name: 'LocationSearch with active locations',
+  render: (props) => {
+    return <LocationSearch.Input {...props} />
+  },
+  parameters: {
+    chromatic: { disableSnapshot: true }
+  },
+  args: {
+    id: 'location-search',
+    searchableResource: ['facilities'],
+    value: 'abc',
+    onChange: fn()
+  },
+  play: async ({ canvasElement, step, args }) => {
+    await step('Locations starting with "i" are visible', async () => {
+      const canvas = within(canvasElement)
+      const input =
+        await canvas.findByTestId<HTMLInputElement>('location-search')
+
+      await userEvent.type(input, 'i')
+      input.blur()
+
+      await expect(args.onChange).toHaveBeenCalled()
+      await expect(args.onChange).toHaveBeenCalledWith(undefined)
+
+      await expect(
+        canvas.findByText('Ibombo Rural Health Centre')
+      ).resolves.toBeInTheDocument()
+
+      await expect(
+        canvas.findByText('Ipongo Rural Health Centre')
+      ).resolves.toBeInTheDocument()
+
+      await expect(
+        canvas.findByText('Itumbwe Health Post')
+      ).resolves.toBeInTheDocument()
+    })
   }
 }
 
