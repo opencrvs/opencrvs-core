@@ -27,6 +27,7 @@ import {
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { useLocations } from './useLocations'
 
+// @todo move this to separate file called useContext.ts
 export function useContext(): UserContext {
   const token = getToken()
   const tokenPayload = getTokenPayload(token)
@@ -41,6 +42,8 @@ export function useContext(): UserContext {
   return { user: tokenPayload ?? undefined, locations: adminStructureLocations }
 }
 
+// @todo: rename to useValidationFunctionsWithContext()
+// also rename this file
 export function useConditionals() {
   const context = useContext()
 
@@ -49,8 +52,10 @@ export function useConditionals() {
       isFieldVisible(field, form, context),
     getCurrentEventState: (event: EventDocument, config: EventConfig) =>
       getCurrentEventState(event, config, context),
-    omitHiddenFields: (fields: FieldConfig[], values: T) =>
-      omitHiddenFields(fields, values, context),
+    omitHiddenFields: <T extends EventState | ActionUpdate>(
+      fields: FieldConfig[],
+      values: T
+    ) => omitHiddenFields(fields, values, context),
     omitHiddenAnnotationFields: (
       actionConfig: ActionConfig,
       declaration: EventState,
