@@ -11,12 +11,15 @@
 import React, { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import {
+  alwaysTrue,
+  ConditionalType,
   FieldConfig,
   FieldType,
   getValidatorsForField,
   joinValues,
   NameField,
   NameFieldValue,
+  not,
   TextField
 } from '@opencrvs/commons/client'
 import { mergeWithoutNullsOrUndefined } from '@client/v2-events/utils'
@@ -137,21 +140,31 @@ function NameInput(props: Props) {
           type: FieldType.TEXT,
           configuration: { maxLength },
           required: nameConfig.firstname?.required,
-          disabled,
+          conditionals: [
+            {
+              type: ConditionalType.ENABLE,
+              conditional: disabled ? not(alwaysTrue()) : not(not(alwaysTrue()))
+            }
+          ],
           label: nameConfig.firstname?.label || {
             defaultMessage: 'First name(s)',
             description: 'This is the label for the firstname field',
             id: 'field.name.firstname.label'
           },
           validation: getValidatorsForField('firstname', validators)
-        }
+        } satisfies TextField
       case 'middlename':
         return {
           id: 'middlename',
           type: FieldType.TEXT,
           configuration: { maxLength },
           required: nameConfig.middlename?.required,
-          disabled,
+          conditionals: [
+            {
+              type: ConditionalType.ENABLE,
+              conditional: disabled ? not(alwaysTrue()) : not(not(alwaysTrue()))
+            }
+          ],
           label: nameConfig.middlename?.label || {
             defaultMessage: 'Middle name',
             description: 'This is the label for the middlename field',
@@ -164,7 +177,12 @@ function NameInput(props: Props) {
           id: 'surname',
           type: FieldType.TEXT,
           required: nameConfig.surname?.required,
-          disabled,
+          conditionals: [
+            {
+              type: ConditionalType.ENABLE,
+              conditional: disabled ? not(alwaysTrue()) : not(not(alwaysTrue()))
+            }
+          ],
           configuration: { maxLength },
           label: nameConfig.surname?.label || {
             defaultMessage: 'Last name',

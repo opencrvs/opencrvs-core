@@ -19,6 +19,7 @@ import {
   field,
   FieldType,
   not,
+  alwaysTrue,
   FieldConfig,
   EventState,
   generateTranslationConfig
@@ -455,7 +456,12 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         fields={fields.map((f) => ({
           ...f,
           // Make all fields disabled
-          disabled: true
+          conditionals: [
+            {
+              type: ConditionalType.ENABLE,
+              conditional: not(alwaysTrue())
+            }
+          ]
         }))}
         id="my-form"
         initialValues={declaration}
