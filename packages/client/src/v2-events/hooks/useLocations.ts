@@ -44,7 +44,7 @@ export function useLocations() {
         // The `...rest` spread carries over things like staleTime, gcTime, enabled, etc.
         // Then we re-attach the queryKey explicitly so React Query can identify this cache.
         const { queryFn, ...rest } =
-          trpcOptionsProxy.locations.get.queryOptions()
+          trpcOptionsProxy.locations.list.queryOptions()
 
         return [
           useSuspenseQuery({
