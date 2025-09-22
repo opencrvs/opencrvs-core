@@ -10,53 +10,38 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import { TestUserRole } from '@opencrvs/commons/client'
-import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { SettingsPage } from './Settings'
 
-const meta: Meta<typeof SettingsPage> = {
-  title: 'Settings'
+import { Sidebar } from './Sidebar'
+
+const meta: Meta<typeof Sidebar> = {
+  title: 'Sidebar',
+  component: Sidebar
 }
 
 export default meta
 
-type Story = StoryObj<typeof SettingsPage>
+type Story = StoryObj<typeof Sidebar>
 
 export const LocalRegistrar: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.buildPath({})
-    }
+    userRole: TestUserRole.Enum.LOCAL_REGISTRAR
   }
 }
 
 export const FieldAgent: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT,
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.buildPath({})
-    }
+    userRole: TestUserRole.Enum.FIELD_AGENT
   }
 }
 
 export const RegistrationAgent: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.REGISTRATION_AGENT,
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.buildPath({})
-    }
+    userRole: TestUserRole.Enum.REGISTRATION_AGENT
   }
 }
 
 export const LocalSystemAdmin: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN,
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.SETTINGS.buildPath({})
-    }
+    userRole: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN
   }
 }

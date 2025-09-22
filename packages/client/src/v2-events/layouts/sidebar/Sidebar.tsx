@@ -41,12 +41,13 @@ import { hasDraftWorkqueue, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
 import { hasOutboxWorkqueue, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { withSuspense } from '../../components/withSuspense'
 import { OrganisationNavigationGroup } from './OrganisationNavigationGroup'
 import { PerformanceNavigationGroup } from './PerformanceNavigationGroup'
 
 const SCREEN_LOCK = 'screenLock'
 
-export function Workqueues({
+function Workqueues({
   workqueues,
   currentWorkqueueSlug,
   menuCollapse
@@ -77,7 +78,7 @@ export function Workqueues({
   ))
 }
 
-export const Sidebar = ({
+export const SidebarComponent = ({
   menuCollapse,
   navigationWidth,
   isMobileView = false
@@ -140,11 +141,6 @@ export const Sidebar = ({
       navigationWidth={navigationWidth}
       role={role}
     >
-      <OrganisationNavigationGroup
-        currentWorkqueueSlug={workqueueSlug}
-        primaryOfficeId={userDetails?.primaryOffice.id}
-      />
-      <PerformanceNavigationGroup currentWorkqueueSlug={workqueueSlug} />
       <NavigationGroup>
         {hasOutbox && (
           <NavigationItem
@@ -193,6 +189,11 @@ export const Sidebar = ({
           />
         )}
       </NavigationGroup>
+      <OrganisationNavigationGroup
+        currentWorkqueueSlug={workqueueSlug}
+        primaryOfficeId={userDetails?.primaryOffice.id}
+      />
+      <PerformanceNavigationGroup currentWorkqueueSlug={workqueueSlug} />
       {isMobileView && (
         <NavigationGroup>
           <NavigationItem
@@ -216,3 +217,5 @@ export const Sidebar = ({
     </LeftNavigation>
   )
 }
+
+export const Sidebar = withSuspense(SidebarComponent)

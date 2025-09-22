@@ -63,6 +63,7 @@ module.exports = defineConfig([
         {
           patterns: [
             '@client/*',
+            '@events/*',
             '!@client/v2-events',
             '!@client/components',
             '!@client/utils',
