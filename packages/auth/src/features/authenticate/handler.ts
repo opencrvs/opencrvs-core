@@ -70,8 +70,6 @@ export default async function authenticateHandler(
   const role = result.role as keyof typeof roleScopeMappings
   const scopes = roleScopeMappings[role]
 
-  console.log('role :>> ', role)
-
   if (isPendingUser) {
     response.token = await createToken(
       result.userId,
