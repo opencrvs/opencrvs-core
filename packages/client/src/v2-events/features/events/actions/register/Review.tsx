@@ -22,7 +22,8 @@ import {
   getActionAnnotation,
   getDeclaration,
   getActionReview,
-  InherentFlags
+  InherentFlags,
+  LocationType
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -42,7 +43,7 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useSuspenseAdminLeafLevelLocations } from '@client/v2-events/hooks/useLocations'
 import { reviewMessages } from '../messages'
 
 function getTranslations(hasErrors: boolean) {
@@ -67,8 +68,8 @@ export function Review() {
   const { closeActionView: closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+
+  const locationIds = useSuspenseAdminLeafLevelLocations()
 
   const registerMutation = events.actions.register
 
@@ -92,15 +93,12 @@ export function Review() {
   const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form,
     annotation,
     reviewFields: reviewConfig.fields,
-    locations: adminStructureLocations
+    locationIds
   })
 
   const messages = getTranslations(incomplete)
@@ -218,7 +216,7 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
-        locations={adminStructureLocations}
+        locationIds={locationIds}
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
