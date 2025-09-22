@@ -50,6 +50,7 @@ type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
   onChange: (newValue: Partial<AddressFieldValue>) => void
   value?: AddressFieldValue
   configuration?: AddressField['configuration']
+  disabled?: boolean
 }
 
 const COUNTRY_FIELD = {

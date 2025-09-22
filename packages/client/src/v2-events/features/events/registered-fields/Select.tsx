@@ -26,6 +26,7 @@ export type SelectInputProps = Omit<
   onChange: (newValue: string) => void
   value?: string
   label?: TranslationConfig
+  disabled?: boolean
 } & { 'data-testid'?: string }
 
 function SelectInput({ onChange, value, ...props }: SelectInputProps) {
