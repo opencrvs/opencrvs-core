@@ -21,7 +21,7 @@ test('Returns single location in right format', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const initialLocations = await client.locations.get()
+  const initialLocations = await client.locations.list()
 
   const setLocationPayload: Location[] = [
     {
@@ -45,7 +45,7 @@ test('Returns multiple locations', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const initialLocations = await client.locations.get()
+  const initialLocations = await client.locations.list()
 
   const locationRng = createPrng(845)
   await client.locations.set(generator.locations.set(5, locationRng))

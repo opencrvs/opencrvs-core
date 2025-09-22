@@ -50,7 +50,7 @@ test('Creates single location', async () => {
   const { user } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const initialLocations = await dataSeedingClient.locations.get()
+  const initialLocations = await dataSeedingClient.locations.list()
 
   const locationPayload: Location[] = [
     {
@@ -75,7 +75,7 @@ test('Creates multiple locations', async () => {
 
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const initialLocations = await dataSeedingClient.locations.get()
+  const initialLocations = await dataSeedingClient.locations.list()
 
   const parentId = generateUuid(rng)
 
@@ -95,7 +95,7 @@ test('seeding locations is additive, not destructive', async () => {
   const { user, generator } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const initialLocations = await dataSeedingClient.locations.get()
+  const initialLocations = await dataSeedingClient.locations.list()
   const locationRng = createPrng(847)
   const initialPayload = generator.locations.set(5, locationRng)
 
