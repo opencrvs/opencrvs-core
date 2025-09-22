@@ -107,7 +107,6 @@ export function Review() {
     annotation,
     reviewFields: reviewConfig.fields,
     status: currentEventState.status,
-    locationIds,
     eventType: event.type
   })
 

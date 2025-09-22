@@ -22,7 +22,6 @@ import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
-import { Location } from '../events/locations'
 import { UUID } from '../uuid'
 
 const ajv = new Ajv({
@@ -170,8 +169,7 @@ export function areConditionsMet(
 // @todo: move this to a better location
 export type UserContext = {
   user?: ITokenPayload
-  //locations?: Array<Location>
-  leafAdminStructureLocationIds: Array<{ id: UUID }>
+  leafAdminStructureLocationIds?: Array<{ id: UUID }>
 }
 
 function isFieldConditionMet(

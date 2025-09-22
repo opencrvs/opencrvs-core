@@ -84,8 +84,7 @@ export function Review() {
     formConfig,
     declaration: form,
     annotation,
-    reviewFields: reviewConfig.fields,
-    locationIds
+    reviewFields: reviewConfig.fields
   })
 
   async function handleEdit({

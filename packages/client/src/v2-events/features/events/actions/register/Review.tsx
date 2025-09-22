@@ -98,8 +98,7 @@ export function Review() {
     formConfig,
     form,
     annotation,
-    reviewFields: reviewConfig.fields,
-    locationIds
+    reviewFields: reviewConfig.fields
   })
 
   const messages = getTranslations(incomplete)

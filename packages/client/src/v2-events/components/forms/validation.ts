@@ -32,8 +32,7 @@ export interface Errors {
 
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
-  values: EventState,
-  locationIds: Array<{ id: UUID }>
+  values: EventState
 ) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
     if (
@@ -42,10 +41,6 @@ export function getValidationErrorsForForm(
       errorsForAllFields[field.id].errors.length > 0
     ) {
       return errorsForAllFields
-    }
-
-    const context = {
-      leafAdminStructureLocationIds: locationIds
     }
 
     return {
@@ -87,14 +82,12 @@ export function validationErrorsInActionFormExist({
   formConfig,
   form,
   annotation,
-  reviewFields = [],
-  locationIds
+  reviewFields = []
 }: {
   formConfig: FormConfig
   form: EventState
   annotation?: EventState
   reviewFields?: FieldConfig[]
-  locationIds: Array<{ id: UUID }>
 }): boolean {
   // We don't want to validate hidden fields
   const formWithoutHiddenFields =
@@ -114,18 +107,13 @@ export function validationErrorsInActionFormExist({
     .some((page) => {
       const fieldErrors = getValidationErrorsForForm(
         page.fields,
-        formWithoutHiddenFields,
-        locationIds
+        formWithoutHiddenFields
       )
       return Object.values(fieldErrors).some((field) => field.errors.length > 0)
     })
 
   const hasAnnotationValidationErrors = Object.values(
-    getValidationErrorsForForm(
-      reviewFields,
-      visibleAnnotationFields,
-      locationIds
-    )
+    getValidationErrorsForForm(reviewFields, visibleAnnotationFields)
   ).some((field) => field.errors.length > 0)
 
   return hasValidationErrors || hasAnnotationValidationErrors

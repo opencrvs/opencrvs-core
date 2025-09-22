@@ -17,7 +17,7 @@ import {
   getCurrentEventState
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
-import { requiresAnyOfScopes } from '@events/router/middleware'
+import { getContext, requiresAnyOfScopes } from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
 import { getEventById, processAction } from '@events/service/events/events'
 import {
@@ -51,6 +51,7 @@ export function declareActionProcedures() {
 
         const configs = await getInMemoryEventConfigurations(token)
         const event = await getEventById(input.eventId)
+        const context = await getContext(token)
 
         const config = configs.find((c) => c.id === event.type)
 
@@ -75,7 +76,11 @@ export function declareActionProcedures() {
         if (!dedupConfig) {
           return declaredEvent
         }
-        const declaredEventState = getCurrentEventState(declaredEvent, config)
+        const declaredEventState = getCurrentEventState(
+          declaredEvent,
+          config,
+          context
+        )
         const duplicates = await searchForDuplicates(
           declaredEventState,
           dedupConfig,

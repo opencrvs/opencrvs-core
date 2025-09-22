@@ -689,7 +689,11 @@ export const WithDuplicateDetectedAction: Story = {
           tRPCMsw.event.search.query(() => {
             return {
               results: [
-                getCurrentEventState(duplicateEvent, tennisClubMembershipEvent)
+                getCurrentEventState(
+                  duplicateEvent,
+                  tennisClubMembershipEvent,
+                  {}
+                )
               ],
               total: 1
             }
@@ -717,7 +721,11 @@ export const WithDuplicateDetectedActionModal: Story = {
           tRPCMsw.event.search.query(() => {
             return {
               results: [
-                getCurrentEventState(duplicateEvent, tennisClubMembershipEvent)
+                getCurrentEventState(
+                  duplicateEvent,
+                  tennisClubMembershipEvent,
+                  {}
+                )
               ],
               total: 1
             }

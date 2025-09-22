@@ -140,7 +140,7 @@ function validateDeclarationUpdateAction({
   const previousDeclaration = getCurrentEventState(
     event,
     eventConfig,
-    context.user
+    context
   ).declaration
   // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
   const completeDeclaration = deepMerge(previousDeclaration, declarationUpdate)
@@ -353,7 +353,7 @@ function validateCorrectableFields({
 }
 
 // @todo for Josh: move this to a better file?
-async function getContext(token: string): Promise<UserContext> {
+export async function getContext(token: string): Promise<UserContext> {
   const leafAdminStructureLocationIds = await getLeafLocationIds({
     locationTypes: [LocationType.enum.ADMIN_STRUCTURE]
   })

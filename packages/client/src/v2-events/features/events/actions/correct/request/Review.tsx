@@ -80,8 +80,7 @@ export function Review() {
 
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
-    form,
-    locationIds
+    form
   })
 
   return (

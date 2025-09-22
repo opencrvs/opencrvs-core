@@ -57,7 +57,7 @@ function eventToEventIndex(
   event: EventDocument,
   config: EventConfig
 ): EventIndex {
-  return encodeEventIndex(getCurrentEventState(event, config), config)
+  return encodeEventIndex(getCurrentEventState(event, config, {}), config)
 }
 
 /*
