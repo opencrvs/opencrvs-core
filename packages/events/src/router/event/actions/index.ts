@@ -436,7 +436,7 @@ export function getDefaultActionProcedures(
       }),
 
     reject: systemProcedure
-      .input(asyncInputFields)
+      .input(AsyncActionConfirmationResponseSchema)
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input
