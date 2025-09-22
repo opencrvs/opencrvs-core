@@ -16,6 +16,7 @@ import {
   EventConfig,
   EventDocument,
   EventState,
+  getAcceptedActions,
   getCurrentEventState,
   getDeclaration,
   isFieldDisplayedOnReview,
@@ -75,12 +76,10 @@ export function DeclarationComparisonTableComponent({
     throw new Error(`Event with id ${eventId} not found`)
   }
 
-  const fullEventActions = fullEventWithoutUpdatedAction.actions.filter(
-    (a) => 'declaration' in a
-  )
+  const acceptedActions = getAcceptedActions(fullEventWithoutUpdatedAction)
 
   const historyWithUpdatedActions = appendUpdateAction({
-    actions: fullEventActions
+    actions: acceptedActions
   })
 
   const fullEvent = {
