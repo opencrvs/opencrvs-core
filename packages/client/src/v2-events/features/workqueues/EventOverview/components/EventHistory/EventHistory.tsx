@@ -21,7 +21,6 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
-  ActionDocument,
   ActionType,
   EventDocument,
   getAcceptedActions
@@ -35,8 +34,8 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import {
+  appendUpdateAction,
   EventHistoryActionDocument,
-  hasDeclarationChanged,
   useActionForHistory
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
@@ -305,42 +304,6 @@ function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
   ) : (
     locationName
   )
-}
-
-function appendUpdateAction({
-  actions
-}: {
-  actions: ActionDocument[]
-}): EventHistoryActionDocument[] {
-  const newActions = []
-
-  for (const action of actions) {
-    if (
-      action.type === 'VALIDATE' ||
-      action.type === 'REGISTER' ||
-      action.type === 'DECLARE'
-    ) {
-      const changed = hasDeclarationChanged(actions, action)
-      if (changed) {
-        newActions.push(
-          {
-            ...action,
-            type: 'UPDATE' as const
-          },
-          {
-            ...action,
-            declaration: {}
-          }
-        )
-        continue
-      }
-      newActions.push(action)
-      continue
-    }
-    newActions.push(action)
-  }
-
-  return newActions
 }
 
 export function EventHistorySkeleton() {

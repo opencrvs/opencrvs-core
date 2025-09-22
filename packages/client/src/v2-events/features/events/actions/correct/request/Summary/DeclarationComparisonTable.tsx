@@ -14,6 +14,7 @@ import { useIntl } from 'react-intl'
 import {
   applyDeclarationToEventIndex,
   EventConfig,
+  EventDocument,
   EventState,
   getCurrentEventState,
   getDeclaration,
@@ -27,7 +28,10 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { hasFieldChanged } from '../../utils'
-import { EventHistoryActionDocument } from '../../useActionForHistory'
+import {
+  appendUpdateAction,
+  EventHistoryActionDocument
+} from '../../useActionForHistory'
 
 const TableHeader = styled.th`
   text-transform: uppercase;
@@ -65,10 +69,23 @@ export function DeclarationComparisonTableComponent({
   id
 }: DeclarationComparisonTableProps) {
   const { getEvent } = useEvents()
-  const fullEvent = getEvent.findFromCache(eventId).data
+  const fullEventWithoutUpdatedAction = getEvent.findFromCache(eventId).data
 
-  if (!fullEvent) {
+  if (!fullEventWithoutUpdatedAction) {
     throw new Error(`Event with id ${eventId} not found`)
+  }
+
+  const fullEventActions = fullEventWithoutUpdatedAction.actions.filter(
+    (a) => 'declaration' in a
+  )
+
+  const historyWithUpdatedActions = appendUpdateAction({
+    actions: fullEventActions
+  })
+
+  const fullEvent = {
+    ...fullEventWithoutUpdatedAction,
+    actions: historyWithUpdatedActions
   }
 
   const index = fullEvent.actions.findIndex((a) => a.id === action?.id)
@@ -86,7 +103,10 @@ export function DeclarationComparisonTableComponent({
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
-  const currentState = getCurrentEventState(fullEvent, eventConfiguration)
+  const currentState = getCurrentEventState(
+    fullEvent as EventDocument,
+    eventConfiguration
+  )
 
   // When form is provided, we apply it on top of the current state to get the latest declaration
   const latestDeclaration = form
@@ -95,7 +115,7 @@ export function DeclarationComparisonTableComponent({
     : currentState.declaration
 
   const previousDeclaration = getCurrentEventState(
-    eventBeforeUpdate,
+    eventBeforeUpdate as EventDocument,
     eventConfiguration
   ).declaration
 

@@ -17,7 +17,8 @@ import {
   DeclarationActionType,
   EventConfig,
   EventDocument,
-  getCurrentEventState
+  getCurrentEventState,
+  UUID
 } from '@opencrvs/commons/client'
 import { getPreviousDeclarationActionType } from '../../components/Action/utils'
 
@@ -81,6 +82,43 @@ export function hasDeclarationChanged(
   )
 }
 
+export function appendUpdateAction({
+  actions
+}: {
+  actions: ActionDocument[]
+}): EventHistoryActionDocument[] {
+  const newActions = []
+
+  for (const action of actions) {
+    if (
+      action.type === 'VALIDATE' ||
+      action.type === 'REGISTER' ||
+      action.type === 'DECLARE'
+    ) {
+      const changed = hasDeclarationChanged(actions, action)
+      if (changed) {
+        newActions.push(
+          {
+            ...action,
+            id: `${action.id}-update` as UUID,
+            type: 'UPDATE' as const
+          },
+          {
+            ...action,
+            declaration: {}
+          }
+        )
+        continue
+      }
+      newActions.push(action)
+      continue
+    }
+    newActions.push(action)
+  }
+
+  return newActions
+}
+
 export function useActionForHistory() {
   function getActionTypeForHistory(
     actions: ActionDocument[],
@@ -104,4 +142,26 @@ export function useActionForHistory() {
   }
 
   return { getActionTypeForHistory }
+}
+
+export function toEventDocument(event: EventHistoryDocument): EventDocument {
+  return {
+    ...event,
+    actions: event.actions.filter(
+      (a): a is ActionDocument => a.type !== 'UPDATE'
+    )
+  }
+}
+
+/**
+ * UI-safe wrapper around getCurrentEventState.
+ *
+ * Accepts EventHistoryDocument (with client-only UPDATE actions)
+ * but strips them out before delegating to the real implementation.
+ */
+export function getCurrentEventStateSafe(
+  event: EventHistoryDocument,
+  config: EventConfig
+) {
+  return getCurrentEventState(toEventDocument(event), config)
 }
