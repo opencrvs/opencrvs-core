@@ -22,7 +22,8 @@ import {
   getActionReview,
   getCurrentEventState,
   getDeclaration,
-  InherentFlags
+  InherentFlags,
+  LocationType
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -42,7 +43,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useSuspenseAdminLeafLevelLocations } from '@client/v2-events/hooks/useLocations'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
@@ -58,8 +59,7 @@ export function Review() {
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const { closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locationIds = useSuspenseAdminLeafLevelLocations()
 
   const event = events.getEvent.getFromCache(eventId)
 
@@ -77,17 +77,13 @@ export function Review() {
 
   const { isActionAllowed } = useUserAllowedActions(event.type)
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
-
   const reviewActionConfiguration = useReviewActionConfig({
     eventType: event.type,
     formConfig,
     declaration: form,
     annotation,
     reviewFields: reviewConfig.fields,
-    locations: adminStructureLocations
+    locationIds
   })
 
   async function handleEdit({
@@ -202,7 +198,7 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
-        locations={adminStructureLocations}
+        locationIds={locationIds}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
         onAnnotationChange={(values) => setAnnotation(values)}

@@ -8,9 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { generateUuid, SCOPES } from '@opencrvs/commons'
+import {
+  createPrng,
+  generateUuid,
+  Location,
+  LocationType,
+  SCOPES
+} from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { Location } from '@events/service/locations/locations'
 
 test('Returns single location in right format', async () => {
   const { user } = await setupTestCase()
@@ -24,7 +29,7 @@ test('Returns single location in right format', async () => {
       parentId: null,
       name: 'Location foobar',
       validUntil: null,
-      locationType: 'ADMIN_STRUCTURE'
+      locationType: LocationType.enum.ADMIN_STRUCTURE
     }
   ]
 
@@ -42,7 +47,8 @@ test('Returns multiple locations', async () => {
 
   const initialLocations = await client.locations.get()
 
-  await client.locations.set(generator.locations.set(5))
+  const locationRng = createPrng(845)
+  await client.locations.set(generator.locations.set(5, locationRng))
 
   const locations = await client.locations.get()
 

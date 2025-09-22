@@ -27,6 +27,7 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { useSuspenseAdminLeafLevelLocations } from '../../hooks/useLocations'
 
 function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
@@ -38,6 +39,8 @@ function ReadonlyView() {
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
+
+  const locationIds = useSuspenseAdminLeafLevelLocations()
 
   const eventStateWithDraft = useMemo(() => {
     const eventState = getCurrentEventState(event, configuration)
@@ -58,6 +61,7 @@ function ReadonlyView() {
         readonlyMode
         form={eventStateWithDraft.declaration}
         formConfig={formConfig}
+        locationIds={locationIds}
         reviewFields={fields}
         title={formatMessage(title, eventStateWithDraft.declaration)}
         onEdit={noop}

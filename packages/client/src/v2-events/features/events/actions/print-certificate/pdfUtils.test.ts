@@ -12,10 +12,11 @@
 import { createIntl } from 'react-intl'
 import createFetchMock from 'vitest-fetch-mock'
 import { ContentSvg } from 'pdfmake/interfaces'
-import { Location } from '@events/service/locations/locations'
 import {
   ActionDocument,
   eventQueryDataGenerator,
+  Location,
+  LocationType,
   tennisClubMembershipEvent,
   User,
   UUID
@@ -39,21 +40,21 @@ const locations = [
     name: 'HQ Office',
     parentId: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID,
     validUntil: null,
-    locationType: 'ADMIN_STRUCTURE'
+    locationType: LocationType.enum.ADMIN_STRUCTURE
   },
   {
     id: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID,
     name: 'Embe',
     parentId: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
     validUntil: null,
-    locationType: 'ADMIN_STRUCTURE'
+    locationType: LocationType.enum.ADMIN_STRUCTURE
   },
   {
     id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
     name: 'Pualula',
     parentId: null,
     validUntil: null,
-    locationType: 'ADMIN_STRUCTURE'
+    locationType: LocationType.enum.ADMIN_STRUCTURE
   }
 ] as Location[]
 const adminLevels = [

@@ -522,7 +522,6 @@ export const GeneratedInputField = React.memo(
           <LocationSearch.Input
             {...field.config}
             searchableResource={
-              field.config.configuration?.searchableResource &&
               field.config.configuration.searchableResource.length > 0
                 ? field.config.configuration.searchableResource
                 : ['locations']
