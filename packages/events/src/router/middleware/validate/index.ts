@@ -44,15 +44,19 @@ import {
   runFieldValidations,
   runStructuralValidations,
   Location,
-  UserContext
+  UserContext,
+  LocationType,
+  UUID
 } from '@opencrvs/commons/events'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
 import { getEventById } from '@events/service/events/events'
-import { isLeafLocation } from '@events/storage/postgres/events/locations'
+import {
+  getLeafLocationIds,
+  isLeafLocation
+} from '@events/storage/postgres/events/locations'
 import { TrpcContext } from '@events/context'
-import { getLocations } from '@events/service/locations/locations'
 import {
   getInvalidUpdateKeys,
   getVerificationPageErrors,
@@ -62,11 +66,11 @@ import {
 export function getFieldErrors(
   fields: FieldConfig[],
   data: ActionUpdate,
-  declaration: EventState = {},
-  context?: { locations: Array<Location> }
+  context: UserContext,
+  declaration: EventState = {}
 ) {
   const visibleFields = fields.filter((field) =>
-    isFieldVisible(field, { ...data, ...declaration })
+    isFieldVisible(field, { ...data, ...declaration }, context)
   )
 
   const visibleFieldIds = visibleFields.map((field) => field.id)
@@ -76,7 +80,8 @@ export function getFieldErrors(
       (field) =>
         // If field is not visible and not in the visible fields list, it is a hidden field
         // We need to check against the visible fields list because there might be fields with same ids, one of which is visible and others are hidden
-        !isFieldVisible(field, data) && !visibleFieldIds.includes(field.id)
+        !isFieldVisible(field, data, context) &&
+        !visibleFieldIds.includes(field.id)
     )
     .map((field) => field.id)
 
@@ -124,7 +129,7 @@ function validateDeclarationUpdateAction({
   actionType: DeclarationUpdateActionType
   declarationUpdate: ActionUpdate
   annotation?: ActionUpdate
-  context: { locations: Array<Location> }
+  context: UserContext
 }) {
   /*
    * Declaration allows partial updates. Updates are validated against primitive types (zod) and field based custom validators (JSON schema).
@@ -134,7 +139,8 @@ function validateDeclarationUpdateAction({
   // 1. Merge declaration update with previous declaration to validate based on the right conditional rules
   const previousDeclaration = getCurrentEventState(
     event,
-    eventConfig
+    eventConfig,
+    context.user
   ).declaration
   // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
   const completeDeclaration = deepMerge(previousDeclaration, declarationUpdate)
@@ -145,7 +151,8 @@ function validateDeclarationUpdateAction({
   // (e.g. when dob is unknown anduser has send the age previously.Now they only send dob, without setting dob unknown to false).
   const cleanedDeclaration = omitHiddenPaginatedFields(
     declarationConfig,
-    completeDeclaration
+    completeDeclaration,
+    context
   )
 
   // 3. When declaration update has fields that are not in the cleaned declaration, payload is invalid.
@@ -167,8 +174,8 @@ function validateDeclarationUpdateAction({
   const declarationErrors = getFieldErrors(
     allVisiblePageFields,
     cleanedDeclaration,
-    {},
-    context
+    context,
+    {}
   )
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
@@ -180,12 +187,14 @@ function validateDeclarationUpdateAction({
 
   const visibleAnnotationFields = omitHiddenFields(
     reviewFields,
-    deepDropNulls(annotation ?? {})
+    deepDropNulls(annotation ?? {}),
+    context
   )
 
   const annotationErrors = getFieldErrors(
     reviewFields,
     visibleAnnotationFields,
+    context,
     {}
   )
 
@@ -196,12 +205,14 @@ function validateActionAnnotation({
   eventConfig,
   actionType,
   annotation = {},
-  declaration = {}
+  declaration = {},
+  context
 }: {
   eventConfig: EventConfig
   actionType: AnnotationActionType
   annotation?: ActionUpdate
   declaration: EventState
+  context: UserContext
 }) {
   const pages = findRecordActionPages(eventConfig, actionType)
 
@@ -215,7 +226,7 @@ function validateActionAnnotation({
   )
 
   const errors = [
-    ...getFieldErrors(formFields, annotation, declaration),
+    ...getFieldErrors(formFields, annotation, context, declaration),
     ...getVerificationPageErrors(visibleVerificationPageIds, annotation)
   ]
 
@@ -225,11 +236,13 @@ function validateActionAnnotation({
 function validateNotifyAction({
   eventConfig,
   annotation = {},
-  declaration = {}
+  declaration = {},
+  context
 }: {
   eventConfig: EventConfig
   annotation?: ActionUpdate
   declaration: ActionUpdate
+  context: UserContext
 }) {
   const declarationConfig = getDeclaration(eventConfig)
 
@@ -253,7 +266,8 @@ function validateNotifyAction({
 
       const fieldErrors = runStructuralValidations({
         field,
-        values: annotation
+        values: annotation,
+        context
       })
 
       return fieldErrors.errors.map((error) => ({
@@ -278,7 +292,8 @@ function validateNotifyAction({
 
       const fieldErrors = runStructuralValidations({
         field: { ...field, required: false },
-        values: declaration
+        values: declaration,
+        context
       })
 
       return fieldErrors.errors.map((error) => ({
@@ -339,12 +354,11 @@ function validateCorrectableFields({
 
 // @todo for Josh: move this to a better file?
 async function getContext(token: string): Promise<UserContext> {
-  const locations = await getLocations()
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
+  const leafAdminStructureLocationIds = await getLeafLocationIds({
+    locationTypes: [LocationType.enum.ADMIN_STRUCTURE]
+  })
 
-  return { locations: adminStructureLocations, user: getTokenPayload(token) }
+  return { leafAdminStructureLocationIds, user: getTokenPayload(token) }
 }
 
 export const validateAction: MiddlewareFunction<
@@ -355,13 +369,6 @@ export const validateAction: MiddlewareFunction<
   ActionInputWithType
 > = async ({ input, next, ctx }) => {
   const actionType = input.type
-
-  const locations = await getLocations()
-
-  // @todo for Josh: this is probably not needed anymore, as the locations are in the context. So we should use the context instead.
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
 
   const event = await getEventById(input.eventId)
   const eventConfig = await getEventConfigurationById({
@@ -381,7 +388,8 @@ export const validateAction: MiddlewareFunction<
     const errors = validateNotifyAction({
       eventConfig,
       annotation: input.annotation,
-      declaration: input.declaration
+      declaration: input.declaration,
+      context
     })
 
     throwWhenNotEmpty(errors)
@@ -413,8 +421,7 @@ export const validateAction: MiddlewareFunction<
       declarationUpdate: input.declaration,
       annotation: input.annotation,
       actionType: declarationUpdateAction.data,
-      // @todo for Josh: use UserContext here instead of just the locations
-      context: { locations: adminStructureLocations }
+      context
     })
 
     throwWhenNotEmpty(errors)
@@ -428,7 +435,8 @@ export const validateAction: MiddlewareFunction<
       eventConfig,
       annotation: input.annotation,
       actionType: annotationActionParse.data,
-      declaration
+      declaration,
+      context
     })
 
     throwWhenNotEmpty(errors)

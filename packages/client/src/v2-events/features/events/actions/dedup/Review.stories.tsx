@@ -9,9 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
-import { AppRouter } from '@events/router'
 import { userEvent, within, expect } from '@storybook/test'
 import {
   ActionType,
@@ -36,14 +33,6 @@ const meta: Meta<typeof ReviewDuplicateIndex> = {
 export default meta
 
 type Story = StoryObj<typeof ReviewDuplicateIndex>
-const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [
-    httpLink({
-      url: '/api/events'
-    })
-  ],
-  transformer: { input: superjson, output: superjson }
-})
 
 const prng = createPrng(123123)
 const duplicates = [
@@ -118,7 +107,7 @@ const actions = [
           country: 'FAR',
           addressType: 'DOMESTIC',
           province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          district: '27160bbd-32d1-4625-812f-860226bfb92a',
           urbanOrRural: 'URBAN',
           town: 'Example Town',
           residentialArea: 'Example Residential Area',
@@ -127,11 +116,10 @@ const actions = [
           zipCode: '123456'
         },
         'recommender.none': true
+      },
+      annotation: {
+        'review.comment': 'asdasdasdasdasdasd'
       }
-    },
-
-    annotation: {
-      'review.comment': 'asdasdasdasdasdasd'
     }
   }),
   generateActionDocument({
@@ -151,7 +139,6 @@ const mockOriginalEvent = {
   actions,
   createdAt: new Date(Date.now()).toISOString(),
   id: generateUuid(prng),
-
   updatedAt: new Date(Date.now()).toISOString()
 }
 

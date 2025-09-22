@@ -60,6 +60,7 @@ function ReadonlyView() {
         readonlyMode
         form={eventStateWithDraft.declaration}
         formConfig={formConfig}
+        locationIds={userContext.leafAdminStructureLocationIds}
         reviewFields={fields}
         title={formatMessage(title, eventStateWithDraft.declaration)}
         onEdit={noop}

@@ -1,17 +1,18 @@
 import { UserContext } from '@opencrvs/commons/client'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
-import { useLocations } from './useLocations'
+import {
+  useLocations,
+  useSuspenseAdminLeafLevelLocations
+} from './useLocations'
 
 export function useContext(): UserContext {
   const token = getToken()
   const tokenPayload = getTokenPayload(token)
 
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locationIds = useSuspenseAdminLeafLevelLocations()
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
-
-  return { user: tokenPayload ?? undefined, locations: adminStructureLocations }
+  return {
+    user: tokenPayload ?? undefined,
+    leafAdminStructureLocationIds: locationIds
+  }
 }

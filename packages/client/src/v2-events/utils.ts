@@ -10,7 +10,6 @@
  */
 import { uniq, isString, get, uniqBy, mergeWith } from 'lodash'
 import { v4 as uuid } from 'uuid'
-import { Location } from '@events/service/locations/locations'
 import {
   ResolvedUser,
   ActionDocument,
@@ -30,7 +29,8 @@ import {
   WorkqueueConfigWithoutQuery,
   joinValues,
   UUID,
-  SystemRole
+  SystemRole,
+  Location
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(
