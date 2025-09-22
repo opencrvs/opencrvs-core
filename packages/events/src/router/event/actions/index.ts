@@ -216,7 +216,7 @@ export async function defaultRequestHandler(
   if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
-      message: 'Unexpected failure from notification API'
+      message: 'Unexpected failure from country config action confirmation API'
     })
     // For Async flow, we just return the event with the requested action and ensure it is indexed
   } else if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
