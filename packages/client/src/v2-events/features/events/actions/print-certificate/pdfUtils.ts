@@ -19,7 +19,6 @@ import type {
   TFontFamilyTypes
 } from 'pdfmake/interfaces'
 import pdfMake from 'pdfmake/build/pdfmake'
-import { Location } from '@events/service/locations/locations'
 import { isEqual } from 'lodash'
 import {
   EventState,
@@ -31,7 +30,8 @@ import {
   EventStatus,
   DEFAULT_DATE_OF_EVENT_PROPERTY,
   ActionDocument,
-  ActionStatus
+  ActionStatus,
+  Location
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'

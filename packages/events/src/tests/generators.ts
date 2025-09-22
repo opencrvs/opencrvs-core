@@ -14,9 +14,11 @@ import {
   eventPayloadGenerator,
   UUID,
   TestUserRole,
-  EventConfig
+  EventConfig,
+  Location,
+  LocationType,
+  generateUuid
 } from '@opencrvs/commons'
-import { Location } from '@events/service/locations/locations'
 import { addLocations } from '@events/storage/postgres/events/locations'
 
 interface Name {
@@ -55,23 +57,23 @@ export function payloadGenerator(
 
   const locations = {
     /** Create test data by providing count or desired locations */
-    set: (input: Array<Partial<Location>> | number) => {
+    set: (input: Array<Partial<Location>> | number, prng: () => number) => {
       if (typeof input === 'number') {
         return Array.from({ length: input }).map((_, i) => ({
-          id: getUUID(),
+          id: generateUuid(prng),
           name: `Location name ${i}`,
           parentId: null,
           validUntil: null,
-          locationType: 'ADMIN_STRUCTURE'
+          locationType: LocationType.Enum.ADMIN_STRUCTURE
         })) as Location[]
       }
 
       return input.map((location, i) => ({
-        id: location.id ?? getUUID(),
+        id: location.id ?? generateUuid(prng),
         name: location.name ?? `Location name ${i}`,
         parentId: location.parentId ?? null,
         validUntil: null,
-        locationType: 'ADMIN_STRUCTURE'
+        locationType: LocationType.Enum.ADMIN_STRUCTURE
       })) as Location[]
     }
   }
@@ -96,9 +98,7 @@ export function seeder() {
     addLocations(
       locations.map((location) => ({
         ...location,
-        validUntil: location.validUntil
-          ? location.validUntil.toISOString()
-          : null
+        validUntil: location.validUntil ? location.validUntil : null
       }))
     )
 

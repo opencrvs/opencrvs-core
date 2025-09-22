@@ -36,7 +36,7 @@ import {
   isFieldDisplayedOnReview,
   isPageVisible,
   runFieldValidations,
-  Location,
+  UUID,
   FieldTypesToHideInReview
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -277,7 +277,7 @@ function FormReview({
   formConfig,
   form,
   previousForm,
-  locations,
+  locationIds,
   onEdit,
   showPreviouslyMissingValuesAsChanged,
   readonlyMode,
@@ -287,7 +287,7 @@ function FormReview({
   formConfig: FormConfig
   form: EventState
   previousForm: EventState
-  locations?: Location[]
+  locationIds?: Array<{ id: UUID }>
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
   readonlyMode?: boolean
@@ -323,7 +323,11 @@ function FormReview({
                 />
               )
 
-              const context = locations ? { locations } : undefined
+              const context = locationIds
+                ? {
+                    leafAdminStructureLocationIds: locationIds
+                  }
+                : undefined
 
               const error = runFieldValidations({
                 field,
@@ -446,7 +450,7 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   form,
-  locations,
+  locationIds,
   annotation,
   onEdit,
   children,
@@ -461,7 +465,7 @@ function ReviewComponent({
   children?: React.ReactNode
   formConfig: FormConfig
   form: EventState
-  locations?: Location[]
+  locationIds?: Array<{ id: UUID }>
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
@@ -507,7 +511,7 @@ function ReviewComponent({
             formConfig={formConfig}
             isCorrection={isCorrection}
             isReviewCorrection={isReviewCorrection}
-            locations={locations}
+            locationIds={locationIds}
             previousForm={previousForm}
             readonlyMode={readonlyMode}
             showPreviouslyMissingValuesAsChanged={
