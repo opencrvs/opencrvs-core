@@ -4,7 +4,7 @@ exports[`Action updates > partial declaration update accounts for conditional fi
 {
   "applicant.address": {
     "addressType": "DOMESTIC",
-    "administrativeArea": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
+    "administrativeArea": "27160bbd-32d1-4625-812f-860226bfb92a",
     "country": "FAR",
     "streetLevelDetails": {
       "number": "55",
@@ -78,7 +78,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "declaration": {
         "applicant.address": {
           "addressType": "DOMESTIC",
-          "administrativeArea": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
+          "administrativeArea": "27160bbd-32d1-4625-812f-860226bfb92a",
           "country": "FAR",
           "streetLevelDetails": {
             "number": "55",
@@ -166,7 +166,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "declaration": {
         "applicant.address": {
           "addressType": "DOMESTIC",
-          "administrativeArea": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
+          "administrativeArea": "27160bbd-32d1-4625-812f-860226bfb92a",
           "country": "FAR",
           "streetLevelDetails": {
             "number": "55",
@@ -254,7 +254,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "declaration": {
         "applicant.address": {
           "addressType": "DOMESTIC",
-          "administrativeArea": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
+          "administrativeArea": "27160bbd-32d1-4625-812f-860226bfb92a",
           "country": "FAR",
           "streetLevelDetails": {
             "number": "55",

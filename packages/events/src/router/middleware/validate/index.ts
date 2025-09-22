@@ -43,14 +43,17 @@ import {
   omitHiddenPaginatedFields,
   runFieldValidations,
   runStructuralValidations,
-  Location
+  LocationType,
+  UUID
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
 import { getEventById } from '@events/service/events/events'
-import { isLeafLocation } from '@events/storage/postgres/events/locations'
+import {
+  getLeafLocationIds,
+  isLeafLocation
+} from '@events/storage/postgres/events/locations'
 import { TrpcContext } from '@events/context'
-import { getLocations } from '@events/service/locations/locations'
 import {
   getInvalidUpdateKeys,
   getVerificationPageErrors,
@@ -61,7 +64,7 @@ export function getFieldErrors(
   fields: FieldConfig[],
   data: ActionUpdate,
   declaration: EventState = {},
-  context?: { locations: Array<Location> }
+  context?: { leafAdminStructureLocationIds: Array<{ id: UUID }> }
 ) {
   const visibleFields = fields.filter((field) =>
     isFieldVisible(field, { ...data, ...declaration })
@@ -122,7 +125,7 @@ function validateDeclarationUpdateAction({
   actionType: DeclarationUpdateActionType
   declarationUpdate: ActionUpdate
   annotation?: ActionUpdate
-  context: { locations: Array<Location> }
+  context: { leafAdminStructureLocationIds: Array<{ id: UUID }> }
 }) {
   /*
    * Declaration allows partial updates. Updates are validated against primitive types (zod) and field based custom validators (JSON schema).
@@ -344,11 +347,9 @@ export const validateAction: MiddlewareFunction<
 > = async ({ input, next, ctx }) => {
   const actionType = input.type
 
-  const locations = await getLocations()
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
-
+  const leafAdminStructureLocationIds = await getLeafLocationIds({
+    locationTypes: [LocationType.enum.ADMIN_STRUCTURE]
+  })
   const event = await getEventById(input.eventId)
   const eventConfig = await getEventConfigurationById({
     eventType: event.type,
@@ -393,7 +394,7 @@ export const validateAction: MiddlewareFunction<
       declarationUpdate: input.declaration,
       annotation: input.annotation,
       actionType: declarationUpdateAction.data,
-      context: { locations: adminStructureLocations }
+      context: { leafAdminStructureLocationIds: leafAdminStructureLocationIds }
     })
 
     throwWhenNotEmpty(errors)
