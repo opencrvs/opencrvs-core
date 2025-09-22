@@ -12,7 +12,6 @@
 import { useSelector } from 'react-redux'
 import {
   deserializeQuery,
-  QueryType,
   User,
   WorkqueueConfig
 } from '@opencrvs/commons/client'
