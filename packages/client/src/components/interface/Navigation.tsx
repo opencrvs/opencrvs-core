@@ -64,6 +64,7 @@ import {
 } from '@client/components/WithRouterProps'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'query-string'
+import { useHasAccessToNavigationItem } from './useHasAccessToNavigationItem'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -146,6 +147,16 @@ const getSettingsAndLogout = (props: IFullProps) => {
   )
 }
 
+export const showRegDashboard =
+  !IS_PROD_ENVIRONMENT ||
+  (IS_PROD_ENVIRONMENT && window.config.REGISTRATIONS_DASHBOARD_URL)
+export const showLeaderboard =
+  !IS_PROD_ENVIRONMENT ||
+  (IS_PROD_ENVIRONMENT && window.config.LEADERBOARDS_DASHBOARD_URL)
+export const showStatistics =
+  !IS_PROD_ENVIRONMENT ||
+  (IS_PROD_ENVIRONMENT && window.config.STATISTICS_DASHBOARD_URL)
+
 const NavigationView = (props: IFullProps) => {
   const {
     intl,
@@ -197,15 +208,6 @@ const NavigationView = (props: IFullProps) => {
       return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
     }
   )
-  const showRegDashboard =
-    !IS_PROD_ENVIRONMENT ||
-    (IS_PROD_ENVIRONMENT && window.config.REGISTRATIONS_DASHBOARD_URL)
-  const showLeaderboard =
-    !IS_PROD_ENVIRONMENT ||
-    (IS_PROD_ENVIRONMENT && window.config.LEADERBOARDS_DASHBOARD_URL)
-  const showStatistics =
-    !IS_PROD_ENVIRONMENT ||
-    (IS_PROD_ENVIRONMENT && window.config.STATISTICS_DASHBOARD_URL)
 
   React.useEffect(() => {
     if (!userDetails || !loadWorkqueueStatuses) {
@@ -255,11 +257,7 @@ const NavigationView = (props: IFullProps) => {
     ).length
   }
 
-  const { routes: scopedRoutes } = useNavigation()
-  const hasAccess = (name: string): boolean =>
-    scopedRoutes.some(
-      (x) => x.name === name || x.tabs.some((t) => t.name === name)
-    )
+  const { hasAccess } = useHasAccessToNavigationItem()
 
   return (
     <LeftNavigation
