@@ -14,13 +14,14 @@ import { array } from 'zod'
 import {
   EventConfig,
   getOrThrow,
+  Location,
+  LocationType,
   logger,
   TokenWithBearer,
   WorkqueueConfig
 } from '@opencrvs/commons'
 import { Bundle, SavedLocation } from '@opencrvs/commons/types'
 import { env } from '@events/environment'
-import { Location } from '../locations/locations'
 
 /**
  * During 1.9.0 we support only docker swarm configuration.
@@ -140,9 +141,13 @@ function parsePartOf(partOf: string | undefined): string | null {
 }
 
 export async function getLocations() {
-  const types = ['ADMIN_STRUCTURE', 'CRVS_OFFICE', 'HEALTH_FACILITY']
-
-  const requests = types.map(async (type) => {
+  const requests = [
+    // Even though these are defined in the same order in the commons, we want to be explicit here.
+    // Admin structures must be seeded first in order for the parent-child relationships to be valid.
+    LocationType.enum.ADMIN_STRUCTURE,
+    LocationType.enum.CRVS_OFFICE,
+    LocationType.enum.HEALTH_FACILITY
+  ].map(async (type) => {
     const url = new URL('/locations', env.CONFIG_URL)
     url.searchParams.set('type', type)
     url.searchParams.set('_count', '0')
@@ -172,7 +177,8 @@ export async function getLocations() {
         id: entry.id,
         name: entry.name,
         parentId: parsePartOf(entry.partOf?.reference),
-        validUntil: entry.status === 'inactive' ? new Date() : null,
+        validUntil:
+          entry.status === 'inactive' ? new Date().toISOString() : null,
         locationType: entry.type?.coding ? entry.type.coding[0]?.code : null
       }
     })

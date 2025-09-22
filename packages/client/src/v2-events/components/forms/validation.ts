@@ -18,7 +18,7 @@ import {
   omitHiddenFields,
   runFieldValidations,
   runStructuralValidations,
-  Location
+  UUID
 } from '@opencrvs/commons/client'
 
 interface FieldErrors {
@@ -34,7 +34,7 @@ export interface Errors {
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
   values: EventState,
-  locations?: Location[]
+  locationIds: Array<{ id: UUID }>
 ) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
     if (
@@ -45,7 +45,9 @@ export function getValidationErrorsForForm(
       return errorsForAllFields
     }
 
-    const context = locations ? { locations } : undefined
+    const context = {
+      leafAdminStructureLocationIds: locationIds
+    }
 
     return {
       ...errorsForAllFields,
@@ -86,13 +88,13 @@ export function validationErrorsInActionFormExist({
   form,
   annotation,
   reviewFields = [],
-  locations
+  locationIds
 }: {
   formConfig: FormConfig
   form: EventState
   annotation?: EventState
   reviewFields?: FieldConfig[]
-  locations?: Location[]
+  locationIds: Array<{ id: UUID }>
 }): boolean {
   // We don't want to validate hidden fields
   const formWithoutHiddenFields = omitHiddenPaginatedFields(formConfig, form)
@@ -108,13 +110,17 @@ export function validationErrorsInActionFormExist({
       const fieldErrors = getValidationErrorsForForm(
         page.fields,
         formWithoutHiddenFields,
-        locations
+        locationIds
       )
       return Object.values(fieldErrors).some((field) => field.errors.length > 0)
     })
 
   const hasAnnotationValidationErrors = Object.values(
-    getValidationErrorsForForm(reviewFields, visibleAnnotationFields)
+    getValidationErrorsForForm(
+      reviewFields,
+      visibleAnnotationFields,
+      locationIds
+    )
   ).some((field) => field.errors.length > 0)
 
   return hasValidationErrors || hasAnnotationValidationErrors

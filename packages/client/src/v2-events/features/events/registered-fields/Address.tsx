@@ -10,7 +10,6 @@
  */
 import React from 'react'
 import { IntlShape } from 'react-intl'
-import { Location } from '@events/service/locations/locations'
 import { useSelector } from 'react-redux'
 import {
   EventState,
@@ -21,6 +20,7 @@ import {
   FieldConfig,
   FieldPropsWithoutReferenceValue,
   FieldType,
+  Location,
   not,
   AdministrativeAreas,
   alwaysTrue,
@@ -28,7 +28,8 @@ import {
   isFieldDisplayedOnReview,
   AddressField,
   AdministrativeArea,
-  DefaultAddressFieldValue
+  DefaultAddressFieldValue,
+  LocationType
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -323,12 +324,10 @@ function AddressInput(props: Props) {
 function AddressOutput({
   value,
   lineSeparator,
-  fields,
   configuration
 }: {
   value?: AddressFieldValue
   lineSeparator?: React.ReactNode
-  fields?: Array<AddressFieldIdentifier>
   configuration?: AddressField
 }) {
   const { getLocations } = useLocations()
@@ -344,7 +343,7 @@ function AddressOutput({
 
   const administrativeArea = value.administrativeArea
   const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
+    (location) => location.locationType === LocationType.enum.ADMIN_STRUCTURE
   )
 
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)

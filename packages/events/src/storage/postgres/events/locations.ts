@@ -11,7 +11,7 @@
 
 import { sql } from 'kysely'
 import { chunk } from 'lodash'
-import { logger, UUID } from '@opencrvs/commons'
+import { Location, LocationType, logger, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { Locations, NewLocations } from './schema/app/Locations'
 
@@ -59,15 +59,41 @@ export async function setLocations(locations: NewLocations[]) {
   return addLocations(locations)
 }
 
-export async function getLocations() {
+export async function getLocations({
+  locationType,
+  locationIds,
+  isActive
+}: {
+  locationType?: LocationType
+  locationIds?: UUID[]
+  isActive?: boolean
+} = {}) {
   const db = getClient()
 
-  return db
+  let query = db
     .selectFrom('locations')
-    .selectAll()
+    .select(['id', 'name', 'parentId', 'validUntil', 'locationType'])
     .where('deletedAt', 'is', null)
-    .$narrowType<{ deletedAt: null }>()
-    .execute()
+    .$narrowType<{
+      deletedAt: null
+      validUntil: Location['validUntil']
+    }>()
+
+  if (locationType) {
+    query = query.where('locationType', '=', locationType)
+  }
+
+  if (locationIds && locationIds.length > 0) {
+    query = query.where('id', 'in', locationIds)
+  }
+
+  if (isActive) {
+    query = query.where((eb) =>
+      eb.or([eb('validUntil', 'is', null), eb('validUntil', '>', 'now()')])
+    )
+  }
+
+  return query.execute()
 }
 
 export async function getLocationById(id: UUID) {
@@ -81,14 +107,14 @@ export async function getLocationById(id: UUID) {
     .executeTakeFirst()
 }
 
-export async function getChildLocations(id: string) {
+export async function getChildLocations(parentId: string) {
   const db = getClient()
 
   const { rows } = await sql<Locations>`
     WITH RECURSIVE r AS (
       SELECT id, parent_id
       FROM app.locations
-      WHERE id = ${id} AND deleted_at IS NULL
+      WHERE id = ${parentId} AND deleted_at IS NULL
       UNION ALL
       SELECT l.id, l.parent_id
       FROM app.locations l
@@ -97,7 +123,7 @@ export async function getChildLocations(id: string) {
     SELECT l.*
     FROM app.locations l
     JOIN r ON r.id = l.id
-    WHERE l.id <> ${id} AND l.deleted_at IS NULL;
+    WHERE l.id <> ${parentId} AND l.deleted_at IS NULL;
   `.execute(db)
   return rows
 }
@@ -114,4 +140,42 @@ export async function isLeafLocation(id: UUID) {
     .executeTakeFirst()
 
   return !result
+}
+
+/**
+ * Get the leaf location IDs from a list of locations.
+ *
+ * A leaf location is defined as a location that does not have any children in the provided list.
+ * e.g. if a location is a parent of another location in the list, it is not considered a leaf. ADMIN_STRUCTURE might have CRVS_OFFICE children, but can be a leaf if we only consider ADMIN_STRUCTURE locations.
+ *
+ * @param locationTypes - The types of locations to include.
+ * @returns The list of leaf location IDs.
+ */
+export async function getLeafLocationIds({
+  locationTypes
+}: { locationTypes?: LocationType[] } = {}) {
+  const db = getClient()
+
+  const query = db
+    .selectFrom('locations as l')
+    .select(['l.id'])
+    .where(({ not, exists, selectFrom }) =>
+      not(
+        exists(
+          selectFrom('locations as c')
+            .select('c.id')
+            .whereRef('c.parentId', '=', 'l.id')
+            .$if(!!locationTypes && !!locationTypes.length, (qb) =>
+              // @ts-expect-error -- query builder cannot infer the type from the condition above.
+              qb.where('c.locationType', 'in', locationTypes)
+            )
+        )
+      )
+    )
+
+  if (locationTypes && locationTypes.length > 0) {
+    query.where('locationType', 'in', locationTypes)
+  }
+
+  return query.execute()
 }
