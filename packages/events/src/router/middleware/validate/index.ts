@@ -43,8 +43,10 @@ import {
   omitHiddenPaginatedFields,
   runFieldValidations,
   runStructuralValidations,
-  Location
+  Location,
+  UserContext
 } from '@opencrvs/commons/events'
+import { getTokenPayload } from '@opencrvs/commons/authentication'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
 import { getEventById } from '@events/service/events/events'
@@ -335,6 +337,16 @@ function validateCorrectableFields({
   return errors
 }
 
+// @todo for Josh: move this to a better file?
+async function getContext(token: string): Promise<UserContext> {
+  const locations = await getLocations()
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
+
+  return { locations: adminStructureLocations, user: getTokenPayload(token) }
+}
+
 export const validateAction: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
@@ -345,6 +357,8 @@ export const validateAction: MiddlewareFunction<
   const actionType = input.type
 
   const locations = await getLocations()
+
+  // @todo for Josh: this is probably not needed anymore, as the locations are in the context. So we should use the context instead.
   const adminStructureLocations = locations.filter(
     (location) => location.locationType === 'ADMIN_STRUCTURE'
   )
@@ -355,7 +369,13 @@ export const validateAction: MiddlewareFunction<
     token: ctx.token
   })
 
-  const declaration = getCurrentEventState(event, eventConfig).declaration
+  const context = await getContext(ctx.token)
+
+  const declaration = getCurrentEventState(
+    event,
+    eventConfig,
+    context
+  ).declaration
 
   if (actionType === ActionType.NOTIFY) {
     const errors = validateNotifyAction({
@@ -393,6 +413,7 @@ export const validateAction: MiddlewareFunction<
       declarationUpdate: input.declaration,
       annotation: input.annotation,
       actionType: declarationUpdateAction.data,
+      // @todo for Josh: use UserContext here instead of just the locations
       context: { locations: adminStructureLocations }
     })
 
