@@ -13,12 +13,12 @@ import {
   ActionDocument,
   EventDocument,
   EventStatus,
-  getCurrentEventState,
   getStatusFromActions
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { DeclarationComparisonTable } from '@client/v2-events/features/events/actions/correct/request/Summary/DeclarationComparisonTable'
+import { EventHistoryActionDocument } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 
 /**
  *
@@ -28,7 +28,7 @@ export function DeclarationUpdateComponent({
   action,
   fullEvent
 }: {
-  action: ActionDocument
+  action: EventHistoryActionDocument
   fullEvent: EventDocument
 }) {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
@@ -45,7 +45,7 @@ export function DeclarationUpdateComponent({
     <DeclarationComparisonTable
       action={action}
       eventConfig={eventConfiguration}
-      fullEvent={fullEvent}
+      eventId={fullEvent.id}
       id={'declaration-update'}
     />
   )

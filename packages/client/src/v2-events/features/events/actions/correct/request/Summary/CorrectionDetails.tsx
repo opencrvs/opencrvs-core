@@ -25,6 +25,7 @@ import {
   isPageVisible,
   PageConfig,
   PageTypes,
+  RequestedCorrectionAction,
   TranslationConfig,
   User
 } from '@opencrvs/commons/client'
@@ -200,7 +201,7 @@ export function CorrectionDetails({
   form: EventState
   annotation: EventState
   requesting: boolean
-  correctionRequestAction?: Action
+  correctionRequestAction?: RequestedCorrectionAction
   editable?: boolean
   workqueue?: string
 }) {
@@ -293,8 +294,8 @@ export function CorrectionDetails({
       <DeclarationComparisonTable
         action={correctionRequestAction}
         eventConfig={eventConfiguration}
+        eventId={event.id}
         form={form}
-        fullEvent={event}
         id={'corrections-table'}
       />
     </>

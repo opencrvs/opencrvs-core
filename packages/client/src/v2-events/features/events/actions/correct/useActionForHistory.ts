@@ -10,21 +10,39 @@
  */
 
 import { isEqual, take } from 'lodash'
-import { z } from 'zod'
 import {
   Action,
   ActionDocument,
   ActionType,
-  ActionTypes,
-  DeclarationActions,
-  DeclarationActionType
+  DeclarationActionType,
+  EventConfig,
+  EventDocument,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { getPreviousDeclarationActionType } from '../../components/Action/utils'
 
 /**
  * Indicates that declaration action changed declaration content. Satisfies V1 spec.
  */
-const DECLARATION_ACTION_UPDATE = 'UPDATE'
+export const DECLARATION_ACTION_UPDATE = 'UPDATE' as const
+type DECLARATION_ACTION_UPDATE = typeof DECLARATION_ACTION_UPDATE
+
+// /**
+//  * Specialized action document used only on the client side.
+//  *
+//  * Unlike the standard ActionDocument, this includes the synthetic
+//  * `DECLARATION_ACTION_UPDATE` type which does not exist on the server.
+//  * The client is responsible for interpreting this action and displaying
+//  * it in the event’s audit history UI.
+//  */
+type WithUpdate<T> = T extends { type: infer U }
+  ? Omit<T, 'type'> & { type: U | DECLARATION_ACTION_UPDATE }
+  : T
+
+export type EventHistoryActionDocument = WithUpdate<ActionDocument>
+export type EventHistoryDocument = Omit<EventDocument, 'actions'> & {
+  actions: EventHistoryActionDocument[]
+}
 
 function getPreviousActions(arr: ActionDocument[], id: string) {
   const index = arr.findIndex((item) => item.id === id)
@@ -66,7 +84,7 @@ export function hasDeclarationChanged(
 export function useActionForHistory() {
   function getActionTypeForHistory(
     actions: ActionDocument[],
-    action: ActionDocument
+    action: EventHistoryActionDocument
   ) {
     if (action.type === ActionType.REQUEST_CORRECTION) {
       const approveAction = actions.find(

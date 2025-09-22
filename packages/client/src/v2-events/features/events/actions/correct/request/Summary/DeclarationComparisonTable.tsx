@@ -12,21 +12,22 @@ import React from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import {
-  Action,
   applyDeclarationToEventIndex,
   EventConfig,
-  EventDocument,
   EventState,
   getCurrentEventState,
   getDeclaration,
-  isFieldDisplayedOnReview
+  isFieldDisplayedOnReview,
+  UUID
 } from '@opencrvs/commons/client'
 import { Table } from '@opencrvs/components/lib/Table'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { hasFieldChanged } from '../../utils'
+import { EventHistoryActionDocument } from '../../useActionForHistory'
 
 const TableHeader = styled.th`
   text-transform: uppercase;
@@ -34,7 +35,7 @@ const TableHeader = styled.th`
   display: inline-block;
 `
 interface BaseDeclarationComparisonTableProps {
-  fullEvent: EventDocument
+  eventId: UUID
   eventConfig: EventConfig
   id: string
 }
@@ -42,13 +43,13 @@ interface BaseDeclarationComparisonTableProps {
 type DeclarationComparisonTableProps =
   | (BaseDeclarationComparisonTableProps & {
       /** When action is provided, the comparison is done between the state before the action and the state after it. */
-      action: Action
+      action: EventHistoryActionDocument
       form?: EventState
     })
   | (BaseDeclarationComparisonTableProps & {
       /** When form is provided, form is applied on top of the latest state and compared to the previous one. */
       form: EventState
-      action?: Action
+      action?: EventHistoryActionDocument
     })
 
 /**
@@ -59,10 +60,17 @@ type DeclarationComparisonTableProps =
 export function DeclarationComparisonTableComponent({
   action,
   form,
-  fullEvent,
+  eventId,
   eventConfig,
   id
 }: DeclarationComparisonTableProps) {
+  const { getEvent } = useEvents()
+  const fullEvent = getEvent.findFromCache(eventId).data
+
+  if (!fullEvent) {
+    throw new Error(`Event with id ${eventId} not found`)
+  }
+
   const index = fullEvent.actions.findIndex((a) => a.id === action?.id)
   // When action is not found or provided, we compare the full event
   const eventBeforeUpdate =
