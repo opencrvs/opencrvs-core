@@ -219,7 +219,7 @@ describe('Overwriting parent field', () => {
       })
     )
 
-    let eventState = getCurrentEventState(event, modiedV2BirthEvent)
+    let eventState = getCurrentEventState(event, modiedV2BirthEvent, {})
     expect(eventState.id).toBeDefined()
     expect(eventState.declaration['informant.dobUnknown']).toBe(false)
     expect(eventState.declaration['informant.dob']).toBe('1988-06-12')
@@ -242,7 +242,7 @@ describe('Overwriting parent field', () => {
       })
     )
 
-    eventState = getCurrentEventState(event, modiedV2BirthEvent)
+    eventState = getCurrentEventState(event, modiedV2BirthEvent, {})
     expect(eventState.declaration['informant.dobUnknown']).toBeFalsy()
     expect(eventState.declaration['informant.relation']).toBe('MOTHER')
   })

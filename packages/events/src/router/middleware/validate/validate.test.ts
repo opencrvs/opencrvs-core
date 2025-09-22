@@ -53,7 +53,8 @@ describe('getFieldErrors()', () => {
           }
         }
       ],
-      { 'test.checkbox': true }
+      { 'test.checkbox': true },
+      {}
     )
 
     expect(errors).toMatchSnapshot()
@@ -137,6 +138,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.checkbox': true },
+      {},
       { 'test.text': 'helloooo' }
     )
 
@@ -180,6 +182,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.checkbox': true },
+      {},
       { 'test.text': 'helloooo' }
     )
 

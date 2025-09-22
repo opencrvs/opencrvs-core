@@ -324,7 +324,8 @@ test('Returns events based on the updatedAt column', async () => {
   expect(oldEvent).toEqual(
     getCurrentEventState(
       oldDocumentWithoutAcceptedDeclaration,
-      tennisClubMembershipEvent
+      tennisClubMembershipEvent,
+      {}
     )
   )
 

@@ -43,10 +43,8 @@ import {
   omitHiddenPaginatedFields,
   runFieldValidations,
   runStructuralValidations,
-  Location,
   UserContext,
-  LocationType,
-  UUID
+  LocationType
 } from '@opencrvs/commons/events'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
 import { getEventConfigurationById } from '@events/service/config/config'

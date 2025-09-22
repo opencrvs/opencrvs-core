@@ -368,7 +368,11 @@ describe('Action updates', () => {
     })
 
     const event = await client.event.get(originalEvent.id)
-    const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
+    const eventState = getCurrentEventState(
+      event,
+      tennisClubMembershipEvent,
+      {}
+    )
     expect(eventState.declaration).toMatchSnapshot()
   })
 
