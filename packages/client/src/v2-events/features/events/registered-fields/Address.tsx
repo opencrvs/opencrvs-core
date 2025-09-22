@@ -451,5 +451,5 @@ function toCertificateVariables(
 export const Address = {
   Input: AddressInput,
   Output: AddressOutput,
-  toCertificateVariables: toCertificateVariables
+  toCertificateVariables
 }

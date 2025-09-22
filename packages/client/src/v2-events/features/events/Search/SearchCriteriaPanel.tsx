@@ -88,7 +88,7 @@ function SearchParamLabel({
     : undefined
 
   const label = intl.formatMessage(field.label)
-  const valueOutput = ValueOutput({ config: field, value: value }, true)
+  const valueOutput = ValueOutput({ config: field, value }, true)
   const output = (
     <>
       {prefix}

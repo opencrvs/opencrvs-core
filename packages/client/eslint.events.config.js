@@ -29,6 +29,7 @@ module.exports = defineConfig([
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-unused-vars': 'warn',
       'react/destructuring-assignment': 'warn',
+      'object-shorthand': 'warn',
       'react/jsx-key': 1,
       'react/jsx-no-literals': 1,
       'react/no-unused-prop-types': 1,
