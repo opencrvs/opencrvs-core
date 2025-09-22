@@ -39,7 +39,7 @@ import {
   FullDocumentPath,
   FullDocumentUrl
 } from '../../documents'
-import { UserContext } from 'src/conditionals/validate'
+import { UserContext } from '../../conditionals/validate'
 
 export function getStatusFromActions(actions: Array<Action>) {
   return actions

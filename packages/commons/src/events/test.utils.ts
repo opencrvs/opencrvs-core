@@ -67,7 +67,7 @@ import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import { z } from 'zod'
 import { FullDocumentPath } from '../documents'
-import { UserContext } from 'src/conditionals/validate'
+import { UserContext } from '../conditionals/validate'
 
 /**
  * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
