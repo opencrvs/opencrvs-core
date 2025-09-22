@@ -60,9 +60,9 @@ export function testDataGenerator(rngSeed?: number) {
         email: 'kalushabwalya17@gmail.com',
         role: {
           label: {
-            id: 'userRole.socialWorker',
-            defaultMessage: 'Social Worker',
-            description: 'Name for user role Social Worker',
+            id: 'userRole.hospitalClerk',
+            defaultMessage: 'Hospital Clerk',
+            description: 'Name for user role Hospital Clerk',
             __typename: 'I18nMessage'
           },
           __typename: 'UserRole'

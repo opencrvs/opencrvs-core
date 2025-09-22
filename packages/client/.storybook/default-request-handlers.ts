@@ -285,11 +285,11 @@ export const handlers = {
               __typename: 'UserRole'
             },
             {
-              id: 'SOCIAL_WORKER',
+              id: 'HOSPITAL_CLERK',
               label: {
-                id: 'userRole.socialWorker',
-                defaultMessage: 'Social Worker',
-                description: 'Name for user role Social Worker',
+                id: 'userRole.hospitalClerk',
+                defaultMessage: 'Hospital Clerk',
+                description: 'Name for user role Hospital Clerk',
                 __typename: 'I18nMessage'
               },
               scopes: [
@@ -327,11 +327,11 @@ export const handlers = {
               __typename: 'UserRole'
             },
             {
-              id: 'LOCAL_LEADER',
+              id: 'COMMUNITY_LEADER',
               label: {
-                id: 'userRole.localLeader',
-                defaultMessage: 'Local Leader',
-                description: 'Name for user role Local Leader',
+                id: 'userRole.communityLeader',
+                defaultMessage: 'Community Leader',
+                description: 'Name for user role Community Leader',
                 __typename: 'I18nMessage'
               },
               scopes: [
@@ -688,11 +688,11 @@ export const handlers = {
               __typename: 'UserRole'
             },
             {
-              id: 'SOCIAL_WORKER',
+              id: 'HOSPITAL_CLERK',
               label: {
-                id: 'userRole.socialWorker',
-                defaultMessage: 'Social Worker',
-                description: 'Name for user role Social Worker',
+                id: 'userRole.hospitalClerk',
+                defaultMessage: 'Hospital Clerk',
+                description: 'Name for user role Hospital Clerk',
                 __typename: 'I18nMessage'
               },
               scopes: [
@@ -730,11 +730,11 @@ export const handlers = {
               __typename: 'UserRole'
             },
             {
-              id: 'LOCAL_LEADER',
+              id: 'COMMUNITY_LEADER',
               label: {
-                id: 'userRole.localLeader',
-                defaultMessage: 'Local Leader',
-                description: 'Name for user role Local Leader',
+                id: 'userRole.communityLeader',
+                defaultMessage: 'Community Leader',
+                description: 'Name for user role Community Leader',
                 __typename: 'I18nMessage'
               },
               scopes: [
@@ -964,12 +964,12 @@ export const handlers = {
                   labels: [
                     {
                       lang: 'en',
-                      label: 'Social Worker',
+                      label: 'Hospital Clerk',
                       __typename: 'RoleLabel'
                     },
                     {
                       lang: 'fr',
-                      label: 'Travailleur social',
+                      label: 'Commis d'hôpital',
                       __typename: 'RoleLabel'
                     }
                   ],
@@ -996,12 +996,12 @@ export const handlers = {
                   labels: [
                     {
                       lang: 'en',
-                      label: 'Local Leader',
+                      label: 'Community Leader',
                       __typename: 'RoleLabel'
                     },
                     {
                       lang: 'fr',
-                      label: 'Leader local',
+                      label: 'Leader communautaire',
                       __typename: 'RoleLabel'
                     }
                   ],

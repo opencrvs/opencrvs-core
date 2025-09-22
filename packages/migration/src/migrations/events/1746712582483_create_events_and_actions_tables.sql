@@ -9,7 +9,7 @@ CREATE TABLE locations (
   deleted_at timestamp with time zone
 );
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON locations TO ${EVENTS_DB_USER};
+GRANT SELECT, INSERT, UPDATE, DELETE ON locations TO events_app;
 
 CREATE TABLE events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -21,7 +21,7 @@ CREATE TABLE events (
   UNIQUE (transaction_id, event_type)
 );
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON events TO ${EVENTS_DB_USER};
+GRANT SELECT, INSERT, UPDATE, DELETE ON events TO events_app;
 
 COMMENT ON TABLE events IS 'Stores life events associated with individuals, identified by tracking_id. Each event includes a type, structured data payload, and a client-supplied transaction_id to ensure idempotency.';
 
@@ -119,7 +119,7 @@ CREATE TABLE event_actions (
   )
 );
 
-GRANT SELECT, DELETE, INSERT ON event_actions TO ${EVENTS_DB_USER};
+GRANT SELECT, DELETE, INSERT ON event_actions TO events_app;
 
 COMMENT ON TABLE event_actions IS 'Stores actions performed on life events, including client-supplied transaction_id for idempotency. Event actions cannot be updated or deleted by the application database user. The same transaction id can only create action of one type. Each action is linked to a specific event.';
 
@@ -141,7 +141,7 @@ CREATE TABLE event_action_drafts (
   UNIQUE (transaction_id, action_type)
 );
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON event_action_drafts TO ${EVENTS_DB_USER};
+GRANT SELECT, INSERT, UPDATE, DELETE ON event_action_drafts TO events_app;
 
 COMMENT ON TABLE event_action_drafts IS 'Stores user-specific drafts of event-related actions. Drafts use client-supplied transaction_id for idempotency. Declaration fields may be incomplete. Each draft is owned exclusively by created_by.';
 

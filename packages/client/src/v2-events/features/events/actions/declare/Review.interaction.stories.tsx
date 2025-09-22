@@ -85,7 +85,7 @@ const mockUser = {
       family: 'Bwalya'
     }
   ],
-  role: 'SOCIAL_WORKER',
+  role: 'HOSPITAL_CLERK',
   signature: 'signature.png' as FullDocumentPath,
   avatar: undefined,
   primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID

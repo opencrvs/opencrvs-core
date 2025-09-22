@@ -193,7 +193,7 @@ const preview: Preview = {
               family: 'Bwalya'
             }
           ],
-          role: 'SOCIAL_WORKER',
+          role: 'HOSPITAL_CLERK',
           primaryOfficeId
         })
       } else if (options.userRole === TestUserRole.Enum.REGISTRATION_AGENT) {
