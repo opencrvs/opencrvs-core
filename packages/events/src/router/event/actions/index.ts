@@ -249,11 +249,14 @@ export async function defaultRequestHandler(
     try {
       parsedBody = (actionConfirmationResponseSchema ?? z.object({}))
         .merge(inputSchema.partial())
-        .parse(confirmationResponse)
-    } catch {
+        .parse(confirmationResponse ?? {})
+    } catch (error) {
+      logger.error(error)
+
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: 'Invalid payload received from notification API'
+        message:
+          'Invalid payload received from country config action confirmation API'
       })
     }
 
