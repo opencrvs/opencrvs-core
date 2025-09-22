@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { noop } from 'lodash'
+import { useLocation } from 'react-router-dom'
 import {
   ActionType,
   getActionReview,
@@ -28,8 +29,10 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSuspenseAdminLeafLevelLocations } from '../../hooks/useLocations'
+import { removeCachedFiles } from '../files/cache'
 
 function ReadonlyView() {
+  const { pathname } = useLocation()
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
   const event = events.getEvent.viewEvent(eventId)
@@ -54,6 +57,14 @@ function ReadonlyView() {
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const formConfig = getDeclaration(configuration)
+
+  useEffect(() => {
+    return () => {
+      void (async () => {
+        await removeCachedFiles(event)
+      })()
+    }
+  }, [event, pathname])
 
   return (
     <FormLayout route={ROUTES.V2.EVENTS.DECLARE}>
