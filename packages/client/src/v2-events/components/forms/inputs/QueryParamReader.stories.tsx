@@ -117,7 +117,7 @@ const testQueryParamReader = {
   configuration: {}
 }
 
-const testQueryParamReaderWithMap = {
+const testQueryParamReaderWithFormProjection = {
   id: 'test.query-param-reader',
   type: FieldType.QUERY_PARAM_READER,
   label: {
@@ -126,7 +126,7 @@ const testQueryParamReaderWithMap = {
     description: 'This is the label for the query param reader field'
   },
   configuration: {
-    map: {
+    formProjection: {
       auth_token: 'token',
       client_session: 'session'
     }
@@ -156,7 +156,7 @@ const testHttpFetch = {
   }
 }
 
-const testHttpFetchAfterMap = {
+const testHttpFetchAfterFormProjection = {
   id: 'test.http-fetch',
   type: FieldType.HTTP,
   label: {
@@ -222,9 +222,9 @@ const forwardedParams: FieldConfig[] = [
   sessionTextField
 ]
 
-const forwardedParamsWithMap: FieldConfig[] = [
-  testQueryParamReaderWithMap,
-  testHttpFetchAfterMap,
+const forwardedParamsWithFormProjection: FieldConfig[] = [
+  testQueryParamReaderWithFormProjection,
+  testHttpFetchAfterFormProjection,
   tokenTextField,
   sessionTextField
 ]
@@ -293,8 +293,8 @@ export const WithForwardedParams: StoryObj<Args> = {
   }
 }
 
-export const WithForwardedParamsThroughMap: StoryObj<Args> = {
-  name: 'With Forwarded Params Through Map',
+export const WithForwardedParamsThroughFormProjection: StoryObj<Args> = {
+  name: 'With Forwarded Params Through Form Projection',
   parameters: {
     chromatic: {
       disableSnapshot: true
@@ -303,7 +303,9 @@ export const WithForwardedParamsThroughMap: StoryObj<Args> = {
     reactRouter: {
       router: {
         path: '/',
-        element: <Form fields={forwardedParamsWithMap} onChange={fn()} />
+        element: (
+          <Form fields={forwardedParamsWithFormProjection} onChange={fn()} />
+        )
       },
       initialPath: '/?auth_token=123&client_session=abc'
     },

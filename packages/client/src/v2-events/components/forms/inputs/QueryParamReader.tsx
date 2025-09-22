@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { useEffect, useRef } from 'react'
-import { useLocation, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import {
   QueryParamReaderField,
   QueryParamReaderFieldValue
@@ -17,15 +17,17 @@ import {
 
 /**
  *  For params like ?input1=1&input2=2,
- *  and map = { input1: 'output1', input2: 'output2' }
+ *  and formProjection = { input1: 'output1', input2: 'output2' }
  *  will result in { output1: '1', output2: '2' }
  */
-function prepareParamsFromMap(
+function prepareFieldValueFromFormProjection(
   params: URLSearchParams,
-  map: NonNullable<QueryParamReaderField['configuration']['map']>
+  formProjection: NonNullable<
+    QueryParamReaderField['configuration']['formProjection']
+  >
 ) {
   const result: Record<string, string> = {}
-  for (const [key, entry] of Object.entries(map)) {
+  for (const [key, entry] of Object.entries(formProjection)) {
     result[entry] = params.get(key) || ''
   }
   return result
@@ -39,7 +41,7 @@ function QueryParamReaderInput({
   onChange: (params: QueryParamReaderFieldValue) => void
 }) {
   const [searchParams, setSearchParams] = useSearchParams()
-  const { map } = configuration
+  const { formProjection } = configuration
   const onChangeRef = useRef(onChange)
   onChangeRef.current = onChange
   const searchString = searchParams.toString()
@@ -49,13 +51,13 @@ function QueryParamReaderInput({
       return
     }
     const params = new URLSearchParams(searchString)
-    const paramsObject = map
-      ? prepareParamsFromMap(params, map)
+    const fieldValue = formProjection
+      ? prepareFieldValueFromFormProjection(params, formProjection)
       : Object.fromEntries(params)
 
-    void Promise.resolve().then(() => onChangeRef.current(paramsObject))
+    void Promise.resolve().then(() => onChangeRef.current(fieldValue))
     setSearchParams(new URLSearchParams(), { replace: true })
-  }, [map, onChangeRef, searchString, setSearchParams])
+  }, [formProjection, onChangeRef, searchString, setSearchParams])
   return null
 }
 

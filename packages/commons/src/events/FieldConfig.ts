@@ -607,10 +607,10 @@ export type HttpField = z.infer<typeof HttpField>
 const QueryParamReaderField = BaseField.extend({
   type: z.literal(FieldType.QUERY_PARAM_READER),
   configuration: z.object({
-    map: z
+    formProjection: z
       .record(z.string())
       .optional()
-      .describe('Maps query params to config keys')
+      .describe('Projection of the field value after parsing the query string')
   })
 })
 
