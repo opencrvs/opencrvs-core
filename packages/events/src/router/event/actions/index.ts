@@ -315,10 +315,10 @@ export function getDefaultActionProcedures(
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
-  let asyncInputFields = AsyncActionConfirmationResponseSchema
+  let asyncAcceptInputFields = AsyncActionConfirmationResponseSchema
 
   if (actionConfig.actionConfirmationResponseSchema) {
-    asyncInputFields = asyncInputFields.merge(
+    asyncAcceptInputFields = asyncAcceptInputFields.merge(
       actionConfig.actionConfirmationResponseSchema
     )
   }
@@ -370,7 +370,7 @@ export function getDefaultActionProcedures(
       }),
 
     accept: systemProcedure
-      .input(actionConfig.inputSchema.merge(asyncInputFields))
+      .input(actionConfig.inputSchema.merge(asyncAcceptInputFields))
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
