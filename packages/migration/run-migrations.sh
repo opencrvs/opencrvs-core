@@ -34,6 +34,8 @@ mkdir -p $BACKUP_PATH
 
 FILES_TO_MIGRATE=$(ls -p $MIGRATIONS_PATH | grep -v /)
 
+# Creating a backup of the original files as they need to be
+# overwritten by the envsubst before running the migrations
 for migration_file in $FILES_TO_MIGRATE
 do
   echo "Creating backup for $MIGRATIONS_PATH/$migration_file"
@@ -49,6 +51,7 @@ done
 
 DATABASE_URL=${EVENTS_POSTGRES_URL} yarn --cwd $SCRIPT_PATH node-pg-migrate up --schema=app --migrations-dir=./src/migrations/events
 
+# Reverting to the original state after running the migrations
 for migration_file in $FILES_TO_MIGRATE
 do
   echo "Reverting original file $MIGRATIONS_PATH/$migration_file"
