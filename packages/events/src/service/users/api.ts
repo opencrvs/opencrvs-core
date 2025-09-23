@@ -75,6 +75,8 @@ export async function getUser(
   return res.json() as Promise<User>
 }
 
+// @todo cihan remove the knipignore
+/** @knipignore */
 export async function getSystem(
   userManagementHost: string,
   systemId: string,
