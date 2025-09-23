@@ -317,7 +317,7 @@ export const resolvers: GQLResolver = {
       // Apply pagination to combined results
       const paginatedResults = combinedResults.slice(
         params.skip || 0,
-        (params.skip || 0) + (params.count || 10)
+        params.count || 10
       )
 
       return {
