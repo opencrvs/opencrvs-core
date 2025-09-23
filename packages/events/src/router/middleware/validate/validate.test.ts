@@ -9,7 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ConditionalType, field, FieldType } from '@opencrvs/commons'
+import { TokenUserType } from '../../../../../commons/build/dist/esm/authentication'
 import { getFieldErrors } from './index'
+
+export const testContext = {
+  user: {
+    sub: 'user_12345',
+    scope: ['declare'],
+    role: 'LOCAL_REGISTRAR',
+    exp: '1678890000',
+    algorithm: 'RS256',
+    userType: TokenUserType.enum.user
+  },
+  leafAdminStructureLocationIds: []
+}
 
 describe('getFieldErrors()', () => {
   it('should return an empty array there are no fields to validate', () => {
@@ -33,7 +46,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       {},
-      {}
+      testContext
     )
     expect(errors).toMatchSnapshot()
   })
@@ -54,7 +67,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.checkbox': true },
-      {}
+      testContext
     )
 
     expect(errors).toMatchSnapshot()
@@ -82,7 +95,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.checkbox': true },
-      {}
+      testContext
     )
 
     expect(errors).toMatchSnapshot()
@@ -110,7 +123,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       {},
-      {}
+      testContext
     )
 
     expect(errors).toMatchSnapshot()
@@ -138,7 +151,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.checkbox': true },
-      {},
+      testContext,
       { 'test.text': 'helloooo' }
     )
 
@@ -182,7 +195,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.checkbox': true },
-      {},
+      testContext,
       { 'test.text': 'helloooo' }
     )
 
@@ -214,7 +227,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.input': 'not hello!' },
-      {}
+      testContext
     )
 
     expect(errors).toMatchSnapshot()
@@ -245,7 +258,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.input': 'helloooo' },
-      {}
+      testContext
     )
 
     expect(errors).toMatchSnapshot()

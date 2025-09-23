@@ -250,7 +250,17 @@ function fieldConfigsToActionPayload(
   )
 }
 
-export const testContext: UserContext = {}
+export const testContext: UserContext = {
+  user: {
+    sub: 'user_12345',
+    scope: ['declare'],
+    role: 'LOCAL_REGISTRAR',
+    exp: '1678890000',
+    algorithm: 'RS256',
+    userType: TokenUserType.enum.user
+  },
+  leafAdminStructureLocationIds: []
+}
 
 export function generateActionDeclarationInput(
   configuration: EventConfig,
