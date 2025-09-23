@@ -125,7 +125,7 @@ export function ValueOutput(
     return <Number.Output {...field} />
   }
 
-  if (isFileFieldType(field)) {
+  if (isFileFieldType(field) || isSignatureFieldType(field)) {
     return <File.Output {...field} />
   }
 
@@ -185,10 +185,6 @@ export function ValueOutput(
 
   if (isFacilityFieldType(field)) {
     return <LocationSearch.Output value={field.value} />
-  }
-
-  if (isSignatureFieldType(field)) {
-    return <SignatureField.Output value={field.value} />
   }
 }
 

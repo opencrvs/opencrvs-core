@@ -14,7 +14,8 @@ import { useIntl } from 'react-intl'
 import {
   FileFieldValue,
   MimeType,
-  File as FileConfig
+  File as FileConfig,
+  SignatureField
 } from '@opencrvs/commons/client'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { getFullDocumentPath } from '@client/v2-events/cache'
@@ -103,7 +104,7 @@ function FileOutput({
   config
 }: {
   value?: FileFieldValue
-  config: FileConfig
+  config: FileConfig | SignatureField
 }) {
   const intl = useIntl()
   const [previewImage, setPreviewImage] = useState<boolean>(false)
@@ -117,7 +118,7 @@ function FileOutput({
       <SingleDocumentPreview
         attachment={value}
         label={
-          config.configuration.fileName
+          'fileName' in config.configuration && config.configuration.fileName
             ? intl.formatMessage(config.configuration.fileName)
             : intl.formatMessage(config.label)
         }

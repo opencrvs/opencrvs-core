@@ -48,12 +48,9 @@ export function isLastActionCorrectionRequest(event: EventDocument) {
 }
 
 function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
-  return actions.reduce(
-    (ann, sortedAction) => {
-      return deepMerge(ann, sortedAction.annotation ?? {})
-    },
-    {} as Record<string, unknown>
-  )
+  return actions.reduce((ann, sortedAction) => {
+    return deepMerge(ann, sortedAction.annotation ?? {})
+  }, {} as EventState)
 }
 
 export function hasAnnotationChanged(
@@ -78,5 +75,5 @@ export function hasAnnotationChanged(
   const bothNil = isNil(prevValue) && isNil(currValue)
   const valueHasChanged = !isEqual(prevValue, currValue) && !bothNil
 
-  return valueHasChanged
+  return { currentAnnotations, previousAnnotations, valueHasChanged }
 }

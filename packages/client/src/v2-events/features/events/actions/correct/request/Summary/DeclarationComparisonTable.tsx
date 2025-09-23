@@ -140,15 +140,21 @@ export function DeclarationComparisonTableComponent({
 
   // Collect all changed review fields once
   const changedReviewFields = reviewFormFields
-    .filter((f) => hasAnnotationChanged(f, fullEvent, index))
+    .filter((f) => hasAnnotationChanged(f, fullEvent, index).valueHasChanged)
     .map((f) => {
+      const { currentAnnotations, previousAnnotations } = hasAnnotationChanged(
+        f,
+        fullEvent,
+        index
+      )
+
       const previous = (
         <Output
           field={f}
           formConfig={declarationConfig}
-          previousForm={previousDeclaration}
+          previousForm={previousAnnotations}
           showPreviouslyMissingValuesAsChanged={false}
-          value={previousDeclaration[f.id]}
+          value={previousAnnotations[f.id]}
         />
       )
 
@@ -156,7 +162,7 @@ export function DeclarationComparisonTableComponent({
         <Output
           field={f}
           showPreviouslyMissingValuesAsChanged={false}
-          value={'Updated'}
+          value={currentAnnotations[f.id]}
         />
       )
 

@@ -16,7 +16,7 @@ import { SignatureField } from './SignatureField'
 
 const meta: Meta<typeof SignatureField> = {
   title: 'Inputs/SignatureField',
-  component: SignatureField,
+  component: SignatureField.Input,
   args: {},
   decorators: [
     (Story) => (

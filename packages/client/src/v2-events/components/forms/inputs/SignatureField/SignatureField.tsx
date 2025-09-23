@@ -205,15 +205,6 @@ function SignatureFieldInput({
   )
 }
 
-function SignatureFieldOutput({
-  value
-}: {
-  value: FileFieldValue | undefined
-}) {
-  return value ? value.toString() : ''
-}
-
 export const SignatureField = {
-  Input: SignatureFieldInput,
-  Output: SignatureFieldOutput
+  Input: SignatureFieldInput
 }
