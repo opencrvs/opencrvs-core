@@ -82,11 +82,26 @@ export function hasDeclarationChanged(
   )
 }
 
-export function appendUpdateAction({
-  actions
-}: {
+/**
+ * Enhances an event’s action history by injecting synthetic `UPDATE` actions
+ * whenever a `DECLARE`, `VALIDATE`, or `REGISTER` action has a changed declaration.
+ *
+ * For each changed action:
+ * - A synthetic `UPDATE` action is added (with `id` suffixed by `-update`).
+ * - The original action is duplicated with an empty `declaration` to preserve ordering.
+ *
+ * All other actions are returned untouched.
+ *
+ * @param {ActionDocument[]} params.actions - The list of event actions to process.
+ * @returns {EventHistoryActionDocument[]} A new list of actions, including injected `UPDATE` actions.
+ *
+ * @example
+ * const result = appendUpdateAction(actions);
+ * // → [ { ...original DECLARE }, { ...synthetic UPDATE }, { ...DECLARE with empty declaration }, ... ]
+ */
+export function expandWithUpdateActions(
   actions: ActionDocument[]
-}): EventHistoryActionDocument[] {
+): EventHistoryActionDocument[] {
   const newActions = []
 
   for (const action of actions) {
@@ -100,6 +115,9 @@ export function appendUpdateAction({
         newActions.push(
           {
             ...action,
+            // Cast suffixed id as UUID to ensure uniqueness for synthetic UPDATE actions.
+            // We can't generate random UUIDs here, since components rely on stable IDs
+            // to find actions across renders.
             id: `${action.id}-update` as UUID,
             type: 'UPDATE' as const
           },

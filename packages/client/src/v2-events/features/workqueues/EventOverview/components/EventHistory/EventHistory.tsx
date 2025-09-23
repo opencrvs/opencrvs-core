@@ -34,7 +34,7 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import {
-  appendUpdateAction,
+  expandWithUpdateActions,
   EventHistoryActionDocument,
   useActionForHistory
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
@@ -334,9 +334,7 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
   const history = getAcceptedActions(fullEvent)
 
-  const historyWithUpdatedActions = appendUpdateAction({
-    actions: history
-  })
+  const historyWithUpdatedActions = expandWithUpdateActions(history)
 
   const visibleHistoryWithUpdatedActions = historyWithUpdatedActions.filter(
     ({ type }) => type !== ActionType.CREATE

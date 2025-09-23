@@ -30,7 +30,7 @@ import { Output } from '@client/v2-events/features/events/components/Output'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { hasFieldChanged } from '../../utils'
 import {
-  appendUpdateAction,
+  expandWithUpdateActions,
   EventHistoryActionDocument
 } from '../../useActionForHistory'
 
@@ -77,10 +77,7 @@ export function DeclarationComparisonTableComponent({
   }
 
   const acceptedActions = getAcceptedActions(fullEventWithoutUpdatedAction)
-
-  const historyWithUpdatedActions = appendUpdateAction({
-    actions: acceptedActions
-  })
+  const historyWithUpdatedActions = expandWithUpdateActions(acceptedActions)
 
   const fullEvent = {
     ...fullEventWithoutUpdatedAction,
