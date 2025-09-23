@@ -169,7 +169,6 @@ function useCreateDraft() {
 
 export function useDrafts() {
   const trpc = useTRPC()
-  const setDraft = localDraftStore((drafts) => drafts.setDraft)
   const getLocalDraftOrDefault = localDraftStore(
     (drafts) => drafts.getLocalDraftOrDefault
   )
@@ -177,7 +176,7 @@ export function useDrafts() {
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
 
-  function findAllRemoteDrafts(
+  function getAllRemoteDrafts(
     additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
   ): Draft[] {
     // Skip the queryFn defined by tRPC and use the one defined above
@@ -217,8 +216,8 @@ export function useDrafts() {
   }
 
   return {
-    setLocalDraft: setDraft,
-    getLocalDraftOrDefault: getLocalDraftOrDefault,
+    setLocalDraft: localDraftStore((drafts) => drafts.setDraft),
+    getLocalDraftOrDefault,
     submitLocalDraft: () => {
       if (!localDraft) {
         throw new Error('No draft to submit')
@@ -233,12 +232,12 @@ export function useDrafts() {
         status: localDraft.action.status
       })
     },
-    getAllRemoteDrafts: findAllRemoteDrafts,
+    getAllRemoteDrafts,
     getRemoteDraftByEventId: function useDraftList(
       eventId: string,
       additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
     ): Draft | undefined {
-      const eventDrafts = findAllRemoteDrafts(additionalOptions).filter(
+      const eventDrafts = getAllRemoteDrafts(additionalOptions).filter(
         (draft) => draft.eventId === eventId
       )
 

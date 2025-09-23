@@ -95,7 +95,6 @@ export const Link = ({
     $font={font}
     $color={color}
     $underline={underline}
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     as={element as any}
     {...props}
   />

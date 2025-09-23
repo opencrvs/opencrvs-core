@@ -41,7 +41,7 @@ export function ButtonField(props: ButtonFieldProps) {
     setFieldTouched,
     values,
     draftData,
-    ...buttonProps
+    disabled
   } = props
   const { icon, loadingLabel, buttonLabel } = fieldDefinition
   const offlineCountryConfig = useSelector(getOfflineData)
@@ -95,10 +95,10 @@ export function ButtonField(props: ButtonFieldProps) {
   }
   return (
     <Button
-      {...buttonProps}
       type="secondary"
       onClick={onClick}
       loading={isLoading}
+      disabled={disabled}
     >
       {supportedIcon && !isLoading && (
         <Icon color="currentColor" name={supportedIcon} size="large" />

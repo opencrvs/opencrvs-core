@@ -31,11 +31,9 @@ import {
   SORT_ORDER,
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
-import { Link as TextButton } from '@opencrvs/components'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
-import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
@@ -47,9 +45,7 @@ import { deserializeSearchParams, serializeSearchParams } from './utils'
 import { ActionCta } from './ActionCta'
 import { SearchResultItemTitle } from './SearchResultItemTitle'
 
-const WithTestId = styled.div.attrs({
-  'data-testid': 'search-result'
-})``
+const WithTestId = styled.div.attrs({ 'data-testid': 'search-result' })``
 
 const COLUMNS = {
   ICON_WITH_NAME: 'iconWithName',
@@ -143,8 +139,8 @@ function changeSortedColumn(
   }
 
   return {
-    newSortedCol: newSortedCol,
-    newSortOrder: newSortOrder
+    newSortedCol,
+    newSortOrder
   }
 }
 
@@ -267,6 +263,7 @@ export const SearchResultComponent = ({
       setSortOrder(newSortOrder)
     }
   }
+
   const mapEventsToResultRows = (
     eventsWithDraft: (EventIndex & {
       title: string | null
@@ -437,11 +434,9 @@ export const SearchResultComponent = ({
 
   const sortedResult = orderBy(dataWithTitle, sortedCol, sortOrder)
 
-  const allResults = mapEventsToResultRows(sortedResult)
+  const rows = mapEventsToResultRows(sortedResult)
 
   const currentPageNumber = Math.floor(offset / limit) + 1
-
-  const paginatedData = allResults
 
   const totalPages = totalResults ? Math.ceil(totalResults / limit) : 0
 
@@ -502,7 +497,7 @@ export const SearchResultComponent = ({
       >
         <Workqueue
           columns={responsiveColumns}
-          content={paginatedData}
+          content={rows}
           hideLastBorder={!isShowPagination}
           sortOrder={sortOrder}
         />

@@ -64,6 +64,10 @@ extendZodWithOpenApi(z)
 
 export const eventRouter = router({
   config: router({
+    /**
+     * Event configurations are intentionally available to all user types.
+     * Some of the dynamic scopes require knowledge of available types.
+     */
     get: publicProcedure
       .meta({
         openapi: {
@@ -74,22 +78,6 @@ export const eventRouter = router({
           protect: true
         }
       })
-      .use(
-        requiresAnyOfScopes(
-          [
-            SCOPES.RECORD_READ,
-            SCOPES.RECORD_EXPORT_RECORDS,
-            SCOPES.CONFIG,
-            SCOPES.CONFIG_UPDATE_ALL
-          ],
-          [
-            'record.create',
-            'record.declare',
-            'record.notify',
-            'record.register'
-          ]
-        )
-      )
       .input(z.void())
       .output(z.array(EventConfig))
       .query(async (options) =>
