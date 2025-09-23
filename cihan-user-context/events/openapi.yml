@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 792817d0-edf5-4745-ac23-5baeeee05faf
+                transactionId: 1adc558e-41bf-439f-9901-da5f36426309
                 type: birth
       responses:
         "200":
@@ -395,7 +395,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: ce7d0572-2080-488c-81d5-5623451de529
+                transactionId: bb3a9167-974b-4713-ba66-110dab3dfa40
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2298,7 +2298,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -2381,7 +2390,17 @@ components:
                       id:
                         type: string
                       required:
-                        type: boolean
+                        anyOf:
+                          - type: boolean
+                          - type: object
+                            properties:
+                              message:
+                                description: Custom required validation message
+                                allOf:
+                                  - $ref: "#/components/schemas/TranslationConfig"
+                            required:
+                              - message
+                        default: false
                       label:
                         $ref: "#/components/schemas/TranslationConfig"
                       type:
@@ -2410,7 +2429,6 @@ components:
                         description: Reference to a field by its ID
                     required:
                       - id
-                      - required
                       - label
                       - type
             defaultValue:
@@ -2478,7 +2496,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -2586,7 +2613,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -2689,7 +2725,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -2798,7 +2843,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -2897,7 +2951,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -2995,7 +3058,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -3110,7 +3182,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -3219,7 +3300,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -3333,7 +3423,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -3452,7 +3551,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -3559,7 +3667,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -3650,7 +3767,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -3758,7 +3884,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -3839,29 +3974,53 @@ components:
                       type: object
                       properties:
                         required:
-                          type: boolean
+                          anyOf:
+                            - type: boolean
+                            - type: object
+                              properties:
+                                message:
+                                  description: Custom required validation message
+                                  allOf:
+                                    - $ref: "#/components/schemas/TranslationConfig"
+                              required:
+                                - message
+                          default: false
                         label:
                           $ref: "#/components/schemas/TranslationConfig"
-                      required:
-                        - required
                     middlename:
                       type: object
                       properties:
                         required:
-                          type: boolean
+                          anyOf:
+                            - type: boolean
+                            - type: object
+                              properties:
+                                message:
+                                  description: Custom required validation message
+                                  allOf:
+                                    - $ref: "#/components/schemas/TranslationConfig"
+                              required:
+                                - message
+                          default: false
                         label:
                           $ref: "#/components/schemas/TranslationConfig"
-                      required:
-                        - required
                     surname:
                       type: object
                       properties:
                         required:
-                          type: boolean
+                          anyOf:
+                            - type: boolean
+                            - type: object
+                              properties:
+                                message:
+                                  description: Custom required validation message
+                                  allOf:
+                                    - $ref: "#/components/schemas/TranslationConfig"
+                              required:
+                                - message
+                          default: false
                         label:
                           $ref: "#/components/schemas/TranslationConfig"
-                      required:
-                        - required
                   default:
                     firstname:
                       required: true
@@ -3917,7 +4076,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -4008,7 +4176,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -4099,7 +4276,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -4191,7 +4377,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -4335,7 +4530,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -4426,7 +4630,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -4538,7 +4751,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -4625,7 +4847,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -4730,7 +4961,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -4821,7 +5061,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -4912,7 +5161,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -5028,7 +5286,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -5126,7 +5393,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -5272,7 +5548,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -5389,7 +5674,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -5495,7 +5789,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
@@ -5652,7 +5955,16 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
-              type: boolean
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
               default: false
             conditionals:
               type: array
