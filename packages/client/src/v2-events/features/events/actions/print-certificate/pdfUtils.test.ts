@@ -185,7 +185,7 @@ function expectRenderOutput(template: string, output: string) {
     templateString: template,
     $metadata: {
       ...metadata,
-      createdBy: registrar.id,
+      createdBy: registrar.v2.id,
       modifiedAt: new Date().toISOString(),
       copiesPrintedForTemplate: 2
     },
@@ -198,22 +198,7 @@ function expectRenderOutput(template: string, output: string) {
     },
     review: false,
     locations: [],
-    users: [
-      {
-        id: registrar.id,
-
-        name: [
-          {
-            use: 'en',
-            given: ['John'],
-            family: 'Musonda'
-          }
-        ],
-        fullHonorificName: 'Dr. Joseph Musonda, 3rd order of the Lion',
-        role: registrar.role.label.id,
-        primaryOfficeId: registrar.primaryOffice.id
-      }
-    ],
+    users: [registrar.v2],
     language: { lang: 'en', messages: {} },
     config: tennisClubMembershipEvent,
     adminLevels: [

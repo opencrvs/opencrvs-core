@@ -11,6 +11,7 @@
 
 import { FullDocumentPath } from '../documents'
 import { z } from 'zod'
+import { UUID } from '../uuid'
 
 export const User = z.object({
   id: z.string(),
@@ -24,7 +25,7 @@ export const User = z.object({
   role: z.string(),
   avatar: FullDocumentPath.optional(),
   signature: FullDocumentPath.optional(),
-  primaryOfficeId: z.string(),
+  primaryOfficeId: UUID,
   fullHonorificName: z.string().optional()
 })
 
