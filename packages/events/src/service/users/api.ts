@@ -12,7 +12,7 @@
 import fetch from 'node-fetch'
 import { joinUrl, FullDocumentPath, UUID, IUserName } from '@opencrvs/commons'
 
-export type User = {
+type User = {
   id: string
   avatar?: {
     data: FullDocumentPath
@@ -30,7 +30,7 @@ export type User = {
   creationDate: number
 }
 
-export type System = {
+type System = {
   name: string
   createdBy: string
   username: string
