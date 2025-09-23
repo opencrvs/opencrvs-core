@@ -482,7 +482,7 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         ...(await canvas.findAllByRole('checkbox')),
         ...(await canvas.findAllByRole('radio'))
       ]
-
+      await expect(formFields).toHaveLength(31)
       for (const f of formFields) {
         await expect(f).toBeDisabled()
       }
@@ -501,6 +501,9 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
       <StyledFormFieldGenerator
         fields={fields}
         id="my-form"
+        // Setting 'membership.duration' to a single date value allows us to demonstrate the enabled field
+        // scenario. The original defaultValue is a range (ex: `{ start: '2025-01-01', end: '2025-12-31' }`), which
+        // disables the date field component, making it difficult to check if all fields are enabled via looping.
         initialValues={{ ...declaration, 'membership.duration': '2025-12-31' }}
         onChange={(data) => {
           args.onChange(data)
@@ -519,6 +522,7 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         ...(await canvas.findAllByRole('checkbox')),
         ...(await canvas.findAllByRole('radio'))
       ]
+      await expect(formFields).toHaveLength(30)
 
       for (const f of formFields) {
         await expect(f).not.toBeDisabled()
@@ -575,7 +579,7 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
         ...(await canvas.findAllByRole('checkbox')),
         ...(await canvas.findAllByRole('radio'))
       ]
-
+      await expect(formFields).toHaveLength(30)
       for (const f of formFields) {
         const fieldToAvoid =
           f.getAttribute('data-testid') === 'number__applicant____age'
@@ -597,7 +601,7 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
         ...(await canvas.findAllByRole('checkbox')),
         ...(await canvas.findAllByRole('radio'))
       ]
-
+      await expect(formFields).toHaveLength(30)
       for (const f of formFields) {
         await expect(f).not.toBeDisabled()
       }
@@ -608,7 +612,6 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
       await userEvent.clear(ageInput)
       await userEvent.type(ageInput, '10')
       ageInput.blur()
-
       const formFields = [
         ...(await canvas.findAllByRole('textbox')),
         ...(await canvas.findAllByRole('spinbutton')),
@@ -616,6 +619,7 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
         ...(await canvas.findAllByRole('radio'))
       ]
 
+      await expect(formFields).toHaveLength(30)
       for (const f of formFields) {
         const fieldToAvoid =
           f.getAttribute('data-testid') === 'number__applicant____age'
