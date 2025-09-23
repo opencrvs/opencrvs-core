@@ -27,7 +27,6 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { wrapHandlersWithSpies } from '@client/tests/v2-events/declaration.utils'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { ReviewIndex } from '../events/actions/declare/Review'
 
 const generator = testDataGenerator()
@@ -41,9 +40,10 @@ const meta: Meta<typeof ReviewIndex> = {
   title: 'Outbox/Interaction',
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: useValidationFunctionsWithContext().getCurrentEventState(
+      formValues: getCurrentEventState(
         declareEventDocument,
-        tennisClubMembershipEvent
+        tennisClubMembershipEvent,
+        {}
       ).declaration
     })
   }
@@ -158,14 +158,14 @@ export const Outbox: Story = {
       await userEvent.click(outboxButton)
 
       const searchResult = await canvas.findByTestId('search-result')
-      const { firstname, surname } =
-        useValidationFunctionsWithContext().getCurrentEventState(
-          declareEventDocument,
-          tennisClubMembershipEvent
-        ).declaration['applicant.name'] as {
-          firstname: string
-          surname: string
-        }
+      const { firstname, surname } = getCurrentEventState(
+        declareEventDocument,
+        tennisClubMembershipEvent,
+        {}
+      ).declaration['applicant.name'] as {
+        firstname: string
+        surname: string
+      }
 
       await expect(searchResult).toHaveTextContent(`${firstname} ${surname}`)
 
