@@ -119,7 +119,6 @@ export function DeclarationComparisonTableComponent({
     <>
       {declarationConfig.pages.map((page) => {
         const changedFields = page.fields
-          .filter((field) => isFieldDisplayedOnReview(field, latestDeclaration))
           .filter((f) =>
             hasFieldChanged(f, latestDeclaration, previousDeclaration)
           )
