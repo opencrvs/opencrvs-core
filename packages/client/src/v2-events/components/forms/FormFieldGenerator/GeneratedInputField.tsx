@@ -640,10 +640,12 @@ export const GeneratedInputField = React.memo(
 
     if (isStatusFieldType(field)) {
       return (
-        <Status.Input
-          configuration={field.config.configuration}
-          id={field.config.id}
-        />
+        <InputField {...field.inputFieldProps}>
+          <Status.Input
+            configuration={field.config.configuration}
+            id={field.config.id}
+          />
+        </InputField>
       )
     }
 
