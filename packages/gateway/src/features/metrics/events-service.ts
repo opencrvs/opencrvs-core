@@ -11,12 +11,6 @@
 
 import { api } from '@gateway/v2-events/events/service'
 
-export interface UserActionsQuery {
-  userId: string
-  skip?: number
-  count?: number
-}
-
 export async function getEventActions(
   query: Parameters<typeof api.user.actions.query>[0],
   authHeader: Record<string, string>
