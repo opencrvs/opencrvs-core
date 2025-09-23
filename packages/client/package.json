@@ -128,6 +128,7 @@
     "@chromatic-com/storybook": "^3.2.3",
     "@eslint/compat": "^1.2.7",
     "@eslint/eslintrc": "^3.3.0",
+    "@faker-js/faker": "^10.0.0",
     "@graphql-codegen/add": "^5.0.0",
     "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/introspection": "^3.0.0",

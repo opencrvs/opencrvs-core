@@ -54,7 +54,8 @@ import {
   SelectDateRangeValue,
   isTimeFieldType,
   isButtonFieldType,
-  isHttpFieldType
+  isHttpFieldType,
+  isLinkButtonFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -75,7 +76,8 @@ import {
   SelectDateRangeField,
   TimeField,
   Button,
-  Http
+  Http,
+  LinkButton
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -132,7 +134,10 @@ export const GeneratedInputField = React.memo(
       id: fieldDefinition.id,
       // If label is hidden or default message is empty, we don't need to render label
       label,
-      required: fieldDefinition.required,
+      required:
+        typeof fieldDefinition.required === 'boolean'
+          ? fieldDefinition.required
+          : !!fieldDefinition.required,
       disabled: readonlyMode,
       helperText: fieldDefinition.helperText
         ? intl.formatMessage(fieldDefinition.helperText)
@@ -489,6 +494,7 @@ export const GeneratedInputField = React.memo(
             maxFileSize={field.config.configuration.maxFileSize}
             modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
             name={fieldDefinition.id}
+            required={inputFieldProps.required}
             value={field.value}
             onChange={(val) => handleFileChange(val)}
           />
@@ -620,6 +626,16 @@ export const GeneratedInputField = React.memo(
           configuration={field.config.configuration}
           parentValue={form[field.config.configuration.trigger.$$field]}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isLinkButtonFieldType(field)) {
+      return (
+        <LinkButton.Input
+          configuration={field.config.configuration}
+          disabled={inputProps.disabled}
+          id={field.config.id}
         />
       )
     }

@@ -34,7 +34,7 @@ import {
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
-import { ActionConfirmationResponseSchema } from '@events/router/event/actions'
+import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -270,7 +270,7 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
   OpenApiMeta,
   TrpcContext,
   TrpcContext,
-  ActionConfirmationResponseSchema
+  AsyncActionConfirmationResponseSchema
 > = async ({ next, ctx, input }) => {
   const {
     eventId: grantedEventId,

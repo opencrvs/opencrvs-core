@@ -15,6 +15,11 @@ import {
   SCOPES
 } from '@opencrvs/commons/client'
 import { FetchUserQuery, Status } from '@client/utils/gateway'
+import { Faker, en } from '@faker-js/faker'
+
+// Initialize faker with seed, so that the test data stays consistent
+const faker = new Faker({ seed: 1001, locale: en })
+export { faker }
 
 const userIds = {
   localRegistrar: '6821c175dce4d7886d4e8210',
