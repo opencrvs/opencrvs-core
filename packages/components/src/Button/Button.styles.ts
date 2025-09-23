@@ -28,6 +28,7 @@ export const base = ({ fullWidth }: { fullWidth?: boolean }) => css`
   margin: 0;
   background: transparent;
   gap: 8px;
+  text-decoration: none;
 
   ${fullWidth &&
   css`

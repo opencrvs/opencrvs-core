@@ -108,6 +108,6 @@ function stringify(
 export const DateField = {
   Input: DateInput,
   Output: DateOutput,
-  stringify: stringify,
+  stringify,
   toCertificateVariables: stringify
 }
