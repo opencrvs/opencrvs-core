@@ -42,7 +42,8 @@ import {
   TimeField,
   HttpField,
   ButtonField,
-  LinkButtonField
+  LinkButtonField,
+  StatusField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -126,6 +127,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.OFFICE:
     case FieldType.PHONE:
     case FieldType.LINK_BUTTON:
+    case FieldType.STATUS:
     case FieldType.ID:
       schema = required ? NonEmptyTextValue : TextValue
       break
@@ -207,6 +209,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.HTTP:
     case FieldType.LINK_BUTTON:
     case FieldType.ID:
+    case FieldType.STATUS:
       return null
     case FieldType.ADDRESS:
       return {
@@ -450,6 +453,13 @@ export const isLinkButtonFieldType = (field: {
   return field.config.type === FieldType.LINK_BUTTON
 }
 
+export const isStatusFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: StatusField } => {
+  return field.config.type === FieldType.STATUS
+}
+
 export type NonInteractiveFieldType =
   | Divider
   | PageHeader
@@ -458,6 +468,7 @@ export type NonInteractiveFieldType =
   | DataField
   | HttpField
   | LinkButtonField
+  | StatusField
 
 export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
 
@@ -471,6 +482,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
     field.type === FieldType.HTTP ||
-    field.type === FieldType.LINK_BUTTON
+    field.type === FieldType.LINK_BUTTON ||
+    field.type === FieldType.STATUS
   )
 }

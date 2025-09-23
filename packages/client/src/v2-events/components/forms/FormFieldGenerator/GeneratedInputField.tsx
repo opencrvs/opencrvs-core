@@ -55,7 +55,8 @@ import {
   isTimeFieldType,
   isButtonFieldType,
   isHttpFieldType,
-  isLinkButtonFieldType
+  isLinkButtonFieldType,
+  isStatusFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -77,7 +78,8 @@ import {
   TimeField,
   Button,
   Http,
-  LinkButton
+  LinkButton,
+  Status
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -631,6 +633,15 @@ export const GeneratedInputField = React.memo(
         <LinkButton.Input
           configuration={field.config.configuration}
           disabled={inputProps.disabled}
+          id={field.config.id}
+        />
+      )
+    }
+
+    if (isStatusFieldType(field)) {
+      return (
+        <Status.Input
+          configuration={field.config.configuration}
           id={field.config.id}
         />
       )

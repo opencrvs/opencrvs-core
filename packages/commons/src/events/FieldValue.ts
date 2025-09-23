@@ -80,6 +80,8 @@ export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
 
 export const ButtonFieldValue = z.number()
 export type ButtonFieldValue = z.infer<typeof ButtonFieldValue>
+export const StatusFieldValue = z.string()
+export type StatusFieldValue = z.infer<typeof StatusFieldValue>
 
 export const FieldValue = z.union([
   /**
@@ -100,7 +102,8 @@ export const FieldValue = z.union([
   NameFieldValue,
   NameFieldUpdateValue,
   ButtonFieldValue,
-  HttpFieldValue
+  HttpFieldValue,
+  StatusFieldValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>

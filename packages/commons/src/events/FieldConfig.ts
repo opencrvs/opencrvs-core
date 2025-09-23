@@ -614,6 +614,29 @@ const LinkButtonField = BaseField.extend({
 
 export type LinkButtonField = z.infer<typeof LinkButtonField>
 
+const StatusField = BaseField.extend({
+  type: z.literal(FieldType.STATUS),
+  configuration: z.object({
+    icon: z
+      .string()
+      .optional()
+      .default('CircleWavyCheck')
+      .describe(
+        'Icon for the button. You can find icons from OpenCRVS UI-Kit.'
+      ),
+    theme: z
+      .enum(['active', 'inactive', 'pending', 'default'])
+      .optional()
+      .default('default')
+      .describe(
+        'Defines the theme of the status pill. See the OpenCRVS UI-Kit "Pill" types for color details.'
+      ),
+    text: TranslationConfig.describe('Text to display on the status pill.')
+  })
+})
+
+export type StatusField = z.infer<typeof StatusField>
+
 /** @knipignore */
 export type FieldConfig =
   | z.infer<typeof Address>
@@ -647,6 +670,7 @@ export type FieldConfig =
   | z.infer<typeof ButtonField>
   | z.infer<typeof HttpField>
   | z.infer<typeof LinkButtonField>
+  | z.infer<typeof StatusField>
 
 /** @knipignore */
 /**
@@ -684,6 +708,8 @@ export type FieldConfigInput =
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
   | z.input<typeof LinkButtonField>
+  | z.input<typeof StatusField>
+
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
  *  referenced quite extensively througout various other schemas. Leaving the
@@ -726,7 +752,8 @@ export const FieldConfig: z.ZodType<
     DataField,
     ButtonField,
     HttpField,
-    LinkButtonField
+    LinkButtonField,
+    StatusField
   ])
   .openapi({
     description: 'Form field configuration',
