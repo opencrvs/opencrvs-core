@@ -9,13 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
+import addDays from 'date-fns/addDays'
 import {
   ActionType,
   generateUuid,
   getUUID,
   tennisClubMembershipEvent,
   generateActionDocument,
-  createPrng
+  createPrng,
+  getRandomDatetime
 } from '@opencrvs/commons/client'
 import { EventHistoryDialog } from './EventHistoryDialog'
 
@@ -177,13 +179,20 @@ const registerAction = generateActionDocument({
   }
 })
 
+const createdAt = getRandomDatetime(
+  prng,
+  new Date('2024-01-01'),
+  new Date('2024-12-31')
+)
+const updatedAt = addDays(new Date(createdAt), 5).toISOString()
+
 const eventWhenDeclareUpdatesDeclaration = {
   trackingId: generateUuid(prng),
   type: tennisClubMembershipEvent.id,
   actions: [createAction, declareAction],
-  createdAt: new Date().toISOString(),
+  createdAt,
   id: generateUuid(prng),
-  updatedAt: new Date().toISOString()
+  updatedAt
 }
 
 export const Declared: Story = {
@@ -208,9 +217,9 @@ const eventWhenValidateUpdatesDeclaration = {
   trackingId: generateUuid(prng),
   type: tennisClubMembershipEvent.id,
   actions: [createAction, declareAction, validateAction],
-  createdAt: new Date().toISOString(),
+  createdAt,
   id: generateUuid(prng),
-  updatedAt: new Date().toISOString()
+  updatedAt
 }
 
 export const Validated: Story = {
@@ -235,9 +244,9 @@ const eventWhenRegisterUpdatesDeclaration = {
   trackingId: generateUuid(prng),
   type: tennisClubMembershipEvent.id,
   actions: [createAction, declareAction, validateAction, registerAction],
-  createdAt: new Date().toISOString(),
+  createdAt,
   id: generateUuid(prng),
-  updatedAt: new Date().toISOString()
+  updatedAt
 }
 
 export const Registered: Story = {
