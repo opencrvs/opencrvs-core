@@ -115,6 +115,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.BUTTON:
     case FieldType.ID:
     case FieldType.PHONE:
+    case FieldType.STATUS:
       return { type: 'keyword' }
     case FieldType.ADDRESS:
       const addressProperties = {
