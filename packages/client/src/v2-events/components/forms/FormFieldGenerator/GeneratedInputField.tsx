@@ -134,7 +134,10 @@ export const GeneratedInputField = React.memo(
       id: fieldDefinition.id,
       // If label is hidden or default message is empty, we don't need to render label
       label,
-      required: fieldDefinition.required,
+      required:
+        typeof fieldDefinition.required === 'boolean'
+          ? fieldDefinition.required
+          : !!fieldDefinition.required,
       disabled: readonlyMode,
       helperText: fieldDefinition.helperText
         ? intl.formatMessage(fieldDefinition.helperText)
@@ -189,6 +192,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...omit(field.inputFieldProps, 'error')}>
           <Name.Input
             configuration={field.config.configuration}
+            disabled={disabled}
             id={fieldDefinition.id}
             validation={validation}
             value={field.value}
@@ -203,7 +207,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...field.inputFieldProps}>
           <Text.Input
             {...inputProps}
-            isDisabled={disabled}
+            isDisabled={inputProps.disabled}
             type="text"
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -217,7 +221,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...field.inputFieldProps}>
           <Text.Input
             {...inputProps}
-            isDisabled={disabled}
+            isDisabled={inputProps.disabled}
             type="text"
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -430,6 +434,7 @@ export const GeneratedInputField = React.memo(
           <Address.Input
             {...field.config}
             configuration={field.config.configuration}
+            disabled={disabled}
             value={field.value}
             //@TODO: We need to come up with a general solution for complex types.
             // @ts-ignore
@@ -443,6 +448,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <Select.Input
             {...field.config}
+            disabled={disabled}
             value={field.value}
             onChange={(val: string) =>
               onFieldValueChange(fieldDefinition.id, val)
@@ -456,6 +462,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <SelectCountry.Input
             {...field.config}
+            disabled={disabled}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
@@ -466,6 +473,7 @@ export const GeneratedInputField = React.memo(
       return (
         <Checkbox.Input
           {...field.config}
+          disabled={disabled}
           value={field.value}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
@@ -476,6 +484,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <RadioGroup.Input
             {...field.config}
+            disabled={disabled}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
@@ -488,9 +497,11 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <SignatureField
             {...field.config}
+            disabled={disabled}
             maxFileSize={field.config.configuration.maxFileSize}
             modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
             name={fieldDefinition.id}
+            required={inputFieldProps.required}
             value={field.value}
             onChange={(val) => handleFileChange(val)}
           />
@@ -508,6 +519,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <AdministrativeArea.Input
             {...field.config}
+            disabled={disabled}
             partOf={typeof partOf === 'string' ? partOf : null}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -521,6 +533,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <LocationSearch.Input
             {...field.config}
+            disabled={disabled}
             searchableResource={
               field.config.configuration.searchableResource.length > 0
                 ? field.config.configuration.searchableResource
@@ -539,6 +552,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <LocationSearch.Input
             {...field.config}
+            disabled={disabled}
             searchableResource={['offices']}
             value={field.value}
             onBlur={onBlur}
@@ -553,6 +567,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <LocationSearch.Input
             {...field.config}
+            disabled={disabled}
             searchableResource={['facilities']}
             value={field.value}
             onBlur={onBlur}

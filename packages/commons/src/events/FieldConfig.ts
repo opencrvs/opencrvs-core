@@ -58,6 +58,15 @@ export const ValidationConfig = z.object({
 })
 
 export type ValidationConfig = z.infer<typeof ValidationConfig>
+const requiredSchema = z
+  .union([
+    z.boolean(),
+    z.object({
+      message: TranslationConfig.describe('Custom required validation message')
+    })
+  ])
+  .default(false)
+  .optional()
 
 const BaseField = z.object({
   id: FieldId,
@@ -65,7 +74,8 @@ const BaseField = z.object({
   parent: FieldReference.optional().describe(
     'Reference to a parent field. If a field has a parent, it will be reset when the parent field is changed.'
   ),
-  required: z.boolean().default(false).optional(),
+  required: requiredSchema,
+  disabled: z.boolean().default(false).optional(),
   conditionals: z.array(FieldConditional).default([]).optional(),
   secured: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),
@@ -378,13 +388,13 @@ export type SelectDateRangeField = z.infer<typeof SelectDateRangeField>
 
 export const NameConfig = z.object({
   firstname: z
-    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .object({ required: requiredSchema, label: TranslationConfig.optional() })
     .optional(),
   middlename: z
-    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .object({ required: requiredSchema, label: TranslationConfig.optional() })
     .optional(),
   surname: z
-    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .object({ required: requiredSchema, label: TranslationConfig.optional() })
     .optional()
 })
 
@@ -531,7 +541,7 @@ const Address = BaseField.extend({
         .array(
           z.object({
             id: z.string(),
-            required: z.boolean(),
+            required: requiredSchema,
             label: TranslationConfig,
             type: z.literal(FieldType.TEXT),
             conditionals: z.array(FieldConditional).default([]).optional(),
