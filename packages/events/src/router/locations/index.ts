@@ -72,6 +72,7 @@ export const locationRouter = router({
         id: location.id,
         name: location.name,
         parentId: location.parentId,
+        locationType: location.locationType,
         validUntil: location.validUntil
           ? new Date(location.validUntil).toISOString()
           : null

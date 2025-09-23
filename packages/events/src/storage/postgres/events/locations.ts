@@ -100,7 +100,7 @@ export async function getLocationById(id: UUID) {
   const db = getClient()
   return db
     .selectFrom('locations')
-    .selectAll()
+    .select(['id', 'name', 'parentId', 'validUntil', 'locationType'])
     .where('id', '=', id)
     .where('deletedAt', 'is', null)
     .$narrowType<{ deletedAt: null }>()
