@@ -42,10 +42,9 @@ import {
   isPhoneFieldType,
   isSelectDateRangeFieldType,
   isLocationFieldType,
-  FileFieldWithOptionValue,
   EventState,
   FormConfig,
-  FieldType
+  isSignatureFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -69,6 +68,7 @@ import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileIn
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
+import { SignatureField } from '@client/v2-events/components/forms/inputs/SignatureField'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -185,6 +185,10 @@ export function ValueOutput(
 
   if (isFacilityFieldType(field)) {
     return <LocationSearch.Output value={field.value} />
+  }
+
+  if (isSignatureFieldType(field)) {
+    return <SignatureField.Output value={field.value} />
   }
 }
 
