@@ -36,7 +36,7 @@ export const user = {
       },
       {
         lang: 'fr',
-        label: 'Commis d'hôpital'
+        label: "Commis d'hôpital"
       }
     ],
     updatedAt: '2023-11-29T07:02:37.399Z'

@@ -607,7 +607,7 @@ export const READY_FOR_REVIEW_BIRTH_RECORD: SavedBundle<
             coding: [
               {
                 system: 'http://opencrvs.org/specs/types',
-                code: '[{"lang":"en","label":"Hospital Clerk"},{"lang":"fr","label":"Commis d'hôpital"}]'
+                code: '[{"lang":"en","label":"Hospital Clerk"},{"lang":"fr","label":"Commis d\'hôpital"}]'
               }
             ]
           }

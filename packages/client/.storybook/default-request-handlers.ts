@@ -969,7 +969,7 @@ export const handlers = {
                     },
                     {
                       lang: 'fr',
-                      label: 'Commis d'hôpital',
+                      label: "Commis d'hôpital",
                       __typename: 'RoleLabel'
                     }
                   ],
