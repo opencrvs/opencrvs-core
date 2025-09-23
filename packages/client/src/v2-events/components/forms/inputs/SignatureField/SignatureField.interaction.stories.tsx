@@ -238,7 +238,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
             }),
             http.post('/api/upload', () => {
               return HttpResponse.text(
-                `uploaded-image-${new Date().getTime()}.jpg`
+                `uploaded-image-${new Date().getTime()}.png`
               )
             }),
             http.get('http://localhost:3535/ocrvs/:id', async () => {
@@ -249,7 +249,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
 
               return new HttpResponse(binary, {
                 headers: {
-                  'Content-Type': 'image/jpg' satisfies MimeType,
+                  'Content-Type': 'image/png' satisfies MimeType,
                   'Cache-Control': 'no-cache'
                 }
               })
