@@ -67,7 +67,8 @@ export function declareActionProcedures() {
           user,
           token,
           event,
-          config
+          config,
+          DeclareActionInput
         )
 
         const dedupConfig = config.actions.find(

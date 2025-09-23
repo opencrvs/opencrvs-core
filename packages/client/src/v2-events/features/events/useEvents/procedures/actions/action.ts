@@ -469,7 +469,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
   const userContext = useContext()
   const mutationKey = customMutationKeys[mutationName]
   const mutation = useMutation({
-    mutationKey: mutationKey,
+    mutationKey,
     ...queryClient.getMutationDefaults(mutationKey)
   })
 

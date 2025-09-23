@@ -107,7 +107,7 @@ function DeclarationActionComponent({
       console.warn(
         `Event with id ${eventId} not found in cache. Redirecting to overview.`
       )
-      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId: eventId }))
+      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
     }
   }, [event, eventId, navigate])
 

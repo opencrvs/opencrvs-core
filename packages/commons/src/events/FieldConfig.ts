@@ -612,6 +612,16 @@ const HttpField = BaseField.extend({
 
 export type HttpField = z.infer<typeof HttpField>
 
+const LinkButtonField = BaseField.extend({
+  type: z.literal(FieldType.LINK_BUTTON),
+  configuration: z.object({
+    url: z.string().describe('URL to open'),
+    text: TranslationConfig.describe('Text to display on the button')
+  })
+}).describe('Button that opens a link')
+
+export type LinkButtonField = z.infer<typeof LinkButtonField>
+
 /** @knipignore */
 export type FieldConfig =
   | z.infer<typeof Address>
@@ -644,6 +654,7 @@ export type FieldConfig =
   | z.infer<typeof DataField>
   | z.infer<typeof ButtonField>
   | z.infer<typeof HttpField>
+  | z.infer<typeof LinkButtonField>
 
 /** @knipignore */
 /**
@@ -680,6 +691,7 @@ export type FieldConfigInput =
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
+  | z.input<typeof LinkButtonField>
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
  *  referenced quite extensively througout various other schemas. Leaving the
@@ -721,7 +733,8 @@ export const FieldConfig: z.ZodType<
     FileUploadWithOptions,
     DataField,
     ButtonField,
-    HttpField
+    HttpField,
+    LinkButtonField
   ])
   .openapi({
     description: 'Form field configuration',

@@ -279,7 +279,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
       })
     },
     chromatic: { disableSnapshot: true },
-    msw: msw
+    msw
   },
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
@@ -336,7 +336,7 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
       })
     },
     chromatic: { disableSnapshot: true },
-    msw: msw
+    msw
   },
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
@@ -401,7 +401,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: eventId
+        eventId
       })
     },
     offline: {
@@ -510,7 +510,7 @@ export const ReviewForIncompleteNameInteraction: Story = {
       })
     },
     chromatic: { disableSnapshot: true },
-    msw: msw
+    msw
   },
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {

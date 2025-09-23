@@ -39,7 +39,7 @@ import {
   useEventCustomAction,
   useIsMutating
 } from './procedures/actions/action'
-import { useGetEventCounts } from './procedures/count'
+import { useGetEventCountsByWorkqueue } from './procedures/count'
 import { findLocalEventDocument, findLocalEventIndex } from './api'
 import { QueryOptions } from './procedures/utils'
 
@@ -87,7 +87,7 @@ export function useEvents() {
     createEvent: useCreateEvent,
     /** Returns an event with full history. If you only need the state of the event, use getEventState. */
     getEvent,
-    useGetEventCounts,
+    useGetEventCountsByWorkqueue,
     deleteEvent: {
       useMutation: useDeleteEvent
     },
