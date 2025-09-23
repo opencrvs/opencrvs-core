@@ -218,7 +218,7 @@ export function useDrafts() {
 
   return {
     setLocalDraft: setDraft,
-    getLocalDraftOrDefault: getLocalDraftOrDefault,
+    getLocalDraftOrDefault,
     submitLocalDraft: () => {
       if (!localDraft) {
         throw new Error('No draft to submit')

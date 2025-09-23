@@ -55,7 +55,7 @@ export function MarkAsNotDuplicateModal({
         duplicateMessages.notDuplicateContentConfirmationTitle,
         {
           name,
-          trackingId: trackingId
+          trackingId
         }
       )}
       titleHeightAuto={true}

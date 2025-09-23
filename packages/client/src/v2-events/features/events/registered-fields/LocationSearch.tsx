@@ -175,6 +175,6 @@ function isLocationEmpty(value: Stringifiable) {
 export const LocationSearch = {
   Input: LocationSearchInput,
   Output: LocationSearchOutput,
-  toCertificateVariables: toCertificateVariables,
+  toCertificateVariables,
   isEmptyValue: isLocationEmpty
 }
