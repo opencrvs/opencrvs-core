@@ -14,8 +14,6 @@ import { z } from 'zod'
 import '@opencrvs/commons/monitoring'
 import { TRPCError } from '@trpc/server'
 import {
-  getSystem,
-  getUser,
   getUserId,
   getUserTypeFromToken,
   logger,
@@ -26,6 +24,7 @@ import {
   UUID
 } from '@opencrvs/commons'
 import { env } from './environment'
+import { getSystem, getUser } from './service/users/api'
 
 export const UserContext = z.object({
   id: z.string(),

@@ -9,45 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { UUID } from '../uuid'
-import { FullDocumentPath } from '../documents'
-
+// @TODO CIHAN: rename this file?
 export interface IUserName {
   use: string
   family: string
   given: string[]
-}
-
-type ObjectId = string
-
-/*
- * Let's add more fields as they are needed
- */
-export type User = {
-  id: string
-  avatar?: {
-    data: FullDocumentPath
-    type: string
-  }
-  signature?: FullDocumentPath
-  name: IUserName[]
-  username: string
-  email: string
-  role: ObjectId
-  practitionerId: string
-  primaryOfficeId: UUID
-  scope: string[]
-  status: string
-  creationDate: number
-}
-
-export type System = {
-  name: string
-  createdBy: string
-  username: string
-  client_id: string
-  status: string
-  scope: string[]
-  sha_secret: string
-  type: string
 }

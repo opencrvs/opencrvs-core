@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { UserNotFoundError } from '@opencrvs/commons'
 import { env } from '@events/environment'
-import { getUser } from './api'
+import { getUser, UserNotFoundError } from './api'
 
 type DatabaseUser = Awaited<ReturnType<typeof getUser>>
 export const getUsersById = async (ids: string[], token: string) => {

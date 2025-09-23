@@ -11,7 +11,7 @@
 import {
   triggerUserEventNotification,
   logger,
-  personNameFromV1ToV2
+  personNameFromV1ToV2,
   IUserName
 } from '@opencrvs/commons'
 import {

@@ -10,7 +10,7 @@
  */
 
 import fetch from 'node-fetch'
-import { joinUrl, System, User } from '@opencrvs/commons'
+import { joinUrl, FullDocumentPath, UUID } from '@opencrvs/commons'
 
 export interface IUserName {
   use: string
@@ -18,7 +18,36 @@ export interface IUserName {
   given: string[]
 }
 
-class UserNotFoundError extends Error {
+export type User = {
+  id: string
+  avatar?: {
+    data: FullDocumentPath
+    type: string
+  }
+  signature?: FullDocumentPath
+  name: IUserName[]
+  username: string
+  email: string
+  role: string
+  practitionerId: string
+  primaryOfficeId: UUID
+  scope: string[]
+  status: string
+  creationDate: number
+}
+
+export type System = {
+  name: string
+  createdBy: string
+  username: string
+  client_id: string
+  status: string
+  scope: string[]
+  sha_secret: string
+  type: string
+}
+
+export class UserNotFoundError extends Error {
   constructor(userId: string) {
     super(`User with id ${userId} not found`)
     this.name = 'UserNotFoundError'
