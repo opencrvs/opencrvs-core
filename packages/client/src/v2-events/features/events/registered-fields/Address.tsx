@@ -51,6 +51,7 @@ type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
   onChange: (newValue: Partial<AddressFieldValue>) => void
   value?: AddressFieldValue
   configuration?: AddressField['configuration']
+  disabled?: boolean
 }
 
 const COUNTRY_FIELD = {
@@ -222,7 +223,7 @@ function getLeafAdministrativeLevel(
  * - In search mode, only displays admin structure and town/village fields.
  */
 function AddressInput(props: Props) {
-  const { onChange, defaultValue, value, ...otherProps } = props
+  const { onChange, defaultValue, disabled, value, ...otherProps } = props
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
@@ -286,7 +287,23 @@ function AddressInput(props: Props) {
     adminLevelIds
   )
 
-  const fields = [COUNTRY_FIELD, ...adminStructure, ...addressFields]
+  const fields = [COUNTRY_FIELD, ...adminStructure, ...addressFields].map(
+    (x) => {
+      const existingEnableCondition =
+        x.conditionals?.find((c) => c.type === ConditionalType.ENABLE)
+          ?.conditional ?? not(not(alwaysTrue()))
+      return {
+        ...x,
+        conditionals: [
+          ...(x.conditionals ?? []),
+          {
+            type: ConditionalType.ENABLE,
+            conditional: disabled ? not(alwaysTrue()) : existingEnableCondition
+          }
+        ]
+      }
+    }
+  )
 
   const handleChange = (values: EventState) => {
     const addressLines = extractAddressLines(values, adminLevelIds)

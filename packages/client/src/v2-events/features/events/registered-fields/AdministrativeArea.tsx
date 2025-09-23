@@ -45,6 +45,7 @@ function AdministrativeAreaInput({
   onChange: (val: string | undefined) => void
   partOf: string | null
   value?: string
+  disabled?: boolean
 }) {
   const options = useAdminLocations(partOf ?? '0')
 
