@@ -166,7 +166,6 @@ export function areConditionsMet(
   )
 }
 
-// @todo: move this to a better location
 export type UserContext = {
   user?: ITokenPayload
   leafAdminStructureLocationIds?: Array<{ id: UUID }>
