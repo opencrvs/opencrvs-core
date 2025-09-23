@@ -51,6 +51,7 @@ import {
 } from '@client/v2-events/features/events/fixtures'
 import { EventConfig } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
+
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
