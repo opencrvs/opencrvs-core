@@ -11,8 +11,9 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 import { expect, fireEvent, fn, userEvent, within } from '@storybook/test'
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
+import { noop } from 'lodash'
 import {
   ConditionalType,
   field,
@@ -25,6 +26,7 @@ import {
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { FormWizard } from '@client/v2-events/features/events/components/FormWizard'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'FormFieldGenerator/Interaction',
@@ -302,7 +304,7 @@ const tennisStyleFields = [
     label: generateTranslationConfig('first name'),
     parent: field('tennis.style')
   }
-]
+] satisfies FieldConfig[]
 
 export const EmptiesWhenParentChanges: StoryObj<typeof FormFieldGenerator> = {
   name: 'Toggling parent field resets children',
@@ -433,5 +435,61 @@ export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
 
       await expect(canvas.queryByText('Required')).not.toBeInTheDocument()
     })
+  }
+}
+
+export const CustomRequiredValidationMessage: StoryObj<
+  typeof FormFieldGenerator
+> = {
+  name: 'Custom required validation message',
+  parameters: {
+    layout: 'centered'
+  },
+  render: function Component(args) {
+    const [validateAllFields, setValidateAllFields] = useState(false)
+    return (
+      <FormWizard
+        currentPage={0}
+        pageTitle="Tennis form"
+        onNextPage={() => setValidateAllFields(true)}
+        onSubmit={noop}
+      >
+        <StyledFormFieldGenerator
+          fields={tennisStyleFields.map((f) => {
+            const { parent, ...rest } = f
+            return {
+              ...rest,
+              required: {
+                message: generateTranslationConfig(
+                  `Please fill up ${f.label.defaultMessage} field`
+                )
+              }
+            } satisfies FieldConfig
+          })}
+          id="my-form"
+          initialValues={{}}
+          validateAllFields={validateAllFields}
+          onAllFieldsValidated={() => false}
+          onChange={(data) => {
+            args.onChange(data)
+          }}
+        />
+      </FormWizard>
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Renders error for required field with custom required validation message',
+      async () => {
+        await userEvent.click(
+          await canvas.findByRole('button', { name: 'Continue' })
+        )
+
+        await canvas.findByText('Please fill up tennis style field')
+        await canvas.findByText('Please fill up first name field')
+      }
+    )
   }
 }
