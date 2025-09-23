@@ -28,18 +28,18 @@ import { getPreviousDeclarationActionType } from '../../components/Action/utils'
 export const DECLARATION_ACTION_UPDATE = 'UPDATE' as const
 type DECLARATION_ACTION_UPDATE = typeof DECLARATION_ACTION_UPDATE
 
-// /**
-//  * Specialized action document used only on the client side.
-//  *
-//  * Unlike the standard ActionDocument, this includes the synthetic
-//  * `DECLARATION_ACTION_UPDATE` type which does not exist on the server.
-//  * The client is responsible for interpreting this action and displaying
-//  * it in the event’s audit history UI.
-//  */
 type WithUpdate<T> = T extends { type: infer U }
   ? Omit<T, 'type'> & { type: U | DECLARATION_ACTION_UPDATE }
   : T
 
+/**
+ * Specialized action document used only on the client side.
+ *
+ * Unlike the standard ActionDocument, this includes the synthetic
+ * `DECLARATION_ACTION_UPDATE` type which does not exist on the server.
+ * The client is responsible for interpreting this action and displaying
+ * it in the event’s audit history UI.
+ */
 export type EventHistoryActionDocument = WithUpdate<ActionDocument>
 export type EventHistoryDocument = Omit<EventDocument, 'actions'> & {
   actions: EventHistoryActionDocument[]
