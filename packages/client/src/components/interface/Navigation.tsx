@@ -16,11 +16,7 @@ import {
 } from '@client/declarations'
 import { buttonMessages } from '@client/i18n/messages'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import {
-  formatUrl,
-  generateGoToHomeTabUrl,
-  generatePerformanceHomeUrl
-} from '@client/navigation'
+import { formatUrl, generateGoToHomeTabUrl } from '@client/navigation'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -649,40 +645,8 @@ const NavigationView = (props: IFullProps) => {
                   }
                 />
               )}
-              {userDetails && hasAccess(WORKQUEUE_TABS.performance) && (
-                <NavigationItem
-                  icon={() => <Icon name="ChartBar" size="small" />}
-                  label={intl.formatMessage(navigationMessages['performance'])}
-                  onClick={() => {
-                    props.router.navigate(
-                      generatePerformanceHomeUrl({
-                        locationId: userDetails.primaryOffice.id
-                      })
-                    )
-                  }}
-                  id={`navigation_${WORKQUEUE_TABS.performance}`}
-                  isSelected={
-                    enableMenuSelection &&
-                    activeMenuItem === WORKQUEUE_TABS.performance
-                  }
-                />
-              )}
             </>
           }
-          {hasAccess(WORKQUEUE_TABS.vsexports) && (
-            <NavigationItem
-              icon={() => <Icon name="Export" size="small" />}
-              id={`navigation_${WORKQUEUE_TABS.vsexports}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.vsexports]
-              )}
-              onClick={() => router.navigate(routes.VS_EXPORTS)}
-              isSelected={
-                enableMenuSelection &&
-                activeMenuItem === WORKQUEUE_TABS.vsexports
-              }
-            />
-          )}
         </NavigationGroup>
       )}
 
@@ -762,33 +726,29 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
     advancedSearchParams: getAdvancedSearchParamsState(state),
     activeMenuItem: window.location.href.includes(WORKQUEUE_TABS.performance)
       ? WORKQUEUE_TABS.performance
-      : window.location.href.endsWith(WORKQUEUE_TABS.vsexports)
-        ? WORKQUEUE_TABS.vsexports
-        : window.location.href.includes(WORKQUEUE_TABS.organisation)
-          ? WORKQUEUE_TABS.organisation
-          : window.location.href.includes(WORKQUEUE_TABS.team)
-            ? WORKQUEUE_TABS.team
-            : window.location.href.endsWith(WORKQUEUE_TABS.application)
-              ? WORKQUEUE_TABS.application
-              : window.location.href.endsWith(WORKQUEUE_TABS.settings)
-                ? WORKQUEUE_TABS.settings
-                : window.location.href.endsWith(WORKQUEUE_TABS.certificate)
-                  ? WORKQUEUE_TABS.certificate
-                  : window.location.href.endsWith(WORKQUEUE_TABS.systems)
-                    ? WORKQUEUE_TABS.systems
+      : window.location.href.includes(WORKQUEUE_TABS.organisation)
+        ? WORKQUEUE_TABS.organisation
+        : window.location.href.includes(WORKQUEUE_TABS.team)
+          ? WORKQUEUE_TABS.team
+          : window.location.href.endsWith(WORKQUEUE_TABS.application)
+            ? WORKQUEUE_TABS.application
+            : window.location.href.endsWith(WORKQUEUE_TABS.settings)
+              ? WORKQUEUE_TABS.settings
+              : window.location.href.endsWith(WORKQUEUE_TABS.certificate)
+                ? WORKQUEUE_TABS.certificate
+                : window.location.href.endsWith(WORKQUEUE_TABS.systems)
+                  ? WORKQUEUE_TABS.systems
+                  : window.location.href.endsWith(
+                        WORKQUEUE_TABS.informantNotification
+                      )
+                    ? WORKQUEUE_TABS.informantNotification
                     : window.location.href.endsWith(
-                          WORKQUEUE_TABS.informantNotification
+                          WORKQUEUE_TABS.emailAllUsers
                         )
-                      ? WORKQUEUE_TABS.informantNotification
-                      : window.location.href.endsWith(
-                            WORKQUEUE_TABS.emailAllUsers
-                          )
-                        ? WORKQUEUE_TABS.emailAllUsers
-                        : window.location.href.endsWith(
-                              WORKQUEUE_TABS.userRoles
-                            )
-                          ? WORKQUEUE_TABS.userRoles
-                          : ''
+                      ? WORKQUEUE_TABS.emailAllUsers
+                      : window.location.href.endsWith(WORKQUEUE_TABS.userRoles)
+                        ? WORKQUEUE_TABS.userRoles
+                        : ''
   }
 }
 
