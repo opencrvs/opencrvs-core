@@ -14,10 +14,9 @@ import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { useSuspenseAdminLeafLevelLocations } from './useLocations'
 
 export function useContext(): UserContext {
+  const locationIds = useSuspenseAdminLeafLevelLocations()
   const token = getToken()
   const tokenPayload = getTokenPayload(token)
-
-  const locationIds = useSuspenseAdminLeafLevelLocations()
 
   return {
     user: tokenPayload ?? undefined,

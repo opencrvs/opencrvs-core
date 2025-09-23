@@ -14,7 +14,6 @@ import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import {
   EventDocument,
-  getCurrentEventState,
   dangerouslyGetCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftToEventIndex,
@@ -64,10 +63,8 @@ function EventOverviewFull({
 }) {
   const userContext = useContext()
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const eventIndex = useValidationFunctionsWithContext().getCurrentEventState(
-    event,
-    eventConfiguration
-  )
+  const { getCurrentEventState } = useValidationFunctionsWithContext()
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(eventIndex.id, {
@@ -81,10 +78,7 @@ function EventOverviewFull({
         configuration: eventConfiguration,
         context: userContext
       })
-    : useValidationFunctionsWithContext().getCurrentEventState(
-        event,
-        eventConfiguration
-      )
+    : getCurrentEventState(event, eventConfiguration)
 
   const { getUser } = useUsers()
   const intl = useIntl()

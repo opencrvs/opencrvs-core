@@ -23,7 +23,6 @@ import {
   UserContext
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
-import { useValidationFunctionsWithContext } from '../hooks/useConditionals'
 
 // Defines custom API functions that are not part of the generated API from TRPC.
 
@@ -32,6 +31,7 @@ export interface CustomMutationParams {
   declaration: EventState
   transactionId: string
   eventConfiguration: EventConfig
+  context: UserContext
   annotation?: EventState
 }
 
@@ -46,12 +46,10 @@ export interface ArchiveOnDuplicateParams extends CustomMutationParams {
 
 function hasPotentialDuplicates(
   event: EventDocument,
-  eventConfiguration: EventConfig
+  eventConfiguration: EventConfig,
+  context: UserContext
 ) {
-  const eventIndex = useValidationFunctionsWithContext().getCurrentEventState(
-    event,
-    eventConfiguration
-  )
+  const eventIndex = getCurrentEventState(event, eventConfiguration, context)
   return eventIndex.potentialDuplicates.length > 0
 }
 
@@ -66,6 +64,7 @@ export async function registerOnDeclare({
   eventConfiguration,
   declaration,
   transactionId,
+  context,
   annotation
 }: CustomMutationParams) {
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
@@ -76,7 +75,7 @@ export async function registerOnDeclare({
     keepAssignment: true
   })
 
-  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
+  if (hasPotentialDuplicates(declaredEvent, eventConfiguration, context)) {
     return declaredEvent
   }
 
@@ -91,7 +90,7 @@ export async function registerOnDeclare({
     }
   )
 
-  if (hasPotentialDuplicates(validatedEvent, eventConfiguration)) {
+  if (hasPotentialDuplicates(validatedEvent, eventConfiguration, context)) {
     return validatedEvent
   }
 
@@ -118,6 +117,7 @@ export async function validateOnDeclare({
   transactionId,
   eventConfiguration,
   declaration,
+  context,
   annotation
 }: CustomMutationParams) {
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
@@ -128,7 +128,7 @@ export async function validateOnDeclare({
     keepAssignment: true
   })
 
-  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
+  if (hasPotentialDuplicates(declaredEvent, eventConfiguration, context)) {
     return declaredEvent
   }
 
@@ -156,6 +156,7 @@ export async function registerOnValidate({
   transactionId,
   eventConfiguration,
   declaration,
+  context,
   annotation
 }: CustomMutationParams) {
   const maybeDuplicateEvent =
@@ -167,7 +168,9 @@ export async function registerOnValidate({
       keepAssignment: true
     })
 
-  if (hasPotentialDuplicates(maybeDuplicateEvent, eventConfiguration)) {
+  if (
+    hasPotentialDuplicates(maybeDuplicateEvent, eventConfiguration, context)
+  ) {
     return maybeDuplicateEvent
   }
 
@@ -225,7 +228,8 @@ export async function makeCorrectionOnRequest({
   annotation: declarationMixedUpAnnotation,
   transactionId,
   event,
-  eventConfiguration
+  eventConfiguration,
+  context
 }: CorrectionRequestParams) {
   // Let's find the REQUEST_CORRECTION action configuration. Because the annotation passed down here is mixed up
   // with declaration in the REQUEST_CORRECTION page form, we need to cleanup the annotation from declaration
@@ -233,18 +237,19 @@ export async function makeCorrectionOnRequest({
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
 
-  const originalDeclaration =
-    useValidationFunctionsWithContext().getCurrentEventState(
-      event,
-      eventConfiguration
-    ).declaration
+  const originalDeclaration = getCurrentEventState(
+    event,
+    eventConfiguration,
+    context
+  ).declaration
 
   const annotation =
     actionConfiguration && declarationMixedUpAnnotation
-      ? useValidationFunctionsWithContext().omitHiddenAnnotationFields(
+      ? omitHiddenAnnotationFields(
           actionConfiguration,
           originalDeclaration,
-          declarationMixedUpAnnotation
+          declarationMixedUpAnnotation,
+          context
         )
       : {}
 

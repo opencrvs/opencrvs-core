@@ -83,20 +83,19 @@ export function Summary() {
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
   const [showPrompt, setShowPrompt] = React.useState(false)
-  const togglePrompt = () => setShowPrompt(!showPrompt)
   const eventFormNavigation = useEventFormNavigation()
   const navigate = useNavigate()
   const intl = useIntl()
+
+  const { getCurrentEventState } = useValidationFunctionsWithContext()
 
   const userContext = useContext()
 
   const events = useEvents()
   const event: EventDocument = events.getEvent.getFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const eventIndex = useValidationFunctionsWithContext().getCurrentEventState(
-    event,
-    eventConfiguration
-  )
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const togglePrompt = () => setShowPrompt(!showPrompt)
 
   const previousFormValues = eventIndex.declaration
   const getFormValues = useEventFormData((state) => state.getFormValues)
@@ -137,7 +136,8 @@ export function Summary() {
       },
       transactionId: generateTransactionId(),
       annotation,
-      event
+      event,
+      context: userContext
     }
 
     if (userMayCorrect) {

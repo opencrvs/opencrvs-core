@@ -16,7 +16,6 @@ import {
   getDeclaration,
   isMetaAction,
   deepMerge,
-  getCurrentEventState,
   ActionDocument,
   getAcceptedActions
 } from '@opencrvs/commons/client'
@@ -32,14 +31,14 @@ import { ReviewCorrection } from './ReviewCorrection'
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REVIEW_CORRECTION.REVIEW)
   const events = useEvents()
-  const userContext = useValidationFunctionsWithContext()
+  const { getCurrentEventState } = useValidationFunctionsWithContext()
 
   const event = events.getEvent.getFromCache(eventId)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const eventIndex = getCurrentEventState(event, configuration, userContext)
+  const eventIndex = getCurrentEventState(event, configuration)
 
   const formConfig = getDeclaration(configuration)
 

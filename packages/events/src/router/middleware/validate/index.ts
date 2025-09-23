@@ -243,7 +243,6 @@ function validateNotifyAction({
   context: UserContext
 }) {
   const declarationConfig = getDeclaration(eventConfig)
-
   const formFields = declarationConfig.pages.flatMap(({ fields }) =>
     fields.flatMap((field) => field)
   )

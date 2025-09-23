@@ -21,10 +21,12 @@ import {
   getOrThrow,
   applyDraftToEventIndex,
   EventConfig,
-  Draft
+  Draft,
+  UserContext
 } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
+import { useContext } from '@client/v2-events/hooks/useContext'
 import { useDrafts } from '../../drafts/useDrafts'
 import { useEventConfigurations } from '../useEventConfiguration'
 import { prefetchPotentialDuplicates } from '../actions/dedup/getDuplicates'
@@ -63,13 +65,10 @@ function getEventWithDraftOrThrow(
 function buildDraftedEventResult(
   event: EventDocument,
   draft: Draft,
-  configuration: EventConfig
+  configuration: EventConfig,
+  context: UserContext
 ) {
-  const currentEventState =
-    useValidationFunctionsWithContext().getCurrentEventState(
-      event,
-      configuration
-    )
+  const currentEventState = getCurrentEventState(event, configuration, context)
   return {
     results: [applyDraftToEventIndex(currentEventState, draft, configuration)],
     total: 1
@@ -82,6 +81,7 @@ export function useEvents() {
   const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
   const eventConfigs = useEventConfigurations()
   const { getRemoteDraftByEventId } = useDrafts()
+  const userContext = useContext()
 
   return {
     createEvent: useCreateEvent,
@@ -153,7 +153,12 @@ export function useEvents() {
               maybeDraft
             )
 
-            return buildDraftedEventResult(event, draft, configuration)
+            return buildDraftedEventResult(
+              event,
+              draft,
+              configuration,
+              userContext
+            )
           },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
@@ -191,7 +196,12 @@ export function useEvents() {
               maybeDraft
             )
 
-            return buildDraftedEventResult(event, draft, configuration)
+            return buildDraftedEventResult(
+              event,
+              draft,
+              configuration,
+              userContext
+            )
           },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)

@@ -11,10 +11,7 @@
 
 import { hashKey, MutationKey, useMutationState } from '@tanstack/react-query'
 import * as z from 'zod'
-import {
-  getCurrentEventState,
-  applyDeclarationToEventIndex
-} from '@opencrvs/commons/client'
+import { applyDeclarationToEventIndex } from '@opencrvs/commons/client'
 import { EventState } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
@@ -35,6 +32,7 @@ function assignmentMutation(mutationKey: MutationKey) {
 export function useOutbox() {
   const trpc = useTRPC()
   const eventConfigurations = useEventConfigurations()
+  const { getCurrentEventState } = useValidationFunctionsWithContext()
 
   const pendingMutations = useMutationState({
     filters: {
@@ -70,11 +68,7 @@ export function useOutbox() {
         return null
       }
 
-      const eventState =
-        useValidationFunctionsWithContext().getCurrentEventState(
-          event,
-          eventConfiguration
-        )
+      const eventState = getCurrentEventState(event, eventConfiguration)
 
       return {
         // Merge the declaration from mutation to get optimistic declaration

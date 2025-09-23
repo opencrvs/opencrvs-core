@@ -16,7 +16,6 @@ import {
   deepMerge,
   EventDocument,
   FieldType,
-  getCurrentEventState,
   isFieldVisible,
   PageTypes,
   getPrintCertificatePages
@@ -46,13 +45,11 @@ export function PrintCertificate({
   const userContext = useContext()
   const formPages = getPrintCertificatePages(eventConfiguration)
   const intl = useIntl()
-  const eventIndex = useValidationFunctionsWithContext().getCurrentEventState(
-    event,
-    eventConfiguration
-  )
+  const { getCurrentEventState } = useValidationFunctionsWithContext()
+  const { certificateTemplates } = useAppConfig()
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
   const annotation = deepMerge(eventIndex.declaration, action.annotation ?? {})
   const templateId = action.content?.templateId
-  const { certificateTemplates } = useAppConfig()
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
     event.type,
     eventIndex.declaration,

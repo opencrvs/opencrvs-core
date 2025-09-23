@@ -191,7 +191,8 @@ export function Review() {
             eventId,
             declaration: {},
             transactionId: uuid(),
-            content: { reason: message }
+            content: { reason: message },
+            context: userContext
           })
         } else {
           events.actions.archive.mutate({

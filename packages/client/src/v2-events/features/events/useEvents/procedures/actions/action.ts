@@ -54,6 +54,7 @@ import {
 } from '@client/v2-events/trpc'
 import { ToastKey } from '@client/v2-events/routes/Toaster'
 import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
+import { useContext } from '@client/v2-events/hooks/useContext'
 
 function retryUnlessConflict(
   _failureCount: number,
@@ -90,9 +91,10 @@ function getCleanedDeclarationDiff(
 
   // If there's no original declaration, just clean the update and return it
   if (isEmpty(originalDeclaration)) {
-    return useValidationFunctionsWithContext().omitHiddenPaginatedFields(
+    return omitHiddenPaginatedFields(
       eventConfiguration.declaration,
-      declarationDiff
+      declarationDiff,
+      {}
     )
   }
 
@@ -102,11 +104,11 @@ function getCleanedDeclarationDiff(
 
   // Remove any hidden/paginated fields from the merged declaration
   // (Ensures we only consider fields relevant to the event configuration)
-  const cleanedDeclaration =
-    useValidationFunctionsWithContext().omitHiddenPaginatedFields(
-      eventConfiguration.declaration,
-      merged
-    )
+  const cleanedDeclaration = omitHiddenPaginatedFields(
+    eventConfiguration.declaration,
+    merged,
+    {}
+  )
 
   // From the update, keep only fields that are valid in the cleaned declaration
   // (Prevents applying updates to hidden/invalid fields)
@@ -428,17 +430,16 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     )
 
     const originalDeclaration = params.fullEvent
-      ? useValidationFunctionsWithContext().getCurrentEventState(
-          params.fullEvent,
-          eventConfiguration
-        ).declaration
+      ? getCurrentEventState(params.fullEvent, eventConfiguration, {})
+          .declaration
       : {}
 
     const annotation = actionConfiguration
-      ? useValidationFunctionsWithContext().omitHiddenAnnotationFields(
+      ? omitHiddenAnnotationFields(
           actionConfiguration,
           originalDeclaration,
-          params.annotation
+          params.annotation,
+          {}
         )
       : {}
 
@@ -465,6 +466,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
   mutationName: T
 ) {
   const eventConfigurations = useEventConfigurations()
+  const userContext = useContext()
   const mutationKey = customMutationKeys[mutationName]
   const mutation = useMutation({
     mutationKey: mutationKey,
@@ -485,13 +487,14 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
 
       const originalDeclaration =
         'event' in params
-          ? useValidationFunctionsWithContext().getCurrentEventState(
+          ? getCurrentEventState(
               /*
                * typescript is somehow unable to infer the type of params.event to
                * be EventDocument
                */
               params.event as EventDocument,
-              eventConfiguration
+              eventConfiguration,
+              userContext
             ).declaration
           : {}
 

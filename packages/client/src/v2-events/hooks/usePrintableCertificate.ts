@@ -17,7 +17,6 @@ import {
   EventConfig,
   EventDocument,
   FieldType,
-  getCurrentEventState,
   getUUID,
   isMinioUrl,
   LanguageConfig,
@@ -82,14 +81,15 @@ export const usePrintableCertificate = ({
   language?: LanguageConfig
 }) => {
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const { declaration, ...metadata } =
-    useValidationFunctionsWithContext().getCurrentEventState(
-      event,
-      eventConfiguration
-    )
+  const { getCurrentEventState } = useValidationFunctionsWithContext()
   const { getEvent } = useEvents()
   const userDetails = useSelector(getUserDetails)
   const { config: appConfig } = useSelector(getOfflineData)
+
+  const { declaration, ...metadata } = getCurrentEventState(
+    event,
+    eventConfiguration
+  )
 
   const adminLevels = appConfig.ADMIN_STRUCTURE
 

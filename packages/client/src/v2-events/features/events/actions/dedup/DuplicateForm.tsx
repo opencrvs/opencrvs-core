@@ -23,6 +23,7 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { EventIndex, EventStatus, getUUID } from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes/routes'
+import { useContext } from '@client/v2-events/hooks/useContext'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { useEventTitle } from '../../useEvents/useEventTitle'
 import { useEvents } from '../../useEvents/useEvents'
@@ -40,7 +41,7 @@ const SubPageContent = styled(Content)`
 
 export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
-
+  const userContext = useContext()
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE
   )
@@ -119,7 +120,8 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
             content: markAsDuplicateContent,
             transactionId: getUUID(),
             eventId: eventIndex.id,
-            declaration: {}
+            declaration: {},
+            context: userContext
           })
 
           if (slug) {

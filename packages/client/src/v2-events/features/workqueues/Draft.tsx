@@ -17,7 +17,6 @@ import {
   EventDocument,
   getOrThrow,
   mandatoryColumns,
-  getCurrentEventState,
   applyDraftToEventIndex
 } from '@opencrvs/commons/client'
 
@@ -32,7 +31,7 @@ import { findLocalEventDocument } from '../events/useEvents/api'
 
 export function Draft() {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
-
+  const { getCurrentEventState } = useValidationFunctionsWithContext()
   const eventConfigs = useEventConfigurations()
   const intl = useIntl()
 
@@ -56,11 +55,7 @@ export function Draft() {
         `Event configuration not found for ${event.type}`
       )
 
-      const currentEventState =
-        useValidationFunctionsWithContext().getCurrentEventState(
-          event,
-          configuration
-        )
+      const currentEventState = getCurrentEventState(event, configuration)
       return draft
         ? applyDraftToEventIndex(currentEventState, draft, configuration)
         : currentEventState

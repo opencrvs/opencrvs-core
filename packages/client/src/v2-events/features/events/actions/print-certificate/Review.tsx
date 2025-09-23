@@ -54,6 +54,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useOnlineStatus } from '@client/utils'
 import { getScope } from '@client/profile/profileSelectors'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useContext } from '@client/v2-events/hooks/useContext'
 
 const CertificateContainer = styled.div`
   svg {
@@ -156,6 +157,7 @@ export function Review() {
 
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
+  const userContext = useContext()
 
   if (!templateId) {
     throw new Error('Please select a template from the previous step')
@@ -201,7 +203,8 @@ export function Review() {
    */
   const validationErrorExist = validationErrorsInActionFormExist({
     formConfig,
-    form: annotation
+    form: annotation,
+    context: userContext
   })
 
   if (validationErrorExist) {

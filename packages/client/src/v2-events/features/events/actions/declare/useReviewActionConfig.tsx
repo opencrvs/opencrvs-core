@@ -22,6 +22,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { reviewMessages } from '@client/v2-events/features/events/actions/messages'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useContext } from '@client/v2-events/hooks/useContext'
 
 export function useReviewActionConfig({
   formConfig,
@@ -37,11 +38,13 @@ export function useReviewActionConfig({
   eventType: string
 }) {
   const events = useEvents()
+  const userContext = useContext()
   const { isActionAllowed } = useUserAllowedActions(eventType)
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form: declaration,
     annotation,
+    context: userContext,
     reviewFields
   })
 
@@ -76,6 +79,7 @@ export function useReviewActionConfig({
           eventId,
           declaration,
           transactionId: uuid(),
+          context: userContext,
           annotation
         }),
       messages: incomplete
@@ -94,6 +98,7 @@ export function useReviewActionConfig({
           eventId,
           declaration,
           transactionId: uuid(),
+          context: userContext,
           annotation
         }),
       messages: incomplete

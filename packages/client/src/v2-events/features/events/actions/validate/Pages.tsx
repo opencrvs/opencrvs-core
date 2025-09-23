@@ -15,11 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import {
-  ActionType,
-  getCurrentEventState,
-  getDeclarationPages
-} from '@opencrvs/commons/client'
+import { ActionType, getDeclarationPages } from '@opencrvs/commons/client'
 
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -46,13 +42,13 @@ export function Pages() {
   const { modal, closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
-  const userContext = useValidationFunctionsWithContext()
+  const { getCurrentEventState } = useValidationFunctionsWithContext()
 
   const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const eventIndex = getCurrentEventState(event, configuration, userContext)
+  const eventIndex = getCurrentEventState(event, configuration)
   const formPages = getDeclarationPages(configuration)
 
   const currentPageId =
