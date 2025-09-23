@@ -55,13 +55,13 @@ function FileInput({
       setFile({
         path,
         originalFilename,
-        type: type
+        type
       })
 
       onChange({
         path,
         originalFilename,
-        type: type
+        type
       })
     }
   })

@@ -58,7 +58,6 @@ export function DesktopCenter() {
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
-
 export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const navigate = useNavigate()

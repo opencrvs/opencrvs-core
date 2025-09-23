@@ -34,7 +34,7 @@ export async function requestActionConfirmation(
   token: string
 ): Promise<{
   responseStatus: ActionConfirmationResponse
-  body: Record<string, unknown> | undefined
+  responseBody: Record<string, unknown> | undefined
 }> {
   const actionConfirmationUrl = new URL(
     `/trigger/events/${event.type}/actions/${actionType}`,
@@ -83,13 +83,13 @@ export async function requestActionConfirmation(
 
     return {
       responseStatus,
-      body: await res.json().catch(() => undefined)
+      responseBody: await res.json().catch(() => undefined)
     }
   } catch (error) {
     logger.error(error)
     return {
       responseStatus: ActionConfirmationResponse.UnexpectedFailure,
-      body: undefined
+      responseBody: undefined
     }
   }
 }
