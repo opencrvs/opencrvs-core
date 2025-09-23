@@ -30,7 +30,8 @@ import {
   timePeriodToDateRange,
   EventStatus,
   AdvancedSearchConfigWithFieldsResolved,
-  METADATA_FIELD_PREFIX
+  METADATA_FIELD_PREFIX,
+  UserContext
 } from '@opencrvs/commons/client'
 import { findScope } from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
@@ -45,17 +46,13 @@ import { statusOptions, timePeriodOptions } from './EventMetadataSearchOptions'
 
 export function getAdvancedSearchFieldErrors(
   sections: AdvancedSearchConfigWithFieldsResolved[],
-  values: EventState
+  values: EventState,
+  context: UserContext
 ) {
-  const userContext = useContext()
   return sections.reduce(
     (acc, section) => ({
       ...acc,
-      ...getStructuralValidationErrorsForForm(
-        section.fields,
-        values,
-        userContext
-      )
+      ...getStructuralValidationErrorsForForm(section.fields, values, context)
     }),
     {} as Errors
   )
