@@ -69,13 +69,22 @@ export function hasDeclarationChanged(
   const currentActionHasUpdates = Object.keys(action.declaration).length > 0
   const previousActionHasDeclaration = !!previousDeclarationAction?.declaration
 
-  const hasUpdatedValues = Object.entries(action.declaration).some(
+  const hasUpdatedDeclarationValues = Object.entries(action.declaration).some(
     ([key, value]) => {
       const prevValue = previousDeclarationAction?.declaration[key]
-
       return !isEqual(prevValue, value)
     }
   )
+
+  const hasUpdatedAnnotationValues =
+    action.annotation &&
+    Object.entries(action.annotation).some(([key, value]) => {
+      const prevValue = previousDeclarationAction?.annotation?.[key]
+      return !isEqual(prevValue, value)
+    })
+
+  const hasUpdatedValues =
+    hasUpdatedDeclarationValues || hasUpdatedAnnotationValues
 
   return (
     currentActionHasUpdates && previousActionHasDeclaration && hasUpdatedValues
