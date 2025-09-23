@@ -287,15 +287,21 @@ function AddressInput(props: Props) {
   )
 
   const fields = [COUNTRY_FIELD, ...adminStructure, ...addressFields].map(
-    (x) => ({
-      ...x,
-      conditionals: [
-        {
-          type: ConditionalType.ENABLE,
-          conditional: disabled ? not(alwaysTrue()) : not(not(alwaysTrue()))
-        }
-      ]
-    })
+    (x) => {
+      const existingEnableCondition =
+        x.conditionals?.find((c) => c.type === ConditionalType.ENABLE)
+          ?.conditional ?? not(not(alwaysTrue()))
+      return {
+        ...x,
+        conditionals: [
+          ...(x.conditionals ?? []),
+          {
+            type: ConditionalType.ENABLE,
+            conditional: disabled ? not(alwaysTrue()) : existingEnableCondition
+          }
+        ]
+      }
+    }
   )
 
   const handleChange = (values: EventState) => {
