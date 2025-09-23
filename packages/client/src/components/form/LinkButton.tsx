@@ -141,7 +141,7 @@ export const LinkButtonField = ({
     <Button
       type="secondary"
       size="large"
-      element="a"
+      element="button"
       fullWidth
       disabled={isDisabled}
       onClick={() => {

@@ -54,7 +54,8 @@ import {
   SelectDateRangeValue,
   isTimeFieldType,
   isButtonFieldType,
-  isHttpFieldType
+  isHttpFieldType,
+  isLinkButtonFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -75,7 +76,8 @@ import {
   SelectDateRangeField,
   TimeField,
   Button,
-  Http
+  Http,
+  LinkButton
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -620,6 +622,16 @@ export const GeneratedInputField = React.memo(
           configuration={field.config.configuration}
           parentValue={form[field.config.configuration.trigger.$$field]}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isLinkButtonFieldType(field)) {
+      return (
+        <LinkButton.Input
+          configuration={field.config.configuration}
+          disabled={inputProps.disabled}
+          id={field.config.id}
         />
       )
     }

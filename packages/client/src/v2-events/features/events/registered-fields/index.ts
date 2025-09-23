@@ -30,6 +30,7 @@ import { SelectCountry } from './SelectCountry'
 import { SelectDateRangeField } from './SelectDateRangeField'
 import { Text } from './Text'
 import { TimeField } from './TimeField'
+import { LinkButton } from './LinkButton'
 
 export * from './Address'
 export * from './AdministrativeArea'
@@ -50,6 +51,7 @@ export * from './SelectCountry'
 export * from './SelectDateRangeField'
 export * from './Text'
 export * from './TimeField'
+export * from './LinkButton'
 
 export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
   type: T
@@ -97,6 +99,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return SelectDateRangeField
     case FieldType.HTTP:
       return Http
+    case FieldType.LINK_BUTTON:
+      return LinkButton
     default:
       return undefined
   }
