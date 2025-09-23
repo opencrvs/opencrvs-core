@@ -28,6 +28,7 @@ function SelectCountryInput({
 }: FieldPropsWithoutReferenceValue<'COUNTRY'> & {
   onChange: (val: string | undefined) => void
   value?: string
+  disabled?: boolean
 }) {
   return (
     <Select.Input

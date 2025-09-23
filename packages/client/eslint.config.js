@@ -24,6 +24,7 @@ const compat = new FlatCompat({
 /**
  * Client runs two different rule sets. One for v2 and the other for rest.
  * Each of them have their own config files.
+ * @TODO: When cleaning up V1 for 1.10, remove legacy config and eslint.legacy.config.js. This is too unstable.
  */
 module.exports = [
   {
@@ -56,6 +57,13 @@ module.exports = [
       }
     },
     settings: {
+      react: {
+        version: 'detect'
+      }
+    }
+  },
+  {
+    settings: {
       'import/resolver': {
         typescript: {
           project: path.resolve(__dirname, './tsconfig.json')
@@ -64,6 +72,17 @@ module.exports = [
     }
   },
   ...eventsConfig,
+  // For some reason this block is needed for ''object-shorthand': 'warn' to get applied.
+  {
+    files: ['./**/*.ts', './**/*.tsx'],
+    settings: {
+      'import/resolver': {
+        typescript: {
+          project: path.resolve(__dirname, './tsconfig.json')
+        }
+      }
+    }
+  },
   {
     files: ['./**/*.ts', './**/*.tsx'],
     /** To enforce relative imports, files propert needs to be defined. It cannot be shared through monorepo config at root. */

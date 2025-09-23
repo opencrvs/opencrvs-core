@@ -51,6 +51,7 @@ import {
 } from '@client/v2-events/features/events/fixtures'
 import { EventConfig } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
+
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
@@ -182,7 +183,7 @@ const preview: Preview = {
       queryClient.clear()
       const primaryOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 
-      if (options.userRole === TestUserRole.Enum.FIELD_AGENT) {
+      if (options.parameters.userRole === TestUserRole.Enum.FIELD_AGENT) {
         window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
         addUserToQueryData({
           id: generator.user.id.fieldAgent,
@@ -196,7 +197,9 @@ const preview: Preview = {
           role: 'SOCIAL_WORKER',
           primaryOfficeId
         })
-      } else if (options.userRole === TestUserRole.Enum.REGISTRATION_AGENT) {
+      } else if (
+        options.parameters.userRole === TestUserRole.Enum.REGISTRATION_AGENT
+      ) {
         window.localStorage.setItem(
           'opencrvs',
           generator.user.token.registrationAgent
@@ -206,6 +209,20 @@ const preview: Preview = {
           id: generator.user.id.registrationAgent,
           name: [{ use: 'en', given: ['Felix'], family: 'Katongo' }],
           role: TestUserRole.Enum.REGISTRATION_AGENT,
+          primaryOfficeId
+        })
+      } else if (
+        options.parameters.userRole === TestUserRole.Enum.LOCAL_SYSTEM_ADMIN
+      ) {
+        window.localStorage.setItem(
+          'opencrvs',
+          generator.user.token.localSystemAdmin
+        )
+
+        addUserToQueryData({
+          id: generator.user.id.localSystemAdmin,
+          name: [{ use: 'en', given: ['Alex'], family: 'Ngonga' }],
+          role: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN,
           primaryOfficeId
         })
       } else {
@@ -238,15 +255,6 @@ const preview: Preview = {
 
       offlineConfigs.forEach((config) => {
         addLocalEventConfig(config)
-      })
-
-      addUserToQueryData({
-        id: generator.user.id.localRegistrar,
-        name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
-        role: 'LOCAL_REGISTRAR',
-        signature: undefined,
-        avatar: undefined,
-        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
       })
 
       const offlineEvents: Array<EventDocument> = options.parameters?.offline

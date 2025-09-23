@@ -147,7 +147,7 @@ export function ValueOutput(
 
   if (isCheckboxFieldType(field)) {
     return (
-      <Checkbox.Output required={field.config.required} value={field.value} />
+      <Checkbox.Output required={!!field.config.required} value={field.value} />
     )
   }
 
