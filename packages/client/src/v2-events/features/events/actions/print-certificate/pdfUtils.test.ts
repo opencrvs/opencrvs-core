@@ -76,38 +76,27 @@ const adminLevels = [
     }
   }
 ]
-const userId = '677fb08730f3abfa33072769'
 
 describe('stringifyEventMetadata', () => {
   test('Resolves event metadata', () => {
+    const generator = testDataGenerator()
+
+    generator.user.id.localRegistrar
+
     const { declaration, ...metadata } = eventQueryDataGenerator({
       id: 'seabeast-clad-stad-elia-oleocellosis' as UUID,
-      assignedTo: userId,
+      assignedTo: generator.user.id.localRegistrar,
       createdByUserType: 'user',
-      createdBy: userId,
+      createdBy: generator.user.id.localRegistrar,
       trackingId: 'B77FF6',
       createdAt: new Date(2000, 1, 1).toISOString(),
       updatedAt: new Date(2000, 1, 2).toISOString(),
       updatedAtLocation: locations[0].id,
       createdAtLocation: locations[0].id,
-      updatedBy: userId
+      updatedBy: generator.user.id.localRegistrar
     })
 
-    const users = [
-      {
-        id: userId,
-        name: [
-          {
-            use: 'en',
-            given: ['Joseph'],
-            family: 'Musonda'
-          }
-        ],
-        fullHonorificName: 'Dr. Joseph Musonda, 3rd order of the Lion',
-        role: 'NATIONAL_REGISTRAR',
-        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-      }
-    ] satisfies User[]
+    const users = [generator.user.localRegistrar().v2]
 
     const stringified = stringifyEventMetadata({
       metadata: {
@@ -267,7 +256,7 @@ describe('SVG compiler', () => {
     it('Returns full honorific name', () => {
       expectRenderOutput(
         '<svg><text>{{ $lookup $metadata "createdBy.fullHonorificName" }}</text></svg>',
-        '<svg><text>Dr. Joseph Musonda, 3rd order of the Lion</text></svg>'
+        '<svg><text>1st Order Honorable Kennedy Mweene</text></svg>'
       )
     })
   })

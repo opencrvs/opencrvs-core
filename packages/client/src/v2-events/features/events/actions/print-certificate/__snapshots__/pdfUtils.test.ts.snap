@@ -3,8 +3,8 @@
 exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
 {
   "assignedTo": {
-    "fullHonorificName": "Dr. Joseph Musonda, 3rd order of the Lion",
-    "name": "Joseph Musonda",
+    "fullHonorificName": "1st Order Honorable Kennedy Mweene",
+    "name": "Kennedy Mweene",
     "signature": "",
   },
   "copiesPrintedForTemplate": 1,
@@ -16,8 +16,8 @@ exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
     "province": "Pualula",
   },
   "createdBy": {
-    "fullHonorificName": "Dr. Joseph Musonda, 3rd order of the Lion",
-    "name": "Joseph Musonda",
+    "fullHonorificName": "1st Order Honorable Kennedy Mweene",
+    "name": "Kennedy Mweene",
     "signature": "",
   },
   "dateOfEvent": "1 February 2000",
@@ -39,8 +39,8 @@ exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
     "province": "Pualula",
   },
   "updatedBy": {
-    "fullHonorificName": "Dr. Joseph Musonda, 3rd order of the Lion",
-    "name": "Joseph Musonda",
+    "fullHonorificName": "1st Order Honorable Kennedy Mweene",
+    "name": "Kennedy Mweene",
     "signature": "",
   },
   "updatedByUserRole": "FIELD_AGENT",
