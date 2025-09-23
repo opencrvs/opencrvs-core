@@ -104,5 +104,5 @@ function stringify(value: string | undefined, context: { intl: IntlShape }) {
 export const TimeField = {
   Input: TimeInput,
   Output: TimeOutput,
-  stringify: stringify
+  stringify
 }

@@ -110,7 +110,7 @@ function DocumentUploaderWithOption({
       const newFile = {
         path,
         originalFilename,
-        type: type,
+        type,
         option: id
       }
 

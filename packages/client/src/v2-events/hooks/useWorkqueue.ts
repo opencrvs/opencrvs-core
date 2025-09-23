@@ -43,14 +43,14 @@ export const useWorkqueue = (workqueueSlug: string) => {
   const legacyUser = useSelector(getUserDetails)
   const { getUser } = useUsers()
   const [user] = getUser.useSuspenseQuery(legacyUser?.id ?? '')
-  const { useGetEventCounts } = useEvents()
+  const { useGetEventCountsByWorkqueue } = useEvents()
 
   const { searchEvent } = useEvents()
 
   const workqueues = useCountryConfigWorkqueueConfigurations()
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
 
-  const deSerializedQueries = workqueues.map((wq) => ({
+  const deserializedQueries = workqueues.map((wq) => ({
     slug: wq.slug,
     query: getDeserializedQuery(wq, user, legacyUser?.primaryOffice.id)
   }))
@@ -90,8 +90,9 @@ export const useWorkqueue = (workqueueSlug: string) => {
     },
     getCount: {
       useSuspenseQuery: () =>
-        useGetEventCounts().useSuspenseQuery(deSerializedQueries),
-      useQuery: () => useGetEventCounts().useQuery(deSerializedQueries)
+        useGetEventCountsByWorkqueue().useSuspenseQuery(deserializedQueries),
+      useQuery: () =>
+        useGetEventCountsByWorkqueue().useQuery(deserializedQueries)
     }
   }
 }

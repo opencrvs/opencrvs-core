@@ -139,8 +139,8 @@ function changeSortedColumn(
   }
 
   return {
-    newSortedCol: newSortedCol,
-    newSortOrder: newSortOrder
+    newSortedCol,
+    newSortOrder
   }
 }
 
