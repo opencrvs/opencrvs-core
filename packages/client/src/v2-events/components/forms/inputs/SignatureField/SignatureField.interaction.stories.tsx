@@ -203,7 +203,7 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
     await step('Accepts file of valid size and type', async () => {
       const filename = 'valid.jpg'
       const validFile = new File(['a'.repeat(512 * 512)], filename, {
-        type: 'image/png' satisfies MimeType
+        type: 'image/jpg' satisfies MimeType
       })
 
       await userEvent.upload(input, validFile)
@@ -249,7 +249,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
 
               return new HttpResponse(binary, {
                 headers: {
-                  'Content-Type': 'image/png' satisfies MimeType,
+                  'Content-Type': 'image/jpg' satisfies MimeType,
                   'Cache-Control': 'no-cache'
                 }
               })
@@ -267,7 +267,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
               type: FieldType.SIGNATURE,
               configuration: {
                 maxFileSize: 1 * 1024 * 1024,
-                acceptedFileTypes: ['image/png']
+                acceptedFileTypes: ['image/jpg' satisfies MimeType]
               },
               signaturePromptLabel: generateTranslationConfig('Signature'),
               label: generateTranslationConfig('Upload signature')
