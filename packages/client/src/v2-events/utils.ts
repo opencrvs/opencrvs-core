@@ -30,7 +30,6 @@ import {
   joinValues,
   UUID,
   SystemRole,
-  ActionType,
   Location
 } from '@opencrvs/commons/client'
 

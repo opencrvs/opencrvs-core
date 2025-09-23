@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { uniqBy } from 'lodash'
 import styled from 'styled-components'
 import { defineMessages, useIntl } from 'react-intl'
 import {
@@ -72,10 +73,9 @@ function getReviewForm(configuration: EventConfig) {
 
 function getReviewFormFields(configuration: EventConfig) {
   const reviewForms = getReviewForm(configuration)
-  const allFields = reviewForms.flatMap((form) => form.fields)
-
-  return Array.from(
-    new Map(allFields.map((field) => [field.id, field])).values()
+  return uniqBy(
+    reviewForms.flatMap((form) => form.fields),
+    (field) => field.id
   )
 }
 
