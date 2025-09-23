@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import {
   applyDeclarationToEventIndex,
   EventConfig,
@@ -19,7 +19,6 @@ import {
   getAcceptedActions,
   getCurrentEventState,
   getDeclaration,
-  isFieldDisplayedOnReview,
   UUID
 } from '@opencrvs/commons/client'
 import { Table } from '@opencrvs/components/lib/Table'
@@ -28,7 +27,7 @@ import { messages as correctionMessages } from '@client/i18n/messages/views/corr
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { hasFieldChanged } from '../../utils'
+import { hasAnnotationChanged, hasFieldChanged } from '../../utils'
 import {
   expandWithUpdateActions,
   EventHistoryActionDocument
@@ -56,6 +55,29 @@ type DeclarationComparisonTableProps =
       form: EventState
       action?: EventHistoryActionDocument
     })
+
+const messages = defineMessages({
+  reviewForm: {
+    defaultMessage: 'Review form',
+    description: 'Review form label for update action',
+    id: 'review.form.title'
+  }
+})
+
+function getReviewForm(configuration: EventConfig) {
+  return configuration.actions
+    .filter((action) => 'review' in action)
+    .map((action) => action.review)
+}
+
+function getReviewFormFields(configuration: EventConfig) {
+  const reviewForms = getReviewForm(configuration)
+  const allFields = reviewForms.flatMap((form) => form.fields)
+
+  return Array.from(
+    new Map(allFields.map((field) => [field.id, field])).values()
+  )
+}
 
 /**
  *
@@ -95,6 +117,7 @@ export function DeclarationComparisonTableComponent({
         }
 
   const declarationConfig = getDeclaration(eventConfig)
+  const reviewFormFields = getReviewFormFields(eventConfig)
 
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
@@ -114,6 +137,35 @@ export function DeclarationComparisonTableComponent({
     eventBeforeUpdate as EventDocument,
     eventConfiguration
   ).declaration
+
+  // Collect all changed review fields once
+  const changedReviewFields = reviewFormFields
+    .filter((f) => hasAnnotationChanged(f, fullEvent, index))
+    .map((f) => {
+      const previous = (
+        <Output
+          field={f}
+          formConfig={declarationConfig}
+          previousForm={previousDeclaration}
+          showPreviouslyMissingValuesAsChanged={false}
+          value={previousDeclaration[f.id]}
+        />
+      )
+
+      const latest = (
+        <Output
+          field={f}
+          showPreviouslyMissingValuesAsChanged={false}
+          value={'Updated'}
+        />
+      )
+
+      return {
+        fieldLabel: intl.formatMessage(f.label),
+        latest,
+        previous
+      }
+    })
 
   return (
     <>
@@ -194,6 +246,47 @@ export function DeclarationComparisonTableComponent({
           />
         )
       })}
+      {changedReviewFields.length > 0 && (
+        <Table
+          key={`${id}-review-fields`}
+          columns={[
+            {
+              label: (
+                <TableHeader>
+                  {intl.formatMessage(messages.reviewForm)}
+                </TableHeader>
+              ),
+              width: 34,
+              key: 'fieldLabel'
+            },
+            {
+              label: (
+                <TableHeader>
+                  {intl.formatMessage(
+                    correctionMessages.correctionSummaryOriginal
+                  )}
+                </TableHeader>
+              ),
+              width: 33,
+              key: 'previous'
+            },
+            {
+              label: (
+                <TableHeader>
+                  {intl.formatMessage(
+                    correctionMessages.correctionSummaryCorrection
+                  )}
+                </TableHeader>
+              ),
+              width: 33,
+              key: 'latest'
+            }
+          ]}
+          content={changedReviewFields}
+          hideTableBottomBorder={true}
+          id={`${id}-review-fields`}
+        />
+      )}
     </>
   )
 }

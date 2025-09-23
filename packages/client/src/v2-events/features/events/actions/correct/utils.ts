@@ -15,8 +15,13 @@ import {
   isFieldVisible,
   isMetaAction,
   EventDocument,
-  ActionType
+  ActionType,
+  deepMerge
 } from '@opencrvs/commons/client'
+import {
+  EventHistoryActionDocument,
+  EventHistoryDocument
+} from './useActionForHistory'
 
 export function hasFieldChanged(
   f: FieldConfig,
@@ -40,4 +45,38 @@ export function isLastActionCorrectionRequest(event: EventDocument) {
   const writeActions = event.actions.filter((a) => !isMetaAction(a.type))
   const lastWriteAction = writeActions[writeActions.length - 1]
   return lastWriteAction.type === ActionType.REQUEST_CORRECTION
+}
+
+function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
+  return actions.reduce(
+    (ann, sortedAction) => {
+      return deepMerge(ann, sortedAction.annotation ?? {})
+    },
+    {} as Record<string, unknown>
+  )
+}
+
+export function hasAnnotationChanged(
+  f: FieldConfig,
+  fullEvent: EventHistoryDocument,
+  currentActionIndex: number
+) {
+  const eventUpToCurrentAction = fullEvent.actions.slice(
+    0,
+    currentActionIndex + 1
+  )
+  const eventUpToPreviousAction = fullEvent.actions.slice(0, currentActionIndex)
+
+  const currentAnnotations = aggregateAnnotations(eventUpToCurrentAction)
+  const previousAnnotations = aggregateAnnotations(eventUpToPreviousAction)
+
+  const prevValue = previousAnnotations[f.id]
+  const currValue = currentAnnotations[f.id]
+
+  // Ensure that if previous value is 'undefined' and current value is 'null'
+  // it doesn't get detected as a value change
+  const bothNil = isNil(prevValue) && isNil(currValue)
+  const valueHasChanged = !isEqual(prevValue, currValue) && !bothNil
+
+  return valueHasChanged
 }
