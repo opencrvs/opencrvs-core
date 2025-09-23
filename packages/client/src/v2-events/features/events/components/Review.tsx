@@ -890,7 +890,7 @@ function RejectActionModal({
 export const Review = {
   Body: withSuspense(ReviewComponent),
   Actions: ReviewActionComponent,
-  EditModal: EditModal,
+  EditModal,
   ActionModal: {
     Accept: AcceptActionModal,
     Reject: RejectActionModal

@@ -161,7 +161,7 @@ export function EventHistoryDialog({
           ]}
           content={[
             {
-              duplicateOf: duplicateOf
+              duplicateOf
             }
           ]}
           noResultText=" "

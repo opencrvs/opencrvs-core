@@ -161,7 +161,7 @@ export const GetEventHook: Story = {
   ],
   parameters: {
     reactRouter: {
-      router: router,
+      router,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
         eventId: createdEvent.id
       })
