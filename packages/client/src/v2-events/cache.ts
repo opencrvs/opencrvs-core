@@ -19,6 +19,11 @@ import {
 export const CACHE_NAME = 'workbox-runtime'
 
 export function getFullDocumentPath(filename: string): FullDocumentPath {
+  if (filename.startsWith('/' + window.config.MINIO_BUCKET)) {
+    // already a full path
+    return filename as FullDocumentPath
+  }
+
   return ('/' +
     joinValues([window.config.MINIO_BUCKET, filename], '/')) as FullDocumentPath
 }
@@ -76,7 +81,9 @@ export async function removeCached(filename: string) {
   }
 
   const cache = await caches.open(cacheKey)
-  return cache.delete(getUnsignedFileUrl(getFullDocumentPath(filename)))
+  return cache.delete(getUnsignedFileUrl(getFullDocumentPath(filename)), {
+    ignoreSearch: true
+  })
 }
 
 export async function ensureCacheExists(cacheName: string) {
