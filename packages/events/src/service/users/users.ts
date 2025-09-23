@@ -35,6 +35,9 @@ export const getUsersById = async (ids: string[], token: string) => {
       role: user.role,
       signature: user.signature ? user.signature : undefined,
       avatar: user.avatar?.data ? user.avatar.data : undefined,
-      primaryOfficeId: user.primaryOfficeId
+      primaryOfficeId: user.primaryOfficeId,
+      fullHonorificName: user.fullHonorificName
+        ? user.fullHonorificName
+        : undefined
     }))
 }

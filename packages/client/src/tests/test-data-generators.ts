@@ -150,6 +150,7 @@ export function testDataGenerator(rngSeed?: number) {
           __typename: 'UserRole'
         },
         status: Status.Active,
+        fullHonorificName: '1st Order Honorable Kennedy Mweene',
         name: [
           {
             use: 'en',

@@ -27,7 +27,8 @@ import {
   tennisClubMembershipEvent,
   footballClubMembershipEvent,
   libraryMembershipEvent,
-  FullDocumentPath
+  FullDocumentPath,
+  TestUserRole
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 
@@ -1198,7 +1199,8 @@ export const handlers = {
         {
           id: testDataGenerator().user.id.localRegistrar,
           name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
-          role: 'LOCAL_REGISTRAR',
+          role: TestUserRole.enum.LOCAL_REGISTRAR,
+          fullHonorificName: '1st Order Honorable Kennedy Mweene',
           signature: undefined,
           avatar: undefined,
           primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
@@ -1215,7 +1217,8 @@ export const handlers = {
             family: 'Mweene'
           }
         ],
-        role: 'LOCAL_REGISTRAR',
+        fullHonorificName: '1st Order Honorable Kennedy Mweene',
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
         signature: 'signature.png' as FullDocumentPath,
         avatar: undefined,
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID

@@ -3,6 +3,7 @@
 exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
 {
   "assignedTo": {
+    "fullHonorificName": "Dr. Joseph Musonda, 3rd order of the Lion",
     "name": "Joseph Musonda",
     "signature": "",
   },
@@ -15,6 +16,7 @@ exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
     "province": "Pualula",
   },
   "createdBy": {
+    "fullHonorificName": "Dr. Joseph Musonda, 3rd order of the Lion",
     "name": "Joseph Musonda",
     "signature": "",
   },
@@ -37,6 +39,7 @@ exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
     "province": "Pualula",
   },
   "updatedBy": {
+    "fullHonorificName": "Dr. Joseph Musonda, 3rd order of the Lion",
     "name": "Joseph Musonda",
     "signature": "",
   },

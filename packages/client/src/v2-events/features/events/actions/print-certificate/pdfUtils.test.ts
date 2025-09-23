@@ -21,6 +21,7 @@ import {
   User,
   UUID
 } from '@opencrvs/commons/client'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
   tennisClubMembershipEventDocument,
   tennisClubMembershipEventIndex
@@ -102,6 +103,7 @@ describe('stringifyEventMetadata', () => {
             family: 'Musonda'
           }
         ],
+        fullHonorificName: 'Dr. Joseph Musonda, 3rd order of the Lion',
         role: 'NATIONAL_REGISTRAR',
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
       }
@@ -121,6 +123,7 @@ describe('stringifyEventMetadata', () => {
     expect(stringified).toMatchSnapshot()
   })
 })
+
 describe('svgToPdfTemplate', () => {
   test('replaces image URL with base64 data', async () => {
     fetch.mockResolvedValue({
@@ -174,11 +177,15 @@ describe('svgToPdfTemplate', () => {
 })
 
 function expectRenderOutput(template: string, output: string) {
+  const generator = testDataGenerator(2323)
+  const registrar = generator.user.localRegistrar()
   const { declaration, ...metadata } = tennisClubMembershipEventIndex
+
   const result = compileSvg({
     templateString: template,
     $metadata: {
       ...metadata,
+      createdBy: registrar.id,
       modifiedAt: new Date().toISOString(),
       copiesPrintedForTemplate: 2
     },
@@ -191,7 +198,22 @@ function expectRenderOutput(template: string, output: string) {
     },
     review: false,
     locations: [],
-    users: [],
+    users: [
+      {
+        id: registrar.id,
+
+        name: [
+          {
+            use: 'en',
+            given: ['John'],
+            family: 'Musonda'
+          }
+        ],
+        fullHonorificName: 'Dr. Joseph Musonda, 3rd order of the Lion',
+        role: registrar.role.label.id,
+        primaryOfficeId: registrar.primaryOffice.id
+      }
+    ],
     language: { lang: 'en', messages: {} },
     config: tennisClubMembershipEvent,
     adminLevels: [
@@ -213,6 +235,7 @@ function expectRenderOutput(template: string, output: string) {
       }
     ]
   })
+
   expect(result).toBe(output)
 }
 
@@ -254,6 +277,12 @@ describe('SVG compiler', () => {
       expectRenderOutput(
         '<svg><text>{{ $lookup $declaration "applicant.name" }}</text></svg>',
         '<svg><text>{&quot;fullname&quot;:&quot;John Doe&quot;,&quot;firstname&quot;:&quot;John&quot;,&quot;surname&quot;:&quot;Doe&quot;}</text></svg>'
+      )
+    })
+    it('Returns full honorific name', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $lookup $metadata "createdBy.fullHonorificName" }}</text></svg>',
+        '<svg><text>Dr. Joseph Musonda, 3rd order of the Lion</text></svg>'
       )
     })
   })
