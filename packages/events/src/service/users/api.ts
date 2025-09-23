@@ -10,13 +10,7 @@
  */
 
 import fetch from 'node-fetch'
-import { joinUrl, FullDocumentPath, UUID } from '@opencrvs/commons'
-
-export interface IUserName {
-  use: string
-  family: string
-  given: string[]
-}
+import { joinUrl, FullDocumentPath, UUID, IUserName } from '@opencrvs/commons'
 
 export type User = {
   id: string
