@@ -15,20 +15,22 @@ import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { userEvent, within, expect } from '@storybook/test'
 import {
+  ActionType,
   EventIndex,
   eventQueryDataGenerator,
   EventStatus,
+  generateEventDocument,
+  generateEventDraftDocument,
   generateWorkqueues,
   InherentFlags,
-  NameFieldValue
+  NameFieldValue,
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import {
-  tennisClubMembershipEventIndex,
-  tennisClubMembershipEventDocument
-} from '@client/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { formattedDuration } from '@client/utils/date-formatting'
+import { faker } from '@client/tests/test-data-generators'
 import { Name } from '../events/registered-fields'
 import { WorkqueueIndex } from './index'
 
@@ -304,5 +306,95 @@ export const WorkqueueCtaByStatusRejected: Story = {
         ]
       }
     }
+  }
+}
+
+function generateDraft() {
+  const createdEvent = {
+    ...generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [ActionType.CREATE]
+    })
+  }
+
+  return {
+    event: createdEvent,
+    draft: generateEventDraftDocument({
+      eventId: createdEvent.id,
+      actionType: ActionType.DECLARE,
+      declaration: {
+        'applicant.name': {
+          firstname: faker.person.firstName(),
+          surname: faker.person.lastName()
+        }
+      }
+    })
+  }
+}
+
+const events = Array.from({ length: 15 }, generateDraft)
+const drafts = events.map((event) => event.draft)
+
+/**
+ * Shows draft action based on the event rather than the draft. (action is based on the CREATED state rather than DECLARED state of draft)
+ */
+export const DraftPagination: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'draft' })
+    },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('draft')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: 1 }
+            }, {})
+          })
+        ],
+        events: [tRPCMsw.event.search.query(() => ({ results: [], total: 0 }))],
+        event: [
+          tRPCMsw.event.draft.list.query(() => drafts),
+          tRPCMsw.event.get.query((input) => {
+            const event = events.find((e) => e.event.id === input)?.event
+
+            if (!event) {
+              throw new Error(`Event not found with id: ${input}`)
+            }
+
+            return event
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return { results: [], total: 0 }
+          })
+        ],
+        drafts: [tRPCMsw.event.draft.list.query(() => drafts)],
+        offline: { drafts }
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    // Expect 10 elements with text 'Tennis club membership application'
+    const firstPageRows = await canvas.findAllByText(
+      'Tennis club membership application'
+    )
+    await expect(firstPageRows).toHaveLength(10)
+
+    // Wait for page to load before interacting
+    await canvas.findByRole('button', { name: 'Next page' }, { timeout: 5000 })
+    await userEvent.click(canvas.getByRole('button', { name: 'Next page' }))
+
+    // Expect 5 elements with text 'Tennis club membership application'
+    const secondPageRows = await canvas.findAllByText(
+      'Tennis club membership application'
+    )
+    await expect(secondPageRows).toHaveLength(5)
   }
 }
