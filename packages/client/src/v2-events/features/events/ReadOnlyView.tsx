@@ -12,7 +12,6 @@
 import React, { useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { noop } from 'lodash'
-import { useLocation } from 'react-router-dom'
 import {
   ActionType,
   getActionReview,
@@ -35,7 +34,6 @@ import { useSuspenseAdminLeafLevelLocations } from '../../hooks/useLocations'
 import { removeCachedFiles } from '../files/cache'
 
 function ReadonlyView() {
-  const { pathname } = useLocation()
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
   const event = events.getEvent.viewEvent(eventId)
@@ -81,7 +79,7 @@ function ReadonlyView() {
         await removeCachedFiles(event)
       })()
     }
-  }, [event, pathname, assignmentStatus])
+  }, [event, assignmentStatus])
 
   return (
     <FormLayout route={ROUTES.V2.EVENTS.DECLARE}>
