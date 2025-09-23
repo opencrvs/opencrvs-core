@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: ea279f9e-9c5b-448d-a1f3-44bd192afe77
+                transactionId: 602e2592-e3bd-46d4-8bd4-7240fc9cfcf7
                 type: birth
       responses:
         "200":
@@ -395,7 +395,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: f6880e5a-4837-4ac6-88c6-7d8f568f6e7a
+                transactionId: 4666c14a-f1cf-4480-ad8f-c5937b1602ea
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -5615,6 +5615,108 @@ components:
             - type
             - configuration
           description: HTTP request function triggered by a button click
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a8
+            secured:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a9
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
+            type:
+              type: string
+              enum:
+                - LINK_BUTTON
+            configuration:
+              type: object
+              properties:
+                url:
+                  type: string
+                  description: URL to open
+                text:
+                  description: Text to display on the button
+                  allOf:
+                    - $ref: "#/components/schemas/TranslationConfig"
+              required:
+                - url
+                - text
+          required:
+            - id
+            - label
+            - type
+            - configuration
+          description: Button that opens a link
       description: Form field configuration
     FieldConditional:
       oneOf:
