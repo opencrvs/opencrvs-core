@@ -134,7 +134,10 @@ export const GeneratedInputField = React.memo(
       id: fieldDefinition.id,
       // If label is hidden or default message is empty, we don't need to render label
       label,
-      required: fieldDefinition.required,
+      required:
+        typeof fieldDefinition.required === 'boolean'
+          ? fieldDefinition.required
+          : !!fieldDefinition.required,
       disabled: readonlyMode,
       helperText: fieldDefinition.helperText
         ? intl.formatMessage(fieldDefinition.helperText)
@@ -491,6 +494,7 @@ export const GeneratedInputField = React.memo(
             maxFileSize={field.config.configuration.maxFileSize}
             modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
             name={fieldDefinition.id}
+            required={inputFieldProps.required}
             value={field.value}
             onChange={(val) => handleFileChange(val)}
           />
