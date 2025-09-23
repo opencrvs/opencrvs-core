@@ -19,8 +19,8 @@ export const userRouter = router({
   get: publicProcedure
     .input(z.string())
     .output(User)
-    .query(async (options) => {
-      const [user] = await getUsersById([options.input], options.ctx.token)
+    .query(async ({ input, ctx }) => {
+      const [user] = await getUsersById([input], ctx.token)
 
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (!user) {
@@ -31,5 +31,5 @@ export const userRouter = router({
     }),
   list: publicProcedure
     .input(z.array(z.string()))
-    .query(async (options) => getUsersById(options.input, options.ctx.token))
+    .query(async ({ input, ctx }) => getUsersById(input, ctx.token))
 })

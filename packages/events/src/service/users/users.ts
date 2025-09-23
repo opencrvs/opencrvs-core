@@ -9,11 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getUser, UserNotFoundError } from '@opencrvs/commons'
+import { UserNotFoundError } from '@opencrvs/commons'
 import { env } from '@events/environment'
+import { getUser } from './api'
 
 type DatabaseUser = Awaited<ReturnType<typeof getUser>>
 export const getUsersById = async (ids: string[], token: string) => {
+  console.log('CIHAN TESTATATATATA')
+  console.log(ids)
+
   const users = await Promise.all(
     ids.map(async (id) => {
       try {
@@ -26,6 +30,9 @@ export const getUsersById = async (ids: string[], token: string) => {
       }
     })
   )
+
+  console.log('CIHAN TESTATATATATA 2')
+  console.log(users)
 
   return users
     .filter((user): user is DatabaseUser => user !== undefined)

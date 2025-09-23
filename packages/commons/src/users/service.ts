@@ -9,10 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import fetch from 'node-fetch'
 import { UUID } from '../uuid'
 import { FullDocumentPath } from '../documents'
-import { joinUrl } from '../url'
 
 export interface IUserName {
   use: string
@@ -25,7 +23,7 @@ type ObjectId = string
 /*
  * Let's add more fields as they are needed
  */
-type User = {
+export type User = {
   id: string
   avatar?: {
     data: FullDocumentPath
@@ -42,7 +40,8 @@ type User = {
   status: string
   creationDate: number
 }
-type System = {
+
+export type System = {
   name: string
   createdBy: string
   username: string
@@ -51,65 +50,4 @@ type System = {
   scope: string[]
   sha_secret: string
   type: string
-}
-
-export class UserNotFoundError extends Error {
-  constructor(userId: string) {
-    super(`User with id ${userId} not found`)
-    this.name = 'UserNotFoundError'
-  }
-}
-
-export async function getUser(
-  userManagementHost: string,
-  userId: string,
-  token: string
-) {
-  const res = await fetch(joinUrl(userManagementHost, 'getUser').href, {
-    method: 'POST',
-    body: JSON.stringify({ userId }),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
-    }
-  })
-
-  if (res.status === 404) {
-    throw new UserNotFoundError(userId)
-  }
-
-  if (!res.ok) {
-    throw new Error(
-      `Unable to retrieve user details. Error: ${res.status} status received`
-    )
-  }
-
-  return res.json() as Promise<User>
-}
-
-export async function getSystem(
-  userManagementHost: string,
-  systemId: string,
-  token: string
-) {
-  const hostWithTrailingSlash = userManagementHost.endsWith('/')
-    ? userManagementHost
-    : userManagementHost + '/'
-
-  const res = await fetch(new URL('getSystem', hostWithTrailingSlash).href, {
-    method: 'POST',
-    body: JSON.stringify({ systemId }),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
-    }
-  })
-
-  if (!res.ok) {
-    throw new Error(
-      `Unable to retrieve system details. Error: ${res.status} status received`
-    )
-  }
-
-  return res.json() as Promise<System>
 }

@@ -12,6 +12,7 @@ import {
   triggerUserEventNotification,
   logger,
   personNameFromV1ToV2
+  IUserName
 } from '@opencrvs/commons'
 import {
   Extension,
@@ -26,8 +27,7 @@ import {
 import User, {
   ISignature,
   ISignatureAttachment,
-  IUser,
-  IUserName
+  IUser
 } from '@user-mgnt/model/user'
 import fetch from 'node-fetch'
 
