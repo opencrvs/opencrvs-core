@@ -17,7 +17,7 @@ import { AppBar, Button, Icon, ToggleMenu } from '@opencrvs/components'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { AllowedRouteWithEventId } from './utils'
 
 const messages = defineMessages({

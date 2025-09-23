@@ -14,7 +14,7 @@ import * as z from 'zod'
 import { applyDeclarationToEventIndex } from '@opencrvs/commons/client'
 import { EventState } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { useEventConfigurations } from '../useEventConfiguration'
 
 const MutationVariables = z.object({

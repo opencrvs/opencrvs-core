@@ -36,7 +36,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { getOfflineData } from '@client/offline/selectors'
 import { useEventConfiguration } from '../features/events/useEventConfiguration'
 import { useEvents } from '../features/events/useEvents/useEvents'
-import { useValidationFunctionsWithContext } from './useConditionals'
+import { useValidationFunctionsWithContext } from './useValidationFunctionsWithContext'
 
 async function replaceMinioUrlWithBase64(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -169,10 +169,7 @@ export const usePrintableCertificate = ({
    */
   const preparePdfCertificate = async (updatedEvent: EventDocument) => {
     const { declaration: updatedDeclaration, ...updatedMetadata } =
-      useValidationFunctionsWithContext().getCurrentEventState(
-        updatedEvent,
-        eventConfiguration
-      )
+      getCurrentEventState(updatedEvent, eventConfiguration)
     const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
       updatedDeclaration,
       config

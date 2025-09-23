@@ -53,7 +53,7 @@ import {
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
 import { ToastKey } from '@client/v2-events/routes/Toaster'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { useContext } from '@client/v2-events/hooks/useContext'
 
 function retryUnlessConflict(

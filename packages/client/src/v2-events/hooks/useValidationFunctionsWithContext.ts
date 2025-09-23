@@ -26,8 +26,6 @@ import {
 
 import { useContext } from './useContext'
 
-// @todo: rename to useValidationFunctionsWithContext()
-// also rename this file
 export function useValidationFunctionsWithContext() {
   const context = useContext()
 

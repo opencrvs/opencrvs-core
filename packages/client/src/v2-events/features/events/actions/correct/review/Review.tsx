@@ -25,7 +25,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { ReviewCorrection } from './ReviewCorrection'
 
 export function Review() {

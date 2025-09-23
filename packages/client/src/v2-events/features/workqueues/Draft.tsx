@@ -22,7 +22,7 @@ import {
 
 import { ROUTES } from '@client/v2-events/routes'
 import { CoreWorkqueues, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { useEventConfigurations } from '../events/useEventConfiguration'
 import { SearchResultComponent } from '../events/Search/SearchResult'
 import { useDrafts } from '../drafts/useDrafts'

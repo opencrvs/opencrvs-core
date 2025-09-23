@@ -17,7 +17,7 @@ import {
   getCurrentEventState
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
-import { getContext, requiresAnyOfScopes } from '@events/router/middleware'
+import { requiresAnyOfScopes } from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
 import { getEventById, processAction } from '@events/service/events/events'
 import {
@@ -26,6 +26,7 @@ import {
 } from '@events/router/event/actions'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
+import { getContext } from '@events/router/middleware/validate/utils'
 
 export function declareActionProcedures() {
   const requireScopesMiddleware = requiresAnyOfScopes(

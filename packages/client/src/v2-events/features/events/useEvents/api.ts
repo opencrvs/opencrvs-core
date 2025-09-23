@@ -26,7 +26,7 @@ import {
   User
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { removeCachedFiles } from '../../files/cache'
 import { MutationType } from './procedures/utils'
 

@@ -21,7 +21,7 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 
 const messages = defineMessages({
   title: {

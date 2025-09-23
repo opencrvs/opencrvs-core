@@ -16,7 +16,7 @@ import {
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 
 export function RequestCorrection({
   action,

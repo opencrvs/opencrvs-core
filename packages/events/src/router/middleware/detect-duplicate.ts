@@ -26,7 +26,7 @@ import { TrpcContext } from '@events/context'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 import { processAction, getEventById } from '@events/service/events/events'
-import { getContext } from '@events/router/middleware/validate'
+import { getContext } from '@events/router/middleware/validate/utils'
 
 function requiresDedupCheck(
   input: ActionInputWithType

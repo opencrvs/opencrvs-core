@@ -43,19 +43,16 @@ import {
   omitHiddenPaginatedFields,
   runFieldValidations,
   runStructuralValidations,
-  UserContext,
-  LocationType
+  UserContext
 } from '@opencrvs/commons/events'
-import { getTokenPayload } from '@opencrvs/commons/authentication'
+
 import { getEventConfigurationById } from '@events/service/config/config'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
 import { getEventById } from '@events/service/events/events'
-import {
-  getLeafLocationIds,
-  isLeafLocation
-} from '@events/storage/postgres/events/locations'
+import { isLeafLocation } from '@events/storage/postgres/events/locations'
 import { TrpcContext } from '@events/context'
 import {
+  getContext,
   getInvalidUpdateKeys,
   getVerificationPageErrors,
   throwWhenNotEmpty
@@ -347,15 +344,6 @@ function validateCorrectableFields({
   })
 
   return errors
-}
-
-// @todo for Josh: move this to a better file?
-export async function getContext(token: string): Promise<UserContext> {
-  const leafAdminStructureLocationIds = await getLeafLocationIds({
-    locationTypes: [LocationType.enum.ADMIN_STRUCTURE]
-  })
-
-  return { leafAdminStructureLocationIds, user: getTokenPayload(token) }
 }
 
 export const validateAction: MiddlewareFunction<

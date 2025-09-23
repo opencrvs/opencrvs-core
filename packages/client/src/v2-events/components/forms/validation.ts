@@ -21,7 +21,7 @@ import {
   omitHiddenFields,
   omitHiddenPaginatedFields
 } from '@opencrvs/commons/client'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 
 interface FieldErrors {
   errors: {

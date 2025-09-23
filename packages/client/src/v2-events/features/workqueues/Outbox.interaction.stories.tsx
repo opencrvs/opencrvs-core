@@ -27,7 +27,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { wrapHandlersWithSpies } from '@client/tests/v2-events/declaration.utils'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useConditionals'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { ReviewIndex } from '../events/actions/declare/Review'
 
 const generator = testDataGenerator()

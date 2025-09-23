@@ -44,7 +44,7 @@ import {
 import { indexEvent } from '@events/service/indexing/indexing'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import * as eventsRepo from '@events/storage/postgres/events/events'
-import { getContext } from '@events/router/middleware/validate'
+import { getContext } from '@events/router/middleware/validate/utils'
 
 export class EventNotFoundError extends TRPCError {
   constructor(id: string) {
