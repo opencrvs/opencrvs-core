@@ -137,11 +137,18 @@ export const Read: Story = {
   }
 }
 
+const createActionCreatedAt = getRandomDatetime(
+  prng,
+  new Date('2023-12-12'),
+  new Date('2023-12-31')
+)
+
 const createAction = generateActionDocument({
   configuration: tennisClubMembershipEvent,
   action: ActionType.CREATE,
   rng: prng,
   defaults: {
+    createdAt: createActionCreatedAt,
     id: generateUuid(prng)
   }
 })
@@ -151,6 +158,7 @@ const declareAction = generateActionDocument({
   action: ActionType.DECLARE,
   rng: prng,
   defaults: {
+    createdAt: addDays(new Date(createActionCreatedAt), 1).toISOString(),
     id: generateUuid(prng)
   }
 })
@@ -160,6 +168,7 @@ const validateAction = generateActionDocument({
   action: ActionType.VALIDATE,
   rng: prng,
   defaults: {
+    createdAt: addDays(new Date(createActionCreatedAt), 2).toISOString(),
     id: generateUuid(prng)
   },
   declarationOverrides: {
@@ -172,6 +181,7 @@ const registerAction = generateActionDocument({
   action: ActionType.REGISTER,
   rng: prng,
   defaults: {
+    createdAt: addDays(new Date(createActionCreatedAt), 3).toISOString(),
     id: generateUuid(prng)
   },
   declarationOverrides: {
@@ -179,20 +189,13 @@ const registerAction = generateActionDocument({
   }
 })
 
-const createdAt = getRandomDatetime(
-  prng,
-  new Date('2024-01-01'),
-  new Date('2024-12-31')
-)
-const updatedAt = addDays(new Date(createdAt), 5).toISOString()
-
 const eventWhenDeclareUpdatesDeclaration = {
   trackingId: generateUuid(prng),
   type: tennisClubMembershipEvent.id,
   actions: [createAction, declareAction],
-  createdAt,
+  createdAt: createActionCreatedAt,
   id: generateUuid(prng),
-  updatedAt
+  updatedAt: addDays(new Date(createActionCreatedAt), 1).toISOString()
 }
 
 export const Declared: Story = {
@@ -217,9 +220,9 @@ const eventWhenValidateUpdatesDeclaration = {
   trackingId: generateUuid(prng),
   type: tennisClubMembershipEvent.id,
   actions: [createAction, declareAction, validateAction],
-  createdAt,
+  createdAt: createActionCreatedAt,
   id: generateUuid(prng),
-  updatedAt
+  updatedAt: addDays(new Date(createActionCreatedAt), 2).toISOString()
 }
 
 export const Validated: Story = {
@@ -244,9 +247,9 @@ const eventWhenRegisterUpdatesDeclaration = {
   trackingId: generateUuid(prng),
   type: tennisClubMembershipEvent.id,
   actions: [createAction, declareAction, validateAction, registerAction],
-  createdAt,
+  createdAt: createActionCreatedAt,
   id: generateUuid(prng),
-  updatedAt
+  updatedAt: addDays(new Date(createActionCreatedAt), 3).toISOString()
 }
 
 export const Registered: Story = {
