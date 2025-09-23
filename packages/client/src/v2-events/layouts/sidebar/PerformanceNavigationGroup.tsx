@@ -20,13 +20,13 @@ import {
   WORKQUEUE_TABS
 } from '@client/components/interface/WorkQueueTabs'
 import * as routes from '@client/navigation/routes'
-import { navigationMessages } from '../../../i18n/messages/views/navigation'
-import { useHasAccessToNavigationItem } from '../../../components/interface/useHasAccessToNavigationItem'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { useHasAccessToNavigationItem } from '@client/components/interface/useHasAccessToNavigationItem'
 import {
   showLeaderboard,
   showRegDashboard,
   showStatistics
-} from '../../../components/interface/Navigation'
+} from '@client/components/interface/Navigation'
 
 /**
  * Based on packages/client/src/components/interface/Navigation.tsx

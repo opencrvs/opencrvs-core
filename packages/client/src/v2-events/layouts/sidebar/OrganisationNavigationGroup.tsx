@@ -23,9 +23,9 @@ import {
   WORKQUEUE_TABS
 } from '@client/components/interface/WorkQueueTabs'
 import * as routes from '@client/navigation/routes'
-import { formatUrl } from '../../../navigation'
-import { navigationMessages } from '../../../i18n/messages/views/navigation'
-import { useHasAccessToNavigationItem } from '../../../components/interface/useHasAccessToNavigationItem'
+import { formatUrl } from '@client/navigation'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { useHasAccessToNavigationItem } from '@client/components/interface/useHasAccessToNavigationItem'
 
 const conmmunicationTab: string[] = [
   WORKQUEUE_TABS.informantNotification,
@@ -45,7 +45,7 @@ export function OrganisationNavigationGroup({
   primaryOfficeId: string | undefined
 }) {
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
-  const [isCommunationExpanded, setIsCommunationExpanded] =
+  const [isCommunicationExpanded, setIsCommunicationExpanded] =
     React.useState(false)
 
   const navigate = useNavigate()
@@ -129,7 +129,7 @@ export function OrganisationNavigationGroup({
             <>
               <NavigationItem
                 expandableIcon={() =>
-                  isCommunationExpanded ||
+                  isCommunicationExpanded ||
                   conmmunicationTab.some(
                     (tab) => tab === currentWorkqueueSlug
                   ) ? (
@@ -146,9 +146,11 @@ export function OrganisationNavigationGroup({
                 label={intl.formatMessage(
                   navigationMessages[WORKQUEUE_TABS.communications]
                 )}
-                onClick={() => setIsCommunationExpanded(!isCommunationExpanded)}
+                onClick={() =>
+                  setIsCommunicationExpanded(!isCommunicationExpanded)
+                }
               />
-              {(isCommunationExpanded ||
+              {(isCommunicationExpanded ||
                 conmmunicationTab.some(
                   (tab) => tab === currentWorkqueueSlug
                 )) && (
