@@ -15,9 +15,9 @@ import { Location, LocationType, UUID } from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 
-setQueryDefaults(trpcOptionsProxy.locations.get, {
+setQueryDefaults(trpcOptionsProxy.locations.list, {
   queryFn: async (...params) => {
-    const queryOptions = trpcOptionsProxy.locations.get.queryOptions()
+    const queryOptions = trpcOptionsProxy.locations.list.queryOptions()
     if (typeof queryOptions.queryFn !== 'function') {
       throw new Error('queryFn is not a function')
     }
@@ -44,12 +44,12 @@ export function useLocations() {
         // The `...rest` spread carries over things like staleTime, gcTime, enabled, etc.
         // Then we re-attach the queryKey explicitly so React Query can identify this cache.
         const { queryFn, ...rest } =
-          trpcOptionsProxy.locations.get.queryOptions()
+          trpcOptionsProxy.locations.list.queryOptions()
 
         return [
           useSuspenseQuery({
             ...rest,
-            queryKey: trpc.locations.get.queryKey({
+            queryKey: trpc.locations.list.queryKey({
               isActive,
               locationIds,
               locationType
