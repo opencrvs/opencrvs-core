@@ -58,7 +58,12 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
               text: {
                 id: 'storybook.status.verified',
                 defaultMessage: 'Verified',
-                description: 'Status text when user is verified'
+                description: 'Status text when the informant is verified'
+              },
+              description: {
+                id: 'storybook.status.verified.description',
+                defaultMessage: 'Verified',
+                description: 'Status description when the informant is verified'
               }
             }
           }
