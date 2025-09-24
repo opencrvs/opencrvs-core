@@ -15,7 +15,6 @@ import { defineMessages, useIntl } from 'react-intl'
 import {
   applyDeclarationToEventIndex,
   EventConfig,
-  getAllAnnotationFields,
   EventDocument,
   EventState,
   getAcceptedActions,
@@ -74,6 +73,14 @@ function getReviewForm(configuration: EventConfig) {
     .map((action) => action.review)
 }
 
+function getReviewFormFields(configuration: EventConfig) {
+  const reviewForms = getReviewForm(configuration)
+  return uniqBy(
+    reviewForms.flatMap((form) => form.fields),
+    (field) => field.id
+  )
+}
+
 /**
  * When action is not found or provided, we compare the full event
  * Needed when action is not provided as props e.g. - correction summary
@@ -121,7 +128,7 @@ export function DeclarationComparisonTableComponent({
   const index = fullEvent.actions.findIndex((a) => a.id === action?.id)
 
   const declarationConfig = getDeclaration(eventConfig)
-  const reviewFormFields = getAllAnnotationFields(eventConfig)
+  const reviewFormFields = getReviewFormFields(eventConfig)
 
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
