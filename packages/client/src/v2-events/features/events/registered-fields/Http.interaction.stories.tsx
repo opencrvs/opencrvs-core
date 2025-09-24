@@ -57,9 +57,7 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
     layout: 'centered',
     msw: {
       handlers: {
-        nidApi: [
-          http.post('/api/nid', () => HttpResponse.json({ nid: '1234567890' }))
-        ]
+        nidApi: [http.post('/api/nid', () => HttpResponse.text('1234567890'))]
       }
     }
   },
@@ -203,7 +201,7 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
                 conditional: never()
               }
             ],
-            value: field('child.http-fetch').get('data.nid')
+            value: field('child.http-fetch').get('data')
           }
         ]}
         id="my-form"

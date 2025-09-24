@@ -85,7 +85,7 @@ async function fetchHttpFieldValue(
     throw err
   }
 
-  return res.json()
+  return res.text()
 }
 
 function HttpInput({
@@ -150,5 +150,7 @@ function HttpInput({
 export const Http = {
   Input: HttpInput,
   Output: null,
-  stringify: () => `[http response or error redacted]`
+  stringify: (value: string | undefined) => {
+    return value?.toString() || ''
+  }
 }
