@@ -10,7 +10,11 @@
  */
 
 import { http, HttpResponse, HttpResponseInit } from 'msw'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createTestClient,
+  sanitizeForSnapshot,
+  setupTestCase
+} from '@events/tests/utils'
 import { mswServer } from '../../tests/msw'
 
 test('Returns empty list when no ids provided', async () => {
@@ -86,4 +90,39 @@ test('Returns multiple users', async () => {
   const fetchedUsers = await client.user.list(userIds)
 
   expect(fetchedUsers).toHaveLength(locations.length)
+})
+
+test('Returns multiple users with honorifics', async () => {
+  const { user, generator, locations, seed } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const usersToCreate = locations.map((location, i) =>
+    generator.user.create({
+      primaryOfficeId: location.id,
+      // 4 to make the nth work.
+      fullHonorificName: `${i + 4}th Class Registration Officer, John Doe`
+    })
+  )
+
+  const userIds = []
+  const users: Array<ReturnType<typeof seed.user>> = []
+  for (const userToCreate of usersToCreate) {
+    const createdUser = seed.user(userToCreate)
+    const userId = createdUser.id
+    userIds.push(userId)
+    users.push(createdUser)
+  }
+
+  mswServer.use(
+    http.post(`http://localhost:3030/getUser`, async ({ request }) => {
+      const body = (await request.clone().json()) as { userId: string }
+      const userId = body.userId
+      return HttpResponse.json(users.find((u) => u.id === userId))
+    })
+  )
+
+  const fetchedUsers = await client.user.list(userIds)
+
+  expect(fetchedUsers).toHaveLength(locations.length)
+  expect(sanitizeForSnapshot(fetchedUsers, ['id'])).toMatchSnapshot()
 })

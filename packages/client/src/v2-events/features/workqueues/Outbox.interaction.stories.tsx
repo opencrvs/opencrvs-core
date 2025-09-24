@@ -20,7 +20,8 @@ import {
   getCurrentEventState,
   footballClubMembershipEvent,
   FullDocumentPath,
-  UUID
+  UUID,
+  User
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -86,20 +87,7 @@ const declarationTrpcMsw = {
   ])
 }
 
-const mockUser = {
-  id: '67bda93bfc07dee78ae558cf',
-  name: [
-    {
-      use: 'en',
-      given: ['Kalusha'],
-      family: 'Bwalya'
-    }
-  ],
-  role: 'SOCIAL_WORKER',
-  signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined,
-  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-}
+const mockUser = generator.user.fieldAgent().v2
 
 export const Outbox: Story = {
   loaders: [
@@ -129,7 +117,7 @@ export const Outbox: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.registrationAgent()
+                getUser: generator.user.registrationAgent().v1
               }
             })
           }),

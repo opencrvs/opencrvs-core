@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-/* eslint-disable max-lines */
+
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
@@ -78,20 +78,7 @@ export default meta
 
 type Story = StoryObj<typeof ReviewIndex>
 
-const mockUser = {
-  id: '67bda93bfc07dee78ae558cf',
-  name: [
-    {
-      use: 'en',
-      given: ['Kalusha'],
-      family: 'Bwalya'
-    }
-  ],
-  role: 'SOCIAL_WORKER',
-  signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined,
-  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-}
+const mockUser = generator.user.fieldAgent().v2
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
@@ -153,7 +140,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
@@ -241,7 +228,7 @@ const msw = {
       graphql.query('fetchUser', () => {
         return HttpResponse.json({
           data: {
-            getUser: generator.user.registrationAgent()
+            getUser: generator.user.registrationAgent().v1
           }
         })
       }),
@@ -437,7 +424,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.fieldAgent()
+                getUser: generator.user.fieldAgent().v1
               }
             })
           }),

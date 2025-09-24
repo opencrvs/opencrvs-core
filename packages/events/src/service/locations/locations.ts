@@ -66,3 +66,7 @@ export const getChildLocations = async (parentIdToSearch: string) => {
     locationType
   }))
 }
+
+export const getLocationById = async (id: UUID) => {
+  return locationsRepo.getLocationById(id)
+}

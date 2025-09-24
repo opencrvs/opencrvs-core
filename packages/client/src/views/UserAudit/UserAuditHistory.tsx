@@ -198,6 +198,10 @@ function UserAuditHistoryComponent(props: Props) {
   }
 
   function getIpAdress(auditLog: UserAuditLogResultItem) {
+    if (!auditLog.userAgent) {
+      return auditLog.ipAddress || '-'
+    }
+
     const device = Bowser.getParser(auditLog.userAgent).getResult()
 
     return (
