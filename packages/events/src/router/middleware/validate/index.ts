@@ -143,7 +143,7 @@ function validateDeclarationUpdateAction({
   const declarationConfig = getDeclaration(eventConfig)
 
   // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
-  // (e.g. when dob is unknown anduser has send the age previously.Now they only send dob, without setting dob unknown to false).
+  // (e.g. when dob is unknown and user has send the age previously. Now they only send dob, without setting dob unknown to false).
   const cleanedDeclaration = omitHiddenPaginatedFields(
     declarationConfig,
     completeDeclaration
@@ -370,6 +370,7 @@ export const validateAction: MiddlewareFunction<
   }
 
   if (actionType === ActionType.REQUEST_CORRECTION) {
+    console.log('kissa')
     const errors = validateCorrectableFields({
       eventConfig,
       declarationUpdate: input.declaration
