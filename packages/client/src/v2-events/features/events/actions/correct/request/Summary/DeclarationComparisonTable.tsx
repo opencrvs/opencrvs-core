@@ -101,6 +101,7 @@ export function DeclarationComparisonTableComponent({
 
   const index = fullEvent.actions.findIndex((a) => a.id === action?.id)
   // When action is not found or provided, we compare the full event
+  // Needed when action is not provided as props e.g. - correction summary
   const eventBeforeUpdate =
     index === -1
       ? fullEvent
@@ -115,8 +116,20 @@ export function DeclarationComparisonTableComponent({
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
+  const currentEvent =
+    // When action is not found or provided, we compare the full event
+    // Needed when action is not provided as props e.g. - correction summary
+    index === -1
+      ? fullEvent
+      : {
+          ...fullEvent,
+          actions: fullEvent.actions.slice(0, index + 1)
+        }
+
   const currentState = getCurrentEventState(
-    fullEvent as EventDocument,
+    // @TODO: Decide whether to make getCurrentEventState accept EventHistoryDocument,
+    // or refactor to derive declaration changes directly from EventDocument (instead of EventIndex).
+    currentEvent as EventDocument,
     eventConfiguration
   )
 
@@ -127,6 +140,8 @@ export function DeclarationComparisonTableComponent({
     : currentState.declaration
 
   const previousDeclaration = getCurrentEventState(
+    // @TODO: Decide whether to make getCurrentEventState accept EventHistoryDocument,
+    // or refactor to derive declaration changes directly from EventDocument (instead of EventIndex).
     eventBeforeUpdate as EventDocument,
     eventConfiguration
   ).declaration
