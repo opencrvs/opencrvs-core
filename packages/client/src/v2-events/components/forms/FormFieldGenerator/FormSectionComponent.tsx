@@ -20,7 +20,6 @@ import {
   FieldConfig,
   FieldType,
   FieldValue,
-  isFieldEnabled,
   AddressType,
   TranslationConfig,
   IndexMap,
@@ -198,8 +197,7 @@ export function FormSectionComponent({
   const intl = useIntl()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
-  const { isFieldVisible } = useValidationFunctionsWithContext()
-  const userContext = useContext()
+  const { isFieldVisible, isFieldEnabled } = useValidationFunctionsWithContext()
 
   const fieldsWithFormikSeparator = fieldsWithDotSeparator.map((field) => ({
     ...field,
@@ -414,7 +412,7 @@ export function FormSectionComponent({
         }
 
         const isDisabled =
-          !isFieldEnabled(field, completeForm, userContext) ||
+          !isFieldEnabled(field, completeForm) ||
           (isCorrection && field.uncorrectable)
 
         const visibleError = errors[field.id]?.errors[0]?.message

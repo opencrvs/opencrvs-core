@@ -21,7 +21,8 @@ import {
   FormConfig,
   omitHiddenPaginatedFields,
   omitHiddenFields,
-  runFieldValidations
+  runFieldValidations,
+  isFieldEnabled
 } from '@opencrvs/commons/client'
 
 import { useContext } from './useContext'
@@ -32,6 +33,8 @@ export function useValidationFunctionsWithContext() {
   return {
     isFieldVisible: (field: FieldConfig, form: ActionUpdate | EventState) =>
       isFieldVisible(field, form, context),
+    isFieldEnabled: (field: FieldConfig, form: ActionUpdate | EventState) =>
+      isFieldEnabled(field, form, context),
     getCurrentEventState: (event: EventDocument, config: EventConfig) =>
       getCurrentEventState(event, config, context),
     omitHiddenFields: <T extends EventState | ActionUpdate>(
