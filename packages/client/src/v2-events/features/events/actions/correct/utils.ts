@@ -58,6 +58,14 @@ export function getAnnotationComparison(
   fullEvent: EventHistoryDocument,
   currentActionIndex: number
 ) {
+  if (currentActionIndex < 0) {
+    return {
+      currentAnnotations: {},
+      previousAnnotations: {},
+      valueHasChanged: false
+    }
+  }
+
   const eventUpToCurrentAction = fullEvent.actions.slice(
     0,
     currentActionIndex + 1
