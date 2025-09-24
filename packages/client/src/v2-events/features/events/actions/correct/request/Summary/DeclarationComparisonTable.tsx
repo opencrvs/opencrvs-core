@@ -17,17 +17,14 @@ import {
   EventConfig,
   EventDocument,
   EventState,
-  getCurrentEventState,
-  getDeclaration,
-  isFieldDisplayedOnReview
+  getDeclaration
 } from '@opencrvs/commons/client'
 import { Table } from '@opencrvs/components/lib/Table'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
-import { useContext } from '@client/v2-events/hooks/useContext'
-import { hasFieldChanged } from '../../utils'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 
 const TableHeader = styled.th`
   text-transform: uppercase;
@@ -64,7 +61,9 @@ export function DeclarationComparisonTableComponent({
   eventConfig,
   id
 }: DeclarationComparisonTableProps) {
-  const userContext = useContext()
+  const { hasFieldChanged, getCurrentEventState, isFieldDisplayedOnReview } =
+    useValidationFunctionsWithContext()
+
   const index = fullEvent.actions.findIndex((a) => a.id === action?.id)
   // When action is not found or provided, we compare the full event
   const eventBeforeUpdate =
@@ -80,11 +79,7 @@ export function DeclarationComparisonTableComponent({
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
-  const currentState = getCurrentEventState(
-    fullEvent,
-    eventConfiguration,
-    userContext
-  )
+  const currentState = getCurrentEventState(fullEvent, eventConfiguration)
 
   // When form is provided, we apply it on top of the current state to get the latest declaration
   const latestDeclaration = form
@@ -94,24 +89,16 @@ export function DeclarationComparisonTableComponent({
 
   const previousDeclaration = getCurrentEventState(
     eventBeforeUpdate,
-    eventConfiguration,
-    userContext
+    eventConfiguration
   ).declaration
 
   return (
     <>
       {declarationConfig.pages.map((page) => {
         const changedFields = page.fields
-          .filter((field) =>
-            isFieldDisplayedOnReview(field, latestDeclaration, userContext)
-          )
+          .filter((field) => isFieldDisplayedOnReview(field, latestDeclaration))
           .filter((f) =>
-            hasFieldChanged(
-              f,
-              latestDeclaration,
-              previousDeclaration,
-              userContext
-            )
+            hasFieldChanged(f, latestDeclaration, previousDeclaration)
           )
           .map((f) => {
             const previous = (

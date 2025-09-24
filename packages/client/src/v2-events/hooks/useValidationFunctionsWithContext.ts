@@ -22,9 +22,13 @@ import {
   omitHiddenPaginatedFields,
   omitHiddenFields,
   runFieldValidations,
-  isFieldEnabled
+  isFieldEnabled,
+  AdvancedSearchConfigWithFieldsResolved,
+  isFieldDisplayedOnReview
 } from '@opencrvs/commons/client'
 
+import { getAdvancedSearchFieldErrors } from '../features/events/Search/utils'
+import { hasFieldChanged } from '../features/events/actions/correct/utils'
 import { useContext } from './useContext'
 
 export function useValidationFunctionsWithContext() {
@@ -35,6 +39,15 @@ export function useValidationFunctionsWithContext() {
       isFieldVisible(field, form, context),
     isFieldEnabled: (field: FieldConfig, form: ActionUpdate | EventState) =>
       isFieldEnabled(field, form, context),
+    hasFieldChanged: (
+      field: FieldConfig,
+      form: EventState,
+      previousFormValues: EventState
+    ) => hasFieldChanged(field, form, previousFormValues, context),
+    isFieldDisplayedOnReview: (
+      field: FieldConfig,
+      form: ActionUpdate | EventState
+    ) => isFieldDisplayedOnReview(field, form, context),
     getCurrentEventState: (event: EventDocument, config: EventConfig) =>
       getCurrentEventState(event, config, context),
     omitHiddenFields: <T extends EventState | ActionUpdate>(
@@ -62,6 +75,10 @@ export function useValidationFunctionsWithContext() {
     }: {
       field: FieldConfig
       values: ActionUpdate
-    }) => runFieldValidations({ field, values, context })
+    }) => runFieldValidations({ field, values, context }),
+    getAdvancedSearchFieldErrors: (
+      sections: AdvancedSearchConfigWithFieldsResolved[],
+      values: EventState
+    ) => getAdvancedSearchFieldErrors(sections, values, context)
   }
 }

@@ -15,12 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import {
-  ActionType,
-  getDeclaration,
-  getCurrentEventState,
-  LocationType
-} from '@opencrvs/commons/client'
+import { ActionType, getDeclaration } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
@@ -33,7 +28,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useContext } from '@client/v2-events/hooks/useContext'
-import { hasFieldChanged } from '../utils'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
@@ -43,15 +38,17 @@ export function Review() {
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
-  const userContext = useContext()
-  const locationIds = userContext.leafAdminStructureLocationIds
+  const { leafAdminStructureLocationIds } = useContext()
+  const { getCurrentEventState, hasFieldChanged } =
+    useValidationFunctionsWithContext()
+  const locationIds = leafAdminStructureLocationIds
 
   const event = events.getEvent.getFromCache(eventId)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const eventIndex = getCurrentEventState(event, configuration, userContext)
+  const eventIndex = getCurrentEventState(event, configuration)
 
   const formConfig = getDeclaration(configuration)
 
@@ -62,7 +59,7 @@ export function Review() {
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)
   const changedFields = formFields.filter((f) =>
-    hasFieldChanged(f, form, previousFormValues, userContext)
+    hasFieldChanged(f, form, previousFormValues)
   )
   const anyValuesHaveChanged = changedFields.length > 0
 
@@ -81,7 +78,7 @@ export function Review() {
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form,
-    context: userContext
+    context: {}
   })
 
   return (

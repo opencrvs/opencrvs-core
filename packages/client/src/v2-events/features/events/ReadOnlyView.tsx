@@ -15,7 +15,6 @@ import { noop } from 'lodash'
 import {
   ActionType,
   getActionReview,
-  getCurrentEventState,
   applyDraftToEventIndex,
   getDeclaration,
   getOrThrow
@@ -31,13 +30,14 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useContext } from '@client/v2-events/hooks/useContext'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { removeCachedFiles } from '../files/cache'
 
 function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
   const event = events.getEvent.viewEvent(eventId)
-  const userContext = useContext()
+  const { leafAdminStructureLocationIds } = useContext()
 
   const maybeAuth = useAuthentication()
   const authentication = getOrThrow(
@@ -52,12 +52,13 @@ function ReadonlyView() {
   )
 
   const eventStateWithDraft = useMemo(() => {
-    const eventState = getCurrentEventState(event, configuration, userContext)
+    const { getCurrentEventState } = useValidationFunctionsWithContext()
+    const eventState = getCurrentEventState(event, configuration)
 
     return draft
       ? applyDraftToEventIndex(eventState, draft, configuration)
       : eventState
-  }, [draft, event, configuration, userContext])
+  }, [draft, event, configuration])
 
   const assignmentStatus = getAssignmentStatus(
     eventStateWithDraft,
@@ -86,7 +87,7 @@ function ReadonlyView() {
         readonlyMode
         form={eventStateWithDraft.declaration}
         formConfig={formConfig}
-        locationIds={userContext.leafAdminStructureLocationIds}
+        locationIds={leafAdminStructureLocationIds}
         reviewFields={fields}
         title={formatMessage(title, eventStateWithDraft.declaration)}
         onEdit={noop}

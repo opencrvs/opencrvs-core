@@ -41,7 +41,6 @@ import {
   Errors,
   getStructuralValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
-import { useContext } from '@client/v2-events/hooks/useContext'
 import { statusOptions, timePeriodOptions } from './EventMetadataSearchOptions'
 
 export function getAdvancedSearchFieldErrors(

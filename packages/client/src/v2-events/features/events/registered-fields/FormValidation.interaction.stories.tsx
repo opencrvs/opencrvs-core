@@ -18,7 +18,6 @@ import selectEvent from 'react-select-event'
 import {
   ActionType,
   generateWorkqueues,
-  getCurrentEventState,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -90,12 +89,10 @@ const parameters = {
           return createdEvent
         }),
         tRPCMsw.event.search.query((input) => {
+          const { getCurrentEventState } = useValidationFunctionsWithContext()
           return {
             results: [
-              useValidationFunctionsWithContext().getCurrentEventState(
-                createdEvent,
-                tennisClubMembershipEvent
-              )
+              getCurrentEventState(createdEvent, tennisClubMembershipEvent)
             ],
             total: 1
           }

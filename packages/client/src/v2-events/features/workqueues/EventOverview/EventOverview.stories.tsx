@@ -23,7 +23,6 @@ import {
   createPrng,
   getRandomDatetime,
   tennisClubMembershipEvent,
-  getCurrentEventState,
   UUID,
   SystemRole,
   TestUserRole,
@@ -89,12 +88,10 @@ export const Overview: Story = {
       handlers: {
         events: [
           tRPCMsw.event.search.query(() => {
+            const { getCurrentEventState } = useValidationFunctionsWithContext()
             return {
               results: [
-                useValidationFunctionsWithContext().getCurrentEventState(
-                  defaultEvent,
-                  tennisClubMembershipEvent
-                )
+                getCurrentEventState(defaultEvent, tennisClubMembershipEvent)
               ],
               total: 1
             }
@@ -687,13 +684,10 @@ export const WithDuplicateDetectedAction: Story = {
       handlers: {
         events: [
           tRPCMsw.event.search.query(() => {
+            const { getCurrentEventState } = useValidationFunctionsWithContext()
             return {
               results: [
-                getCurrentEventState(
-                  duplicateEvent,
-                  tennisClubMembershipEvent,
-                  {}
-                )
+                getCurrentEventState(duplicateEvent, tennisClubMembershipEvent)
               ],
               total: 1
             }
@@ -719,13 +713,10 @@ export const WithDuplicateDetectedActionModal: Story = {
       handlers: {
         events: [
           tRPCMsw.event.search.query(() => {
+            const { getCurrentEventState } = useValidationFunctionsWithContext()
             return {
               results: [
-                getCurrentEventState(
-                  duplicateEvent,
-                  tennisClubMembershipEvent,
-                  {}
-                )
+                getCurrentEventState(duplicateEvent, tennisClubMembershipEvent)
               ],
               total: 1
             }

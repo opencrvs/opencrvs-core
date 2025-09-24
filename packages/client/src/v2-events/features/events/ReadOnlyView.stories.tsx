@@ -20,13 +20,13 @@ import {
   generateEventDocument,
   generateEventDraftDocument,
   generateWorkqueues,
-  getCurrentEventState,
   tennisClubMembershipEvent,
   testContext
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { ReadonlyViewIndex } from './ReadOnlyView'
 
 const generator = testDataGenerator()
@@ -137,14 +137,11 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
             return eventDocument
           }),
           tRPCMsw.event.search.query(() => {
+            const { getCurrentEventState } = useValidationFunctionsWithContext()
             return {
               total: 1,
               results: [
-                getCurrentEventState(
-                  eventDocument,
-                  tennisClubMembershipEvent,
-                  testContext
-                )
+                getCurrentEventState(eventDocument, tennisClubMembershipEvent)
               ]
             }
           })

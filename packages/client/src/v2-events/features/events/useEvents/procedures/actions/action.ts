@@ -23,7 +23,6 @@ import {
   ActionStatus,
   ActionUpdate,
   EventDocument,
-  getCurrentEventState,
   omitHiddenAnnotationFields,
   omitHiddenPaginatedFields,
   deepMerge,
@@ -54,7 +53,6 @@ import {
 } from '@client/v2-events/trpc'
 import { ToastKey } from '@client/v2-events/routes/Toaster'
 import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
-import { useContext } from '@client/v2-events/hooks/useContext'
 
 function retryUnlessConflict(
   _failureCount: number,
@@ -375,6 +373,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   trpcProcedure: P
 ) {
   const eventConfigurations = useEventConfigurations()
+  const { getCurrentEventState } = useValidationFunctionsWithContext()
 
   const allOptions = {
     ...trpcProcedure.mutationOptions(),
@@ -430,8 +429,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     )
 
     const originalDeclaration = params.fullEvent
-      ? getCurrentEventState(params.fullEvent, eventConfiguration, {})
-          .declaration
+      ? getCurrentEventState(params.fullEvent, eventConfiguration).declaration
       : {}
 
     const annotation = actionConfiguration
@@ -466,12 +464,12 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
   mutationName: T
 ) {
   const eventConfigurations = useEventConfigurations()
-  const userContext = useContext()
   const mutationKey = customMutationKeys[mutationName]
   const mutation = useMutation({
     mutationKey,
     ...queryClient.getMutationDefaults(mutationKey)
   })
+  const { getCurrentEventState } = useValidationFunctionsWithContext()
 
   return {
     mutate: (params: Omit<CustomMutationTypes[T], 'eventConfiguration'>) => {
@@ -493,8 +491,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
                * be EventDocument
                */
               params.event as EventDocument,
-              eventConfiguration,
-              userContext
+              eventConfiguration
             ).declaration
           : {}
 

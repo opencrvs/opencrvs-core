@@ -24,19 +24,14 @@ import {
   TranslationConfig,
   EventState,
   NameFieldValue,
-  isFieldVisible,
   isDateRangeFieldType,
   isNameFieldType
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { useContext } from '@client/v2-events/hooks/useContext'
-import {
-  getAdvancedSearchFieldErrors,
-  resolveAdvancedSearchConfig,
-  serializeSearchParams
-} from './utils'
+import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
+import { resolveAdvancedSearchConfig, serializeSearchParams } from './utils'
 const MIN_PARAMS_TO_SEARCH = 2
 
 const SearchButton = styled(Button)`
@@ -138,7 +133,8 @@ export function TabSearch({
 }) {
   const intl = useIntl()
   const navigate = useNavigate()
-  const userContext = useContext()
+  const { isFieldVisible, getAdvancedSearchFieldErrors } =
+    useValidationFunctionsWithContext()
 
   const [formValues, setFormValues] = useState<EventState>(fieldValues)
 
@@ -170,7 +166,7 @@ export function TabSearch({
     }))
 
   const errors = Object.values(
-    getAdvancedSearchFieldErrors(sections, formValues, userContext)
+    getAdvancedSearchFieldErrors(sections, formValues)
   ).flatMap((errObj) => errObj.errors)
 
   const nonEmptyValues = filterEmptyValues(formValues)
@@ -181,7 +177,7 @@ export function TabSearch({
     const updatedValues = Object.entries(nonEmptyValues).reduce(
       (result, [fieldId, value]) => {
         const field = fields.find((f) => f.id === fieldId)
-        if (!field || !isFieldVisible(field, formValues, userContext)) {
+        if (!field || !isFieldVisible(field, formValues)) {
           return result
         }
         if (field.type === FieldType.NAME && typeof value === 'object') {
@@ -221,7 +217,7 @@ export function TabSearch({
         if (!field) {
           return count
         }
-        if (!isFieldVisible(field, formValues, userContext)) {
+        if (!isFieldVisible(field, formValues)) {
           return count
         }
         return count + countFilledFieldsForInputType(field, val)

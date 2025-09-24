@@ -19,9 +19,7 @@ import {
 import {
   FieldConfig,
   generateTransactionId,
-  isFieldVisible,
   getDeclarationFields,
-  // getCurrentEventState,
   EventDocument,
   ActionType
 } from '@opencrvs/commons/client'
@@ -42,8 +40,6 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
-import { useContext } from '@client/v2-events/hooks/useContext'
-import { hasFieldChanged } from '../../utils'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
@@ -87,9 +83,8 @@ export function Summary() {
   const navigate = useNavigate()
   const intl = useIntl()
 
-  const { getCurrentEventState } = useValidationFunctionsWithContext()
-
-  const userContext = useContext()
+  const { getCurrentEventState, hasFieldChanged, isFieldVisible } =
+    useValidationFunctionsWithContext()
 
   const events = useEvents()
   const event: EventDocument = events.getEvent.getFromCache(eventId)
@@ -116,13 +111,13 @@ export function Summary() {
           return false
         }
 
-        return hasFieldChanged(field, form, previousFormValues, userContext)
+        return hasFieldChanged(field, form, previousFormValues)
       })
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
-      const wasVisible = isFieldVisible(field, previousFormValues, userContext)
-      const isHidden = !isFieldVisible(field, form, userContext)
+      const wasVisible = isFieldVisible(field, previousFormValues)
+      const isHidden = !isFieldVisible(field, form)
       return wasVisible && isHidden
     })
 
@@ -137,7 +132,7 @@ export function Summary() {
       transactionId: generateTransactionId(),
       annotation,
       event,
-      context: userContext
+      context: {}
     }
 
     if (userMayCorrect) {
@@ -158,7 +153,8 @@ export function Summary() {
     previousFormValues,
     navigate,
     userMayCorrect,
-    userContext
+    hasFieldChanged,
+    isFieldVisible
   ])
 
   return (

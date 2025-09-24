@@ -39,7 +39,6 @@ import {
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
 import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
-import { useContext } from '@client/v2-events/hooks/useContext'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
