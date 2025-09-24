@@ -19,6 +19,7 @@ import {
   createPrng,
   getRandomDatetime
 } from '@opencrvs/commons/client'
+import { DECLARATION_ACTION_UPDATE } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { EventHistoryDialog } from './EventHistoryDialog'
 
 const meta: Meta<typeof EventHistoryDialog> = {
@@ -65,6 +66,19 @@ const requestCorrectionAction = {
   annotation: {
     'correction.request.reason': 'My reason',
     'identity-check': true
+  }
+}
+
+const updateAction = {
+  ...actionBase,
+  id: generateUuid(prng),
+  type: DECLARATION_ACTION_UPDATE,
+  declaration: {
+    'applicant.email': 'newmail@baz.fi',
+    'recommender.name': {
+      firstname: 'Updated',
+      surname: 'Name'
+    }
   }
 }
 
@@ -398,6 +412,48 @@ export const RequestCorrection: Story = {
     }
   }
 }
+
+export const UpdateAction: Story = {
+  args: {
+    ...argbase,
+    action: updateAction,
+    fullEvent: {
+      id: getUUID(),
+      type: 'tennis-club-membership',
+      actions: [
+        {
+          ...actionBase,
+          id: generateUuid(prng),
+          type: ActionType.CREATE
+        },
+        {
+          ...actionBase,
+          id: generateUuid(prng),
+          type: ActionType.DECLARE,
+          declaration
+        },
+        // @ts-expect-error - Storybook uses EventHistoryDocument (with UPDATE) instead of EventDocument
+        updateAction,
+        {
+          ...actionBase,
+          id: generateUuid(prng),
+          type: ActionType.VALIDATE,
+          declaration: {}
+        },
+        {
+          ...actionBase,
+          id: generateUuid(prng),
+          type: ActionType.REGISTER,
+          declaration: {}
+        }
+      ],
+      trackingId: 'ABCD123',
+      updatedAt: '2021-01-01',
+      createdAt: '2021-01-01'
+    }
+  }
+}
+
 export const RecordCorrected: Story = {
   args: {
     ...argbase,
