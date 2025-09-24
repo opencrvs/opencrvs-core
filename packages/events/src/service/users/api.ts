@@ -125,7 +125,8 @@ export async function getUserOrSystem(
         ? user.fullHonorificName
         : undefined
     }
-  } catch (e) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_) {
     logger.info(`No user found for id: ${id}. Will look for a system instead.`)
   }
 
@@ -138,6 +139,7 @@ export async function getUserOrSystem(
       name: system.name,
       role: system.type
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     logger.info(
       `No system found for id: ${id}. User/system has probably been removed. Will return undefined.`
