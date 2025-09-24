@@ -14,6 +14,8 @@ import { TRPCError } from '@trpc/server'
 import { User } from '@opencrvs/commons'
 import { router, publicProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
+import { getUserActions } from '@events/service/events/user-actions'
+import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 
 export const userRouter = router({
   get: publicProcedure
@@ -31,5 +33,8 @@ export const userRouter = router({
     }),
   list: publicProcedure
     .input(z.array(z.string()))
-    .query(async (options) => getUsersById(options.input, options.ctx.token))
+    .query(async (options) => getUsersById(options.input, options.ctx.token)),
+  actions: publicProcedure.input(UserActionsQuery).query(async (options) => {
+    return getUserActions(options.input)
+  })
 })

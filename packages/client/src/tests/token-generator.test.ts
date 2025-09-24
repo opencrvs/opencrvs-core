@@ -26,9 +26,14 @@ it('Generates tokens', () => {
     localRegistrar: generateToken(
       generator.user.scopes.localRegistrar,
       generator.user.id.localRegistrar
+    ),
+    localSystemAdmin: generateToken(
+      generator.user.scopes.localSystemAdmin,
+      generator.user.id.localSystemAdmin
     )
   }
   expect(token.fieldAgent).toMatchSnapshot('fieldAgent token')
   expect(token.registrationAgent).toMatchSnapshot('registrationAgent token')
   expect(token.localRegistrar).toMatchSnapshot('localRegistrar token')
+  expect(token.localSystemAdmin).toMatchSnapshot('localSystemAdmin token')
 })

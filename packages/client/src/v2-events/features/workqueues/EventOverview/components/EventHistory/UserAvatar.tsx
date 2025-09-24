@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { ResolvedUser } from '@opencrvs/commons/client'
+import { User } from '@opencrvs/commons/client'
 import { Avatar, Maybe } from '@client/utils/gateway'
 import { AvatarSmall } from '@client/components/Avatar'
 import { getUsersFullName } from '@client/v2-events/utils'
@@ -32,7 +32,7 @@ export function UserAvatar({
   avatar,
   locale
 }: {
-  names: ResolvedUser['name'] | string
+  names: User['name'] | string
   avatar?: Maybe<Avatar>
   locale: string
 }) {

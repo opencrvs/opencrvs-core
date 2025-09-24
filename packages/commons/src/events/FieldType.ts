@@ -42,6 +42,7 @@ export const FieldType = {
   DATA: 'DATA',
   BUTTON: 'BUTTON',
   HTTP: 'HTTP',
+  LINK_BUTTON: 'LINK_BUTTON',
   QR_READER: 'QR_READER',
   ID_READER: 'ID_READER'
 } as const
