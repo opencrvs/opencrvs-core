@@ -147,7 +147,8 @@ queryClient.setMutationDefaults([DELETE_MUTATION_KEY], {
 queryClient.setMutationDefaults([UPLOAD_MUTATION_KEY], {
   retry: true,
   retryDelay: 5000,
-  mutationFn: uploadFile
+  mutationFn: uploadFile,
+  meta: { ignoreOutbox: true }
 })
 
 interface Options {
