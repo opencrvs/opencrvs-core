@@ -13,22 +13,21 @@ import {
   EventStatus,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import {
   getMetadataFieldConfigs,
   buildSearchQuery,
   serializeSearchParams,
   deserializeSearchParams,
   buildQuickSearchQuery,
-  resolveAdvancedSearchConfig
+  resolveAdvancedSearchConfig,
+  getAdvancedSearchFieldErrors
 } from './utils'
 
 describe('getAdvancedSearchFieldErrors', () => {
   it('should return no errors for empty values', () => {
-    const { getAdvancedSearchFieldErrors } = useValidationFunctionsWithContext()
     const mockFormValues = { 'applicant.dob': '3' }
     const sections = resolveAdvancedSearchConfig(tennisClubMembershipEvent)
-    const errors = getAdvancedSearchFieldErrors(sections, mockFormValues)
+    const errors = getAdvancedSearchFieldErrors(sections, mockFormValues, {})
     expect(errors).toEqual({
       'applicant.name': {
         errors: []
