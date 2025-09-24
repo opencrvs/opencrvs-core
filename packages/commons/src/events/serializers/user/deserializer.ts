@@ -10,7 +10,7 @@
  */
 
 import { QueryExpression, QueryType } from '../../../events'
-import { User } from 'src/users/User'
+import { User } from '../../../users/User'
 import {
   CountryConfigQueryType,
   SerializedQueryExpression
