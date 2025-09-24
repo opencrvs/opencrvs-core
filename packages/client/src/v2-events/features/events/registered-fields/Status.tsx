@@ -11,7 +11,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
-import { Icon, Pill } from '@opencrvs/components'
+import { Banner, Icon, Pill, Text } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons/client'
 import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
 
@@ -29,7 +29,70 @@ const StyledIcon = styled(Icon)`
   margin-right: 4px;
 `
 
-function StatusOutput({
+const IconWrapper = styled.div<{
+  type: FieldProps<'STATUS'>['configuration']['theme']
+}>`
+  --background-color: ${({ theme, type }) => `
+    ${type === 'default' ? theme.colors.primaryLight : ''}
+    ${type === 'active' ? theme.colors.greenLight : ''}
+    ${type === 'inactive' ? theme.colors.redLight : ''}
+  `};
+  height: 24px;
+  width: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background-color);
+`
+
+function Input({
+  id,
+  configuration
+}: Pick<FieldProps<'STATUS'>, 'id' | 'configuration'>) {
+  const intl = useIntl()
+
+  return (
+    <Banner.Container>
+      <Banner.Header type="active">
+        <Pill
+          data-testid={`${id}__${configuration.theme}`}
+          label={
+            <>
+              <StyledIcon
+                name={throwIfUnsupportedIcon(configuration.icon)}
+                size="small"
+              />
+              {intl.formatMessage(configuration.text)}
+            </>
+          }
+          pillTheme="dark"
+          size="small"
+          type={configuration.theme}
+        />
+
+        <IconWrapper type={configuration.theme}>
+          {configuration.theme === 'active' && (
+            <Icon color="greenDarker" name="Check" size="small" weight="bold" />
+          )}
+          {configuration.theme === 'default' && (
+            <Icon color="primaryDark" name="Check" size="small" weight="bold" />
+          )}
+          {configuration.theme === 'inactive' && (
+            <Icon color="redDarker" name="X" size="small" weight="bold" />
+          )}
+        </IconWrapper>
+      </Banner.Header>
+      <Banner.Body>
+        <Text element="span" variant="reg16">
+          {intl.formatMessage(configuration.description)}
+        </Text>
+      </Banner.Body>
+    </Banner.Container>
+  )
+}
+
+function Output({
   id,
   configuration
 }: Pick<FieldProps<'STATUS'>, 'id' | 'configuration'>) {
@@ -55,6 +118,6 @@ function StatusOutput({
 }
 
 export const Status = {
-  Input: StatusOutput,
-  Output: StatusOutput
+  Input,
+  Output
 }

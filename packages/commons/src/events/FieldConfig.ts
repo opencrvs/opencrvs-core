@@ -631,7 +631,8 @@ const StatusField = BaseField.extend({
       .describe(
         'Defines the theme of the status pill. See the OpenCRVS UI-Kit "Pill" types for color details.'
       ),
-    text: TranslationConfig.describe('Text to display on the status pill.')
+    text: TranslationConfig.describe('Text to display on the status pill.'),
+    description: TranslationConfig.describe('Explaining text on the banner.')
   })
 })
 
