@@ -10,7 +10,7 @@
  */
 
 import { z } from 'zod'
-
+import { TRPCError } from '@trpc/server'
 import { UserOrSystem } from '@opencrvs/commons'
 import { router, publicProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
@@ -22,8 +22,13 @@ export const userRouter = router({
     .input(z.string())
     .output(UserOrSystem)
     .query(async ({ input, ctx }) => {
-      const [user] = await getUsersById([input], ctx.token)
-      return user
+      const users = await getUsersById([input], ctx.token)
+
+      if (users.length === 0) {
+        throw new TRPCError({ code: 'NOT_FOUND' })
+      }
+
+      return users[0]
     }),
   list: publicProcedure
     .input(z.array(z.string()))
