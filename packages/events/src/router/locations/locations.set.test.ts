@@ -50,7 +50,7 @@ test('Creates single location', async () => {
   const { user } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const initialLocations = await dataSeedingClient.locations.get()
+  const initialLocations = await dataSeedingClient.locations.list()
 
   const locationPayload: Location[] = [
     {
@@ -64,7 +64,7 @@ test('Creates single location', async () => {
 
   await dataSeedingClient.locations.set(locationPayload)
 
-  const locations = await dataSeedingClient.locations.get()
+  const locations = await dataSeedingClient.locations.list()
 
   expect(locations).toHaveLength(initialLocations.length + 1)
   expect(locations).toMatchObject(initialLocations.concat(locationPayload))
@@ -75,7 +75,7 @@ test('Creates multiple locations', async () => {
 
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const initialLocations = await dataSeedingClient.locations.get()
+  const initialLocations = await dataSeedingClient.locations.list()
 
   const parentId = generateUuid(rng)
 
@@ -86,7 +86,7 @@ test('Creates multiple locations', async () => {
 
   await dataSeedingClient.locations.set(locationPayload)
 
-  const locations = await dataSeedingClient.locations.get()
+  const locations = await dataSeedingClient.locations.list()
 
   expect(locations).toEqual(initialLocations.concat(locationPayload))
 })
@@ -95,13 +95,13 @@ test('seeding locations is additive, not destructive', async () => {
   const { user, generator } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const initialLocations = await dataSeedingClient.locations.get()
+  const initialLocations = await dataSeedingClient.locations.list()
   const locationRng = createPrng(847)
   const initialPayload = generator.locations.set(5, locationRng)
 
   await dataSeedingClient.locations.set(initialPayload)
 
-  const locationAfterInitialSeed = await dataSeedingClient.locations.get()
+  const locationAfterInitialSeed = await dataSeedingClient.locations.list()
   expect(locationAfterInitialSeed).toHaveLength(
     initialLocations.length + initialPayload.length
   )
@@ -112,7 +112,7 @@ test('seeding locations is additive, not destructive', async () => {
   await dataSeedingClient.locations.set(remainingLocationsPayload)
 
   const remainingLocationsAfterDeletion =
-    await dataSeedingClient.locations.get()
+    await dataSeedingClient.locations.list()
 
   expect(remainingLocationsAfterDeletion).toStrictEqual(
     locationAfterInitialSeed
