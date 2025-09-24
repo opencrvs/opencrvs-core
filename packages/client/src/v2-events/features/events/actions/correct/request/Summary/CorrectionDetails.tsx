@@ -294,8 +294,8 @@ export function CorrectionDetails({
       <DeclarationComparisonTable
         action={correctionRequestAction}
         eventConfig={eventConfiguration}
-        eventId={event.id}
         form={form}
+        fullEvent={event}
         id={'corrections-table'}
       />
     </>

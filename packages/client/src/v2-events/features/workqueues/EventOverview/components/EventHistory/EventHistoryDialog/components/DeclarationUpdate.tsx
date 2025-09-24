@@ -45,7 +45,7 @@ export function DeclarationUpdateComponent({
     <DeclarationComparisonTable
       action={action}
       eventConfig={eventConfiguration}
-      eventId={fullEvent.id}
+      fullEvent={fullEvent}
       id={'declaration-update'}
     />
   )

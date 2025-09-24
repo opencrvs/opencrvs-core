@@ -40,7 +40,7 @@ const TableHeader = styled.th`
   display: inline-block;
 `
 interface BaseDeclarationComparisonTableProps {
-  eventId: UUID
+  fullEvent: EventDocument
   eventConfig: EventConfig
   id: string
 }
@@ -87,17 +87,10 @@ function getReviewFormFields(configuration: EventConfig) {
 export function DeclarationComparisonTableComponent({
   action,
   form,
-  eventId,
+  fullEvent: fullEventWithoutUpdatedAction,
   eventConfig,
   id
 }: DeclarationComparisonTableProps) {
-  const { getEvent } = useEvents()
-  const fullEventWithoutUpdatedAction = getEvent.findFromCache(eventId).data
-
-  if (!fullEventWithoutUpdatedAction) {
-    throw new Error(`Event with id ${eventId} not found`)
-  }
-
   const acceptedActions = getAcceptedActions(fullEventWithoutUpdatedAction)
   const historyWithUpdatedActions = expandWithUpdateActions(acceptedActions)
 
