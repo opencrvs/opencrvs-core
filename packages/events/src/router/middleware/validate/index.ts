@@ -370,7 +370,6 @@ export const validateAction: MiddlewareFunction<
   }
 
   if (actionType === ActionType.REQUEST_CORRECTION) {
-    console.log('kissa')
     const errors = validateCorrectableFields({
       eventConfig,
       declarationUpdate: input.declaration
