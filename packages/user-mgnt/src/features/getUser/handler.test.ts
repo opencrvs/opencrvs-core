@@ -15,6 +15,7 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as mockingoose from 'mockingoose'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import { joinValues } from '@opencrvs/commons'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
@@ -102,6 +103,7 @@ describe('getUser tests', () => {
     const parsedResult = JSON.parse(JSON.stringify(res.result))
     expect(parsedResult).toEqual(dummyUser)
   })
+
   it('Successfully returns user with practitioner id', async () => {
     mockingoose(User).toReturn(dummyUser, 'findOne')
 
@@ -116,6 +118,30 @@ describe('getUser tests', () => {
 
     const parsedResult = JSON.parse(JSON.stringify(res.result))
     expect(parsedResult).toEqual(dummyUser)
+  })
+
+  it('Returns full honorific name when user has one', async () => {
+    const fullHonorificName = `${joinValues(['Dr.', ...dummyUser.name[0].given, dummyUser.name[0].family, 'PhD'], ' ')}`
+    const userWithHonorificName = {
+      ...dummyUser,
+      fullHonorificName
+    }
+
+    mockingoose(User).toReturn(userWithHonorificName, 'findOne')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/getUser',
+      payload: { practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de' },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    const parsedResult = JSON.parse(JSON.stringify(res.result))
+
+    expect(parsedResult.fullHonorificName).toEqual(fullHonorificName)
+    expect(parsedResult).toEqual(userWithHonorificName)
   })
 
   it('Returns signature when there is one', async () => {

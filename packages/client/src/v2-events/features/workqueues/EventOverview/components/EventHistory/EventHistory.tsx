@@ -145,7 +145,7 @@ interface ActionCreator {
 
 function useActionCreator() {
   const intl = useIntl()
-  const { getUser } = useEventOverviewContext()
+  const { findUser } = useEventOverviewContext()
   const { systems } = useSelector(getOfflineData)
 
   const getActionCreator = (
@@ -164,10 +164,11 @@ function useActionCreator() {
         name: intl.formatMessage(messages.system)
       } as const
     }
-    const user = getUser(action.createdBy)
+    const user = findUser(action.createdBy)
     return {
       type: 'user',
-      name: getUsersFullName(user.name, intl.locale)
+      // @todo:
+      name: user ? getUsersFullName(user.name, intl.locale) : 'Missing user'
     } as const
   }
   return { getActionCreator }
@@ -175,9 +176,9 @@ function useActionCreator() {
 
 function User({ action }: { action: EventHistoryActionDocument }) {
   const intl = useIntl()
-  const { getUser } = useEventOverviewContext()
+  const { findUser } = useEventOverviewContext()
   const navigate = useNavigate()
-  const user = getUser(action.createdBy)
+  const user = findUser(action.createdBy)
   const { canReadUser } = usePermissions()
 
   const { getActionCreator } = useActionCreator()
@@ -188,10 +189,12 @@ function User({ action }: { action: EventHistoryActionDocument }) {
     throw new Error('Expected action creator to be a user')
   }
 
-  const canViewUser = canReadUser({
-    id: user.id,
-    primaryOffice: { id: user.primaryOfficeId }
-  })
+  const canViewUser =
+    !!user &&
+    canReadUser({
+      id: user.id,
+      primaryOffice: { id: user.primaryOfficeId }
+    })
 
   return canViewUser ? (
     <Link
@@ -268,19 +271,22 @@ function ActionRole({ action }: { action: EventHistoryActionDocument }) {
 }
 
 function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
-  const { getUser, getLocation } = useEventOverviewContext()
+  const { findUser, getLocation } = useEventOverviewContext()
   const { canAccessOffice } = usePermissions()
   const navigate = useNavigate()
   const { getActionCreator } = useActionCreator()
 
-  const user = getUser(action.createdBy)
+  const user = findUser(action.createdBy)
   const locationName = action.createdAtLocation
     ? getLocation(action.createdAtLocation)?.name
     : undefined
 
-  const hasAccessToOffice = canAccessOffice({
-    id: user.primaryOfficeId
-  })
+  const hasAccessToOffice =
+    !!user &&
+    canAccessOffice({
+      id: user.primaryOfficeId
+    })
+
   const { type } = getActionCreator(action)
 
   if (type === 'system') {
