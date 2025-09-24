@@ -53,7 +53,7 @@ function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
   }, {} as EventState)
 }
 
-export function hasAnnotationChanged(
+export function getAnnotationComparison(
   f: FieldConfig,
   fullEvent: EventHistoryDocument,
   currentActionIndex: number

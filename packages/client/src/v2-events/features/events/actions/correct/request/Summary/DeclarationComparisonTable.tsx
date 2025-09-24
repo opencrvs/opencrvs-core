@@ -28,7 +28,7 @@ import { messages as correctionMessages } from '@client/i18n/messages/views/corr
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { hasAnnotationChanged, hasFieldChanged } from '../../utils'
+import { getAnnotationComparison, hasFieldChanged } from '../../utils'
 import {
   expandWithUpdateActions,
   EventHistoryActionDocument
@@ -140,13 +140,10 @@ export function DeclarationComparisonTableComponent({
 
   // Collect all changed review fields once
   const changedReviewFields = reviewFormFields
-    .filter((f) => hasAnnotationChanged(f, fullEvent, index).valueHasChanged)
+    .filter((f) => getAnnotationComparison(f, fullEvent, index).valueHasChanged)
     .map((f) => {
-      const { currentAnnotations, previousAnnotations } = hasAnnotationChanged(
-        f,
-        fullEvent,
-        index
-      )
+      const { currentAnnotations, previousAnnotations } =
+        getAnnotationComparison(f, fullEvent, index)
 
       const previous = (
         <Output
