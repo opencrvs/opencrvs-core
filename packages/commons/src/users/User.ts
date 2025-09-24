@@ -12,7 +12,7 @@
 import { FullDocumentPath } from '../documents'
 import { z } from 'zod'
 import { UUID } from '../uuid'
-import { TokenUserType } from 'src/authentication'
+import { TokenUserType } from '../authentication'
 
 export const REINDEX_USER_ID = '__ANONYMOUS_REINDEX_USER__'
 
