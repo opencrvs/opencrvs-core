@@ -16,7 +16,6 @@ import { mockOfflineData } from '../src/tests/mock-offline-data'
 import forms from '../src/tests/forms.json'
 import { AppRouter } from '../src/v2-events/trpc'
 import {
-  tennisClubMembershipEventIndex,
   tennisClubMembershipEventDocument,
   TestImage
 } from '../src/v2-events/features/events/fixtures'
@@ -76,7 +75,7 @@ export const handlers = {
     })
   ],
   eventLocations: [
-    tRPCMsw.locations.get.query(() => {
+    tRPCMsw.locations.list.query(() => {
       return [
         {
           id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
@@ -1209,59 +1208,24 @@ export const handlers = {
     })
   ],
   user: [
-    graphql.query('fetchUser', () => {
+    graphql.query('fetchUser', (input) => {
+      const userId = input.variables.userId
+      const generator = testDataGenerator()
+      let response
+
+      if (userId == generator.user.id.fieldAgent) {
+        response = generator.user.fieldAgent()
+      } else if (userId == generator.user.id.registrationAgent) {
+        response = generator.user.registrationAgent()
+      } else if (userId == generator.user.id.localSystemAdmin) {
+        response = generator.user.localSystemAdmin()
+      } else {
+        response = generator.user.localRegistrar()
+      }
+
       return HttpResponse.json({
         data: {
-          getUser: {
-            id: testDataGenerator().user.id.localRegistrar,
-            userMgntUserID: testDataGenerator().user.id.localRegistrar,
-            creationDate: '1737725915295',
-            username: 'k.mweene',
-            practitionerId: '6f672b75-ec29-4bdc-84f6-4cb3ff9bb529',
-            mobile: '+260933333333',
-            email: 'kalushabwalya1.7@gmail.com',
-            role: {
-              label: {
-                id: 'userRole.localRegistrar',
-                defaultMessage: 'Local Registrar',
-                description: 'Name for user role Local Registrar',
-                __typename: 'I18nMessage'
-              },
-              __typename: 'UserRole'
-            },
-            status: 'active',
-            name: [
-              {
-                use: 'en',
-                firstNames: 'Kennedy',
-                familyName: 'Mweene',
-                __typename: 'HumanName'
-              }
-            ],
-            primaryOffice: {
-              id: '028d2c85-ca31-426d-b5d1-2cef545a4902',
-              name: 'Ibombo District Office',
-              alias: ['Ibombo District Office'],
-              status: 'active',
-              __typename: 'Location'
-            },
-            localRegistrar: {
-              name: [
-                {
-                  use: 'en',
-                  firstNames: 'Kennedy',
-                  familyName: 'Mweene',
-                  __typename: 'HumanName'
-                }
-              ],
-              role: 'LOCAL_REGISTRAR',
-              signature: null,
-              __typename: 'LocalRegistrar'
-            },
-            avatar: null,
-            searches: [],
-            __typename: 'User'
-          }
+          getUser: response
         }
       })
     }),
@@ -2310,6 +2274,11 @@ export const handlers = {
   ],
   workqueues: [
     tRPCMsw.workqueue.count.query((input) => {
+      if (input.length === 0) {
+        /** Ensure we catch situations where no input is provided before merging anything. */
+        throw new Error('No input provided.')
+      }
+
       return input.reduce((acc, { slug }) => {
         return { ...acc, [slug]: 7 }
       }, {})
