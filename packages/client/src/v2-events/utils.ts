@@ -11,7 +11,7 @@
 import { uniq, isString, get, uniqBy, mergeWith } from 'lodash'
 import { v4 as uuid } from 'uuid'
 import {
-  ResolvedUser,
+  User,
   ActionDocument,
   EventConfig,
   EventIndex,
@@ -33,10 +33,7 @@ import {
   Location
 } from '@opencrvs/commons/client'
 
-export function getUsersFullName(
-  names: ResolvedUser['name'],
-  language: string
-) {
+export function getUsersFullName(names: User['name'], language: string) {
   const match = names.find((name) => name.use === language) ?? names[0]
 
   return joinValues([...match.given, match.family])
