@@ -112,17 +112,14 @@ export function hasDeclarationChanged(
 export function expandWithUpdateActions(
   actions: ActionDocument[]
 ): EventHistoryActionDocument[] {
-  const newActions = []
-
-  for (const action of actions) {
+  return actions.flatMap<EventHistoryActionDocument>((action) => {
     if (
       action.type === ActionTypes.enum.VALIDATE ||
       action.type === ActionTypes.enum.REGISTER ||
       action.type === ActionTypes.enum.DECLARE
     ) {
-      const changed = hasDeclarationChanged(actions, action)
-      if (changed) {
-        newActions.push(
+      if (hasDeclarationChanged(actions, action)) {
+        return [
           {
             ...action,
             // Cast suffixed id as UUID to ensure uniqueness for synthetic UPDATE actions.
@@ -135,16 +132,12 @@ export function expandWithUpdateActions(
             ...action,
             declaration: {}
           }
-        )
-        continue
+        ]
       }
-      newActions.push(action)
-      continue
+      return [action]
     }
-    newActions.push(action)
-  }
-
-  return newActions
+    return [action]
+  })
 }
 
 export function useActionForHistory() {
