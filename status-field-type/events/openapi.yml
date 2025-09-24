@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 4eae3bdd-943e-40ae-9a1e-275be4f31e79
+                transactionId: 904be7d8-bf7d-4564-84e2-8df787fbf7c2
                 type: birth
       responses:
         "200":
@@ -395,7 +395,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 0f4c9016-600b-489a-b1f0-cb1a3c026b0e
+                transactionId: ab26a197-94f8-43d7-94e3-7927e0487c87
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -5821,10 +5821,15 @@ components:
                   description: Text to display on the status pill.
                   allOf:
                     - $ref: "#/components/schemas/TranslationConfig"
+                description:
+                  description: Explaining text on the banner.
+                  allOf:
+                    - $ref: "#/components/schemas/TranslationConfig"
               required:
                 - icon
                 - theme
                 - text
+                - description
           required:
             - id
             - label

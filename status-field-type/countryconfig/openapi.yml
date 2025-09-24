@@ -4165,10 +4165,14 @@ components:
                 text:
                   $ref: "#/components/schemas/TranslationConfig"
                   description: Text to display on the status pill.
+                description:
+                  $ref: "#/components/schemas/TranslationConfig"
+                  description: Explaining text on the banner.
               required:
                 - icon
                 - theme
                 - text
+                - description
           required:
             - id
             - label
