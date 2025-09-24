@@ -11,7 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { IDReader } from '.'
 import React from 'react'
-import { QRReader } from './readers/QRReader/QRReader'
+import { QrReader } from './readers/QrReader/QrReader'
 import { Stack } from '../Stack'
 import { Text } from '../Text'
 import { ScannableQRReader } from './types'
@@ -30,7 +30,7 @@ const IDReaderComponent = (qrReaderProps: Partial<ScannableQRReader>) => (
     dividerLabel="Or"
     manualInputInstructionLabel="Complete fields below"
   >
-    <QRReader
+    <QrReader
       {...qrReaderProps}
       labels={{
         button: 'Scan ID QR code',

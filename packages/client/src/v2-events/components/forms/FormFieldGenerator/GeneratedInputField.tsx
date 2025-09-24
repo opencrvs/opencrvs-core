@@ -54,7 +54,8 @@ import {
   SelectDateRangeValue,
   isTimeFieldType,
   isButtonFieldType,
-  isHttpFieldType
+  isHttpFieldType,
+  isIdReaderFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -84,6 +85,7 @@ import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileIn
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
+import { IdReader } from '@client/v2-events/features/events/registered-fields/IdReader'
 import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
 import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
@@ -622,6 +624,10 @@ export const GeneratedInputField = React.memo(
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )
+    }
+
+    if (isIdReaderFieldType(field)) {
+      return <IdReader.Input />
     }
 
     throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)

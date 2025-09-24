@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { QRReader } from '@opencrvs/components/src/IDReader/readers/QRReader/QRReader'
+import { QrReader } from '@opencrvs/components/src/IDReader/readers/QrReader/QrReader'
 import {
   IFormData,
   IFormField,
@@ -62,7 +62,7 @@ export const ReaderGenerator = ({
             }
           }
           return (
-            <QRReader
+            <QrReader
               key={type}
               labels={{
                 button: intl.formatMessage(messages.button),
