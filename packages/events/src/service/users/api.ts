@@ -10,11 +10,19 @@
  */
 
 import fetch from 'node-fetch'
-import { joinUrl, FullDocumentPath, UUID, IUserName } from '@opencrvs/commons'
-import { logger } from '@opencrvs/commons'
+import {
+  joinUrl,
+  FullDocumentPath,
+  UUID,
+  IUserName,
+  UserOrSystem,
+  TokenUserType,
+  logger,
+  SystemRole
+} from '@opencrvs/commons'
 import { env } from '@events/environment'
 
-export type User = {
+type UserAPIResult = {
   id: string
   avatar?: {
     data: FullDocumentPath
@@ -25,6 +33,7 @@ export type User = {
   username: string
   email: string
   role: string
+  fullHonorificName?: string
   practitionerId: string
   primaryOfficeId: UUID
   scope: string[]
@@ -32,18 +41,10 @@ export type User = {
   creationDate: number
 }
 
-type System = {
-  name: string
-  createdBy: string
-  username: string
-  client_id: string
-  status: string
-  scope: string[]
-  sha_secret: string
-  type: string
-}
-
-export async function getUser(userId: string, token: string): Promise<User> {
+export async function getUser(
+  userId: string,
+  token: string
+): Promise<UserAPIResult> {
   const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'getUser').href, {
     method: 'POST',
     body: JSON.stringify({ userId }),
@@ -59,13 +60,24 @@ export async function getUser(userId: string, token: string): Promise<User> {
     )
   }
 
-  return res.json() as Promise<User>
+  return res.json() as Promise<UserAPIResult>
+}
+
+type SystemAPIResult = {
+  name: string
+  createdBy: string
+  username: string
+  client_id: string
+  status: string
+  scope: string[]
+  sha_secret: string
+  type: SystemRole
 }
 
 export async function getSystem(
   systemId: string,
   token: string
-): Promise<System> {
+): Promise<SystemAPIResult> {
   const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'getSystem').href, {
     method: 'POST',
     body: JSON.stringify({ systemId }),
@@ -81,32 +93,37 @@ export async function getSystem(
     )
   }
 
-  return res.json() as Promise<System>
+  return res.json() as Promise<SystemAPIResult>
 }
 
 export interface UserDetails {
   id: string
   name: IUserName[]
   role: string
+  fullHonorificName?: string
   signature?: string
   avatar?: string
-  primaryOfficeId?: UUID
+  primaryOfficeId?: string
 }
 
 export async function getUserOrSystem(
   id: string,
   token: string
-): Promise<UserDetails | undefined> {
+): Promise<UserOrSystem | undefined> {
   try {
     const user = await getUser(id, token)
 
     return {
+      type: TokenUserType.enum.user,
       id: user.id,
       name: user.name,
       role: user.role,
       signature: user.signature ? user.signature : undefined,
       avatar: user.avatar?.data ? user.avatar.data : undefined,
-      primaryOfficeId: user.primaryOfficeId
+      primaryOfficeId: user.primaryOfficeId,
+      fullHonorificName: user.fullHonorificName
+        ? user.fullHonorificName
+        : undefined
     }
   } catch (e) {
     logger.info(`No user found for id: ${id}. Will look for a system instead.`)
@@ -116,8 +133,9 @@ export async function getUserOrSystem(
     const system = await getSystem(id, token)
 
     return {
+      type: TokenUserType.enum.system,
       id,
-      name: [{ use: system.name, given: [], family: '' }],
+      name: system.name,
       role: system.type
     }
   } catch (e) {

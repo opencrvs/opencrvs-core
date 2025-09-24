@@ -43,6 +43,7 @@ import {
   EventDocument,
   tennisClubMembershipEvent,
   TestUserRole,
+  TokenUserType,
   UUID
 } from '@opencrvs/commons/client'
 import {
@@ -185,18 +186,7 @@ const preview: Preview = {
 
       if (options.parameters.userRole === TestUserRole.Enum.FIELD_AGENT) {
         window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
-        addUserToQueryData({
-          id: generator.user.id.fieldAgent,
-          name: [
-            {
-              use: 'en',
-              given: ['Kalusha'],
-              family: 'Bwalya'
-            }
-          ],
-          role: 'SOCIAL_WORKER',
-          primaryOfficeId
-        })
+        addUserToQueryData(generator.user.fieldAgent().v2)
       } else if (
         options.parameters.userRole === TestUserRole.Enum.REGISTRATION_AGENT
       ) {
@@ -205,12 +195,7 @@ const preview: Preview = {
           generator.user.token.registrationAgent
         )
 
-        addUserToQueryData({
-          id: generator.user.id.registrationAgent,
-          name: [{ use: 'en', given: ['Felix'], family: 'Katongo' }],
-          role: TestUserRole.Enum.REGISTRATION_AGENT,
-          primaryOfficeId
-        })
+        addUserToQueryData(generator.user.registrationAgent().v2)
       } else if (
         options.parameters.userRole === TestUserRole.Enum.LOCAL_SYSTEM_ADMIN
       ) {
@@ -223,7 +208,8 @@ const preview: Preview = {
           id: generator.user.id.localSystemAdmin,
           name: [{ use: 'en', given: ['Alex'], family: 'Ngonga' }],
           role: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN,
-          primaryOfficeId
+          primaryOfficeId,
+          type: TokenUserType.enum.user
         })
       } else {
         window.localStorage.setItem(
@@ -231,12 +217,7 @@ const preview: Preview = {
           generator.user.token.localRegistrar
         )
 
-        addUserToQueryData({
-          id: generator.user.id.localRegistrar,
-          name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
-          role: TestUserRole.Enum.LOCAL_REGISTRAR,
-          primaryOfficeId
-        })
+        addUserToQueryData(generator.user.localRegistrar().v2)
       }
 
       /*

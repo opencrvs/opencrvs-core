@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getUserOrSystem, UserDetails } from './api'
-
+import { UserOrSystem } from '@opencrvs/commons'
+import { getUserOrSystem } from './api'
 /**
  * Retrieves multiple users/systems by their IDs.
  *
@@ -24,7 +24,7 @@ import { getUserOrSystem, UserDetails } from './api'
 export const getUsersById = async (
   ids: string[],
   token: string
-): Promise<UserDetails[]> => {
+): Promise<UserOrSystem[]> => {
   const users = await Promise.all(
     ids.map(async (id) => getUserOrSystem(id, token))
   )

@@ -11,6 +11,9 @@
 
 import { FullDocumentPath } from '../documents'
 import { z } from 'zod'
+import { UUID } from '../uuid'
+import { TokenUserType } from 'src/authentication'
+import { SystemRole } from 'src/client'
 
 export const User = z.object({
   id: z.string(),
@@ -23,8 +26,26 @@ export const User = z.object({
   ),
   role: z.string(),
   avatar: FullDocumentPath.optional(),
-  signature: FullDocumentPath.optional(),
-  primaryOfficeId: z.string()
+  signature: FullDocumentPath.optional().describe(
+    'Storage key for the user signature. e.g. /ocrvs/signature.png'
+  ),
+  primaryOfficeId: UUID,
+  fullHonorificName: z.string().optional(),
+  type: TokenUserType.extract(['user'])
 })
-
 export type User = z.infer<typeof User>
+
+export const System = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: TokenUserType.extract(['system']),
+  role: SystemRole,
+  primaryOfficeId: z.undefined().optional(),
+  signature: z.undefined().optional(),
+  avatar: z.undefined().optional(),
+  fullHonorificName: z.string().optional()
+})
+export type System = z.infer<typeof System>
+
+export const UserOrSystem = z.discriminatedUnion('type', [User, System])
+export type UserOrSystem = z.infer<typeof UserOrSystem>

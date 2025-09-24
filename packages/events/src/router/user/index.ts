@@ -11,18 +11,19 @@
 
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
-import { User } from '@opencrvs/commons'
+import { UserOrSystem } from '@opencrvs/commons'
 import { router, publicProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
+import { getUserActions } from '@events/service/events/user-actions'
+import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 
 export const userRouter = router({
   get: publicProcedure
     .input(z.string())
-    .output(User)
+    .output(UserOrSystem)
     .query(async ({ input, ctx }) => {
       const [user] = await getUsersById([input], ctx.token)
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (!user) {
         throw new TRPCError({ code: 'NOT_FOUND' })
       }
@@ -31,5 +32,9 @@ export const userRouter = router({
     }),
   list: publicProcedure
     .input(z.array(z.string()))
-    .query(async ({ input, ctx }) => getUsersById(input, ctx.token))
+    .output(z.array(UserOrSystem))
+    .query(async ({ input, ctx }) => getUsersById(input, ctx.token)),
+  actions: publicProcedure.input(UserActionsQuery).query(async ({ input }) => {
+    return getUserActions(input)
+  })
 })

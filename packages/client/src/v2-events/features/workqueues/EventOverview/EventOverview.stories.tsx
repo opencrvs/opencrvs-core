@@ -629,7 +629,7 @@ const actionDefaults = {
   ),
   createdBy: refData.user.id.localRegistrar,
   createdByRole: TestUserRole.Enum.LOCAL_REGISTRAR,
-  createdAtLocation: refData.user.localRegistrar().primaryOffice.id as UUID
+  createdAtLocation: refData.user.localRegistrar().v2.primaryOfficeId
 } satisfies Partial<ActionDocument>
 
 const duplicateEvent = {
