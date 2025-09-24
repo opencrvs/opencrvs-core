@@ -9,8 +9,44 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { UserOrSystem } from '@opencrvs/commons'
-import { getUserOrSystem } from './api'
+import { UserOrSystem, TokenUserType } from '@opencrvs/commons'
+import { getUser, getSystem } from './api'
+
+export async function getUserOrSystem(
+  id: string,
+  token: string
+): Promise<UserOrSystem | undefined> {
+  const user = await getUser(id, token)
+
+  if (user) {
+    return {
+      type: TokenUserType.enum.user,
+      id: user.id,
+      name: user.name,
+      role: user.role,
+      signature: user.signature ? user.signature : undefined,
+      avatar: user.avatar?.data ? user.avatar.data : undefined,
+      primaryOfficeId: user.primaryOfficeId,
+      fullHonorificName: user.fullHonorificName
+        ? user.fullHonorificName
+        : undefined
+    }
+  }
+
+  const system = await getSystem(id, token)
+
+  if (system) {
+    return {
+      type: TokenUserType.enum.system,
+      id,
+      name: system.name,
+      role: system.type
+    }
+  }
+
+  return
+}
+
 /**
  * Retrieves multiple users/systems by their IDs.
  *
