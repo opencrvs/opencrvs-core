@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: e654e6fd-0603-4d8c-aa2f-e5d41f853f6d
+                transactionId: 8a2243ab-7458-4c45-953b-439f0cada6f2
                 type: birth
       responses:
         "200":
@@ -395,7 +395,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 8d401214-9e70-42d0-8170-858768510ffd
+                transactionId: 526f48cb-c13b-47e2-bf1e-4ca065855ac9
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2309,6 +2309,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -2507,6 +2510,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -2624,6 +2630,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -2735,6 +2744,9 @@ components:
                         - $ref: "#/components/schemas/TranslationConfig"
                   required:
                     - message
+              default: false
+            disabled:
+              type: boolean
               default: false
             conditionals:
               type: array
@@ -2854,6 +2866,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -2962,6 +2977,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -3068,6 +3086,9 @@ components:
                         - $ref: "#/components/schemas/TranslationConfig"
                   required:
                     - message
+              default: false
+            disabled:
+              type: boolean
               default: false
             conditionals:
               type: array
@@ -3193,6 +3214,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -3310,6 +3334,9 @@ components:
                         - $ref: "#/components/schemas/TranslationConfig"
                   required:
                     - message
+              default: false
+            disabled:
+              type: boolean
               default: false
             conditionals:
               type: array
@@ -3433,6 +3460,9 @@ components:
                         - $ref: "#/components/schemas/TranslationConfig"
                   required:
                     - message
+              default: false
+            disabled:
+              type: boolean
               default: false
             conditionals:
               type: array
@@ -3562,6 +3592,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -3678,6 +3711,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -3777,6 +3813,9 @@ components:
                         - $ref: "#/components/schemas/TranslationConfig"
                   required:
                     - message
+              default: false
+            disabled:
+              type: boolean
               default: false
             conditionals:
               type: array
@@ -3894,6 +3933,9 @@ components:
                         - $ref: "#/components/schemas/TranslationConfig"
                   required:
                     - message
+              default: false
+            disabled:
+              type: boolean
               default: false
             conditionals:
               type: array
@@ -4087,6 +4129,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -4186,6 +4231,9 @@ components:
                         - $ref: "#/components/schemas/TranslationConfig"
                   required:
                     - message
+              default: false
+            disabled:
+              type: boolean
               default: false
             conditionals:
               type: array
@@ -4287,6 +4335,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -4387,6 +4438,9 @@ components:
                         - $ref: "#/components/schemas/TranslationConfig"
                   required:
                     - message
+              default: false
+            disabled:
+              type: boolean
               default: false
             conditionals:
               type: array
@@ -4534,6 +4588,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -4633,6 +4690,9 @@ components:
                         - $ref: "#/components/schemas/TranslationConfig"
                   required:
                     - message
+              default: false
+            disabled:
+              type: boolean
               default: false
             conditionals:
               type: array
@@ -4755,6 +4815,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -4850,6 +4913,9 @@ components:
                         - $ref: "#/components/schemas/TranslationConfig"
                   required:
                     - message
+              default: false
+            disabled:
+              type: boolean
               default: false
             conditionals:
               type: array
@@ -4965,6 +5031,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -5065,6 +5134,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -5164,6 +5236,9 @@ components:
                         - $ref: "#/components/schemas/TranslationConfig"
                   required:
                     - message
+              default: false
+            disabled:
+              type: boolean
               default: false
             conditionals:
               type: array
@@ -5287,6 +5362,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -5393,6 +5471,9 @@ components:
                         - $ref: "#/components/schemas/TranslationConfig"
                   required:
                     - message
+              default: false
+            disabled:
+              type: boolean
               default: false
             conditionals:
               type: array
@@ -5546,6 +5627,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -5672,6 +5756,9 @@ components:
                   required:
                     - message
               default: false
+            disabled:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
@@ -5786,6 +5873,9 @@ components:
                         - $ref: "#/components/schemas/TranslationConfig"
                   required:
                     - message
+              default: false
+            disabled:
+              type: boolean
               default: false
             conditionals:
               type: array
@@ -5952,6 +6042,9 @@ components:
                         - $ref: "#/components/schemas/TranslationConfig"
                   required:
                     - message
+              default: false
+            disabled:
+              type: boolean
               default: false
             conditionals:
               type: array
