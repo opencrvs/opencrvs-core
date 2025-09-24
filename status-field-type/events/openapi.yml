@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 3c80cdec-4a19-4af2-ba10-31c8d981397a
+                transactionId: 4e37fbe6-cbbc-4480-8896-38b66b8e3c78
                 type: birth
       responses:
         "200":
@@ -395,7 +395,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: d6cf4859-ab5e-4f33-8e3a-3e7a019ba0da
+                transactionId: 302b4026-8735-4a87-9bd2-5715837e6578
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -5799,35 +5799,25 @@ components:
             type:
               type: string
               enum:
-                - STATUS
+                - VERIFICATION_STATUS
+            defaultValue:
+              type: string
+              enum: &a18
+                - verified
+                - authenticated
+                - failed
             configuration:
               type: object
               properties:
-                icon:
-                  type: string
-                  default: CircleWavyCheck
-                  description: Icon for the button. You can find icons from OpenCRVS UI-Kit.
-                theme:
-                  type: string
-                  enum:
-                    - active
-                    - inactive
-                    - pending
-                    - default
-                  default: default
-                  description: Defines the theme of the status pill. See the OpenCRVS UI-Kit
-                    "Pill" types for color details.
                 text:
                   description: Text to display on the status pill.
                   allOf:
                     - $ref: "#/components/schemas/TranslationConfig"
                 description:
-                  description: Explaining text on the banner.
+                  description: Explaining text on the banner and review page.
                   allOf:
                     - $ref: "#/components/schemas/TranslationConfig"
               required:
-                - icon
-                - theme
                 - text
                 - description
           required:
@@ -12699,6 +12689,7 @@ components:
                 required:
                   - loading
               - type: string
+                enum: *a18
       required:
         - id
         - type
