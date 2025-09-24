@@ -47,21 +47,11 @@ export function ActionTypeSpecificContent({
   }
 
   if (type === ActionType.REQUEST_CORRECTION) {
-    return (
-      <RequestCorrection
-        action={action as RequestedCorrectionAction}
-        fullEvent={fullEvent}
-      />
-    )
+    return <RequestCorrection action={action} fullEvent={fullEvent} />
   }
 
   if (type === ActionType.PRINT_CERTIFICATE) {
-    return (
-      <PrintCertificate
-        action={action as PrintCertificateAction}
-        event={fullEvent}
-      />
-    )
+    return <PrintCertificate action={action} event={fullEvent} />
   }
 
   return null
