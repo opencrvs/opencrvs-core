@@ -12,7 +12,7 @@
 import { UserOrSystem, TokenUserType } from '@opencrvs/commons'
 import { getUser, getSystem } from './api'
 
-export async function getUserOrSystem(
+async function getUserOrSystem(
   id: string,
   token: string
 ): Promise<UserOrSystem | undefined> {
