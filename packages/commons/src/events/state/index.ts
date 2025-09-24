@@ -27,8 +27,7 @@ import {
   aggregateActionDeclarations,
   deepMerge,
   getAcceptedActions,
-  getCompleteActionAnnotation,
-  omitHiddenPaginatedFields
+  getCompleteActionAnnotation
 } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
