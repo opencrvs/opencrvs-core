@@ -164,25 +164,3 @@ export function useActionForHistory() {
 
   return { getActionTypeForHistory }
 }
-
-export function toEventDocument(event: EventHistoryDocument): EventDocument {
-  return {
-    ...event,
-    actions: event.actions.filter(
-      (a): a is ActionDocument => a.type !== DECLARATION_ACTION_UPDATE
-    )
-  }
-}
-
-/**
- * UI-safe wrapper around getCurrentEventState.
- *
- * Accepts EventHistoryDocument (with client-only UPDATE actions)
- * but strips them out before delegating to the real implementation.
- */
-export function getCurrentEventStateSafe(
-  event: EventHistoryDocument,
-  config: EventConfig
-) {
-  return getCurrentEventState(toEventDocument(event), config)
-}
