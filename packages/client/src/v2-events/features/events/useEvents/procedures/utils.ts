@@ -42,7 +42,7 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
     const { eventId } = params
 
     if (!isTemporaryId(eventId)) {
-      return canonicalMutationFn({ ...params, eventId: eventId })
+      return canonicalMutationFn({ ...params, eventId })
     }
 
     const localVersion =

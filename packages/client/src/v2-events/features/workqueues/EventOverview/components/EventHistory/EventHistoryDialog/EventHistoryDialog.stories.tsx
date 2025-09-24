@@ -9,13 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
+import addDays from 'date-fns/addDays'
 import {
   ActionType,
   generateUuid,
   getUUID,
   tennisClubMembershipEvent,
   generateActionDocument,
-  createPrng
+  createPrng,
+  getRandomDatetime
 } from '@opencrvs/commons/client'
 import { EventHistoryDialog } from './EventHistoryDialog'
 
@@ -135,11 +137,18 @@ export const Read: Story = {
   }
 }
 
+const createActionCreatedAt = getRandomDatetime(
+  prng,
+  new Date('2023-12-12'),
+  new Date('2023-12-31')
+)
+
 const createAction = generateActionDocument({
   configuration: tennisClubMembershipEvent,
   action: ActionType.CREATE,
   rng: prng,
   defaults: {
+    createdAt: createActionCreatedAt,
     id: generateUuid(prng)
   }
 })
@@ -149,6 +158,7 @@ const declareAction = generateActionDocument({
   action: ActionType.DECLARE,
   rng: prng,
   defaults: {
+    createdAt: addDays(new Date(createActionCreatedAt), 1).toISOString(),
     id: generateUuid(prng)
   }
 })
@@ -158,6 +168,7 @@ const validateAction = generateActionDocument({
   action: ActionType.VALIDATE,
   rng: prng,
   defaults: {
+    createdAt: addDays(new Date(createActionCreatedAt), 2).toISOString(),
     id: generateUuid(prng)
   },
   declarationOverrides: {
@@ -170,6 +181,7 @@ const registerAction = generateActionDocument({
   action: ActionType.REGISTER,
   rng: prng,
   defaults: {
+    createdAt: addDays(new Date(createActionCreatedAt), 3).toISOString(),
     id: generateUuid(prng)
   },
   declarationOverrides: {
@@ -181,9 +193,9 @@ const eventWhenDeclareUpdatesDeclaration = {
   trackingId: generateUuid(prng),
   type: tennisClubMembershipEvent.id,
   actions: [createAction, declareAction],
-  createdAt: new Date().toISOString(),
+  createdAt: createActionCreatedAt,
   id: generateUuid(prng),
-  updatedAt: new Date().toISOString()
+  updatedAt: addDays(new Date(createActionCreatedAt), 1).toISOString()
 }
 
 export const Declared: Story = {
@@ -208,9 +220,9 @@ const eventWhenValidateUpdatesDeclaration = {
   trackingId: generateUuid(prng),
   type: tennisClubMembershipEvent.id,
   actions: [createAction, declareAction, validateAction],
-  createdAt: new Date().toISOString(),
+  createdAt: createActionCreatedAt,
   id: generateUuid(prng),
-  updatedAt: new Date().toISOString()
+  updatedAt: addDays(new Date(createActionCreatedAt), 2).toISOString()
 }
 
 export const Validated: Story = {
@@ -235,9 +247,9 @@ const eventWhenRegisterUpdatesDeclaration = {
   trackingId: generateUuid(prng),
   type: tennisClubMembershipEvent.id,
   actions: [createAction, declareAction, validateAction, registerAction],
-  createdAt: new Date().toISOString(),
+  createdAt: createActionCreatedAt,
   id: generateUuid(prng),
-  updatedAt: new Date().toISOString()
+  updatedAt: addDays(new Date(createActionCreatedAt), 3).toISOString()
 }
 
 export const Registered: Story = {
