@@ -96,16 +96,6 @@ export async function getSystem(
   return res.json() as Promise<SystemAPIResult>
 }
 
-export interface UserDetails {
-  id: string
-  name: IUserName[]
-  role: string
-  fullHonorificName?: string
-  signature?: string
-  avatar?: string
-  primaryOfficeId?: string
-}
-
 export async function getUserOrSystem(
   id: string,
   token: string
