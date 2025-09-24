@@ -232,6 +232,10 @@ export function mapFieldTypeToMockValue(
     case FieldType.FILE_WITH_OPTIONS:
     case FieldType.DATA:
       return undefined
+    case FieldType.QR_READER:
+      return Object.create(null)
+    case FieldType.ID_READER:
+      return Object.create(null)
   }
 }
 

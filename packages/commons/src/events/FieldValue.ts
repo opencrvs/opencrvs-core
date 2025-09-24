@@ -19,7 +19,9 @@ import {
   HttpFieldUpdateValue,
   HttpFieldValue,
   StreetLevelDetailsValue,
-  StreetLevelDetailsUpdateValue
+  StreetLevelDetailsUpdateValue,
+  QrReaderFieldValue,
+  IdReaderFieldValue
 } from './CompositeFieldValue'
 /**
  * FieldValues defined in this file are primitive field values.
@@ -100,7 +102,9 @@ export const FieldValue = z.union([
   NameFieldValue,
   NameFieldUpdateValue,
   ButtonFieldValue,
-  HttpFieldValue
+  HttpFieldValue,
+  QrReaderFieldValue,
+  IdReaderFieldValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>
@@ -158,5 +162,7 @@ export type FieldUpdateValueSchema =
   | typeof NameFieldUpdateValue
   | typeof HttpFieldUpdateValue
   | typeof ButtonFieldValue
+  | typeof QrReaderFieldValue
+  | typeof IdReaderFieldValue
   | z.ZodString
   | z.ZodBoolean

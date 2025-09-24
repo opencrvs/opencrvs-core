@@ -604,6 +604,24 @@ const HttpField = BaseField.extend({
 
 export type HttpField = z.infer<typeof HttpField>
 
+const QrReaderField = BaseField.extend({
+  type: z.literal(FieldType.QR_READER)
+})
+
+export type QrReaderField = z.infer<typeof QrReaderField>
+
+const IdReaderField = BaseField.extend({
+  type: z.literal(FieldType.ID_READER),
+  methods: z.array(
+    z.object({
+      type: z.string(),
+      configuration: z.record(z.string()).optional()
+    })
+  )
+})
+
+export type IdReaderField = z.infer<typeof IdReaderField>
+
 /** @knipignore */
 export type FieldConfig =
   | z.infer<typeof Address>
@@ -636,6 +654,8 @@ export type FieldConfig =
   | z.infer<typeof DataField>
   | z.infer<typeof ButtonField>
   | z.infer<typeof HttpField>
+  | z.infer<typeof QrReaderField>
+  | z.infer<typeof IdReaderField>
 
 /** @knipignore */
 /**
@@ -672,6 +692,8 @@ export type FieldConfigInput =
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
+  | z.infer<typeof QrReaderField>
+  | z.infer<typeof IdReaderField>
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
  *  referenced quite extensively througout various other schemas. Leaving the
@@ -713,7 +735,9 @@ export const FieldConfig: z.ZodType<
     FileUploadWithOptions,
     DataField,
     ButtonField,
-    HttpField
+    HttpField,
+    QrReaderField,
+    IdReaderField
   ])
   .openapi({
     description: 'Form field configuration',

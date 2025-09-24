@@ -41,7 +41,9 @@ import {
   SelectDateRangeField,
   TimeField,
   HttpField,
-  ButtonField
+  ButtonField,
+  QrReaderField,
+  IdReaderField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -70,7 +72,9 @@ import {
   AddressType,
   NameFieldValue,
   NameFieldUpdateValue,
-  HttpFieldUpdateValue
+  HttpFieldUpdateValue,
+  QrReaderFieldValue,
+  IdReaderFieldValue
 } from './CompositeFieldValue'
 
 /**
@@ -155,6 +159,12 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.HTTP:
       schema = HttpFieldUpdateValue
       break
+    case FieldType.QR_READER:
+      schema = QrReaderFieldValue
+      break
+    case FieldType.ID_READER:
+      schema = IdReaderFieldValue
+      break
   }
 
   return required ? schema : schema.nullish()
@@ -221,6 +231,10 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
       } satisfies FileFieldValue
     case FieldType.FILE_WITH_OPTIONS:
       return [] satisfies FileFieldWithOptionValue
+    case FieldType.QR_READER:
+      return Object.create(null) satisfies QrReaderFieldValue
+    case FieldType.ID_READER:
+      return Object.create(null) satisfies IdReaderFieldValue
   }
 }
 
@@ -438,6 +452,20 @@ export const isHttpFieldType = (field: {
   value: FieldValue
 }): field is { value: undefined; config: HttpField } => {
   return field.config.type === FieldType.HTTP
+}
+
+export const isQrReaderFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: QrReaderField } => {
+  return field.config.type === FieldType.QR_READER
+}
+
+export const isIdReaderFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: IdReaderField } => {
+  return field.config.type === FieldType.ID_READER
 }
 
 export type NonInteractiveFieldType =

@@ -41,7 +41,9 @@ export const FieldType = {
   SIGNATURE: 'SIGNATURE',
   DATA: 'DATA',
   BUTTON: 'BUTTON',
-  HTTP: 'HTTP'
+  HTTP: 'HTTP',
+  QR_READER: 'QR_READER',
+  ID_READER: 'ID_READER'
 } as const
 
 /**
@@ -63,7 +65,8 @@ export const compositeFieldTypes = [
   FieldType.DATE_RANGE,
   FieldType.ADDRESS,
   FieldType.FILE_WITH_OPTIONS,
-  FieldType.FILE
+  FieldType.FILE,
+  FieldType.ID_READER
 ]
 
 export const FieldTypesToHideInReview = [
