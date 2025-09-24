@@ -43,7 +43,7 @@ export const FieldType = {
   BUTTON: 'BUTTON',
   HTTP: 'HTTP',
   LINK_BUTTON: 'LINK_BUTTON',
-  STATUS: 'STATUS'
+  VERIFICATION_STATUS: 'VERIFICATION_STATUS'
 } as const
 
 /**

@@ -46,7 +46,7 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
         fields={[
           {
             id: 'storybook.status',
-            type: FieldType.STATUS,
+            type: FieldType.VERIFICATION_STATUS,
             label: {
               id: 'storybook.status',
               defaultMessage: 'Verification status',

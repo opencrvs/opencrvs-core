@@ -80,8 +80,12 @@ export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
 
 export const ButtonFieldValue = z.number()
 export type ButtonFieldValue = z.infer<typeof ButtonFieldValue>
-export const StatusFieldValue = z.string()
-export type StatusFieldValue = z.infer<typeof StatusFieldValue>
+export const VerificationStatusValue = z.enum([
+  'verified',
+  'authenticated',
+  'failed'
+])
+export type VerificationStatusValue = z.infer<typeof VerificationStatusValue>
 
 export const FieldValue = z.union([
   /**
@@ -103,7 +107,7 @@ export const FieldValue = z.union([
   NameFieldUpdateValue,
   ButtonFieldValue,
   HttpFieldValue,
-  StatusFieldValue
+  VerificationStatusValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>

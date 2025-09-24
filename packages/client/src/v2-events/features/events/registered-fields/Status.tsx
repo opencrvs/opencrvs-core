@@ -12,30 +12,23 @@ import React from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { Banner, Icon, Pill, Text } from '@opencrvs/components'
-import { FieldProps } from '@opencrvs/commons/client'
 import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
-
-function throwIfUnsupportedIcon(icon: string) {
-  if (icon in SupportedIcons) {
-    return icon as keyof typeof SupportedIcons
-  }
-
-  throw new Error(
-    `Unsupported icon in FieldType.STATUS: ${icon}. Please use one of the supported icons from @opencrvs/components`
-  )
-}
+import {
+  VerificationStatus,
+  VerificationStatusValue
+} from '@opencrvs/commons/client'
 
 const StyledIcon = styled(Icon)`
   margin-right: 4px;
 `
 
 const IconWrapper = styled.div<{
-  type: FieldProps<'STATUS'>['configuration']['theme']
+  type: VerificationStatusValue
 }>`
   --background-color: ${({ theme, type }) => `
-    ${type === 'default' ? theme.colors.primaryLight : ''}
-    ${type === 'active' ? theme.colors.greenLight : ''}
-    ${type === 'inactive' ? theme.colors.redLight : ''}
+    ${type === 'authenticated' ? theme.colors.primaryLight : ''}
+    ${type === 'verified' ? theme.colors.greenLight : ''}
+    ${type === 'failed' ? theme.colors.redLight : ''}
   `};
   height: 24px;
   width: 24px;
@@ -46,39 +39,53 @@ const IconWrapper = styled.div<{
   background-color: var(--background-color);
 `
 
+const PILL_FOR_STATUS = {
+  verified: 'default',
+  authenticated: 'active',
+  failed: 'inactive'
+} as const
+
+const ICON_FOR_STATUS = {
+  verified: 'CircleWavyCheck',
+  authenticated: 'Fingerprint',
+  failed: 'X'
+} satisfies Record<VerificationStatusValue, keyof typeof SupportedIcons>
+
 function Input({
   id,
-  configuration
-}: Pick<FieldProps<'STATUS'>, 'id' | 'configuration'>) {
+  configuration,
+  value
+}: {
+  id: string
+  configuration: VerificationStatus['configuration']
+  value: VerificationStatusValue
+}) {
   const intl = useIntl()
 
   return (
     <Banner.Container>
-      <Banner.Header type="active">
+      <Banner.Header type={PILL_FOR_STATUS[value]}>
         <Pill
-          data-testid={`${id}__${configuration.theme}`}
+          data-testid={`${id}__${value}`}
           label={
             <>
-              <StyledIcon
-                name={throwIfUnsupportedIcon(configuration.icon)}
-                size="small"
-              />
+              <StyledIcon name={ICON_FOR_STATUS[value]} size="small" />
               {intl.formatMessage(configuration.text)}
             </>
           }
           pillTheme="dark"
           size="small"
-          type={configuration.theme}
+          type={PILL_FOR_STATUS[value]}
         />
 
-        <IconWrapper type={configuration.theme}>
-          {configuration.theme === 'active' && (
+        <IconWrapper type={value}>
+          {value === 'verified' && (
             <Icon color="greenDarker" name="Check" size="small" weight="bold" />
           )}
-          {configuration.theme === 'default' && (
+          {value === 'authenticated' && (
             <Icon color="primaryDark" name="Check" size="small" weight="bold" />
           )}
-          {configuration.theme === 'inactive' && (
+          {value === 'failed' && (
             <Icon color="redDarker" name="X" size="small" weight="bold" />
           )}
         </IconWrapper>
@@ -94,25 +101,27 @@ function Input({
 
 function Output({
   id,
-  configuration
-}: Pick<FieldProps<'STATUS'>, 'id' | 'configuration'>) {
+  configuration,
+  value
+}: {
+  id: string
+  configuration: VerificationStatus['configuration']
+  value: VerificationStatusValue
+}) {
   const intl = useIntl()
 
   return (
     <Pill
-      data-testid={`${id}__${configuration.theme}`}
+      data-testid={`${id}__${value}`}
       label={
         <>
-          <StyledIcon
-            name={throwIfUnsupportedIcon(configuration.icon)}
-            size="small"
-          />
+          <StyledIcon name={ICON_FOR_STATUS[value]} size="small" />
           {intl.formatMessage(configuration.text)}
         </>
       }
       pillTheme="dark"
       size="small"
-      type={configuration.theme}
+      type={PILL_FOR_STATUS[value]}
     />
   )
 }

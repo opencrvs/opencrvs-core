@@ -43,7 +43,7 @@ import {
   HttpField,
   ButtonField,
   LinkButtonField,
-  StatusField
+  VerificationStatus
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -59,7 +59,8 @@ import {
   DateRangeFieldValue,
   SelectDateRangeValue,
   TimeValue,
-  ButtonFieldValue
+  ButtonFieldValue,
+  VerificationStatusValue
 } from './FieldValue'
 
 import { FullDocumentPath } from '../documents'
@@ -127,7 +128,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.OFFICE:
     case FieldType.PHONE:
     case FieldType.LINK_BUTTON:
-    case FieldType.STATUS:
+    case FieldType.VERIFICATION_STATUS:
     case FieldType.ID:
       schema = required ? NonEmptyTextValue : TextValue
       break
@@ -209,7 +210,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.HTTP:
     case FieldType.LINK_BUTTON:
     case FieldType.ID:
-    case FieldType.STATUS:
+    case FieldType.VERIFICATION_STATUS:
       return null
     case FieldType.ADDRESS:
       return {
@@ -453,11 +454,14 @@ export const isLinkButtonFieldType = (field: {
   return field.config.type === FieldType.LINK_BUTTON
 }
 
-export const isStatusFieldType = (field: {
+export const isVerificationStatusType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: undefined; config: StatusField } => {
-  return field.config.type === FieldType.STATUS
+}): field is {
+  value: VerificationStatusValue | undefined
+  config: VerificationStatus
+} => {
+  return field.config.type === FieldType.VERIFICATION_STATUS
 }
 
 export type NonInteractiveFieldType =
@@ -468,7 +472,6 @@ export type NonInteractiveFieldType =
   | DataField
   | HttpField
   | LinkButtonField
-  | StatusField
 
 export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
 
@@ -482,7 +485,6 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
     field.type === FieldType.HTTP ||
-    field.type === FieldType.LINK_BUTTON ||
-    field.type === FieldType.STATUS
+    field.type === FieldType.LINK_BUTTON
   )
 }

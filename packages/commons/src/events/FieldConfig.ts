@@ -23,7 +23,8 @@ import {
   SignatureFieldValue,
   SelectDateRangeValue,
   TimeValue,
-  ButtonFieldValue
+  ButtonFieldValue,
+  VerificationStatusValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -614,29 +615,18 @@ const LinkButtonField = BaseField.extend({
 
 export type LinkButtonField = z.infer<typeof LinkButtonField>
 
-const StatusField = BaseField.extend({
-  type: z.literal(FieldType.STATUS),
+const VerificationStatus = BaseField.extend({
+  type: z.literal(FieldType.VERIFICATION_STATUS),
+  defaultValue: VerificationStatusValue.optional(),
   configuration: z.object({
-    icon: z
-      .string()
-      .optional()
-      .default('CircleWavyCheck')
-      .describe(
-        'Icon for the button. You can find icons from OpenCRVS UI-Kit.'
-      ),
-    theme: z
-      .enum(['active', 'inactive', 'pending', 'default'])
-      .optional()
-      .default('default')
-      .describe(
-        'Defines the theme of the status pill. See the OpenCRVS UI-Kit "Pill" types for color details.'
-      ),
     text: TranslationConfig.describe('Text to display on the status pill.'),
-    description: TranslationConfig.describe('Explaining text on the banner.')
+    description: TranslationConfig.describe(
+      'Explaining text on the banner and review page.'
+    )
   })
 })
 
-export type StatusField = z.infer<typeof StatusField>
+export type VerificationStatus = z.infer<typeof VerificationStatus>
 
 /** @knipignore */
 export type FieldConfig =
@@ -671,7 +661,7 @@ export type FieldConfig =
   | z.infer<typeof ButtonField>
   | z.infer<typeof HttpField>
   | z.infer<typeof LinkButtonField>
-  | z.infer<typeof StatusField>
+  | z.infer<typeof VerificationStatus>
 
 /** @knipignore */
 /**
@@ -709,7 +699,7 @@ export type FieldConfigInput =
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
   | z.input<typeof LinkButtonField>
-  | z.input<typeof StatusField>
+  | z.input<typeof VerificationStatus>
 
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
@@ -754,7 +744,7 @@ export const FieldConfig: z.ZodType<
     ButtonField,
     HttpField,
     LinkButtonField,
-    StatusField
+    VerificationStatus
   ])
   .openapi({
     description: 'Form field configuration',

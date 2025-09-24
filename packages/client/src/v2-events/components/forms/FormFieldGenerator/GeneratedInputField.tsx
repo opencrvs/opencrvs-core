@@ -56,7 +56,7 @@ import {
   isButtonFieldType,
   isHttpFieldType,
   isLinkButtonFieldType,
-  isStatusFieldType
+  isVerificationStatusType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -638,12 +638,13 @@ export const GeneratedInputField = React.memo(
       )
     }
 
-    if (isStatusFieldType(field)) {
+    if (isVerificationStatusType(field)) {
       return (
         <InputField {...field.inputFieldProps}>
           <Status.Input
             configuration={field.config.configuration}
             id={field.config.id}
+            value={field.value as any}
           />
         </InputField>
       )

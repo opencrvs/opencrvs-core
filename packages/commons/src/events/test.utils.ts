@@ -182,8 +182,9 @@ export function mapFieldTypeToMockValue(
     case FieldType.ID:
     case FieldType.OFFICE:
     case FieldType.LINK_BUTTON:
-    case FieldType.STATUS:
       return `${field.id}-${field.type}-${i}`
+    case FieldType.VERIFICATION_STATUS:
+      return 'verified'
     case FieldType.NAME:
       return generateRandomName(rng)
     case FieldType.NUMBER:
