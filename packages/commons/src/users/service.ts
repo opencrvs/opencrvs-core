@@ -36,6 +36,7 @@ type User = {
   username: string
   email: string
   role: ObjectId
+  fullHonorificName?: string
   practitionerId: string
   primaryOfficeId: UUID
   scope: string[]

@@ -26,8 +26,7 @@ import {
   UUID,
   tennisClubMembershipEvent,
   footballClubMembershipEvent,
-  libraryMembershipEvent,
-  FullDocumentPath
+  libraryMembershipEvent
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 
@@ -1178,13 +1177,13 @@ export const handlers = {
       let response
 
       if (userId == generator.user.id.fieldAgent) {
-        response = generator.user.fieldAgent()
+        response = generator.user.fieldAgent().v1
       } else if (userId == generator.user.id.registrationAgent) {
-        response = generator.user.registrationAgent()
+        response = generator.user.registrationAgent().v1
       } else if (userId == generator.user.id.localSystemAdmin) {
         response = generator.user.localSystemAdmin()
       } else {
-        response = generator.user.localRegistrar()
+        response = generator.user.localRegistrar().v1
       }
 
       return HttpResponse.json({
@@ -1194,32 +1193,14 @@ export const handlers = {
       })
     }),
     tRPCMsw.user.list.query(() => {
-      return [
-        {
-          id: testDataGenerator().user.id.localRegistrar,
-          name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
-          role: 'LOCAL_REGISTRAR',
-          signature: undefined,
-          avatar: undefined,
-          primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-        }
-      ]
+      const generator = testDataGenerator()
+
+      return [generator.user.localRegistrar().v2]
     }),
     tRPCMsw.user.get.query((id) => {
-      return {
-        id,
-        name: [
-          {
-            use: 'en',
-            given: ['Kennedy'],
-            family: 'Mweene'
-          }
-        ],
-        role: 'LOCAL_REGISTRAR',
-        signature: 'signature.png' as FullDocumentPath,
-        avatar: undefined,
-        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-      }
+      const generator = testDataGenerator()
+
+      return generator.user.localRegistrar().v2
     })
   ],
   event: [

@@ -58,13 +58,15 @@ function findUserById(userId: string, users: User[]) {
   if (!user) {
     return {
       name: '',
-      signature: ''
+      signature: '',
+      fullHonorificName: ''
     }
   }
 
   return {
     name: getUsersFullName(user.name, 'en'),
-    signature: user.signature ?? ''
+    signature: user.signature ?? '',
+    fullHonorificName: user.fullHonorificName ?? ''
   }
 }
 
