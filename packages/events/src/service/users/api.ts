@@ -62,8 +62,6 @@ export async function getUser(userId: string, token: string): Promise<User> {
   return res.json() as Promise<User>
 }
 
-// @todo cihan remove the knipignore
-/** @knipignore */
 export async function getSystem(
   systemId: string,
   token: string
