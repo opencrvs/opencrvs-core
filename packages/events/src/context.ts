@@ -23,7 +23,6 @@ import {
   TokenWithBearer,
   UUID
 } from '@opencrvs/commons'
-import { env } from './environment'
 import { getSystem, getUser } from './service/users/api'
 
 export const UserContext = z.object({
@@ -120,7 +119,7 @@ async function resolveUserDetails(
     }
 
     if (userType === TokenUserType.Enum.system) {
-      const { type } = await getSystem(env.USER_MANAGEMENT_URL, userId, token)
+      const { type } = await getSystem(userId, token)
 
       return SystemContext.parse({
         type: userType,
@@ -131,7 +130,6 @@ async function resolveUserDetails(
     }
 
     const { primaryOfficeId, role, signature, username } = await getUser(
-      env.USER_MANAGEMENT_URL,
       userId,
       token
     )

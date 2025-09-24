@@ -11,8 +11,10 @@
 
 import fetch from 'node-fetch'
 import { joinUrl, FullDocumentPath, UUID, IUserName } from '@opencrvs/commons'
+import { logger } from '@opencrvs/commons'
+import { env } from '@events/environment'
 
-type User = {
+export type User = {
   id: string
   avatar?: {
     data: FullDocumentPath
@@ -41,19 +43,8 @@ type System = {
   type: string
 }
 
-export class UserNotFoundError extends Error {
-  constructor(userId: string) {
-    super(`User with id ${userId} not found`)
-    this.name = 'UserNotFoundError'
-  }
-}
-
-export async function getUser(
-  userManagementHost: string,
-  userId: string,
-  token: string
-) {
-  const res = await fetch(joinUrl(userManagementHost, 'getUser').href, {
+export async function getUser(userId: string, token: string): Promise<User> {
+  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'getUser').href, {
     method: 'POST',
     body: JSON.stringify({ userId }),
     headers: {
@@ -61,10 +52,6 @@ export async function getUser(
       Authorization: token
     }
   })
-
-  if (res.status === 404) {
-    throw new UserNotFoundError(userId)
-  }
 
   if (!res.ok) {
     throw new Error(
@@ -78,15 +65,10 @@ export async function getUser(
 // @todo cihan remove the knipignore
 /** @knipignore */
 export async function getSystem(
-  userManagementHost: string,
   systemId: string,
   token: string
-) {
-  const hostWithTrailingSlash = userManagementHost.endsWith('/')
-    ? userManagementHost
-    : userManagementHost + '/'
-
-  const res = await fetch(new URL('getSystem', hostWithTrailingSlash).href, {
+): Promise<System> {
+  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'getSystem').href, {
     method: 'POST',
     body: JSON.stringify({ systemId }),
     headers: {
@@ -102,4 +84,49 @@ export async function getSystem(
   }
 
   return res.json() as Promise<System>
+}
+
+export interface UserDetails {
+  id: string
+  name: IUserName[]
+  role: string
+  signature?: string
+  avatar?: string
+  primaryOfficeId?: UUID
+}
+
+export async function getUserOrSystem(
+  id: string,
+  token: string
+): Promise<UserDetails | undefined> {
+  try {
+    const user = await getUser(id, token)
+
+    return {
+      id: user.id,
+      name: user.name,
+      role: user.role,
+      signature: user.signature ? user.signature : undefined,
+      avatar: user.avatar?.data ? user.avatar.data : undefined,
+      primaryOfficeId: user.primaryOfficeId
+    }
+  } catch (e) {
+    logger.info(`No user found for id: ${id}. Will look for a system instead.`)
+  }
+
+  try {
+    const system = await getSystem(id, token)
+
+    return {
+      id,
+      name: [{ use: system.name, given: [], family: '' }],
+      role: system.type
+    }
+  } catch (e) {
+    logger.info(
+      `No system found for id: ${id}. User/system has probably been removed. Will return undefined.`
+    )
+  }
+
+  return
 }
