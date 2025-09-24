@@ -14,6 +14,7 @@ import {
   Action,
   ActionDocument,
   ActionType,
+  ActionTypes,
   DeclarationActionType,
   EventConfig,
   EventDocument,
@@ -115,9 +116,9 @@ export function expandWithUpdateActions(
 
   for (const action of actions) {
     if (
-      action.type === 'VALIDATE' ||
-      action.type === 'REGISTER' ||
-      action.type === 'DECLARE'
+      action.type === ActionTypes.enum.VALIDATE ||
+      action.type === ActionTypes.enum.REGISTER ||
+      action.type === ActionTypes.enum.DECLARE
     ) {
       const changed = hasDeclarationChanged(actions, action)
       if (changed) {
@@ -128,7 +129,7 @@ export function expandWithUpdateActions(
             // We can't generate random UUIDs here, since components rely on stable IDs
             // to find actions across renders.
             id: `${action.id}-update` as UUID,
-            type: 'UPDATE' as const
+            type: DECLARATION_ACTION_UPDATE
           },
           {
             ...action,
@@ -175,7 +176,7 @@ export function toEventDocument(event: EventHistoryDocument): EventDocument {
   return {
     ...event,
     actions: event.actions.filter(
-      (a): a is ActionDocument => a.type !== 'UPDATE'
+      (a): a is ActionDocument => a.type !== DECLARATION_ACTION_UPDATE
     )
   }
 }

@@ -75,13 +75,11 @@ export function getAnnotationComparison(
   const currentAnnotations = aggregateAnnotations(eventUpToCurrentAction)
   const previousAnnotations = aggregateAnnotations(eventUpToPreviousAction)
 
-  const prevValue = previousAnnotations[f.id]
-  const currValue = currentAnnotations[f.id]
-
-  // Ensure that if previous value is 'undefined' and current value is 'null'
-  // it doesn't get detected as a value change
-  const bothNil = isNil(prevValue) && isNil(currValue)
-  const valueHasChanged = !isEqual(prevValue, currValue) && !bothNil
+  const valueHasChanged = hasFieldChanged(
+    f,
+    currentAnnotations,
+    previousAnnotations
+  )
 
   return { currentAnnotations, previousAnnotations, valueHasChanged }
 }

@@ -15,7 +15,7 @@ import {
   FileFieldValue,
   MimeType,
   File as FileConfig,
-  SignatureField
+  SignatureField as SignatureFieldConfig
 } from '@opencrvs/commons/client'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { getFullDocumentPath } from '@client/v2-events/cache'
@@ -104,7 +104,7 @@ function FileOutput({
   config
 }: {
   value?: FileFieldValue
-  config: FileConfig | SignatureField
+  config: FileConfig | SignatureFieldConfig
 }) {
   const intl = useIntl()
   const [previewImage, setPreviewImage] = useState<boolean>(false)

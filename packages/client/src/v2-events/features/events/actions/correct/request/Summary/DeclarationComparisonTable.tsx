@@ -15,24 +15,27 @@ import { defineMessages, useIntl } from 'react-intl'
 import {
   applyDeclarationToEventIndex,
   EventConfig,
+  getAllAnnotationFields,
   EventDocument,
   EventState,
   getAcceptedActions,
   getCurrentEventState,
-  getDeclaration,
-  UUID
+  getDeclaration
 } from '@opencrvs/commons/client'
 import { Table } from '@opencrvs/components/lib/Table'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { getAnnotationComparison, hasFieldChanged } from '../../utils'
+import {
+  getAnnotationComparison,
+  hasFieldChanged
+} from '@client/v2-events/features/events/actions/correct/utils'
 import {
   expandWithUpdateActions,
-  EventHistoryActionDocument
-} from '../../useActionForHistory'
+  EventHistoryActionDocument,
+  EventHistoryDocument
+} from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 
 const TableHeader = styled.th`
   text-transform: uppercase;
@@ -71,12 +74,28 @@ function getReviewForm(configuration: EventConfig) {
     .map((action) => action.review)
 }
 
-function getReviewFormFields(configuration: EventConfig) {
-  const reviewForms = getReviewForm(configuration)
-  return uniqBy(
-    reviewForms.flatMap((form) => form.fields),
-    (field) => field.id
-  )
+/**
+ * When action is not found or provided, we compare the full event
+ * Needed when action is not provided as props e.g. - correction summary
+ */
+function sliceEventAt(
+  fullEvent: EventHistoryDocument,
+  actionId?: string,
+  includeCurrent = false
+): EventHistoryDocument {
+  const index = actionId
+    ? fullEvent.actions.findIndex((a) => a.id === actionId)
+    : -1
+
+  if (index === -1) {
+    return fullEvent
+  }
+
+  const sliceEnd = includeCurrent ? index + 1 : index
+  return {
+    ...fullEvent,
+    actions: fullEvent.actions.slice(0, sliceEnd)
+  }
 }
 
 /**
@@ -100,31 +119,15 @@ export function DeclarationComparisonTableComponent({
   }
 
   const index = fullEvent.actions.findIndex((a) => a.id === action?.id)
-  // When action is not found or provided, we compare the full event
-  // Needed when action is not provided as props e.g. - correction summary
-  const eventBeforeUpdate =
-    index === -1
-      ? fullEvent
-      : {
-          ...fullEvent,
-          actions: fullEvent.actions.slice(0, index)
-        }
 
   const declarationConfig = getDeclaration(eventConfig)
-  const reviewFormFields = getReviewFormFields(eventConfig)
+  const reviewFormFields = getAllAnnotationFields(eventConfig)
 
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
-  const currentEvent =
-    // When action is not found or provided, we compare the full event
-    // Needed when action is not provided as props e.g. - correction summary
-    index === -1
-      ? fullEvent
-      : {
-          ...fullEvent,
-          actions: fullEvent.actions.slice(0, index + 1)
-        }
+  const eventBeforeUpdate = sliceEventAt(fullEvent, action?.id, false)
+  const currentEvent = sliceEventAt(fullEvent, action?.id, true)
 
   const currentState = getCurrentEventState(
     // @TODO: Decide whether to make getCurrentEventState accept EventHistoryDocument,
@@ -147,7 +150,7 @@ export function DeclarationComparisonTableComponent({
   ).declaration
 
   // Collect all changed review fields once
-  const changedReviewFields = reviewFormFields
+  const changedAnnotationFields = reviewFormFields
     .filter((f) => getAnnotationComparison(f, fullEvent, index).valueHasChanged)
     .map((f) => {
       const { currentAnnotations, previousAnnotations } =
@@ -257,7 +260,7 @@ export function DeclarationComparisonTableComponent({
           />
         )
       })}
-      {changedReviewFields.length > 0 && (
+      {changedAnnotationFields.length > 0 && (
         <Table
           key={`${id}-review-fields`}
           columns={[
@@ -293,7 +296,7 @@ export function DeclarationComparisonTableComponent({
               key: 'latest'
             }
           ]}
-          content={changedReviewFields}
+          content={changedAnnotationFields}
           hideTableBottomBorder={true}
           id={`${id}-review-fields`}
         />
