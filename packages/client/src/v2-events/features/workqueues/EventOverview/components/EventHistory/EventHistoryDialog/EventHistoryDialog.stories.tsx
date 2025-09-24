@@ -47,7 +47,8 @@ const actionBase = {
   status: 'Accepted',
   transactionId: '123',
   declaration: {},
-  requestId: '123'
+  requestId: '123',
+  annotation: {}
 } as const
 
 const prng = createPrng(1231232)
@@ -79,6 +80,9 @@ const updateAction = {
       firstname: 'Updated',
       surname: 'Name'
     }
+  },
+  annotation: {
+    'review.comment': 'My comment'
   }
 }
 
