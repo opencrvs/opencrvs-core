@@ -13,7 +13,16 @@ import { FullDocumentPath } from '../documents'
 import { z } from 'zod'
 import { UUID } from '../uuid'
 import { TokenUserType } from 'src/authentication'
-import { SystemRole } from 'src/client'
+
+export const REINDEX_USER_ID = '__ANONYMOUS_REINDEX_USER__'
+
+export type IUserName = {
+  use: string
+  family: string
+  given: string[]
+}
+
+export type SystemRole = z.infer<typeof SystemRole>
 
 export const User = z.object({
   id: z.string(),
@@ -34,6 +43,15 @@ export const User = z.object({
   type: TokenUserType.extract(['user'])
 })
 export type User = z.infer<typeof User>
+
+export const SystemRole = z.enum([
+  'HEALTH',
+  'NATIONAL_ID',
+  'RECORD_SEARCH',
+  'REINDEX',
+  'WEBHOOK',
+  'IMPORT_EXPORT'
+])
 
 export const System = z.object({
   id: z.string(),
