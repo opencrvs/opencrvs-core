@@ -26,7 +26,7 @@ function init() {
       // Docker swarm provides this environment variale
       // FIXME: containerId is not used by APM in k8s
       containerId: process.env.HOSTNAME,
-      hostname: process.env.NODE_HOSTNAME || require('os').hostname(),
+      hostname: process.env.NODE_NAME || require('os').hostname(),
       environment: process.env.APN_ENVIRONMENT || process.env.NODE_ENV || 'development',
     })
   }
