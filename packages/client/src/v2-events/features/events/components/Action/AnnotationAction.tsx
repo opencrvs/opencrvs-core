@@ -54,6 +54,7 @@ function AnnotationActionComponent({
   const activeRemoteDraft = remoteDraft
     ? findActiveDraftForEvent(event, remoteDraft)
     : undefined
+
   const localDraft = getLocalDraftOrDefault(
     activeRemoteDraft ||
       createEmptyDraft(params.eventId, createTemporaryId(), actionType)

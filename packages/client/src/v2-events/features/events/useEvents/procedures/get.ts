@@ -141,19 +141,12 @@ export function useGetEvent() {
       // Skip the queryFn defined by tRPC and use our own default defined above
       const { queryFn, ...queryOptions } = trpc.event.get.queryOptions(id)
 
-      const downloaded = queryClient.getQueryData(trpc.event.get.queryKey(id))
       const downloadedForViewing = queryClient.getQueryData([
         ['view-event', id]
       ])
 
       if (downloadedForViewing) {
         return viewEvent(id)
-      }
-
-      if (!downloaded) {
-        throw new Error(
-          `Event with id ${id} not found in cache. Please ensure the event is first assigned and downloaded to the browser.`
-        )
       }
 
       return useSuspenseQuery({
