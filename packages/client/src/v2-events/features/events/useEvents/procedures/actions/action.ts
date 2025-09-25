@@ -124,7 +124,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   onError: errorToastOnConflict,
   onMutate: updateEventOptimistically(
     ActionType.DECLARE,
-    ActionStatus.Requested,
+    ActionStatus.Accepted,
     true
   ),
   meta: { actionType: ActionType.DECLARE }
