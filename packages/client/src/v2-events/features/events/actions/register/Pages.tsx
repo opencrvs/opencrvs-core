@@ -43,14 +43,12 @@ export function Pages() {
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const navigate = useNavigate()
   const drafts = useDrafts()
-  const userContext = useContext()
 
   const { modal, closeActionView } = useEventFormNavigation()
   const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const eventIndex = getCurrentEventState(event, configuration, userContext)
   const declarationPages = getDeclarationPages(configuration)
 
   const currentPageId =

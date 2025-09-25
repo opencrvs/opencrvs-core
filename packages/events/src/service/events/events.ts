@@ -44,7 +44,6 @@ import {
 import { indexEvent } from '@events/service/indexing/indexing'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import * as eventsRepo from '@events/storage/postgres/events/events'
-import { getContext } from '@events/router/middleware/validate/utils'
 
 export class EventNotFoundError extends TRPCError {
   constructor(id: string) {
@@ -117,9 +116,7 @@ export async function throwConflictIfActionNotAllowed(
     token
   })
 
-  const context = await getContext(token)
-
-  const eventIndex = getCurrentEventState(event, eventConfig, context)
+  const eventIndex = getCurrentEventState(event, eventConfig)
 
   const allowedActions: DisplayableAction[] =
     getAvailableActionsForEvent(eventIndex)

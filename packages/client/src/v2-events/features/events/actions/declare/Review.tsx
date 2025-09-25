@@ -67,7 +67,7 @@ export function Review() {
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  const currentEventState = getCurrentEventState(event, config, userContext)
+  const currentEventState = getCurrentEventState(event, config)
 
   const formConfig = getDeclaration(config)
   const reviewConfig = getActionReview(config, ActionType.DECLARE)

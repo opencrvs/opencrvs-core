@@ -399,7 +399,7 @@ test('deduplication check is performed before validation when configured', async
   )
 
   expect(
-    getCurrentEventState(stillDeclaredEvent, tennisClubMembershipEvent, {})
+    getCurrentEventState(stillDeclaredEvent, tennisClubMembershipEvent)
   ).toMatchObject({
     status: 'DECLARED',
     potentialDuplicates: [
@@ -444,7 +444,7 @@ test('deduplication check is skipped if the event has been marked as not duplica
   )
 
   expect(
-    getCurrentEventState(declaredDuplicateEvent, tennisClubMembershipEvent, {})
+    getCurrentEventState(declaredDuplicateEvent, tennisClubMembershipEvent)
       .potentialDuplicates
   ).toEqual([{ id: existingEvent.id, trackingId: existingEvent.trackingId }])
 
@@ -466,7 +466,7 @@ test('deduplication check is skipped if the event has been marked as not duplica
   )
 
   expect(
-    getCurrentEventState(validatedEvent, tennisClubMembershipEvent, {})
+    getCurrentEventState(validatedEvent, tennisClubMembershipEvent)
   ).toMatchObject({
     status: 'VALIDATED',
     potentialDuplicates: []
@@ -509,7 +509,7 @@ test('deduplication check is not skipped if the event has been marked as not dup
   )
 
   expect(
-    getCurrentEventState(declaredDuplicateEvent, tennisClubMembershipEvent, {})
+    getCurrentEventState(declaredDuplicateEvent, tennisClubMembershipEvent)
       .potentialDuplicates
   ).toEqual([{ id: existingEvent.id, trackingId: existingEvent.trackingId }])
 
@@ -538,7 +538,7 @@ test('deduplication check is not skipped if the event has been marked as not dup
   )
 
   expect(
-    getCurrentEventState(stillDeclaredEvent, tennisClubMembershipEvent, {})
+    getCurrentEventState(stillDeclaredEvent, tennisClubMembershipEvent)
   ).toMatchObject({
     status: 'DECLARED',
     potentialDuplicates: [
@@ -569,13 +569,11 @@ test('Event status changes after validation action is accepted', async () => {
 
   const statusAfterDeclareAction = getCurrentEventState(
     eventAfterDeclareAction,
-    tennisClubMembershipEvent,
-    {}
+    tennisClubMembershipEvent
   ).status
   const statusAfterValidateAction = getCurrentEventState(
     eventAfterValidatedAction,
-    tennisClubMembershipEvent,
-    {}
+    tennisClubMembershipEvent
   ).status
 
   expect(eventAfterValidatedAction.actions).toStrictEqual([
@@ -628,13 +626,11 @@ test('Event status does not change if validation action is rejected', async () =
 
   const statusAfterDeclareAction = getCurrentEventState(
     eventAfterDeclareAction,
-    tennisClubMembershipEvent,
-    {}
+    tennisClubMembershipEvent
   ).status
   const statusAfterValidateAction = getCurrentEventState(
     eventAfterValidatedAction,
-    tennisClubMembershipEvent,
-    {}
+    tennisClubMembershipEvent
   ).status
 
   expect(eventAfterValidatedAction.actions).toStrictEqual([

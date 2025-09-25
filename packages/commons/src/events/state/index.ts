@@ -27,8 +27,7 @@ import {
   aggregateActionDeclarations,
   deepMerge,
   getAcceptedActions,
-  getCompleteActionAnnotation,
-  omitHiddenPaginatedFields
+  getCompleteActionAnnotation
 } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
@@ -187,8 +186,7 @@ export function extractPotentialDuplicatesFromActions(
  */
 export function getCurrentEventState(
   event: EventDocument,
-  config: EventConfig,
-  context: UserContext
+  config: EventConfig
 ): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
@@ -208,7 +206,7 @@ export function getCurrentEventState(
   // Includes only accepted actions metadata. Sometimes (e.g. on updatedAt) we want to show the accepted timestamp rather than the request timestamp.
   const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
 
-  const declaration = aggregateActionDeclarations(event, config, context)
+  const declaration = aggregateActionDeclarations(event)
 
   return deepDropNulls({
     id: event.id,
@@ -225,11 +223,7 @@ export function getCurrentEventState(
     assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
     updatedBy: requestActionMetadata.createdBy,
     updatedAtLocation: requestActionMetadata.createdAtLocation,
-    declaration: omitHiddenPaginatedFields(
-      config.declaration,
-      declaration,
-      context
-    ),
+    declaration: declaration,
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),
@@ -287,7 +281,7 @@ export function dangerouslyGetCurrentEventStateWithDrafts({
     actions: actionsWithDraft
   }
 
-  return getCurrentEventState(eventWithDraft, configuration, context)
+  return getCurrentEventState(eventWithDraft, configuration)
 }
 
 export function applyDeclarationToEventIndex(

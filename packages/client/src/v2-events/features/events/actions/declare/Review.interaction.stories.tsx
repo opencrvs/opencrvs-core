@@ -19,10 +19,7 @@ import {
   tennisClubMembershipEvent,
   generateEventDocument,
   generateEventDraftDocument,
-  getCurrentEventState,
-  FullDocumentPath,
-  UUID,
-  testContext
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -67,8 +64,7 @@ const meta: Meta<typeof ReviewIndex> = {
     useEventFormData.setState({
       formValues: getCurrentEventState(
         declaredEventDocument,
-        tennisClubMembershipEvent,
-        testContext
+        tennisClubMembershipEvent
       ).declaration
     })
   }
@@ -128,8 +124,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
               results: [
                 getCurrentEventState(
                   declarationTrpcMsw.eventDocument,
-                  tennisClubMembershipEvent,
-                  testContext
+                  tennisClubMembershipEvent
                 )
               ]
             }
@@ -152,8 +147,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
               results: [
                 getCurrentEventState(
                   declarationTrpcMsw.eventDocument,
-                  tennisClubMembershipEvent,
-                  testContext
+                  tennisClubMembershipEvent
                 )
               ],
               total: 1
@@ -215,8 +209,7 @@ const msw = {
           results: [
             getCurrentEventState(
               declarationTrpcMsw.eventDocument,
-              tennisClubMembershipEvent,
-              testContext
+              tennisClubMembershipEvent
             )
           ],
           total: 1
@@ -411,8 +404,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
               results: [
                 getCurrentEventState(
                   declarationTrpcMsw.eventDocument,
-                  tennisClubMembershipEvent,
-                  testContext
+                  tennisClubMembershipEvent
                 )
               ],
               total: 1

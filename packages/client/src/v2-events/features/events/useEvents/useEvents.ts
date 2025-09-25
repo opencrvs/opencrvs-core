@@ -21,15 +21,12 @@ import {
   getOrThrow,
   applyDraftToEventIndex,
   EventConfig,
-  Draft,
-  UserContext
+  Draft
 } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { useContext } from '@client/v2-events/hooks/useContext'
 import { useDrafts } from '../../drafts/useDrafts'
 import { useEventConfigurations } from '../useEventConfiguration'
-import { prefetchPotentialDuplicates } from '../actions/dedup/getDuplicates'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
@@ -65,10 +62,9 @@ function getEventWithDraftOrThrow(
 function buildDraftedEventResult(
   event: EventDocument,
   draft: Draft,
-  configuration: EventConfig,
-  context: UserContext
+  configuration: EventConfig
 ) {
-  const currentEventState = getCurrentEventState(event, configuration, context)
+  const currentEventState = getCurrentEventState(event, configuration)
   return {
     results: [applyDraftToEventIndex(currentEventState, draft, configuration)],
     total: 1
@@ -153,12 +149,7 @@ export function useEvents() {
               maybeDraft
             )
 
-            return buildDraftedEventResult(
-              event,
-              draft,
-              configuration,
-              userContext
-            )
+            return buildDraftedEventResult(event, draft, configuration)
           },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
@@ -196,12 +187,7 @@ export function useEvents() {
               maybeDraft
             )
 
-            return buildDraftedEventResult(
-              event,
-              draft,
-              configuration,
-              userContext
-            )
+            return buildDraftedEventResult(event, draft, configuration)
           },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)

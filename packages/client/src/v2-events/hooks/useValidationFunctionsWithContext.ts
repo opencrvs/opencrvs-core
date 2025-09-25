@@ -49,7 +49,7 @@ export function useValidationFunctionsWithContext() {
       form: ActionUpdate | EventState
     ) => isFieldDisplayedOnReview(field, form, context),
     getCurrentEventState: (event: EventDocument, config: EventConfig) =>
-      getCurrentEventState(event, config, context),
+      getCurrentEventState(event, config),
     omitHiddenFields: <T extends EventState | ActionUpdate>(
       fields: FieldConfig[],
       values: T

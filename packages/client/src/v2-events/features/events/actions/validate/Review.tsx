@@ -97,7 +97,7 @@ export function Review() {
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
-  const currentEventState = getCurrentEventState(event, config, userContext)
+  const currentEventState = getCurrentEventState(event, config)
   const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 

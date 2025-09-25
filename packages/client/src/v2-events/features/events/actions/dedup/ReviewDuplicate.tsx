@@ -31,7 +31,6 @@ import { Review as ReviewComponent } from '@client/v2-events/features/events/com
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { FormHeader } from '@client/v2-events/layouts/form/FormHeader'
-import { useContext } from '@client/v2-events/hooks/useContext'
 import { findLocalEventDocument } from '../../useEvents/api'
 import { DuplicateForm } from './DuplicateForm'
 import { DuplicateComparison } from './DuplicateComparison'
@@ -129,7 +128,6 @@ function ReviewDuplicate() {
 
   const intl = useIntl()
   const navigate = useNavigate()
-  const userContext = useContext()
   const events = useEvents()
   const event = events.getEvent.findFromCache(eventId).data
 
@@ -153,7 +151,7 @@ function ReviewDuplicate() {
     event.type
   )
 
-  const eventState = getCurrentEventState(event, configuration, userContext)
+  const eventState = getCurrentEventState(event, configuration)
 
   const potentialDuplicates = eventState.potentialDuplicates.reduce<
     Record<string, EventIndex>
@@ -164,11 +162,7 @@ function ReviewDuplicate() {
         `Event with id ${id} and trackingId ${trackingId} not found in cache.`
       )
     }
-    acc[trackingId] = getCurrentEventState(
-      localEvent,
-      configuration,
-      userContext
-    )
+    acc[trackingId] = getCurrentEventState(localEvent, configuration)
     return acc
   }, {})
 

@@ -10,6 +10,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { http, HttpResponse } from 'msw'
+import { TRPCError } from '@trpc/server'
 import {
   ActionStatus,
   ActionType,
@@ -368,12 +369,41 @@ describe('Action updates', () => {
     })
 
     const event = await client.event.get(originalEvent.id)
-    const eventState = getCurrentEventState(
-      event,
-      tennisClubMembershipEvent,
-      {}
-    )
+    const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(eventState.declaration).toMatchSnapshot()
+  })
+
+  it('declaration including hidden fields throws error', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+
+    const originalEvent = await client.event.create(generator.event.create())
+
+    const payload = generator.event.actions.declare(originalEvent.id)
+    const declarationWithHiddenField = {
+      ...payload.declaration,
+      'applicant.dobUnknown': true,
+      'applicant.age': 19,
+      'applicant.dob': '2000-01-01' // dob can't be known and unknown at the same time.
+    }
+
+    await expect(
+      client.event.actions.declare.request({
+        ...payload,
+        declaration: declarationWithHiddenField
+      })
+    ).rejects.toMatchObject(
+      new TRPCError({
+        code: 'BAD_REQUEST',
+        message: JSON.stringify([
+          {
+            message: 'Hidden or disabled field should not receive a value',
+            id: 'applicant.dob',
+            value: '2000-01-01'
+          }
+        ])
+      })
+    )
   })
 
   it('File references are removed with explicit null', async () => {

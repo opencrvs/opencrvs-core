@@ -129,7 +129,7 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
       `Event configuration for type ${updatedEvent.type} not found`
     )
   }
-  const updatedEventIndex = getCurrentEventState(updatedEvent, config, {})
+  const updatedEventIndex = getCurrentEventState(updatedEvent, config)
   // Update the local event index with the updated event
   setEventSearchQuery(updatedEventIndex)
 

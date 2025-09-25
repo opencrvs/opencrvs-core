@@ -377,7 +377,7 @@ export function createStoriesFromScenarios(
                 tRPCMsw.event.search.query(() => ({
                   total: 1,
                   results: [
-                    getCurrentEventState(event, tennisClubMembershipEvent, {})
+                    getCurrentEventState(event, tennisClubMembershipEvent)
                   ]
                 })),
                 tRPCMsw.event.get.query(() => {
@@ -457,9 +457,7 @@ export function createdByOtherUserScenario({
           event: [
             tRPCMsw.event.search.query(() => ({
               total: 1,
-              results: [
-                getCurrentEventState(event, tennisClubMembershipEvent, {})
-              ]
+              results: [getCurrentEventState(event, tennisClubMembershipEvent)]
             })),
             tRPCMsw.event.get.query(() => {
               return tennisClubMembershipEventDocument

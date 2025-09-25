@@ -26,7 +26,6 @@ import { TrpcContext } from '@events/context'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 import { processAction, getEventById } from '@events/service/events/events'
-import { getContext } from '@events/router/middleware/validate/utils'
 
 function requiresDedupCheck(
   input: ActionInputWithType
@@ -66,7 +65,6 @@ export const detectDuplicate: MiddlewareFunction<
   const { user, token } = ctx
   const configs = await getInMemoryEventConfigurations(token)
   const storedEvent = await getEventById(input.eventId)
-  const context = await getContext(token)
   const config = configs.find((c) => c.id === storedEvent.type)
 
   if (!config) {
@@ -96,7 +94,7 @@ export const detectDuplicate: MiddlewareFunction<
     createdBySignature: user.signature
   }
 
-  const existingEventState = getCurrentEventState(storedEvent, config, context)
+  const existingEventState = getCurrentEventState(storedEvent, config)
 
   const futureEventState = getCurrentEventState(
     {
@@ -112,8 +110,7 @@ export const detectDuplicate: MiddlewareFunction<
         }
       ]
     },
-    config,
-    context
+    config
   )
 
   const isMarkedAsNotDuplicate = storedEvent.actions.reduce((acc, action) => {

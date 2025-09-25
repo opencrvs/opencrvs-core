@@ -26,7 +26,6 @@ import {
 } from '@events/router/event/actions'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
-import { getContext } from '@events/router/middleware/validate/utils'
 
 export function declareActionProcedures() {
   const requireScopesMiddleware = requiresAnyOfScopes(
@@ -52,7 +51,6 @@ export function declareActionProcedures() {
 
         const configs = await getInMemoryEventConfigurations(token)
         const event = await getEventById(input.eventId)
-        const context = await getContext(token)
 
         const config = configs.find((c) => c.id === event.type)
 
@@ -78,11 +76,7 @@ export function declareActionProcedures() {
         if (!dedupConfig) {
           return declaredEvent
         }
-        const declaredEventState = getCurrentEventState(
-          declaredEvent,
-          config,
-          context
-        )
+        const declaredEventState = getCurrentEventState(declaredEvent, config)
         const duplicates = await searchForDuplicates(
           declaredEventState,
           dedupConfig,

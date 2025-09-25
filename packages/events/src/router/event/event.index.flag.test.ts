@@ -620,7 +620,7 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
     const [duplicateEvent] = await createDuplicateEvent()
 
     expect(
-      getCurrentEventState(duplicateEvent, tennisClubMembershipEvent, {}).flags
+      getCurrentEventState(duplicateEvent, tennisClubMembershipEvent).flags
     ).toContain(InherentFlags.POTENTIAL_DUPLICATE)
   })
 
@@ -631,7 +631,7 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
       generator.event.actions.duplicate.markNotDuplicate(duplicateEvent.id)
     )
     expect(
-      getCurrentEventState(event, tennisClubMembershipEvent, {}).flags
+      getCurrentEventState(event, tennisClubMembershipEvent).flags
     ).not.toContain(InherentFlags.POTENTIAL_DUPLICATE)
   })
 
@@ -642,7 +642,7 @@ suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
       generator.event.actions.duplicate.markAsDuplicate(duplicateEvent.id)
     )
     expect(
-      getCurrentEventState(event, tennisClubMembershipEvent, {}).flags
+      getCurrentEventState(event, tennisClubMembershipEvent).flags
     ).not.toContain(InherentFlags.POTENTIAL_DUPLICATE)
   })
 })

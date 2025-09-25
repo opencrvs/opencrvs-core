@@ -18,9 +18,7 @@ import {
   findActiveDraftForEvent,
   dangerouslyGetCurrentEventStateWithDrafts,
   getActionAnnotation,
-  DeclarationUpdateActionType,
   ActionType,
-  Action,
   deepMerge,
   getUUID,
   deepDropNulls,
@@ -57,15 +55,14 @@ function useActionGuard(
   event: EventDocument,
   configuration: EventConfig
 ) {
-  const userContext = useContext()
-  const eventState = getCurrentEventState(event, configuration, userContext)
+  const eventState = getCurrentEventState(event, configuration)
   const availableActions = getAvailableActionsForEvent(eventState)
   const { isActionAllowed } = useUserAllowedActions(event.type)
 
   // If the action is not available for the event, redirect to the overview page
   if (!availableActions.includes(actionType)) {
     throw new Error(
-      `Action ${actionType} not available for the event ${event.id} with status ${getCurrentEventState(event, configuration, userContext).status} ${eventState.flags.length > 0 ? `(flags: ${eventState.flags.join(', ')})` : ''}`
+      `Action ${actionType} not available for the event ${event.id} with status ${eventState.status} ${eventState.flags.length > 0 ? `(flags: ${eventState.flags.join(', ')})` : ''}`
     )
   }
 

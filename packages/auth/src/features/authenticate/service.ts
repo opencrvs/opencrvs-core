@@ -22,7 +22,7 @@ import {
   sendVerificationCode,
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
-import { logger, UUID } from '@opencrvs/commons'
+import { logger, UUID, IUserName } from '@opencrvs/commons'
 import * as F from 'fp-ts'
 import { Scope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
@@ -39,11 +39,6 @@ const sign = promisify<
   string
 >(jwt.sign)
 
-export interface IUserName {
-  use: string
-  family: string
-  given: string[]
-}
 export interface IAuthentication {
   name: IUserName[]
   mobile?: string

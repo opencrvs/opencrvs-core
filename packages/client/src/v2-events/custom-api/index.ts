@@ -46,10 +46,9 @@ export interface ArchiveOnDuplicateParams extends CustomMutationParams {
 
 function hasPotentialDuplicates(
   event: EventDocument,
-  eventConfiguration: EventConfig,
-  context: UserContext
+  eventConfiguration: EventConfig
 ) {
-  const eventIndex = getCurrentEventState(event, eventConfiguration, context)
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
   return eventIndex.potentialDuplicates.length > 0
 }
 
@@ -64,7 +63,6 @@ export async function registerOnDeclare({
   eventConfiguration,
   declaration,
   transactionId,
-  context,
   annotation
 }: CustomMutationParams) {
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
@@ -75,7 +73,7 @@ export async function registerOnDeclare({
     keepAssignment: true
   })
 
-  if (hasPotentialDuplicates(declaredEvent, eventConfiguration, context)) {
+  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
     return declaredEvent
   }
 
@@ -90,7 +88,7 @@ export async function registerOnDeclare({
     }
   )
 
-  if (hasPotentialDuplicates(validatedEvent, eventConfiguration, context)) {
+  if (hasPotentialDuplicates(validatedEvent, eventConfiguration)) {
     return validatedEvent
   }
 
@@ -117,7 +115,6 @@ export async function validateOnDeclare({
   transactionId,
   eventConfiguration,
   declaration,
-  context,
   annotation
 }: CustomMutationParams) {
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
@@ -128,7 +125,7 @@ export async function validateOnDeclare({
     keepAssignment: true
   })
 
-  if (hasPotentialDuplicates(declaredEvent, eventConfiguration, context)) {
+  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
     return declaredEvent
   }
 
@@ -168,9 +165,7 @@ export async function registerOnValidate({
       keepAssignment: true
     })
 
-  if (
-    hasPotentialDuplicates(maybeDuplicateEvent, eventConfiguration, context)
-  ) {
+  if (hasPotentialDuplicates(maybeDuplicateEvent, eventConfiguration)) {
     return maybeDuplicateEvent
   }
 
@@ -239,8 +234,7 @@ export async function makeCorrectionOnRequest({
 
   const originalDeclaration = getCurrentEventState(
     event,
-    eventConfiguration,
-    context
+    eventConfiguration
   ).declaration
 
   const annotation =

@@ -43,8 +43,7 @@ const meta: Meta<typeof ReviewIndex> = {
     useEventFormData.setState({
       formValues: getCurrentEventState(
         declareEventDocument,
-        tennisClubMembershipEvent,
-        {}
+        tennisClubMembershipEvent
       ).declaration
     })
   }
@@ -148,8 +147,7 @@ export const Outbox: Story = {
       const searchResult = await canvas.findByTestId('search-result')
       const { firstname, surname } = getCurrentEventState(
         declareEventDocument,
-        tennisClubMembershipEvent,
-        {}
+        tennisClubMembershipEvent
       ).declaration['applicant.name'] as {
         firstname: string
         surname: string
