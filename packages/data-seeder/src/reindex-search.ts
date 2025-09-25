@@ -45,6 +45,7 @@ const triggerReindex = async () => {
 
 let reindexingAttempts = 0
 async function main() {
+  // eslint-disable-next-line no-console
   console.info(
     `Reindexing search...${reindexingAttempts === 0 ? '' : ` (attempt ${reindexingAttempts})`}`
   )
@@ -53,6 +54,7 @@ async function main() {
   } catch (error) {
     reindexingAttempts++
     if (reindexingAttempts > 30) {
+      // eslint-disable-next-line no-console
       console.error(
         `Failed to reindex search after ${reindexingAttempts} attempts. Error: ${error}`
       )
@@ -61,7 +63,7 @@ async function main() {
     setTimeout(main, 5000)
     return
   }
-
+  // eslint-disable-next-line no-console
   console.info('...done reindexing')
 }
 
