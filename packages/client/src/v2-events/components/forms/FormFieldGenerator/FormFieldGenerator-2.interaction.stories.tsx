@@ -529,6 +529,8 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
     const canvas = within(canvasElement)
 
     await step('All form fields should be enable', async () => {
+      await new Promise((resolve) => setTimeout(resolve, 5000)) // wait 5s for suspense to resolve
+
       // Find all kind of input fields and expect them to be disabled
       const formFields = [
         ...(await canvas.findAllByRole('textbox')),
@@ -591,6 +593,8 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
     const canvas = within(canvasElement)
 
     await step('All form fields should be disabled', async () => {
+      await new Promise((resolve) => setTimeout(resolve, 5000)) // wait 5s for suspense to resolve
+
       const formFields = [
         ...(await canvas.findAllByRole('textbox')),
         ...(await canvas.findAllByRole('spinbutton')),
