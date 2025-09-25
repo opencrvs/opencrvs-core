@@ -245,6 +245,7 @@ export function testDataGenerator(rngSeed?: number) {
         email: 'kalushab.walya17@gmail.com',
         fullHonorificName: null,
         role: {
+          id: 'LOCAL_SYSTEM_ADMIN',
           label: {
             id: 'userRole.localSystemAdmin',
             defaultMessage: 'Local System Admin',
