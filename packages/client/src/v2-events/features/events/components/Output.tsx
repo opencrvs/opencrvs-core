@@ -45,7 +45,8 @@ import {
   FileFieldWithOptionValue,
   EventState,
   FormConfig,
-  FieldType
+  FieldType,
+  isVerificationStatusType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -63,7 +64,8 @@ import {
   Number,
   Text,
   TimeField,
-  getRegisteredFieldByFieldConfig
+  getRegisteredFieldByFieldConfig,
+  VerificationStatus
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
@@ -185,6 +187,16 @@ export function ValueOutput(
 
   if (isFacilityFieldType(field)) {
     return <LocationSearch.Output value={field.value} />
+  }
+
+  if (isVerificationStatusType(field)) {
+    return (
+      <VerificationStatus.Output
+        configuration={field.config.configuration}
+        id={field.config.id}
+        value={field.value ?? 'pending'}
+      />
+    )
   }
 }
 

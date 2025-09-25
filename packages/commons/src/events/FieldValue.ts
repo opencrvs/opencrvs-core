@@ -83,7 +83,8 @@ export type ButtonFieldValue = z.infer<typeof ButtonFieldValue>
 export const VerificationStatusValue = z.enum([
   'verified',
   'authenticated',
-  'failed'
+  'failed',
+  'pending'
 ])
 export type VerificationStatusValue = z.infer<typeof VerificationStatusValue>
 

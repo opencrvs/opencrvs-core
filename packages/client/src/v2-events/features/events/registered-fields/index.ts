@@ -31,7 +31,7 @@ import { SelectDateRangeField } from './SelectDateRangeField'
 import { Text } from './Text'
 import { TimeField } from './TimeField'
 import { LinkButton } from './LinkButton'
-import { Status } from './Status'
+import { VerificationStatus } from './VerificationStatus'
 
 export * from './Address'
 export * from './AdministrativeArea'
@@ -53,7 +53,7 @@ export * from './SelectDateRangeField'
 export * from './Text'
 export * from './TimeField'
 export * from './LinkButton'
-export * from './Status'
+export * from './VerificationStatus'
 
 export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
   type: T
@@ -104,7 +104,7 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
     case FieldType.LINK_BUTTON:
       return LinkButton
     case FieldType.VERIFICATION_STATUS:
-      return Status
+      return VerificationStatus
     default:
       return undefined
   }

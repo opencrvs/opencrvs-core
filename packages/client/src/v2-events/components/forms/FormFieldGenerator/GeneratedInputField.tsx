@@ -79,7 +79,7 @@ import {
   Button,
   Http,
   LinkButton,
-  Status
+  VerificationStatus
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -639,8 +639,9 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isVerificationStatusType(field)) {
+      console.log(field)
       return (
-        <Status.Input
+        <VerificationStatus.Input
           configuration={field.config.configuration}
           id={field.config.id}
           value={field.value}

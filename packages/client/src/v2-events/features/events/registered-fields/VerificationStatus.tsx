@@ -17,11 +17,12 @@ import {
   Icon,
   Pill,
   ResponsiveModal,
+  Stack,
   Text
 } from '@opencrvs/components'
 import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
 import {
-  VerificationStatus,
+  VerificationStatus as VerificationStatusField,
   VerificationStatusValue
 } from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -50,14 +51,16 @@ const IconWrapper = styled.div<{
 const PILL_FOR_STATUS = {
   verified: 'default',
   authenticated: 'active',
-  failed: 'inactive'
+  failed: 'inactive',
+  pending: 'pending'
 } as const
 
 const ICON_FOR_STATUS = {
   verified: 'CircleWavyCheck',
   authenticated: 'Fingerprint',
-  failed: 'X'
-} satisfies Record<VerificationStatusValue, keyof typeof SupportedIcons>
+  failed: 'X',
+  pending: 'CircleWavyQuestion'
+} as const satisfies Record<string, keyof typeof SupportedIcons>
 
 function Input({
   id,
@@ -66,7 +69,7 @@ function Input({
   onReset
 }: {
   id: string
-  configuration: VerificationStatus['configuration']
+  configuration: VerificationStatusField['configuration']
   value: VerificationStatusValue | undefined
   onReset: () => void
 }) {
@@ -121,7 +124,7 @@ function Input({
           label={
             <>
               <StyledIcon name={ICON_FOR_STATUS[value]} size="small" />
-              {intl.formatMessage(configuration.text)}
+              {intl.formatMessage(configuration.text, { value })}
             </>
           }
           pillTheme="dark"
@@ -143,7 +146,7 @@ function Input({
       </Banner.Header>
       <Banner.Body>
         <Text element="span" variant="reg16">
-          {intl.formatMessage(configuration.description)}
+          {intl.formatMessage(configuration.description, { value })}
         </Text>
       </Banner.Body>
       {/* TODO: Revoke button */}
@@ -159,28 +162,33 @@ function Output({
   value
 }: {
   id: string
-  configuration: VerificationStatus['configuration']
+  configuration: VerificationStatusField['configuration']
   value: VerificationStatusValue
 }) {
   const intl = useIntl()
 
   return (
-    <Pill
-      data-testid={`${id}__${value}`}
-      label={
-        <>
-          <StyledIcon name={ICON_FOR_STATUS[value]} size="small" />
-          {intl.formatMessage(configuration.text)}
-        </>
-      }
-      pillTheme="dark"
-      size="small"
-      type={PILL_FOR_STATUS[value]}
-    />
+    <Stack alignItems="flex-start" direction="column">
+      <Pill
+        data-testid={`${id}__${value}`}
+        label={
+          <>
+            <StyledIcon name={ICON_FOR_STATUS[value]} size="small" />
+            {intl.formatMessage(configuration.text, { value })}
+          </>
+        }
+        pillTheme="dark"
+        size="small"
+        type={PILL_FOR_STATUS[value]}
+      />
+      <Text color="grey600" element="p" variant="reg14">
+        {intl.formatMessage(configuration.description, { value })}
+      </Text>
+    </Stack>
   )
 }
 
-export const Status = {
+export const VerificationStatus = {
   Input,
   Output
 }
