@@ -43,6 +43,7 @@ import {
   EventDocument,
   tennisClubMembershipEvent,
   TestUserRole,
+  TokenUserType,
   UUID
 } from '@opencrvs/commons/client'
 import {
@@ -204,11 +205,11 @@ const preview: Preview = {
         )
 
         addUserToQueryData({
-          // @todo:
           id: generator.user.id.localSystemAdmin,
           name: [{ use: 'en', given: ['Alex'], family: 'Ngonga' }],
           role: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN,
-          primaryOfficeId
+          primaryOfficeId,
+          type: TokenUserType.enum.user
         })
       } else {
         window.localStorage.setItem(
