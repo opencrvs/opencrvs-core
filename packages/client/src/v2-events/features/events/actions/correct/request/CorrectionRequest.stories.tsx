@@ -14,7 +14,18 @@ import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
 import { expect, waitFor, within, userEvent } from '@storybook/test'
-import { ActionType, TestUserRole } from '@opencrvs/commons/client'
+import {
+  ActionStatus,
+  ActionType,
+  generateActionDocument,
+  generateEventDocument,
+  tennisClubMembershipEvent,
+  TestUserRole,
+  ActionDocument,
+  TokenUserType,
+  UUID,
+  generateUuid
+} from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -289,5 +300,134 @@ export const Summary: Story = {
       void expect(await canvas.findByText('Riku Rouvila')).toBeInTheDocument()
       void expect(await canvas.findByText('Max McLaren')).toBeInTheDocument()
     })
+  }
+}
+
+const event1 = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    ActionType.CREATE,
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER
+  ],
+  declarationOverrides: {
+    'applicant.dobUnknown': false,
+    'applicant.age': 20,
+    'applicant.dob': '2000-01-01'
+  }
+})
+
+export const SummaryWithPartialUpdates: Story = {
+  parameters: {
+    offline: {
+      drafts: [draft],
+      events: [event1]
+    },
+    reactRouter: {
+      router: {
+        path: '/',
+        element: <FormClear />,
+        children: [router]
+      },
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({
+        eventId: event1.id
+      })
+    }
+  }
+}
+
+const event2 = {
+  trackingId: generateUuid(),
+  type: tennisClubMembershipEvent.id,
+  id: generateUuid(),
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  actions: [
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE
+    }),
+    {
+      type: ActionType.DECLARE,
+      createdAt: new Date(Date.now() - 500).toISOString(),
+      createdBy: generateUuid(),
+      createdByUserType: TokenUserType.Enum.user,
+      createdByRole: TestUserRole.Enum.FIELD_AGENT,
+      id: generateUuid(),
+      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+      declaration: {
+        'applicant.name': {
+          firstname: 'Riku',
+          surname: 'Rouvila'
+        },
+        'applicant.dob': '2025-01-23',
+        'applicant.address': {
+          country: 'FAR',
+          addressType: 'DOMESTIC',
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '27160bbd-32d1-4625-812f-860226bfb92a',
+          urbanOrRural: 'URBAN',
+          town: 'Example Town',
+          residentialArea: 'Example Residential Area',
+          street: 'Example Street',
+          number: '55',
+          zipCode: '123456'
+        },
+        'recommender.name': {
+          firstname: 'Euan',
+          surname: 'Millar'
+        },
+        'recommender.id': '123456789'
+      },
+      annotation: {},
+      status: ActionStatus.Accepted,
+      transactionId: generateUuid()
+    } satisfies ActionDocument,
+    {
+      type: ActionType.VALIDATE,
+      createdAt: new Date(Date.now() - 500).toISOString(),
+      createdBy: generateUuid(),
+      createdByUserType: TokenUserType.Enum.user,
+      createdByRole: TestUserRole.Enum.FIELD_AGENT,
+      id: generateUuid(),
+      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+      declaration: {},
+      annotation: {},
+      status: ActionStatus.Accepted,
+      transactionId: generateUuid()
+    },
+    {
+      type: ActionType.REGISTER,
+      createdAt: new Date(Date.now() - 500).toISOString(),
+      createdBy: generateUuid(),
+      createdByUserType: TokenUserType.Enum.user,
+      createdByRole: TestUserRole.Enum.FIELD_AGENT,
+      id: generateUuid(),
+      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+      declaration: {},
+      annotation: {},
+      status: ActionStatus.Accepted,
+      transactionId: generateUuid()
+    }
+  ]
+}
+
+export const SummaryWithPartialUpdates2: Story = {
+  parameters: {
+    offline: {
+      drafts: [],
+      events: [event2]
+    },
+    reactRouter: {
+      router: {
+        path: '/',
+        element: <FormClear />,
+        children: [router]
+      },
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({
+        eventId: event2.id
+      })
+    }
   }
 }

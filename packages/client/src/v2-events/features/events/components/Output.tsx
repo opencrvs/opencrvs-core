@@ -235,6 +235,16 @@ export function isEmptyValue(field: FieldConfig, value: unknown) {
   return !Boolean(value)
 }
 
+// Function we use for checking whether a field value has changed.
+// For objects we need to ignore undefined values.
+function isEqual<T extends FieldValue>(a: T, b: T) {
+  if (typeof a === 'object' && typeof b === 'object') {
+    return _.isEqual(_.omitBy(a, _.isUndefined), _.omitBy(b, _.isUndefined))
+  }
+
+  return _.isEqual(a, b)
+}
+
 export function Output({
   field,
   value,
@@ -296,7 +306,7 @@ export function Output({
   const hasPreviousValue = previousValue !== undefined
 
   // Note, checking for previousValue !== value is not enough, as we have composite fields.
-  if (hasPreviousValue && !_.isEqual(previousValue, value)) {
+  if (hasPreviousValue && !isEqual(previousValue, value)) {
     let valueOutput = <ValueOutput config={field} value={value} />
 
     if (isEmptyValue(field, value)) {

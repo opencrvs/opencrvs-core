@@ -8,15 +8,26 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { isEqual, isNil } from 'lodash'
+import * as _ from 'lodash'
 import {
   FieldConfig,
   EventState,
   isFieldVisible,
   isMetaAction,
   EventDocument,
-  ActionType
+  ActionType,
+  FieldValue
 } from '@opencrvs/commons/client'
+
+// Function we use for checking whether a field value has changed.
+// For objects we need to ignore undefined values.
+function isEqual<T extends FieldValue>(a: T, b: T) {
+  if (typeof a === 'object' && typeof b === 'object') {
+    return _.isEqual(_.omitBy(a, _.isUndefined), _.omitBy(b, _.isUndefined))
+  }
+
+  return _.isEqual(a, b)
+}
 
 export function hasFieldChanged(
   f: FieldConfig,
@@ -30,7 +41,7 @@ export function hasFieldChanged(
 
   // Ensure that if previous value is 'undefined' and current value is 'null'
   // it doesn't get detected as a value change
-  const bothNil = isNil(prevValue) && isNil(currValue)
+  const bothNil = _.isNil(prevValue) && _.isNil(currValue)
   const valueHasChanged = !isEqual(prevValue, currValue) && !bothNil
 
   return isVisible && valueHasChanged
