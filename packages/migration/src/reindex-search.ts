@@ -61,7 +61,7 @@ async function main() {
     setTimeout(main, 5000)
   }
 
-  console.info(`...done reindexing}`)
+  console.info('...done reindexing')
 }
 
 main()
