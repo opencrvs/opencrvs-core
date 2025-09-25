@@ -27,7 +27,6 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 
-// eslint-disable-next-line react/no-unused-prop-types
 type Props = PropsWithChildren<{ actionType: Exclude<ActionType, 'DELETE'> }>
 
 /**
@@ -127,8 +126,10 @@ function AnnotationActionComponent({ children, actionType }: Props) {
   return children
 }
 
-export const AnnotationAction = (props: Props) => (
-  <NavigationStack>
-    {withSuspense(AnnotationActionComponent)(props)}
-  </NavigationStack>
-)
+export const AnnotationAction = withSuspense((props: Props) => {
+  return (
+    <NavigationStack>
+      <AnnotationActionComponent {...props} />
+    </NavigationStack>
+  )
+})

@@ -73,7 +73,6 @@ function useActionGuard(
   }
 }
 
-// eslint-disable-next-line react/no-unused-prop-types
 type Props = PropsWithChildren<{ actionType: AvailableActionTypes }>
 
 /**
@@ -262,8 +261,10 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   return children
 }
 
-export const DeclarationAction = (props: Props) => (
-  <NavigationStack>
-    {withSuspense(DeclarationActionComponent)(props)}
-  </NavigationStack>
-)
+export const DeclarationAction = withSuspense((props: Props) => {
+  return (
+    <NavigationStack>
+      <DeclarationActionComponent {...props} />
+    </NavigationStack>
+  )
+})
