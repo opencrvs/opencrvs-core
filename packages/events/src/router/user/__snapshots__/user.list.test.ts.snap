@@ -1,5 +1,106 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Returns both normal users and system users 1`] = `
+[
+  {
+    "avatar": undefined,
+    "fullHonorificName": undefined,
+    "id": "[sanitized]",
+    "name": [
+      {
+        "family": "Doe",
+        "given": [
+          "John",
+        ],
+        "use": "en",
+      },
+    ],
+    "primaryOfficeId": "27160bbd-32d1-4625-812f-860226bfb92a",
+    "role": "REGISTRATION_AGENT",
+    "signature": undefined,
+    "type": "user",
+  },
+  {
+    "avatar": undefined,
+    "fullHonorificName": undefined,
+    "id": "[sanitized]",
+    "name": [
+      {
+        "family": "Doe",
+        "given": [
+          "John",
+        ],
+        "use": "en",
+      },
+    ],
+    "primaryOfficeId": "5fe99b4f-c5c4-4fa2-929f-f27ffad4a5c8",
+    "role": "REGISTRATION_AGENT",
+    "signature": undefined,
+    "type": "user",
+  },
+  {
+    "avatar": undefined,
+    "fullHonorificName": undefined,
+    "id": "[sanitized]",
+    "name": [
+      {
+        "family": "Doe",
+        "given": [
+          "John",
+        ],
+        "use": "en",
+      },
+    ],
+    "primaryOfficeId": "bf6ba32a-eef5-4669-9397-2f5989eb23b9",
+    "role": "REGISTRATION_AGENT",
+    "signature": undefined,
+    "type": "user",
+  },
+  {
+    "avatar": undefined,
+    "fullHonorificName": undefined,
+    "id": "[sanitized]",
+    "name": [
+      {
+        "family": "Doe",
+        "given": [
+          "John",
+        ],
+        "use": "en",
+      },
+    ],
+    "primaryOfficeId": "15125bb4-f42d-41c1-b8fb-0012def8aa07",
+    "role": "REGISTRATION_AGENT",
+    "signature": undefined,
+    "type": "user",
+  },
+  {
+    "avatar": undefined,
+    "fullHonorificName": undefined,
+    "id": "[sanitized]",
+    "name": [
+      {
+        "family": "Doe",
+        "given": [
+          "John",
+        ],
+        "use": "en",
+      },
+    ],
+    "primaryOfficeId": "f2a39423-0bc4-4dc4-9ef4-a3e4577305ad",
+    "role": "REGISTRATION_AGENT",
+    "signature": undefined,
+    "type": "user",
+  },
+  {
+    "id": "[sanitized]",
+    "name": "My health system integration",
+    "role": "HEALTH",
+    "type": "system",
+  },
+]
+`;
+
 exports[`Returns multiple users with honorifics 1`] = `
 [
   {
@@ -18,6 +119,7 @@ exports[`Returns multiple users with honorifics 1`] = `
     "primaryOfficeId": "27160bbd-32d1-4625-812f-860226bfb92a",
     "role": "REGISTRATION_AGENT",
     "signature": undefined,
+    "type": "user",
   },
   {
     "avatar": undefined,
@@ -35,6 +137,7 @@ exports[`Returns multiple users with honorifics 1`] = `
     "primaryOfficeId": "5fe99b4f-c5c4-4fa2-929f-f27ffad4a5c8",
     "role": "REGISTRATION_AGENT",
     "signature": undefined,
+    "type": "user",
   },
   {
     "avatar": undefined,
@@ -52,6 +155,7 @@ exports[`Returns multiple users with honorifics 1`] = `
     "primaryOfficeId": "bf6ba32a-eef5-4669-9397-2f5989eb23b9",
     "role": "REGISTRATION_AGENT",
     "signature": undefined,
+    "type": "user",
   },
   {
     "avatar": undefined,
@@ -69,6 +173,7 @@ exports[`Returns multiple users with honorifics 1`] = `
     "primaryOfficeId": "15125bb4-f42d-41c1-b8fb-0012def8aa07",
     "role": "REGISTRATION_AGENT",
     "signature": undefined,
+    "type": "user",
   },
   {
     "avatar": undefined,
@@ -86,6 +191,7 @@ exports[`Returns multiple users with honorifics 1`] = `
     "primaryOfficeId": "f2a39423-0bc4-4dc4-9ef4-a3e4577305ad",
     "role": "REGISTRATION_AGENT",
     "signature": undefined,
+    "type": "user",
   },
 ]
 `;
