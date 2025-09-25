@@ -13,9 +13,6 @@ import {
   EventState,
   FieldConfig,
   isFieldVisible,
-  getCurrentEventState,
-  EventConfig,
-  EventDocument,
   ActionConfig,
   omitHiddenAnnotationFields,
   FormConfig,
@@ -48,8 +45,6 @@ export function useValidationFunctionsWithContext() {
       field: FieldConfig,
       form: ActionUpdate | EventState
     ) => isFieldDisplayedOnReview(field, form, context),
-    getCurrentEventState: (event: EventDocument, config: EventConfig) =>
-      getCurrentEventState(event, config),
     omitHiddenFields: <T extends EventState | ActionUpdate>(
       fields: FieldConfig[],
       values: T

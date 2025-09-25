@@ -12,7 +12,7 @@ import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { buttonMessages } from '@client/i18n/messages'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
@@ -37,7 +37,6 @@ export function Onboarding() {
   )
 
   const events = useEvents()
-  const { getCurrentEventState } = useValidationFunctionsWithContext()
   const annotation = useActionAnnotation((state) => state.getAnnotation())
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 

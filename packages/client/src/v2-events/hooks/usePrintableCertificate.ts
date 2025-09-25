@@ -23,7 +23,8 @@ import {
   Location,
   PrintCertificateAction,
   UUID,
-  UserOrSystem
+  UserOrSystem,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
@@ -81,7 +82,7 @@ export const usePrintableCertificate = ({
   language?: LanguageConfig
 }) => {
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const { getCurrentEventState } = useValidationFunctionsWithContext()
+
   const { getEvent } = useEvents()
   const userDetails = useSelector(getUserDetails)
   const { config: appConfig } = useSelector(getOfflineData)

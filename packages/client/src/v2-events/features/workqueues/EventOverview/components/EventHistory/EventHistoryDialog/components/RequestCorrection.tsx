@@ -12,11 +12,11 @@ import React from 'react'
 import {
   deepMerge,
   EventDocument,
+  getCurrentEventState,
   RequestedCorrectionAction
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 
 export function RequestCorrection({
   action,
@@ -26,7 +26,6 @@ export function RequestCorrection({
   fullEvent: EventDocument
 }) {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
-  const { getCurrentEventState } = useValidationFunctionsWithContext()
 
   // We need to get the state of the event before the correction request was made
   // so that we can display the original, uncorrected values

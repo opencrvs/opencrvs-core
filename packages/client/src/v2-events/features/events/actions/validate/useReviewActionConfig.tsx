@@ -15,8 +15,7 @@ import {
   DeclarationFormConfig,
   FieldConfig,
   EventStatus,
-  ActionType,
-  UUID
+  ActionType
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -61,7 +60,7 @@ export function useReviewActionConfig({
             eventId,
             declaration,
             transactionId: uuid(),
-            context: userContext,
+
             annotation
           })
         }
@@ -69,7 +68,6 @@ export function useReviewActionConfig({
           eventId,
           declaration,
           transactionId: uuid(),
-          context: userContext,
           annotation
         })
       },
@@ -89,7 +87,6 @@ export function useReviewActionConfig({
           return events.customActions.validateOnDeclare.mutate({
             eventId,
             declaration,
-            context: userContext,
             annotation,
             transactionId: uuid()
           })

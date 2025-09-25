@@ -31,12 +31,12 @@ export interface CustomMutationParams {
   declaration: EventState
   transactionId: string
   eventConfiguration: EventConfig
-  context: UserContext
   annotation?: EventState
 }
 
 export interface CorrectionRequestParams extends CustomMutationParams {
   event: EventDocument
+  context: UserContext
 }
 
 export interface ArchiveOnDuplicateParams extends CustomMutationParams {
@@ -153,7 +153,6 @@ export async function registerOnValidate({
   transactionId,
   eventConfiguration,
   declaration,
-  context,
   annotation
 }: CustomMutationParams) {
   const maybeDuplicateEvent =

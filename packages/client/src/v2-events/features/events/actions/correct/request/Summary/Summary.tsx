@@ -21,7 +21,8 @@ import {
   generateTransactionId,
   getDeclarationFields,
   EventDocument,
-  ActionType
+  ActionType,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -83,7 +84,7 @@ export function Summary() {
   const navigate = useNavigate()
   const intl = useIntl()
 
-  const { getCurrentEventState, hasFieldChanged, isFieldVisible } =
+  const { hasFieldChanged, isFieldVisible } =
     useValidationFunctionsWithContext()
 
   const events = useEvents()

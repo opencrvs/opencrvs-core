@@ -27,7 +27,8 @@ import {
   SystemRole,
   TestUserRole,
   generateActionDocument,
-  ActionDocument
+  ActionDocument,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -88,7 +89,6 @@ export const Overview: Story = {
       handlers: {
         events: [
           tRPCMsw.event.search.query(() => {
-            const { getCurrentEventState } = useValidationFunctionsWithContext()
             return {
               results: [
                 getCurrentEventState(defaultEvent, tennisClubMembershipEvent)
@@ -684,7 +684,6 @@ export const WithDuplicateDetectedAction: Story = {
       handlers: {
         events: [
           tRPCMsw.event.search.query(() => {
-            const { getCurrentEventState } = useValidationFunctionsWithContext()
             return {
               results: [
                 getCurrentEventState(duplicateEvent, tennisClubMembershipEvent)
@@ -713,7 +712,6 @@ export const WithDuplicateDetectedActionModal: Story = {
       handlers: {
         events: [
           tRPCMsw.event.search.query(() => {
-            const { getCurrentEventState } = useValidationFunctionsWithContext()
             return {
               results: [
                 getCurrentEventState(duplicateEvent, tennisClubMembershipEvent)

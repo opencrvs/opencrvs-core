@@ -19,7 +19,8 @@ import {
   applyDraftToEventIndex,
   deepDropNulls,
   EventStatus,
-  getOrThrow
+  getOrThrow,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -38,7 +39,6 @@ import {
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useAuthentication } from '@client/utils/userUtils'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { useContext } from '@client/v2-events/hooks/useContext'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
@@ -63,7 +63,6 @@ function EventOverviewFull({
 }) {
   const userContext = useContext()
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const { getCurrentEventState } = useValidationFunctionsWithContext()
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
   const { getRemoteDraftByEventId } = useDrafts()

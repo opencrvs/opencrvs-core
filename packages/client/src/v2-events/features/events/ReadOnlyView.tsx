@@ -17,7 +17,8 @@ import {
   getActionReview,
   applyDraftToEventIndex,
   getDeclaration,
-  getOrThrow
+  getOrThrow,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -52,7 +53,6 @@ function ReadonlyView() {
   )
 
   const eventStateWithDraft = useMemo(() => {
-    const { getCurrentEventState } = useValidationFunctionsWithContext()
     const eventState = getCurrentEventState(event, configuration)
 
     return draft

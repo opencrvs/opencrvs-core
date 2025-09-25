@@ -15,7 +15,11 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, getDeclaration } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  getCurrentEventState,
+  getDeclaration
+} from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
@@ -39,8 +43,7 @@ export function Review() {
   const navigate = useNavigate()
   const events = useEvents()
   const { leafAdminStructureLocationIds } = useContext()
-  const { getCurrentEventState, hasFieldChanged } =
-    useValidationFunctionsWithContext()
+  const { hasFieldChanged } = useValidationFunctionsWithContext()
   const locationIds = leafAdminStructureLocationIds
 
   const event = events.getEvent.getFromCache(eventId)

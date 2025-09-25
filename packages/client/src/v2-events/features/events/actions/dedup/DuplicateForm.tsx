@@ -120,8 +120,7 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
             content: markAsDuplicateContent,
             transactionId: getUUID(),
             eventId: eventIndex.id,
-            declaration: {},
-            context: userContext
+            declaration: {}
           })
 
           if (slug) {

@@ -27,7 +27,8 @@ import {
   omitHiddenPaginatedFields,
   deepMerge,
   EventState,
-  EventConfig
+  EventConfig,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -52,7 +53,6 @@ import {
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
 import { ToastKey } from '@client/v2-events/routes/Toaster'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 
 function retryUnlessConflict(
   _failureCount: number,
@@ -373,7 +373,6 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   trpcProcedure: P
 ) {
   const eventConfigurations = useEventConfigurations()
-  const { getCurrentEventState } = useValidationFunctionsWithContext()
 
   const allOptions = {
     ...trpcProcedure.mutationOptions(),
@@ -469,7 +468,6 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
     mutationKey,
     ...queryClient.getMutationDefaults(mutationKey)
   })
-  const { getCurrentEventState } = useValidationFunctionsWithContext()
 
   return {
     mutate: (params: Omit<CustomMutationTypes[T], 'eventConfiguration'>) => {

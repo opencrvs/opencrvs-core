@@ -79,7 +79,6 @@ export function useReviewActionConfig({
           eventId,
           declaration,
           transactionId: uuid(),
-          context: userContext,
           annotation
         }),
       messages: incomplete
@@ -98,7 +97,6 @@ export function useReviewActionConfig({
           eventId,
           declaration,
           transactionId: uuid(),
-          context: userContext,
           annotation
         }),
       messages: incomplete

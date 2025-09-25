@@ -17,7 +17,8 @@ import {
   EventDocument,
   FieldType,
   PageTypes,
-  getPrintCertificatePages
+  getPrintCertificatePages,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -42,8 +43,7 @@ export function PrintCertificate({
   const { eventConfiguration } = useEventConfiguration(event.type)
   const formPages = getPrintCertificatePages(eventConfiguration)
   const intl = useIntl()
-  const { getCurrentEventState, isFieldVisible } =
-    useValidationFunctionsWithContext()
+  const { isFieldVisible } = useValidationFunctionsWithContext()
   const { certificateTemplates } = useAppConfig()
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const annotation = deepMerge(eventIndex.declaration, action.annotation ?? {})

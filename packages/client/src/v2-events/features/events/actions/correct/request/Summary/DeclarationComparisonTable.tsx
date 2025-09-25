@@ -17,6 +17,7 @@ import {
   EventConfig,
   EventDocument,
   EventState,
+  getCurrentEventState,
   getDeclaration
 } from '@opencrvs/commons/client'
 import { Table } from '@opencrvs/components/lib/Table'
@@ -61,7 +62,7 @@ export function DeclarationComparisonTableComponent({
   eventConfig,
   id
 }: DeclarationComparisonTableProps) {
-  const { hasFieldChanged, getCurrentEventState, isFieldDisplayedOnReview } =
+  const { hasFieldChanged, isFieldDisplayedOnReview } =
     useValidationFunctionsWithContext()
 
   const index = fullEvent.actions.findIndex((a) => a.id === action?.id)

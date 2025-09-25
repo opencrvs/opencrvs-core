@@ -22,8 +22,7 @@ import {
   getActionAnnotation,
   getDeclaration,
   getActionReview,
-  InherentFlags,
-  LocationType
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -186,8 +185,7 @@ export function Review() {
             eventId,
             declaration: {},
             transactionId: uuid(),
-            content: { reason: message },
-            context: userContext
+            content: { reason: message }
           })
         } else {
           events.actions.archive.mutate({

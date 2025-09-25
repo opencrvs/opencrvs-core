@@ -20,6 +20,7 @@ import {
   generateEventDocument,
   generateEventDraftDocument,
   generateWorkqueues,
+  getCurrentEventState,
   tennisClubMembershipEvent,
   testContext
 } from '@opencrvs/commons/client'
@@ -137,7 +138,6 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
             return eventDocument
           }),
           tRPCMsw.event.search.query(() => {
-            const { getCurrentEventState } = useValidationFunctionsWithContext()
             return {
               total: 1,
               results: [

@@ -11,10 +11,12 @@
 
 import { hashKey, MutationKey, useMutationState } from '@tanstack/react-query'
 import * as z from 'zod'
-import { applyDeclarationToEventIndex } from '@opencrvs/commons/client'
+import {
+  applyDeclarationToEventIndex,
+  getCurrentEventState
+} from '@opencrvs/commons/client'
 import { EventState } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { useEventConfigurations } from '../useEventConfiguration'
 
 const MutationVariables = z.object({
@@ -32,7 +34,6 @@ function assignmentMutation(mutationKey: MutationKey) {
 export function useOutbox() {
   const trpc = useTRPC()
   const eventConfigurations = useEventConfigurations()
-  const { getCurrentEventState } = useValidationFunctionsWithContext()
 
   const pendingMutations = useMutationState({
     filters: {

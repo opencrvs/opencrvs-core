@@ -12,12 +12,14 @@
 import React, { useCallback } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { isUndeclaredDraft, TranslationConfig } from '@opencrvs/commons/client'
+import {
+  getCurrentEventState,
+  isUndeclaredDraft
+} from '@opencrvs/commons/client'
 import { AppBar, Button, Icon, ToggleMenu } from '@opencrvs/components'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { AllowedRouteWithEventId } from './utils'
 
 const messages = defineMessages({
@@ -48,7 +50,7 @@ export function FormHeader({
   const { modal, exit, closeActionView, deleteDeclaration } =
     useEventFormNavigation()
   const events = useEvents()
-  const { getCurrentEventState } = useValidationFunctionsWithContext()
+
   const { eventId } = useTypedParams(route)
 
   if (!eventId) {

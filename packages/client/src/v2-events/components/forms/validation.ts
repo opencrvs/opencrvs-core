@@ -16,12 +16,10 @@ import {
   FormConfig,
   runStructuralValidations,
   UserContext,
-  UUID,
   runFieldValidations,
   omitHiddenFields,
   omitHiddenPaginatedFields
 } from '@opencrvs/commons/client'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 
 interface FieldErrors {
   errors: {
