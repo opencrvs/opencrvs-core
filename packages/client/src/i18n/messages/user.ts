@@ -166,7 +166,7 @@ const messagesToDefine: IUserMessages = {
   COMMUNITY_LEADER: {
     defaultMessage: 'Community Leader',
     description: 'The description for Community Leader type',
-    id: 'constants.localLeader'
+    id: 'constants.communityLeader'
   },
   HEALTHCARE_WORKER: {
     defaultMessage: 'Healthcare Worker',
