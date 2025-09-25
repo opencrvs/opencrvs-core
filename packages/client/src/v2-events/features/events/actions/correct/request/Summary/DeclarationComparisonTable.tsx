@@ -33,7 +33,8 @@ import {
 import {
   expandWithUpdateActions,
   EventHistoryActionDocument,
-  EventHistoryDocument
+  EventHistoryDocument,
+  getCurrentEventStateSafe
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 
 const TableHeader = styled.th`
@@ -136,23 +137,24 @@ export function DeclarationComparisonTableComponent({
   const eventBeforeUpdate = sliceEventAt(fullEvent, action?.id, false)
   const currentEvent = sliceEventAt(fullEvent, action?.id, true)
 
-  const currentState = getCurrentEventState(
-    // @TODO: Decide whether to make getCurrentEventState accept EventHistoryDocument,
-    // or refactor to derive declaration changes directly from EventDocument (instead of EventIndex).
-    currentEvent as EventDocument,
+  const currentState = getCurrentEventStateSafe(
+    currentEvent,
     eventConfiguration
   )
 
+  const formWithOnlyChangedValues = form ? form : action?.declaration
+
   // When form is provided, we apply it on top of the current state to get the latest declaration
-  const latestDeclaration = form
-    ? applyDeclarationToEventIndex(currentState, form, eventConfiguration)
-        .declaration
+  const latestDeclaration = formWithOnlyChangedValues
+    ? applyDeclarationToEventIndex(
+        currentState,
+        formWithOnlyChangedValues,
+        eventConfiguration
+      ).declaration
     : currentState.declaration
 
-  const previousDeclaration = getCurrentEventState(
-    // @TODO: Decide whether to make getCurrentEventState accept EventHistoryDocument,
-    // or refactor to derive declaration changes directly from EventDocument (instead of EventIndex).
-    eventBeforeUpdate as EventDocument,
+  const previousDeclaration = getCurrentEventStateSafe(
+    eventBeforeUpdate,
     eventConfiguration
   ).declaration
 
