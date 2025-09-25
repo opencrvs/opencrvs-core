@@ -27,8 +27,6 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 
-type Props = PropsWithChildren<{ actionType: Exclude<ActionType, 'DELETE'> }>
-
 /**
  * Creates a wrapper component for the annotation action.
  * Manages the state of the annotation action and its local draft.
@@ -39,7 +37,10 @@ type Props = PropsWithChildren<{ actionType: Exclude<ActionType, 'DELETE'> }>
  *
  * This differs from DeclarationAction, which is a series of one-time actions that modify the declaration.
  */
-function AnnotationActionComponent({ children, actionType }: Props) {
+function AnnotationActionComponent({
+  children,
+  actionType
+}: PropsWithChildren<{ actionType: Exclude<ActionType, 'DELETE'> }>) {
   const params = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
 
   const { getEvent } = useEvents()
@@ -126,7 +127,9 @@ function AnnotationActionComponent({ children, actionType }: Props) {
   return children
 }
 
-export const AnnotationAction = (props: Props) => (
+export const AnnotationAction = (
+  props: PropsWithChildren<{ actionType: Exclude<ActionType, 'DELETE'> }>
+) => (
   <NavigationStack>
     {withSuspense(AnnotationActionComponent)(props)}
   </NavigationStack>

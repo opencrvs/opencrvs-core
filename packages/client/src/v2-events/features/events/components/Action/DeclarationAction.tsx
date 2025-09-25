@@ -73,8 +73,6 @@ function useActionGuard(
   }
 }
 
-type Props = PropsWithChildren<{ actionType: AvailableActionTypes }>
-
 /**
  * Creates a wrapper component for the declaration action.
  * Manages the state of the declaration action and its local draft.
@@ -84,7 +82,10 @@ type Props = PropsWithChildren<{ actionType: AvailableActionTypes }>
  *
  * This differs from AnnotationAction, which modify the annotation, and can be triggered multiple times.
  */
-function DeclarationActionComponent({ children, actionType }: Props) {
+function DeclarationActionComponent({
+  children,
+  actionType
+}: PropsWithChildren<{ actionType: AvailableActionTypes }>) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
 
   const events = useEvents()
@@ -261,7 +262,9 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   return children
 }
 
-export const DeclarationAction = (props: Props) => (
+export const DeclarationAction = (
+  props: PropsWithChildren<{ actionType: AvailableActionTypes }>
+) => (
   <NavigationStack>
     {withSuspense(DeclarationActionComponent)(props)}
   </NavigationStack>
