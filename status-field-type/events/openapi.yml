@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 9c6bbd99-6ecf-422c-a157-8f5ba1aa5a3b
+                transactionId: d6af6f68-374b-4b68-8f26-84131d9a4909
                 type: birth
       responses:
         "200":
@@ -395,7 +395,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 05039a10-1ea4-4a22-a327-051e1ab63308
+                transactionId: e94bbbff-c40c-430e-9620-a97327d5f11d
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -5806,6 +5806,8 @@ components:
                 - verified
                 - authenticated
                 - failed
+                - pending
+              default: pending
             configuration:
               type: object
               properties:
@@ -5824,6 +5826,7 @@ components:
             - id
             - label
             - type
+            - defaultValue
             - configuration
       description: Form field configuration
     FieldConditional:
