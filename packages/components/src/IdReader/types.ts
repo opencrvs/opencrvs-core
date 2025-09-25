@@ -26,7 +26,7 @@ interface QRReaderType {
   }
 }
 
-export interface IDReaderProps {
+export interface IdReaderProps {
   dividerLabel: string
   manualInputInstructionLabel: string
   children: React.ReactNode
