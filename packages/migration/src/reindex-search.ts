@@ -59,6 +59,7 @@ async function main() {
       process.exit(1)
     }
     setTimeout(main, 5000)
+    return
   }
 
   console.info('...done reindexing')
