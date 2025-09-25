@@ -172,7 +172,7 @@ export function createValidationSchema(config: FieldConfig[]) {
   > = {}
 
   for (const field of config) {
-    shape[field.id] = mapFieldTypeToZod(field.type, field.required)
+    shape[field.id] = mapFieldTypeToZod(field.type, !!field.required)
   }
 
   return z.object(shape)

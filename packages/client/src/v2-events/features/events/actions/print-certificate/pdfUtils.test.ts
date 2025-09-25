@@ -21,6 +21,7 @@ import {
   User,
   UUID
 } from '@opencrvs/commons/client'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
   tennisClubMembershipEventDocument,
   tennisClubMembershipEventIndex
@@ -75,37 +76,27 @@ const adminLevels = [
     }
   }
 ]
-const userId = '677fb08730f3abfa33072769'
 
 describe('stringifyEventMetadata', () => {
   test('Resolves event metadata', () => {
+    const generator = testDataGenerator()
+
+    generator.user.id.localRegistrar
+
     const { declaration, ...metadata } = eventQueryDataGenerator({
       id: 'seabeast-clad-stad-elia-oleocellosis' as UUID,
-      assignedTo: userId,
+      assignedTo: generator.user.id.localRegistrar,
       createdByUserType: 'user',
-      createdBy: userId,
+      createdBy: generator.user.id.localRegistrar,
       trackingId: 'B77FF6',
       createdAt: new Date(2000, 1, 1).toISOString(),
       updatedAt: new Date(2000, 1, 2).toISOString(),
       updatedAtLocation: locations[0].id,
       createdAtLocation: locations[0].id,
-      updatedBy: userId
+      updatedBy: generator.user.id.localRegistrar
     })
 
-    const users = [
-      {
-        id: userId,
-        name: [
-          {
-            use: 'en',
-            given: ['Joseph'],
-            family: 'Musonda'
-          }
-        ],
-        role: 'NATIONAL_REGISTRAR',
-        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-      }
-    ] satisfies User[]
+    const users = [generator.user.localRegistrar().v2]
 
     const stringified = stringifyEventMetadata({
       metadata: {
@@ -121,6 +112,7 @@ describe('stringifyEventMetadata', () => {
     expect(stringified).toMatchSnapshot()
   })
 })
+
 describe('svgToPdfTemplate', () => {
   test('replaces image URL with base64 data', async () => {
     fetch.mockResolvedValue({
@@ -174,11 +166,15 @@ describe('svgToPdfTemplate', () => {
 })
 
 function expectRenderOutput(template: string, output: string) {
+  const generator = testDataGenerator(2323)
+  const registrar = generator.user.localRegistrar()
   const { declaration, ...metadata } = tennisClubMembershipEventIndex
+
   const result = compileSvg({
     templateString: template,
     $metadata: {
       ...metadata,
+      createdBy: registrar.v2.id,
       modifiedAt: new Date().toISOString(),
       copiesPrintedForTemplate: 2
     },
@@ -191,7 +187,7 @@ function expectRenderOutput(template: string, output: string) {
     },
     review: false,
     locations: [],
-    users: [],
+    users: [registrar.v2],
     language: { lang: 'en', messages: {} },
     config: tennisClubMembershipEvent,
     adminLevels: [
@@ -213,6 +209,7 @@ function expectRenderOutput(template: string, output: string) {
       }
     ]
   })
+
   expect(result).toBe(output)
 }
 
@@ -254,6 +251,12 @@ describe('SVG compiler', () => {
       expectRenderOutput(
         '<svg><text>{{ $lookup $declaration "applicant.name" }}</text></svg>',
         '<svg><text>{&quot;fullname&quot;:&quot;John Doe&quot;,&quot;firstname&quot;:&quot;John&quot;,&quot;surname&quot;:&quot;Doe&quot;}</text></svg>'
+      )
+    })
+    it('Returns full honorific name', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $lookup $metadata "createdBy.fullHonorificName" }}</text></svg>',
+        '<svg><text>1st Order Honorable Kennedy Mweene</text></svg>'
       )
     })
   })

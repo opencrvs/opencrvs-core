@@ -12,9 +12,18 @@ import {
   createPrng,
   eventPayloadGenerator,
   getUUID,
-  SCOPES
+  SCOPES,
+  TestUserRole,
+  TokenUserType,
+  User,
+  UUID
 } from '@opencrvs/commons/client'
 import { FetchUserQuery, Status } from '@client/utils/gateway'
+import { Faker, en } from '@faker-js/faker'
+
+// Initialize faker with seed, so that the test data stays consistent
+const faker = new Faker({ seed: 1001, locale: en })
+export { faker }
 
 const userIds = {
   localRegistrar: '6821c175dce4d7886d4e8210',
@@ -53,8 +62,24 @@ export function testDataGenerator(rngSeed?: number) {
         'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ1c2VyLnJlYWQ6bXktb2ZmaWNlIiwidXNlci5yZWFkOm15LWp1cmlzZGljdGlvbiIsInVzZXIudXBkYXRlOm15LWp1cmlzZGljdGlvbiIsIm9yZ2FuaXNhdGlvbi5yZWFkLWxvY2F0aW9uczpteS1qdXJpc2RpY3Rpb24iLCJwZXJmb3JtYW5jZS5yZWFkIiwicGVyZm9ybWFuY2UucmVhZC1kYXNoYm9hcmRzIiwicGVyZm9ybWFuY2Uudml0YWwtc3RhdGlzdGljcy1leHBvcnQiLCJvcmdhbmlzYXRpb24ucmVhZC1sb2NhdGlvbnM6bXktb2ZmaWNlIiwidXNlci5jcmVhdGVbcm9sZT1GSUVMRF9BR0VOVHxQT0xJQ0VfT0ZGSUNFUnxTT0NJQUxfV09SS0VSfEhFQUxUSENBUkVfV09SS0VSfExPQ0FMX0xFQURFUnxSRUdJU1RSQVRJT05fQUdFTlR8TE9DQUxfUkVHSVNUUkFSXSIsInVzZXIuZWRpdFtyb2xlPUZJRUxEX0FHRU5UfFBPTElDRV9PRkZJQ0VSfFNPQ0lBTF9XT1JLRVJ8SEVBTFRIQ0FSRV9XT1JLRVJ8TE9DQUxfTEVBREVSfFJFR0lTVFJBVElPTl9BR0VOVHxMT0NBTF9SRUdJU1RSQVJdIl0sImlhdCI6MTQ4NzA3NjcwOCwiYXVkIjoib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNjhjYmQyNmZjNjQ3NjE1NjU0Njk1OTFkIn0.JLNHJ9_XrjZvqz3OTkhYFTaa949uffgda6iQuSWABgCD4-vR0gDbkeDalEnVWzPpGRfbAYiaHu7UybFnM0YqN-5KtAiBh_dYa5qWF_5RCkcS5Fibzxx7tJRhbxiuXqzTjw9TpAxZ-XyFsI5T8qR5pBcO1kzNPUKyM3PpBfv65cjnvDYgFKOSibb-aRe2f557sSLXYlVls0u3pWlMEQybfzBr-DiqCFE99P2Zwznaau6Zdb54RbeyTjYwL6iqis9QGzNwksm9-N67HkfLI8EVD0Zw2BMUGcqj7AbRD6Mx-jAnBvgCYpuhkVCAyrOmc16RaG74iuR8MgJBp67KD1gQzpoaWZ7q6sJf_JMY8x1X8VAGh7zk1TzcShSx-4rz1BMlYBjkYQebOOs6Z1B7izI-2DAcAbUOerYhhZdBRFhx9jmjeO0WNkfCw1C5gDil9bcgIr44oks2qoLa-d_Y71z2Yp1or9D1OppxBqwukWDIjxU1uaaFemMT2Q9TNai5pwwaV-o2eftHXAvHwi4NQ9RZLkaAzW1QBVp4J46uR_eliOHZGJf1qCmqKhXfwVbLX4lHSyhXuJ8RZCqUE9AlTlKRFox6TNBfLZJSG5OzQwCOJ-0QRlYcBzr5FRJZqqQzcHDzGv7tKhW3vToaN4NF3dzSsvqQ7GXWaWnu7t66pBtxEoU'
     },
     id: userIds,
-    fieldAgent: () =>
-      ({
+    fieldAgent: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+      v2: {
+        id: '67bda93bfc07dee78ae558cf',
+        name: [
+          {
+            use: 'en',
+            given: ['Kalusha'],
+            family: 'Bwalya'
+          }
+        ],
+        role: 'SOCIAL_WORKER',
+        fullHonorificName: undefined,
+        signature: undefined,
+        avatar: undefined,
+        type: TokenUserType.enum.user,
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+      } satisfies User,
+      v1: {
         id: userIds.fieldAgent,
         userMgntUserID: getUUID(),
         creationDate: '1736421510056',
@@ -91,10 +116,21 @@ export function testDataGenerator(rngSeed?: number) {
         avatar: null,
         searches: [],
         __typename: 'User'
-      }) satisfies FetchUserQuery['getUser'],
-    registrationAgent: () =>
-      ({
-        id: userIds.registrationAgent,
+      } satisfies FetchUserQuery['getUser']
+    }),
+    registrationAgent: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+      v2: {
+        id: user.id.registrationAgent,
+        name: [{ use: 'en', given: ['Felix'], family: 'Katongo' }],
+        role: TestUserRole.Enum.REGISTRATION_AGENT,
+        avatar: undefined,
+        signature: undefined,
+        fullHonorificName: undefined,
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+        type: TokenUserType.enum.user
+      } satisfies User,
+      v1: {
+        id: user.id.registrationAgent,
         userMgntUserID: getUUID(),
         creationDate: '1736421510209',
         username: 'f.katongo',
@@ -130,9 +166,20 @@ export function testDataGenerator(rngSeed?: number) {
         avatar: null,
         searches: [],
         __typename: 'User'
-      }) satisfies FetchUserQuery['getUser'],
-    localRegistrar: () =>
-      ({
+      } satisfies FetchUserQuery['getUser']
+    }),
+    localRegistrar: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+      v2: {
+        id: user.id.localRegistrar,
+        name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
+        role: TestUserRole.Enum.LOCAL_REGISTRAR,
+        fullHonorificName: '1st Order Honorable Kennedy Mweene',
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+        avatar: undefined,
+        signature: undefined,
+        type: TokenUserType.enum.user
+      } satisfies User,
+      v1: {
         id: userIds.localRegistrar,
         userMgntUserID: getUUID(),
         creationDate: '1737725915295',
@@ -150,6 +197,7 @@ export function testDataGenerator(rngSeed?: number) {
           __typename: 'UserRole'
         },
         status: Status.Active,
+        fullHonorificName: '1st Order Honorable Kennedy Mweene',
         name: [
           {
             use: 'en',
@@ -181,7 +229,8 @@ export function testDataGenerator(rngSeed?: number) {
         avatar: null,
         searches: [],
         __typename: 'User'
-      }) satisfies FetchUserQuery['getUser'],
+      } satisfies FetchUserQuery['getUser']
+    }),
     localSystemAdmin: () =>
       ({
         id: userIds.localSystemAdmin,

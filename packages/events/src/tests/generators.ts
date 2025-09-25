@@ -32,12 +32,14 @@ export interface CreatedUser {
   primaryOfficeId: UUID
   role: string
   name: Array<Name>
+  fullHonorificName?: string
 }
 
 interface CreateUser {
   primaryOfficeId: UUID
   role?: string
   name?: Array<Name>
+  fullHonorificName?: string
 }
 
 /**
@@ -49,9 +51,10 @@ export function payloadGenerator(
 ) {
   const user = {
     create: (input: CreateUser) => ({
-      role: input.role ?? ('REGISTRATION_AGENT' as TestUserRole),
+      role: input.role ?? TestUserRole.Enum.REGISTRATION_AGENT,
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
-      primaryOfficeId: input.primaryOfficeId
+      primaryOfficeId: input.primaryOfficeId,
+      fullHonorificName: input.fullHonorificName
     })
   }
 
@@ -90,6 +93,7 @@ export function seeder() {
     return {
       primaryOfficeId: user.primaryOfficeId,
       name: user.name,
+      fullHonorificName: user.fullHonorificName,
       role: user.role as TestUserRole,
       id: getUUID()
     }
