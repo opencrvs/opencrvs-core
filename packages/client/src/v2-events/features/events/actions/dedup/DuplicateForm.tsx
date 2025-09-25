@@ -41,7 +41,7 @@ const SubPageContent = styled(Content)`
 
 export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
-  const userContext = useContext()
+
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE
   )

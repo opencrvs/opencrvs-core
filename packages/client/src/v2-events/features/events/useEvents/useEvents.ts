@@ -24,7 +24,6 @@ import {
   Draft
 } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
-import { useContext } from '@client/v2-events/hooks/useContext'
 import { useDrafts } from '../../drafts/useDrafts'
 import { useEventConfigurations } from '../useEventConfiguration'
 import { useGetEvent } from './procedures/get'
@@ -77,7 +76,6 @@ export function useEvents() {
   const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
   const eventConfigs = useEventConfigurations()
   const { getRemoteDraftByEventId } = useDrafts()
-  const userContext = useContext()
 
   return {
     createEvent: useCreateEvent,

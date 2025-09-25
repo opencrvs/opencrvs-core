@@ -40,7 +40,6 @@ export function Pages() {
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES
   )
   const navigate = useNavigate()
-
   const { modal } = useEventFormNavigation()
   const { setAnnotation, getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()

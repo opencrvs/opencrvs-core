@@ -208,7 +208,7 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
     await step('Accepts file of valid size and type', async () => {
       const filename = 'valid.jpg'
       const validFile = new File(['a'.repeat(512 * 512)], filename, {
-        type: 'image/jpg' satisfies MimeType
+        type: MimeType.enum['image/png']
       })
 
       await userEvent.upload(input, validFile)
@@ -269,7 +269,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
             }),
             http.post('/api/upload', () => {
               return HttpResponse.text(
-                `uploaded-image-${new Date().getTime()}.png`
+                `uploaded-image-${new Date().getTime()}.jpg`
               )
             }),
             http.get('http://localhost:3535/ocrvs/:id', async () => {

@@ -92,7 +92,7 @@ function getCleanedDeclarationDiff(
     return omitHiddenPaginatedFields(
       eventConfiguration.declaration,
       declarationDiff,
-      {}
+      {} // Needs context
     )
   }
 
