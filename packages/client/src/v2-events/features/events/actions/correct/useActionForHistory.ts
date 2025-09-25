@@ -165,7 +165,7 @@ export function useActionForHistory() {
   return { getActionTypeForHistory }
 }
 
-export function toEventDocument(event: EventHistoryDocument): EventDocument {
+function toEventDocument(event: EventHistoryDocument): EventDocument {
   return {
     ...event,
     actions: event.actions.filter(
