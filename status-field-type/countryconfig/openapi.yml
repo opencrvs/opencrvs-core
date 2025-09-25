@@ -4533,7 +4533,6 @@ components:
                 - authenticated
                 - failed
                 - pending
-              default: pending
             configuration:
               type: object
               properties:
@@ -4550,7 +4549,6 @@ components:
             - id
             - label
             - type
-            - defaultValue
             - configuration
       description: Form field configuration
     FieldConditional:
