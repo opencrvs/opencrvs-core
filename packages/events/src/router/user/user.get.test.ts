@@ -11,6 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse, HttpResponseInit } from 'msw'
+import { TokenUserType } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { mswServer } from '../../tests/msw'
 
@@ -43,7 +44,8 @@ test('Returns user in correct format if found', async () => {
     name: user.name,
     role: user.role,
     signature: user.signature,
-    primaryOfficeId: user.primaryOfficeId
+    primaryOfficeId: user.primaryOfficeId,
+    type: TokenUserType.enum.user
   })
 })
 
@@ -69,6 +71,7 @@ test('Returns user with full honorific name when defined', async () => {
     role: user.role,
     signature: user.signature,
     primaryOfficeId: user.primaryOfficeId,
-    fullHonorificName: userWithHonorific.fullHonorificName
+    fullHonorificName: userWithHonorific.fullHonorificName,
+    type: TokenUserType.enum.user
   })
 })

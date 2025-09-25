@@ -8,15 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { fetchJSON, joinUrl, Roles } from '@opencrvs/commons'
+import { fetchJSON, joinUrl, Roles, IUserName } from '@opencrvs/commons'
 import { env } from '@user-mgnt/environment'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized, conflict, badRequest } from '@hapi/boom'
 import User, {
   IUserModel,
-  ISecurityQuestionAnswer,
-  IUserName
+  ISecurityQuestionAnswer
 } from '@user-mgnt/model/user'
 import {
   isNonEmptyArray,
