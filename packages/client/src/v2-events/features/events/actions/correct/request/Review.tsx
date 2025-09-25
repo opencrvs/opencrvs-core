@@ -18,12 +18,7 @@ import {
 import {
   ActionType,
   getDeclaration,
-<<<<<<< HEAD
   getCurrentEventState
-=======
-  getCurrentEventState,
-  LocationType
->>>>>>> develop
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
