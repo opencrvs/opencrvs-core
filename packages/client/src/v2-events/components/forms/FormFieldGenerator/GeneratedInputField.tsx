@@ -654,7 +654,7 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isIdReaderFieldType(field)) {
-      return <IdReader.Input />
+      return <IdReader.Input methods={field.config.methods} />
     }
 
     throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)

@@ -131,6 +131,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.PHONE:
     case FieldType.LINK_BUTTON:
     case FieldType.ID:
+    case FieldType.EXTERNAL_AUTHENTICATOR:
       schema = required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
