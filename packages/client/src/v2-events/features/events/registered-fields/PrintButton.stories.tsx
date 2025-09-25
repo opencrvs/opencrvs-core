@@ -13,7 +13,6 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React, { useState } from 'react'
 import { within, userEvent, expect, waitFor } from '@storybook/test'
 import styled from 'styled-components'
-import { Button as UI_Button, Icon as UI_Icon } from '@opencrvs/components'
 
 interface PrintButtonProps {
   id: string
@@ -34,7 +33,7 @@ function MockPrintButton({
   id,
   buttonLabel,
   disabled,
-  template,
+  template = 'v2-birth-certificate',
   value,
   onChange
 }: PrintButtonProps) {
@@ -45,22 +44,6 @@ function MockPrintButton({
   const handlePrint = () => {
     onChange?.(new Date().toISOString())
     alert('Simulated print (in a real run, this would open the prepared PDF).')
-  }
-
-  // Try to use your UI Button if available, otherwise a native button
-  if (UI_Button && UI_Icon) {
-    return (
-      <UI_Button
-        disabled={disabled || alreadyPrinted}
-        id={id}
-        size="medium"
-        type="secondary"
-        onClick={handlePrint}
-      >
-        <UI_Icon name="Printer" />
-        {label}
-      </UI_Button>
-    )
   }
 
   return (
@@ -74,13 +57,13 @@ function MockPrintButton({
       }}
       onClick={handlePrint}
     >
-      🖨 {label}
+      {label}
     </button>
   )
 }
 
 const meta: Meta<typeof MockPrintButton> = {
-  title: 'Inputs/PrintButton (mocked story)',
+  title: 'Inputs/PrintButton',
   component: MockPrintButton,
   parameters: { layout: 'centered' }
 }
