@@ -19,9 +19,12 @@ import {
   FieldValue
 } from '@opencrvs/commons/client'
 
-// Function we use for checking whether a field value has changed.
-// For objects we need to ignore undefined values.
-function isEqual<T extends FieldValue>(a: T, b: T) {
+/**
+ * Function we use for checking whether a field value has changed.
+ * For objects we need to ignore undefined values since the form might create them.
+ * @returns whether the two field values are equal when ignoring undefined values
+ */
+export function isEqualFieldValue<T extends FieldValue>(a: T, b: T) {
   if (typeof a === 'object' && typeof b === 'object') {
     return _.isEqual(_.omitBy(a, _.isUndefined), _.omitBy(b, _.isUndefined))
   }
@@ -42,7 +45,7 @@ export function hasFieldChanged(
   // Ensure that if previous value is 'undefined' and current value is 'null'
   // it doesn't get detected as a value change
   const bothNil = _.isNil(prevValue) && _.isNil(currValue)
-  const valueHasChanged = !isEqual(prevValue, currValue) && !bothNil
+  const valueHasChanged = !isEqualFieldValue(prevValue, currValue) && !bothNil
 
   return isVisible && valueHasChanged
 }
