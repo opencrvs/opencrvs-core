@@ -21,12 +21,14 @@ function CheckboxInput({
 }: FieldPropsWithoutReferenceValue<'CHECKBOX'> & {
   value?: boolean
   onChange: (val: boolean) => void
+  disabled?: boolean
 }) {
   const intl = useIntl()
   const inputValue = !!value ? 'true' : 'false'
 
   return (
     <CheckboxComponent
+      disabled={props.disabled}
       id={props.id}
       label={intl.formatMessage(label)}
       name={props.id}

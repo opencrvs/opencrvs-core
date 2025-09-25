@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux'
 import {
   deserializeQuery,
   User,
+  UserOrSystem,
   WorkqueueConfig
 } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -23,19 +24,15 @@ import { useUsers } from './useUsers'
 
 function getDeserializedQuery(
   workqueueConfig: WorkqueueConfig | undefined,
-  user: User,
-  primaryOfficeId: string | undefined
+  user: UserOrSystem
 ) {
   if (!workqueueConfig) {
     throw new Error('Workqueue config not found')
   }
-  if (!primaryOfficeId) {
+  if (!user.primaryOfficeId) {
     throw new Error("User's primary office id not found")
   }
-  return deserializeQuery(workqueueConfig.query, {
-    ...user,
-    primaryOfficeId
-  })
+  return deserializeQuery(workqueueConfig.query, user)
 }
 
 export const useWorkqueue = (workqueueSlug: string) => {
@@ -52,16 +49,12 @@ export const useWorkqueue = (workqueueSlug: string) => {
 
   const deserializedQueries = workqueues.map((wq) => ({
     slug: wq.slug,
-    query: getDeserializedQuery(wq, user, legacyUser?.primaryOffice.id)
+    query: getDeserializedQuery(wq, user)
   }))
 
   return {
     getResult: ({ offset, limit }: { offset: number; limit: number }) => {
-      const deserializedQuery = getDeserializedQuery(
-        workqueueConfig,
-        user,
-        legacyUser?.primaryOffice.id
-      )
+      const deserializedQuery = getDeserializedQuery(workqueueConfig, user)
       return {
         useSuspenseQuery: () =>
           searchEvent.useSuspenseQuery(
@@ -108,11 +101,7 @@ export function useWorkqueues() {
     prefetch: async () => {
       return Promise.all(
         workqueues.map(async (workqueueConfig) => {
-          const deserializedQuery = getDeserializedQuery(
-            workqueueConfig,
-            user,
-            legacyUser?.primaryOffice.id
-          )
+          const deserializedQuery = getDeserializedQuery(workqueueConfig, user)
 
           const key = trpc.event.search.queryKey({
             query: deserializedQuery,
