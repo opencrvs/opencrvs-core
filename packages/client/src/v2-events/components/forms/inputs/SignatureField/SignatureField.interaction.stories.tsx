@@ -28,6 +28,7 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { TestImage } from '@client/v2-events/features/events/fixtures'
+import { noop } from '@client/v2-events'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/SignatureField/Interaction',
@@ -113,6 +114,32 @@ const createdEvent = generateEventDocument({
 export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
   parameters: {
     layout: 'centered',
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <StyledFormFieldGenerator
+            fields={[
+              {
+                id: 'storybook.signature',
+                type: FieldType.SIGNATURE,
+                configuration: {
+                  maxFileSize: 1 * 1024 * 1024,
+                  acceptedFileTypes: ['image/png' satisfies MimeType]
+                },
+                signaturePromptLabel: generateTranslationConfig('Signature'),
+                label: generateTranslationConfig('Upload signature')
+              }
+            ]}
+            id="my-form"
+            onChange={(data) => {
+              meta.args?.onChange?.(data) ?? noop()
+            }}
+          />
+        )
+      },
+      initialPath: '/event/123-abcd-213'
+    },
     chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
@@ -127,7 +154,7 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
               presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
             })
           }),
-          http.get('http://localhost:3535/ocrvs/:id', () => {
+          http.get('http://localhost:3535/ocrvs/:eventId/:id', () => {
             return new HttpResponse(TestImage.Fish, {
               headers: {
                 'Content-Type': 'image/svg+xml',
@@ -138,28 +165,6 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
         ]
       }
     }
-  },
-  render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        fields={[
-          {
-            id: 'storybook.signature',
-            type: FieldType.SIGNATURE,
-            configuration: {
-              maxFileSize: 1 * 1024 * 1024,
-              acceptedFileTypes: ['image/png' satisfies MimeType]
-            },
-            signaturePromptLabel: generateTranslationConfig('Signature'),
-            label: generateTranslationConfig('Upload signature')
-          }
-        ]}
-        id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
-      />
-    )
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
@@ -223,6 +228,32 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
     parameters: {
       layout: 'centered',
       chromatic: { disableSnapshot: true },
+      reactRouter: {
+        router: {
+          path: '/event/:eventId',
+          element: (
+            <StyledFormFieldGenerator
+              fields={[
+                {
+                  id: 'storybook.signature',
+                  type: FieldType.SIGNATURE,
+                  configuration: {
+                    maxFileSize: 1 * 1024 * 1024,
+                    acceptedFileTypes: ['image/png']
+                  },
+                  signaturePromptLabel: generateTranslationConfig('Signature'),
+                  label: generateTranslationConfig('Upload signature')
+                }
+              ]}
+              id="my-form"
+              onChange={(data) => {
+                meta.args?.onChange?.(data) ?? noop()
+              }}
+            />
+          )
+        },
+        initialPath: '/event/123-abcd-213'
+      },
       msw: {
         handlers: {
           event: [
@@ -243,7 +274,18 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
             }),
             http.get('http://localhost:3535/ocrvs/:id', async () => {
               spies.getImage++
+              const response = await fetch(signaturePngBase64)
+              const binary = new Uint8Array(await response.arrayBuffer())
 
+              return new HttpResponse(binary, {
+                headers: {
+                  'Content-Type': 'image/png' satisfies MimeType,
+                  'Cache-Control': 'no-cache'
+                }
+              })
+            }),
+            http.get('http://localhost:3535/ocrvs/:eventId/:id', async () => {
+              spies.getImage++
               const response = await fetch(signaturePngBase64)
               const binary = new Uint8Array(await response.arrayBuffer())
 
@@ -257,28 +299,6 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
           ]
         }
       }
-    },
-    render: function Component(args) {
-      return (
-        <StyledFormFieldGenerator
-          fields={[
-            {
-              id: 'storybook.signature',
-              type: FieldType.SIGNATURE,
-              configuration: {
-                maxFileSize: 1 * 1024 * 1024,
-                acceptedFileTypes: ['image/png']
-              },
-              signaturePromptLabel: generateTranslationConfig('Signature'),
-              label: generateTranslationConfig('Upload signature')
-            }
-          ]}
-          id="my-form"
-          onChange={(data) => {
-            args.onChange(data)
-          }}
-        />
-      )
     },
     play: async ({ canvasElement, step }) => {
       const canvas = within(canvasElement)

@@ -27,6 +27,7 @@ import {
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { noop } from '@client/v2-events'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'FormFieldGenerator/Interaction',
@@ -448,28 +449,32 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
   name: 'Disable state with every type of field',
   parameters: {
     layout: 'centered',
-    chromatic: { disableSnapshot: true }
-  },
-  render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        fields={fields.map((f) => ({
-          ...f,
-          // Make all fields disabled
-          conditionals: [
-            {
-              type: ConditionalType.ENABLE,
-              conditional: not(alwaysTrue())
-            }
-          ]
-        }))}
-        id="my-form"
-        initialValues={declaration}
-        onChange={(data) => {
-          args.onChange(data)
-        }}
-      />
-    )
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <StyledFormFieldGenerator
+            fields={fields.map((f) => ({
+              ...f,
+              // Make all fields disabled
+              conditionals: [
+                {
+                  type: ConditionalType.ENABLE,
+                  conditional: not(alwaysTrue())
+                }
+              ]
+            }))}
+            id="my-form"
+            initialValues={declaration}
+            onChange={(data) => {
+              meta.args?.onChange?.(data) ?? noop()
+            }}
+          />
+        )
+      },
+      initialPath: '/event/123-kalsnk-213'
+    }
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
@@ -494,22 +499,29 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
   name: 'Enable state with every type of field',
   parameters: {
     layout: 'centered',
-    chromatic: { disableSnapshot: true }
-  },
-  render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        fields={fields}
-        id="my-form"
-        // Setting 'membership.duration' to a single date value allows us to demonstrate the enabled field
-        // scenario. The original defaultValue is a range (ex: `{ start: '2025-01-01', end: '2025-12-31' }`), which
-        // disables the date field component, making it difficult to check if all fields are enabled via looping.
-        initialValues={{ ...declaration, 'membership.duration': '2025-12-31' }}
-        onChange={(data) => {
-          args.onChange(data)
-        }}
-      />
-    )
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <StyledFormFieldGenerator
+            fields={fields}
+            id="my-form"
+            // Setting 'membership.duration' to a single date value allows us to demonstrate the enabled field
+            // scenario. The original defaultValue is a range (ex: `{ start: '2025-01-01', end: '2025-12-31' }`), which
+            // disables the date field component, making it difficult to check if all fields are enabled via looping.
+            initialValues={{
+              ...declaration,
+              'membership.duration': '2025-12-31'
+            }}
+            onChange={(data) => {
+              meta.args?.onChange?.(data) ?? noop()
+            }}
+          />
+        )
+      },
+      initialPath: '/event/123-abcd-213'
+    }
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
@@ -536,38 +548,42 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
   name: 'Enable state with every type of field with enable condition',
   parameters: {
     layout: 'centered',
-    chromatic: { disableSnapshot: true }
-  },
-  render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        fields={fields
-          .map((f) => {
-            if (f.id === 'applicant.age') {
-              return f
-            }
-            return {
-              ...f,
-              conditionals: [
-                {
-                  type: ConditionalType.ENABLE,
-                  conditional: field('applicant.age').isEqualTo(40)
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <StyledFormFieldGenerator
+            fields={fields
+              .map((f) => {
+                if (f.id === 'applicant.age') {
+                  return f
                 }
-              ]
-            }
-          })
-          .filter(Boolean)}
-        id="my-form"
-        initialValues={{
-          ...declaration,
-          'membership.duration': '2025-12-31',
-          'applicant.age': 30
-        }}
-        onChange={(data) => {
-          args.onChange(data)
-        }}
-      />
-    )
+                return {
+                  ...f,
+                  conditionals: [
+                    {
+                      type: ConditionalType.ENABLE,
+                      conditional: field('applicant.age').isEqualTo(40)
+                    }
+                  ]
+                }
+              })
+              .filter(Boolean)}
+            id="my-form"
+            initialValues={{
+              ...declaration,
+              'membership.duration': '2025-12-31',
+              'applicant.age': 30
+            }}
+            onChange={(data) => {
+              meta.args?.onChange?.(data) ?? noop()
+            }}
+          />
+        )
+      },
+      initialPath: '/event/123-abcd-213'
+    }
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
