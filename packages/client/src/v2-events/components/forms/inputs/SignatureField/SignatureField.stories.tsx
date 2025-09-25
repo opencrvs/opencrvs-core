@@ -11,12 +11,13 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
+import { FileFieldValue } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { noop } from '@client/v2-events'
 import { SignatureField } from './SignatureField'
 
 const meta: Meta<typeof SignatureField> = {
   title: 'Inputs/SignatureField',
-  component: SignatureField.Input,
   args: {},
   decorators: [
     (Story) => (
@@ -24,7 +25,23 @@ const meta: Meta<typeof SignatureField> = {
         <Story />
       </TRPCProvider>
     )
-  ]
+  ],
+  parameters: {
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <SignatureField.Input
+            maxFileSize={5 * 1024 * 1024}
+            modalTitle={'Upload Signature'}
+            name={'Upload Signature'}
+            onChange={() => noop()}
+          />
+        )
+      },
+      initialPath: '/event/123-kalsnk-213'
+    }
+  }
 }
 
 export default meta

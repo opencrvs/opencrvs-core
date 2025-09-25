@@ -91,7 +91,8 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
     setEventData(response.id, response)
     setEventData(context.transactionId, response)
     await refetchAllSearchQueries()
-  }
+  },
+  meta: { actionType: ActionType.CREATE }
 })
 
 export function useCreateEvent() {
