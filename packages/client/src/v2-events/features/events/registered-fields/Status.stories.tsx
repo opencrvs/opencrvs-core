@@ -11,7 +11,7 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 import { fn, userEvent, within } from '@storybook/test'
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { noop } from 'lodash'
 import { FieldType } from '@opencrvs/commons/client'
@@ -19,7 +19,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { TRPCProvider } from '@client/v2-events/trpc'
 
 const meta: Meta<typeof FormFieldGenerator> = {
-  title: 'Inputs/Status',
+  title: 'Inputs/VerificationStatus',
   args: { onChange: fn() },
   decorators: [
     (Story) => (
@@ -41,34 +41,82 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
     layout: 'centered'
   },
   render: function Component() {
+    const [formData, setFormData] = React.useState({})
+
     return (
       <StyledFormFieldGenerator
         fields={[
           {
-            id: 'storybook.status',
+            id: 'storybook.verified',
             type: FieldType.VERIFICATION_STATUS,
             label: {
-              id: 'storybook.status',
-              defaultMessage: 'Verification status',
+              id: 'storybook.verified',
+              defaultMessage: 'Verified verification status',
               description: 'The title for the status field label'
             },
             configuration: {
-              icon: 'CircleWavyCheck',
-              theme: 'default',
               text: {
-                id: 'storybook.status.verified',
+                id: 'storybook.verified.verified',
                 defaultMessage: 'Verified',
                 description: 'Status text when the informant is verified'
               },
               description: {
-                id: 'storybook.status.verified.description',
-                defaultMessage: 'Verified',
+                id: 'storybook.verified.verified.description',
+                defaultMessage: 'ID verified with National ID system',
                 description: 'Status description when the informant is verified'
+              }
+            }
+          },
+          {
+            id: 'storybook.authenticated',
+            type: FieldType.VERIFICATION_STATUS,
+            label: {
+              id: 'storybook.authenticated',
+              defaultMessage: 'Authenticated verification status',
+              description: 'The title for the status field label'
+            },
+            configuration: {
+              text: {
+                id: 'storybook.authenticated.authenticated',
+                defaultMessage: 'Authenticated',
+                description: 'Status text when the informant is authenticated'
+              },
+              description: {
+                id: 'storybook.authenticated.authenticated.description',
+                defaultMessage: 'ID authenticated with National ID system',
+                description:
+                  'Status description when the informant is authenticated'
+              }
+            }
+          },
+          {
+            id: 'storybook.failed',
+            type: FieldType.VERIFICATION_STATUS,
+            label: {
+              id: 'storybook.failed',
+              defaultMessage: 'Failed verification status',
+              description: 'The title for the status field label'
+            },
+            configuration: {
+              text: {
+                id: 'storybook.failed.failed',
+                defaultMessage: 'Failed',
+                description: 'Status text when the informant is failed'
+              },
+              description: {
+                id: 'storybook.failed.failed.description',
+                defaultMessage: 'ID verification failed',
+                description: 'Status description when the informant is failed'
               }
             }
           }
         ]}
         id="my-form"
+        initialValues={{
+          'storybook.verified': 'verified',
+          'storybook.authenticated': 'authenticated',
+          'storybook.failed': 'failed'
+        }}
         onChange={noop}
       />
     )

@@ -11,12 +11,20 @@
 import React from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
-import { Banner, Icon, Pill, Text } from '@opencrvs/components'
+import {
+  Banner,
+  Button,
+  Icon,
+  Pill,
+  ResponsiveModal,
+  Text
+} from '@opencrvs/components'
 import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
 import {
   VerificationStatus,
   VerificationStatusValue
 } from '@opencrvs/commons/client'
+import { useModal } from '@client/v2-events/hooks/useModal'
 
 const StyledIcon = styled(Icon)`
   margin-right: 4px;
@@ -26,8 +34,8 @@ const IconWrapper = styled.div<{
   type: VerificationStatusValue
 }>`
   --background-color: ${({ theme, type }) => `
-    ${type === 'authenticated' ? theme.colors.primaryLight : ''}
-    ${type === 'verified' ? theme.colors.greenLight : ''}
+    ${type === 'verified' ? theme.colors.primaryLight : ''}
+    ${type === 'authenticated' ? theme.colors.greenLight : ''}
     ${type === 'failed' ? theme.colors.redLight : ''}
   `};
   height: 24px;
@@ -54,13 +62,56 @@ const ICON_FOR_STATUS = {
 function Input({
   id,
   configuration,
-  value
+  value,
+  onReset
 }: {
   id: string
   configuration: VerificationStatus['configuration']
-  value: VerificationStatusValue
+  value: VerificationStatusValue | undefined
+  onReset: () => void
 }) {
   const intl = useIntl()
+  const [modal, openModal] = useModal()
+  const handleReset = async () => {
+    const confirm = await openModal((close) => (
+      <ResponsiveModal
+        autoHeight
+        preventClickOnParent
+        show
+        actions={[
+          <Button
+            key="cancel-btn"
+            id="cancel"
+            type="tertiary"
+            onClick={() => close(false)}
+          >
+            {`TODO: Cancel`}
+          </Button>,
+          <Button
+            key="confirm-btn"
+            id="confirm"
+            type="negative"
+            onClick={() => close(true)}
+          >
+            {`TODO: Continue`}
+          </Button>
+        ]}
+        handleClose={() => close(false)}
+        id="assignment"
+        responsive={false}
+        title="@TODO: Title!"
+      >
+        {`TODO: Description`}
+      </ResponsiveModal>
+    ))
+    if (confirm) {
+      onReset()
+    }
+  }
+
+  if (!value) {
+    return null
+  }
 
   return (
     <Banner.Container>
@@ -95,6 +146,9 @@ function Input({
           {intl.formatMessage(configuration.description)}
         </Text>
       </Banner.Body>
+      {/* TODO: Revoke button */}
+      <button style={{ display: 'none' }} onClick={handleReset} />
+      {modal}
     </Banner.Container>
   )
 }

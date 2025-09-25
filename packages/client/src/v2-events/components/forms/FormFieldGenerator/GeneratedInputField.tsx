@@ -640,13 +640,12 @@ export const GeneratedInputField = React.memo(
 
     if (isVerificationStatusType(field)) {
       return (
-        <InputField {...field.inputFieldProps}>
-          <Status.Input
-            configuration={field.config.configuration}
-            id={field.config.id}
-            value={field.value as any}
-          />
-        </InputField>
+        <Status.Input
+          configuration={field.config.configuration}
+          id={field.config.id}
+          value={field.value}
+          onReset={() => onFieldValueChange(fieldDefinition.id, undefined)}
+        />
       )
     }
 

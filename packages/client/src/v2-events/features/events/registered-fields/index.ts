@@ -103,7 +103,7 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return Http
     case FieldType.LINK_BUTTON:
       return LinkButton
-    case FieldType.STATUS:
+    case FieldType.VERIFICATION_STATUS:
       return Status
     default:
       return undefined
