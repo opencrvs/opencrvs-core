@@ -73,6 +73,9 @@ function useActionGuard(
   }
 }
 
+// eslint-disable-next-line react/no-unused-prop-types
+type Props = PropsWithChildren<{ actionType: AvailableActionTypes }>
+
 /**
  * Creates a wrapper component for the declaration action.
  * Manages the state of the declaration action and its local draft.
@@ -82,10 +85,7 @@ function useActionGuard(
  *
  * This differs from AnnotationAction, which modify the annotation, and can be triggered multiple times.
  */
-function DeclarationActionComponent({
-  children,
-  actionType
-}: PropsWithChildren<{ actionType: AvailableActionTypes }>) {
+function DeclarationActionComponent({ children, actionType }: Props) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
 
   const events = useEvents()
@@ -262,9 +262,7 @@ function DeclarationActionComponent({
   return children
 }
 
-export const DeclarationAction = (
-  props: PropsWithChildren<{ actionType: AvailableActionTypes }>
-) => (
+export const DeclarationAction = (props: Props) => (
   <NavigationStack>
     {withSuspense(DeclarationActionComponent)(props)}
   </NavigationStack>
