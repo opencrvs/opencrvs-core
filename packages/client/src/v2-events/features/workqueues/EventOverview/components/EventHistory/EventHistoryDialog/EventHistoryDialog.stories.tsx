@@ -19,7 +19,10 @@ import {
   createPrng,
   getRandomDatetime
 } from '@opencrvs/commons/client'
-import { DECLARATION_ACTION_UPDATE } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
+import {
+  DECLARATION_ACTION_UPDATE,
+  expandWithUpdateActions
+} from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { EventHistoryDialog } from './EventHistoryDialog'
 
 const meta: Meta<typeof EventHistoryDialog> = {
@@ -254,10 +257,14 @@ export const Validated: Story = {
   }
 }
 
+const updateActionForValidate = expandWithUpdateActions(
+  eventWhenValidateUpdatesDeclaration.actions
+).filter((a) => a.type === DECLARATION_ACTION_UPDATE)[0]
+
 export const ValidatedOnDeclarationUpdate: Story = {
   args: {
     fullEvent: eventWhenValidateUpdatesDeclaration,
-    action: validateAction
+    action: updateActionForValidate
   }
 }
 
@@ -281,10 +288,14 @@ export const Registered: Story = {
   }
 }
 
+const updateActionForRegister = expandWithUpdateActions(
+  eventWhenRegisterUpdatesDeclaration.actions
+).filter((a) => a.type === DECLARATION_ACTION_UPDATE)[0]
+
 export const RegisteredOnDeclarationUpdate: Story = {
   args: {
     fullEvent: eventWhenRegisterUpdatesDeclaration,
-    action: registerAction
+    action: updateActionForRegister
   }
 }
 
