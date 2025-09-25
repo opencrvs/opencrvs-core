@@ -141,8 +141,7 @@ export function DeclarationComparisonTableComponent({
     currentEvent,
     eventConfiguration
   )
-
-  const formWithOnlyChangedValues = form ? form : action?.declaration
+  const formWithOnlyChangedValues = form ?? action?.declaration
 
   // When form is provided, we apply it on top of the current state to get the latest declaration
   const latestDeclaration = formWithOnlyChangedValues
