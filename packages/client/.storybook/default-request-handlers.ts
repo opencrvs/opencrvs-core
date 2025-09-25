@@ -536,6 +536,42 @@ export const handlers = {
       }
 
       const url = new URL(request.request.url)
+
+      const basename = url.pathname.split('/').pop()
+
+      let file: string
+      switch (basename) {
+        case 'tree.svg':
+          file = TestImage.Tree
+          break
+        case 'fish.svg':
+          file = TestImage.Fish
+          break
+        case 'mountain.svg':
+          file = TestImage.Mountain
+          break
+        default:
+          file = TestImage.Box
+      }
+
+      return new HttpResponse(file, {
+        headers: {
+          'Content-Type': 'image/svg+xml',
+          'Cache-Control': 'no-cache'
+        }
+      })
+    }),
+    http.get('http://localhost:3535/ocrvs/:eventId/:id', async (request) => {
+      const cache = await caches.open(FAKE_CACHE_NAME)
+
+      const response = await cache.match(request.request)
+
+      if (response) {
+        return response
+      }
+
+      const url = new URL(request.request.url)
+
       const basename = url.pathname.split('/').pop()
 
       let file: string
