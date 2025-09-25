@@ -242,13 +242,11 @@ export function getCurrentEventState(
 export function dangerouslyGetCurrentEventStateWithDrafts({
   event,
   draft,
-  configuration,
-  context
+  configuration
 }: {
   event: EventDocument
   draft: Draft
   configuration: EventConfig
-  context: UserContext
 }): EventIndex {
   const actions = event.actions
     .slice()

@@ -74,8 +74,7 @@ function EventOverviewFull({
     ? dangerouslyGetCurrentEventStateWithDrafts({
         event,
         draft,
-        configuration: eventConfiguration,
-        context: userContext
+        configuration: eventConfiguration
       })
     : getCurrentEventState(event, eventConfiguration)
 

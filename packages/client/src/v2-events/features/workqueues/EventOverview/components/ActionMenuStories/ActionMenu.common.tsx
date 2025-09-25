@@ -40,7 +40,6 @@ import {
   addLocalEventConfig
 } from '@client/v2-events/features/events/useEvents/api'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { ActionMenu } from '../ActionMenu'
 import { actionLabels } from '../useAllowedActionConfigurations'
 

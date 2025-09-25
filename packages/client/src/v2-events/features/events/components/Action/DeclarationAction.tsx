@@ -37,7 +37,6 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
-import { useContext } from '@client/v2-events/hooks/useContext'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
 import { AvailableActionTypes, getPreviousDeclarationActionType } from './utils'
@@ -92,7 +91,6 @@ function DeclarationActionComponent({
 
   const events = useEvents()
   const navigate = useNavigate()
-  const userContext = useContext()
   const { setLocalDraft, getLocalDraftOrDefault, getRemoteDraftByEventId } =
     useDrafts()
 
@@ -188,10 +186,9 @@ function DeclarationActionComponent({
       dangerouslyGetCurrentEventStateWithDrafts({
         event,
         draft: mergedDraft,
-        configuration,
-        context: userContext
+        configuration
       }),
-    [mergedDraft, event, configuration, userContext]
+    [mergedDraft, event, configuration]
   )
 
   const actionAnnotation = useMemo(() => {

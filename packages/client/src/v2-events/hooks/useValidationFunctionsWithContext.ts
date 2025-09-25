@@ -34,8 +34,6 @@ export function useValidationFunctionsWithContext() {
   return {
     isFieldVisible: (field: FieldConfig, form: ActionUpdate | EventState) =>
       isFieldVisible(field, form, context),
-    isFieldEnabled: (field: FieldConfig, form: ActionUpdate | EventState) =>
-      isFieldEnabled(field, form, context),
     hasFieldChanged: (
       field: FieldConfig,
       form: EventState,

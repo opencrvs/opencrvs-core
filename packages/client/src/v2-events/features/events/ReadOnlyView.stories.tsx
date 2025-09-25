@@ -21,13 +21,11 @@ import {
   generateEventDraftDocument,
   generateWorkqueues,
   getCurrentEventState,
-  tennisClubMembershipEvent,
-  testContext
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { ReadonlyViewIndex } from './ReadOnlyView'
 
 const generator = testDataGenerator()

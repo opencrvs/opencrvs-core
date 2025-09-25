@@ -31,7 +31,6 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useContext } from '@client/v2-events/hooks/useContext'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
 import { removeCachedFiles } from '../files/cache'
 
 function ReadonlyView() {
