@@ -16,6 +16,7 @@ import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { userSerializer } from '../events/serializers/user/serializer'
 import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
+import { FieldConfig } from '../events/FieldConfig'
 
 /** @knipignore */
 export type JSONSchema = {
@@ -508,6 +509,27 @@ export function createFieldConditionals(fieldId: string) {
             },
             description:
               'The provided administrative value should have a value corresponding to the required lowest administrative level'
+          }
+        }
+      }),
+    getRequiredValidatorForNestedFields: (childFieldConfigs: FieldConfig[]) =>
+      defineFormConditional({
+        type: 'object',
+        properties: {
+          [fieldId]: {
+            type: 'object',
+            properties: Object.fromEntries(
+              childFieldConfigs
+                .filter((field) => field.required)
+                .map((field) => {
+                  return [
+                    field.id,
+                    {
+                      minLength: 1
+                    }
+                  ]
+                })
+            )
           }
         }
       }),
