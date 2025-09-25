@@ -42,7 +42,8 @@ export const FieldType = {
   DATA: 'DATA',
   BUTTON: 'BUTTON',
   PRINT_BUTTON: 'PRINT_BUTTON',
-  HTTP: 'HTTP'
+  HTTP: 'HTTP',
+  LINK_BUTTON: 'LINK_BUTTON'
 } as const
 
 /**

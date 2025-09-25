@@ -37,7 +37,8 @@ const Label = styled.label<{ disabled?: boolean }>`
 const Check = styled.span<{ size?: string; disabled?: boolean }>`
   display: inline-block;
   border-radius: 4px;
-  background: ${({ theme }) => theme.colors.grey600};
+  background: ${({ theme, disabled }) =>
+    disabled ? theme.colors.grey200 : theme.colors.grey600};
   ${({ size }) =>
     size === 'large'
       ? `height: 40px;
@@ -126,24 +127,26 @@ export const Checkbox = ({
   name,
   id,
   selected,
+  disabled,
   label,
   value,
   onChange,
   size = 'small'
 }: CheckboxProps) => {
   return (
-    <Label htmlFor={id}>
+    <Label htmlFor={id} disabled={disabled}>
       <Input
         id={id}
         role="checkbox"
         size={size === 'large' ? 40 : 16}
         type="checkbox"
+        disabled={disabled}
         checked={selected}
         name={name}
         value={value}
         onChange={onChange}
       />
-      <Check size={size}>
+      <Check size={size} disabled={disabled}>
         {selected && (size === 'large' ? <TickLarge /> : <Tick />)}
       </Check>
       {label}

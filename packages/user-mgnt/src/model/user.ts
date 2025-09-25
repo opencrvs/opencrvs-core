@@ -10,6 +10,7 @@
  */
 import { statuses } from '@user-mgnt/utils/userUtils'
 import { Document, model, Schema } from 'mongoose'
+import { IUserName } from '@opencrvs/commons'
 
 export enum AUDIT_REASON {
   TERMINATED,
@@ -27,11 +28,6 @@ export enum AUDIT_ACTION {
   CERTIFICATE_DELETED
 }
 
-export interface IUserName {
-  use: string
-  family: string
-  given: string[]
-}
 export interface ISecurityQuestionAnswer {
   questionKey: string
   answerHash: string

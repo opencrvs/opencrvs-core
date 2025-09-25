@@ -11,6 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse, HttpResponseInit } from 'msw'
+import { TokenUserType } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { mswServer } from '../../tests/msw'
 
@@ -29,6 +30,7 @@ test('Throws error if user not found with id', async () => {
 
 test('Returns user in correct format if found', async () => {
   const { user } = await setupTestCase()
+
   const client = createTestClient(user)
   mswServer.use(
     http.post(`http://localhost:3030/getUser`, () => {
@@ -42,6 +44,34 @@ test('Returns user in correct format if found', async () => {
     name: user.name,
     role: user.role,
     signature: user.signature,
-    primaryOfficeId: user.primaryOfficeId
+    primaryOfficeId: user.primaryOfficeId,
+    type: TokenUserType.enum.user
+  })
+})
+
+test('Returns user with full honorific name when defined', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user)
+  const userWithHonorific = {
+    ...user,
+    fullHonorificName: 'Dr. John Doe, PhD'
+  }
+
+  mswServer.use(
+    http.post(`http://localhost:3030/getUser`, () => {
+      return HttpResponse.json(userWithHonorific)
+    })
+  )
+  const fetchedUser = await client.user.get(user.id)
+
+  expect(fetchedUser).toEqual({
+    id: user.id,
+    name: user.name,
+    role: user.role,
+    signature: user.signature,
+    primaryOfficeId: user.primaryOfficeId,
+    fullHonorificName: userWithHonorific.fullHonorificName,
+    type: TokenUserType.enum.user
   })
 })

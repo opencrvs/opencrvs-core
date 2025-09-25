@@ -203,7 +203,7 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
                 conditional: never()
               }
             ],
-            value: field('child.http-fetch').get('data.nid')
+            value: field('child.http-fetch').get('data')
           }
         ]}
         id="my-form"

@@ -260,6 +260,40 @@ function isFieldReference(value: unknown): value is FieldReference {
   return typeof value === 'object' && value !== null && '$$field' in value
 }
 
+function defineComparison(
+  fieldId: string,
+  value: number | FieldReference,
+  keyword: 'exclusiveMinimum' | 'exclusiveMaximum'
+) {
+  if (isFieldReference(value)) {
+    const comparedFieldId = value.$$field
+    return defineFormConditional({
+      type: 'object',
+      properties: {
+        [fieldId]: {
+          type: ['number'],
+          [keyword]: { $data: `1/${comparedFieldId}` }
+        },
+        [comparedFieldId]: {
+          type: 'number'
+        }
+      },
+      required: [fieldId, comparedFieldId]
+    })
+  }
+
+  return defineFormConditional({
+    type: 'object',
+    properties: {
+      [fieldId]: {
+        type: 'number',
+        [keyword]: value
+      }
+    },
+    required: [fieldId]
+  })
+}
+
 /**
  * Generate conditional rules for a form field.
  *
@@ -359,7 +393,11 @@ export function createFieldConditionals(fieldId: string) {
       now: () =>
         defineFormConditional(getDateRange({ $data: '/$now' }, 'formatMaximum'))
     }),
-    isEqualTo(value: string | boolean | FieldReference) {
+    isGreaterThan: (value: number | FieldReference) =>
+      defineComparison(fieldId, value, 'exclusiveMinimum'),
+    isLessThan: (value: number | FieldReference) =>
+      defineComparison(fieldId, value, 'exclusiveMaximum'),
+    isEqualTo(value: string | boolean | number | FieldReference) {
       // If the value is a reference to another field, the JSON schema uses the field reference as the 'const' value we compare to
       if (isFieldReference(value)) {
         const comparedFieldId = value.$$field
@@ -368,10 +406,10 @@ export function createFieldConditionals(fieldId: string) {
           type: 'object',
           properties: {
             [fieldId]: {
-              type: ['string', 'boolean'],
+              type: ['string', 'boolean', 'number'],
               const: { $data: `/$form/${comparedFieldId}` }
             },
-            [comparedFieldId]: { type: ['string', 'boolean'] }
+            [comparedFieldId]: { type: ['string', 'boolean', 'number'] }
           },
           required: [fieldId, comparedFieldId]
         })
@@ -384,7 +422,8 @@ export function createFieldConditionals(fieldId: string) {
             {
               oneOf: [
                 { type: 'string', const: value },
-                { type: 'boolean', const: value }
+                { type: 'boolean', const: value },
+                { type: 'number', const: value }
               ],
               const: value
             },

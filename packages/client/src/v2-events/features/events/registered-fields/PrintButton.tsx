@@ -28,6 +28,7 @@ interface PrintButtonProps {
   template: string
   buttonLabel?: { id: string; defaultMessage: string }
   disabled?: boolean
+  value?: string
   /**
    * Optional callback to set a form value when the print action completes.
    * This allows satisfying a "required" constraint for this field.
@@ -43,10 +44,10 @@ export const PrintButton = {
     template,
     buttonLabel,
     disabled,
+    value,
     onChange
   }: PrintButtonProps) => {
     const intl = useIntl()
-    // const { eventId } = useParams()
     const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
     const { getEvent } = useEvents()
     const { certificateTemplates, language } = useAppConfig()
@@ -60,16 +61,10 @@ export const PrintButton = {
     const [locations] = getLocations.useSuspenseQuery()
     const { eventConfiguration } = useEventConfiguration(event.type)
 
-    console.log('eventId :>> ', eventId)
-
     // Find the certificate template configuration
     const certificateConfig = certificateTemplates.find(
       (cert) => cert.id === template
     )
-
-    console.log('PrintB certificateTemplates :>> ', certificateTemplates)
-    console.log('certificateConfig :>> ', certificateConfig)
-    console.log('template :>> ', template)
 
     const { preparePdfCertificate } = usePrintableCertificate({
       event,
@@ -80,20 +75,19 @@ export const PrintButton = {
       language
     })
 
+    const alreadyPrinted = Boolean(value)
+
     const handlePrint = async () => {
       if (!certificateConfig || !language || !preparePdfCertificate) {
-        console.log('must return ------------->')
         return
       }
+
+      onChange?.(new Date().toISOString())
 
       // Follow the new print flow: prepare first, then mutate, then print in the prepared window
       const openPreparedPdf = await preparePdfCertificate(event)
       // Defer recording print action to the dedicated review flow; button just opens prepared PDF
       openPreparedPdf()
-      // Notify form that print action has occurred to satisfy required validation if needed
-      if (typeof onChange === 'function') {
-        onChange(new Date().toISOString())
-      }
     }
 
     const label = buttonLabel
@@ -102,7 +96,7 @@ export const PrintButton = {
 
     return (
       <Button
-        disabled={disabled || !certificateConfig}
+        disabled={disabled || !certificateConfig || alreadyPrinted}
         id={id}
         size="medium"
         type="secondary"
