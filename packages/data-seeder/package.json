@@ -6,6 +6,7 @@
   "license": "MPL-2.0",
   "scripts": {
     "seed": "NODE_OPTIONS=--dns-result-order=ipv4first ts-node -r tsconfig-paths/register src/index.ts",
+    "reindex-search": "NODE_OPTIONS=--dns-result-order=ipv4first ts-node -r tsconfig-paths/register src/reindex-search.ts",
     "test:compilation": "tsc --noEmit",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0"
   },
