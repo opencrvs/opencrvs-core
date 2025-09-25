@@ -1,4 +1,14 @@
-// PrintButton.stories.tsx
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+
 import type { Meta, StoryObj } from '@storybook/react'
 import React, { useState } from 'react'
 import { within, userEvent, expect, waitFor } from '@storybook/test'
@@ -15,9 +25,8 @@ interface PrintButtonProps {
 }
 
 const Container = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 2rem;
+  width: 400px;
+  margin: 0 auto;
 `
 
 // Minimal in-story "mock" of PrintButton.Input to avoid calling app hooks
