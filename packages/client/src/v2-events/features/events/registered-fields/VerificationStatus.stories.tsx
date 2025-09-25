@@ -47,6 +47,27 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
       <StyledFormFieldGenerator
         fields={[
           {
+            id: 'storybook.pending',
+            type: FieldType.VERIFICATION_STATUS,
+            label: {
+              id: 'storybook.pending',
+              defaultMessage: 'Pending verification status',
+              description: 'The title for the status field label'
+            },
+            configuration: {
+              text: {
+                id: 'storybook.pending.pending',
+                defaultMessage: 'Pending',
+                description: 'Status text when the informant is pending'
+              },
+              description: {
+                id: 'storybook.pending.pending.description',
+                defaultMessage: 'ID pending with National ID system',
+                description: 'Status description when the informant is pending'
+              }
+            }
+          },
+          {
             id: 'storybook.verified',
             type: FieldType.VERIFICATION_STATUS,
             label: {
@@ -113,6 +134,7 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
         ]}
         id="my-form"
         initialValues={{
+          'storybook.pending': 'pending',
           'storybook.verified': 'verified',
           'storybook.authenticated': 'authenticated',
           'storybook.failed': 'failed'

@@ -617,7 +617,7 @@ export type LinkButtonField = z.infer<typeof LinkButtonField>
 
 const VerificationStatus = BaseField.extend({
   type: z.literal(FieldType.VERIFICATION_STATUS),
-  defaultValue: VerificationStatusValue.optional().default('pending'),
+  defaultValue: VerificationStatusValue.optional(),
   configuration: z.object({
     text: TranslationConfig.describe('Text to display on the status pill.'),
     description: TranslationConfig.describe(
