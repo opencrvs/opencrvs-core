@@ -63,10 +63,6 @@ const router = {
          */
         const event = getEvent.findFromCache(createdEvent.id)
 
-        React.useEffect(() => {
-          void event.refetch()
-        }, [event, event.refetch])
-
         /*
          * Explicitly call the hook to trigger draft fetching
          */
@@ -165,7 +161,7 @@ export const GetEventHook: Story = {
   ],
   parameters: {
     reactRouter: {
-      router: router,
+      router,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
         eventId: createdEvent.id
       })

@@ -16,12 +16,15 @@ import {
   ActionStatus,
   ActionType,
   AddressType,
+  createPrng,
   EventStatus,
   generateActionDocument,
   getCurrentEventState,
   getMixedPath,
   getUUID,
   InherentFlags,
+  Location,
+  LocationType,
   SCOPES,
   TENNIS_CLUB_MEMBERSHIP,
   TEST_SYSTEM_IANA_TIMEZONE
@@ -36,7 +39,7 @@ import {
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
-import { Location } from '@events/service/locations/locations'
+
 test('User without any search scopes should not see any events', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
@@ -248,9 +251,10 @@ test('Returns events based on the updatedAt column', async () => {
   const oldEventCreateAction = generateActionDocument({
     configuration: tennisClubMembershipEvent,
     action: ActionType.CREATE,
-    user,
     defaults: {
-      createdAt: oldEventCreatedAt
+      createdAt: oldEventCreatedAt,
+      createdBy: user.id,
+      createdAtLocation: user.primaryOfficeId
     }
   })
 
@@ -261,9 +265,10 @@ test('Returns events based on the updatedAt column', async () => {
     generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action,
-      user,
       defaults: {
-        status: ActionStatus.Requested
+        status: ActionStatus.Requested,
+        createdBy: user.id,
+        createdAtLocation: user.primaryOfficeId
       }
     })
   )
@@ -886,8 +891,9 @@ test('Returns multiple documents after creation', async () => {
 test('Returns correctly based on registration location even when a parent location level is used for searching', async () => {
   const { user, generator, seed, locations } = await setupTestCase()
 
+  const locationRng = createPrng(842)
   const parentLocation = {
-    ...generator.locations.set(1)[0],
+    ...generator.locations.set(1, locationRng)[0],
     name: 'Parent location'
   }
 
@@ -898,7 +904,7 @@ test('Returns correctly based on registration location even when a parent locati
       id: user.primaryOfficeId,
       name: 'Child location',
       parentId: parentLocation.id,
-      locationType: 'ADMIN_STRUCTURE'
+      locationType: LocationType.enum.ADMIN_STRUCTURE
     }
   ]
 

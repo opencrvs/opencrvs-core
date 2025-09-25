@@ -145,7 +145,7 @@ export function ValueOutput(
 
   if (isCheckboxFieldType(field)) {
     return (
-      <Checkbox.Output required={field.config.required} value={field.value} />
+      <Checkbox.Output required={!!field.config.required} value={field.value} />
     )
   }
 
@@ -153,7 +153,6 @@ export function ValueOutput(
     return (
       <Address.Output
         configuration={field.config}
-        fields={searchMode === true ? ['country'] : undefined}
         lineSeparator={searchMode === true ? ', ' : undefined}
         value={field.value}
       />

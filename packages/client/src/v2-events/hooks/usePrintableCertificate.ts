@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Location } from '@events/service/locations/locations'
 import { useSelector } from 'react-redux'
 import {
   ActionDocument,
@@ -22,9 +21,10 @@ import {
   getUUID,
   isMinioUrl,
   LanguageConfig,
+  Location,
   PrintCertificateAction,
-  User,
-  UUID
+  UUID,
+  UserOrSystem
 } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
@@ -76,7 +76,7 @@ export const usePrintableCertificate = ({
   event: EventDocument
   config: EventConfig
   locations: Location[]
-  users: User[]
+  users: UserOrSystem[]
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
 }) => {

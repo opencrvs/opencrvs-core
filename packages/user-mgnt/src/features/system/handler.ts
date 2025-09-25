@@ -328,7 +328,7 @@ interface IGetSystemPayload {
 
 export async function getSystemHandler(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  _h: Hapi.ResponseToolkit
 ) {
   const { systemId, clientId } = request.payload as IGetSystemPayload
   let criteria = {}

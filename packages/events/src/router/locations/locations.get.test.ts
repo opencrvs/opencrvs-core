@@ -8,43 +8,28 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { generateUuid, SCOPES } from '@opencrvs/commons'
+import { generateUuid, Location, LocationType, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { Location } from '@events/service/locations/locations'
 
 test('Returns single location in right format', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const initialLocations = await client.locations.get()
+  const locationId = generateUuid()
 
   const setLocationPayload: Location[] = [
     {
-      id: generateUuid(),
+      id: locationId,
       parentId: null,
       name: 'Location foobar',
       validUntil: null,
-      locationType: 'ADMIN_STRUCTURE'
+      locationType: LocationType.enum.ADMIN_STRUCTURE
     }
   ]
 
   await client.locations.set(setLocationPayload)
 
-  const locations = await client.locations.get()
+  const one = await client.locations.get(locationId)
 
-  expect(locations).toHaveLength(initialLocations.length + 1)
-  expect(locations).toMatchObject(initialLocations.concat(setLocationPayload))
-})
-
-test('Returns multiple locations', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
-
-  const initialLocations = await client.locations.get()
-
-  await client.locations.set(generator.locations.set(5))
-
-  const locations = await client.locations.get()
-
-  expect(locations).toHaveLength(initialLocations.length + 5)
+  expect(one).toMatchObject(setLocationPayload[0])
 })

@@ -20,8 +20,7 @@ import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-
-import { Location } from '../events/locations'
+import { UUID } from '../uuid'
 
 const ajv = new Ajv({
   $data: true,
@@ -31,9 +30,11 @@ const ajv = new Ajv({
 
 const DataContext = z.object({
   rootData: z.object({
-    $locations: z.array(Location)
+    $leafAdminStructureLocationIds: z.array(z.object({ id: UUID }))
   })
 })
+
+type DataContext = z.infer<typeof DataContext>
 
 // https://ajv.js.org/packages/ajv-formats.html
 addFormats(ajv)
@@ -105,25 +106,13 @@ ajv.addKeyword({
   schemaType: 'boolean',
   $data: true,
   errors: true,
-  validate(
-    schema: {},
-    data: string,
-    _: unknown,
-    dataContext?: { rootData: unknown }
-  ) {
-    const context = DataContext.safeParse(dataContext)
+  // @ts-ignore -- Force type. We will move this away from AJV next. Parsing the array will take seconds and is only called by core.
+  validate(schema: {}, data: string, _: unknown, dataContext?: DataContext) {
+    const locationIdInput = data
 
-    if (!context.success) {
-      throw new Error('Validation context must contain $locations')
-    }
+    const locations = dataContext?.rootData.$leafAdminStructureLocationIds ?? []
 
-    const locationToValidate = data
-
-    const locations = context.data.rootData.$locations
-
-    return !locations.some(
-      (location) => location.parentId === locationToValidate
-    )
+    return locations.some((location) => location.id === locationIdInput)
   }
 })
 
@@ -290,12 +279,20 @@ function createIntlError(message: TranslationConfig) {
  * Form error message definitions for Zod validation errors.
  * Overrides zod internal type error messages (string) to match the OpenCRVS error messages (TranslationConfig).
  */
-function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
+function zodToIntlErrorMap(
+  issue: ZodIssueOptionalMessage,
+  _ctx: ErrorMapCtx,
+  field: FieldConfig
+) {
+  const requiredMessage: TranslationConfig =
+    field.required && typeof field.required === 'object'
+      ? field.required.message
+      : errorMessages.requiredField
   // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
   switch (issue.code) {
     case 'invalid_string': {
       if (_ctx.data === '') {
-        return createIntlError(errorMessages.requiredField)
+        return createIntlError(requiredMessage)
       }
 
       if (issue.validation === 'date') {
@@ -314,14 +311,14 @@ function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
         issue.expected !== issue.received &&
         (issue.received === 'undefined' || issue.received === 'null')
       ) {
-        return createIntlError(errorMessages.requiredField)
+        return createIntlError(requiredMessage)
       }
 
       break
     }
     case 'too_small': {
       if (issue.message === undefined) {
-        return createIntlError(errorMessages.requiredField)
+        return createIntlError(requiredMessage)
       }
 
       break
@@ -330,13 +327,14 @@ function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
       for (const { issues } of issue.unionErrors) {
         for (const e of issues) {
           if (
-            zodToIntlErrorMap(e, _ctx).message.message.id !== 'error.required'
+            zodToIntlErrorMap(e, _ctx, field).message.message.id !==
+            'error.required'
           ) {
             return createIntlError(errorMessages.invalidInput)
           }
         }
       }
-      return createIntlError(errorMessages.requiredField)
+      return createIntlError(requiredMessage)
     }
   }
 
@@ -387,9 +385,12 @@ export function validateFieldInput({
   field: FieldConfig
   value: FieldUpdateValue
 }) {
-  const zodType = mapFieldTypeToZod(field.type, field.required)
-  // @ts-expect-error
-  const rawError = zodType.safeParse(value, { errorMap: zodToIntlErrorMap })
+  const zodType = mapFieldTypeToZod(field.type, !!field.required)
+
+  const rawError = zodType.safeParse(value, {
+    // @ts-expect-error
+    errorMap: (issue, _ctx) => zodToIntlErrorMap(issue, _ctx, field)
+  })
 
   // We have overridden the standard error messages
   return (rawError.error?.issues.map((issue) => issue.message) ??
@@ -431,7 +432,7 @@ export function runFieldValidations({
 }: {
   field: FieldConfig
   values: ActionUpdate
-  context?: { locations: Array<Location> }
+  context?: { leafAdminStructureLocationIds: Array<{ id: UUID }> }
 }) {
   if (
     !isFieldVisible(field, values) ||
@@ -445,7 +446,15 @@ export function runFieldValidations({
   const conditionalParameters = {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
-    $locations: context?.locations ?? [],
+    /**
+     * In real use cases, there can be hundreds of thousands of locations.
+     * Make sure that the context contains only the locations that are needed for validation.
+     * E.g. if the user is a leaf admin, only the leaf locations under their admin structure are needed.
+     *
+     * Loading few megabytes of locations to memory just for validation is not efficient and will choke the application.
+     */
+    $leafAdminStructureLocationIds:
+      context?.leafAdminStructureLocationIds ?? [],
     $online: isOnline()
   }
 

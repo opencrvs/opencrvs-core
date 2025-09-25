@@ -14,10 +14,8 @@ services:
     restart: unless-stopped
 
   redis:
-    image: docker.io/bitnami/redis:8.0
+    image: redis:8
     restart: unless-stopped
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.16.4

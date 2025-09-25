@@ -58,6 +58,15 @@ export const ValidationConfig = z.object({
 })
 
 export type ValidationConfig = z.infer<typeof ValidationConfig>
+const requiredSchema = z
+  .union([
+    z.boolean(),
+    z.object({
+      message: TranslationConfig.describe('Custom required validation message')
+    })
+  ])
+  .default(false)
+  .optional()
 
 const BaseField = z.object({
   id: FieldId,
@@ -65,7 +74,8 @@ const BaseField = z.object({
   parent: FieldReference.optional().describe(
     'Reference to a parent field. If a field has a parent, it will be reset when the parent field is changed.'
   ),
-  required: z.boolean().default(false).optional(),
+  required: requiredSchema,
+  disabled: z.boolean().default(false).optional(),
   conditionals: z.array(FieldConditional).default([]).optional(),
   secured: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),
@@ -378,13 +388,13 @@ export type SelectDateRangeField = z.infer<typeof SelectDateRangeField>
 
 export const NameConfig = z.object({
   firstname: z
-    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .object({ required: requiredSchema, label: TranslationConfig.optional() })
     .optional(),
   middlename: z
-    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .object({ required: requiredSchema, label: TranslationConfig.optional() })
     .optional(),
   surname: z
-    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .object({ required: requiredSchema, label: TranslationConfig.optional() })
     .optional()
 })
 
@@ -472,13 +482,9 @@ export type AdministrativeArea = z.infer<typeof AdministrativeArea>
 const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
   defaultValue: NonEmptyTextValue.optional(),
-  configuration: z
-    .object({
-      searchableResource: z
-        .array(z.enum(['locations', 'facilities', 'offices']))
-        .optional()
-    })
-    .optional()
+  configuration: z.object({
+    searchableResource: z.array(z.enum(['locations', 'facilities', 'offices']))
+  })
 }).describe('Input field for a location')
 
 export type LocationInput = z.infer<typeof LocationInput>
@@ -535,7 +541,7 @@ const Address = BaseField.extend({
         .array(
           z.object({
             id: z.string(),
-            required: z.boolean(),
+            required: requiredSchema,
             label: TranslationConfig,
             type: z.literal(FieldType.TEXT),
             conditionals: z.array(FieldConditional).default([]).optional(),
@@ -608,6 +614,16 @@ const HttpField = BaseField.extend({
 
 export type HttpField = z.infer<typeof HttpField>
 
+const LinkButtonField = BaseField.extend({
+  type: z.literal(FieldType.LINK_BUTTON),
+  configuration: z.object({
+    url: z.string().describe('URL to open'),
+    text: TranslationConfig.describe('Text to display on the button')
+  })
+}).describe('Button that opens a link')
+
+export type LinkButtonField = z.infer<typeof LinkButtonField>
+
 /** @knipignore */
 export type FieldConfig =
   | z.infer<typeof Address>
@@ -640,6 +656,7 @@ export type FieldConfig =
   | z.infer<typeof DataField>
   | z.infer<typeof ButtonField>
   | z.infer<typeof HttpField>
+  | z.infer<typeof LinkButtonField>
 
 /** @knipignore */
 /**
@@ -676,6 +693,7 @@ export type FieldConfigInput =
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
+  | z.input<typeof LinkButtonField>
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
  *  referenced quite extensively througout various other schemas. Leaving the
@@ -717,7 +735,8 @@ export const FieldConfig: z.ZodType<
     FileUploadWithOptions,
     DataField,
     ButtonField,
-    HttpField
+    HttpField,
+    LinkButtonField
   ])
   .openapi({
     description: 'Form field configuration',

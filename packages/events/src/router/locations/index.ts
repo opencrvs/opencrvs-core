@@ -10,13 +10,13 @@
  */
 
 import { z } from 'zod'
-
-import { SCOPES } from '@opencrvs/commons'
+import { TRPCError } from '@trpc/server'
+import { Location, LocationType, SCOPES, UUID } from '@opencrvs/commons'
 import { router, systemProcedure } from '@events/router/trpc'
 import {
   getLocations,
-  Location,
   setLocations,
+  getLocationById,
   syncLocations
 } from '@events/service/locations/locations'
 import { requiresAnyOfScopes } from '../middleware'
@@ -40,7 +40,44 @@ export const locationRouter = router({
     .mutation(async () => {
       await syncLocations()
     }),
-  get: systemProcedure.output(z.array(Location)).query(getLocations),
+  list: systemProcedure
+    .input(
+      z
+        .object({
+          isActive: z.boolean().optional(),
+          locationIds: z.array(UUID).optional(),
+          locationType: LocationType.optional()
+        })
+        .optional()
+    )
+    .output(z.array(Location))
+    .query(async ({ input }) =>
+      getLocations({
+        isActive: input?.isActive,
+        locationIds: input?.locationIds,
+        locationType: input?.locationType
+      })
+    ),
+  get: systemProcedure
+    .input(UUID)
+    .output(Location)
+    .query(async ({ input }) => {
+      const location = await getLocationById(input)
+
+      if (!location) {
+        throw new TRPCError({ code: 'NOT_FOUND' })
+      }
+
+      return {
+        id: location.id,
+        name: location.name,
+        parentId: location.parentId,
+        locationType: location.locationType,
+        validUntil: location.validUntil
+          ? new Date(location.validUntil).toISOString()
+          : null
+      } as Location
+    }),
   set: systemProcedure
     .use(
       requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])

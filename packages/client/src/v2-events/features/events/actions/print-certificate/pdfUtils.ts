@@ -19,7 +19,6 @@ import type {
   TFontFamilyTypes
 } from 'pdfmake/interfaces'
 import pdfMake from 'pdfmake/build/pdfmake'
-import { Location } from '@events/service/locations/locations'
 import { isEqual } from 'lodash'
 import {
   EventState,
@@ -31,7 +30,9 @@ import {
   EventStatus,
   DEFAULT_DATE_OF_EVENT_PROPERTY,
   ActionDocument,
-  ActionStatus
+  ActionStatus,
+  Location,
+  UserOrSystem
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -52,19 +53,21 @@ type CertificateConfiguration = Partial<{
   fonts: Record<string, FontFamilyTypes>
 }>
 
-function findUserById(userId: string, users: User[]) {
+function findUserById(userId: string, users: UserOrSystem[]) {
   const user = users.find((u) => u.id === userId)
 
   if (!user) {
     return {
       name: '',
-      signature: ''
+      signature: '',
+      fullHonorificName: ''
     }
   }
 
   return {
     name: getUsersFullName(user.name, 'en'),
-    signature: user.signature ?? ''
+    signature: user.signature ?? '',
+    fullHonorificName: user.fullHonorificName ?? ''
   }
 }
 
@@ -83,7 +86,7 @@ export const stringifyEventMetadata = ({
   >
   intl: IntlShape
   locations: Location[]
-  users: User[]
+  users: UserOrSystem[]
   adminLevels: AdminStructureItem[]
 }) => {
   return {
@@ -231,7 +234,7 @@ export function compileSvg({
   $actions: ActionDocument[]
   $declaration: EventState
   locations: Location[]
-  users: User[]
+  users: UserOrSystem[]
   /**
    * Indicates whether certificate is reviewed or actually printed
    * in V1 "preview" was used. In V2, "review" is used to remain consistent with action terminology (review of print action rather than preview of certificate).

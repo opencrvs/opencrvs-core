@@ -10,7 +10,6 @@
  */
 import React from 'react'
 import { IntlShape } from 'react-intl'
-import { Location } from '@events/service/locations/locations'
 import { useSelector } from 'react-redux'
 import {
   EventState,
@@ -21,6 +20,7 @@ import {
   FieldConfig,
   FieldPropsWithoutReferenceValue,
   FieldType,
+  Location,
   not,
   AdministrativeAreas,
   alwaysTrue,
@@ -28,7 +28,8 @@ import {
   isFieldDisplayedOnReview,
   AddressField,
   AdministrativeArea,
-  DefaultAddressFieldValue
+  DefaultAddressFieldValue,
+  LocationType
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -49,6 +50,7 @@ type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
   onChange: (newValue: Partial<AddressFieldValue>) => void
   value?: AddressFieldValue
   configuration?: AddressField['configuration']
+  disabled?: boolean
 }
 
 const COUNTRY_FIELD = {
@@ -220,7 +222,7 @@ function getLeafAdministrativeLevel(
  * - In search mode, only displays admin structure and town/village fields.
  */
 function AddressInput(props: Props) {
-  const { onChange, defaultValue, value, ...otherProps } = props
+  const { onChange, defaultValue, disabled, value, ...otherProps } = props
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
@@ -284,7 +286,23 @@ function AddressInput(props: Props) {
     adminLevelIds
   )
 
-  const fields = [COUNTRY_FIELD, ...adminStructure, ...addressFields]
+  const fields = [COUNTRY_FIELD, ...adminStructure, ...addressFields].map(
+    (x) => {
+      const existingEnableCondition =
+        x.conditionals?.find((c) => c.type === ConditionalType.ENABLE)
+          ?.conditional ?? not(not(alwaysTrue()))
+      return {
+        ...x,
+        conditionals: [
+          ...(x.conditionals ?? []),
+          {
+            type: ConditionalType.ENABLE,
+            conditional: disabled ? not(alwaysTrue()) : existingEnableCondition
+          }
+        ]
+      }
+    }
+  )
 
   const handleChange = (values: EventState) => {
     const addressLines = extractAddressLines(values, adminLevelIds)
@@ -323,12 +341,10 @@ function AddressInput(props: Props) {
 function AddressOutput({
   value,
   lineSeparator,
-  fields,
   configuration
 }: {
   value?: AddressFieldValue
   lineSeparator?: React.ReactNode
-  fields?: Array<AddressFieldIdentifier>
   configuration?: AddressField
 }) {
   const { getLocations } = useLocations()
@@ -344,7 +360,7 @@ function AddressOutput({
 
   const administrativeArea = value.administrativeArea
   const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
+    (location) => location.locationType === LocationType.enum.ADMIN_STRUCTURE
   )
 
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
@@ -452,5 +468,5 @@ function toCertificateVariables(
 export const Address = {
   Input: AddressInput,
   Output: AddressOutput,
-  toCertificateVariables: toCertificateVariables
+  toCertificateVariables
 }

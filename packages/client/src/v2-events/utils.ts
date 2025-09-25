@@ -10,9 +10,8 @@
  */
 import { uniq, isString, get, uniqBy, mergeWith } from 'lodash'
 import { v4 as uuid } from 'uuid'
-import { Location } from '@events/service/locations/locations'
 import {
-  ResolvedUser,
+  User,
   ActionDocument,
   EventConfig,
   EventIndex,
@@ -30,14 +29,17 @@ import {
   WorkqueueConfigWithoutQuery,
   joinValues,
   UUID,
-  SystemRole
+  SystemRole,
+  Location,
+  UserOrSystem
 } from '@opencrvs/commons/client'
 
-export function getUsersFullName(
-  names: ResolvedUser['name'],
-  language: string
-) {
-  const match = names.find((name) => name.use === language) ?? names[0]
+export function getUsersFullName(name: UserOrSystem['name'], language: string) {
+  if (typeof name === 'string') {
+    return name
+  }
+
+  const match = name.find((n) => n.use === language) ?? name[0]
 
   return joinValues([...match.given, match.family])
 }
