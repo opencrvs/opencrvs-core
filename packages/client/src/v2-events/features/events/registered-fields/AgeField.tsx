@@ -17,7 +17,7 @@ function AgeInput(props: AgeInputProps) {
   return <Number.Input {...props} data-testid={`age__${props.id}`} min={0} />
 }
 
-export const Age = {
+export const AgeField = {
   Input: AgeInput,
   Output: Number.Output
 }

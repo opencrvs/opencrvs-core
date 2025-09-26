@@ -23,7 +23,6 @@ import {
   QueryParamReaderFieldValue,
   QueryParamReaderFieldUpdateValue
 } from './CompositeFieldValue'
-import { FieldReference } from './FieldConfig'
 /**
  * FieldValues defined in this file are primitive field values.
  * FieldValues defined in CompositeFieldValue.ts are composed of multiple primitive field values (Address, File etc).
@@ -45,17 +44,11 @@ export const DateValue = z
   .date()
   .describe('Date in the format YYYY-MM-DD')
 
-export const AgeValueInput = z.object({
-  age: z.number(),
-  asOfDate: FieldReference
-})
-
 export const AgeValue = z.object({
   age: z.number(),
   asOfDate: DateValue
 })
 
-export type AgeValueInput = z.infer<typeof AgeValueInput>
 export type AgeValue = z.infer<typeof AgeValue>
 
 export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)

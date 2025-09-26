@@ -24,8 +24,7 @@ import {
   SelectDateRangeValue,
   TimeValue,
   ButtonFieldValue,
-  VerificationStatusValue,
-  AgeValueInput
+  VerificationStatusValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -244,7 +243,10 @@ export type DateField = z.infer<typeof DateField>
 
 const AgeField = BaseField.extend({
   type: z.literal(FieldType.AGE),
-  defaultValue: AgeValueInput.optional()
+  defaultValue: NumberFieldValue.optional(),
+  configuration: z.object({
+    asOfDate: FieldReference
+  })
 }).describe('An age input field which uses the current date as the asOfDate')
 
 export type AgeField = z.infer<typeof AgeField>
@@ -805,6 +807,7 @@ export const FieldConfig: z.ZodType<
     TextField,
     NumberField,
     TextAreaField,
+    AgeField,
     DateField,
     TimeField,
     DateRangeField,

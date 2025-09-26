@@ -37,6 +37,7 @@ import { QueryParamReader } from './QueryParamReader'
 
 export * from './Address'
 export * from './AdministrativeArea'
+export * from './AgeField'
 export * from './BulletList'
 export * from './Button'
 export * from './Checkbox'

@@ -45,7 +45,8 @@ import {
   ButtonField,
   LinkButtonField,
   VerificationStatus,
-  QueryParamReaderField
+  QueryParamReaderField,
+  AgeField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -259,6 +260,13 @@ export const isDateFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: DateField } => {
   return field.config.type === FieldType.DATE
+}
+
+export const isAgeFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: AgeValue | undefined; config: AgeField } => {
+  return field.config.type === FieldType.AGE
 }
 
 export const isTimeFieldType = (field: {
