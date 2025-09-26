@@ -49,6 +49,17 @@ export function getValidationErrorsForForm(
       leafAdminStructureLocationIds: locationIds
     }
 
+    if (field.id === 'father.addressSameAs') {
+      console.log(field.id)
+      console.log(
+        runFieldValidations({
+          field,
+          values,
+          context
+        })
+      )
+    }
+
     return {
       ...errorsForAllFields,
       [field.id]: runFieldValidations({
@@ -112,6 +123,7 @@ export function validationErrorsInActionFormExist({
         formWithoutHiddenFields,
         locationIds
       )
+
       return Object.values(fieldErrors).some((field) => field.errors.length > 0)
     })
 

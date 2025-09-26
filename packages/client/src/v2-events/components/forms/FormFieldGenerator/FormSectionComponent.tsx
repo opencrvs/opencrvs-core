@@ -151,6 +151,8 @@ function getUpdatedChildValueOnChange({
 }) {
   if (!fieldReference) {
     // If there is no reference, we reset the value to the default value.
+
+    // @TODO CIHAN: should we recursively go through the children? (children of children)
     return (
       handleDefaultValue({
         field: childField,
