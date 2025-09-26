@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux'
 import {
   deserializeQuery,
   User,
-  UUID,
+  UserOrSystem,
   WorkqueueConfig
 } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -24,7 +24,7 @@ import { useUsers } from './useUsers'
 
 function getDeserializedQuery(
   workqueueConfig: WorkqueueConfig | undefined,
-  user: User
+  user: UserOrSystem
 ) {
   if (!workqueueConfig) {
     throw new Error('Workqueue config not found')
