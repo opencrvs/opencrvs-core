@@ -85,6 +85,11 @@ async function fetchHttpFieldValue(
     throw err
   }
 
+  const contentType = res.headers.get('Content-Type') || ''
+
+  if (contentType.startsWith('text/')) {
+    return res.text()
+  }
   return res.json()
 }
 
@@ -150,5 +155,5 @@ function HttpInput({
 export const Http = {
   Input: HttpInput,
   Output: null,
-  stringify: () => `[http response or error redacted]`
+  stringify: (value: HttpFieldValue) => value
 }
