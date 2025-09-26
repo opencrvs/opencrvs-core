@@ -12,12 +12,14 @@ import _ from 'lodash'
 import { estypes } from '@elastic/elasticsearch'
 import {
   AddressFieldValue,
+  AddressType,
   EventConfig,
   EventIndex,
   FieldValue,
   getDeclarationFieldById,
   isNameFieldType,
-  NameFieldValue
+  NameFieldValue,
+  QueryInputType
 } from '@opencrvs/commons/events'
 
 export type EncodedEventIndex = EventIndex
@@ -139,22 +141,47 @@ export function nameQueryKey(fieldName: string) {
 
 export function generateQueryForAddressField(
   fieldId: string,
-  value: AddressFieldValue
+  search: QueryInputType
 ) {
-  const { country, addressType } = value
+  if (!(search.type === 'exact' || search.type === 'fuzzy')) {
+    return { bool: { must: [] } }
+  }
+
+  const address = AddressFieldValue.safeParse(JSON.parse(search.term))
+  if (address.error) {
+    return { bool: { must: [] } }
+  }
+
+  const { country, addressType, administrativeArea, streetLevelDetails } =
+    address.data
   const mustMatches = []
 
+  const declarationKey = declarationReference(encodeFieldId(fieldId))
   if (country) {
-    mustMatches.push({ match: { [`${fieldId}.country`]: country } })
+    mustMatches.push({
+      term: { [`${declarationKey}.country`]: country }
+    })
   }
-  if (addressType === 'DOMESTIC') {
-    if (value.administrativeArea) {
+  if (addressType === AddressType.DOMESTIC) {
+    if (administrativeArea) {
       mustMatches.push({
-        match: { [`${fieldId}.administrativeArea`]: value.administrativeArea }
+        term: {
+          [`${declarationKey}.administrativeArea`]: administrativeArea
+        }
       })
     }
   }
-
+  if (
+    addressType === AddressType.INTERNATIONAL &&
+    streetLevelDetails &&
+    Object.keys(streetLevelDetails).length
+  ) {
+    Object.entries(streetLevelDetails).forEach(([key, value]) => {
+      mustMatches.push({
+        match: { [`${declarationKey}.streetLevelDetails.${key}`]: value }
+      })
+    })
+  }
   return {
     bool: {
       must: mustMatches,
