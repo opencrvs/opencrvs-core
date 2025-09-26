@@ -13,7 +13,8 @@ import {
   ActionDocument,
   ActionType,
   DeclarationActions,
-  EventDocument
+  EventDocument,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { RequestCorrection } from './RequestCorrection'
 import { PrintCertificate } from './PrintCertificate'
@@ -21,10 +22,12 @@ import { DeclarationUpdate } from './DeclarationUpdate'
 
 export function ActionTypeSpecificContent({
   action,
-  fullEvent
+  fullEvent,
+  validatorContext
 }: {
   action: ActionDocument
   fullEvent: EventDocument
+  validatorContext: ValidatorContext
 }) {
   const { type } = action
 
@@ -34,7 +37,13 @@ export function ActionTypeSpecificContent({
   }
 
   if (type === ActionType.REQUEST_CORRECTION) {
-    return <RequestCorrection action={action} fullEvent={fullEvent} />
+    return (
+      <RequestCorrection
+        action={action}
+        fullEvent={fullEvent}
+        validatorContext={validatorContext}
+      />
+    )
   }
 
   if (type === ActionType.PRINT_CERTIFICATE) {

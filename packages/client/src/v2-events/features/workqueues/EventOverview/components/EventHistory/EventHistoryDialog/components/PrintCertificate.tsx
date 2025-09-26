@@ -26,7 +26,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
-import { useValidatorContext } from '../../../../../../../hooks/useValidatorContext'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 const verifiedMessage = {
   id: 'verified',

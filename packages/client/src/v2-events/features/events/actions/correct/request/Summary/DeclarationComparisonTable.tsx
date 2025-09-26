@@ -26,8 +26,8 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { hasFieldChanged } from '../../utils'
-import { useValidatorContext } from '../../../../../../hooks/useValidatorContext'
 
 const TableHeader = styled.th`
   text-transform: uppercase;

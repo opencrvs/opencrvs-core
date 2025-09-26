@@ -26,12 +26,13 @@ import {
   NameFieldValue,
   isDateRangeFieldType,
   isNameFieldType,
-  isFieldVisible
+  isFieldVisible,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { useValidatorContext } from '../../../hooks/useValidatorContext'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import {
   getAdvancedSearchFieldErrors,
   resolveAdvancedSearchConfig,
@@ -66,7 +67,8 @@ const messages = defineMessages(messagesToDefine)
 function SearchSectionForm({
   section,
   handleFieldChange,
-  fieldValues
+  fieldValues,
+  validatorContext
 }: {
   section: {
     title: TranslationConfig
@@ -75,6 +77,7 @@ function SearchSectionForm({
   }
   handleFieldChange: (fieldId: string, value: FieldValue) => void
   fieldValues?: EventState
+  validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
 
@@ -91,6 +94,7 @@ function SearchSectionForm({
         fields={section.fields}
         id={section.title.id}
         initialValues={fieldValues}
+        validatorContext={validatorContext}
         onChange={(updatedValues) => {
           Object.entries(updatedValues).forEach(([fieldId, value]) =>
             handleFieldChange(fieldId, value)
@@ -241,6 +245,7 @@ export function TabSearch({
           fieldValues={fieldValues}
           handleFieldChange={handleFieldChange}
           section={section}
+          validatorContext={validatorContext}
         />
       ))}
       <SearchButton

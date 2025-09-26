@@ -24,7 +24,8 @@ import {
   ActionDocument,
   ActionType,
   EventDocument,
-  getAcceptedActions
+  getAcceptedActions,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -325,7 +326,13 @@ export function EventHistorySkeleton() {
 /**
  *  Renders the event history table. Used for audit trail.
  */
-export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
+export function EventHistory({
+  fullEvent,
+  validatorContext
+}: {
+  fullEvent: EventDocument
+  validatorContext: ValidatorContext
+}) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
   const intl = useIntl()
@@ -340,6 +347,7 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         close={close}
         fullEvent={fullEvent}
         userName={userName}
+        validatorContext={validatorContext}
       />
     ))
   }

@@ -20,7 +20,8 @@ import {
   NameField,
   NameFieldValue,
   not,
-  TextField
+  TextField,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { mergeWithoutNullsOrUndefined } from '@client/v2-events/utils'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -32,6 +33,7 @@ interface Props {
   validation: FieldConfig['validation']
   value?: NameFieldValue
   disabled?: boolean
+  validatorContext: ValidatorContext
 }
 
 const defailtNameFieldValue: NameFieldValue = {
@@ -114,7 +116,14 @@ function FocusNameInputsOnHash({
 }
 
 function NameInput(props: Props) {
-  const { id, onChange, disabled, value = {}, configuration } = props
+  const {
+    id,
+    onChange,
+    disabled,
+    value = {},
+    configuration,
+    validatorContext
+  } = props
 
   const { maxLength, order } = configuration || {}
 
@@ -203,6 +212,7 @@ function NameInput(props: Props) {
         id={id}
         initialValues={{ ...value }}
         parentId={id}
+        validatorContext={validatorContext}
         onChange={(values) => {
           onChange(mergeWithoutNullsOrUndefined(defailtNameFieldValue, values))
         }}

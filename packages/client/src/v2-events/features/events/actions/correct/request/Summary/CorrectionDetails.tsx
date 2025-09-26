@@ -26,7 +26,8 @@ import {
   PageConfig,
   PageTypes,
   TranslationConfig,
-  User
+  User,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment, Link } from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
@@ -40,7 +41,6 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getLocations } from '@client/offline/selectors'
-import { useValidatorContext } from '../../../../../../hooks/useValidatorContext'
 import { DeclarationComparisonTable } from './DeclarationComparisonTable'
 
 const messages = defineMessages({
@@ -116,10 +116,9 @@ function buildCorrectionDetails(
   intl: IntlShape,
   users: User[],
   locations: ReturnType<typeof getLocations>,
+  validatorContext: ValidatorContext,
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
-  const validatorContext = useValidatorContext()
-
   const details: CorrectionDetail[] = correctionFormPages
     .filter((page) => isPageVisible(page, annotation))
     .flatMap((page) => {
@@ -199,7 +198,8 @@ export function CorrectionDetails({
   requesting,
   editable = false,
   workqueue,
-  correctionRequestAction
+  correctionRequestAction,
+  validatorContext
 }: {
   event: EventDocument
   form: EventState
@@ -208,6 +208,7 @@ export function CorrectionDetails({
   correctionRequestAction?: Action
   editable?: boolean
   workqueue?: string
+  validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(event.type)
@@ -229,6 +230,7 @@ export function CorrectionDetails({
     intl,
     users,
     locations,
+    validatorContext,
     correctionRequestAction
   )
 

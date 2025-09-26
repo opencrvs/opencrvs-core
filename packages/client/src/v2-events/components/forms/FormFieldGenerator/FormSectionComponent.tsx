@@ -30,7 +30,8 @@ import {
   FieldReference,
   getAllUniqueFields,
   isFieldVisible,
-  isFieldEnabled
+  isFieldEnabled,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -40,7 +41,6 @@ import {
   makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
-import { useValidatorContext } from '../../../hooks/useValidatorContext'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -79,6 +79,7 @@ type AllProps = {
   isCorrection?: boolean
   systemVariables: SystemVariables
   parentId?: string
+  validatorContext: ValidatorContext
 } & UsedFormikProps
 
 /**
@@ -191,14 +192,14 @@ export function FormSectionComponent({
   onAllFieldsValidated,
   isCorrection = false,
   systemVariables,
-  parentId
+  parentId,
+  validatorContext
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not -
   useOnlineStatus()
   const intl = useIntl()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
-  const validatorContext = useValidatorContext()
 
   const fieldsWithFormikSeparator = fieldsWithDotSeparator.map((field) => ({
     ...field,

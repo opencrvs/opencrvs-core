@@ -524,6 +524,7 @@ function ReviewComponent({
                   id={'review'}
                   initialValues={annotation}
                   readonlyMode={readonlyMode}
+                  validatorContext={validatorContext}
                   onChange={onAnnotationChange}
                 />
               </ReviewContainter>

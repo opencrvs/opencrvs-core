@@ -29,6 +29,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 export function Pages() {
   const events = useEvents()
@@ -40,6 +41,8 @@ export function Pages() {
   const drafts = useDrafts()
   const { modal, closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
+
+  const validatorContext = useValidatorContext()
 
   const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
@@ -85,6 +88,7 @@ export function Pages() {
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}
+        validatorContext={validatorContext}
         onPageChange={(nextPageId: string) =>
           navigate(
             ROUTES.V2.EVENTS.VALIDATE.PAGES.buildPath(

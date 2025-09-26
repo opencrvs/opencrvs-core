@@ -310,6 +310,7 @@ export function ReviewCorrection({
         event={event}
         form={form}
         requesting={!isActionAllowed(ActionType.APPROVE_CORRECTION)}
+        validatorContext={validatorContext}
       />
       <Row background="white" position="left">
         {rejectButton}

@@ -43,7 +43,7 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
-import { useValidatorContext } from '../../../../hooks/useValidatorContext'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {

@@ -29,7 +29,8 @@ import {
   AddressField,
   AdministrativeArea,
   DefaultAddressFieldValue,
-  LocationType
+  LocationType,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -52,6 +53,7 @@ type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
   value?: AddressFieldValue
   configuration?: AddressField['configuration']
   disabled?: boolean
+  validatorContext: ValidatorContext
 }
 
 const COUNTRY_FIELD = {
@@ -223,7 +225,14 @@ function getLeafAdministrativeLevel(
  * - In search mode, only displays admin structure and town/village fields.
  */
 function AddressInput(props: Props) {
-  const { onChange, defaultValue, disabled, value, ...otherProps } = props
+  const {
+    onChange,
+    defaultValue,
+    disabled,
+    value,
+    validatorContext,
+    ...otherProps
+  } = props
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
@@ -332,8 +341,8 @@ function AddressInput(props: Props) {
       {...otherProps}
       fields={fields}
       initialValues={{ ...resolvedValue, ...derivedAdminLevels }}
-      locations={adminStructureLocations}
       parentId={props.id}
+      validatorContext={validatorContext}
       onChange={handleChange}
     />
   )

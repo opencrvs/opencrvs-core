@@ -41,8 +41,8 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { hasFieldChanged } from '../../utils'
-import { useValidatorContext } from '../../../../../../hooks/useValidatorContext'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
@@ -216,6 +216,7 @@ export function Summary() {
             event={event}
             form={form}
             requesting={!userMayCorrect}
+            validatorContext={validatorContext}
             workqueue={workqueue}
           />
         </Content>
