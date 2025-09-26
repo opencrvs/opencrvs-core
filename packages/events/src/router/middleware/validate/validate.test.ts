@@ -8,8 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ConditionalType, field, FieldType } from '@opencrvs/commons'
-import { TokenUserType } from '../../../../../commons/build/dist/esm/authentication'
+import {
+  ConditionalType,
+  field,
+  FieldType,
+  TokenUserType
+} from '@opencrvs/commons'
 import { getFieldErrors } from './index'
 
 export const testContext = {
