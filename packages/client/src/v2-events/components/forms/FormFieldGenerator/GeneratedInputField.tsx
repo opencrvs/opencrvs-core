@@ -654,7 +654,6 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isVerificationStatusType(field)) {
-      console.log(field)
       return (
         <VerificationStatus.Input
           configuration={field.config.configuration}
