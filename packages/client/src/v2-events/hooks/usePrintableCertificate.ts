@@ -81,15 +81,13 @@ export const usePrintableCertificate = ({
   language?: LanguageConfig
 }) => {
   const { eventConfiguration } = useEventConfiguration(event.type)
-
-  const { getEvent } = useEvents()
-  const userDetails = useSelector(getUserDetails)
-  const { config: appConfig } = useSelector(getOfflineData)
-
   const { declaration, ...metadata } = getCurrentEventState(
     event,
     eventConfiguration
   )
+  const { getEvent } = useEvents()
+  const userDetails = useSelector(getUserDetails)
+  const { config: appConfig } = useSelector(getOfflineData)
 
   const adminLevels = appConfig.ADMIN_STRUCTURE
 

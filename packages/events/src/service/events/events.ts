@@ -115,7 +115,6 @@ export async function throwConflictIfActionNotAllowed(
     eventType: event.type,
     token
   })
-
   const eventIndex = getCurrentEventState(event, eventConfig)
 
   const allowedActions: DisplayableAction[] =

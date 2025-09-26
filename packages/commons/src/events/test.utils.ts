@@ -250,7 +250,7 @@ function fieldConfigsToActionPayload(
   )
 }
 
-export const testContext: ValidatorContext = {
+export const testContext = {
   user: {
     sub: 'user_12345',
     scope: ['declare'],
@@ -260,7 +260,7 @@ export const testContext: ValidatorContext = {
     userType: TokenUserType.enum.user
   },
   leafAdminStructureLocationIds: []
-}
+} satisfies ValidatorContext
 
 export function generateActionDeclarationInput(
   configuration: EventConfig,

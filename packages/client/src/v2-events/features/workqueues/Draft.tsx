@@ -17,8 +17,8 @@ import {
   EventDocument,
   getOrThrow,
   mandatoryColumns,
-  applyDraftToEventIndex,
-  getCurrentEventState
+  getCurrentEventState,
+  applyDraftToEventIndex
 } from '@opencrvs/commons/client'
 
 import { ROUTES } from '@client/v2-events/routes'
@@ -31,6 +31,7 @@ import { findLocalEventDocument } from '../events/useEvents/api'
 
 export function Draft() {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
+
   const eventConfigs = useEventConfigurations()
   const intl = useIntl()
 

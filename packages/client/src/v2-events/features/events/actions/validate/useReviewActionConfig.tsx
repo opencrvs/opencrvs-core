@@ -60,7 +60,6 @@ export function useReviewActionConfig({
             eventId,
             declaration,
             transactionId: uuid(),
-
             annotation
           })
         }
