@@ -55,7 +55,8 @@ import {
   isTimeFieldType,
   isButtonFieldType,
   isHttpFieldType,
-  isLinkButtonFieldType
+  isLinkButtonFieldType,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -108,11 +109,13 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   disabled?: boolean
   eventConfig?: EventConfig
   readonlyMode?: boolean
+  validatorContext: ValidatorContext
 }
 
 export const GeneratedInputField = React.memo(
   <T extends FieldConfig>({
     fieldDefinition,
+    validatorContext,
     onBlur,
     onFieldValueChange,
     error,
@@ -195,6 +198,7 @@ export const GeneratedInputField = React.memo(
             disabled={disabled}
             id={fieldDefinition.id}
             validation={validation}
+            validatorContext={validatorContext}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
@@ -435,6 +439,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             configuration={field.config.configuration}
             disabled={disabled}
+            validatorContext={validatorContext}
             value={field.value}
             //@TODO: We need to come up with a general solution for complex types.
             // @ts-ignore

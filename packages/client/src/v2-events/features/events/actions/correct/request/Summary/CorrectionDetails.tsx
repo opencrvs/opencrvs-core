@@ -303,6 +303,7 @@ export function CorrectionDetails({
         form={form}
         fullEvent={event}
         id={'corrections-table'}
+        validatorContext={validatorContext}
       />
     </>
   )

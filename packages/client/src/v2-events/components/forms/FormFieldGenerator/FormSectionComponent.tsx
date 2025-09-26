@@ -446,6 +446,7 @@ export function FormSectionComponent({
                         ] || touched[parentId]
                       : touched[field.id]) ?? false
                   }
+                  validatorContext={validatorContext}
                   value={formikField.value}
                   onBlur={formikField.onBlur}
                   onFieldValueChange={onFieldValueChange}

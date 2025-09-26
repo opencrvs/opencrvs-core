@@ -19,14 +19,14 @@ import {
   PageTypes,
   getPrintCertificatePages,
   getCurrentEventState,
-  isFieldVisible
+  isFieldVisible,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 const verifiedMessage = {
   id: 'verified',
@@ -36,15 +36,16 @@ const verifiedMessage = {
 
 export function PrintCertificate({
   event,
-  action
+  action,
+  validatorContext
 }: {
   event: EventDocument
   action: PrintCertificateAction
+  validatorContext: ValidatorContext
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const formPages = getPrintCertificatePages(eventConfiguration)
   const intl = useIntl()
-  const validatorContext = useValidatorContext()
 
   const { certificateTemplates } = useAppConfig()
   const eventIndex = getCurrentEventState(event, eventConfiguration)

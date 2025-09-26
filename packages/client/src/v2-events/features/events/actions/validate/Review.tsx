@@ -105,7 +105,8 @@ export function Review() {
     annotation,
     reviewFields: reviewConfig.fields,
     status: currentEventState.status,
-    eventType: event.type
+    eventType: event.type,
+    validatorContext
   })
 
   async function handleEdit({

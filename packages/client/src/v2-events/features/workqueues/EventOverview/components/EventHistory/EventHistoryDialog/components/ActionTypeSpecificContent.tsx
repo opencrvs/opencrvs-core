@@ -33,7 +33,13 @@ export function ActionTypeSpecificContent({
 
   const isDeclarationAction = DeclarationActions.safeParse(type).success
   if (isDeclarationAction) {
-    return <DeclarationUpdate action={action} fullEvent={fullEvent} />
+    return (
+      <DeclarationUpdate
+        action={action}
+        fullEvent={fullEvent}
+        validatorContext={validatorContext}
+      />
+    )
   }
 
   if (type === ActionType.REQUEST_CORRECTION) {
@@ -47,7 +53,13 @@ export function ActionTypeSpecificContent({
   }
 
   if (type === ActionType.PRINT_CERTIFICATE) {
-    return <PrintCertificate action={action} event={fullEvent} />
+    return (
+      <PrintCertificate
+        action={action}
+        event={fullEvent}
+        validatorContext={validatorContext}
+      />
+    )
   }
 
   return null

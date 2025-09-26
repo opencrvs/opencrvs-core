@@ -19,14 +19,14 @@ import {
   EventState,
   getCurrentEventState,
   getDeclaration,
-  isFieldDisplayedOnReview
+  isFieldDisplayedOnReview,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { Table } from '@opencrvs/components/lib/Table'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { hasFieldChanged } from '../../utils'
 
 const TableHeader = styled.th`
@@ -37,6 +37,7 @@ const TableHeader = styled.th`
 interface BaseDeclarationComparisonTableProps {
   fullEvent: EventDocument
   eventConfig: EventConfig
+  validatorContext: ValidatorContext
   id: string
 }
 
@@ -62,9 +63,9 @@ export function DeclarationComparisonTableComponent({
   form,
   fullEvent,
   eventConfig,
-  id
+  id,
+  validatorContext
 }: DeclarationComparisonTableProps) {
-  const validatorContext = useValidatorContext()
   const index = fullEvent.actions.findIndex((a) => a.id === action?.id)
   // When action is not found or provided, we compare the full event
   const eventBeforeUpdate =
