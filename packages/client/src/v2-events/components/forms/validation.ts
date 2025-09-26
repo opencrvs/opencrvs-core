@@ -15,7 +15,7 @@ import {
   isPageVisible,
   FormConfig,
   runStructuralValidations,
-  UserContext,
+  ValidatorContext,
   runFieldValidations,
   omitHiddenFields,
   omitHiddenPaginatedFields
@@ -34,7 +34,7 @@ export interface Errors {
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
   values: EventState,
-  context: UserContext
+  context: ValidatorContext
 ) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
     if (
@@ -59,7 +59,7 @@ export function getValidationErrorsForForm(
 export function getStructuralValidationErrorsForForm(
   fields: FieldConfig[],
   values: EventState,
-  context: UserContext
+  context: ValidatorContext
 ) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
     if (
@@ -90,7 +90,7 @@ export function validationErrorsInActionFormExist({
 }: {
   formConfig: FormConfig
   form: EventState
-  context: UserContext
+  context: ValidatorContext
   annotation?: EventState
   reviewFields?: FieldConfig[]
 }): boolean {

@@ -31,7 +31,7 @@ import {
   EventStatus,
   AdvancedSearchConfigWithFieldsResolved,
   METADATA_FIELD_PREFIX,
-  UserContext
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { findScope } from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
@@ -46,7 +46,7 @@ import { statusOptions, timePeriodOptions } from './EventMetadataSearchOptions'
 export function getAdvancedSearchFieldErrors(
   sections: AdvancedSearchConfigWithFieldsResolved[],
   values: EventState,
-  context: UserContext
+  context: ValidatorContext
 ) {
   return sections.reduce(
     (acc, section) => ({

@@ -43,7 +43,7 @@ import {
   omitHiddenPaginatedFields,
   runFieldValidations,
   runStructuralValidations,
-  UserContext
+  ValidatorContext
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -52,7 +52,7 @@ import { getEventById } from '@events/service/events/events'
 import { isLeafLocation } from '@events/storage/postgres/events/locations'
 import { TrpcContext } from '@events/context'
 import {
-  getContext,
+  getValidatorContext,
   getInvalidUpdateKeys,
   getVerificationPageErrors,
   throwWhenNotEmpty
@@ -61,7 +61,7 @@ import {
 export function getFieldErrors(
   fields: FieldConfig[],
   data: ActionUpdate,
-  context: UserContext,
+  context: ValidatorContext,
   declaration: EventState = {}
 ) {
   const visibleFields = fields.filter((field) =>
@@ -124,7 +124,7 @@ function validateDeclarationUpdateAction({
   actionType: DeclarationUpdateActionType
   declarationUpdate: ActionUpdate
   annotation?: ActionUpdate
-  context: UserContext
+  context: ValidatorContext
 }) {
   /*
    * Declaration allows partial updates. Updates are validated against primitive types (zod) and field based custom validators (JSON schema).
@@ -206,7 +206,7 @@ function validateActionAnnotation({
   actionType: AnnotationActionType
   annotation?: ActionUpdate
   declaration: EventState
-  context: UserContext
+  context: ValidatorContext
 }) {
   const pages = findRecordActionPages(eventConfig, actionType)
 
@@ -236,7 +236,7 @@ function validateNotifyAction({
   eventConfig: EventConfig
   annotation?: ActionUpdate
   declaration: ActionUpdate
-  context: UserContext
+  context: ValidatorContext
 }) {
   const declarationConfig = getDeclaration(eventConfig)
   const formFields = declarationConfig.pages.flatMap(({ fields }) =>
@@ -360,7 +360,7 @@ export const validateAction: MiddlewareFunction<
     token: ctx.token
   })
 
-  const context = await getContext(ctx.token)
+  const context = await getValidatorContext(ctx.token)
 
   const declaration = getCurrentEventState(event, eventConfig).declaration
 

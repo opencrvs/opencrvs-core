@@ -166,7 +166,7 @@ export function areConditionsMet(
   )
 }
 
-export type UserContext = {
+export type ValidatorContext = {
   user?: ITokenPayload
   leafAdminStructureLocationIds?: Array<{ id: UUID }>
 }
@@ -175,7 +175,7 @@ function isFieldConditionMet(
   field: FieldConfig,
   form: ActionUpdate | EventState,
   conditionalType: ConditionalType,
-  context: UserContext
+  context: ValidatorContext
 ) {
   const hasRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === conditionalType
@@ -198,7 +198,7 @@ function isFieldConditionMet(
 export function isFieldVisible(
   field: FieldConfig,
   form: ActionUpdate | EventState,
-  context: UserContext
+  context: ValidatorContext
 ) {
   return isFieldConditionMet(field, form, ConditionalType.SHOW, context)
 }
@@ -211,7 +211,7 @@ function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
 export function isFieldEnabled(
   field: FieldConfig,
   form: ActionUpdate | EventState,
-  context: UserContext
+  context: ValidatorContext
 ) {
   return isFieldConditionMet(field, form, ConditionalType.ENABLE, context)
 }
@@ -220,7 +220,7 @@ export function isFieldEnabled(
 export function isFieldDisplayedOnReview(
   field: FieldConfig,
   form: ActionUpdate | EventState,
-  context: UserContext
+  context: ValidatorContext
 ) {
   return (
     isFieldVisible(field, form, context) &&
@@ -406,7 +406,7 @@ export function runStructuralValidations({
 }: {
   field: FieldConfig
   values: ActionUpdate
-  context: UserContext
+  context: ValidatorContext
 }) {
   if (
     !isFieldVisible(field, values, context) ||
@@ -434,7 +434,7 @@ export function runFieldValidations({
 }: {
   field: FieldConfig
   values: ActionUpdate
-  context: UserContext
+  context: ValidatorContext
 }) {
   if (
     !isFieldVisible(field, values, context) ||

@@ -17,7 +17,7 @@ import {
   EventDocument,
   ActionType,
   FieldValue,
-  UserContext
+  ValidatorContext
 } from '@opencrvs/commons/client'
 
 /**
@@ -37,7 +37,7 @@ export function hasFieldChanged(
   f: FieldConfig,
   form: EventState,
   previousFormValues: EventState,
-  context: UserContext
+  context: ValidatorContext
 ) {
   const isVisible = isFieldVisible(f, form, context)
 

@@ -43,7 +43,7 @@ import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import {
   isConditionMet,
   isFieldVisible,
-  UserContext
+  ValidatorContext
 } from '../conditionals/validate'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
@@ -171,7 +171,7 @@ export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
 export function omitHiddenFields<T extends EventState | ActionUpdate>(
   fields: FieldConfig[],
   values: T,
-  context: UserContext,
+  context: ValidatorContext,
   visibleVerificationPageIds: string[] = []
 ) {
   return omitBy<T>(values, (_, fieldId) => {
@@ -195,7 +195,7 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
 export function omitHiddenPaginatedFields(
   formConfig: FormConfig,
   declaration: EventState,
-  context: UserContext
+  context: ValidatorContext
 ) {
   const visiblePagesFormFields = formConfig.pages
     .filter((p) => isPageVisible(p, declaration))
@@ -293,7 +293,7 @@ export function omitHiddenAnnotationFields(
   actionConfig: ActionConfig,
   declaration: EventState,
   annotation: ActionUpdate,
-  context: UserContext
+  context: ValidatorContext
 ) {
   const annotationFields = getActionAnnotationFields(actionConfig)
 

@@ -20,7 +20,7 @@ import {
   ArchiveActionInput,
   MarkAsDuplicateActionInput,
   ActionStatus,
-  UserContext
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
 
@@ -36,7 +36,7 @@ export interface CustomMutationParams {
 
 export interface CorrectionRequestParams extends CustomMutationParams {
   event: EventDocument
-  context: UserContext
+  context: ValidatorContext
 }
 
 export interface ArchiveOnDuplicateParams extends CustomMutationParams {

@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getOrThrow, UserContext } from '@opencrvs/commons/client'
+import { getOrThrow, ValidatorContext } from '@opencrvs/commons/client'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { useSuspenseAdminLeafLevelLocations } from './useLocations'
 
-export function useValidatorContext(): UserContext {
+export function useValidatorContext(): ValidatorContext {
   const leafAdminStructureLocationIds = useSuspenseAdminLeafLevelLocations()
   const token = getToken()
   const tokenPayload = getOrThrow(

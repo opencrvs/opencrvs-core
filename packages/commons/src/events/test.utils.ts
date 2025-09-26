@@ -67,7 +67,7 @@ import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import { z } from 'zod'
 import { FullDocumentPath } from '../documents'
-import { UserContext } from '../conditionals/validate'
+import { ValidatorContext } from '../conditionals/validate'
 
 /**
  * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
@@ -250,7 +250,7 @@ function fieldConfigsToActionPayload(
   )
 }
 
-export const testContext: UserContext = {
+export const testContext: ValidatorContext = {
   user: {
     sub: 'user_12345',
     scope: ['declare'],

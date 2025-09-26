@@ -15,8 +15,9 @@ import {
   ActionUpdate,
   errorMessages,
   LocationType,
-  UserContext
+  ValidatorContext
 } from '@opencrvs/commons/events'
+import { getOrThrow } from '@opencrvs/commons'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
 import { getLeafLocationIds } from '@events/storage/postgres/events/locations'
 
@@ -98,10 +99,14 @@ export function getInvalidUpdateKeys<T>({
     }))
 }
 
-export async function getContext(token: string): Promise<UserContext> {
+export async function getValidatorContext(
+  token: string
+): Promise<ValidatorContext> {
   const leafAdminStructureLocationIds = await getLeafLocationIds({
     locationTypes: [LocationType.enum.ADMIN_STRUCTURE]
   })
 
-  return { leafAdminStructureLocationIds, user: getTokenPayload(token) }
+  const user = getOrThrow(getTokenPayload(token), 'Token is missing.')
+
+  return { leafAdminStructureLocationIds, user }
 }

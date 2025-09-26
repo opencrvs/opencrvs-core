@@ -36,12 +36,12 @@ import {
   isFieldDisplayedOnReview,
   isPageVisible,
   runFieldValidations,
-  FieldTypesToHideInReview
+  FieldTypesToHideInReview,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -289,7 +289,7 @@ function FormReview({
   previousForm: EventState
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
-  validatorContext: ReturnType<typeof useValidatorContext>
+  validatorContext: ValidatorContext
   readonlyMode?: boolean
   isCorrection?: boolean
   isReviewCorrection?: boolean
@@ -461,7 +461,7 @@ function ReviewComponent({
   children?: React.ReactNode
   formConfig: FormConfig
   form: EventState
-  validatorContext: ReturnType<typeof useValidatorContext>
+  validatorContext: ValidatorContext
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
