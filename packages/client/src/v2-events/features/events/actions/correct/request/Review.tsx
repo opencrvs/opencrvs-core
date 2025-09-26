@@ -31,7 +31,7 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
-import { useContext } from '@client/v2-events/hooks/useContext'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { hasFieldChanged } from '../utils'
 
 export function Review() {
@@ -42,8 +42,7 @@ export function Review() {
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
-  const userContext = useContext()
-  const locationIds = userContext.leafAdminStructureLocationIds
+  const validatorContext = useValidatorContext()
 
   const event = events.getEvent.getFromCache(eventId)
 
@@ -61,7 +60,7 @@ export function Review() {
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)
   const changedFields = formFields.filter((f) =>
-    hasFieldChanged(f, form, previousFormValues, userContext)
+    hasFieldChanged(f, form, previousFormValues, validatorContext)
   )
   const anyValuesHaveChanged = changedFields.length > 0
 
@@ -89,12 +88,12 @@ export function Review() {
         form={form}
         formConfig={formConfig}
         isCorrection={true}
-        locationIds={locationIds}
         previousFormValues={previousFormValues}
         title={intlWithData.formatMessage(
           actionConfig.label,
           previousFormValues
         )}
+        validatorContext={validatorContext}
         onEdit={({ pageId, fieldId }) => {
           navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(

@@ -42,7 +42,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { hasFieldChanged } from '../../utils'
-import { useContext } from '../../../../../../hooks/useContext'
+import { useValidatorContext } from '../../../../../../hooks/useValidatorContext'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
@@ -82,7 +82,7 @@ export function Summary() {
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
 
-  const userContext = useContext()
+  const validatorContext = useValidatorContext()
   const [showPrompt, setShowPrompt] = React.useState(false)
   const eventFormNavigation = useEventFormNavigation()
   const navigate = useNavigate()
@@ -113,13 +113,22 @@ export function Summary() {
           return false
         }
 
-        return hasFieldChanged(field, form, previousFormValues, userContext)
+        return hasFieldChanged(
+          field,
+          form,
+          previousFormValues,
+          validatorContext
+        )
       })
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
-      const wasVisible = isFieldVisible(field, previousFormValues, userContext)
-      const isHidden = !isFieldVisible(field, form, userContext)
+      const wasVisible = isFieldVisible(
+        field,
+        previousFormValues,
+        validatorContext
+      )
+      const isHidden = !isFieldVisible(field, form, validatorContext)
       return wasVisible && isHidden
     })
 
@@ -155,7 +164,7 @@ export function Summary() {
     previousFormValues,
     navigate,
     userMayCorrect,
-    userContext
+    validatorContext
   ])
 
   return (

@@ -28,7 +28,7 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { useContext } from '@client/v2-events/hooks/useContext'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { removeCachedFiles } from '../files/cache'
@@ -37,7 +37,7 @@ function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
   const event = events.getEvent.viewEvent(eventId)
-  const { leafAdminStructureLocationIds } = useContext()
+  const validatorContext = useValidatorContext()
 
   const maybeAuth = useAuthentication()
   const authentication = getOrThrow(
@@ -86,9 +86,9 @@ function ReadonlyView() {
         readonlyMode
         form={eventStateWithDraft.declaration}
         formConfig={formConfig}
-        locationIds={leafAdminStructureLocationIds}
         reviewFields={fields}
         title={formatMessage(title, eventStateWithDraft.declaration)}
+        validatorContext={validatorContext}
         onEdit={noop}
       >
         <></>

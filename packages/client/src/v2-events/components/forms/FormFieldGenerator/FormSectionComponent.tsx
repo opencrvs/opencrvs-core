@@ -40,7 +40,7 @@ import {
   makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
-import { useContext } from '../../../hooks/useContext'
+import { useValidatorContext } from '../../../hooks/useValidatorContext'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -198,7 +198,7 @@ export function FormSectionComponent({
   const intl = useIntl()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
-  const userContext = useContext()
+  const validatorContext = useValidatorContext()
 
   const fieldsWithFormikSeparator = fieldsWithDotSeparator.map((field) => ({
     ...field,
@@ -393,7 +393,7 @@ export function FormSectionComponent({
   const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
     const fieldErrors = errors[field.id]?.errors
     const hasErrors = fieldErrors && fieldErrors.length > 0
-    return isFieldVisible(field, completeForm, userContext) && hasErrors
+    return isFieldVisible(field, completeForm, validatorContext) && hasErrors
   })
 
   useEffect(() => {
@@ -408,12 +408,12 @@ export function FormSectionComponent({
   return (
     <section className={className}>
       {fieldsWithFormikSeparator.map((field) => {
-        if (!isFieldVisible(field, completeForm, userContext)) {
+        if (!isFieldVisible(field, completeForm, validatorContext)) {
           return null
         }
 
         const isDisabled =
-          !isFieldEnabled(field, completeForm, userContext) ||
+          !isFieldEnabled(field, completeForm, validatorContext) ||
           (isCorrection && field.uncorrectable)
 
         const visibleError = errors[field.id]?.errors[0]?.message

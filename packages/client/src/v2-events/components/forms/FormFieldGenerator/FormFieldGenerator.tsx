@@ -31,7 +31,7 @@ import {
 } from '@client/v2-events/components/forms/utils'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
 import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
-import { useContext } from '@client/v2-events/hooks/useContext'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -93,7 +93,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
   }) => {
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
-    const userContext = useContext()
+    const validatorContext = useValidatorContext()
     const updateTouchFields = (
       touched: Record<string, boolean | undefined>
     ) => {
@@ -143,7 +143,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
           getValidationErrorsForForm(
             fields,
             makeFormikFieldIdsOpenCRVSCompatible(values),
-            userContext
+            validatorContext
           )
         }
         validateOnMount={true}

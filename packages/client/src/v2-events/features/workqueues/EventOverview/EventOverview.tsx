@@ -39,7 +39,6 @@ import {
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useAuthentication } from '@client/utils/userUtils'
-import { useContext } from '@client/v2-events/hooks/useContext'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
@@ -61,7 +60,6 @@ function EventOverviewFull({
   event: EventDocument
   onAction: () => void
 }) {
-  const userContext = useContext()
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex

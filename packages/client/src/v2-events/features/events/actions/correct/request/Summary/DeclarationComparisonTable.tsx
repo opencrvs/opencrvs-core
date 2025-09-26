@@ -27,7 +27,7 @@ import { messages as correctionMessages } from '@client/i18n/messages/views/corr
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { hasFieldChanged } from '../../utils'
-import { useContext } from '../../../../../../hooks/useContext'
+import { useValidatorContext } from '../../../../../../hooks/useValidatorContext'
 
 const TableHeader = styled.th`
   text-transform: uppercase;
@@ -64,7 +64,7 @@ export function DeclarationComparisonTableComponent({
   eventConfig,
   id
 }: DeclarationComparisonTableProps) {
-  const userContext = useContext()
+  const validatorContext = useValidatorContext()
   const index = fullEvent.actions.findIndex((a) => a.id === action?.id)
   // When action is not found or provided, we compare the full event
   const eventBeforeUpdate =
@@ -98,14 +98,14 @@ export function DeclarationComparisonTableComponent({
       {declarationConfig.pages.map((page) => {
         const changedFields = page.fields
           .filter((field) =>
-            isFieldDisplayedOnReview(field, latestDeclaration, userContext)
+            isFieldDisplayedOnReview(field, latestDeclaration, validatorContext)
           )
           .filter((f) =>
             hasFieldChanged(
               f,
               latestDeclaration,
               previousDeclaration,
-              userContext
+              validatorContext
             )
           )
           .map((f) => {

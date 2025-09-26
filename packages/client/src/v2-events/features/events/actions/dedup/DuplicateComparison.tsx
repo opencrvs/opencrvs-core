@@ -34,7 +34,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { noop } from '@client/v2-events'
-import { useContext } from '@client/v2-events/hooks/useContext'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { Output, ValueOutput } from '../../components/Output'
 import { AdministrativeArea } from '../../registered-fields'
@@ -121,7 +121,7 @@ export function DuplicateComparison({
   potentialDuplicateEvent: EventIndex
 }) {
   const intl = useIntl()
-  const userContext = useContext()
+  const validatorContext = useValidatorContext()
 
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const { eventConfiguration } = useEventConfiguration(originalEvent.type)
@@ -155,12 +155,12 @@ export function DuplicateComparison({
               isFieldDisplayedOnReview(
                 field,
                 originalDeclaration,
-                userContext
+                validatorContext
               ) ||
               isFieldDisplayedOnReview(
                 field,
                 potentialDuplicateDeclaration,
-                userContext
+                validatorContext
               )
           )
           .filter(

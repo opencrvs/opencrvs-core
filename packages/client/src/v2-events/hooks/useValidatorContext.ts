@@ -9,17 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { UserContext } from '@opencrvs/commons/client'
+import { getOrThrow, UserContext } from '@opencrvs/commons/client'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { useSuspenseAdminLeafLevelLocations } from './useLocations'
 
-export function useContext(): UserContext {
-  const locationIds = useSuspenseAdminLeafLevelLocations()
+export function useValidatorContext(): UserContext {
+  const leafAdminStructureLocationIds = useSuspenseAdminLeafLevelLocations()
   const token = getToken()
-  const tokenPayload = getTokenPayload(token)
+  const tokenPayload = getOrThrow(
+    getTokenPayload(token),
+    'Token payload missing. User is not logged in'
+  )
 
   return {
-    user: tokenPayload ?? undefined,
-    leafAdminStructureLocationIds: locationIds
+    user: tokenPayload,
+    leafAdminStructureLocationIds
   }
 }

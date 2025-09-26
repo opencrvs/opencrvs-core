@@ -41,7 +41,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { useContext } from '@client/v2-events/hooks/useContext'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 /**
@@ -58,9 +58,7 @@ export function Review() {
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { closeActionView } = useEventFormNavigation()
-  const userContext = useContext()
-
-  const locationIds = userContext.leafAdminStructureLocationIds
+  const validatorContext = useValidatorContext()
 
   const event = events.getEvent.findFromCache(eventId).data
 
@@ -221,10 +219,10 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
-        locationIds={locationIds}
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
+        validatorContext={validatorContext}
         onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       >

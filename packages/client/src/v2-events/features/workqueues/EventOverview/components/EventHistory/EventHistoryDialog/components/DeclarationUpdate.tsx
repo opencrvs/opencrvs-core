@@ -13,7 +13,6 @@ import {
   ActionDocument,
   EventDocument,
   EventStatus,
-  getCurrentEventState,
   getStatusFromActions
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'

@@ -39,7 +39,7 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
-import { useContext } from '@client/v2-events/hooks/useContext'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -348,7 +348,7 @@ function AddressOutput({
   lineSeparator?: React.ReactNode
   configuration?: AddressField
 }) {
-  const userContext = useContext()
+  const validatorContext = useValidatorContext()
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
   const { config } = useSelector(getOfflineData)
@@ -410,7 +410,7 @@ function AddressOutput({
         isFieldDisplayedOnReview(
           field.field satisfies FieldConfig,
           addressValues,
-          userContext
+          validatorContext
         )
     )
 

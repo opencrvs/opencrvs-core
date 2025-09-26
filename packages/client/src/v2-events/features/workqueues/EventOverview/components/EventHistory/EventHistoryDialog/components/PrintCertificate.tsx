@@ -26,7 +26,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
-import { useContext } from '../../../../../../../hooks/useContext'
+import { useValidatorContext } from '../../../../../../../hooks/useValidatorContext'
 
 const verifiedMessage = {
   id: 'verified',
@@ -44,7 +44,7 @@ export function PrintCertificate({
   const { eventConfiguration } = useEventConfiguration(event.type)
   const formPages = getPrintCertificatePages(eventConfiguration)
   const intl = useIntl()
-  const userContext = useContext()
+  const validatorContext = useValidatorContext()
 
   const { certificateTemplates } = useAppConfig()
   const eventIndex = getCurrentEventState(event, eventConfiguration)
@@ -69,7 +69,7 @@ export function PrintCertificate({
   // When we merge phase-3 branch here, we could try refactoring this to be a shared frontend module/function.
   const content = formPages.flatMap((page) => {
     const fields = page.fields
-      .filter((f) => isFieldVisible(f, annotation, userContext))
+      .filter((f) => isFieldVisible(f, annotation, validatorContext))
       .map((field) => {
         const valueDisplay = (
           <Output
