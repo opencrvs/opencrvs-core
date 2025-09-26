@@ -302,7 +302,7 @@ export function Output({
       return '-'
     }
 
-    return <ValueOutput config={field} value={''} />
+    return <ValueOutput config={field} value={undefined} />
   }
 
   const hasPreviousValue = previousValue !== undefined
