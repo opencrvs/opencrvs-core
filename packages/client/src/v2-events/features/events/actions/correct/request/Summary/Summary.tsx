@@ -22,7 +22,8 @@ import {
   getDeclarationFields,
   EventDocument,
   ActionType,
-  getCurrentEventState
+  getCurrentEventState,
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -40,7 +41,8 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
+import { hasFieldChanged } from '../../utils'
+import { useContext } from '../../../../../../hooks/useContext'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
@@ -79,13 +81,12 @@ export function Summary() {
   const [{ workqueue }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
+
+  const userContext = useContext()
   const [showPrompt, setShowPrompt] = React.useState(false)
   const eventFormNavigation = useEventFormNavigation()
   const navigate = useNavigate()
   const intl = useIntl()
-
-  const { hasFieldChanged, isFieldVisible } =
-    useValidationFunctionsWithContext()
 
   const events = useEvents()
   const event: EventDocument = events.getEvent.getFromCache(eventId)
@@ -112,13 +113,13 @@ export function Summary() {
           return false
         }
 
-        return hasFieldChanged(field, form, previousFormValues)
+        return hasFieldChanged(field, form, previousFormValues, userContext)
       })
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
-      const wasVisible = isFieldVisible(field, previousFormValues)
-      const isHidden = !isFieldVisible(field, form)
+      const wasVisible = isFieldVisible(field, previousFormValues, userContext)
+      const isHidden = !isFieldVisible(field, form, userContext)
       return wasVisible && isHidden
     })
 
@@ -154,8 +155,7 @@ export function Summary() {
     previousFormValues,
     navigate,
     userMayCorrect,
-    hasFieldChanged,
-    isFieldVisible
+    userContext
   ])
 
   return (

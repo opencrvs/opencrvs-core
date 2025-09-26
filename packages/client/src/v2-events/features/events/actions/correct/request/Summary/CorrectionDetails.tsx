@@ -21,6 +21,7 @@ import {
   ActionType,
   EventDocument,
   EventState,
+  isFieldVisible,
   isPageVisible,
   PageConfig,
   PageTypes,
@@ -39,7 +40,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getLocations } from '@client/offline/selectors'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
+import { useContext } from '../../../../../../hooks/useContext'
 import { DeclarationComparisonTable } from './DeclarationComparisonTable'
 
 const messages = defineMessages({
@@ -117,7 +118,7 @@ function buildCorrectionDetails(
   locations: ReturnType<typeof getLocations>,
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
-  const { isFieldVisible } = useValidationFunctionsWithContext()
+  const userContext = useContext()
 
   const details: CorrectionDetail[] = correctionFormPages
     .filter((page) => isPageVisible(page, annotation))
@@ -138,7 +139,9 @@ function buildCorrectionDetails(
         ]
       }
       return page.fields
-        .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
+        .filter((f) =>
+          isFieldVisible(f, { ...form, ...annotation }, userContext)
+        )
         .filter((f) => !isEmptyValue(f, { ...form, ...annotation }[f.id]))
         .map((field) => ({
           label: field.label,

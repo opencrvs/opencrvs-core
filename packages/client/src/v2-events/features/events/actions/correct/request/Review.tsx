@@ -32,7 +32,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useContext } from '@client/v2-events/hooks/useContext'
-import { useValidationFunctionsWithContext } from '@client/v2-events/hooks/useValidationFunctionsWithContext'
+import { hasFieldChanged } from '../utils'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
@@ -42,9 +42,8 @@ export function Review() {
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
-  const { leafAdminStructureLocationIds } = useContext()
-  const { hasFieldChanged } = useValidationFunctionsWithContext()
-  const locationIds = leafAdminStructureLocationIds
+  const userContext = useContext()
+  const locationIds = userContext.leafAdminStructureLocationIds
 
   const event = events.getEvent.getFromCache(eventId)
 
@@ -62,7 +61,7 @@ export function Review() {
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)
   const changedFields = formFields.filter((f) =>
-    hasFieldChanged(f, form, previousFormValues)
+    hasFieldChanged(f, form, previousFormValues, userContext)
   )
   const anyValuesHaveChanged = changedFields.length > 0
 
