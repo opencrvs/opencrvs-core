@@ -22,10 +22,10 @@ import {
   getCurrentEventState,
   getUUID,
   PageTypes,
-  PrintCertificateAction
+  PrintCertificateAction,
+  ActionUpdate
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { ActionUpdate } from '@opencrvs/commons/client'
 import {
   createEvent,
   createTestClient,
@@ -375,7 +375,7 @@ describe('Action updates', () => {
     expect(eventState.declaration).toMatchSnapshot()
   })
 
-  it.only('declaration including hidden fields throws error', async () => {
+  it('declaration including hidden fields throws error', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
 
