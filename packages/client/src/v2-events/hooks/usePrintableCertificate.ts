@@ -17,14 +17,14 @@ import {
   EventConfig,
   EventDocument,
   FieldType,
+  getCurrentEventState,
   getUUID,
   isMinioUrl,
   LanguageConfig,
   Location,
   PrintCertificateAction,
   UUID,
-  UserOrSystem,
-  getCurrentEventState
+  UserOrSystem
 } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
