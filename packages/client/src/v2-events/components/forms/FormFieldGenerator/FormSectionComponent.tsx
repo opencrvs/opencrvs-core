@@ -12,7 +12,6 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
 import { cloneDeep, isEqual, set, groupBy, omit, get } from 'lodash'
-import { useIntl } from 'react-intl'
 import styled, { keyframes } from 'styled-components'
 import {
   EventState,
@@ -21,7 +20,6 @@ import {
   FieldType,
   FieldValue,
   AddressType,
-  TranslationConfig,
   IndexMap,
   joinValues,
   isNonInteractiveFieldType,
@@ -55,7 +53,7 @@ type AllProps = {
   fields: FieldConfig[]
   className?: string
   readonlyMode?: boolean
-  errors: Record<string, { errors: { message: TranslationConfig }[] }>
+  errors: IndexMap<string>
   /**
    * Update the form values in the non-formik state.
    */
@@ -198,7 +196,6 @@ export function FormSectionComponent({
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not -
   useOnlineStatus()
-  const intl = useIntl()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
 
@@ -321,9 +318,7 @@ export function FormSectionComponent({
 
       const updatedTouched = omit(touched, formikChildIds)
 
-      // @TODO: Formik does not type errors well. Actual error message differs from the type.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      void setErrors(updatedErrors as any)
+      void setErrors(updatedErrors)
       void setValues(updatedValues)
       void setTouched(updatedTouched)
       void setAllTouchedFields(updatedTouched)
@@ -390,7 +385,7 @@ export function FormSectionComponent({
   const completeForm = { ...initialValues, ...form }
 
   const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
-    const fieldErrors = errors[field.id]?.errors
+    const fieldErrors = errors[field.id]
     const hasErrors = fieldErrors && fieldErrors.length > 0
     return isFieldVisible(field, completeForm, validatorContext) && hasErrors
   })
@@ -431,8 +426,8 @@ export function FormSectionComponent({
           !isFieldEnabled(field, visibleFieldValues, validatorContext) ||
           (isCorrection && field.uncorrectable)
 
-        const visibleError = errors[field.id]?.errors[0]?.message
-        const error = visibleError ? intl.formatMessage(visibleError) : ''
+        const visibleError = errors[field.id]?.[0]
+        const error = visibleError ?? ''
 
         return (
           <FormItem

@@ -13,6 +13,7 @@ import React, { useEffect } from 'react'
 
 import { Formik } from 'formik'
 import { isEqual, noop } from 'lodash'
+import { useIntl } from 'react-intl'
 import {
   EventConfig,
   EventState,
@@ -93,6 +94,8 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
   }) => {
     const { setAllTouchedFields, touchedFields } = useEventFormData()
 
+    const intl = useIntl()
+
     const updateTouchFields = (
       touched: Record<string, boolean | undefined>
     ) => {
@@ -140,10 +143,17 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         initialTouched={touchedFields}
         initialValues={formikCompatibleInitialValues}
         validate={(values) =>
-          getValidationErrorsForForm(
-            fields,
-            makeFormikFieldIdsOpenCRVSCompatible(values),
-            validatorContext
+          Object.fromEntries(
+            Object.entries(
+              getValidationErrorsForForm(
+                fields,
+                makeFormikFieldIdsOpenCRVSCompatible(values),
+                validatorContext
+              )
+            ).map(([fieldId, errors]) => [
+              fieldId,
+              errors?.[0].message && intl.formatMessage(errors[0].message)
+            ])
           )
         }
         validateOnMount={true}
@@ -165,10 +175,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
           return (
             <FormSectionComponent
               className={className}
-              // @TODO: Formik does not type errors well. Actual error message differs from the type.
-              // This was previously cast on FormSectionComponent level.
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              errors={formikProps.errors as any}
+              errors={formikProps.errors}
               eventConfig={eventConfig}
               fields={fields}
               fieldsToShowValidationErrors={fieldsToShowValidationErrors}

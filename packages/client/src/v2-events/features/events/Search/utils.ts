@@ -38,7 +38,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import {
-  Errors,
+  IntlErrors,
   getStructuralValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
 import { statusOptions, timePeriodOptions } from './EventMetadataSearchOptions'
@@ -53,7 +53,7 @@ export function getAdvancedSearchFieldErrors(
       ...acc,
       ...getStructuralValidationErrorsForForm(section.fields, values, context)
     }),
-    {} as Errors
+    {} as IntlErrors
   )
 }
 

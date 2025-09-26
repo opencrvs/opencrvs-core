@@ -412,9 +412,7 @@ export function runStructuralValidations({
     !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
-    return {
-      errors: []
-    }
+    return []
   }
 
   const fieldValidationResult = validateFieldInput({
@@ -422,9 +420,7 @@ export function runStructuralValidations({
     value: values[field.id]
   })
 
-  return {
-    errors: fieldValidationResult
-  }
+  return fieldValidationResult
 }
 
 export function runFieldValidations({
@@ -440,9 +436,7 @@ export function runFieldValidations({
     !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
-    return {
-      errors: []
-    }
+    return []
   }
 
   const conditionalParameters = {
@@ -470,10 +464,8 @@ export function runFieldValidations({
     conditionalParameters
   })
 
-  return {
-    // Assumes that custom validation errors are based on the field type, and extend the validation.
-    errors: [...fieldValidationResult, ...customValidationResults]
-  }
+  // Assumes that custom validation errors are based on the field type, and extend the validation.
+  return [...fieldValidationResult, ...customValidationResults]
 }
 
 export function getValidatorsForField(
