@@ -11,7 +11,7 @@
 import * as React from 'react'
 import { Number, NumberInputProps } from './Number'
 
-interface AgeInputProps extends Omit<NumberInputProps, 'min'> {}
+type AgeInputProps = Omit<NumberInputProps, 'min'>
 
 function AgeInput(props: AgeInputProps) {
   return <Number.Input {...props} data-testid={`age__${props.id}`} min={0} />

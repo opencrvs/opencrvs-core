@@ -60,8 +60,7 @@ import {
   isVerificationStatusType,
   isQueryParamReaderFieldType,
   ValidatorContext,
-  isAgeFieldType,
-  DateValue
+  isAgeFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -260,20 +259,16 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isAgeFieldType(field)) {
-      const asOfDateRef = field.config.configuration.asOfDate.$$field
-      const asOfDateValue =
-        makeFormikFieldIdsOpenCRVSCompatible(form)[asOfDateRef]
-      const asOfDate = asOfDateValue ? DateValue.parse(asOfDateValue) : ''
       return (
-        <InputField {...field.inputFieldProps}>
+        <InputField {...inputFieldProps}>
           <AgeField.Input
             {...inputProps}
             value={field.value?.age}
-            onChange={(val) =>
-              onFieldValueChange(
-                fieldDefinition.id,
-                val !== undefined ? { age: val, asOfDate } : undefined
-              )
+            onChange={(age) =>
+              onFieldValueChange(fieldDefinition.id, {
+                age,
+                asOfDate: field.value?.asOfDate
+              })
             }
           />
         </InputField>

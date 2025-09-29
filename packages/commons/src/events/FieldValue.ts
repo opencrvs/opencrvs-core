@@ -45,8 +45,8 @@ export const DateValue = z
   .describe('Date in the format YYYY-MM-DD')
 
 export const AgeValue = z.object({
-  age: z.number(),
-  asOfDate: DateValue
+  age: z.number().optional(),
+  asOfDate: DateValue.optional()
 })
 
 export type AgeValue = z.infer<typeof AgeValue>

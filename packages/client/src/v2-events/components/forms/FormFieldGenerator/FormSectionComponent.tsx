@@ -30,7 +30,8 @@ import {
   omitHiddenFields,
   isFieldEnabled,
   ValidatorContext,
-  isFieldVisible
+  isFieldVisible,
+  isAgeFieldType
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -280,6 +281,29 @@ export function FormSectionComponent({
     [fieldsWithDotSeparator, systemVariables]
   )
 
+  function setAsOfDateIfAgeField(
+    child: FieldConfig,
+    fieldValues: EventState,
+    parentFormikFieldId: string
+  ) {
+    const parentFieldId = makeFormFieldIdFormikCompatible(parentFormikFieldId)
+    const formikFieldId = makeFormFieldIdFormikCompatible(child.id)
+    const field = {
+      config: child,
+      value: fieldValues[formikFieldId]
+    }
+    if (
+      !isAgeFieldType(field) ||
+      field.config.configuration.asOfDate.$$field !== parentFieldId
+    ) {
+      return
+    }
+    set(fieldValues, formikFieldId, {
+      ...field.value,
+      asOfDate: fieldValues[parentFormikFieldId]
+    })
+  }
+
   const onFieldValueChange = useCallback(
     (formikFieldId: string, value: FieldValue | undefined) => {
       const updatedValues = cloneDeep(values)
@@ -298,6 +322,7 @@ export function FormSectionComponent({
 
       for (const child of interactiveChildren) {
         setValuesForListenerFields(child, updatedValues, updatedErrors)
+        setAsOfDateIfAgeField(child, updatedValues, formikFieldId)
       }
 
       // @TODO: we should not reference field id 'country' directly.
