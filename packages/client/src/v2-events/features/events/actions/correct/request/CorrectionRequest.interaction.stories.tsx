@@ -219,9 +219,9 @@ export const ReviewWithParentFieldChanges: Story = {
     })
 
     await step('Change recommender values', async () => {
-      await userEvent.click(canvas.getByTestId('change-button-senior-pass.id'))
-      await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
-
+      await userEvent.click(
+        canvas.getByTestId('change-button-recommender.none')
+      )
       await userEvent.click(
         canvas.getByRole('checkbox', {
           name: 'No recommender'
