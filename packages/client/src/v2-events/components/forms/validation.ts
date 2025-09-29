@@ -49,17 +49,6 @@ export function getValidationErrorsForForm(
       leafAdminStructureLocationIds: locationIds
     }
 
-    if (field.id === 'father.addressSameAs') {
-      console.log(field.id)
-      console.log(
-        runFieldValidations({
-          field,
-          values,
-          context
-        })
-      )
-    }
-
     return {
       ...errorsForAllFields,
       [field.id]: runFieldValidations({
