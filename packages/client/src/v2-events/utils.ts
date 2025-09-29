@@ -109,7 +109,6 @@ export function createTemporaryId() {
  *
  * @returns Resolves template variables in the default value and returns the resolved value.
  *
-
  */
 export function replacePlaceholders({
   fieldType,
