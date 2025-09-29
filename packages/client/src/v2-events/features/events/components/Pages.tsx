@@ -138,12 +138,12 @@ export function Pages({
     <FormFieldGenerator
       allFields={formPages.flatMap((p) => p.fields)}
       eventConfig={eventConfig}
-      id="locationForm"
       // In some Action page forms, the form data itself is not the complete declaration.
       // We still merge the optional `declaration` prop into the initial form values so that
       // read-only declaration data is available for Data components or calculations.
       // Example: Print Certificate action.
       fields={page.fields}
+      id="locationForm"
       initialValues={{ ...declaration, ...form }}
       isCorrection={isCorrection}
       validateAllFields={validateAllFields}

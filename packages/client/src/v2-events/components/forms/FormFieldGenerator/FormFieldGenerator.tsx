@@ -169,7 +169,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
           /*
            * Only include values from visible fields so values of hidden fields don’t affect conditional checks.
            *
-           * You might wonder why values of hidden fields aren’t filtered out earlier.
+           * You might wonder why values of hidden fields aren’t filtered out completely earlier.
            * That’s intentional — we persist their values so if the fields become visible again, the previous values are restored instead of resetting.
            */
           const valuesWithoutHiddenFields = allFields
