@@ -13,6 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React, { useState } from 'react'
 import { within, userEvent, expect, waitFor } from '@storybook/test'
 import styled from 'styled-components'
+import { action } from '@storybook/addon-actions'
 
 interface PrintButtonProps {
   id: string
@@ -28,7 +29,6 @@ const Container = styled.div`
   margin: 0 auto;
 `
 
-// Minimal in-story "mock" of PrintButton.Input to avoid calling app hooks
 function MockPrintButton({
   id,
   buttonLabel,
@@ -71,16 +71,16 @@ export default meta
 type Story = StoryObj<typeof MockPrintButton>
 
 export const Default: Story = {
-  render: (args) => {
+  render: (args: Story['args']) => {
     const [value, setValue] = useState<string | undefined>(undefined)
     return (
       <Container>
         <MockPrintButton
-          {...(args as any)}
+          {...(args as PrintButtonProps)}
           value={value}
           onChange={(val) => {
             setValue(val)
-            ;(args as any).onChange?.(val)
+            args?.onChange?.(val)
           }}
         />
       </Container>
@@ -101,6 +101,6 @@ export const Default: Story = {
       defaultMessage: 'Print'
     },
     disabled: false,
-    onChange: () => {}
+    onChange: action('onChange')
   }
 }
