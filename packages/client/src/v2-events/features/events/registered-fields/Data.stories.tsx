@@ -30,7 +30,11 @@ const meta: Meta<FormFieldGeneratorProps> = {
     validatorContext: { control: false }
   },
   decorators: [
-    (Story, context) => <TRPCProvider>{Story(context)}</TRPCProvider>,
+    (Story, context) => (
+      <TRPCProvider>
+        <Story {...context} />
+      </TRPCProvider>
+    ),
     withValidatorContext
   ]
 }
@@ -181,7 +185,7 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
     layout: 'centered',
     userRole: TestUserRole.Enum.FIELD_AGENT
   },
-  render: (args) => {
+  render: (args, context) => {
     return (
       <StyledFormFieldGenerator
         {...args}

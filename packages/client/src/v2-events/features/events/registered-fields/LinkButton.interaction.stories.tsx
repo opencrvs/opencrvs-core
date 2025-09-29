@@ -15,25 +15,22 @@ import styled from 'styled-components'
 import { ConditionalType, user } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
+import { FormFieldGeneratorProps } from '../../../components/forms/FormFieldGenerator/FormFieldGenerator'
 
-interface Args {
-  onChange: (val: unknown) => void
-  url: string
-}
-
-const meta: Meta<Args> = {
+const url = 'https://example.com/authenticate'
+const meta: Meta<FormFieldGeneratorProps> = {
   title: 'Inputs/LinkButton',
   args: {
-    url: 'https://example.com/authenticate',
     onChange: fn()
   },
-
   decorators: [
-    (Story) => (
+    (Story, context) => (
       <TRPCProvider>
-        <Story />
+        <Story {...context} />
       </TRPCProvider>
-    )
+    ),
+    withValidatorContext
   ]
 }
 
@@ -47,7 +44,7 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
 
 export default meta
 
-type Story = StoryObj<Args>
+type Story = StoryObj<FormFieldGeneratorProps>
 
 export const Redirection: Story = {
   play: async ({ canvasElement }) => {
@@ -72,7 +69,7 @@ export const Redirection: Story = {
             e.preventDefault()
             alert(
               'On click, the link button changes href to\n' +
-                args.url +
+                url +
                 '?redirect_uri=' +
                 window.location.href
             )
@@ -80,6 +77,7 @@ export const Redirection: Story = {
         }}
       >
         <StyledFormFieldGenerator
+          {...args}
           fields={[
             {
               id: 'person.authenticate',
@@ -101,7 +99,7 @@ export const Redirection: Story = {
                   defaultMessage: 'Authenticate by external system',
                   description: 'Authenticate'
                 },
-                url: 'https://example.com/authenticate'
+                url
               }
             }
           ]}

@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import type { StoryContext, StoryFn } from '@storybook/react'
+import React from 'react'
+import type { Decorator } from '@storybook/react'
 import {
   getOrThrow,
   getTokenPayload,
@@ -17,7 +17,6 @@ import {
   TestUserRole,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { FormFieldGeneratorProps } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { getLeafLocationIds } from '@client/v2-events/hooks/useLocations'
 import { V2_DEFAULT_MOCK_LOCATIONS } from '../.storybook/default-request-handlers'
@@ -51,21 +50,26 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
       }
     }
  */
-export function withValidatorContext(
-  Story: StoryFn<FormFieldGeneratorProps>,
-  context: StoryContext<FormFieldGeneratorProps>
-) {
+export const withValidatorContext: Decorator = (Story, context) => {
+  const validatorContext: ValidatorContext = getTestValidatorContext(
+    context.parameters.userRole
+  )
+
+  return (
+    <Story
+      args={{ ...context.args, validatorContext }}
+      validatorContext={validatorContext}
+    />
+  )
+}
+export function getTestValidatorContext(userRole?: TestUserRole) {
   let token
 
-  if (context.parameters.userRole === TestUserRole.Enum.FIELD_AGENT) {
+  if (userRole === TestUserRole.Enum.FIELD_AGENT) {
     token = generator.user.token.fieldAgent
-  } else if (
-    context.parameters.userRole === TestUserRole.Enum.LOCAL_SYSTEM_ADMIN
-  ) {
+  } else if (userRole === TestUserRole.Enum.LOCAL_SYSTEM_ADMIN) {
     token = generator.user.token.localSystemAdmin
-  } else if (
-    context.parameters.userRole === TestUserRole.Enum.REGISTRATION_AGENT
-  ) {
+  } else if (userRole === TestUserRole.Enum.REGISTRATION_AGENT) {
     token = generator.user.token.registrationAgent
   } else {
     token = generator.user.token.localRegistrar
@@ -80,15 +84,9 @@ export function withValidatorContext(
     V2_DEFAULT_MOCK_LOCATIONS,
     [LocationType.enum.ADMIN_STRUCTURE]
   )
-  const validatorContext = {
+
+  return {
     user,
     leafAdminStructureLocationIds
-  } satisfies ValidatorContext
-
-  const mergedArgs = {
-    ...context.args,
-    validatorContext
   }
-
-  return Story(mergedArgs, context)
 }

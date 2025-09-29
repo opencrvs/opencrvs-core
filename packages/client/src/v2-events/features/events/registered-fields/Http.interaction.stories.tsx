@@ -25,6 +25,7 @@ import {
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 interface Args {
   onChange: (val: unknown) => void
@@ -34,11 +35,12 @@ const meta: Meta<Args> = {
   title: 'Inputs/Http',
   args: { onChange: fn() },
   decorators: [
-    (Story) => (
+    (Story, context) => (
       <TRPCProvider>
-        <Story />
+        <Story {...context} />
       </TRPCProvider>
-    )
+    ),
+    withValidatorContext
   ]
 }
 
@@ -77,6 +79,7 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={[
           {
             id: 'child.http-fetch',
