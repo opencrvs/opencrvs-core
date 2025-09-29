@@ -10,6 +10,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { http, HttpResponse } from 'msw'
+import { TRPCError } from '@trpc/server'
 import {
   ActionStatus,
   ActionType,
@@ -21,10 +22,12 @@ import {
   getCurrentEventState,
   getUUID,
   PageTypes,
-  PrintCertificateAction
+  PrintCertificateAction,
+  ActionUpdate
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
+  createEvent,
   createTestClient,
   sanitizeForSnapshot,
   setupTestCase,
@@ -370,6 +373,77 @@ describe('Action updates', () => {
     const event = await client.event.get(originalEvent.id)
     const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(eventState.declaration).toMatchSnapshot()
+  })
+
+  it('declaration including hidden fields throws error', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+
+    const originalEvent = await client.event.create(generator.event.create())
+
+    const getDeclarationWithHiddenField = (declaration: ActionUpdate) => {
+      return {
+        ...declaration,
+        'applicant.dobUnknown': true,
+        'applicant.age': 19,
+        'applicant.dob': '2000-01-01' // dob can't be known and unknown at the same time.
+      }
+    }
+
+    const declarePayload = generator.event.actions.declare(originalEvent.id)
+    const declarationWithHiddenField = getDeclarationWithHiddenField(
+      declarePayload.declaration
+    )
+
+    const expectedError = new TRPCError({
+      code: 'BAD_REQUEST',
+      message: JSON.stringify([
+        {
+          message: 'Hidden or disabled field should not receive a value',
+          id: 'applicant.dob',
+          value: '2000-01-01'
+        }
+      ])
+    })
+
+    await expect(
+      client.event.actions.declare.request({
+        ...declarePayload,
+        declaration: declarationWithHiddenField
+      })
+    ).rejects.toMatchObject(expectedError)
+
+    const declaredEvent = await createEvent(client, generator, [
+      ActionType.DECLARE
+    ])
+    const validatePayload = generator.event.actions.validate(declaredEvent.id)
+    const validateDeclarationWithHiddenField = getDeclarationWithHiddenField(
+      validatePayload.declaration
+    )
+
+    await expect(
+      client.event.actions.validate.request({
+        ...validatePayload,
+        declaration: validateDeclarationWithHiddenField
+      })
+    ).rejects.toMatchObject(expectedError)
+
+    const validatedEvent = await createEvent(client, generator, [
+      ActionType.DECLARE,
+      ActionType.VALIDATE
+    ])
+
+    const registerPayload = generator.event.actions.register(validatedEvent.id)
+    const registerDeclarationWithHiddenField = getDeclarationWithHiddenField(
+      registerPayload.declaration
+    )
+
+    await expect(
+      client.event.actions.register.request({
+        ...registerPayload,
+        declaration: registerDeclarationWithHiddenField
+      })
+    ).rejects.toMatchObject(expectedError)
   })
 
   it('File references are removed with explicit null', async () => {
