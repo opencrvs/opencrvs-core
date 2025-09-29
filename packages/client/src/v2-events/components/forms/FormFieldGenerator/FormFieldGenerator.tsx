@@ -22,7 +22,8 @@ import {
   isNonInteractiveFieldType,
   joinValues,
   SystemVariables,
-  Location
+  Location,
+  omitHiddenFields
 } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import {
@@ -73,6 +74,7 @@ interface FormFieldGeneratorProps {
   isCorrection?: boolean
   parentId?: string // `child____name` part of `child____name____firstname`
   locations?: Location[]
+  allFields?: FieldConfig[]
 }
 
 export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
@@ -89,7 +91,8 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     onAllFieldsValidated,
     isCorrection = false,
     parentId,
-    locations
+    locations,
+    allFields
   }) => {
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
@@ -101,6 +104,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         Object.keys(touched).length > 0 &&
         !isEqual(touched, initialTouchedFields) &&
         Object.keys(touched).filter((key) => !(key in initialTouchedFields))
+
       if (newlyTouched && newlyTouched.length > 0) {
         const newlyTouchedFields = parentId
           ? newlyTouched.reduce(
@@ -162,6 +166,19 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
             updateTouchFields(touched)
           }, [touched])
 
+          /*
+           * Only include values from visible fields so values of hidden fields don’t affect conditional checks.
+           *
+           * You might wonder why values of hidden fields aren’t filtered out earlier.
+           * That’s intentional — we persist their values so if the fields become visible again, the previous values are restored instead of resetting.
+           */
+          const valuesWithoutHiddenFields = allFields
+            ? omitHiddenFields(
+                allFields,
+                makeFormikFieldIdsOpenCRVSCompatible(formikProps.values)
+              )
+            : formikProps.values
+
           return (
             <FormSectionComponent
               className={className}
@@ -186,7 +203,9 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               systemVariables={systemVariables}
               touched={{ ...formikProps.touched, ...initialTouchedFields }}
               validateAllFields={validateAllFields}
-              values={formikProps.values}
+              values={makeFormFieldIdsFormikCompatible(
+                valuesWithoutHiddenFields
+              )}
               onAllFieldsValidated={onAllFieldsValidated}
               onChange={formikOnChange}
             />
