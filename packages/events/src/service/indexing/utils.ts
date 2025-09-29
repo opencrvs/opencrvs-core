@@ -171,11 +171,7 @@ export function generateQueryForAddressField(
       })
     }
   }
-  if (
-    addressType === AddressType.INTERNATIONAL &&
-    streetLevelDetails &&
-    Object.keys(streetLevelDetails).length
-  ) {
+  if (streetLevelDetails && Object.keys(streetLevelDetails).length) {
     Object.entries(streetLevelDetails).forEach(([key, value]) => {
       mustMatches.push({
         match: { [`${declarationKey}.streetLevelDetails.${key}`]: value }
