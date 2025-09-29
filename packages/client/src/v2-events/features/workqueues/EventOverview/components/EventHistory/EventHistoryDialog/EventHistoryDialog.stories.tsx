@@ -506,7 +506,7 @@ const newFullEvent = {
           firstname: 'rec first',
           middlename: ''
         },
-        'recommender.none': false, // Should not be visible as not displayed on review.
+        'recommender.none': false, // Should be visible.
         'applicant.image.label': 'picture text'
       },
       annotation: {},
