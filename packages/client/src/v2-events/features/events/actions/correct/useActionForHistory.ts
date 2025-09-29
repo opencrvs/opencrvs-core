@@ -114,28 +114,30 @@ export function expandWithUpdateActions(
 ): EventHistoryActionDocument[] {
   return actions.flatMap<EventHistoryActionDocument>((action) => {
     if (
-      action.type === ActionTypes.enum.VALIDATE ||
-      action.type === ActionTypes.enum.REGISTER ||
-      action.type === ActionTypes.enum.DECLARE
+      action.type !== ActionTypes.enum.VALIDATE &&
+      action.type !== ActionTypes.enum.REGISTER &&
+      action.type !== ActionTypes.enum.DECLARE
     ) {
-      if (hasDeclarationChanged(actions, action)) {
-        return [
-          {
-            ...action,
-            // Cast suffixed id as UUID to ensure uniqueness for synthetic UPDATE actions.
-            // We can't generate random UUIDs here, since components rely on stable IDs
-            // to find actions across renders.
-            id: `${action.id}-update` as UUID,
-            type: DECLARATION_ACTION_UPDATE
-          },
-          {
-            ...action,
-            declaration: {}
-          }
-        ]
-      }
       return [action]
     }
+
+    if (hasDeclarationChanged(actions, action)) {
+      return [
+        {
+          ...action,
+          // Cast suffixed id as UUID to ensure uniqueness for synthetic UPDATE actions.
+          // We can't generate random UUIDs here, since components rely on stable IDs
+          // to find actions across renders.
+          id: `${action.id}-update` as UUID,
+          type: DECLARATION_ACTION_UPDATE
+        },
+        {
+          ...action,
+          declaration: {}
+        }
+      ]
+    }
+
     return [action]
   })
 }
