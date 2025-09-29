@@ -1164,12 +1164,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           id: 'recommender.none',
           type: 'CHECKBOX',
           required: false,
-          conditionals: [
-            {
-              type: ConditionalType.DISPLAY_ON_REVIEW,
-              conditional: never()
-            }
-          ],
+          conditionals: [],
           label: {
             defaultMessage: 'No recommender',
             description: 'This is the label for the field',
