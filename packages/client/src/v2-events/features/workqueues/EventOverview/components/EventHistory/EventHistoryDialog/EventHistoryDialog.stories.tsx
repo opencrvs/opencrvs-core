@@ -259,7 +259,7 @@ export const Validated: Story = {
 
 const updateActionForValidate = expandWithUpdateActions(
   eventWhenValidateUpdatesDeclaration.actions
-).filter((a) => a.type === DECLARATION_ACTION_UPDATE)[0]
+).find((a) => a.type === DECLARATION_ACTION_UPDATE)
 
 export const ValidatedOnDeclarationUpdate: Story = {
   args: {
@@ -290,7 +290,7 @@ export const Registered: Story = {
 
 const updateActionForRegister = expandWithUpdateActions(
   eventWhenRegisterUpdatesDeclaration.actions
-).filter((a) => a.type === DECLARATION_ACTION_UPDATE)[0]
+).find((a) => a.type === DECLARATION_ACTION_UPDATE)
 
 export const RegisteredOnDeclarationUpdate: Story = {
   args: {
