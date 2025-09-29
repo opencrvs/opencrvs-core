@@ -41,6 +41,7 @@ import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -478,7 +479,7 @@ function toCertificateVariables(
 }
 
 export const Address = {
-  Input: AddressInput,
+  Input: withSuspense(AddressInput),
   Output: AddressOutput,
   toCertificateVariables
 }
