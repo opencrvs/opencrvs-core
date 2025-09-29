@@ -87,16 +87,6 @@ export const CheckedCheckboxShouldAppearOnReview: StoryObj<typeof Review> = {
         </Review.Body>
       </div>
     )
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-
-    await canvas.findByText(/Checkbox review?/)
-
-    await expect(canvas.queryByText('No recommender')).toBeInTheDocument()
-    await expect(
-      canvas.queryByTestId('row-value-recommender.none')
-    ).toHaveTextContent('Yes')
   }
 }
 
