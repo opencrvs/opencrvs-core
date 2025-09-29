@@ -40,11 +40,7 @@ import {
   EventState
 } from './ActionDocument'
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
-import {
-  getOnlyVisibleFormValues,
-  isConditionMet,
-  isFieldVisible
-} from '../conditionals/validate'
+import { isConditionMet, isFieldVisible } from '../conditionals/validate'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID, UUID } from '../uuid'
@@ -587,32 +583,24 @@ export function aggregateActionDeclarations(
     .filter((a) => !EXCLUDED_ACTIONS.some((type) => type === a.type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  const aggregatedDeclaration = aggregatedActions.reduce(
-    (declaration, action) => {
-      /*
-       * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
-       * details in the correction. To do this, we find the original request that this
-       * approval is for and merge its details with the current data of the record.
-       */
-      if (action.type === ActionType.APPROVE_CORRECTION) {
-        const requestAction = allAcceptedActions.find(
-          ({ id }) => id === action.requestId
-        )
+  return aggregatedActions.reduce((declaration, action) => {
+    /*
+     * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
+     * details in the correction. To do this, we find the original request that this
+     * approval is for and merge its details with the current data of the record.
+     */
+    if (action.type === ActionType.APPROVE_CORRECTION) {
+      const requestAction = allAcceptedActions.find(
+        ({ id }) => id === action.requestId
+      )
 
-        if (!requestAction) {
-          return declaration
-        }
-
-        return getCompleteActionDeclaration(declaration, event, requestAction)
+      if (!requestAction) {
+        return declaration
       }
 
-      return getCompleteActionDeclaration(declaration, event, action)
-    },
-    {}
-  )
+      return getCompleteActionDeclaration(declaration, event, requestAction)
+    }
 
-  return getOnlyVisibleFormValues(
-    config.declaration.pages.flatMap(({ fields }) => fields),
-    aggregatedDeclaration
-  )
+    return getCompleteActionDeclaration(declaration, event, action)
+  }, {})
 }
