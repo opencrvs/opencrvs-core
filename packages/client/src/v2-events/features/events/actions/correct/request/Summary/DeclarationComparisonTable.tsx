@@ -19,7 +19,8 @@ import {
   EventState,
   getAcceptedActions,
   getCurrentEventState,
-  getDeclaration
+  getDeclaration,
+  isFieldDisplayedOnReview
 } from '@opencrvs/commons/client'
 import { Table } from '@opencrvs/components/lib/Table'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -193,6 +194,7 @@ export function DeclarationComparisonTableComponent({
     <>
       {declarationConfig.pages.map((page) => {
         const changedFields = page.fields
+          .filter((field) => isFieldDisplayedOnReview(field, latestDeclaration))
           .filter((f) =>
             hasFieldChanged(f, latestDeclaration, previousDeclaration)
           )
