@@ -72,9 +72,9 @@ export const Number = {
     const postfix = config.configuration?.postfix
     return (
       <>
-        {prefix && <>{intl.formatMessage(prefix)} </>}
+        {prefix && intl.formatMessage(prefix)}
         {value.toString() || ''}
-        {postfix && <> {intl.formatMessage(postfix)}</>}
+        {postfix && intl.formatMessage(postfix)}
       </>
     )
   }
