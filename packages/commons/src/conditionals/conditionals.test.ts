@@ -698,7 +698,7 @@ describe('"user" conditionals', () => {
     expect(validate(user.isOnline(), offlineUserParams)).toBe(false)
   })
 
-  it.only('validates "user.hasRole" conditional', () => {
+  it('validates "user.hasRole" conditional', () => {
     expect(validate(user.hasRole('LOCAL_REGISTRAR'), userParams)).toBe(true)
     expect(validate(user.hasRole('NOTHING_REGISTRAR'), userParams)).toBe(false)
   })

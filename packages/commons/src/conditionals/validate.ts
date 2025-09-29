@@ -20,7 +20,6 @@ import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { TokenUserType } from '../authentication'
 import { UUID } from '../uuid'
 
 const ajv = new Ajv({
@@ -125,26 +124,6 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
   return result
 }
 
-// TODO: to be removed when the right solution is implemented
-const mockUser = [
-  {
-    scope: ['record.register', 'record.registration-correct'],
-    exp: '1739881718',
-    algorithm: 'RS256',
-    userType: TokenUserType.enum.user,
-    sub: '677b33fea7efb08730f3abfa33',
-    role: 'LOCAL_REGISTRAR'
-  },
-  {
-    scope: ['record.register', 'record.registration-correct'],
-    exp: '1739881718',
-    algorithm: 'RS256',
-    userType: TokenUserType.enum.user,
-    sub: '677b33fea7efb08730f3abfa33',
-    role: 'NATIONAL_REGISTRAR'
-  }
-]
-
 export function isOnline() {
   if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
     return navigator.onLine
@@ -203,9 +182,7 @@ function isFieldConditionMet(
     $now: formatISO(new Date(), {
       representation: 'date'
     }),
-    $online: isOnline(),
-    // TODO: to be removed when the right solution is implemented
-    $user: mockUser[0]
+    $online: isOnline()
   })
 
   return validConditionals.includes(conditionalType)
