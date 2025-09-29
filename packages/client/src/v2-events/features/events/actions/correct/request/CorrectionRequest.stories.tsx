@@ -279,7 +279,7 @@ export const Summary: Story = {
     const canvas = within(canvasElement)
     await step('Check the summary table', async () => {
       void expect(await canvas.findByText('Verify ID')).toBeInTheDocument()
-      void expect(canvas.getAllByText(/^Yes$/)).toHaveLength(1)
+      void expect(await canvas.findAllByText(/^Yes$/)).toHaveLength(1)
       void expect(
         await canvas.findByText('Another registration agent or field agent')
       ).toBeInTheDocument()
