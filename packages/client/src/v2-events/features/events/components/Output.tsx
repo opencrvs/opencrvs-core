@@ -11,7 +11,6 @@
 
 import React from 'react'
 import styled from 'styled-components'
-import * as _ from 'lodash'
 import { isUndefined } from 'lodash'
 import {
   FieldConfig,
@@ -42,10 +41,8 @@ import {
   isPhoneFieldType,
   isSelectDateRangeFieldType,
   isLocationFieldType,
-  FileFieldWithOptionValue,
   EventState,
-  FormConfig,
-  FieldType
+  FormConfig
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -69,6 +66,7 @@ import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileIn
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
+import { isEqualFieldValue } from '../actions/correct/utils'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -296,7 +294,7 @@ export function Output({
   const hasPreviousValue = previousValue !== undefined
 
   // Note, checking for previousValue !== value is not enough, as we have composite fields.
-  if (hasPreviousValue && !_.isEqual(previousValue, value)) {
+  if (hasPreviousValue && !isEqualFieldValue(previousValue, value)) {
     let valueOutput = <ValueOutput config={field} value={value} />
 
     if (isEmptyValue(field, value)) {
