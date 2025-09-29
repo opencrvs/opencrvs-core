@@ -18,7 +18,6 @@ import {
   EventDocument,
   EventState,
   getAcceptedActions,
-  getCurrentEventState,
   getDeclaration,
   isFieldDisplayedOnReview
 } from '@opencrvs/commons/client'

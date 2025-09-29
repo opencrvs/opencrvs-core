@@ -131,10 +131,10 @@ export function expandWithUpdateActions(
           id: `${action.id}-update` as UUID,
           type: DECLARATION_ACTION_UPDATE
         },
-        {
-          ...action,
-          declaration: {}
-        }
+        // Preserve the original action’s declaration.
+        // This is required so that when the synthetic UPDATE action is later stripped out,
+        // declaration changes can still be detected correctly in getCurrentEventState.
+        action
       ]
     }
 
