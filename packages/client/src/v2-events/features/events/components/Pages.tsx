@@ -136,7 +136,7 @@ export function Pages({
 
   const fields = (
     <FormFieldGenerator
-      allFields={formPages.flatMap((p) => p.fields)}
+      allFields={declaration ? undefined : formPages.flatMap((p) => p.fields)}
       eventConfig={eventConfig}
       // In some Action page forms, the form data itself is not the complete declaration.
       // We still merge the optional `declaration` prop into the initial form values so that
