@@ -11,7 +11,9 @@
 import {
   Scope,
   SCOPES,
-  DEFAULT_ROLES_DEFINITION
+  DEFAULT_ROLES_DEFINITION,
+  TestUserRole,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { EventType, Status, FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -1786,15 +1788,30 @@ export function fetchUserMock(officeId: string): FetchUserQuery {
   }
 }
 
-export function generateToken(scope: Scope[], subject?: string) {
+export function generateToken({
+  scope,
+  userType,
+  role,
+  subject
+}: {
+  scope: Scope[]
+  subject?: string
+  userType?: TokenUserType
+  role?: TestUserRole
+}) {
   if (subject) {
-    return jwt.sign({ scope }, readFileSync('./test/cert.key'), {
-      subject,
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:gateway-user'
-    })
+    return jwt.sign(
+      { scope, userType, role },
+      readFileSync('./test/cert.key'),
+      {
+        subject,
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
   }
+
   return jwt.sign({ scope }, readFileSync('./test/cert.key'), {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
@@ -1803,7 +1820,7 @@ export function generateToken(scope: Scope[], subject?: string) {
 }
 
 export function setScopes(scope: Scope[], store: AppStore) {
-  const token = generateToken(scope)
+  const token = generateToken({ scope })
 
   window.history.replaceState({}, '', '?token=' + token)
 

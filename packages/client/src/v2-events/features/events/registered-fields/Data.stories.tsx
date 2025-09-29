@@ -13,18 +13,25 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
 import { noop } from 'lodash'
-import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  FieldType,
+  tennisClubMembershipEvent,
+  TestUserRole
+} from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { FormFieldGeneratorProps } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorProps> = {
   title: 'Inputs/Data',
+  component: FormFieldGenerator,
+  argTypes: {
+    validatorContext: { control: false }
+  },
   decorators: [
-    (Story) => (
-      <TRPCProvider>
-        <Story />
-      </TRPCProvider>
-    )
+    (Story, context) => <TRPCProvider>{Story(context)}</TRPCProvider>,
+    withValidatorContext
   ]
 }
 
@@ -39,9 +46,10 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
   parameters: {
     layout: 'centered'
   },
-  render: function Component() {
+  render: (args) => {
     return (
       <StyledFormFieldGenerator
+        {...args}
         eventConfig={tennisClubMembershipEvent}
         fields={[
           {
@@ -103,11 +111,13 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
   typeof FormFieldGenerator
 > = {
   parameters: {
-    layout: 'centered'
+    layout: 'centered',
+    userRole: TestUserRole.Enum.REGISTRATION_AGENT
   },
-  render: function Component() {
+  render: (args) => {
     return (
       <StyledFormFieldGenerator
+        {...args}
         eventConfig={tennisClubMembershipEvent}
         fields={[
           {
@@ -134,6 +144,10 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
                 // recommender.name is not rendered, because recommender.none is true
                 {
                   fieldId: 'recommender.name'
+                },
+                // applicant.isRecommendedByFieldAgent is not rendered, because the user is registration agent
+                {
+                  fieldId: 'applicant.isRecommendedByFieldAgent'
                 }
               ]
             }
@@ -151,7 +165,8 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
           'applicant.name': {
             firstname: 'Rasheed',
             surname: ''
-          }
+          },
+          'applicant.isRecommendedByFieldAgent': true
         }}
         onChange={noop}
       />
@@ -163,11 +178,13 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
   typeof FormFieldGenerator
 > = {
   parameters: {
-    layout: 'centered'
+    layout: 'centered',
+    userRole: TestUserRole.Enum.FIELD_AGENT
   },
-  render: function Component() {
+  render: (args) => {
     return (
       <StyledFormFieldGenerator
+        {...args}
         eventConfig={tennisClubMembershipEvent}
         fields={[
           {
@@ -191,6 +208,10 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
                 // recommender.name is rendered, because recommender.none is false
                 {
                   fieldId: 'recommender.name'
+                },
+                // applicant.isRecommendedByFieldAgent is  rendered, because the user is field agent
+                {
+                  fieldId: 'applicant.isRecommendedByFieldAgent'
                 }
               ]
             }
@@ -206,7 +227,8 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
             firstname: 'Rasheed',
             surname: ''
           },
-          'recommender.none': false
+          'recommender.none': false,
+          'applicant.isRecommendedByFieldAgent': true
         }}
         onChange={noop}
       />
