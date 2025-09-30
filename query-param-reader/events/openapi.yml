@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: f171aa2d-fa72-41a1-bea1-1974879fd948
+                transactionId: ef32a0a0-663e-4454-b539-550d81494661
                 type: birth
       responses:
         "200":
@@ -401,7 +401,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 28666be4-51a5-4cef-84bf-20c5c2ff9d35
+                transactionId: 64068d0d-0483-459b-bf55-bb526b7615e1
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -6016,20 +6016,22 @@ components:
                 params:
                   type: object
                   additionalProperties:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    anyOf:
+                      - type: string
+                      - type: object
+                        properties:
+                          $$field:
+                            type: string
+                            description: Unique identifier for the field
+                          $$subfield:
+                            type: array
+                            items:
+                              type: string
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        required:
+                          - $$field
+                        description: Reference to a field by its ID
                 timeout:
                   type: number
                   default: 15000
