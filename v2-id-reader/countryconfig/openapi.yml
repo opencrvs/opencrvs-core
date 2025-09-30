@@ -4526,6 +4526,12 @@ components:
             type:
               type: string
               const: QR_READER
+            configuration:
+              type: object
+              properties:
+                validator: {}
+              required:
+                - validator
           required:
             - id
             - label
@@ -4626,20 +4632,264 @@ components:
             methods:
               type: array
               items:
-                type: object
-                properties:
-                  type:
-                    anyOf:
-                      - type: string
+                anyOf:
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Unique identifier for the field
+                      label:
+                        $ref: "#/components/schemas/TranslationConfig"
+                      parent:
+                        type: object
+                        properties:
+                          $$field:
+                            type: string
+                            description: Unique identifier for the field
+                          $$subfield:
+                            type: array
+                            items:
+                              type: string
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        required:
+                          - $$field
+                        description: Reference to a parent field. If a field has a parent, it will be
+                          reset when the parent field is changed.
+                      required:
+                        anyOf:
+                          - type: boolean
+                          - type: object
+                            properties:
+                              message:
+                                $ref: "#/components/schemas/TranslationConfig"
+                                description: Custom required validation message
+                            required:
+                              - message
+                        default: false
+                      disabled:
+                        type: boolean
+                        default: false
+                      conditionals:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/FieldConditional"
+                        default: *a5
+                      secured:
+                        type: boolean
+                        default: false
+                      placeholder:
+                        $ref: "#/components/schemas/TranslationConfig"
+                      validation:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            validator:
+                              $ref: "#/components/schemas/Conditional"
+                            message:
+                              $ref: "#/components/schemas/TranslationConfig"
+                          required:
+                            - validator
+                            - message
+                        default: *a6
+                      helperText:
+                        $ref: "#/components/schemas/TranslationConfig"
+                      hideLabel:
+                        type: boolean
+                        default: false
+                      uncorrectable:
+                        type: boolean
+                        default: false
+                        description: Indicates if the field can be changed during a record correction.
+                      value:
+                        type: object
+                        properties:
+                          $$field:
+                            type: string
+                            description: Unique identifier for the field
+                          $$subfield:
+                            type: array
+                            items:
+                              type: string
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        required:
+                          - $$field
+                        description: Reference to a parent field. If field has a value, the value will
+                          be copied when the parent field is changed.
+                      analytics:
+                        type: boolean
+                        default: false
+                        description: Meta field for analytics to allow filtering non-analytics fields
+                          away
+                      type:
+                        type: string
                         const: QR_READER
-                      - type: string
+                      configuration:
+                        type: object
+                        properties:
+                          validator: {}
+                        required:
+                          - validator
+                    required:
+                      - id
+                      - label
+                      - type
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Unique identifier for the field
+                      label:
+                        $ref: "#/components/schemas/TranslationConfig"
+                      parent:
+                        type: object
+                        properties:
+                          $$field:
+                            type: string
+                            description: Unique identifier for the field
+                          $$subfield:
+                            type: array
+                            items:
+                              type: string
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        required:
+                          - $$field
+                        description: Reference to a parent field. If a field has a parent, it will be
+                          reset when the parent field is changed.
+                      required:
+                        anyOf:
+                          - type: boolean
+                          - type: object
+                            properties:
+                              message:
+                                $ref: "#/components/schemas/TranslationConfig"
+                                description: Custom required validation message
+                            required:
+                              - message
+                        default: false
+                      disabled:
+                        type: boolean
+                        default: false
+                      conditionals:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/FieldConditional"
+                        default: *a5
+                      secured:
+                        type: boolean
+                        default: false
+                      placeholder:
+                        $ref: "#/components/schemas/TranslationConfig"
+                      validation:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            validator:
+                              $ref: "#/components/schemas/Conditional"
+                            message:
+                              $ref: "#/components/schemas/TranslationConfig"
+                          required:
+                            - validator
+                            - message
+                        default: *a6
+                      helperText:
+                        $ref: "#/components/schemas/TranslationConfig"
+                      hideLabel:
+                        type: boolean
+                        default: false
+                      uncorrectable:
+                        type: boolean
+                        default: false
+                        description: Indicates if the field can be changed during a record correction.
+                      value:
+                        type: object
+                        properties:
+                          $$field:
+                            type: string
+                            description: Unique identifier for the field
+                          $$subfield:
+                            type: array
+                            items:
+                              type: string
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        required:
+                          - $$field
+                        description: Reference to a parent field. If field has a value, the value will
+                          be copied when the parent field is changed.
+                      analytics:
+                        type: boolean
+                        default: false
+                        description: Meta field for analytics to allow filtering non-analytics fields
+                          away
+                      type:
+                        type: string
                         const: EXTERNAL_AUTHENTICATOR
-                  configuration:
-                    type: object
-                    additionalProperties:
-                      type: string
-                required:
-                  - type
+                      configuration:
+                        type: object
+                        properties:
+                          link:
+                            type: object
+                            properties:
+                              $$field:
+                                type: string
+                                description: Unique identifier for the field
+                              $$subfield:
+                                type: array
+                                items:
+                                  type: string
+                                description: 'If the FieldValue is an object, subfield can be used to refer to
+                                  e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
+                                  }`'
+                            required:
+                              - $$field
+                            description: Reference to a field by its ID
+                          queryParamReader:
+                            type: object
+                            properties:
+                              $$field:
+                                type: string
+                                description: Unique identifier for the field
+                              $$subfield:
+                                type: array
+                                items:
+                                  type: string
+                                description: 'If the FieldValue is an object, subfield can be used to refer to
+                                  e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
+                                  }`'
+                            required:
+                              - $$field
+                            description: Reference to a field by its ID
+                          http:
+                            type: object
+                            properties:
+                              $$field:
+                                type: string
+                                description: Unique identifier for the field
+                              $$subfield:
+                                type: array
+                                items:
+                                  type: string
+                                description: 'If the FieldValue is an object, subfield can be used to refer to
+                                  e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
+                                  }`'
+                            required:
+                              - $$field
+                            description: Reference to a field by its ID
+                        required:
+                          - link
+                          - queryParamReader
+                          - http
+                    required:
+                      - id
+                      - label
+                      - type
+                      - configuration
+                description: Methods for reading an ID
           required:
             - id
             - label
