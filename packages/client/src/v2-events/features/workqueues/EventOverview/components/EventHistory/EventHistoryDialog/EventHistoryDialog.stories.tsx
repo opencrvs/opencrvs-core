@@ -20,7 +20,8 @@ import {
   createPrng,
   getRandomDatetime,
   UUID,
-  getAcceptedActions
+  getAcceptedActions,
+  EventDocument
 } from '@opencrvs/commons/client'
 import {
   DECLARATION_ACTION_UPDATE,
@@ -822,6 +823,204 @@ export const DeclarationUpdateOnRegister: Story = {
   args: {
     fullEvent: newFullEvent,
     action: updateActions[3]
+  }
+}
+
+const eventWithNotifyActions = {
+  id: '2eec9e19-c356-4a0a-8a2d-0730cbc39dca' as UUID,
+  type: 'tennis-club-membership',
+  createdAt: '2025-09-30T06:50:33.629Z',
+  updatedAt: '2025-09-30T06:50:33.629Z',
+  trackingId: '28W273',
+  actions: [
+    {
+      id: '68b78b5e-a2fd-45b5-8b3c-ce1e9dc649b0' as UUID,
+      transactionId: 'tmp-8026e5be-2ccb-483e-9507-97796a872083',
+      createdByUserType: 'user',
+      createdAt: '2025-09-30T06:50:33.629Z',
+      createdBy: '68da88dfd0d608fec619f142',
+      createdByRole: 'SOCIAL_WORKER',
+      createdAtLocation: '899e81dd-9cc8-4370-8038-4e9cc25a941f' as UUID,
+      declaration: {},
+      status: 'Accepted',
+      type: 'CREATE'
+    },
+    {
+      id: '813dd280-9b86-4888-a772-b4d0efbd0e88' as UUID,
+      transactionId: 'tmp-8026e5be-2ccb-483e-9507-97796a872083',
+      createdByUserType: 'user',
+      createdAt: '2025-09-30T06:50:33.629Z',
+      createdBy: '68da88dfd0d608fec619f142',
+      createdByRole: 'SOCIAL_WORKER',
+      createdAtLocation: '899e81dd-9cc8-4370-8038-4e9cc25a941f' as UUID,
+      declaration: {},
+      status: 'Accepted',
+      type: 'ASSIGN',
+      assignedTo: '68da88dfd0d608fec619f142'
+    },
+    {
+      id: '8b763619-35a3-4236-9f4e-5d9b31f8d7ac' as UUID,
+      transactionId: '5bd48b60-f2f8-4a7e-9917-1aa6de56fc3c',
+      createdByUserType: 'user',
+      createdAt: '2025-09-30T06:50:46.275Z',
+      createdBy: '68da88dfd0d608fec619f142',
+      createdByRole: 'SOCIAL_WORKER',
+      createdAtLocation: '899e81dd-9cc8-4370-8038-4e9cc25a941f' as UUID,
+      declaration: {
+        'applicant.name': {
+          surname: 'first',
+          firstname: 'first',
+          middlename: 'last'
+        },
+        'recommender.none': false
+      },
+      annotation: {},
+      status: 'Requested',
+      type: 'NOTIFY'
+    },
+    {
+      id: '025f676e-62fc-4315-8a53-28707c9e3fae' as UUID,
+      transactionId: '5bd48b60-f2f8-4a7e-9917-1aa6de56fc3c',
+      createdByUserType: 'user',
+      createdAt: '2025-09-30T06:50:46.406Z',
+      createdBy: '68da88dfd0d608fec619f142',
+      createdByRole: 'SOCIAL_WORKER',
+      createdAtLocation: '899e81dd-9cc8-4370-8038-4e9cc25a941f' as UUID,
+      declaration: {},
+      status: 'Accepted',
+      originalActionId: '8b763619-35a3-4236-9f4e-5d9b31f8d7ac' as UUID,
+      type: 'NOTIFY'
+    },
+    {
+      id: '9d9d8e87-4134-42ff-b515-f6c038551c34' as UUID,
+      transactionId: '5bd48b60-f2f8-4a7e-9917-1aa6de56fc3c',
+      createdByUserType: 'user',
+      createdAt: '2025-09-30T06:50:46.409Z',
+      createdBy: '68da88dfd0d608fec619f142',
+      createdByRole: 'SOCIAL_WORKER',
+      createdAtLocation: '899e81dd-9cc8-4370-8038-4e9cc25a941f' as UUID,
+      declaration: {},
+      status: 'Accepted',
+      type: 'UNASSIGN'
+    },
+    {
+      id: '5b10ffbd-c3d0-4d98-a143-fcd88013f1bc' as UUID,
+      transactionId: '951b19b5-8bb9-45c0-9163-22eebb9cdcea',
+      createdByUserType: 'user',
+      createdAt: '2025-09-30T06:51:29.228Z',
+      createdBy: '68da88dfd0d608fec619f14a',
+      createdByRole: 'REGISTRATION_AGENT',
+      createdAtLocation: '899e81dd-9cc8-4370-8038-4e9cc25a941f' as UUID,
+      declaration: {},
+      annotation: {},
+      status: 'Accepted',
+      type: 'ASSIGN',
+      assignedTo: '68da88dfd0d608fec619f14a'
+    },
+    {
+      id: '66d6c0b3-c506-4b79-9032-22dd82261fff' as UUID,
+      transactionId: '64f190d6-2fc6-45ef-955f-0e7650c6e2cb',
+      createdByUserType: 'user',
+      createdAt: '2025-09-30T06:51:40.814Z',
+      createdBy: '68da88dfd0d608fec619f14a',
+      createdByRole: 'REGISTRATION_AGENT',
+      createdAtLocation: '899e81dd-9cc8-4370-8038-4e9cc25a941f' as UUID,
+      declaration: {},
+      annotation: {},
+      status: 'Requested',
+      type: 'REJECT',
+      content: {
+        reason: 'fill it up!!'
+      }
+    },
+    {
+      id: '70eddf69-498c-486c-aa55-7045acdd3d8c' as UUID,
+      transactionId: '64f190d6-2fc6-45ef-955f-0e7650c6e2cb',
+      createdByUserType: 'user',
+      createdAt: '2025-09-30T06:51:40.873Z',
+      createdBy: '68da88dfd0d608fec619f14a',
+      createdByRole: 'REGISTRATION_AGENT',
+      createdAtLocation: '899e81dd-9cc8-4370-8038-4e9cc25a941f' as UUID,
+      declaration: {},
+      status: 'Accepted',
+      originalActionId: '66d6c0b3-c506-4b79-9032-22dd82261fff' as UUID,
+      type: 'REJECT',
+      content: {
+        reason: 'fill it up!!'
+      }
+    },
+    {
+      id: 'e827d3a7-5bd1-4b2c-becb-1ea7608448fe' as UUID,
+      transactionId: '64f190d6-2fc6-45ef-955f-0e7650c6e2cb',
+      createdByUserType: 'user',
+      createdAt: '2025-09-30T06:51:40.876Z',
+      createdBy: '68da88dfd0d608fec619f14a',
+      createdByRole: 'REGISTRATION_AGENT',
+      createdAtLocation: '899e81dd-9cc8-4370-8038-4e9cc25a941f' as UUID,
+      declaration: {},
+      status: 'Accepted',
+      type: 'UNASSIGN'
+    },
+    {
+      id: '8c53d5b9-9113-43c0-ada1-a4675b4f9f89' as UUID,
+      transactionId: '0d3de8fb-71a2-41f8-a61c-d3c98908c9e4',
+      createdByUserType: 'user',
+      createdAt: '2025-09-30T06:51:50.462Z',
+      createdBy: '68da88dfd0d608fec619f142',
+      createdByRole: 'SOCIAL_WORKER',
+      createdAtLocation: '899e81dd-9cc8-4370-8038-4e9cc25a941f' as UUID,
+      declaration: {},
+      annotation: {},
+      status: 'Accepted',
+      type: 'ASSIGN',
+      assignedTo: '68da88dfd0d608fec619f142'
+    },
+    {
+      id: '85c72614-b472-4078-a32b-a7a57e46e771' as UUID,
+      transactionId: '75b3df01-5367-43a6-94e4-b96d276ed772',
+      createdByUserType: 'user',
+      createdAt: '2025-09-30T06:52:10.919Z',
+      createdBy: '68da88dfd0d608fec619f142',
+      createdByRole: 'SOCIAL_WORKER',
+      createdAtLocation: '899e81dd-9cc8-4370-8038-4e9cc25a941f' as UUID,
+      declaration: {
+        'applicant.dob': '2000-02-22', // dob was added in second notify after rejection. Should not be track the diff
+        'applicant.name': {
+          surname: 'first',
+          firstname: 'first',
+          middlename: 'last'
+        },
+        'recommender.none': false
+      },
+      annotation: {},
+      status: 'Requested',
+      type: 'NOTIFY'
+    },
+    {
+      id: '85c72614-b472-4078-a32b-a7a57e46e771' as UUID,
+      transactionId: '75b3df01-5367-43a6-94e4-b96d276ed772',
+      createdByUserType: 'user',
+      createdAt: '2025-09-30T06:52:10.919Z',
+      createdBy: '68da88dfd0d608fec619f142',
+      createdByRole: 'SOCIAL_WORKER',
+      createdAtLocation: '899e81dd-9cc8-4370-8038-4e9cc25a941f' as UUID,
+      declaration: {},
+      originalActionId: '85c72614-b472-4078-a32b-a7a57e46e771' as UUID,
+      annotation: {},
+      status: 'Accepted',
+      type: 'NOTIFY'
+    }
+  ]
+} satisfies EventDocument
+
+const updateActionsForNotifyActions = expandWithUpdateActions(
+  getAcceptedActions(eventWithNotifyActions)
+).filter((a) => a.type === DECLARATION_ACTION_UPDATE)
+
+export const DeclarationUpdateNotify: Story = {
+  args: {
+    fullEvent: eventWithNotifyActions,
+    action: updateActionsForNotifyActions[0]
   }
 }
 

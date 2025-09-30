@@ -52,10 +52,7 @@ function getPreviousActions(arr: ActionDocument[], id: string) {
 }
 export function hasDeclarationChanged(
   actions: ActionDocument[],
-  action: Extract<
-    Action,
-    { type: Exclude<DeclarationActionType, typeof ActionType.NOTIFY> }
-  >
+  action: Extract<Action, { type: DeclarationActionType }>
 ) {
   const previousActions = getPreviousActions(actions, action.id)
   const previousActionType = getPreviousDeclarationActionType(
@@ -114,14 +111,15 @@ export function expandWithUpdateActions(
 ): EventHistoryActionDocument[] {
   return actions.flatMap<EventHistoryActionDocument>((action) => {
     if (
-      action.type !== ActionTypes.enum.VALIDATE &&
-      action.type !== ActionTypes.enum.REGISTER &&
-      action.type !== ActionTypes.enum.DECLARE
+      action.type === ActionTypes.enum.VALIDATE ||
+      action.type === ActionTypes.enum.REGISTER ||
+      action.type === ActionTypes.enum.DECLARE ||
+      action.type === ActionTypes.enum.NOTIFY
     ) {
-      return [action]
-    }
+      if (!hasDeclarationChanged(actions, action)) {
+        return [action]
+      }
 
-    if (hasDeclarationChanged(actions, action)) {
       return [
         {
           ...action,
