@@ -45,7 +45,7 @@ async function replaceMinioUrlWithBase64(
   declaration: Record<string, unknown>,
   config: EventConfig
 ) {
-  // Why a cloned copy? to avoid mutating the original declaration
+  // Clone to avoid mutating the original declaration
   const declarationClone: Record<string, unknown> = JSON.parse(
     JSON.stringify(declaration)
   )
@@ -56,21 +56,20 @@ async function replaceMinioUrlWithBase64(
     .map((field) => field.id)
 
   for (const fieldId of fileFieldIds) {
-    const fieldValue = declarationClone[fieldId] as
-      | { filename?: string }
-      | undefined
+    const field = declarationClone[fieldId]
+
     if (
-      fieldValue &&
-      typeof fieldValue === 'object' &&
-      typeof fieldValue.filename === 'string' &&
-      isMinioUrl(fieldValue.filename)
+      field &&
+      typeof field === 'object' &&
+      'filename' in field &&
+      typeof field.filename === 'string' &&
+      isMinioUrl(field.filename)
     ) {
-      const newFilename = await fetchImageAsBase64(fieldValue.filename)
-      // this should be a presigned minio url
-      ;(declarationClone[fieldId] as { filename?: string }).filename =
-        newFilename
+      // TypeScript now knows `field` has a `filename` property of type string
+      field.filename = await fetchImageAsBase64(field.filename)
     }
   }
+
   return declarationClone
 }
 
@@ -164,8 +163,8 @@ export const usePrintableCertificate = ({
 
   const certificateFonts = certificateConfig.fonts ?? {}
   const isEmptyDeclaration = Object.keys(declaration).length === 0
-  const declarationToUse: EventState = isEmptyDeclaration
-    ? ((localDeclaration ?? declaration) as EventState)
+  const declarationToUse = isEmptyDeclaration
+    ? (localDeclaration ?? declaration)
     : declaration
 
   const svgWithoutFonts = compileSvg({
