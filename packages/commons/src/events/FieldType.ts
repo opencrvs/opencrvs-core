@@ -42,7 +42,8 @@ export const FieldType = {
   DATA: 'DATA',
   BUTTON: 'BUTTON',
   HTTP: 'HTTP',
-  LINK_BUTTON: 'LINK_BUTTON'
+  LINK_BUTTON: 'LINK_BUTTON',
+  QUERY_PARAM_READER: 'QUERY_PARAM_READER'
 } as const
 
 /**
