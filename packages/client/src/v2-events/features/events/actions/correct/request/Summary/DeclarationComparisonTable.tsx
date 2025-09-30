@@ -144,6 +144,8 @@ export function DeclarationComparisonTableComponent({
     currentEvent,
     eventConfiguration
   )
+
+  // `action.declaration` is extracted to be merged by applyDeclarationToEventIndex to get latest EventIndex
   const formWithOnlyChangedValues = form ?? action?.declaration
 
   // When form is provided, we apply it on top of the current state to get the latest declaration

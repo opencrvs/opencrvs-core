@@ -67,8 +67,19 @@ function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
   }, {} as EventState)
 }
 
+/**
+ * Compares annotations of a given field between the current action and the previous state.
+ *
+ * @param field Field configuration of a review form field
+ * @param fullEvent Extended EventDocument with a possible synthetic `UPDATE` action
+ * @param currentActionIndex Index of the action from the actions array of fullEvent to evaluate
+ * @returns An object containing:
+ *  - currentAnnotations: aggregated annotations including the current action
+ *  - previousAnnotations: aggregated annotations up to (but not including) the current action
+ *  - valueHasChanged: boolean indicating whether the field's value changed between the two states
+ */
 export function getAnnotationComparison(
-  f: FieldConfig,
+  field: FieldConfig,
   fullEvent: EventHistoryDocument,
   currentActionIndex: number
 ) {
@@ -90,7 +101,7 @@ export function getAnnotationComparison(
   const previousAnnotations = aggregateAnnotations(eventUpToPreviousAction)
 
   const valueHasChanged = hasFieldChanged(
-    f,
+    field,
     currentAnnotations,
     previousAnnotations
   )

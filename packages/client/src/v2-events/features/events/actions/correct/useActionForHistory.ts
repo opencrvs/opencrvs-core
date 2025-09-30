@@ -91,11 +91,11 @@ function hasDeclarationChanged(
 
 /**
  * Enhances an event’s action history by injecting synthetic `UPDATE` actions
- * whenever a `DECLARE`, `VALIDATE`, or `REGISTER` action has a changed declaration.
+ * whenever a `NOTIFY`, `DECLARE`, `VALIDATE`, or `REGISTER` action has a changed declaration.
  *
  * For each changed action:
  * - A synthetic `UPDATE` action is added (with `id` suffixed by `-update`).
- * - The original action is duplicated with an empty `declaration` to preserve ordering.
+ * - The original action is duplicated to preserve ordering.
  *
  * All other actions are returned untouched.
  *
@@ -104,7 +104,7 @@ function hasDeclarationChanged(
  *
  * @example
  * const result = appendUpdateAction(actions);
- * // → [ { ...original DECLARE }, { ...synthetic UPDATE }, { ...DECLARE with empty declaration }, ... ]
+ * // → [ { ...actions }, { ...synthetic UPDATE for a DECLARE action}, { ...original DECLARE action }, ... ]
  */
 export function expandWithUpdateActions(
   actions: ActionDocument[]

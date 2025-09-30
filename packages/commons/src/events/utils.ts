@@ -98,7 +98,7 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
   return []
 }
 
-export function getAllAnnotationFields(config: EventConfig): FieldConfig[] {
+function getAllAnnotationFields(config: EventConfig): FieldConfig[] {
   return flattenDeep(config.actions.map(getActionAnnotationFields))
 }
 
