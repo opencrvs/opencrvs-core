@@ -8,15 +8,34 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { isEqual, isNil } from 'lodash'
+import * as _ from 'lodash'
 import {
   FieldConfig,
   EventState,
   isFieldVisible,
   isMetaAction,
   EventDocument,
-  ActionType
+  ActionType,
+  deepMerge,
+  FieldValue
 } from '@opencrvs/commons/client'
+
+/**
+ * Function we use for checking whether a field value has changed.
+ * For objects we need to ignore undefined values since the form might create them.
+ * @returns whether the two field values are equal when ignoring undefined values
+ */
+export function isEqualFieldValue<T extends FieldValue>(a: T, b: T) {
+  if (typeof a === 'object' && typeof b === 'object') {
+    return _.isEqual(_.omitBy(a, _.isUndefined), _.omitBy(b, _.isUndefined))
+  }
+
+  return _.isEqual(a, b)
+}
+import {
+  EventHistoryActionDocument,
+  EventHistoryDocument
+} from './useActionForHistory'
 
 export function hasFieldChanged(
   f: FieldConfig,
@@ -30,8 +49,8 @@ export function hasFieldChanged(
 
   // Ensure that if previous value is 'undefined' and current value is 'null'
   // it doesn't get detected as a value change
-  const bothNil = isNil(prevValue) && isNil(currValue)
-  const valueHasChanged = !isEqual(prevValue, currValue) && !bothNil
+  const bothNil = _.isNil(prevValue) && _.isNil(currValue)
+  const valueHasChanged = !isEqualFieldValue(prevValue, currValue) && !bothNil
 
   return isVisible && valueHasChanged
 }
@@ -40,4 +59,52 @@ export function isLastActionCorrectionRequest(event: EventDocument) {
   const writeActions = event.actions.filter((a) => !isMetaAction(a.type))
   const lastWriteAction = writeActions[writeActions.length - 1]
   return lastWriteAction.type === ActionType.REQUEST_CORRECTION
+}
+
+function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
+  return actions.reduce((ann, sortedAction) => {
+    return deepMerge(ann, sortedAction.annotation ?? {})
+  }, {} as EventState)
+}
+
+/**
+ * Compares annotations of a given field between the current action and the previous state.
+ *
+ * @param field Field configuration of a review form field
+ * @param fullEvent Extended EventDocument with a possible synthetic `UPDATE` action
+ * @param currentActionIndex Index of the action from the actions array of fullEvent to evaluate
+ * @returns An object containing:
+ *  - currentAnnotations: aggregated annotations including the current action
+ *  - previousAnnotations: aggregated annotations up to (but not including) the current action
+ *  - valueHasChanged: boolean indicating whether the field's value changed between the two states
+ */
+export function getAnnotationComparison(
+  field: FieldConfig,
+  fullEvent: EventHistoryDocument,
+  currentActionIndex: number
+) {
+  if (currentActionIndex < 0) {
+    return {
+      currentAnnotations: {},
+      previousAnnotations: {},
+      valueHasChanged: false
+    }
+  }
+
+  const eventUpToCurrentAction = fullEvent.actions.slice(
+    0,
+    currentActionIndex + 1
+  )
+  const eventUpToPreviousAction = fullEvent.actions.slice(0, currentActionIndex)
+
+  const currentAnnotations = aggregateAnnotations(eventUpToCurrentAction)
+  const previousAnnotations = aggregateAnnotations(eventUpToPreviousAction)
+
+  const valueHasChanged = hasFieldChanged(
+    field,
+    currentAnnotations,
+    previousAnnotations
+  )
+
+  return { currentAnnotations, previousAnnotations, valueHasChanged }
 }

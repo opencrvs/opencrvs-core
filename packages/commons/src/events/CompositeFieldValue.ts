@@ -108,6 +108,15 @@ export const HttpFieldUpdateValue = z
   .or(z.null())
   .or(z.undefined())
 
+export const QueryParamReaderFieldValue = z
+  .record(z.string(), z.string())
+  .nullish()
+export type QueryParamReaderFieldValue = z.infer<
+  typeof QueryParamReaderFieldValue
+>
+
+export const QueryParamReaderFieldUpdateValue = z.record(z.string(), z.string())
+
 export const QrReaderFieldValue = z.any()
 export type QrReaderFieldValue = z.infer<typeof QrReaderFieldValue>
 

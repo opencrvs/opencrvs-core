@@ -20,6 +20,8 @@ import {
   HttpFieldValue,
   StreetLevelDetailsValue,
   StreetLevelDetailsUpdateValue,
+  QueryParamReaderFieldValue,
+  QueryParamReaderFieldUpdateValue,
   QrReaderFieldValue,
   IdReaderFieldValue
 } from './CompositeFieldValue'
@@ -103,6 +105,7 @@ export const FieldValue = z.union([
   NameFieldUpdateValue,
   ButtonFieldValue,
   HttpFieldValue,
+  QueryParamReaderFieldValue,
   QrReaderFieldValue,
   IdReaderFieldValue
 ])
@@ -126,7 +129,8 @@ export const FieldUpdateValue = z.union([
   FileFieldWithOptionValue,
   DataFieldValue,
   NameFieldUpdateValue,
-  HttpFieldUpdateValue
+  HttpFieldUpdateValue,
+  QueryParamReaderFieldUpdateValue
 ])
 
 export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
@@ -161,6 +165,7 @@ export type FieldUpdateValueSchema =
   | typeof NameFieldValue
   | typeof NameFieldUpdateValue
   | typeof HttpFieldUpdateValue
+  | typeof QueryParamReaderFieldUpdateValue
   | typeof ButtonFieldValue
   | typeof QrReaderFieldValue
   | typeof IdReaderFieldValue

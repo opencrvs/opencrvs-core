@@ -20,6 +20,7 @@ import { generateActionDocument, generateEventDocument } from '../test.utils'
 import { EventIndex } from '../EventIndex'
 import { TENNIS_CLUB_MEMBERSHIP } from '../Constants'
 import { TokenUserType } from '../../authentication'
+import { EventDocument } from '../EventDocument'
 
 /* eslint-disable max-lines */
 
@@ -78,7 +79,6 @@ describe('getCurrentEventState()', () => {
       actions,
       createdAt: new Date(Date.now()).toISOString(),
       id: getUUID(),
-
       updatedAt: new Date(Date.now()).toISOString()
     }
 
@@ -533,6 +533,120 @@ describe('getCurrentEventState()', () => {
     expect(eventState2.declaration['applicant.dobUnknown']).toBe(true)
     expect(eventState2.declaration['applicant.dob']).toBe(undefined)
     expect(eventState2.declaration['applicant.age']).toBe(20)
+  })
+
+  test('should correctly merge the declaration from actions even when originalActionId is not available', () => {
+    const fullEvent = {
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      createdAt: new Date(Date.now()).toISOString(),
+      id: getUUID(),
+      updatedAt: new Date(Date.now()).toISOString(),
+      actions: [
+        {
+          id: '54594a56-0d9e-405d-a069-e81f5355242e' as UUID,
+          transactionId: 'tmp-d6e326d4-19ed-4f3f-8b7f-09bca9f4c74e',
+          createdByUserType: 'user',
+          createdAt: '2025-09-22T15:07:09.898Z',
+          createdBy: '68cd35f68cb33ba093f20256',
+          createdByRole: 'SOCIAL_WORKER',
+          createdAtLocation: '480f91d2-3b97-4a0a-9920-293f7dac6391' as UUID,
+          declaration: {},
+          status: 'Accepted',
+          type: 'CREATE',
+          annotation: {}
+        },
+        {
+          id: '67ce9faa-bce4-4208-bbe5-e55148364ba5' as UUID,
+          transactionId: 'tmp-d6e326d4-19ed-4f3f-8b7f-09bca9f4c74e',
+          createdByUserType: 'user',
+          createdAt: '2025-09-22T15:07:09.898Z',
+          createdBy: '68cd35f68cb33ba093f20256',
+          createdByRole: 'SOCIAL_WORKER',
+          createdAtLocation: '480f91d2-3b97-4a0a-9920-293f7dac6391' as UUID,
+          declaration: {},
+          status: 'Accepted',
+          type: 'ASSIGN',
+          assignedTo: '68cd35f68cb33ba093f20256',
+          annotation: {}
+        },
+        {
+          id: '80e4dee3-7409-47a1-9922-a872d8c9b9ae' as UUID,
+          transactionId: 'e4249dc3-7a7a-4f57-9fd8-73bea9e2bfcb',
+          createdByUserType: 'user',
+          createdAt: '2025-09-22T15:07:29.212Z',
+          createdBy: '68cd35f68cb33ba093f20256',
+          createdByRole: 'SOCIAL_WORKER',
+          createdAtLocation: '480f91d2-3b97-4a0a-9920-293f7dac6391' as UUID,
+          declaration: {
+            'applicant.name': {
+              surname: 'sdad',
+              firstname: 'Ashikul',
+              middlename: 'sdsa'
+            }
+          },
+          status: 'Accepted',
+          // the originalActionId is an action with a `status: 'Requested'` that is not in the actions array
+          // should still merge the declaration information when originalActionId is not listed
+          originalActionId: '2c93fd07-3c54-4b7c-93a6-4b1e79506fd8' as UUID,
+          type: 'NOTIFY',
+          annotation: {}
+        },
+        {
+          id: 'f17b8a91-16a5-45f4-92e0-881c707a4213' as UUID,
+          transactionId: 'e4249dc3-7a7a-4f57-9fd8-73bea9e2bfcb',
+          createdByUserType: 'user',
+          createdAt: '2025-09-22T15:07:29.216Z',
+          createdBy: '68cd35f68cb33ba093f20256',
+          createdByRole: 'SOCIAL_WORKER',
+          createdAtLocation: '480f91d2-3b97-4a0a-9920-293f7dac6391' as UUID,
+          declaration: {},
+          status: 'Accepted',
+          type: 'UNASSIGN',
+          annotation: {}
+        },
+        {
+          id: '95367738-61e7-421f-a4d0-23974017115a' as UUID,
+          transactionId: '0736cf71-43b4-4393-a830-1b9af88ee4ee',
+          createdByUserType: 'user',
+          createdAt: '2025-09-22T15:07:55.406Z',
+          createdBy: '68cd35f68cb33ba093f2025e',
+          createdByRole: 'REGISTRATION_AGENT',
+          createdAtLocation: '480f91d2-3b97-4a0a-9920-293f7dac6391' as UUID,
+          declaration: {},
+          status: 'Accepted',
+          type: 'READ',
+          annotation: {}
+        },
+        {
+          id: '027978ce-a4b0-4d1c-9fd1-3aeda86f4ef1' as UUID,
+          transactionId: '4ae24ac6-0ec2-45e0-8e7f-ce27711646e7',
+          createdByUserType: 'user',
+          createdAt: '2025-09-22T15:07:56.135Z',
+          createdBy: '68cd35f68cb33ba093f2025e',
+          createdByRole: 'REGISTRATION_AGENT',
+          createdAtLocation: '480f91d2-3b97-4a0a-9920-293f7dac6391' as UUID,
+          declaration: {},
+          annotation: {},
+          status: 'Accepted',
+          type: 'ASSIGN',
+          assignedTo: '68cd35f68cb33ba093f2025e'
+        }
+      ]
+    } satisfies EventDocument
+
+    const eventState = getCurrentEventState(
+      fullEvent,
+      tennisClubMembershipEvent
+    )
+
+    expect(eventState.declaration).toEqual({
+      'applicant.name': {
+        surname: 'sdad',
+        firstname: 'Ashikul',
+        middlename: 'sdsa'
+      }
+    })
   })
 })
 

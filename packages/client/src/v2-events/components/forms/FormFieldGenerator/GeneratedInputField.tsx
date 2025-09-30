@@ -56,6 +56,7 @@ import {
   isButtonFieldType,
   isHttpFieldType,
   isLinkButtonFieldType,
+  isQueryParamReaderFieldType,
   isIdReaderFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
@@ -90,7 +91,11 @@ import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { IdReader } from '@client/v2-events/features/events/registered-fields/IdReader'
 import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
-import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
+import { QueryParamReader } from '../inputs/QueryParamReader'
+import {
+  makeFormikFieldIdsOpenCRVSCompatible,
+  parseFieldReferencesInConfiguration
+} from './utils'
 
 interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
@@ -497,7 +502,7 @@ export const GeneratedInputField = React.memo(
     if (isSignatureFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <SignatureField
+          <SignatureField.Input
             {...field.config}
             disabled={disabled}
             maxFileSize={field.config.configuration.maxFileSize}
@@ -635,7 +640,10 @@ export const GeneratedInputField = React.memo(
       return (
         <Http.Input
           key={fieldDefinition.id}
-          configuration={field.config.configuration}
+          configuration={parseFieldReferencesInConfiguration(
+            field.config.configuration,
+            form
+          )}
           parentValue={form[field.config.configuration.trigger.$$field]}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
@@ -648,6 +656,15 @@ export const GeneratedInputField = React.memo(
           configuration={field.config.configuration}
           disabled={inputProps.disabled}
           id={field.config.id}
+        />
+      )
+    }
+
+    if (isQueryParamReaderFieldType(field)) {
+      return (
+        <QueryParamReader.Input
+          configuration={field.config.configuration}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )
     }

@@ -14,6 +14,7 @@ import {
   getUUID,
   SCOPES,
   TestUserRole,
+  TokenUserType,
   User,
   UUID
 } from '@opencrvs/commons/client'
@@ -71,10 +72,11 @@ export function testDataGenerator(rngSeed?: number) {
             family: 'Bwalya'
           }
         ],
-        role: 'SOCIAL_WORKER',
+        role: 'HOSPITAL_CLERK',
         fullHonorificName: undefined,
         signature: undefined,
         avatar: undefined,
+        type: TokenUserType.enum.user,
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
       } satisfies User,
       v1: {
@@ -87,9 +89,9 @@ export function testDataGenerator(rngSeed?: number) {
         email: 'kalushabwalya17@gmail.com',
         role: {
           label: {
-            id: 'userRole.socialWorker',
-            defaultMessage: 'Social Worker',
-            description: 'Name for user role Social Worker',
+            id: 'userRole.hospitalClerk',
+            defaultMessage: 'Hospital Clerk',
+            description: 'Name for user role Hospital Clerk',
             __typename: 'I18nMessage'
           },
           __typename: 'UserRole'
@@ -124,7 +126,8 @@ export function testDataGenerator(rngSeed?: number) {
         avatar: undefined,
         signature: undefined,
         fullHonorificName: undefined,
-        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+        type: TokenUserType.enum.user
       } satisfies User,
       v1: {
         id: user.id.registrationAgent,
@@ -173,7 +176,8 @@ export function testDataGenerator(rngSeed?: number) {
         fullHonorificName: '1st Order Honorable Kennedy Mweene',
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
         avatar: undefined,
-        signature: undefined
+        signature: undefined,
+        type: TokenUserType.enum.user
       } satisfies User,
       v1: {
         id: userIds.localRegistrar,
