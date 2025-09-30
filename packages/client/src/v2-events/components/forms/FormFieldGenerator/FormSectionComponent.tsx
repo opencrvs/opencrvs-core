@@ -414,34 +414,34 @@ export function FormSectionComponent({
   )
   const allFields = [...(declarationFields ?? []), ...fieldsWithDotSeparator]
 
+  // TODO CIHAN: make it recursive
   const valuesWithoutHiddenFields = omitBy(completeForm, (_, fieldId) => {
     // There can be multiple field configurations with the same id, with e.g. different options and conditions
     const fieldConfigs = allFields.filter((f) => f.id === fieldId)
-
-    if (fieldId === 'father.addressSameAs') {
-      console.log('fieldConfigs')
-      console.log(fieldConfigs)
-    }
 
     return fieldConfigs.length
       ? fieldConfigs.every((f) => !isFieldVisible(f, completeForm))
       : false
   })
 
-  console.log('completeForm')
-  console.log(completeForm)
-  console.log('valuesWithoutHiddenFields')
-  console.log(valuesWithoutHiddenFields)
+  const valuesWithoutHiddenFields2 = omitBy(completeForm, (_, fieldId) => {
+    // There can be multiple field configurations with the same id, with e.g. different options and conditions
+    const fieldConfigs = allFields.filter((f) => f.id === fieldId)
+
+    return fieldConfigs.length
+      ? fieldConfigs.every((f) => !isFieldVisible(f, valuesWithoutHiddenFields))
+      : false
+  })
 
   return (
     <section className={className}>
       {fieldsWithFormikSeparator.map((field) => {
-        if (!isFieldVisible(field, valuesWithoutHiddenFields)) {
+        if (!isFieldVisible(field, valuesWithoutHiddenFields2)) {
           return null
         }
 
         const isDisabled =
-          !isFieldEnabled(field, valuesWithoutHiddenFields) ||
+          !isFieldEnabled(field, valuesWithoutHiddenFields2) ||
           (isCorrection && field.uncorrectable)
 
         const visibleError = errors[field.id]?.errors[0]?.message

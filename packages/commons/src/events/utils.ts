@@ -22,7 +22,8 @@ import {
   uniqBy,
   cloneDeep,
   orderBy,
-  groupBy
+  groupBy,
+  isEqual
 } from 'lodash'
 import {
   ActionType,
@@ -185,6 +186,20 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
     // As long as one of the field configs is visible, the field should be included
     return fieldConfigs.every((f) => !isFieldVisible(f, values))
   })
+}
+
+export function omitHiddenFieldsRecursive<T extends EventState | ActionUpdate>(
+  fields: FieldConfig[],
+  values: T,
+  visibleVerificationPageIds: string[] = []
+): Partial<T> {
+  const next = omitHiddenFields(fields, values, visibleVerificationPageIds)
+
+  if (isEqual(next, values)) {
+    return next
+  }
+
+  return omitHiddenFieldsRecursive(fields, next, visibleVerificationPageIds)
 }
 
 export function omitHiddenPaginatedFields(
