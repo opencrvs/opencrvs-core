@@ -8,14 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { performance } from 'node:perf_hooks'
 import { omit } from 'lodash'
-import {
-  EventDocument,
-  getUUID,
-  logger,
-  TokenWithBearer
-} from '@opencrvs/commons'
+import { EventDocument, getUUID, TokenWithBearer } from '@opencrvs/commons'
 import { upsertEventWithActions } from '@events/storage/postgres/events/import'
 import {
   getEventConfigurationById,
