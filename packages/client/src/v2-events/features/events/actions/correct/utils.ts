@@ -17,7 +17,8 @@ import {
   EventDocument,
   ActionType,
   FieldValue,
-  ValidatorContext
+  ValidatorContext,
+  deepMerge
 } from '@opencrvs/commons/client'
 
 /**
@@ -32,6 +33,10 @@ export function isEqualFieldValue<T extends FieldValue>(a: T, b: T) {
 
   return _.isEqual(a, b)
 }
+import {
+  EventHistoryActionDocument,
+  EventHistoryDocument
+} from './useActionForHistory'
 
 export function hasFieldChanged(
   f: FieldConfig,
@@ -56,4 +61,54 @@ export function isLastActionCorrectionRequest(event: EventDocument) {
   const writeActions = event.actions.filter((a) => !isMetaAction(a.type))
   const lastWriteAction = writeActions[writeActions.length - 1]
   return lastWriteAction.type === ActionType.REQUEST_CORRECTION
+}
+
+function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
+  return actions.reduce((ann, sortedAction) => {
+    return deepMerge(ann, sortedAction.annotation ?? {})
+  }, {} as EventState)
+}
+
+/**
+ * Compares annotations of a given field between the current action and the previous state.
+ *
+ * @param field Field configuration of a review form field
+ * @param fullEvent Extended EventDocument with a possible synthetic `UPDATE` action
+ * @param currentActionIndex Index of the action from the actions array of fullEvent to evaluate
+ * @returns An object containing:
+ *  - currentAnnotations: aggregated annotations including the current action
+ *  - previousAnnotations: aggregated annotations up to (but not including) the current action
+ *  - valueHasChanged: boolean indicating whether the field's value changed between the two states
+ */
+export function getAnnotationComparison(
+  field: FieldConfig,
+  fullEvent: EventHistoryDocument,
+  currentActionIndex: number,
+  context: ValidatorContext
+) {
+  if (currentActionIndex < 0) {
+    return {
+      currentAnnotations: {},
+      previousAnnotations: {},
+      valueHasChanged: false
+    }
+  }
+
+  const eventUpToCurrentAction = fullEvent.actions.slice(
+    0,
+    currentActionIndex + 1
+  )
+  const eventUpToPreviousAction = fullEvent.actions.slice(0, currentActionIndex)
+
+  const currentAnnotations = aggregateAnnotations(eventUpToCurrentAction)
+  const previousAnnotations = aggregateAnnotations(eventUpToPreviousAction)
+
+  const valueHasChanged = hasFieldChanged(
+    field,
+    currentAnnotations,
+    previousAnnotations,
+    context
+  )
+
+  return { currentAnnotations, previousAnnotations, valueHasChanged }
 }

@@ -25,6 +25,7 @@ import {
   isPageVisible,
   PageConfig,
   PageTypes,
+  RequestedCorrectionAction,
   TranslationConfig,
   User,
   ValidatorContext
@@ -205,7 +206,7 @@ export function CorrectionDetails({
   form: EventState
   annotation: EventState
   requesting: boolean
-  correctionRequestAction?: Action
+  correctionRequestAction?: RequestedCorrectionAction
   editable?: boolean
   workqueue?: string
   validatorContext: ValidatorContext

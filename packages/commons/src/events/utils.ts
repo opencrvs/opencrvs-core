@@ -554,14 +554,15 @@ export function getCompleteActionDeclaration(
     const originalAction = event.actions.find(
       ({ id }) => id === action.originalActionId
     )
-    if (originalAction?.status !== ActionStatus.Requested) {
-      return declaration
-    }
 
-    return deepMerge(
-      deepMerge(declaration, originalAction.declaration),
-      action.declaration
-    )
+    // Requested actions may carry partial declaration data.
+    // Merge original declaration with the current one to preserve completeness.
+    if (originalAction?.status === ActionStatus.Requested) {
+      return deepMerge(
+        deepMerge(declaration, originalAction.declaration),
+        action.declaration
+      )
+    }
   }
   return deepMerge(declaration, action.declaration)
 }

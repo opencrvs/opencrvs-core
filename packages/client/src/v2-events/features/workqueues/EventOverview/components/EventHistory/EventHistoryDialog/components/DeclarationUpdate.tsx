@@ -10,7 +10,6 @@
  */
 import React from 'react'
 import {
-  ActionDocument,
   EventDocument,
   EventStatus,
   getStatusFromActions,
@@ -19,6 +18,7 @@ import {
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { DeclarationComparisonTable } from '@client/v2-events/features/events/actions/correct/request/Summary/DeclarationComparisonTable'
+import { EventHistoryActionDocument } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 
 /**
  *
@@ -29,7 +29,7 @@ export function DeclarationUpdateComponent({
   fullEvent,
   validatorContext
 }: {
-  action: ActionDocument
+  action: EventHistoryActionDocument
   fullEvent: EventDocument
   validatorContext: ValidatorContext
 }) {
