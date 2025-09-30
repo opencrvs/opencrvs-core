@@ -11,7 +11,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
-import { cloneDeep, isEqual, set, groupBy, omit, get } from 'lodash'
+import { cloneDeep, isEqual, set, groupBy, omit, get, omitBy } from 'lodash'
 import { useIntl } from 'react-intl'
 import styled, { keyframes } from 'styled-components'
 import {
@@ -403,15 +403,45 @@ export function FormSectionComponent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validateAllFields])
 
+  /*
+   * For the conditional check data, we want to only include values from visible fields so values of hidden fields don’t affect them.
+   *
+   * You might wonder why values of hidden fields aren’t filtered out completely earlier.
+   * That’s intentional — we persist their values so if the fields become visible again, the previous values are restored instead of resetting.
+   */
+  const declarationFields = eventConfig?.declaration.pages.flatMap(
+    (p) => p.fields
+  )
+  const allFields = [...(declarationFields ?? []), ...fieldsWithDotSeparator]
+
+  const valuesWithoutHiddenFields = omitBy(completeForm, (_, fieldId) => {
+    // There can be multiple field configurations with the same id, with e.g. different options and conditions
+    const fieldConfigs = allFields.filter((f) => f.id === fieldId)
+
+    if (fieldId === 'father.addressSameAs') {
+      console.log('fieldConfigs')
+      console.log(fieldConfigs)
+    }
+
+    return fieldConfigs.length
+      ? fieldConfigs.every((f) => !isFieldVisible(f, completeForm))
+      : false
+  })
+
+  console.log('completeForm')
+  console.log(completeForm)
+  console.log('valuesWithoutHiddenFields')
+  console.log(valuesWithoutHiddenFields)
+
   return (
     <section className={className}>
       {fieldsWithFormikSeparator.map((field) => {
-        if (!isFieldVisible(field, completeForm)) {
+        if (!isFieldVisible(field, valuesWithoutHiddenFields)) {
           return null
         }
 
         const isDisabled =
-          !isFieldEnabled(field, completeForm) ||
+          !isFieldEnabled(field, valuesWithoutHiddenFields) ||
           (isCorrection && field.uncorrectable)
 
         const visibleError = errors[field.id]?.errors[0]?.message

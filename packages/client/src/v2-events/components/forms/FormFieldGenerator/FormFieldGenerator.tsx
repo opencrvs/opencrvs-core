@@ -22,8 +22,7 @@ import {
   isNonInteractiveFieldType,
   joinValues,
   SystemVariables,
-  Location,
-  omitHiddenFields
+  Location
 } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import {
@@ -91,8 +90,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     onAllFieldsValidated,
     isCorrection = false,
     parentId,
-    locations,
-    allFields
+    locations
   }) => {
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
@@ -166,19 +164,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
             updateTouchFields(touched)
           }, [touched])
 
-          /*
-           * Only include values from visible fields so values of hidden fields don’t affect conditional checks.
-           *
-           * You might wonder why values of hidden fields aren’t filtered out completely earlier.
-           * That’s intentional — we persist their values so if the fields become visible again, the previous values are restored instead of resetting.
-           */
-          const valuesWithoutHiddenFields = allFields
-            ? omitHiddenFields(
-                allFields,
-                makeFormikFieldIdsOpenCRVSCompatible(formikProps.values)
-              )
-            : formikProps.values
-
           return (
             <FormSectionComponent
               className={className}
@@ -203,9 +188,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               systemVariables={systemVariables}
               touched={{ ...formikProps.touched, ...initialTouchedFields }}
               validateAllFields={validateAllFields}
-              values={makeFormFieldIdsFormikCompatible(
-                valuesWithoutHiddenFields
-              )}
+              values={formikProps.values}
               onAllFieldsValidated={onAllFieldsValidated}
               onChange={formikOnChange}
             />
