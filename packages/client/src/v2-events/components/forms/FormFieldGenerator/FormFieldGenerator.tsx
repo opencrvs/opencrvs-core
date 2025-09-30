@@ -73,7 +73,6 @@ interface FormFieldGeneratorProps {
   isCorrection?: boolean
   parentId?: string // `child____name` part of `child____name____firstname`
   locations?: Location[]
-  allFields?: FieldConfig[]
 }
 
 export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
@@ -102,7 +101,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         Object.keys(touched).length > 0 &&
         !isEqual(touched, initialTouchedFields) &&
         Object.keys(touched).filter((key) => !(key in initialTouchedFields))
-
       if (newlyTouched && newlyTouched.length > 0) {
         const newlyTouchedFields = parentId
           ? newlyTouched.reduce(
