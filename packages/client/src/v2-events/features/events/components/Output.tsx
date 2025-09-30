@@ -43,7 +43,6 @@ import {
   isLocationFieldType,
   EventState,
   FormConfig,
-  FieldType,
   isVerificationStatusType
 } from '@opencrvs/commons/client'
 import {
