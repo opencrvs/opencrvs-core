@@ -165,6 +165,7 @@ export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
   return isConditionMet(page.conditional, formValues)
 }
 
+// TODO CIHAN: remove this function?
 export function omitHiddenFields<T extends EventState | ActionUpdate>(
   fields: FieldConfig[],
   values: T,
@@ -188,20 +189,7 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
   })
 }
 
-export function omitHiddenFieldsRecursive<T extends EventState | ActionUpdate>(
-  fields: FieldConfig[],
-  values: T,
-  visibleVerificationPageIds: string[] = []
-): Partial<T> {
-  const next = omitHiddenFields(fields, values, visibleVerificationPageIds)
-
-  if (isEqual(next, values)) {
-    return next
-  }
-
-  return omitHiddenFieldsRecursive(fields, next, visibleVerificationPageIds)
-}
-
+// TODO CIHAN: remove this function?
 export function omitHiddenPaginatedFields(
   formConfig: FormConfig,
   declaration: EventState
@@ -244,6 +232,17 @@ export function stripHiddenFields<T extends EventState | ActionUpdate>(
   }
 
   return fn(base)
+}
+
+export function stripHiddenPaginatedFieldValues(
+  formConfig: FormConfig,
+  values: EventState
+) {
+  const visiblePagesFormFields = formConfig.pages
+    .filter((p) => isPageVisible(p, values))
+    .flatMap((p) => p.fields)
+
+  return stripHiddenFields(values, visiblePagesFormFields)
 }
 
 /**

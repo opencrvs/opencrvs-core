@@ -12,7 +12,7 @@ import { MessageDescriptor } from 'react-intl'
 import {
   FieldConfig,
   EventState,
-  omitHiddenPaginatedFields,
+  stripHiddenPaginatedFieldValues,
   isPageVisible,
   FormConfig,
   omitHiddenFields,
@@ -99,7 +99,10 @@ export function validationErrorsInActionFormExist({
   // We don't want to validate hidden fields
 
   // TODO CIHAN: use recursive function here?
-  const formWithoutHiddenFields = omitHiddenPaginatedFields(formConfig, form)
+  const formWithoutHiddenFields = stripHiddenPaginatedFieldValues(
+    formConfig,
+    form
+  )
 
   const visibleAnnotationFields = omitHiddenFields(
     reviewFields,
