@@ -31,7 +31,7 @@ import {
   InteractiveFieldType,
   FieldReference,
   getAllUniqueFields,
-  stripHiddenFields
+  omitHiddenFields
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -386,7 +386,6 @@ export function FormSectionComponent({
   ])
 
   // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
-  // Address is the only deep value.
   const completeForm = { ...initialValues, ...form }
 
   const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
@@ -413,9 +412,8 @@ export function FormSectionComponent({
   const declarationFields = eventConfig?.declaration.pages.flatMap(
     (p) => p.fields
   )
-  // TODO CIHAN: do we need this allFields?
   const allFields = [...(declarationFields ?? []), ...fieldsWithDotSeparator]
-  const visibleFieldValues = stripHiddenFields(completeForm, allFields)
+  const visibleFieldValues = omitHiddenFields(allFields, completeForm)
 
   return (
     <section className={className}>

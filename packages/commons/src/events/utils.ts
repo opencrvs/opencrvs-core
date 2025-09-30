@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -165,42 +164,6 @@ export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
   return isConditionMet(page.conditional, formValues)
 }
 
-// TODO CIHAN: remove this function?
-export function omitHiddenFields<T extends EventState | ActionUpdate>(
-  fields: FieldConfig[],
-  values: T,
-  visibleVerificationPageIds: string[] = []
-) {
-  return omitBy<T>(values, (_, fieldId) => {
-    // We dont want to omit visible verification page values
-    if (visibleVerificationPageIds.includes(fieldId)) {
-      return false
-    }
-
-    // There can be multiple field configurations with the same id, with e.g. different options and conditions
-    const fieldConfigs = fields.filter((f) => f.id === fieldId)
-
-    if (!fieldConfigs.length) {
-      return true
-    }
-
-    // As long as one of the field configs is visible, the field should be included
-    return fieldConfigs.every((f) => !isFieldVisible(f, values))
-  })
-}
-
-// TODO CIHAN: remove this function?
-export function omitHiddenPaginatedFields(
-  formConfig: FormConfig,
-  declaration: EventState
-) {
-  const visiblePagesFormFields = formConfig.pages
-    .filter((p) => isPageVisible(p, declaration))
-    .flatMap((p) => p.fields)
-
-  return omitHiddenFields(visiblePagesFormFields, declaration)
-}
-
 /**
  * Removes values from the form that correspond to hidden fields.
  * This function recursively omits any fields from the form values that are not visible
@@ -213,9 +176,9 @@ export function omitHiddenPaginatedFields(
  * @param {FieldConfig[]} fields - The list of field configurations to check visibility against
  * @returns {Partial<T>} A new object containing only the values for visible fields
  */
-export function stripHiddenFields<T extends EventState | ActionUpdate>(
-  formValues: T,
-  fields: FieldConfig[]
+export function omitHiddenFields<T extends EventState | ActionUpdate>(
+  fields: FieldConfig[],
+  formValues: T
 ): Partial<T> {
   const base = cloneDeep(formValues)
 
@@ -234,7 +197,7 @@ export function stripHiddenFields<T extends EventState | ActionUpdate>(
   return fn(base)
 }
 
-export function stripHiddenPaginatedFieldValues(
+export function omitHiddenPaginatedFields(
   formConfig: FormConfig,
   values: EventState
 ) {
@@ -242,7 +205,7 @@ export function stripHiddenPaginatedFieldValues(
     .filter((p) => isPageVisible(p, values))
     .flatMap((p) => p.fields)
 
-  return stripHiddenFields(values, visiblePagesFormFields)
+  return omitHiddenFields(visiblePagesFormFields, values)
 }
 
 /**
@@ -309,44 +272,13 @@ export function getVisibleVerificationPageIds(
     .map((page) => page.id)
 }
 
-export function getActionVerificationPageIds(
-  actionConfig: ActionConfig,
-  annotation: ActionUpdate
-): string[] {
-  if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
-    return getVisibleVerificationPageIds(
-      actionConfig.correctionForm.pages,
-      annotation
-    )
-  }
-
-  if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
-    return getVisibleVerificationPageIds(
-      actionConfig.printForm.pages,
-      annotation
-    )
-  }
-
-  return []
-}
-
 export function omitHiddenAnnotationFields(
   actionConfig: ActionConfig,
   declaration: EventState,
   annotation: ActionUpdate
 ) {
   const annotationFields = getActionAnnotationFields(actionConfig)
-
-  const visibleVerificationPageIds = getActionVerificationPageIds(
-    actionConfig,
-    annotation
-  )
-
-  return omitHiddenFields(
-    annotationFields,
-    { ...declaration, ...annotation },
-    visibleVerificationPageIds
-  )
+  return omitHiddenFields(annotationFields, { ...declaration, ...annotation })
 }
 
 /**
