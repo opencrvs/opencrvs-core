@@ -158,15 +158,15 @@ const messagesToDefine: IUserMessages = {
     description: 'The description for Police Officer type',
     id: 'constants.policeOfficer'
   },
-  SOCIAL_WORKER: {
-    defaultMessage: 'Social Worker',
-    description: 'The description for Social Worker type',
+  HOSPITAL_CLERK: {
+    defaultMessage: 'Hospital Clerk',
+    description: 'The description for Hospital Clerk type',
     id: 'constants.socialWorker'
   },
-  LOCAL_LEADER: {
-    defaultMessage: 'Local Leader',
-    description: 'The description for Local Leader type',
-    id: 'constants.localLeader'
+  COMMUNITY_LEADER: {
+    defaultMessage: 'Community Leader',
+    description: 'The description for Community Leader type',
+    id: 'constants.communityLeader'
   },
   HEALTHCARE_WORKER: {
     defaultMessage: 'Healthcare Worker',
