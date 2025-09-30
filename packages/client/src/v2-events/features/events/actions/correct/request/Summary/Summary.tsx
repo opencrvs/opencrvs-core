@@ -23,8 +23,7 @@ import {
   getDeclarationFields,
   getCurrentEventState,
   EventDocument,
-  ActionType,
-  omitHiddenFields
+  ActionType
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -42,7 +41,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
-import { hasDeclarationFieldChanged, hasFieldChanged } from '../../utils'
+import { hasDeclarationFieldChanged } from '../../utils'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
