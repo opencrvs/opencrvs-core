@@ -124,7 +124,7 @@ function Input({
           label={
             <>
               <StyledIcon name={ICON_FOR_STATUS[value]} size="small" />
-              {intl.formatMessage(configuration.text, { value })}
+              {intl.formatMessage(configuration.status, { value })}
             </>
           }
           pillTheme="dark"
@@ -174,16 +174,13 @@ function Output({
         label={
           <>
             <StyledIcon name={ICON_FOR_STATUS[value]} size="small" />
-            {intl.formatMessage(configuration.text, { value })}
+            {intl.formatMessage(configuration.status, { value })}
           </>
         }
         pillTheme="dark"
         size="small"
         type={PILL_FOR_STATUS[value]}
       />
-      <Text color="grey600" element="p" variant="reg14">
-        {intl.formatMessage(configuration.description, { value })}
-      </Text>
     </Stack>
   )
 }

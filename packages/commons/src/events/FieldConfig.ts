@@ -629,9 +629,9 @@ const VerificationStatus = BaseField.extend({
   type: z.literal(FieldType.VERIFICATION_STATUS),
   defaultValue: VerificationStatusValue.optional(),
   configuration: z.object({
-    text: TranslationConfig.describe('Text to display on the status pill.'),
+    status: TranslationConfig.describe('Text to display on the status pill.'),
     description: TranslationConfig.describe(
-      'Explaining text on the banner and review page.'
+      'Explaining text on the banner in form.'
     )
   })
 })
