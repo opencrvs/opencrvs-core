@@ -34,6 +34,7 @@ import {
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
+import { JSONSchema } from 'src/client'
 extendZodWithOpenApi(z)
 
 const FieldId = z.string().describe('Unique identifier for the field')
@@ -625,7 +626,14 @@ const LinkButtonField = BaseField.extend({
 export type LinkButtonField = z.infer<typeof LinkButtonField>
 
 const QrReaderField = BaseField.extend({
-  type: z.literal(FieldType.QR_READER)
+  type: z.literal(FieldType.QR_READER),
+  configuration: z
+    .object({
+      validator: z.custom<JSONSchema>(
+        (val) => typeof val === 'object' && val !== null
+      )
+    })
+    .optional()
 })
 
 export type QrReaderField = z.infer<typeof QrReaderField>
@@ -644,13 +652,9 @@ export type ExternalAuthenticator = z.infer<typeof ExternalAuthenticator>
 const IdReaderField = BaseField.extend({
   type: z.literal(FieldType.ID_READER),
   methods: z.array(
-    z.object({
-      type: z.union([
-        z.literal(FieldType.QR_READER),
-        z.literal(FieldType.EXTERNAL_AUTHENTICATOR)
-      ]),
-      configuration: z.record(z.string()).optional()
-    })
+    z
+      .union([QrReaderField, ExternalAuthenticator])
+      .describe('Methods for reading an ID')
   )
 })
 

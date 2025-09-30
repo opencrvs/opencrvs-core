@@ -13,7 +13,7 @@
 export type Validator = (
   data: Parameters<Scan['onScan']>[0]
 ) => string | undefined
-interface QRReaderType {
+interface QrReaderType {
   validator?: Validator
   labels: {
     button: string
@@ -44,4 +44,4 @@ interface Scan {
   onError?: ErrorHandler
 }
 
-export interface ScannableQRReader extends QRReaderType, Scan {}
+export interface ScannableQrReader extends QrReaderType, Scan {}

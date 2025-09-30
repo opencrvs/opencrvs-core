@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { QrReader } from '@opencrvs/components/src/IDReader/readers/QrReader/QrReader'
+import { QrReader } from '@opencrvs/components/lib/IdReader/readers/QrReader/QrReader'
 import {
   IFormData,
   IFormField,

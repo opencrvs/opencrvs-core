@@ -14,7 +14,7 @@ import React from 'react'
 import { QrReader } from './readers/QrReader/QrReader'
 import { Stack } from '../Stack'
 import { Text } from '../Text'
-import { ScannableQRReader } from './types'
+import { ScannableQrReader } from './types'
 
 const meta: Meta<typeof IdReader> = {
   title: 'Controls/IDReader',
@@ -25,7 +25,7 @@ export default meta
 
 type Story = StoryObj<typeof IdReader>
 
-const IDReaderComponent = (qrReaderProps: Partial<ScannableQRReader>) => (
+const IDReaderComponent = (qrReaderProps: Partial<ScannableQrReader>) => (
   <IdReader
     dividerLabel="Or"
     manualInputInstructionLabel="Complete fields below"

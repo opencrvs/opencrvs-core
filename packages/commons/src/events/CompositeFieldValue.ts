@@ -108,8 +108,8 @@ export const HttpFieldUpdateValue = z
   .or(z.null())
   .or(z.undefined())
 
-export const QrReaderFieldValue = z.record(z.string(), z.string())
+export const QrReaderFieldValue = z.any()
 export type QrReaderFieldValue = z.infer<typeof QrReaderFieldValue>
 
-export const IdReaderFieldValue = z.record(z.string(), z.string())
+export const IdReaderFieldValue = z.any()
 export type IdReaderFieldValue = z.infer<typeof IdReaderFieldValue>

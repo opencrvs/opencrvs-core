@@ -590,7 +590,6 @@ export const GeneratedInputField = React.memo(
             error={inputFieldProps.error}
             maxFileSize={field.config.configuration.maxFileSize}
             options={field.config.options}
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             value={field.value ?? []}
             onChange={handleFileWithOptionChange}
           />
@@ -654,7 +653,14 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isIdReaderFieldType(field)) {
-      return <IdReader.Input methods={field.config.methods} />
+      return (
+        <IdReader.Input
+          methods={field.config.methods}
+          onChange={(val) => {
+            onFieldValueChange(fieldDefinition.id, val)
+          }}
+        />
+      )
     }
 
     throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)

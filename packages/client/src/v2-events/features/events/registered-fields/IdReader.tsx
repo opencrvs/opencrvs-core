@@ -1,15 +1,16 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { FieldType } from '@opencrvs/commons/client'
+import {
+  FieldType,
+  IdReaderField,
+  IdReaderFieldValue
+} from '@opencrvs/commons/client'
 import { QrReader } from '@opencrvs/components/src/IdReader/readers/QrReader/QrReader'
 import { IdReader as IdReaderUI } from '@opencrvs/components/src/IdReader'
-import { LinkButton } from './LinkButton'
-
-interface ReadingMethod {
-  type: (typeof FieldType)[keyof typeof FieldType]
-  // @todo: add proper type
-  configuration?: Record<string, any>
-}
+import {
+  tutorialMessages,
+  messages as qrReaderMessages
+} from '@client/i18n/messages/views/qr-reader'
 
 const messages = {
   or: {
@@ -24,37 +25,51 @@ const messages = {
   }
 }
 
-function GeneratedReaderInput(props: ReadingMethod) {
+function GeneratedReaderInput(
+  props: IdReaderField['methods'][number] & {
+    onChange: (data: IdReaderFieldValue) => void
+  }
+) {
+  const intl = useIntl()
   if (props.type === FieldType.QR_READER) {
     return (
       <QrReader
         labels={{
-          button: 'Scan ID QR code',
-          scannerDialogSupportingCopy: '',
-          tutorial: { cameraCleanliness: '', distance: '', lightBalance: '' }
+          button: intl.formatMessage(qrReaderMessages.button),
+          scannerDialogSupportingCopy: intl.formatMessage(
+            qrReaderMessages.scannerDialogSupportingCopy
+          ),
+          tutorial: {
+            cameraCleanliness: intl.formatMessage(
+              tutorialMessages.cameraCleanliness
+            ),
+            distance: intl.formatMessage(tutorialMessages.distance),
+            lightBalance: intl.formatMessage(tutorialMessages.lightBalance)
+          }
         }}
-        onScan={(data) => console.log(data)}
+        validator={props.configuration?.validator}
+        onScan={(data) => props.onChange(data)}
       />
     )
   }
 
-  if (props.type === FieldType.EXTERNAL_AUTHENTICATOR) {
-    return (
-      <LinkButton.Input
-        configuration={{
-          url: props.configuration?.url,
-          text: props.configuration?.text
-        }}
-        id=""
-      />
-    )
-  }
+  // TODO: complete
+  // if (props.type === FieldType.EXTERNAL_AUTHENTICATOR) {
+  //   return <LinkButton.Input configuration={props.configuration} id="" />
+  // }
 
   throw new Error('Unsupported reading method type: ' + props.type)
 }
 
-function IdReaderInput({ methods }: { methods: ReadingMethod[] }) {
+function IdReaderInput({
+  methods,
+  onChange
+}: {
+  methods: IdReaderField['methods']
+  onChange: (data: IdReaderFieldValue) => void
+}) {
   const intl = useIntl()
+
   return (
     <IdReaderUI
       dividerLabel={intl.formatMessage(messages.or)}
@@ -65,8 +80,8 @@ function IdReaderInput({ methods }: { methods: ReadingMethod[] }) {
       {methods.map((method) => (
         <GeneratedReaderInput
           key={method.type}
-          configuration={method.configuration}
-          type={method.type}
+          onChange={onChange}
+          {...method}
         />
       ))}
     </IdReaderUI>
