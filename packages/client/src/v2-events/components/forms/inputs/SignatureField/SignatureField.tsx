@@ -64,7 +64,7 @@ function base64ToFile(fileString: string, filename: string) {
   return new File([bytes], filename, { type: mime })
 }
 
-export function SignatureField({
+function SignatureFieldInput({
   value,
   onChange,
   required,
@@ -203,4 +203,8 @@ export function SignatureField({
       )}
     </>
   )
+}
+
+export const SignatureField = {
+  Input: SignatureFieldInput
 }

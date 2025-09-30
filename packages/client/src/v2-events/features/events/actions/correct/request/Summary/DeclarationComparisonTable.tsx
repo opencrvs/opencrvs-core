@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { uniqBy } from 'lodash'
 import styled from 'styled-components'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import {
-  Action,
   applyDeclarationToEventIndex,
   EventConfig,
   EventDocument,
   EventState,
-  getCurrentEventState,
+  getAcceptedActions,
   getDeclaration,
   isFieldDisplayedOnReview
 } from '@opencrvs/commons/client'
@@ -26,7 +26,16 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
-import { hasFieldChanged } from '../../utils'
+import {
+  getAnnotationComparison,
+  hasFieldChanged
+} from '@client/v2-events/features/events/actions/correct/utils'
+import {
+  expandWithUpdateActions,
+  EventHistoryActionDocument,
+  EventHistoryDocument,
+  getCurrentEventStateSafe
+} from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 
 const TableHeader = styled.th`
   text-transform: uppercase;
@@ -42,14 +51,58 @@ interface BaseDeclarationComparisonTableProps {
 type DeclarationComparisonTableProps =
   | (BaseDeclarationComparisonTableProps & {
       /** When action is provided, the comparison is done between the state before the action and the state after it. */
-      action: Action
+      action: EventHistoryActionDocument
       form?: EventState
     })
   | (BaseDeclarationComparisonTableProps & {
       /** When form is provided, form is applied on top of the latest state and compared to the previous one. */
       form: EventState
-      action?: Action
+      action?: EventHistoryActionDocument
     })
+
+const messages = defineMessages({
+  reviewForm: {
+    defaultMessage: 'Review form',
+    description: 'Review form label for update action',
+    id: 'review.form.title'
+  }
+})
+
+function getReviewForm(configuration: EventConfig) {
+  return configuration.actions
+    .filter((action) => 'review' in action)
+    .map((action) => action.review)
+}
+
+function getReviewFormFields(configuration: EventConfig) {
+  const reviewForms = getReviewForm(configuration)
+  return uniqBy(
+    reviewForms.flatMap((form) => form.fields),
+    (field) => field.id
+  )
+}
+
+/**
+ * When action is not found or provided, we compare the full event
+ * Needed when action is not provided as props e.g. - correction summary
+ */
+function sliceEventAt(
+  fullEvent: EventHistoryDocument,
+  actionId: string,
+  includeCurrent = false
+): EventHistoryDocument {
+  const index = fullEvent.actions.findIndex((a) => a.id === actionId)
+
+  if (index === -1) {
+    return fullEvent
+  }
+
+  const sliceEnd = includeCurrent ? index + 1 : index
+  return {
+    ...fullEvent,
+    actions: fullEvent.actions.slice(0, sliceEnd)
+  }
+}
 
 /**
  *
@@ -59,37 +112,87 @@ type DeclarationComparisonTableProps =
 export function DeclarationComparisonTableComponent({
   action,
   form,
-  fullEvent,
+  fullEvent: fullEventWithoutUpdatedAction,
   eventConfig,
   id
 }: DeclarationComparisonTableProps) {
+  const acceptedActions = getAcceptedActions(fullEventWithoutUpdatedAction)
+  const historyWithUpdatedActions = expandWithUpdateActions(acceptedActions)
+
+  const fullEvent = {
+    ...fullEventWithoutUpdatedAction,
+    actions: historyWithUpdatedActions
+  }
+
   const index = fullEvent.actions.findIndex((a) => a.id === action?.id)
-  // When action is not found or provided, we compare the full event
-  const eventBeforeUpdate =
-    index === -1
-      ? fullEvent
-      : {
-          ...fullEvent,
-          actions: fullEvent.actions.slice(0, index)
-        }
 
   const declarationConfig = getDeclaration(eventConfig)
+  const reviewFormFields = getReviewFormFields(eventConfig)
 
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
-  const currentState = getCurrentEventState(fullEvent, eventConfiguration)
+  const eventBeforeUpdate = action
+    ? sliceEventAt(fullEvent, action.id, false)
+    : fullEvent
+
+  const currentEvent = action
+    ? sliceEventAt(fullEvent, action.id, true)
+    : fullEvent
+
+  const currentState = getCurrentEventStateSafe(
+    currentEvent,
+    eventConfiguration
+  )
+
+  // `action.declaration` is extracted to be merged by applyDeclarationToEventIndex to get latest EventIndex
+  const formWithOnlyChangedValues = form ?? action?.declaration
 
   // When form is provided, we apply it on top of the current state to get the latest declaration
-  const latestDeclaration = form
-    ? applyDeclarationToEventIndex(currentState, form, eventConfiguration)
-        .declaration
+  const latestDeclaration = formWithOnlyChangedValues
+    ? applyDeclarationToEventIndex(
+        currentState,
+        formWithOnlyChangedValues,
+        eventConfiguration
+      ).declaration
     : currentState.declaration
 
-  const previousDeclaration = getCurrentEventState(
+  const previousDeclaration = getCurrentEventStateSafe(
     eventBeforeUpdate,
     eventConfiguration
   ).declaration
+
+  // Collect all changed review fields once
+  const changedAnnotationFields = reviewFormFields
+    .filter((f) => getAnnotationComparison(f, fullEvent, index).valueHasChanged)
+    .map((f) => {
+      const { currentAnnotations, previousAnnotations } =
+        getAnnotationComparison(f, fullEvent, index)
+
+      const previous = (
+        <Output
+          field={f}
+          formConfig={declarationConfig}
+          previousForm={previousAnnotations}
+          showPreviouslyMissingValuesAsChanged={false}
+          value={previousAnnotations[f.id]}
+        />
+      )
+
+      const latest = (
+        <Output
+          field={f}
+          showPreviouslyMissingValuesAsChanged={false}
+          value={currentAnnotations[f.id]}
+        />
+      )
+
+      return {
+        fieldLabel: intl.formatMessage(f.label),
+        latest,
+        previous
+      }
+    })
 
   return (
     <>
@@ -171,6 +274,47 @@ export function DeclarationComparisonTableComponent({
           />
         )
       })}
+      {changedAnnotationFields.length > 0 && (
+        <Table
+          key={`${id}-review-fields`}
+          columns={[
+            {
+              label: (
+                <TableHeader>
+                  {intl.formatMessage(messages.reviewForm)}
+                </TableHeader>
+              ),
+              width: 34,
+              key: 'fieldLabel'
+            },
+            {
+              label: (
+                <TableHeader>
+                  {intl.formatMessage(
+                    correctionMessages.correctionSummaryOriginal
+                  )}
+                </TableHeader>
+              ),
+              width: 33,
+              key: 'previous'
+            },
+            {
+              label: (
+                <TableHeader>
+                  {intl.formatMessage(
+                    correctionMessages.correctionSummaryCorrection
+                  )}
+                </TableHeader>
+              ),
+              width: 33,
+              key: 'latest'
+            }
+          ]}
+          content={changedAnnotationFields}
+          hideTableBottomBorder={true}
+          id={`${id}-review-fields`}
+        />
+      )}
     </>
   )
 }
