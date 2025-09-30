@@ -27,8 +27,7 @@ import {
   aggregateActionDeclarations,
   deepMerge,
   getAcceptedActions,
-  getCompleteActionAnnotation,
-  omitHiddenPaginatedFields
+  getCompleteActionAnnotation
 } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
@@ -181,11 +180,17 @@ export function extractPotentialDuplicatesFromActions(
 }
 
 /**
- * @returns the current state of the event based on the actions taken.
+ * NOTE: This function should not run field validations. It should return the state based on the actions, without considering context (users, roles, permissions, etc).
+ *
+ * If you update this function, please ensure @EventIndex type is updated accordingly.
+ * In most cases, you won't need to add new parameters to this function. Discuss with the team before doing so.
+ *
+ * @returns Calculates a snapshot summary of the event based on the actions taken on it.
  * @see EventIndex for the description of the returned object.
  */
 export function getCurrentEventState(
   event: EventDocument,
+  /** @TODO: remove config parameter, it is only used by resolveDateOfEvent. See if it can be achieved in some other way. */
   config: EventConfig
 ): EventIndex {
   const creationAction = event.actions.find(
@@ -223,7 +228,7 @@ export function getCurrentEventState(
     assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
     updatedBy: requestActionMetadata.createdBy,
     updatedAtLocation: requestActionMetadata.createdAtLocation,
-    declaration: omitHiddenPaginatedFields(config.declaration, declaration),
+    declaration,
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),
