@@ -32,11 +32,11 @@ export const user = {
     labels: [
       {
         lang: 'en',
-        label: 'Social Worker'
+        label: 'Hospital Clerk'
       },
       {
         lang: 'fr',
-        label: 'Travailleur social'
+        label: "Commis d'hôpital"
       }
     ],
     updatedAt: '2023-11-29T07:02:37.399Z'
