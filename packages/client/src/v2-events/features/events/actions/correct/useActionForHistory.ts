@@ -50,7 +50,7 @@ function getPreviousActions(arr: ActionDocument[], id: string) {
   const index = arr.findIndex((item) => item.id === id)
   return index === -1 ? arr : take(arr, index)
 }
-export function hasDeclarationChanged(
+function hasDeclarationChanged(
   actions: ActionDocument[],
   action: Extract<Action, { type: DeclarationActionType }>
 ) {
