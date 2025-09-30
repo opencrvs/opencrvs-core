@@ -14,8 +14,9 @@ import * as jwt from 'jsonwebtoken'
 import {
   ActionType,
   createPrng,
+  EventConfig,
+  EventDocument,
   generateRandomSignature,
-  getUUID,
   Scope,
   SCOPES,
   SystemRole,
@@ -48,7 +49,8 @@ export const UNSTABLE_EVENT_FIELDS = [
   'updatedBy',
   'acceptedAt',
   'dateOfEvent',
-  'registrationNumber'
+  'registrationNumber',
+  'originalActionId'
 ]
 /**u
  * Cleans up unstable fields in data for snapshot testing.
@@ -90,18 +92,22 @@ export function sanitizeForSnapshot(data: unknown, fields: string[]) {
 const { createCallerFactory } = t
 
 export const TEST_USER_DEFAULT_SCOPES = [
-  SCOPES.RECORD_DECLARE,
-  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
-  SCOPES.RECORD_READ,
-  SCOPES.RECORD_REGISTER,
-  SCOPES.RECORD_REGISTRATION_CORRECT,
-  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-  SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-  SCOPES.RECORD_DECLARATION_ARCHIVE,
-  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-  SCOPES.RECORD_UNASSIGN_OTHERS,
+  SCOPES.RECORD_READ, // @TODO: this can be removed after unnecessary .list endpoint is removed
   SCOPES.SEARCH_BIRTH,
-  'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]'
+  'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
+  `record.create[event=birth|death|tennis-club-membership]`,
+  'record.read[event=birth|death|tennis-club-membership]',
+  'record.notify[event=birth|death|tennis-club-membership]',
+  'record.create[event=birth|death|tennis-club-membership]',
+  'record.declare[event=birth|death|tennis-club-membership]',
+  'record.declared.validate[event=birth|death|tennis-club-membership]',
+  'record.declared.reject[event=birth|death|tennis-club-membership]',
+  'record.declared.archive[event=birth|death|tennis-club-membership]',
+  'record.register[event=birth|death|tennis-club-membership]',
+  'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]',
+  'record.registered.request-correction[event=birth|death|tennis-club-membership]',
+  'record.registered.correct[event=birth|death|tennis-club-membership]',
+  'record.unassign-others[event=birth|death|tennis-club-membership]'
 ]
 
 export function createTestToken(
@@ -111,6 +117,33 @@ export function createTestToken(
 ): TokenWithBearer {
   const token = jwt.sign(
     { scope: scopes, sub: userId, userType },
+    readFileSync(join(__dirname, './cert.key')),
+    {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:events-user'
+    }
+  )
+
+  return `Bearer ${token}`
+}
+
+function createTokenExchangeTestToken(
+  userId: string,
+  eventId: string,
+  actionId: string
+): TokenWithBearer {
+  const token = jwt.sign(
+    {
+      scope: [
+        SCOPES.RECORD_CONFIRM_REGISTRATION,
+        SCOPES.RECORD_REJECT_REGISTRATION
+      ],
+      sub: userId,
+      userType: TokenUserType.enum.user,
+      eventId,
+      actionId
+    },
     readFileSync(join(__dirname, './cert.key')),
     {
       algorithm: 'RS256',
@@ -160,28 +193,60 @@ export function createTestClient(
 }
 
 /**
+ * The token that is passed to country config needs to have been exchanged for the specific eventId and actionId.
+ */
+export function createCountryConfigClient(
+  user: CreatedUser,
+  eventId: string,
+  actionId: string
+) {
+  const createCaller = createCallerFactory(appRouter)
+  const token = createTokenExchangeTestToken(user.id, eventId, actionId)
+
+  const caller = createCaller({
+    user: {
+      ...user,
+      type: TokenUserType.enum.user
+    },
+    token
+  })
+  return caller
+}
+
+/**
  *  Setup for test cases. Creates a user and locations in the database, and provides relevant client instances and seeders.
  */
-export const setupTestCase = async (rngSeed?: number) => {
+export const setupTestCase = async (
+  rngSeed?: number,
+  configuration?: EventConfig
+) => {
   const rng = createPrng(rngSeed ?? 101)
-  const generator = payloadGenerator(rng)
+  const generator = payloadGenerator(rng, configuration)
   const eventsDb = getClient()
 
   const seed = seeder()
-  await seed.locations(generator.locations.set(5))
+  const locationRng = createPrng(10123)
+  await seed.locations(generator.locations.set(5, locationRng))
 
   const locations = await getLocations()
-  const user = seed.user(
+
+  const defaultUser = seed.user(
     generator.user.create({
       primaryOfficeId: locations[0].id
     })
   )
-  const users = [user]
+  const secondaryUser = seed.user(
+    generator.user.create({
+      primaryOfficeId: locations[1].id
+    })
+  )
+
+  const users = [defaultUser, secondaryUser]
 
   return {
     locations,
     user: {
-      ...user,
+      ...defaultUser,
       signature: generateRandomSignature(rng)
     },
     eventsDb,
@@ -202,12 +267,23 @@ export const setupTestCase = async (rngSeed?: number) => {
 function actionToClientAction(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
+  action: Extract<ActionType, 'CREATE'>
+): () => Promise<EventDocument>
+function actionToClientAction(
+  client: ReturnType<typeof createTestClient>,
+  generator: ReturnType<typeof payloadGenerator>,
+  action: Exclude<ActionType, 'CREATE'>
+): (eventId: string) => Promise<EventDocument>
+function actionToClientAction(
+  client: ReturnType<typeof createTestClient>,
+  generator: ReturnType<typeof payloadGenerator>,
   action: ActionType
-) {
+):
+  | (() => Promise<EventDocument>)
+  | ((eventId: string) => Promise<EventDocument>) {
   switch (action) {
     case ActionType.CREATE:
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      return async (_: string) => client.event.create(generator.event.create())
+      return async () => client.event.create(generator.event.create())
     case ActionType.DECLARE:
       return async (eventId: string) =>
         client.event.actions.declare.request(
@@ -232,8 +308,7 @@ function actionToClientAction(
       return async (eventId: string) =>
         client.event.actions.register.request(
           generator.event.actions.register(eventId, {
-            keepAssignment: true,
-            registrationNumber: getUUID()
+            keepAssignment: true
           })
         )
     case ActionType.PRINT_CERTIFICATE:
@@ -252,11 +327,12 @@ function actionToClientAction(
         )
 
     case ActionType.NOTIFY:
-    case ActionType.DETECT_DUPLICATE:
+    case ActionType.DUPLICATE_DETECTED:
     case ActionType.APPROVE_CORRECTION:
     case ActionType.ASSIGN:
     case ActionType.UNASSIGN:
-    case ActionType.MARKED_AS_DUPLICATE:
+    case ActionType.MARK_AS_NOT_DUPLICATE:
+    case ActionType.MARK_AS_DUPLICATE:
     case ActionType.REJECT_CORRECTION:
     case ActionType.DELETE:
     case ActionType.READ:
@@ -269,14 +345,17 @@ function actionToClientAction(
 
 /**
  * Create event based on actions to be used in tests.
- * Created through API to make sure it get indexed properly. (To seed directly to database we need: https://github.com/opencrvs/opencrvs-core/issues/8884)
+ * Created through API to make sure it get indexed properly.
+
+ * To seed directly to database we need:
+ * https://github.com/opencrvs/opencrvs-core/issues/8884
  */
 export async function createEvent(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  actions?: Exclude<ActionType, typeof ActionType.CREATE>[]
+  actions: Exclude<ActionType, typeof ActionType.CREATE>[]
 ): Promise<ReturnType<typeof client.event.create>> {
-  let createdEvent: Awaited<ReturnType<typeof client.event.create>> | undefined
+  let createdEvent: EventDocument | undefined
 
   // Always first create the event
   const createAction = actionToClientAction(
@@ -285,9 +364,9 @@ export async function createEvent(
     ActionType.CREATE
   )
 
-  createdEvent = await createAction('')
+  createdEvent = await createAction()
 
-  for (const action of actions ?? []) {
+  for (const action of actions) {
     const clientAction = actionToClientAction(client, generator, action)
     createdEvent = await clientAction(createdEvent.id)
   }

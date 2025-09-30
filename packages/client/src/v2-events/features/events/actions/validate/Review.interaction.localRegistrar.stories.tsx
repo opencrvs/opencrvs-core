@@ -18,7 +18,9 @@ import {
   tennisClubMembershipEvent,
   generateEventDocument,
   getCurrentEventState,
-  FullDocumentPath
+  UUID,
+  FullDocumentPath,
+  User
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -38,14 +40,18 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   ],
   transformer: { input: superjson, output: superjson }
 })
-const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
-const eventDocument = generateEventDocument({
+const declareEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [ActionType.CREATE, ActionType.DECLARE]
 })
 
-const eventId = eventDocument.id
+const declarationTrpcMsw = createDeclarationTrpcMsw(
+  tRPCMsw,
+  declareEventDocument
+)
+
+const eventId = declareEventDocument.id
 
 const meta: Meta<typeof Review> = {
   beforeEach: () => {
@@ -53,7 +59,7 @@ const meta: Meta<typeof Review> = {
      * Ensure record is "downloaded offline" in the user's browser
      */
     addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(eventDocument.id, eventDocument)
+    setEventData(eventId, declareEventDocument)
   },
   title: 'Validate/Review/Interaction/Local Registrar',
   loaders: [
@@ -78,24 +84,7 @@ export default meta
 
 type Story = StoryObj<typeof Review>
 
-const mockUser = {
-  id: '67bda93bfc07dee78ae558cf',
-  name: [
-    {
-      use: 'en',
-      given: ['Kalusha'],
-      family: 'Bwalya'
-    }
-  ],
-  role: 'SOCIAL_WORKER',
-  signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined
-}
-
-const declareEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
-})
+const mockUser = generator.user.fieldAgent().v2
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
@@ -122,7 +111,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
@@ -194,7 +183,7 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
@@ -316,7 +305,7 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),

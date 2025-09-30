@@ -145,3 +145,67 @@ export const updatePractitionerRoleCodeAggregate = [
     }
   }
 ]
+
+/**
+ * Transform role code based on the english label to match how the scripts will generate new roles from aliases
+ */
+export const transformRoleCodes = (doc: any) => {
+  const updatedCode = [...doc.code]
+
+  // Find the types system code and extract the English label
+  const typesCodeEntry = doc.code.find((c: any) =>
+    c?.coding?.find((cod: any) => cod?.system === typeSystemUrl)
+  )
+
+  const typesCoding = typesCodeEntry?.coding?.find(
+    (cod: any) => cod?.system === typeSystemUrl
+  )
+
+  if (typesCoding?.code) {
+    try {
+      const labelArray = JSON.parse(typesCoding.code)
+
+      const englishLabel = labelArray?.find(
+        (item: any) => item?.lang === 'en' && item?.label
+      )
+
+      if (englishLabel?.label) {
+        const transformedLabel = englishLabel.label
+          .replace(/[^a-zA-Z0-9 ]/g, '')
+          .toUpperCase()
+          .replace(/ /g, '_')
+
+        // Find and update the roles system code
+        const rolesCodeIndex = updatedCode.findIndex((c: any) =>
+          c?.coding?.find((cod: any) => cod?.system === roleSystemUrl)
+        )
+
+        if (rolesCodeIndex !== -1) {
+          const rolesCodingIndex = updatedCode[rolesCodeIndex].coding.findIndex(
+            (cod: any) => cod?.system === roleSystemUrl
+          )
+
+          if (rolesCodingIndex !== -1) {
+            updatedCode[rolesCodeIndex].coding[rolesCodingIndex].code =
+              transformedLabel
+          }
+        }
+      } else {
+        console.warn(
+          `Document ${doc._id}: No valid English label found in types code`
+        )
+      }
+    } catch (parseError) {
+      console.warn(
+        `Document ${doc._id}: Could not parse types code as JSON, skipping role update:`,
+        parseError
+      )
+    }
+  }
+
+  // Remove the types system from the code array
+  const filteredCode = updatedCode.filter((c: any) =>
+    c?.coding?.find((cod: any) => cod?.system !== typeSystemUrl)
+  )
+  return filteredCode
+}

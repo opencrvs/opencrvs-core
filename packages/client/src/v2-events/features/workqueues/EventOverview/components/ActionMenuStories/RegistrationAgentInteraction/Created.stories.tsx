@@ -18,7 +18,9 @@ import {
   createStoriesFromScenarios,
   AssertType,
   Scenario,
-  UserRoles
+  UserRoles,
+  getMockEvent,
+  createdByOtherUserScenario
 } from '../ActionMenu.common'
 
 export default {
@@ -26,7 +28,7 @@ export default {
   title: 'ActionMenu/RegistrationAgent/Created'
 } as Meta<typeof ActionMenu>
 
-const craetedScenariosForRegistrationAgent: Scenario[] = [
+const createdScenariosForRegistrationAgent: Scenario[] = [
   {
     name: 'AssignedToSelf',
     recordDownloaded: true,
@@ -41,8 +43,22 @@ const craetedScenariosForRegistrationAgent: Scenario[] = [
 ]
 
 const stories = createStoriesFromScenarios(
-  craetedScenariosForRegistrationAgent,
+  createdScenariosForRegistrationAgent,
   UserRoles.REGISTRATION_AGENT
 )
 
 export const AssignedToSelf = stories['AssignedToSelf']
+
+// Created by some other user
+const event = getMockEvent([ActionType.CREATE], UserRoles.FIELD_AGENT)
+
+export const CreatedByOtherUser = createdByOtherUserScenario({
+  event,
+  role: UserRoles.LOCAL_REGISTRAR,
+  expected: {
+    ...getHiddenActions(),
+    [ActionType.READ]: AssertType.ENABLED,
+    [ActionType.DECLARE]: AssertType.DISABLED,
+    [ActionType.DELETE]: AssertType.DISABLED
+  }
+})

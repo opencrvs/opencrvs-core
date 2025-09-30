@@ -10,51 +10,61 @@
  */
 
 import { TRPCError } from '@trpc/server'
+import { TokenWithBearer } from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
+  configurableEventScopeAllowed,
   findLastAssignmentAction,
   UnassignActionInput
 } from '@opencrvs/commons/events'
-import { inScope, SCOPES, UUID } from '@opencrvs/commons'
-import { addAction, getEventById } from '@events/service/events/events'
-import { setBearerForToken } from '@events/router/middleware'
+import { getScopes } from '@opencrvs/commons'
 import { TrpcUserContext } from '@events/context'
+import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventById, processAction } from '@events/service/events/events'
 
-export async function unassignRecord(
-  input: UnassignActionInput,
-  {
-    eventId,
-    user,
-    token
-  }: {
-    eventId: UUID
-    user: TrpcUserContext
-    token: string
+export async function unassignRecord({
+  input,
+  user,
+  token
+}: {
+  input: UnassignActionInput
+  user: TrpcUserContext
+  token: TokenWithBearer
+}) {
+  const event = await getEventById(input.eventId)
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
+
+  const lastAssignmentAction = findLastAssignmentAction(event.actions)
+
+  // If last assignment action is not 'ASSIGN', simply return the event as it's already unassigned
+  if (lastAssignmentAction?.type !== ActionType.ASSIGN) {
+    return event
   }
-) {
-  const storedEvent = await getEventById(eventId)
-  const lastAssignmentAction = findLastAssignmentAction(storedEvent.actions)
 
-  if (lastAssignmentAction?.type === ActionType.ASSIGN) {
-    if (
-      lastAssignmentAction.assignedTo !== user.id &&
-      !inScope({ Authorization: setBearerForToken(token) }, [
-        SCOPES.RECORD_UNASSIGN_OTHERS
-      ])
-    ) {
-      throw new TRPCError({
-        code: 'FORBIDDEN'
-      })
+  // If event is not assigned to the user who is unassigning, we need to ensure that the user may unassign others
+  if (lastAssignmentAction.assignedTo !== user.id) {
+    // Ensure that the user has scope to unassign users from this event type
+    const userScopes = getScopes(token)
+    const unassignOtherAllowed = configurableEventScopeAllowed(
+      userScopes,
+      ['record.unassign-others'],
+      event.type
+    )
+
+    if (!unassignOtherAllowed) {
+      throw new TRPCError({ code: 'FORBIDDEN' })
     }
-
-    return addAction(input, {
-      eventId,
-      user,
-      token,
-      status: ActionStatus.Accepted
-    })
   }
 
-  return storedEvent
+  return processAction(input, {
+    event,
+    user,
+    token,
+    status: ActionStatus.Accepted,
+    configuration
+  })
 }

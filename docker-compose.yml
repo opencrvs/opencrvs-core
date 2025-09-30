@@ -27,16 +27,6 @@ services:
     environment:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
       - GATEWAY_URL_INTERNAL=http://gateway:7070
-  dashboards:
-    image: ghcr.io/opencrvs/ocrvs-dashboards:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/dashboards/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
-
   login:
     image: ghcr.io/opencrvs/ocrvs-login:${VERSION}
     #platform: linux/amd64
@@ -93,6 +83,7 @@ services:
       - DOCUMENTS_URL=http://documents:9050
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
       - AUTH_URL=http://auth:4040
+      - CONFIG_URL=http://config:2021
   # User facing services
   workflow:
     image: ghcr.io/opencrvs/ocrvs-workflow:${VERSION}
@@ -181,7 +172,6 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
-      - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - METRICS_URL=http://metrics:1050
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
   user-mgnt:
@@ -195,7 +185,6 @@ services:
       - base
     environment:
       - MONGO_URL=mongodb://mongo1/user-mgnt
-      - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - HOST=0.0.0.0
       - METRICS_URL=http://metrics:1050
       - FHIR_URL=http://hearth:3447/fhir
@@ -273,6 +262,8 @@ services:
       - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
       - EVENTS_MONGO_URL=mongodb://mongo1/events
       - SEARCH_URL=http://search:9090/
+      - EVENTS_URL=http://events:5555/
+      - AUTH_URL=http://auth:4040/
       - ES_HOST=elasticsearch:9200
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086

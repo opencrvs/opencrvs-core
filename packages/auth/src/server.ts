@@ -63,8 +63,11 @@ import { tokenHandler } from '@auth/features/oauthToken/handler'
 import { logger } from '@opencrvs/commons'
 import { getPublicKey } from '@auth/features/authenticate/service'
 import anonymousTokenHandler, {
-  responseSchema
+  responseSchema as anonymousResponseSchema
 } from './features/anonymousToken/handler'
+import reindexingTokenHandler, {
+  responseSchema as reindexResponseSchema
+} from './features/reindexToken/handler'
 import { Boom, badRequest } from '@hapi/boom'
 
 export type AuthServer = {
@@ -76,7 +79,11 @@ export type AuthServer = {
 export async function createServer() {
   let whitelist: string[] = [env.DOMAIN]
   if (env.DOMAIN[0] !== '*') {
-    whitelist = [env.COUNTRY_CONFIG_URL, env.LOGIN_URL, env.CLIENT_APP_URL]
+    whitelist = [
+      env.COUNTRY_CONFIG_URL_EXTERNAL,
+      env.LOGIN_URL,
+      env.CLIENT_APP_URL
+    ]
   }
   logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
@@ -138,7 +145,22 @@ export async function createServer() {
       notes:
         'Returns a token to be used for endpoints that allow unauthorized access such as certificate verification endpoints',
       response: {
-        schema: responseSchema
+        schema: anonymousResponseSchema
+      }
+    }
+  })
+  // curl -H 'Content-Type: application/json' http://localhost:4040/reindexing-token
+  server.route({
+    method: 'GET',
+    path: '/internal/reindexing-token',
+    handler: reindexingTokenHandler,
+    options: {
+      tags: ['api'],
+      description: 'Create a token for migrations to call reindexing endpoints',
+      notes:
+        'Returns a token to be used for reindexing endpoints. This endpoint should never be called directly by clients.',
+      response: {
+        schema: reindexResponseSchema
       }
     }
   })
@@ -418,8 +440,10 @@ export async function createServer() {
   }
 
   async function start() {
-    await server.start()
+    // Start database before application server.
+    // We have had issues where the database was not ready when the server started which resulted in redis instance being undefined.
     await database.start()
+    await server.start()
     server.log('info', `server started on ${env.AUTH_HOST}:${env.AUTH_PORT}`)
   }
 

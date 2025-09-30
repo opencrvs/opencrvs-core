@@ -22,8 +22,7 @@ import {
   sendVerificationCode,
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
-import { logger, UUID } from '@opencrvs/commons'
-import { unauthorized } from '@hapi/boom'
+import { logger, UUID, IUserName } from '@opencrvs/commons'
 import * as F from 'fp-ts'
 import { Scope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
@@ -40,11 +39,6 @@ const sign = promisify<
   string
 >(jwt.sign)
 
-export interface IUserName {
-  use: string
-  family: string
-  given: string[]
-}
 export interface IAuthentication {
   name: IUserName[]
   mobile?: string
@@ -137,14 +131,26 @@ export async function createToken(
   })
 }
 
-export async function createTokenForRecordValidation(
-  userId: UUID,
+type ActionConfirmationInput = {
+  eventId: UUID
+  actionId: UUID
+}
+
+type LegacyRecordValidationInput = {
   recordId: UUID
+}
+
+export async function createTokenForActionConfirmation(
+  input: ActionConfirmationInput | LegacyRecordValidationInput,
+  userId: UUID
 ) {
   return sign(
     {
       scope: ['record.confirm-registration', 'record.reject-registration'],
-      recordId
+      eventId: 'eventId' in input ? input.eventId : undefined,
+      actionId: 'actionId' in input ? input.actionId : undefined,
+      recordId: 'recordId' in input ? input.recordId : undefined,
+      userType: TokenUserType.enum.user
     },
     cert,
     {
@@ -152,8 +158,8 @@ export async function createTokenForRecordValidation(
       algorithm: 'RS256',
       expiresIn: '7 days',
       audience: [
-        'opencrvs:gateway-user', // to get to the gateway
-        'opencrvs:user-mgnt-user', // to allow the gateway to connect the 'sub' to an actual user
+        'opencrvs:gateway-user',
+        'opencrvs:user-mgnt-user',
         'opencrvs:auth-user',
         'opencrvs:hearth-user',
         'opencrvs:notification-user',
@@ -212,28 +218,13 @@ export async function generateAndSendVerificationCode(
     verificationCode = await generateVerificationCode(nonce)
   }
 
-  if (!env.isProd || env.QA_ENV) {
-    logger.info(
-      `Sending a verification to,
-          ${JSON.stringify({
-            mobile: mobile,
-            email: email,
-            verificationCode
-          })}`
-    )
-  } else {
-    if (isDemoUser) {
-      throw unauthorized()
-    } else {
-      await sendVerificationCode(
-        verificationCode,
-        notificationEvent,
-        userFullName,
-        mobile,
-        email
-      )
-    }
-  }
+  await sendVerificationCode(
+    verificationCode,
+    notificationEvent,
+    userFullName,
+    mobile,
+    email
+  )
 }
 
 const tokenPayload = t.type({

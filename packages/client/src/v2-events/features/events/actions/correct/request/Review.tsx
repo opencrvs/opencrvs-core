@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
@@ -16,9 +15,13 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, getDeclaration } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  getDeclaration,
+  getCurrentEventState,
+  LocationType
+} from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { getCurrentEventState } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -29,6 +32,7 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { useSuspenseAdminLeafLevelLocations } from '@client/v2-events/hooks/useLocations'
 import { hasFieldChanged } from '../utils'
 
 export function Review() {
@@ -39,6 +43,7 @@ export function Review() {
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
+  const locationIds = useSuspenseAdminLeafLevelLocations()
 
   const event = events.getEvent.getFromCache(eventId)
 
@@ -74,15 +79,17 @@ export function Review() {
 
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
-    form
+    form,
+    locationIds
   })
 
   return (
-    <FormLayout route={ROUTES.V2.EVENTS.REGISTER}>
+    <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       <ReviewComponent.Body
         form={form}
         formConfig={formConfig}
         isCorrection={true}
+        locationIds={locationIds}
         previousFormValues={previousFormValues}
         title={intlWithData.formatMessage(
           actionConfig.label,

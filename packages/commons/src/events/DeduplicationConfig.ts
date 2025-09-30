@@ -16,13 +16,21 @@ extendZodWithOpenApi(z)
 const FieldReference = z.string()
 
 const Matcher = z.object({
-  fieldId: z.string(),
+  /**
+   * Reference to the field used in matching.
+   *
+   * For `dateRange` type matcher the value of this field will also
+   * be used as the origin date to calculate the distance from.
+   */
+  fieldId: FieldReference,
   options: z
     .object({
       boost: z.number().optional()
     })
     .optional()
-    .default({})
+    .default({
+      boost: 1
+    })
 })
 
 const FuzzyMatcher = Matcher.extend({
@@ -41,36 +49,58 @@ const FuzzyMatcher = Matcher.extend({
       boost: z.number().optional().default(1)
     })
     .optional()
-    .default({})
+    .default({
+      fuzziness: 'AUTO:4,7',
+      boost: 1
+    })
 })
+
+export type FuzzyMatcherOptions = z.input<typeof FuzzyMatcher>['options']
 
 const StrictMatcher = Matcher.extend({
   type: z.literal('strict'),
   options: z
     .object({
-      boost: z.number().optional().default(1)
+      boost: z.number().optional().default(1),
+      /**
+       * The constant value to be present in the field for both records
+       */
+      value: z.string().optional()
     })
     .optional()
-    .default({})
+    .default({
+      boost: 1
+    })
 })
+
+export type StrictMatcherOptions = z.input<typeof StrictMatcher>['options']
 
 const DateRangeMatcher = Matcher.extend({
   type: z.literal('dateRange'),
   options: z.object({
+    /**
+     * The distance pivot in days. Distance from the origin (the value of
+     * fieldId) at which relevance scores receive half of the boost value
+     */
+    pivot: z.number().optional(),
     days: z.number(),
-    origin: FieldReference,
     boost: z.number().optional().default(1)
   })
 })
 
-const DateDistanceMatcher = Matcher.extend({
-  type: z.literal('dateDistance'),
-  options: z.object({
-    days: z.number(),
-    origin: FieldReference,
-    boost: z.number().optional().default(1)
-  })
-})
+export type DateRangeMatcherOptions = z.input<
+  typeof DateRangeMatcher
+>['options']
+
+export type NotInput = {
+  type: 'not'
+  clause: ClauseInput
+}
+
+export type NotOutput = {
+  type: 'not'
+  clause: ClauseOutput
+}
 
 export type AndInput = {
   type: 'and'
@@ -92,6 +122,12 @@ export type OrOutput = {
   clauses: ClauseOutput[]
 }
 
+const Not = z.object({
+  type: z.literal('not'),
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  clause: z.lazy(() => Clause)
+})
+
 const And = z.object({
   type: z.literal('and'),
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -105,20 +141,20 @@ const Or = z.object({
 })
 
 export type ClauseInput =
+  | NotInput
   | AndInput
   | OrInput
   | z.input<typeof FuzzyMatcher>
   | z.input<typeof StrictMatcher>
   | z.input<typeof DateRangeMatcher>
-  | z.input<typeof DateDistanceMatcher>
 
 export type ClauseOutput =
+  | NotOutput
   | AndOutput
   | OrOutput
   | z.output<typeof FuzzyMatcher>
   | z.output<typeof StrictMatcher>
   | z.output<typeof DateRangeMatcher>
-  | z.output<typeof DateDistanceMatcher>
 
 /**
  * Defines a deduplication clause. Clauses are either matcher clauses or logical clauses. Logical clauses (and, or) are used to combine multiple clauses.
@@ -131,12 +167,12 @@ export type ClauseOutput =
 export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> = z
   .lazy(() =>
     z.discriminatedUnion('type', [
+      Not,
       And,
       Or,
       FuzzyMatcher,
       StrictMatcher,
-      DateRangeMatcher,
-      DateDistanceMatcher
+      DateRangeMatcher
     ])
   )
   .openapi({
@@ -151,4 +187,5 @@ export const DeduplicationConfig = z.object({
   query: Clause
 })
 
+export type DeduplicationConfigInput = z.input<typeof DeduplicationConfig>
 export type DeduplicationConfig = z.infer<typeof DeduplicationConfig>

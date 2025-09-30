@@ -9,8 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
+import { omit } from 'lodash'
 import {
   EventState,
   FieldConfig,
@@ -48,7 +51,11 @@ import {
   getValidatorsForField,
   DateRangeFieldValue,
   isSelectDateRangeFieldType,
-  SelectDateRangeValue
+  SelectDateRangeValue,
+  isTimeFieldType,
+  isButtonFieldType,
+  isHttpFieldType,
+  isLinkButtonFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -66,7 +73,11 @@ import {
   Divider,
   PageHeader,
   Paragraph,
-  SelectDateRangeField
+  SelectDateRangeField,
+  TimeField,
+  Button,
+  Http,
+  LinkButton
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -123,7 +134,10 @@ export const GeneratedInputField = React.memo(
       id: fieldDefinition.id,
       // If label is hidden or default message is empty, we don't need to render label
       label,
-      required: fieldDefinition.required,
+      required:
+        typeof fieldDefinition.required === 'boolean'
+          ? fieldDefinition.required
+          : !!fieldDefinition.required,
       disabled: readonlyMode,
       helperText: fieldDefinition.helperText
         ? intl.formatMessage(fieldDefinition.helperText)
@@ -146,13 +160,13 @@ export const GeneratedInputField = React.memo(
     }
 
     const handleFileChange = useCallback(
-      (val: FileFieldValue | undefined) =>
+      (val: FileFieldValue | null) =>
         onFieldValueChange(fieldDefinition.id, val),
       [fieldDefinition.id, onFieldValueChange]
     )
 
     const handleFileWithOptionChange = useCallback(
-      (val: FileFieldWithOptionValue | undefined) =>
+      (val: FileFieldWithOptionValue) =>
         onFieldValueChange(fieldDefinition.id, val),
       [fieldDefinition.id, onFieldValueChange]
     )
@@ -174,13 +188,12 @@ export const GeneratedInputField = React.memo(
       )
 
       return (
-        <InputField {...field.inputFieldProps}>
+        // We are showing errors to underlying text input, so we need to ignore them here
+        <InputField {...omit(field.inputFieldProps, 'error')}>
           <Name.Input
+            configuration={field.config.configuration}
+            disabled={disabled}
             id={fieldDefinition.id}
-            includeMiddlename={field.config.configuration?.includeMiddlename}
-            maxLength={field.config.configuration?.maxLength}
-            required={fieldDefinition.required}
-            searchMode={field.config.configuration?.searchMode}
             validation={validation}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -194,7 +207,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...field.inputFieldProps}>
           <Text.Input
             {...inputProps}
-            isDisabled={disabled}
+            isDisabled={inputProps.disabled}
             type="text"
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -208,7 +221,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...field.inputFieldProps}>
           <Text.Input
             {...inputProps}
-            isDisabled={disabled}
+            isDisabled={inputProps.disabled}
             type="text"
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -221,6 +234,20 @@ export const GeneratedInputField = React.memo(
       return (
         <InputField {...field.inputFieldProps}>
           <DateField.Input
+            {...inputProps}
+            value={field.value}
+            onChange={(val: string) =>
+              onFieldValueChange(fieldDefinition.id, val)
+            }
+          />
+        </InputField>
+      )
+    }
+
+    if (isTimeFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <TimeField.Input
             {...inputProps}
             value={field.value}
             onChange={(val: string) =>
@@ -382,6 +409,7 @@ export const GeneratedInputField = React.memo(
           <File.Input
             {...inputProps}
             acceptedFileTypes={field.config.configuration.acceptedFileTypes}
+            disabled={disabled}
             error={inputFieldProps.error}
             label={uploadedFileNameLabel}
             maxFileSize={field.config.configuration.maxFileSize}
@@ -401,9 +429,12 @@ export const GeneratedInputField = React.memo(
     }
     if (isAddressFieldType(field)) {
       return (
-        <InputField {...inputFieldProps}>
+        // We are showing errors to underlying inputs, so we need to ignore them here
+        <InputField {...omit(field.inputFieldProps, 'error')}>
           <Address.Input
             {...field.config}
+            configuration={field.config.configuration}
+            disabled={disabled}
             value={field.value}
             //@TODO: We need to come up with a general solution for complex types.
             // @ts-ignore
@@ -417,6 +448,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <Select.Input
             {...field.config}
+            disabled={disabled}
             value={field.value}
             onChange={(val: string) =>
               onFieldValueChange(fieldDefinition.id, val)
@@ -430,6 +462,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <SelectCountry.Input
             {...field.config}
+            disabled={disabled}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
@@ -440,6 +473,7 @@ export const GeneratedInputField = React.memo(
       return (
         <Checkbox.Input
           {...field.config}
+          disabled={disabled}
           value={field.value}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
@@ -450,6 +484,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <RadioGroup.Input
             {...field.config}
+            disabled={disabled}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
@@ -462,9 +497,11 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <SignatureField
             {...field.config}
+            disabled={disabled}
             maxFileSize={field.config.configuration.maxFileSize}
             modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
             name={fieldDefinition.id}
+            required={inputFieldProps.required}
             value={field.value}
             onChange={(val) => handleFileChange(val)}
           />
@@ -482,6 +519,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <AdministrativeArea.Input
             {...field.config}
+            disabled={disabled}
             partOf={typeof partOf === 'string' ? partOf : null}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -495,8 +533,8 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <LocationSearch.Input
             {...field.config}
+            disabled={disabled}
             searchableResource={
-              field.config.configuration?.searchableResource &&
               field.config.configuration.searchableResource.length > 0
                 ? field.config.configuration.searchableResource
                 : ['locations']
@@ -514,6 +552,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <LocationSearch.Input
             {...field.config}
+            disabled={disabled}
             searchableResource={['offices']}
             value={field.value}
             onBlur={onBlur}
@@ -528,6 +567,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <LocationSearch.Input
             {...field.config}
+            disabled={disabled}
             searchableResource={['facilities']}
             value={field.value}
             onBlur={onBlur}
@@ -568,6 +608,45 @@ export const GeneratedInputField = React.memo(
           {...field.config}
           declarationFields={getDeclarationFields(eventConfig)}
           formData={form}
+        />
+      )
+    }
+
+    if (isButtonFieldType(field)) {
+      return (
+        // Button can be always 'touched' to show errors.
+        // Button doesn't have a similar `onBlur -> FocusEvent -> touched -> errors` flow as other InputFields
+        <InputField {...inputFieldProps} touched={true}>
+          <Button.Input
+            configuration={field.config.configuration}
+            disabled={inputProps.disabled}
+            id={field.config.id}
+            value={field.value}
+            onChange={(clicks) =>
+              onFieldValueChange(fieldDefinition.id, clicks)
+            }
+          />
+        </InputField>
+      )
+    }
+
+    if (isHttpFieldType(field)) {
+      return (
+        <Http.Input
+          key={fieldDefinition.id}
+          configuration={field.config.configuration}
+          parentValue={form[field.config.configuration.trigger.$$field]}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isLinkButtonFieldType(field)) {
+      return (
+        <LinkButton.Input
+          configuration={field.config.configuration}
+          disabled={inputProps.disabled}
+          id={field.config.id}
         />
       )
     }

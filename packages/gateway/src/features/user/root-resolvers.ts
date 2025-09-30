@@ -13,7 +13,7 @@ import {
   Roles,
   logger,
   isBase64FileString,
-  joinURL,
+  joinUrl,
   fetchJSON,
   UUID
 } from '@opencrvs/commons'
@@ -338,8 +338,11 @@ export const resolvers: GQLResolver = {
         }
       }
 
-      if (user.role && !hasScope(authHeader, SCOPES.USER_DATA_SEEDING)) {
-        const scopes = getScopes(authHeader)
+      if (
+        user.role &&
+        !hasScope(authHeader.Authorization, SCOPES.USER_DATA_SEEDING)
+      ) {
+        const scopes = getScopes(authHeader.Authorization)
         const creatableRoleIds =
           findScope(scopes, 'user.create')?.options?.role ?? []
 
@@ -362,12 +365,12 @@ export const resolvers: GQLResolver = {
       }
 
       const roles = await fetchJSON<Roles>(
-        joinURL(COUNTRY_CONFIG_URL, '/roles')
+        joinUrl(COUNTRY_CONFIG_URL, '/roles')
       )
       const userPayload: IUserPayload = createOrUpdateUserPayload(user, roles)
       const action = userPayload.id ? 'updateUser' : 'createUser'
 
-      const res = await fetch(joinURL(USER_MANAGEMENT_URL, action), {
+      const res = await fetch(joinUrl(USER_MANAGEMENT_URL, action), {
         method: 'POST',
         body: JSON.stringify(userPayload),
         headers: {

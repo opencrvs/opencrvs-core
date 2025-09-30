@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { AppRouter } from '@gateway/v2-events/events/router'
-import { onlineManager, QueryClient } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/react-query'
 import {
   PersistQueryClientProvider,
   type PersistedClient,
@@ -27,10 +27,8 @@ import {
 } from '@trpc/tanstack-react-query'
 import React from 'react'
 import superjson from 'superjson'
-import { useSelector } from 'react-redux'
 import { storage } from '@client/storage'
 import { getToken } from '@client/utils/authUtils'
-import { getUserDetails } from '@client/profile/profileSelectors'
 
 const { TRPCProvider: TRPCProviderRaw, useTRPC } =
   createTRPCContext<AppRouter>()
@@ -99,11 +97,19 @@ export const trpcOptionsProxy = createTRPCOptionsProxy({
 
 export function TRPCProvider({
   children,
+  /*
+   * Should never be "false" outside test environments where we might want to get access
+   * to the query client before the client is restored from the persisted storage.
+   */
+  waitForClientRestored = true,
   storeIdentifier = 'DEFAULT_IDENTIFIER_FOR_TESTS_ONLY__THIS_SHOULD_NEVER_SHOW_OUTSIDE_STORYBOOK'
 }: {
   children: React.ReactNode
   storeIdentifier?: string
+  waitForClientRestored?: boolean
 }) {
+  const [queriesRestored, setQueriesRestored] = React.useState(false)
+
   return (
     <PersistQueryClientProvider
       client={queryClient}
@@ -127,6 +133,7 @@ export function TRPCProvider({
         }
       }}
       onSuccess={async () => {
+        setQueriesRestored(true)
         await queryClient.resumePausedMutations()
 
         const mutations = queryClient.getMutationCache().getAll()
@@ -137,7 +144,7 @@ export function TRPCProvider({
       }}
     >
       <TRPCProviderRaw queryClient={queryClient} trpcClient={trpcClient}>
-        {children}
+        {!waitForClientRestored || queriesRestored ? children : null}
       </TRPCProviderRaw>
     </PersistQueryClientProvider>
   )

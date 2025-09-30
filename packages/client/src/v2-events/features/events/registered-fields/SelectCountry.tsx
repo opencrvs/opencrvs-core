@@ -10,17 +10,25 @@
  */
 import React from 'react'
 import { IntlShape, useIntl } from 'react-intl'
-import { FieldProps, SelectOption } from '@opencrvs/commons/client'
+import {
+  FieldPropsWithoutReferenceValue,
+  Country,
+  FieldProps,
+  FieldTypeToFieldConfig,
+  SelectOption
+} from '@opencrvs/commons/client'
 import { countries } from '@client/utils/countries'
 import { Select } from './Select'
+import { StringifierContext } from './RegisteredField'
 
 function SelectCountryInput({
   value,
   onChange,
   ...props
-}: FieldProps<'COUNTRY'> & {
+}: FieldPropsWithoutReferenceValue<'COUNTRY'> & {
   onChange: (val: string | undefined) => void
   value?: string
+  disabled?: boolean
 }) {
   return (
     <Select.Input
@@ -42,7 +50,7 @@ function SelectCountryOutput({ value }: { value: string | undefined }) {
   return selectedCountry ? intl.formatMessage(selectedCountry.label) : ''
 }
 
-function stringify(intl: IntlShape, value: string) {
+function stringify(value: string, { intl }: StringifierContext<Country>) {
   const selectedCountry = countries.find((country) => country.value === value)
   return selectedCountry ? intl.formatMessage(selectedCountry.label) : ''
 }

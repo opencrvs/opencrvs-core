@@ -82,6 +82,7 @@ function formatAllNonStringValues(
       )
     }
   }
+
   return templateData as Record<string, string>
 }
 

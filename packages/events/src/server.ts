@@ -60,11 +60,21 @@ export function server() {
       return
     }
 
+    if (req.url === '/ping') {
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ status: 'ok' }))
+      return
+    }
+
     // If it's a tRPC request, handle it with the tRPC server
     if (isTrpcRequest(req)) {
       trpcServer(req, res)
     } else {
       // If it's a REST request, handle it with the REST server
+      // Ensure Content-Type is set, otherwise default to JSON. Fixes trpc-to-openapi crashing as it only supports 'application/json'
+      if (!req.headers['content-type']) {
+        req.headers['content-type'] = 'application/json'
+      }
       void restServer(req, res)
     }
   })

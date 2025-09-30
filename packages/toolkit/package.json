@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/toolkit",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "OpenCRVS toolkit for building country configurations",
   "license": "MPL-2.0",
   "exports": {
@@ -8,7 +8,9 @@
     "./api": "./dist/api/index.js",
     "./events": "./dist/events/index.js",
     "./scopes": "./dist/scopes/index.js",
-    "./conditionals": "./dist/conditionals/index.js"
+    "./events/deduplication": "./dist/events/deduplication.js",
+    "./conditionals": "./dist/conditionals/index.js",
+    "./notification": "./dist/notification/index.js"
   },
   "scripts": {
     "build": "./build.sh",
@@ -18,6 +20,7 @@
     "uuid": "^9.0.0",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
+    "object-hash": "^3.0.0",
     "superjson": "1.9.0-0",
     "@trpc/client": "11.4.3",
     "@trpc/server": "11.4.3",
@@ -27,7 +30,8 @@
     "@types/uuid": "^9.0.3",
     "esbuild": "^0.24.0",
     "typescript": "^5.6.3",
-    "@opencrvs/events": "^1.7.0"
+    "@opencrvs/events": "^1.7.0",
+    "@types/object-hash": "^3.0.6"
   },
   "moduleNameMapper": {
     "@opencrvs/commons/events": "@opencrvs/commons/build/dist/common/events/index.js",

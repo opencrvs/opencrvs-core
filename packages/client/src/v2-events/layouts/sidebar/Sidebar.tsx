@@ -20,11 +20,15 @@ import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavig
 import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
-import { joinValues } from '@opencrvs/commons/client'
+import {
+  ActionDocument,
+  joinValues,
+  WorkqueueConfig
+} from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { storage } from '@client/storage'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
-import { useWorkqueueConfigurations } from '@client/v2-events/features/events/useWorkqueueConfiguration'
+import { useCountryConfigWorkqueueConfigurations } from '@client/v2-events/features/events/useCountryConfigWorkqueueConfigurations'
 import { ROUTES } from '@client/v2-events/routes'
 import { removeToken } from '@client/utils/authUtils'
 import * as routes from '@client/navigation/routes'
@@ -41,10 +45,44 @@ import { hasDraftWorkqueue, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
 import { hasOutboxWorkqueue, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { withSuspense } from '../../components/withSuspense'
+import { OrganisationNavigationGroup } from './OrganisationNavigationGroup'
+import { PerformanceNavigationGroup } from './PerformanceNavigationGroup'
 
 const SCREEN_LOCK = 'screenLock'
 
-export const Sidebar = ({
+function Workqueues({
+  workqueues,
+  currentWorkqueueSlug,
+  menuCollapse
+}: {
+  workqueues: WorkqueueConfig[]
+  currentWorkqueueSlug?: string
+  menuCollapse?: () => void /* Only relevant for mobile view */
+}) {
+  const intl = useIntl()
+  const navigate = useNavigate()
+  const { getCount } = useWorkqueue(currentWorkqueueSlug ?? '')
+  const counts = getCount.useSuspenseQuery()
+
+  return workqueues.map(({ name: label, slug, icon }) => (
+    <NavigationItem
+      key={slug}
+      count={counts[slug] || 0}
+      data-testid={`navigation_workqueue_${slug}`}
+      icon={() => <Icon name={icon} size="small" />}
+      id={`navigation_workqueue_${slug}`}
+      isSelected={slug === currentWorkqueueSlug}
+      label={intl.formatMessage(label)}
+      onClick={() => {
+        navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
+        menuCollapse?.()
+      }}
+    />
+  ))
+}
+
+export const SidebarComponent = ({
   menuCollapse,
   navigationWidth,
   isMobileView = false
@@ -63,7 +101,7 @@ export const Sidebar = ({
   const { getAllRemoteDrafts } = useDrafts()
   const drafts = getAllRemoteDrafts()
 
-  const workqueues = useWorkqueueConfigurations()
+  const workqueues = useCountryConfigWorkqueueConfigurations()
 
   const hasOutbox = hasOutboxWorkqueue(scopes ?? [])
   const hasDraft = hasDraftWorkqueue(scopes ?? [])
@@ -72,9 +110,6 @@ export const Sidebar = ({
   const offlineCountryConfig = useSelector(getOfflineData)
   const userDetails = useSelector(getUserDetails)
   const language = useSelector(getLanguage)
-
-  const { getCount } = useWorkqueue(workqueueSlug ?? '')
-  const counts = getCount.useSuspenseQuery()
 
   let name = ''
   if (userDetails?.name) {
@@ -149,22 +184,20 @@ export const Sidebar = ({
             }}
           />
         )}
-        {workqueues.map(({ name: label, slug, icon }) => (
-          <NavigationItem
-            key={slug}
-            count={counts[slug] || 0}
-            data-testid={`navigation_workqueue_${slug}`}
-            icon={() => <Icon name={icon} size="small" />}
-            id={`navigation_workqueue_${slug}`}
-            isSelected={slug === workqueueSlug}
-            label={intl.formatMessage(label)}
-            onClick={() => {
-              navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: slug }))
-              menuCollapse && menuCollapse()
-            }}
+        {/* Not all users have access to workqueues. */}
+        {workqueues.length > 0 && (
+          <Workqueues
+            currentWorkqueueSlug={workqueueSlug}
+            menuCollapse={menuCollapse}
+            workqueues={workqueues}
           />
-        ))}
+        )}
       </NavigationGroup>
+      <OrganisationNavigationGroup
+        currentWorkqueueSlug={workqueueSlug}
+        primaryOfficeId={userDetails?.primaryOffice.id}
+      />
+      <PerformanceNavigationGroup currentWorkqueueSlug={workqueueSlug} />
       {isMobileView && (
         <NavigationGroup>
           <NavigationItem
@@ -188,3 +221,5 @@ export const Sidebar = ({
     </LeftNavigation>
   )
 }
+
+export const Sidebar = withSuspense(SidebarComponent)

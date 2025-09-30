@@ -14,36 +14,33 @@ import { z } from 'zod'
 import '@opencrvs/commons/monitoring'
 import { TRPCError } from '@trpc/server'
 import {
-  getSystem,
-  getUser,
   getUserId,
   getUserTypeFromToken,
   logger,
+  REINDEX_USER_ID,
   SystemRole,
   TokenUserType,
   TokenWithBearer,
-  UUID
+  User,
+  System
 } from '@opencrvs/commons'
-import { env } from './environment'
+import { getSystem, getUser } from './service/users/api'
 
-const UserContext = z.object({
-  id: z.string(),
-  primaryOfficeId: UUID,
-  role: z.string(),
-  signature: z
-    .string()
-    .nullish()
-    .describe('Storage key for the user signature. e.g. /ocrvs/signature.png'),
-  type: TokenUserType.extract(['user'])
+export const UserContext = User.pick({
+  id: true,
+  primaryOfficeId: true,
+  role: true,
+  signature: true,
+  type: true
 })
 export type UserContext = z.infer<typeof UserContext>
 
-export const SystemContext = z.object({
-  id: z.string(),
-  role: SystemRole,
-  type: TokenUserType.extract(['system']),
-  primaryOfficeId: z.undefined().optional(),
-  signature: z.undefined().optional()
+export const SystemContext = System.pick({
+  id: true,
+  role: true,
+  type: true,
+  primaryOfficeId: true,
+  signature: true
 })
 type SystemContext = z.infer<typeof SystemContext>
 
@@ -110,8 +107,17 @@ async function resolveUserDetails(
   }
 
   try {
+    if (userId === REINDEX_USER_ID) {
+      return SystemContext.parse({
+        type: TokenUserType.Enum.system,
+        id: userId,
+        primaryOfficeId: undefined,
+        role: SystemRole.enum.REINDEX
+      })
+    }
+
     if (userType === TokenUserType.Enum.system) {
-      const { type } = await getSystem(env.USER_MANAGEMENT_URL, userId, token)
+      const { type } = await getSystem(userId, token)
 
       return SystemContext.parse({
         type: userType,
@@ -122,7 +128,6 @@ async function resolveUserDetails(
     }
 
     const { primaryOfficeId, role, signature, username } = await getUser(
-      env.USER_MANAGEMENT_URL,
       userId,
       token
     )

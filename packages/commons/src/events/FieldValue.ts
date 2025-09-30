@@ -14,14 +14,12 @@ import {
   AddressFieldUpdateValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  RuralAddressValue,
-  RuralAddressUpdateValue,
-  UrbanAddressValue,
-  UrbanAddressUpdateValue,
-  GenericAddressValue,
-  GenericAddressUpdateValue,
   NameFieldValue,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  HttpFieldUpdateValue,
+  HttpFieldValue,
+  StreetLevelDetailsValue,
+  StreetLevelDetailsUpdateValue
 } from './CompositeFieldValue'
 /**
  * FieldValues defined in this file are primitive field values.
@@ -43,6 +41,8 @@ export const DateValue = z
   .string()
   .date()
   .describe('Date in the format YYYY-MM-DD')
+
+export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
 
 export const DatetimeValue = z.string().datetime()
 
@@ -78,39 +78,51 @@ export type DataFieldValue = z.infer<typeof DataFieldValue>
 export const SignatureFieldValue = z.string()
 export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
 
+export const ButtonFieldValue = z.number()
+export type ButtonFieldValue = z.infer<typeof ButtonFieldValue>
+
 export const FieldValue = z.union([
+  /**
+   * Street level is our first dynamic record. In the future we might extend it to include any dynamic (sub)field.
+   */
+  StreetLevelDetailsValue,
   TextValue,
   DateValue,
+  TimeValue,
+  AddressFieldValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
   CheckboxFieldValue,
   NumberFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  UrbanAddressValue,
-  RuralAddressValue,
   DataFieldValue,
-  GenericAddressValue,
   NameFieldValue,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  ButtonFieldValue,
+  HttpFieldValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>
 
 export const FieldUpdateValue = z.union([
+  /**
+   * Street level is our first dynamic record. In the future we might extend it to include any dynamic (sub)field.
+   */
+  StreetLevelDetailsUpdateValue,
   TextValue,
   DateValue,
+  TimeValue,
+  AddressFieldUpdateValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
   CheckboxFieldValue,
   NumberFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  UrbanAddressUpdateValue,
-  RuralAddressUpdateValue,
   DataFieldValue,
-  GenericAddressUpdateValue,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  HttpFieldUpdateValue
 ])
 
 export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
@@ -144,5 +156,7 @@ export type FieldUpdateValueSchema =
   | typeof DataFieldValue
   | typeof NameFieldValue
   | typeof NameFieldUpdateValue
+  | typeof HttpFieldUpdateValue
+  | typeof ButtonFieldValue
   | z.ZodString
   | z.ZodBoolean

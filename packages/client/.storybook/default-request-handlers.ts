@@ -16,7 +16,6 @@ import { mockOfflineData } from '../src/tests/mock-offline-data'
 import forms from '../src/tests/forms.json'
 import { AppRouter } from '../src/v2-events/trpc'
 import {
-  tennisClubMembershipEventIndex,
   tennisClubMembershipEventDocument,
   TestImage
 } from '../src/v2-events/features/events/fixtures'
@@ -27,8 +26,7 @@ import {
   UUID,
   tennisClubMembershipEvent,
   footballClubMembershipEvent,
-  libraryMembershipEvent,
-  FullDocumentPath
+  libraryMembershipEvent
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 
@@ -73,127 +71,166 @@ export const handlers = {
         footballClubMembershipEvent,
         libraryMembershipEvent
       ]
-    }),
-    tRPCMsw.event.list.query(() => {
-      return [tennisClubMembershipEventIndex]
     })
   ],
   eventLocations: [
-    tRPCMsw.locations.get.query(() => {
+    tRPCMsw.locations.list.query(() => {
       return [
         {
           id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-          externalId: 'AWn3s2RqgAN',
           name: 'Central',
-          partOf: null
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: null,
+          validUntil: null
         },
         {
           id: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
-          externalId: 'KozcEjeTyuD',
           name: 'Sulaka',
-          partOf: null
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: null,
+          validUntil: null
         },
         {
           id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
-          externalId: 'B1u1bVtIA92',
           name: 'Pualula',
-          partOf: null
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: null,
+          validUntil: null
         },
         {
           id: '6d1a59df-988c-4021-a846-ccbc021931a7' as UUID,
-          externalId: 'dbTLdTi7s8F',
           name: 'Chuminga',
-          partOf: null
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: null,
+          validUntil: null
         },
         {
           id: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          externalId: 'oEBf29y8JP8',
           name: 'Ibombo',
-          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          validUntil: null
+        },
+        {
+          // @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
+          // @TODO:  Find a way to give out context aware mock values in the future.
+          id: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
+          name: 'Isango',
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          validUntil: null
         },
         {
           id: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
-          externalId: 'ntoX1PkiWri',
           name: 'Isamba',
-          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          validUntil: null
         },
         {
           id: '89a33893-b17d-481d-a26d-6461e7ac1651' as UUID,
-          externalId: 'QTtxiWj8ONP',
           name: 'Itambo',
-          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          validUntil: null
         },
         {
           id: 'd42ab2fe-e7ed-470e-8b31-4fb27f9b8250' as UUID,
-          externalId: 'ydyJb1RAy4U',
           name: 'Ezhi',
-          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+          locationType: 'ADMIN_STRUCTURE',
+          parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          validUntil: null
         },
         {
           id: '423d000f-101b-47c0-8b86-21a908067cee' as UUID,
-          externalId: 'pXhz0PLiYZX',
           name: 'Chamakubi Health Post',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: '4d3279be-d026-420c-88f7-f0a4ae986973' as UUID,
-          externalId: 'di3U5u7F8Y3',
           name: 'Ibombo Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: '190902f4-1d77-476a-8947-41145af1db7d' as UUID,
-          externalId: 'B5LpoYehUfI',
           name: 'Chikobo Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: 'f5ecbd9b-a01e-4a65-910e-70e86ab41b71' as UUID,
-          externalId: 'g42i3akwlpj',
           name: 'Chilochabalenje Health Post',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: 'dbfc178f-7295-4b90-b28d-111c95b03127' as UUID,
-          externalId: 'FhCAve1Ndla',
           name: 'Chipeso Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: '09862bfe-c7ac-46cd-987b-668681533c80' as UUID,
-          externalId: 'uhVtTq0ICIF',
           name: 'Chisamba Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: '834ce389-e95b-4fb0-96a0-33e9ab323059' as UUID,
-          externalId: 'dhcU6eMvhRQ',
           name: 'Chitanda Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: '0431c433-6062-4a4c-aee9-25271aec61ee' as UUID,
-          externalId: 'xUFGW5vo7No',
           name: 'Golden Valley Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: 'bc84d0b6-7ba7-480d-a339-5d9920d90eb2' as UUID,
-          externalId: 'h1YIvEZ6dla',
           name: 'Ipongo Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: '4cf1f53b-b730-41d2-8649-dff7eeed970d' as UUID,
-          externalId: 'VEhbknBaEOz',
           name: 'Itumbwe Health Post',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
         },
         {
           id: '4b3676cb-9355-4942-9eb9-2ce46acaf0e0' as UUID,
-          externalId: 'sbFApO4who4',
           name: 'Kabangalala Rural Health Centre',
-          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+          locationType: 'HEALTH_FACILITY',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
+        },
+        {
+          id: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+          name: 'Ibombo District Office',
+          locationType: 'CRVS_OFFICE',
+          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          validUntil: null
+        },
+        {
+          id: '62a0ccb4-4f30-4f30-8882-f256007dff9f' as UUID,
+          name: 'Isamba District Office',
+          locationType: 'CRVS_OFFICE',
+          parentId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
+          validUntil: null
         }
       ]
     })
@@ -499,6 +536,42 @@ export const handlers = {
       }
 
       const url = new URL(request.request.url)
+
+      const basename = url.pathname.split('/').pop()
+
+      let file: string
+      switch (basename) {
+        case 'tree.svg':
+          file = TestImage.Tree
+          break
+        case 'fish.svg':
+          file = TestImage.Fish
+          break
+        case 'mountain.svg':
+          file = TestImage.Mountain
+          break
+        default:
+          file = TestImage.Box
+      }
+
+      return new HttpResponse(file, {
+        headers: {
+          'Content-Type': 'image/svg+xml',
+          'Cache-Control': 'no-cache'
+        }
+      })
+    }),
+    http.get('http://localhost:3535/ocrvs/:eventId/:id', async (request) => {
+      const cache = await caches.open(FAKE_CACHE_NAME)
+
+      const response = await cache.match(request.request)
+
+      if (response) {
+        return response
+      }
+
+      const url = new URL(request.request.url)
+
       const basename = url.pathname.split('/').pop()
 
       let file: string
@@ -1134,106 +1207,44 @@ export const handlers = {
     })
   ],
   user: [
-    graphql.query('fetchUser', () => {
+    graphql.query('fetchUser', (input) => {
+      const userId = input.variables.userId
+      const generator = testDataGenerator()
+      let response
+
+      if (userId == generator.user.id.fieldAgent) {
+        response = generator.user.fieldAgent().v1
+      } else if (userId == generator.user.id.registrationAgent) {
+        response = generator.user.registrationAgent().v1
+      } else if (userId == generator.user.id.localSystemAdmin) {
+        response = generator.user.localSystemAdmin()
+      } else {
+        response = generator.user.localRegistrar().v1
+      }
+
       return HttpResponse.json({
         data: {
-          getUser: {
-            id: '679397db138339c63cdc24e1',
-            userMgntUserID: '679397db138339c63cdc24e1',
-            creationDate: '1737725915295',
-            username: 'k.mweene',
-            practitionerId: '6f672b75-ec29-4bdc-84f6-4cb3ff9bb529',
-            mobile: '+260933333333',
-            email: 'kalushabwalya1.7@gmail.com',
-            role: {
-              label: {
-                id: 'userRole.localRegistrar',
-                defaultMessage: 'Local Registrar',
-                description: 'Name for user role Local Registrar',
-                __typename: 'I18nMessage'
-              },
-              __typename: 'UserRole'
-            },
-            status: 'active',
-            name: [
-              {
-                use: 'en',
-                firstNames: 'Kennedy',
-                familyName: 'Mweene',
-                __typename: 'HumanName'
-              }
-            ],
-            primaryOffice: {
-              id: '028d2c85-ca31-426d-b5d1-2cef545a4902',
-              name: 'Ibombo District Office',
-              alias: ['Ibombo District Office'],
-              status: 'active',
-              __typename: 'Location'
-            },
-            localRegistrar: {
-              name: [
-                {
-                  use: 'en',
-                  firstNames: 'Kennedy',
-                  familyName: 'Mweene',
-                  __typename: 'HumanName'
-                }
-              ],
-              role: 'LOCAL_REGISTRAR',
-              signature: null,
-              __typename: 'LocalRegistrar'
-            },
-            avatar: null,
-            searches: [],
-            __typename: 'User'
-          }
+          getUser: response
         }
       })
     }),
     tRPCMsw.user.list.query(() => {
-      return [
-        {
-          id: testDataGenerator().user.id.localRegistrar,
-          name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
-          role: 'LOCAL_REGISTRAR',
-          signature: undefined,
-          avatar: undefined
-        }
-      ]
+      const generator = testDataGenerator()
+
+      return [generator.user.localRegistrar().v2]
     }),
     tRPCMsw.user.get.query((id) => {
-      return {
-        id,
-        name: [
-          {
-            use: 'en',
-            given: ['Kennedy'],
-            family: 'Mweene'
-          }
-        ],
-        role: 'LOCAL_REGISTRAR',
-        signature: 'signature.png' as FullDocumentPath,
-        avatar: undefined
-      }
+      const generator = testDataGenerator()
+
+      return generator.user.localRegistrar().v2
     })
   ],
   event: [
     tRPCMsw.event.get.query(() => {
       return tennisClubMembershipEventDocument
     }),
-    tRPCMsw.event.list.query(() => {
-      return [tennisClubMembershipEventIndex]
-    }),
     tRPCMsw.event.search.query((input) => {
-      return []
-    }),
-    tRPCMsw.workqueue.config.list.query(() => {
-      return generateWorkqueues()
-    }),
-    tRPCMsw.workqueue.count.query((input) => {
-      return input.reduce((acc, { slug }) => {
-        return { ...acc, [slug]: 7 }
-      }, {})
+      return { results: [], total: 0 }
     })
   ],
   locations: [
@@ -1257,7 +1268,8 @@ export const handlers = {
         entry: [
           {
             fullUrl:
-              'http://localhost:2021/location/5ef450bc-712d-48ad-93f3-8da0fa453baa/_history/8ae119de-682a-40fa-be03-9de10fc07d53',
+              // @NOTE: Addresss component uses both V1 and V2. It should use only V2 api in the long run. Meanwhile, ensure ids match.
+              'http://localhost:2021/location/62a0ccb4-880d-4f30-8882-f256007dfff9/_history/8ae119de-682a-40fa-be03-9de10fc07d53',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1322,11 +1334,11 @@ export const handlers = {
                 lastUpdated: '2025-02-05T07:52:42.267+00:00',
                 versionId: '8ae119de-682a-40fa-be03-9de10fc07d53'
               },
-              id: '5ef450bc-712d-48ad-93f3-8da0fa453baa'
+              id: '62a0ccb4-880d-4f30-8882-f256007dfff9'
             },
             request: {
               method: 'PUT',
-              url: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+              url: 'Location/62a0ccb4-880d-4f30-8882-f256007dfff9'
             }
           },
           {
@@ -1345,7 +1357,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+                reference: 'Location/62a0ccb4-880d-4f30-8882-f256007dfff9'
               },
               type: {
                 coding: [
@@ -1422,7 +1434,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+                reference: 'Location/62a0ccb4-880d-4f30-8882-f256007dfff9'
               },
               type: {
                 coding: [
@@ -1684,7 +1696,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+                reference: 'Location/62a0ccb4-880d-4f30-8882-f256007dfff9'
               },
               type: {
                 coding: [
@@ -1980,7 +1992,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+                reference: 'Location/62a0ccb4-880d-4f30-8882-f256007dfff9'
               },
               type: {
                 coding: [
@@ -2142,6 +2154,7 @@ export const handlers = {
         certificates: [
           {
             id: 'tennis-club-membership-certificate',
+            isV2Template: true,
             event: TENNIS_CLUB_MEMBERSHIP,
             label: {
               id: 'certificates.tennis-club-membership.certificate.copy',
@@ -2167,6 +2180,7 @@ export const handlers = {
           },
           {
             id: 'tennis-club-membership-certified-certificate',
+            isV2Template: true,
             event: TENNIS_CLUB_MEMBERSHIP,
             label: {
               id: 'certificates.tennis-club-membership.certificate.certified-copy',
@@ -2237,6 +2251,21 @@ export const handlers = {
           'Content-Type': 'image/svg+xml'
         }
       })
+    })
+  ],
+  workqueues: [
+    tRPCMsw.workqueue.count.query((input) => {
+      if (input.length === 0) {
+        /** Ensure we catch situations where no input is provided before merging anything. */
+        throw new Error('No input provided.')
+      }
+
+      return input.reduce((acc, { slug }) => {
+        return { ...acc, [slug]: 7 }
+      }, {})
+    }),
+    tRPCMsw.workqueue.config.list.query(() => {
+      return generateWorkqueues()
     })
   ]
 }

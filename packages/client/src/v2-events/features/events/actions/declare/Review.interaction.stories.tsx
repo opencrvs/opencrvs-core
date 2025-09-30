@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
@@ -19,11 +20,12 @@ import {
   generateEventDocument,
   generateEventDraftDocument,
   getCurrentEventState,
-  FullDocumentPath
+  FullDocumentPath,
+  UUID
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
 import { setEventData, addLocalEventConfig } from '../../useEvents/api'
@@ -39,23 +41,31 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const declareEventDocument = generateEventDocument({
+const createdEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE]
+})
+const declarationTrpcMsw = createDeclarationTrpcMsw(
+  tRPCMsw,
+  createdEventDocument
+)
+
+const declaredEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [ActionType.CREATE, ActionType.DECLARE]
 })
-const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
 const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Interaction',
   parameters: {
     offline: {
-      events: [declareEventDocument]
+      events: [createdEventDocument]
     }
   },
   beforeEach: () => {
     useEventFormData.setState({
       formValues: getCurrentEventState(
-        declareEventDocument,
+        declaredEventDocument,
         tennisClubMembershipEvent
       ).declaration
     })
@@ -66,19 +76,7 @@ export default meta
 
 type Story = StoryObj<typeof ReviewIndex>
 
-const mockUser = {
-  id: '67bda93bfc07dee78ae558cf',
-  name: [
-    {
-      use: 'en',
-      given: ['Kalusha'],
-      family: 'Bwalya'
-    }
-  ],
-  role: 'SOCIAL_WORKER',
-  signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined
-}
+const mockUser = generator.user.fieldAgent().v2
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
@@ -111,19 +109,27 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     chromatic: { disableSnapshot: true },
     offline: {
       events: [declarationTrpcMsw.eventDocument],
-      drafts: [declarationTrpcMsw.draft]
+      drafts: [
+        generateEventDraftDocument({
+          eventId: declarationTrpcMsw.eventDocument.id,
+          actionType: ActionType.DECLARE
+        })
+      ]
     },
     msw: {
       handlers: {
         drafts: declarationTrpcMsw.drafts.handlers,
         events: [
           tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                declarationTrpcMsw.eventDocument,
-                tennisClubMembershipEvent
-              )
-            ]
+            return {
+              total: 1,
+              results: [
+                getCurrentEventState(
+                  declarationTrpcMsw.eventDocument,
+                  tennisClubMembershipEvent
+                )
+              ]
+            }
           }),
           ...declarationTrpcMsw.events.handlers
         ],
@@ -131,7 +137,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
@@ -139,12 +145,15 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
             return [mockUser]
           }),
           tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                declarationTrpcMsw.eventDocument,
-                tennisClubMembershipEvent
-              )
-            ]
+            return {
+              results: [
+                getCurrentEventState(
+                  declarationTrpcMsw.eventDocument,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
           }),
           tRPCMsw.user.get.query((id) => {
             return mockUser
@@ -193,6 +202,41 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   }
 }
 
+const msw = {
+  handlers: {
+    drafts: declarationTrpcMsw.drafts.handlers,
+    events: [
+      tRPCMsw.event.search.query((input) => {
+        return {
+          results: [
+            getCurrentEventState(
+              declarationTrpcMsw.eventDocument,
+              tennisClubMembershipEvent
+            )
+          ],
+          total: 1
+        }
+      }),
+      ...declarationTrpcMsw.events.handlers
+    ],
+    user: [
+      graphql.query('fetchUser', () => {
+        return HttpResponse.json({
+          data: {
+            getUser: generator.user.registrationAgent().v1
+          }
+        })
+      }),
+      tRPCMsw.user.list.query(([id]) => {
+        return [mockUser]
+      }),
+      tRPCMsw.user.get.query((id) => {
+        return mockUser
+      })
+    ]
+  }
+}
+
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   loaders: [
     () => {
@@ -213,41 +257,11 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: createdEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
-    msw: {
-      handlers: {
-        drafts: declarationTrpcMsw.drafts.handlers,
-        events: [
-          tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                declarationTrpcMsw.eventDocument,
-                tennisClubMembershipEvent
-              )
-            ]
-          }),
-          ...declarationTrpcMsw.events.handlers
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent()
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUser
-          })
-        ]
-      }
-    }
+    msw
   },
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
@@ -300,41 +314,11 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: createdEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
-    msw: {
-      handlers: {
-        drafts: declarationTrpcMsw.drafts.handlers,
-        events: [
-          tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                declarationTrpcMsw.eventDocument,
-                tennisClubMembershipEvent
-              )
-            ]
-          }),
-          ...declarationTrpcMsw.events.handlers
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent()
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUser
-          })
-        ]
-      }
-    }
+    msw
   },
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
@@ -399,7 +383,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: eventId
+        eventId
       })
     },
     offline: {
@@ -418,12 +402,15 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
         ],
         events: [
           tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                declarationTrpcMsw.eventDocument,
-                tennisClubMembershipEvent
-              )
-            ]
+            return {
+              results: [
+                getCurrentEventState(
+                  declarationTrpcMsw.eventDocument,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
           }),
           ...declarationTrpcMsw.events.handlers
         ],
@@ -431,7 +418,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.fieldAgent()
+                getUser: generator.user.fieldAgent().v1
               }
             })
           }),
@@ -482,19 +469,70 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
   }
 }
 
+export const ReviewForIncompleteNameInteraction: Story = {
+  name: 'Declaration shows as incomplete when surname is left out',
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+    async () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: createdEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw
+  },
+  play: async ({ canvasElement, step }) => {
+    await step('Modal has scope based content', async () => {
+      const canvas = within(canvasElement)
+      const changeButton = await canvas.findByTestId(
+        'change-button-applicant.name',
+        {},
+        { timeout: 5000 }
+      )
+      await userEvent.click(changeButton)
+      const modal = within(await canvas.findByRole('dialog'))
+
+      const confirmEditButton = await modal.findByRole('button', {
+        name: 'Continue'
+      })
+
+      await userEvent.click(confirmEditButton)
+
+      const surnameInput = await canvas.findByTestId('text__surname')
+      await userEvent.clear(surnameInput)
+
+      const backToReviewButton = await canvas.findByText('Back to review')
+      await userEvent.click(backToReviewButton)
+      await canvas.findByText('Declaration incomplete')
+    })
+  }
+}
+
 export const ChangeFieldInReview: Story = {
   beforeEach: () => {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
     addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(declareEventDocument.id, declareEventDocument)
+    setEventData(createdEventDocument.id, createdEventDocument)
   },
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: createdEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
@@ -505,7 +543,7 @@ export const ChangeFieldInReview: Story = {
             return [
               generateEventDraftDocument({
                 eventId,
-                actionType: ActionType.REGISTER
+                actionType: ActionType.DECLARE
               })
             ]
           })
@@ -544,8 +582,10 @@ export const ChangeFieldInReview: Story = {
       const backToReviewButton = await canvas.findByText('Back to review')
       await userEvent.click(backToReviewButton)
 
-      await canvas.findByText("Applicant's name")
-      await canvas.findByText('John Nileem-Rowa')
+      await waitFor(async () => {
+        await expect(canvas.getByText("Applicant's name")).toBeInTheDocument()
+        await expect(canvas.getByText('John Nileem-Rowa')).toBeInTheDocument()
+      })
     })
   }
 }

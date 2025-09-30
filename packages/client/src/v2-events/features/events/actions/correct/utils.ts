@@ -8,12 +8,29 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { isEqual } from 'lodash'
+import * as _ from 'lodash'
 import {
   FieldConfig,
   EventState,
-  isFieldVisible
+  isFieldVisible,
+  isMetaAction,
+  EventDocument,
+  ActionType,
+  FieldValue
 } from '@opencrvs/commons/client'
+
+/**
+ * Function we use for checking whether a field value has changed.
+ * For objects we need to ignore undefined values since the form might create them.
+ * @returns whether the two field values are equal when ignoring undefined values
+ */
+export function isEqualFieldValue<T extends FieldValue>(a: T, b: T) {
+  if (typeof a === 'object' && typeof b === 'object') {
+    return _.isEqual(_.omitBy(a, _.isUndefined), _.omitBy(b, _.isUndefined))
+  }
+
+  return _.isEqual(a, b)
+}
 
 export function hasFieldChanged(
   f: FieldConfig,
@@ -21,7 +38,20 @@ export function hasFieldChanged(
   previousFormValues: EventState
 ) {
   const isVisible = isFieldVisible(f, form)
-  const valueHasChanged = !isEqual(previousFormValues[f.id], form[f.id])
+
+  const prevValue = previousFormValues[f.id]
+  const currValue = form[f.id]
+
+  // Ensure that if previous value is 'undefined' and current value is 'null'
+  // it doesn't get detected as a value change
+  const bothNil = _.isNil(prevValue) && _.isNil(currValue)
+  const valueHasChanged = !isEqualFieldValue(prevValue, currValue) && !bothNil
 
   return isVisible && valueHasChanged
+}
+
+export function isLastActionCorrectionRequest(event: EventDocument) {
+  const writeActions = event.actions.filter((a) => !isMetaAction(a.type))
+  const lastWriteAction = writeActions[writeActions.length - 1]
+  return lastWriteAction.type === ActionType.REQUEST_CORRECTION
 }

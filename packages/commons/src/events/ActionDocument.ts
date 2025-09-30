@@ -64,6 +64,9 @@ export const ActionBase = z.object({
     .describe(
       'Reference to the original action that was asynchronously rejected or accepted by 3rd party integration.'
     )
+  // 'content' field reserved for additional data
+  // Each action can define its own content specifc to the action
+  // See PrintCertificateAction
 })
 
 export type ActionBase = z.infer<typeof ActionBase>
@@ -71,7 +74,7 @@ export type ActionBase = z.infer<typeof ActionBase>
 const AssignedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.ASSIGN),
-    assignedTo: z.string()
+    assignedTo: z.string() // TODO move into 'content' property
   })
 )
 
@@ -84,7 +87,7 @@ const UnassignedAction = ActionBase.merge(
 export const RegisterAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REGISTER),
-    registrationNumber: z.string().optional()
+    registrationNumber: z.string().optional() // TODO move into 'content' property
   })
 )
 
@@ -102,31 +105,57 @@ const ValidateAction = ActionBase.merge(
   })
 )
 
-export const RejectionReason = z.object({
-  message: z
+export const ReasonContent = z.object({
+  reason: z
     .string()
     .min(1, { message: 'Message cannot be empty' })
-    .describe('Message describing reason for rejection or archiving'),
-  isDuplicate: z.boolean().optional().describe('If a declaration is duplicated')
+    .describe('Message describing reason for rejection or archiving')
 })
 
 const RejectAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REJECT),
-    reason: RejectionReason
+    content: ReasonContent
+  })
+)
+
+export const PotentialDuplicate = z.object({
+  id: UUID,
+  trackingId: z.string()
+})
+export type PotentialDuplicate = z.infer<typeof PotentialDuplicate>
+
+export const DuplicateDetectedAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.DUPLICATE_DETECTED),
+    content: z.object({
+      duplicates: z.array(PotentialDuplicate)
+    })
+  })
+)
+export type DuplicateDetectedAction = z.infer<typeof DuplicateDetectedAction>
+
+const MarkNotDuplicateAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.MARK_AS_NOT_DUPLICATE)
   })
 )
 
 const MarkAsDuplicateAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.MARKED_AS_DUPLICATE)
+    type: z.literal(ActionType.MARK_AS_DUPLICATE),
+    content: z
+      .object({
+        duplicateOf: UUID
+      })
+      .optional()
   })
 )
 
 const ArchiveAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.ARCHIVE),
-    reason: RejectionReason
+    content: ReasonContent
   })
 )
 
@@ -142,11 +171,20 @@ const NotifiedAction = ActionBase.merge(
   })
 )
 
+export const PrintContent = z.object({
+  templateId: z.string().optional()
+})
+
+export type PrintContent = z.infer<typeof PrintContent>
+
 const PrintCertificateAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.PRINT_CERTIFICATE)
+    type: z.literal(ActionType.PRINT_CERTIFICATE),
+    content: PrintContent.optional().nullable()
   })
 )
+
+export type PrintCertificateAction = z.infer<typeof PrintCertificateAction>
 
 const RequestedCorrectionAction = ActionBase.merge(
   z.object({
@@ -161,14 +199,15 @@ export type RequestedCorrectionAction = z.infer<
 const ApprovedCorrectionAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.APPROVE_CORRECTION),
-    requestId: z.string()
+    requestId: z.string() // TODO move into 'content' property
   })
 )
 
 const RejectedCorrectionAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REJECT_CORRECTION),
-    requestId: z.string()
+    requestId: z.string(), // TODO move into 'content' property
+    content: ReasonContent
   })
 )
 
@@ -183,6 +222,8 @@ export const ActionDocument = z
     CreatedAction.openapi({ ref: 'CreatedAction' }),
     ValidateAction.openapi({ ref: 'ValidateAction' }),
     RejectAction.openapi({ ref: 'RejectAction' }),
+    DuplicateDetectedAction.openapi({ ref: 'DuplicateDetectedAction' }),
+    MarkNotDuplicateAction.openapi({ ref: 'MarkNotDuplicateAction' }),
     MarkAsDuplicateAction.openapi({ ref: 'MarkAsDuplicateAction' }),
     ArchiveAction.openapi({ ref: 'ArchiveAction' }),
     NotifiedAction.openapi({ ref: 'NotifiedAction' }),
@@ -218,19 +259,5 @@ export type AsyncRejectActionDocument = z.infer<
 
 export const Action = z.union([ActionDocument, AsyncRejectActionDocument])
 export type Action = ActionDocument | AsyncRejectActionDocument
-
-export const ResolvedUser = z.object({
-  id: z.string(),
-  role: z.string(),
-  name: z.array(
-    z.object({
-      use: z.string(),
-      given: z.array(z.string()),
-      family: z.string()
-    })
-  )
-})
-
-export type ResolvedUser = z.infer<typeof ResolvedUser>
 
 export type CreatedAction = z.infer<typeof CreatedAction>

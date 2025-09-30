@@ -22,9 +22,25 @@ import type {
   inferOutput,
   TRPCQueryOptions
 } from '@trpc/tanstack-react-query'
-import { findLocalEventIndex } from '@client/v2-events/features/events/useEvents/api'
-import { AppRouter, queryClient } from '@client/v2-events/trpc'
+import { isObject } from 'lodash'
+import {
+  ActionType,
+  deepMerge,
+  FileFieldValue,
+  FileFieldValueWithOption,
+  FileFieldWithOptionValue
+} from '@opencrvs/commons/client'
+import {
+  findLocalEventDocument,
+  findLocalEventIndex
+} from '@client/v2-events/features/events/useEvents/api'
+import {
+  AppRouter,
+  queryClient,
+  trpcOptionsProxy
+} from '@client/v2-events/trpc'
 import { isTemporaryId, RequireKey } from '@client/v2-events/utils'
+import { prefetchPotentialDuplicates } from '../../actions/dedup/getDuplicates'
 
 export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
   canonicalMutationFn: (params: T) => Promise<R>
@@ -33,10 +49,11 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
     const { eventId } = params
 
     if (!isTemporaryId(eventId)) {
-      return canonicalMutationFn({ ...params, eventId: eventId })
+      return canonicalMutationFn({ ...params, eventId })
     }
 
-    const localVersion = findLocalEventIndex(eventId)
+    const localVersion =
+      findLocalEventIndex(eventId) || findLocalEventDocument(eventId)
 
     if (!localVersion || isTemporaryId(localVersion.id)) {
       throw new Error(
@@ -44,8 +61,49 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
       )
     }
 
+    const replaceTemporaryIdInDocumentPath = (
+      fieldValue: FileFieldValue | FileFieldValueWithOption
+    ) => {
+      const path = fieldValue.path
+        .split('/')
+        .map((chunk) => (chunk === eventId ? localVersion.id : chunk))
+        .join('/')
+      return { ...fieldValue, path }
+    }
+
+    const replaceTemporaryIdInObject = (obj: object) => {
+      return Object.fromEntries(
+        Object.entries(obj).map(([key, value]) => {
+          const maybeFile = FileFieldValue.safeParse(value)
+          if (maybeFile.success) {
+            return [key, replaceTemporaryIdInDocumentPath(maybeFile.data)]
+          }
+          const maybeFileWithOptions = FileFieldWithOptionValue.safeParse(value)
+          if (maybeFileWithOptions.success) {
+            const filesWithActualUrls = maybeFileWithOptions.data.map((file) =>
+              replaceTemporaryIdInDocumentPath(file)
+            )
+            return [key, filesWithActualUrls]
+          }
+          return [key, value]
+        })
+      )
+    }
+
+    const declaration =
+      'declaration' in params &&
+      params.declaration &&
+      isObject(params.declaration)
+        ? replaceTemporaryIdInObject(params.declaration)
+        : {}
+
+    const annotation =
+      'annotation' in params && params.annotation && isObject(params.annotation)
+        ? replaceTemporaryIdInObject(params.annotation)
+        : {}
+
     return canonicalMutationFn({
-      ...params,
+      ...deepMerge(deepMerge(params, { declaration }), { annotation }),
       eventId: localVersion.id,
       eventType: localVersion.type
     })
@@ -137,10 +195,14 @@ export function createEventActionMutationFn<
 
   return waitUntilEventIsCreated<inferInput<P>, inferOutput<P>>(
     async ({ eventType, ...params }) => {
-      return defaultMutationFn({
+      const response = await defaultMutationFn({
         ...params,
         declaration: params.declaration
       })
+      if (params.type === ActionType.ASSIGN) {
+        await prefetchPotentialDuplicates(params.eventId)
+      }
+      return response
     }
   )
 }

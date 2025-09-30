@@ -18,7 +18,8 @@ import {
   tennisClubMembershipEvent,
   generateEventDocument,
   getCurrentEventState,
-  FullDocumentPath
+  FullDocumentPath,
+  UUID
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -38,13 +39,18 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   ],
   transformer: { input: superjson, output: superjson }
 })
-const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
-const eventDocument = generateEventDocument({
+
+const validatedEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE]
 })
 
-const eventId = eventDocument.id
+const declarationTrpcMsw = createDeclarationTrpcMsw(
+  tRPCMsw,
+  validatedEventDocument
+)
+
+const eventId = validatedEventDocument.id
 
 const meta: Meta<typeof Review> = {
   title: 'Register/Review/Interaction/Local Registrar',
@@ -53,7 +59,7 @@ const meta: Meta<typeof Review> = {
      * Ensure record is "downloaded offline" in the user's browser
      */
     addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(eventDocument.id, eventDocument)
+    setEventData(eventId, validatedEventDocument)
   },
   loaders: [
     () => {
@@ -76,30 +82,13 @@ export default meta
 
 type Story = StoryObj<typeof Review>
 
-const mockUser = {
-  id: '67bda93bfc07dee78ae558cf',
-  name: [
-    {
-      use: 'en',
-      given: ['Kalusha'],
-      family: 'Bwalya'
-    }
-  ],
-  role: 'SOCIAL_WORKER',
-  signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined
-}
-
-const validateEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE]
-})
+const mockUser = generator.user.fieldAgent().v2
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
       formValues: getCurrentEventState(
-        validateEventDocument,
+        validatedEventDocument,
         tennisClubMembershipEvent
       ).declaration
     })
@@ -120,7 +109,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
@@ -191,7 +180,7 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
        * and this test case assumes a scenario where user had previously
        * downloaded the event document.
        */
-      events: [declarationTrpcMsw.eventDocument]
+      events: [validatedEventDocument]
     },
     msw: {
       handlers: {
@@ -201,7 +190,7 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
@@ -303,8 +292,7 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
           'event.actions.validate.request': false,
           'event.config.get': false,
           'event.create': false,
-          'event.get': false,
-          'event.list': false
+          'event.get': false
         })
       })
     })
@@ -327,7 +315,7 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),

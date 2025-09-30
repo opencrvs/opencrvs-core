@@ -25,14 +25,14 @@ const FullSizeWrapper = styled.div`
   justify-content: center;
 `
 
-export function withSuspense<
-  ComponentProps extends { children?: React.ReactNode }
->(Component: React.ComponentType<ComponentProps>) {
-  return (props: ComponentProps) => (
+export function withSuspense<P extends object>(
+  Component: React.ComponentType<P>
+) {
+  return (props: P) => (
     <React.Suspense
       fallback={
         <FullSizeWrapper>
-          <Spinner id={`page-spinner-${new Date().getTime()}`} />
+          <Spinner id={`page-spinner-${Date.now()}`} />
         </FullSizeWrapper>
       }
     >

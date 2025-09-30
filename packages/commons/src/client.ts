@@ -17,7 +17,7 @@ export * from './utils'
 export * from './conditionals/validate'
 export { DEFAULT_ROLES_DEFINITION } from './authentication'
 export * from './fixtures'
-export * from './users/systemRole'
+export * from './users/User'
 export * from './authentication'
 export * from './url'
 

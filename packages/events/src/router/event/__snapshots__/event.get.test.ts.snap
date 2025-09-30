@@ -1,3 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Returns 404 when not found 1`] = `[TRPCError: Event not found with ID: 11111111-1111-4111-9111-111111111111]`;
+
+exports[`prevents access if required scope does not have correct event type configured 1`] = `[TRPCError: Event not found with ID: 11111111-1111-4111-9111-111111111111]`;

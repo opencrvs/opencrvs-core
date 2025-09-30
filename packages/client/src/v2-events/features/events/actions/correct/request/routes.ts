@@ -12,7 +12,7 @@
 import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
 import { uuid } from '@client/v2-events/routes/utils'
 
-export const routes = route(
+export const requestRoutes = route(
   'request-correction/:eventId',
   {
     params: { eventId: uuid().defined() },
@@ -46,6 +46,23 @@ export const routes = route(
         workqueue: string()
       },
       hash: hashValues()
+    })
+  }
+)
+
+export const reviewRoutes = route(
+  'review-correction/:eventId',
+  {
+    params: { eventId: uuid().defined() },
+    searchParams: {
+      workqueue: string()
+    }
+  },
+  {
+    REVIEW: route('review', {
+      searchParams: {
+        workqueue: string()
+      }
     })
   }
 )

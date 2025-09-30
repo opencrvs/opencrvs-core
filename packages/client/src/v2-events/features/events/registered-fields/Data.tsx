@@ -15,7 +15,7 @@ import {
   EventState,
   FieldProps,
   FieldType,
-  Inferred,
+  FieldConfig,
   isFieldVisible,
   TranslationConfig
 } from '@opencrvs/commons/client'
@@ -105,7 +105,7 @@ function DataInput({
   declarationFields
 }: FieldProps<'DATA'> & {
   formData: EventState
-  declarationFields: Inferred[]
+  declarationFields: FieldConfig[]
 }) {
   const intl = useIntl()
   const { subtitle, data } = configuration

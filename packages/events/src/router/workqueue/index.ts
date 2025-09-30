@@ -21,8 +21,8 @@ import {
 } from '@opencrvs/commons'
 import { router, publicProcedure } from '@events/router/trpc'
 import {
-  getEventConfigurations,
-  getWorkqueueConfigurations
+  getInMemoryEventConfigurations,
+  getInMemoryWorkqueueConfigurations
 } from '@events/service/config/config'
 import { getEventCount } from '@events/service/indexing/indexing'
 import { requireScopeForWorkqueues } from '@events/router/middleware'
@@ -33,16 +33,15 @@ export const workqueueRouter = router({
       .input(z.void())
       .output(z.array(WorkqueueConfig))
       .query(async (options) => {
-        return getWorkqueueConfigurations(options.ctx.token)
+        return getInMemoryWorkqueueConfigurations(options.ctx.token)
       })
   }),
   count: publicProcedure
     .input(WorkqueueCountInput)
     .use(requireScopeForWorkqueues)
     .output(WorkqueueCountOutput)
-    .query(async (options) => {
-      const scopes = getScopes({ Authorization: options.ctx.token })
-
+    .query(async ({ ctx, input }) => {
+      const scopes = getScopes(ctx.token)
       const searchScope = findScope(scopes, 'search')
       // Only to satisfy type checking, as findScope will return undefined if no scope is found
       if (!searchScope) {
@@ -53,10 +52,10 @@ export const workqueueRouter = router({
         SearchScopeAccessLevels
       >
       return getEventCount(
-        options.input,
-        await getEventConfigurations(options.ctx.token),
+        input,
+        await getInMemoryEventConfigurations(ctx.token),
         searchScopeOptions,
-        options.ctx.user.primaryOfficeId
+        ctx.user.primaryOfficeId
       )
     })
 })

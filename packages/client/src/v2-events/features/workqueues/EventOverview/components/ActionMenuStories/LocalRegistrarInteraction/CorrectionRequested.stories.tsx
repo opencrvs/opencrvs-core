@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta } from '@storybook/react'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType, ClientSpecificAction } from '@opencrvs/commons/client'
 import { AssignmentStatus } from '@client/v2-events/utils'
 import { ActionMenu } from '../../ActionMenu'
 import {
@@ -37,15 +37,16 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN,
-      ActionType.REQUEST_CORRECTION
+      ActionType.REQUEST_CORRECTION,
+      ClientSpecificAction.REVIEW_CORRECTION_REQUEST
     ],
     expected: {
       ...getHiddenActions(),
       [ActionType.ASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
       [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
-      // @TODO when correction approval/rejection is implemented, this should show 'Approve Correction' action
-      [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
+      [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN,
+      [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: AssertType.DISABLED
     }
   },
   {
@@ -57,15 +58,16 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       ActionType.DECLARE,
       ActionType.VALIDATE,
       ActionType.REGISTER,
-      ActionType.REQUEST_CORRECTION
+      ActionType.REQUEST_CORRECTION,
+      ClientSpecificAction.REVIEW_CORRECTION_REQUEST
     ],
     expected: {
       ...getHiddenActions(),
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
       [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
-      // @TODO when correction approval/rejection is implemented, this should show 'Approve Correction' action
-      [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
+      [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN,
+      [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: AssertType.ENABLED
     }
   },
   {
@@ -79,15 +81,16 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       ActionType.REGISTER,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_OTHERS,
-      ActionType.REQUEST_CORRECTION
+      ActionType.REQUEST_CORRECTION,
+      ClientSpecificAction.REVIEW_CORRECTION_REQUEST
     ],
     expected: {
       ...getHiddenActions(),
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
       [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
-      // @TODO when correction approval/rejection is implemented, this should show 'Approve Correction' action
-      [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
+      [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN,
+      [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: AssertType.DISABLED
     }
   }
 ]

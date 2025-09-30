@@ -41,11 +41,18 @@ import {
 import {
   Draft,
   EventDocument,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  TestUserRole,
+  TokenUserType,
+  UUID
 } from '@opencrvs/commons/client'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import {
+  tennisClubMembershipEventDocument,
+  tennisClubMembershipEventWithCorrectionRequest
+} from '@client/v2-events/features/events/fixtures'
 import { EventConfig } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
+
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
@@ -175,11 +182,43 @@ const preview: Preview = {
     async (options) => {
       await clearStorage()
       queryClient.clear()
+      const primaryOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 
-      window.localStorage.setItem(
-        'opencrvs',
-        generator.user.token.localRegistrar
-      )
+      if (options.parameters.userRole === TestUserRole.Enum.FIELD_AGENT) {
+        window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+        addUserToQueryData(generator.user.fieldAgent().v2)
+      } else if (
+        options.parameters.userRole === TestUserRole.Enum.REGISTRATION_AGENT
+      ) {
+        window.localStorage.setItem(
+          'opencrvs',
+          generator.user.token.registrationAgent
+        )
+
+        addUserToQueryData(generator.user.registrationAgent().v2)
+      } else if (
+        options.parameters.userRole === TestUserRole.Enum.LOCAL_SYSTEM_ADMIN
+      ) {
+        window.localStorage.setItem(
+          'opencrvs',
+          generator.user.token.localSystemAdmin
+        )
+
+        addUserToQueryData({
+          id: generator.user.id.localSystemAdmin,
+          name: [{ use: 'en', given: ['Alex'], family: 'Ngonga' }],
+          role: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN,
+          primaryOfficeId,
+          type: TokenUserType.enum.user
+        })
+      } else {
+        window.localStorage.setItem(
+          'opencrvs',
+          generator.user.token.localRegistrar
+        )
+
+        addUserToQueryData(generator.user.localRegistrar().v2)
+      }
 
       /*
        * OFFLINE DATA INITIALISATION
@@ -199,16 +238,11 @@ const preview: Preview = {
         addLocalEventConfig(config)
       })
 
-      addUserToQueryData({
-        id: generator.user.id.localRegistrar,
-        name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
-        role: 'LOCAL_REGISTRAR',
-        signature: undefined,
-        avatar: undefined
-      })
-
       const offlineEvents: Array<EventDocument> = options.parameters?.offline
-        ?.events ?? [tennisClubMembershipEventDocument]
+        ?.events ?? [
+        tennisClubMembershipEventDocument,
+        tennisClubMembershipEventWithCorrectionRequest
+      ]
 
       offlineEvents.forEach((event) => {
         setEventData(event.id, event)

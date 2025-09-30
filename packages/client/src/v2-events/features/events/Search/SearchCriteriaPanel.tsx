@@ -18,10 +18,9 @@ import {
   EventConfig,
   EventState,
   FieldValue,
-  Inferred
+  FieldConfig
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
-import { constantsMessages } from '@client/v2-events/messages'
 import { filterEmptyValues } from '@client/v2-events/utils'
 import { ValueOutput } from '@client/v2-events/features/events/components/Output'
 import { getSearchParamsFieldConfigs, serializeSearchParams } from './utils'
@@ -30,7 +29,12 @@ const messagesToDefine = {
   edit: {
     defaultMessage: 'Edit',
     description: 'Edit button text',
-    id: 'v2.buttons.edit'
+    id: 'buttons.edit'
+  },
+  event: {
+    defaultMessage: 'Event',
+    description: 'Label for Event of event in work queue list item',
+    id: 'constants.event'
   }
 }
 
@@ -65,7 +69,7 @@ function SearchParamLabel({
   value
 }: {
   eventConfig: EventConfig
-  fieldConfigs: Inferred[]
+  fieldConfigs: FieldConfig[]
   fieldName: string
   value: FieldValue
 }) {
@@ -84,7 +88,7 @@ function SearchParamLabel({
     : undefined
 
   const label = intl.formatMessage(field.label)
-  const valueOutput = <ValueOutput config={field} value={value} />
+  const valueOutput = ValueOutput({ config: field, value }, true)
   const output = (
     <>
       {prefix}
@@ -97,34 +101,28 @@ function SearchParamLabel({
 
 export function SearchCriteriaPanel({
   eventConfig,
-  searchParams
+  formValues
 }: {
   eventConfig: EventConfig
-  searchParams: EventState
+  formValues: EventState
 }) {
   const navigate = useNavigate()
   const intl = useIntl()
 
   const searchFieldConfigs = getSearchParamsFieldConfigs(
     eventConfig,
-    searchParams
+    formValues
   )
-  const filteredSearchParams = Object.fromEntries(
-    Object.entries(searchParams).filter(([key]) =>
-      searchFieldConfigs.some((config) => config.id === key)
-    )
-  )
-
   return (
     <>
       <SearchParamContainer>
         <Pill
-          key={constantsMessages.event.id}
-          label={`${intl.formatMessage(constantsMessages.event)}: ${convertPathToLabel(eventConfig.id)}`}
+          key={messagesToDefine.event.id}
+          label={`${intl.formatMessage(messagesToDefine.event)}: ${convertPathToLabel(eventConfig.id)}`}
           size="small"
           type="default"
         ></Pill>
-        {Object.entries(filteredSearchParams).map(([key, value]) => (
+        {Object.entries(formValues).map(([key, value]) => (
           <SearchParamLabel
             key={key}
             eventConfig={eventConfig}
@@ -137,7 +135,7 @@ export function SearchCriteriaPanel({
           font="bold14"
           onClick={() => {
             const nonEmptyValues = filterEmptyValues({
-              ...searchParams,
+              ...formValues,
               eventType: eventConfig.id
             })
             const serializedParams = serializeSearchParams(nonEmptyValues)

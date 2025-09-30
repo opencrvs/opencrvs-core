@@ -15,16 +15,20 @@ import { Action, ActionStatus } from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
 import { InherentFlags, EventStatus, Flag } from '../EventMetadata'
 
-function isCertificatePrinted(actions: Action[]) {
+function isPendingCertification(actions: Action[]) {
+  if (getStatusFromActions(actions) !== EventStatus.enum.REGISTERED) {
+    return false
+  }
+
   return actions.reduce<boolean>((prev, { type }) => {
     if (type === ActionType.PRINT_CERTIFICATE) {
-      return true
-    }
-    if (type === ActionType.APPROVE_CORRECTION) {
       return false
     }
+    if (type === ActionType.APPROVE_CORRECTION) {
+      return true
+    }
     return prev
-  }, false)
+  }, true)
 }
 
 function isCorrectionRequested(actions: Action[]) {
@@ -47,7 +51,22 @@ function isDeclarationIncomplete(actions: Action[]): boolean {
 }
 
 function isRejected(actions: Action[]): boolean {
-  return getStatusFromActions(actions) === EventStatus.enum.REJECTED
+  return actions.at(-1)?.type === ActionType.REJECT
+}
+
+function isPotentialDuplicate(actions: Action[]): boolean {
+  return actions.reduce<boolean>((prev, { type }) => {
+    if (type === ActionType.DUPLICATE_DETECTED) {
+      return true
+    }
+    if (
+      type === ActionType.MARK_AS_NOT_DUPLICATE ||
+      type === ActionType.MARK_AS_DUPLICATE
+    ) {
+      return false
+    }
+    return prev
+  }, false)
 }
 
 export function getFlagsFromActions(actions: Action[]): Flag[] {
@@ -78,8 +97,8 @@ export function getFlagsFromActions(actions: Action[]): Flag[] {
       return flag satisfies Flag
     })
 
-  if (isCertificatePrinted(sortedActions)) {
-    flags.push(InherentFlags.PRINTED)
+  if (isPendingCertification(sortedActions)) {
+    flags.push(InherentFlags.PENDING_CERTIFICATION)
   }
   if (isCorrectionRequested(sortedActions)) {
     flags.push(InherentFlags.CORRECTION_REQUESTED)
@@ -89,6 +108,9 @@ export function getFlagsFromActions(actions: Action[]): Flag[] {
   }
   if (isRejected(sortedActions)) {
     flags.push(InherentFlags.REJECTED)
+  }
+  if (isPotentialDuplicate(sortedActions)) {
+    flags.push(InherentFlags.POTENTIAL_DUPLICATE)
   }
 
   return flags

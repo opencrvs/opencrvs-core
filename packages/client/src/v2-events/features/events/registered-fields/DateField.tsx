@@ -11,17 +11,22 @@
 
 import format from 'date-fns/format'
 import * as React from 'react'
-import { defineMessages, IntlShape, useIntl } from 'react-intl'
-import { DatetimeValue, DateValue } from '@opencrvs/commons/client'
+import { defineMessages, useIntl } from 'react-intl'
+import {
+  DateField as DateFieldType,
+  DatetimeValue,
+  DateValue
+} from '@opencrvs/commons/client'
 import {
   DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
 } from '@opencrvs/components/lib/DateField'
+import { StringifierContext } from './RegisteredField'
 
 const messages = defineMessages({
   dateFormat: {
     defaultMessage: 'd MMMM y',
-    id: 'v2.configuration.dateFormat',
+    id: 'configuration.dateFormat',
     description: 'Default format for date values'
   }
 })
@@ -83,14 +88,17 @@ function DateOutput({ value }: { value?: string }) {
   return String(value ?? '')
 }
 
-function stringify(intl: IntlShape, value?: string) {
+function stringify(
+  value: string | undefined,
+  context: StringifierContext<DateFieldType>
+) {
   // We should allow parsing valid datetimes into the configured date format.
   const parsed = DateValue.or(DatetimeValue).safeParse(value)
 
   if (parsed.success) {
     return format(
       new Date(parsed.data),
-      intl.formatMessage(messages.dateFormat)
+      context.intl.formatMessage(messages.dateFormat)
     )
   }
 
@@ -100,5 +108,6 @@ function stringify(intl: IntlShape, value?: string) {
 export const DateField = {
   Input: DateInput,
   Output: DateOutput,
-  stringify: stringify
+  stringify,
+  toCertificateVariables: stringify
 }

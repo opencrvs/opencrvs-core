@@ -8,11 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { on } from 'events'
 import React from 'react'
-import { IntlShape, useIntl } from 'react-intl'
 import {
-  FieldProps,
+  FieldPropsWithoutReferenceValue,
   RadioGroup as RadioGroupField,
   SelectOption
 } from '@opencrvs/commons/client'
@@ -21,6 +19,8 @@ import {
   RadioSize
 } from '@opencrvs/components'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
+import { useIntlWithFormData } from '@client/v2-events/messages/utils'
+import { StringifierContext } from './RegisteredField'
 
 function RadioGroupInput({
   onChange,
@@ -28,16 +28,20 @@ function RadioGroupInput({
   options,
   configuration,
   ...props
-}: FieldProps<'RADIO_GROUP'> & {
+}: FieldPropsWithoutReferenceValue<'RADIO_GROUP'> & {
   onChange: (val: string | undefined) => void
   value?: string
+  disabled?: boolean
 }) {
-  const intl = useIntl()
+  const intl = useIntlWithFormData()
 
   const selectedOption = options.find((option) => option.value === value)
   const formattedOptions = options.map((option: SelectOption) => ({
     value: option.value,
-    label: intl.formatMessage(option.label)
+    label:
+      typeof option.label === 'string'
+        ? option.label
+        : intl.formatMessage(option.label)
   }))
 
   const inputValue = selectedOption?.value ?? ''
@@ -66,32 +70,50 @@ function RadioGroupOutput({
   value: Stringifiable
   options: SelectOption[]
 }) {
-  const intl = useIntl()
+  const intl = useIntlWithFormData()
   const selectedOption = options.find((option) => option.value === value)
 
-  return selectedOption ? intl.formatMessage(selectedOption.label) : ''
+  if (!selectedOption) {
+    return ''
+  }
+
+  if (typeof selectedOption.label === 'string') {
+    return selectedOption.label
+  }
+
+  return intl.formatMessage(selectedOption.label)
 }
 
 function stringify(
-  intl: IntlShape,
   value: string,
-  fieldConfig: RadioGroupField
+  { intl, config }: StringifierContext<RadioGroupField>
 ) {
-  const option = fieldConfig.options.find((opt) => opt.value === value)
+  if (!config) {
+    return value
+  }
+
+  const option = config.options.find((opt) => opt.value === value)
 
   if (!option) {
     // eslint-disable-next-line no-console
     console.error(
-      `Could not find option with value ${value} for field ${fieldConfig.id}`
+      `Could not find option with value ${value} for field ${config.id}`
     )
     return value
   }
 
-  return intl.formatMessage(option.label)
+  return typeof option.label === 'string'
+    ? option.label
+    : intl.formatMessage(option.label)
+}
+
+function isRadioGroupEmpty(value: Stringifiable) {
+  return !value.toString()
 }
 
 export const RadioGroup = {
   Input: RadioGroupInput,
   Output: RadioGroupOutput,
+  isEmptyValue: isRadioGroupEmpty,
   stringify
 }

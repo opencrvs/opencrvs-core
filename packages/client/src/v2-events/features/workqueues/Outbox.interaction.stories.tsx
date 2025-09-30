@@ -19,7 +19,9 @@ import {
   generateEventDocument,
   getCurrentEventState,
   footballClubMembershipEvent,
-  FullDocumentPath
+  FullDocumentPath,
+  UUID,
+  User
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -27,7 +29,6 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { wrapHandlersWithSpies } from '@client/tests/v2-events/declaration.utils'
 import { ReviewIndex } from '../events/actions/declare/Review'
-import { tennisClubMembershipEventIndex } from '../events/fixtures'
 
 const generator = testDataGenerator()
 
@@ -52,7 +53,7 @@ export default meta
 
 const OUTBOX_FREEZE_TIME = 5 * 1000 // 5 seconds
 
-const eventDocument = generateEventDocument({
+const createdEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [ActionType.CREATE]
 })
@@ -70,14 +71,9 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 const declarationTrpcMsw = {
   events: wrapHandlersWithSpies([
     {
-      name: 'event.list',
-      procedure: tRPCMsw.event.list.query,
-      handler: () => [tennisClubMembershipEventIndex]
-    },
-    {
       name: 'event.create',
       procedure: tRPCMsw.event.create.mutation,
-      handler: () => eventDocument
+      handler: () => createdEventDocument
     },
     {
       name: 'event.actions.declare.request',
@@ -90,19 +86,7 @@ const declarationTrpcMsw = {
   ])
 }
 
-const mockUser = {
-  id: '67bda93bfc07dee78ae558cf',
-  name: [
-    {
-      use: 'en',
-      given: ['Kalusha'],
-      family: 'Bwalya'
-    }
-  ],
-  role: 'SOCIAL_WORKER',
-  signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined
-}
+const mockUser = generator.user.fieldAgent().v2
 
 export const Outbox: Story = {
   loaders: [
@@ -117,12 +101,12 @@ export const Outbox: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: createdEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
     offline: {
-      events: [eventDocument, declareEventDocument],
+      events: [createdEventDocument],
       configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
     },
     msw: {
@@ -132,7 +116,7 @@ export const Outbox: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.registrationAgent()
+                getUser: generator.user.registrationAgent().v1
               }
             })
           }),

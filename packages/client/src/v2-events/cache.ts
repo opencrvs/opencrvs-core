@@ -11,7 +11,7 @@
 
 import {
   FullDocumentPath,
-  FullDocumentURL,
+  FullDocumentUrl,
   joinValues
 } from '@opencrvs/commons/client'
 
@@ -19,6 +19,11 @@ import {
 export const CACHE_NAME = 'workbox-runtime'
 
 export function getFullDocumentPath(filename: string): FullDocumentPath {
+  if (filename.startsWith('/' + window.config.MINIO_BUCKET)) {
+    // already a full path
+    return filename as FullDocumentPath
+  }
+
   return ('/' +
     joinValues([window.config.MINIO_BUCKET, filename], '/')) as FullDocumentPath
 }
@@ -26,11 +31,11 @@ export function getFullDocumentPath(filename: string): FullDocumentPath {
  * Files are stored in MinIO. Files should be accessed via unsigned URLs, utilizing browser cache and aggressively precaching them.
  * @returns unsigned URL to the file in MinIO. Assumes file has been cached.
  */
-export function getUnsignedFileUrl(path: FullDocumentPath): FullDocumentURL {
+export function getUnsignedFileUrl(path: FullDocumentPath): FullDocumentUrl {
   return new URL(
     path,
     window.config.MINIO_BASE_URL
-  ).toString() as FullDocumentURL
+  ).toString() as FullDocumentUrl
 }
 
 /**
@@ -76,7 +81,9 @@ export async function removeCached(filename: string) {
   }
 
   const cache = await caches.open(cacheKey)
-  return cache.delete(getUnsignedFileUrl(getFullDocumentPath(filename)))
+  return cache.delete(getUnsignedFileUrl(getFullDocumentPath(filename)), {
+    ignoreSearch: true
+  })
 }
 
 export async function ensureCacheExists(cacheName: string) {

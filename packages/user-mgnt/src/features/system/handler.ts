@@ -27,7 +27,7 @@ import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import * as Joi from 'joi'
 import uuid from 'uuid/v4'
-import { getEventConfigurations } from './countryconfig'
+import { getInMemoryEventConfigurations } from './countryconfig'
 
 export enum EventType {
   Birth = 'birth',
@@ -70,6 +70,13 @@ export async function registerSystem(
       }
     }
 
+    if (type === types.IMPORT_EXPORT && !settings) {
+      settings = {
+        dailyQuota: 1000000, //Arbitrary high number, should we make this configurable?
+        webhook: []
+      }
+    }
+
     const authorization = request.headers.authorization as string
     const token = getTokenPayload(authorization.split(' ')[1])
     const userId = token.sub
@@ -85,7 +92,8 @@ export async function registerSystem(
       throw new Error('System with NATIONAL_ID already exists !')
     }
 
-    const eventConfigurations = await getEventConfigurations(authorization)
+    const eventConfigurations =
+      await getInMemoryEventConfigurations(authorization)
     const eventIds = eventConfigurations.map((eventConfig) => eventConfig.id)
     const systemScopes = getSystemIntegrationRoleScopes(type, eventIds)
 
@@ -126,7 +134,9 @@ export async function registerSystem(
       )
     }
 
-    if (type === types.WEBHOOK || type === types.RECORD_SEARCH) {
+    if (
+      [types.WEBHOOK, types.RECORD_SEARCH, types.IMPORT_EXPORT].includes(type)
+    ) {
       const systemDetails = {
         client_id,
         name: name || systemAdminUser.username,
@@ -318,7 +328,7 @@ interface IGetSystemPayload {
 
 export async function getSystemHandler(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  _h: Hapi.ResponseToolkit
 ) {
   const { systemId, clientId } = request.payload as IGetSystemPayload
   let criteria = {}

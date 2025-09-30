@@ -1,4 +1,0 @@
-{
-  "watch": ["src/**", "../commons/build/**"],
-  "ext": "js,ts"
-}

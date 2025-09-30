@@ -177,6 +177,9 @@ export const QueryExpression = z
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
     'legalStatuses.REGISTERED.acceptedAt': z.optional(DateCondition),
+    'legalStatuses.DECLARED.createdAtLocation': z.optional(
+      z.union([Within, Exact])
+    ),
     'legalStatuses.REGISTERED.createdAtLocation': z.optional(
       z.union([Within, Exact])
     ),
@@ -203,50 +206,79 @@ export const QueryExpression = z
 export const QueryType = z
   .object({
     type: z.literal('and').or(z.literal('or')).openapi({ default: 'and' }),
-    clauses: z.preprocess(
-      (val) => {
-        // When `QueryType` is used as a query parameter in a REST API:
-
-        // If `clauses` contains a single item, it may be sent as a JSON string instead of an array.
-        // We wrap it in an array and parse it.
-        if (typeof val === 'string') {
-          return [JSON.parse(val)]
-        }
-        // If `clauses` contains multiple items, each item may still be sent as a separate JSON string.
-        // We parse each string into its corresponding object.
-        if (Array.isArray(val)) {
-          return val.map((v) => (typeof v === 'string' ? JSON.parse(v) : v))
-        }
-        // If `clauses` is already passed correctly (e.g., via tRPC), we return it as-is.
-        return val
-
-        // This preprocessing ensures consistent handling of `clauses` regardless of how the client submits the data.
-      },
-      z
-        .array(QueryExpression)
-        .nonempty('At least one clause is required.')
-        .openapi({
-          default: [
-            {
-              eventType: TENNIS_CLUB_MEMBERSHIP,
-              status: {
-                type: 'anyOf',
-                terms: EventStatus.options
-              },
-              updatedAt: {
-                type: 'range',
-                gte: '2025-05-22',
-                lte: '2025-05-29'
-              },
-              data: {}
-            }
-          ]
-        })
-    )
+    clauses: z
+      .array(QueryExpression)
+      .nonempty('At least one clause is required.')
+      .openapi({
+        default: [
+          {
+            eventType: TENNIS_CLUB_MEMBERSHIP,
+            status: {
+              type: 'anyOf',
+              terms: EventStatus.options
+            },
+            updatedAt: {
+              type: 'range',
+              gte: '2025-05-22',
+              lte: '2025-05-29'
+            },
+            data: {}
+          }
+        ]
+      })
   })
   .openapi({
     ref: 'QueryType'
   })
+
+function parseStringifiedQueryField(val: unknown) {
+  if (typeof val === 'string') {
+    return JSON.parse(val)
+  }
+  return val
+}
+
+export const SearchQuery = z
+  .object({
+    query: z.preprocess(parseStringifiedQueryField, QueryType).openapi({
+      default: {
+        type: 'and',
+        clauses: [
+          {
+            eventType: TENNIS_CLUB_MEMBERSHIP,
+            status: {
+              type: 'anyOf',
+              terms: EventStatus.options
+            },
+            updatedAt: {
+              type: 'range',
+              gte: '2025-05-22',
+              lte: '2025-05-29'
+            },
+            data: {}
+          }
+        ]
+      }
+    }),
+    limit: z.number().optional().default(100),
+    offset: z.number().optional().default(0),
+    sort: z
+      .preprocess(
+        parseStringifiedQueryField,
+        z.array(
+          z.object({
+            field: z.string(),
+            direction: z.enum(['asc', 'desc']).default('asc')
+          })
+        )
+      )
+      .optional()
+  })
+  .openapi({
+    ref: 'SearchQuery'
+  })
+
+export type SearchQuery = z.infer<typeof SearchQuery>
 
 export type QueryType = z.infer<typeof QueryType>
 export type QueryExpression = z.infer<typeof QueryExpression>

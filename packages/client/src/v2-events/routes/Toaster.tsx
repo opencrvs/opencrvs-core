@@ -19,14 +19,20 @@ import { MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
 
 export enum ToastKey {
-  NOT_ASSIGNED_ERROR = 'v2.errors.notAssigned'
+  NOT_ASSIGNED_ERROR = 'errors.notAssigned',
+  SOMETHING_WENT_WRONG = 'errors.somethingWentWrong'
 }
 
 const availableToasts: Record<ToastKey, MessageDescriptor> = {
   [ToastKey.NOT_ASSIGNED_ERROR]: {
-    id: 'v2.errors.notAssigned',
+    id: 'errors.notAssigned',
     defaultMessage: "You've been unassigned from the event",
     description: 'User not assigned error toast message'
+  },
+  [ToastKey.SOMETHING_WENT_WRONG]: {
+    id: 'errors.somethingWentWrong',
+    defaultMessage: 'Something went wrong. Please try again.',
+    description: 'Error toast message for general errors'
   }
 }
 

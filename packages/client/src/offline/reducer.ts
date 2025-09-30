@@ -102,7 +102,9 @@ export interface IOfflineData {
   locations: ILocationDataResponse
   forms: IForms
   facilities: IFacilitiesDataResponse
+  activeFacilities: IFacilitiesDataResponse
   offices: IOfficesDataResponse
+  activeOffices: IOfficesDataResponse
   languages: ILanguage[]
   templates: {
     fonts?: CertificateConfiguration['fonts']
@@ -559,6 +561,11 @@ function reducer(
 
     case actions.FACILITIES_LOADED: {
       const facilities = filterLocations(action.payload, 'HEALTH_FACILITY')
+      const activeFacilities = Object.fromEntries(
+        Object.entries(facilities).filter(
+          ([, facility]) => facility.status === 'active'
+        )
+      )
 
       const offices = filterLocations(
         action.payload,
@@ -577,12 +584,20 @@ function reducer(
               state.userDetails.primaryOffice.id
         }*/
       )
+      const activeOffices = Object.fromEntries(
+        Object.entries(offices).filter(
+          ([, office]) => office.status === 'active'
+        )
+      )
+
       return {
         ...state,
         offlineData: {
           ...state.offlineData,
           facilities,
-          offices
+          activeFacilities,
+          offices,
+          activeOffices
         }
       }
     }

@@ -30,7 +30,7 @@ export function Outbox() {
   const outboxColumns = defineWorkqueuesColumns([
     {
       label: {
-        id: 'v2.workqueues.dateOfEvent',
+        id: 'workqueues.dateOfEvent',
         defaultMessage: 'Date of Event',
         description: 'Label for workqueue column: dateOfEvent'
       },
@@ -44,10 +44,12 @@ export function Outbox() {
 
   return (
     <SearchResultComponent
+      allowRetry={true}
       columns={outboxColumns}
       eventConfigs={eventConfigs}
       queryData={outbox}
       title={intl.formatMessage(WORKQUEUE_OUTBOX.name)}
+      totalResults={outbox.length}
       {...searchParams}
     />
   )

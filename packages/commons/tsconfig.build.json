@@ -1,10 +1,12 @@
 {
-  "extends": "./tsconfig.json",
-  "exclude": [
-    "node_modules",
-    "build",
-    "test/setupJest.ts",
-    "src/client.ts",
-    "src/**/*.test.ts"
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "./tsconfig-esm.json"
+    },
+    {
+      "path": "./tsconfig-commonjs.json"
+    }
   ]
 }

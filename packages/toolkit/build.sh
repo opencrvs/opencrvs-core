@@ -19,6 +19,8 @@ npx tsc --build
 npx esbuild src/events/index.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external
 mkdir -p ./dist/commons/events
 cp -r ../commons/build/dist/common/events/*.d.ts ./dist/commons/events
+mkdir -p ./dist/commons/events/state
+cp -r ../commons/build/dist/common/events/state/*.d.ts ./dist/commons/events/state
 
 # Build common conditionals
 npx esbuild src/conditionals/index.ts --bundle --format=cjs --outdir=./dist/conditionals --allow-overwrite --packages=external
@@ -33,6 +35,15 @@ cp -r ../commons/build/dist/common/scopes.d.ts ./dist/scopes/index.d.ts
 npx esbuild src/api/index.ts --bundle --format=cjs --outdir=./dist/api --allow-overwrite --packages=external
 mkdir -p ./dist/commons/api
 cp -r ../events/build/types/router/router.d.ts ./dist/commons/api
+
+# Build deduplication api
+npx esbuild src/events/deduplication.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external
+cp -r ../commons/build/dist/common/events/deduplication.d.ts ./dist/events/deduplication.d.ts
+
+# Build common notifications
+npx esbuild src/notification/index.ts --bundle --format=cjs --outdir=./dist/notification --allow-overwrite --packages=external
+mkdir -p ./dist/commons/notification
+cp -r ../commons/build/dist/common/notification/*.d.ts ./dist/commons/notification
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   sed -i '' 's|@opencrvs/events/build/types|../commons/api|g' dist/api/index.d.ts

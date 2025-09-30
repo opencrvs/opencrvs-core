@@ -30,7 +30,6 @@ import {
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { RejectionState, Review } from './Review'
@@ -45,7 +44,7 @@ const mockDeclaration = {
     country: 'FAR',
     addressType: AddressType.DOMESTIC,
     province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-    district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+    district: '27160bbd-32d1-4625-812f-860226bfb92a',
     street: '123 Tennis Club Avenue',
     number: '123',
     zipCode: 'Z12345',
@@ -104,12 +103,12 @@ export const ReviewWithoutChanges: Story = {
 
 const reviewActionMessages = {
   title: {
-    id: 'v2.changeModal.title',
+    id: 'changeModal.title',
     defaultMessage: 'This is a title',
     description: 'The title for review action'
   },
   description: {
-    id: 'v2.changeModal.description',
+    id: 'changeModal.description',
     defaultMessage: 'This is a description',
     description: 'The title for review action'
   },
@@ -227,9 +226,7 @@ export const ReviewWithValidationErrors: Story = {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        urbanOrRural: 'RURAL',
-        village: 'Tennisville'
+        administrativeArea: 'invalid-uuid'
       } as AddressFieldValue
     }
   },
@@ -361,8 +358,7 @@ export const ReviewWithConditionallyHiddenFields: Story = {
                     }
                   ]
                 },
-                // By default, checkboxes are hidden unless selected
-                // I.e. this should be hidden
+                // These fields should be shown, since there are no conditions
                 {
                   id: 'has-it-been-a-nice-day',
                   type: FieldType.CHECKBOX,
@@ -373,7 +369,6 @@ export const ReviewWithConditionallyHiddenFields: Story = {
                     id: 'has-it-been-a-nice-day.label'
                   }
                 },
-                // This field should be shown, since its selected
                 {
                   id: 'are-you-feeling-all-right',
                   type: FieldType.CHECKBOX,
@@ -545,7 +540,7 @@ export const ReviewWithIncompleteName: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
         eventId: eventDocumentWithoutSurname.id
       })
     }

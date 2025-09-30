@@ -9,41 +9,51 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
+import {
+  MiddlewareFunction,
+  TRPCError
+} from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import {
+  ActionInputWithType,
   ActionType,
   ActionUpdate,
-  DeclarationUpdateActions,
   AnnotationActionType,
-  EventConfig,
-  isPageVisible,
-  getVisibleVerificationPageIds,
-  annotationActions,
-  findRecordActionPages,
-  DeclarationUpdateActionType,
-  getActionReviewFields,
-  getDeclaration,
-  DeclarationActions,
-  getCurrentEventState,
-  omitHiddenPaginatedFields,
-  EventDocument,
-  deepMerge,
-  deepDropNulls,
-  omitHiddenFields,
-  EventState,
-  Inferred,
-  isFieldVisible,
-  errorMessages,
-  runFieldValidations,
-  ActionInputWithType,
   ApproveCorrectionActionInput,
-  RejectCorrectionActionInput
+  DeclarationActions,
+  DeclarationUpdateActionType,
+  DeclarationUpdateActions,
+  EventConfig,
+  EventDocument,
+  EventState,
+  FieldConfig,
+  RejectCorrectionActionInput,
+  annotationActions,
+  deepDropNulls,
+  deepMerge,
+  errorMessages,
+  findRecordActionPages,
+  getActionReviewFields,
+  getCurrentEventState,
+  getDeclaration,
+  getVisibleVerificationPageIds,
+  isFieldVisible,
+  isPageVisible,
+  omitHiddenFields,
+  omitHiddenPaginatedFields,
+  runFieldValidations,
+  runStructuralValidations,
+  LocationType,
+  UUID
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
-import { getEventById } from '@events/service/events/events'
-import { TrpcContext } from '@events/context'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
+import { getEventById } from '@events/service/events/events'
+import {
+  getLeafLocationIds,
+  isLeafLocation
+} from '@events/storage/postgres/events/locations'
+import { TrpcContext } from '@events/context'
 import {
   getInvalidUpdateKeys,
   getVerificationPageErrors,
@@ -51,9 +61,10 @@ import {
 } from './utils'
 
 export function getFieldErrors(
-  fields: Inferred[],
+  fields: FieldConfig[],
   data: ActionUpdate,
-  declaration: EventState = {}
+  declaration: EventState = {},
+  context?: { leafAdminStructureLocationIds: Array<{ id: UUID }> }
 ) {
   const visibleFields = fields.filter((field) =>
     isFieldVisible(field, { ...data, ...declaration })
@@ -87,7 +98,8 @@ export function getFieldErrors(
   const visibleFieldErrors = visibleFields.flatMap((field) => {
     const fieldErrors = runFieldValidations({
       field,
-      values: data
+      values: data,
+      context
     })
 
     return fieldErrors.errors.map((error) => ({
@@ -105,14 +117,15 @@ function validateDeclarationUpdateAction({
   event,
   actionType,
   declarationUpdate,
-  annotation
+  annotation,
+  context
 }: {
   eventConfig: EventConfig
   event: EventDocument
   actionType: DeclarationUpdateActionType
   declarationUpdate: ActionUpdate
-  // @TODO: annotation is always specific to action. Is there ever a need for null?
   annotation?: ActionUpdate
+  context: { leafAdminStructureLocationIds: Array<{ id: UUID }> }
 }) {
   /*
    * Declaration allows partial updates. Updates are validated against primitive types (zod) and field based custom validators (JSON schema).
@@ -130,7 +143,7 @@ function validateDeclarationUpdateAction({
   const declarationConfig = getDeclaration(eventConfig)
 
   // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
-  // (e.g. when dob is unknown anduser has send the age previously.Now they only send dob, without setting dob unknown to false).
+  // (e.g. when dob is unknown and user has send the age previously. Now they only send dob, without setting dob unknown to false).
   const cleanedDeclaration = omitHiddenPaginatedFields(
     declarationConfig,
     completeDeclaration
@@ -154,7 +167,9 @@ function validateDeclarationUpdateAction({
 
   const declarationErrors = getFieldErrors(
     allVisiblePageFields,
-    cleanedDeclaration
+    cleanedDeclaration,
+    {},
+    context
   )
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
@@ -169,7 +184,11 @@ function validateDeclarationUpdateAction({
     deepDropNulls(annotation ?? {})
   )
 
-  const annotationErrors = getFieldErrors(reviewFields, visibleAnnotationFields)
+  const annotationErrors = getFieldErrors(
+    reviewFields,
+    visibleAnnotationFields,
+    {}
+  )
 
   return [...declarationErrors, ...annotationErrors]
 }
@@ -233,7 +252,7 @@ function validateNotifyAction({
         }
       }
 
-      const fieldErrors = runFieldValidations({
+      const fieldErrors = runStructuralValidations({
         field,
         values: annotation
       })
@@ -258,8 +277,8 @@ function validateNotifyAction({
         }
       }
 
-      const fieldErrors = runFieldValidations({
-        field,
+      const fieldErrors = runStructuralValidations({
+        field: { ...field, required: false },
         values: declaration
       })
 
@@ -322,15 +341,19 @@ function validateCorrectableFields({
 export const validateAction: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
-  TrpcContext,
-  TrpcContext & { isDuplicateAction?: boolean; event: EventDocument },
+  unknown,
+  unknown,
   ActionInputWithType
 > = async ({ input, next, ctx }) => {
   const actionType = input.type
+
+  const leafAdminStructureLocationIds = await getLeafLocationIds({
+    locationTypes: [LocationType.enum.ADMIN_STRUCTURE]
+  })
   const event = await getEventById(input.eventId)
   const eventConfig = await getEventConfigurationById({
-    token: ctx.token,
-    eventType: event.type
+    eventType: event.type,
+    token: ctx.token
   })
 
   const declaration = getCurrentEventState(event, eventConfig).declaration
@@ -370,7 +393,8 @@ export const validateAction: MiddlewareFunction<
       event,
       declarationUpdate: input.declaration,
       annotation: input.annotation,
-      actionType: declarationUpdateAction.data
+      actionType: declarationUpdateAction.data,
+      context: { leafAdminStructureLocationIds: leafAdminStructureLocationIds }
     })
 
     throwWhenNotEmpty(errors)
@@ -392,4 +416,45 @@ export const validateAction: MiddlewareFunction<
   }
 
   throw new Error('Trying to validate unsupported action type')
+}
+
+// When performing actions via REST API, we need to ensure that a valid 'createdAtLocation' is provided in the payload.
+// For normal users, the createdAtLocation is resolved on the backend from the user's primaryOfficeId.
+export const requireLocationForSystemUserAction: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  ActionInputWithType
+> = async ({ input, next, ctx }) => {
+  const { user } = ctx
+
+  if (user.type !== 'system') {
+    if (input.createdAtLocation) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'createdAtLocation is not allowed for non-system users'
+      })
+    }
+
+    return next()
+  }
+
+  if (!input.createdAtLocation) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'createdAtLocation is required and must be a valid office id'
+    })
+  }
+
+  // Ensure given location is a leaf location, i.e. an office location
+  const isLeaf = await isLeafLocation(input.createdAtLocation)
+  if (!isLeaf) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'createdAtLocation must be an office location'
+    })
+  }
+
+  return next()
 }

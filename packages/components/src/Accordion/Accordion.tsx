@@ -36,6 +36,7 @@ const AccordionHeader = styled.div`
 `
 
 const AccordionHeaderTitle = styled.div`
+  flex: 1;
   h2 {
     margin-top: 0;
     margin-bottom: 6px;

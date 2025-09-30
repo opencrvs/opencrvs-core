@@ -98,7 +98,6 @@ export const REGISTRAR_DEFAULT_SCOPES = [
   SCOPES.RECORD_EXPORT_RECORDS,
   SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
   SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
-  SCOPES.RECORD_CREATE_COMMENTS,
   SCOPES.PERFORMANCE_READ,
   SCOPES.PERFORMANCE_READ_DASHBOARDS,
   SCOPES.ORGANISATION_READ_LOCATIONS,
@@ -121,7 +120,6 @@ export const REGISTRATION_AGENT_DEFAULT_SCOPES = [
   SCOPES.RECORD_EXPORT_RECORDS,
   SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
   SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
-  SCOPES.RECORD_CREATE_COMMENTS,
   SCOPES.PERFORMANCE_READ,
   SCOPES.PERFORMANCE_READ_DASHBOARDS,
   SCOPES.ORGANISATION_READ_LOCATIONS,
@@ -986,7 +984,9 @@ export const mockOfflineDataDispatch = {
   templates: mockOfflineData.templates,
   locations: mockOfflineData.locations,
   facilities: mockOfflineData.facilities,
+  activeFacilities: mockOfflineData.facilities,
   offices: mockOfflineData.offices,
+  activeOffices: mockOfflineData.offices,
   assets: mockOfflineData.assets,
   config: mockOfflineData.config,
   anonymousConfig: mockOfflineData.anonymousConfig,
@@ -1718,7 +1718,11 @@ export const mockUserGraphqlOperation = {
       { user: mockCompleteFormData },
       '',
       userDetails,
-      mockOfflineData,
+      {
+        ...mockOfflineData,
+        activeFacilities: mockOfflineData.facilities,
+        activeOffices: mockOfflineData.offices
+      },
       undefined
     )
   },

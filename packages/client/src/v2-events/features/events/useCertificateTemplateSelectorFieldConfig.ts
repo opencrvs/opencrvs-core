@@ -9,14 +9,35 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FieldConfig, FieldType } from '@opencrvs/commons/client'
+import formatISO from 'date-fns/formatISO'
+import {
+  areCertificateConditionsMet,
+  EventDocument,
+  EventState,
+  FieldConfig,
+  FieldType
+} from '@opencrvs/commons/client'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
 export const CERT_TEMPLATE_ID = 'certificateTemplateId'
 export const useCertificateTemplateSelectorFieldConfig = (
-  eventType: string
+  eventType: string,
+  declaration: EventState,
+  event: EventDocument
 ): FieldConfig => {
   const { certificateTemplates } = useAppConfig()
+
+  const declarationWithEventMetadata = {
+    $form: declaration,
+    $event: event,
+    $now: formatISO(new Date(), { representation: 'date' })
+  }
+
+  // Filter out certificates that are not for the event type and are not v2 templates
+  const eventCertificateTemplates = certificateTemplates.filter(
+    (x) => x.event === eventType && x.isV2Template
+  )
+
   return {
     id: CERT_TEMPLATE_ID,
     type: FieldType.SELECT,
@@ -24,13 +45,20 @@ export const useCertificateTemplateSelectorFieldConfig = (
     label: {
       defaultMessage: 'Type',
       description: 'This is the label for the field',
-      id: 'v2.event.default.action.certificate.template.type.label'
+      id: 'event.default.action.certificate.template.type.label'
     },
-    defaultValue: certificateTemplates.find(
+    defaultValue: eventCertificateTemplates.find(
       (x) => x.event === eventType && x.isDefault
     )?.id,
-    options: certificateTemplates
-      .filter((x) => x.event === eventType)
+    options: eventCertificateTemplates
+      .filter(
+        (template) =>
+          !template.conditionals ||
+          areCertificateConditionsMet(
+            template.conditionals,
+            declarationWithEventMetadata
+          )
+      )
       .map((x) => ({ label: x.label, value: x.id }))
   }
 }

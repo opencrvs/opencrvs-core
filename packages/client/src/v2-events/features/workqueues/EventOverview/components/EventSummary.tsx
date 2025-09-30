@@ -15,7 +15,10 @@ import {
   EventConfig,
   getDeclarationFields,
   areConditionsMet,
-  getMixedPath
+  getMixedPath,
+  Flag,
+  ActionFlag,
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -27,84 +30,100 @@ import { Output } from '@client/v2-events/features/events/components/Output'
 const messages = {
   assignedTo: {
     label: {
-      id: 'v2.event.summary.assignedTo.label',
+      id: 'event.summary.assignedTo.label',
       defaultMessage: 'Assigned to',
       description: 'Assigned to label'
     },
     value: {
-      id: 'v2.event.summary.assignedTo.value',
+      id: 'event.summary.assignedTo.value',
       defaultMessage: '{event.assignedTo}',
       description: 'Assigned to value'
     },
     emptyValueMessage: {
-      id: 'v2.event.summary.assignedTo.empty',
+      id: 'event.summary.assignedTo.empty',
       defaultMessage: 'Not assigned',
       description: 'Not assigned message'
     }
   },
   status: {
     label: {
-      id: 'v2.event.summary.status.label',
+      id: 'event.summary.status.label',
       defaultMessage: 'Status',
       description: 'Status of the event'
     },
     value: {
-      id: 'v2.event.summary.status.value',
+      id: 'event.summary.status.value',
       defaultMessage:
-        '{event.status, select, CREATED {Draft} NOTIFIED {Incomplete} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
+        '{event.status, select, CREATED {Draft} NOTIFIED {Notified} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARK_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
       description: 'Status of the event'
+    }
+  },
+  flags: {
+    label: {
+      id: 'event.summary.flags.label',
+      defaultMessage: 'Flags',
+      description: 'Flags of the event'
+    },
+    placeholder: {
+      id: 'event.summary.flags.placeholder',
+      defaultMessage: 'No flags',
+      description: 'Message when no flags are present'
     }
   },
   event: {
     label: {
-      id: 'v2.event.summary.event.label',
+      id: 'event.summary.event.label',
       defaultMessage: 'Event',
       description: 'Event label'
     }
   },
   trackingId: {
     label: {
-      id: 'v2.event.summary.trackingId.label',
+      id: 'event.summary.trackingId.label',
       defaultMessage: 'Tracking ID',
       description: 'Tracking id label'
     },
     emptyValueMessage: {
-      id: 'v2.event.summary.trackingId.empty',
+      id: 'event.summary.trackingId.empty',
       defaultMessage: 'No tracking ID',
       description: 'No tracking ID message'
     },
     value: {
-      id: 'v2.event.summary.trackingId.value',
+      id: 'event.summary.trackingId.value',
       defaultMessage: '{event.trackingId}',
       description: 'Tracking id value'
     }
   },
   registrationNumber: {
     label: {
-      id: 'v2.event.summary.registrationNumber.label',
+      id: 'event.summary.registrationNumber.label',
       defaultMessage: 'Registration Number',
       description: 'Registration Number label'
     },
     emptyValueMessage: {
-      id: 'v2.event.summary.registrationNumber.empty',
+      id: 'event.summary.registrationNumber.empty',
       defaultMessage: 'No registration number',
       description: 'No registration number message'
     },
     value: {
-      id: 'v2.event.summary.registrationNumber.value',
+      id: 'event.summary.registrationNumber.value',
       defaultMessage: '{event.registrationNumber}',
       description: 'Registration number value'
     }
   }
 }
 
+export const summaryMessages = messages
+
 export function EventSummary({
   event,
   eventConfiguration,
+  flags,
   hideSecuredFields = false
 }: {
   event: Record<string, FieldValue | null>
   eventConfiguration: EventConfig
+  flags: Flag[]
   hideSecuredFields?: boolean
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
@@ -133,11 +152,13 @@ export function EventSummary({
         label: field.label ?? config.label,
         emptyValueMessage: field.emptyValueMessage,
         secured: config.secured ?? false,
-        value: Output({
-          field: config,
-          showPreviouslyMissingValuesAsChanged: false,
-          value
-        })
+        value: (
+          <Output
+            field={config}
+            showPreviouslyMissingValuesAsChanged={false}
+            value={value}
+          />
+        )
       }
     }
 
@@ -153,6 +174,11 @@ export function EventSummary({
       value: intl.formatMessage(field.value, event)
     }
   })
+
+  const flattenedFlags = flags
+    .filter((flag) => !ActionFlag.safeParse(flag).success)
+    .filter((flag) => flag !== InherentFlags.INCOMPLETE)
+    .join(', ')
 
   return (
     <>
@@ -171,6 +197,13 @@ export function EventSummary({
           data-testid="status"
           label={intl.formatMessage(messages.status.label)}
           value={intl.formatMessage(messages.status.value, event)}
+        />
+        <Summary.Row
+          key="flags"
+          data-testid="flags"
+          label={intl.formatMessage(messages.flags.label)}
+          placeholder={intl.formatMessage(messages.flags.placeholder)}
+          value={flattenedFlags}
         />
         <Summary.Row
           key="event"

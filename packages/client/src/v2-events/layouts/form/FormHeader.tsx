@@ -22,12 +22,12 @@ import { AllowedRouteWithEventId } from './utils'
 
 const messages = defineMessages({
   saveExitButton: {
-    id: 'v2.buttons.saveExit',
+    id: 'buttons.saveExit',
     defaultMessage: 'Save & Exit',
     description: 'The label for the save and exit button'
   },
   exitButton: {
-    id: 'v2.buttons.exit',
+    id: 'buttons.exit',
     defaultMessage: 'Exit',
     description: 'The label for the exit button'
   }
@@ -39,13 +39,14 @@ export function FormHeader({
   route,
   appbarIcon
 }: {
-  label: TranslationConfig
+  label: string
   onSaveAndExit?: () => void
   route: AllowedRouteWithEventId
   appbarIcon?: React.ReactNode
 }) {
   const intl = useIntl()
-  const { modal, exit, goToHome, deleteDeclaration } = useEventFormNavigation()
+  const { modal, exit, closeActionView, deleteDeclaration } =
+    useEventFormNavigation()
 
   const { eventId } = useTypedParams(route)
 
@@ -124,7 +125,7 @@ export function FormHeader({
               data-testid="exit-button"
               size="small"
               type="icon"
-              onClick={goToHome}
+              onClick={() => closeActionView()}
             >
               <Icon name="X" />
             </Button>
@@ -132,7 +133,7 @@ export function FormHeader({
           {modal}
         </>
       }
-      desktopTitle={intl.formatMessage(label)}
+      desktopTitle={label}
       mobileLeft={appbarIcon}
       mobileRight={
         <>
@@ -169,14 +170,14 @@ export function FormHeader({
               />
             </>
           ) : (
-            <Button size="small" type="icon" onClick={goToHome}>
+            <Button size="small" type="icon" onClick={() => closeActionView()}>
               <Icon name="X" />
             </Button>
           )}
           {modal}
         </>
       }
-      mobileTitle={intl.formatMessage(label)}
+      mobileTitle={label}
     />
   )
 }

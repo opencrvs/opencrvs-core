@@ -13,9 +13,13 @@ import {
   getUUID,
   eventPayloadGenerator,
   UUID,
-  TestUserRole
+  TestUserRole,
+  EventConfig,
+  Location,
+  LocationType,
+  generateUuid
 } from '@opencrvs/commons'
-import { Location, setLocations } from '@events/service/locations/locations'
+import { addLocations } from '@events/storage/postgres/events/locations'
 
 interface Name {
   use: string
@@ -28,48 +32,56 @@ export interface CreatedUser {
   primaryOfficeId: UUID
   role: string
   name: Array<Name>
+  fullHonorificName?: string
 }
 
 interface CreateUser {
   primaryOfficeId: UUID
   role?: string
   name?: Array<Name>
+  fullHonorificName?: string
 }
 
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
  */
-export function payloadGenerator(rng: () => number) {
+export function payloadGenerator(
+  rng: () => number,
+  configuration?: EventConfig
+) {
   const user = {
     create: (input: CreateUser) => ({
-      role: input.role ?? ('REGISTRATION_AGENT' as TestUserRole),
+      role: input.role ?? TestUserRole.Enum.REGISTRATION_AGENT,
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
-      primaryOfficeId: input.primaryOfficeId
+      primaryOfficeId: input.primaryOfficeId,
+      fullHonorificName: input.fullHonorificName
     })
   }
 
   const locations = {
     /** Create test data by providing count or desired locations */
-    set: (input: Array<Partial<Location>> | number) => {
+    set: (input: Array<Partial<Location>> | number, prng: () => number) => {
       if (typeof input === 'number') {
         return Array.from({ length: input }).map((_, i) => ({
-          id: getUUID(),
+          id: generateUuid(prng),
           name: `Location name ${i}`,
-          externalId: getUUID(),
-          partOf: null
-        }))
+          parentId: null,
+          validUntil: null,
+          locationType: LocationType.Enum.ADMIN_STRUCTURE
+        })) as Location[]
       }
 
       return input.map((location, i) => ({
-        id: location.id ?? getUUID(),
+        id: location.id ?? generateUuid(prng),
         name: location.name ?? `Location name ${i}`,
-        externalId: location.externalId ?? getUUID(),
-        partOf: null
-      }))
+        parentId: location.parentId ?? null,
+        validUntil: null,
+        locationType: LocationType.Enum.ADMIN_STRUCTURE
+      })) as Location[]
     }
   }
 
-  return { event: eventPayloadGenerator(rng), locations, user }
+  return { event: eventPayloadGenerator(rng, configuration), locations, user }
 }
 
 /**
@@ -81,11 +93,18 @@ export function seeder() {
     return {
       primaryOfficeId: user.primaryOfficeId,
       name: user.name,
+      fullHonorificName: user.fullHonorificName,
       role: user.role as TestUserRole,
       id: getUUID()
     }
   }
-  const seedLocations = async (locations: Location[]) => setLocations(locations)
+  const seedLocations = async (locations: Location[]) =>
+    addLocations(
+      locations.map((location) => ({
+        ...location,
+        validUntil: location.validUntil ? location.validUntil : null
+      }))
+    )
 
   return {
     user: seedUser,

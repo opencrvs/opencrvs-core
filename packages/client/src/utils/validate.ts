@@ -20,13 +20,11 @@ import XRegExp from 'xregexp'
 import { IOfflineData } from '@client/offline/reducer'
 import _, { get } from 'lodash'
 import format, { convertAgeToDate } from '@client/utils/date-formatting'
+import { ResourceType } from '@client/forms'
 
 export function getListOfLocations(
   resource: IOfflineData,
-  resourceType: Extract<
-    keyof IOfflineData,
-    'facilities' | 'locations' | 'offices'
-  >
+  resourceType: ResourceType
 ) {
   return resource[resourceType]
 }

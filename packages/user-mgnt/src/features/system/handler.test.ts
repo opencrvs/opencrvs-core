@@ -106,7 +106,7 @@ describe('registerSystem handler', () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
     fetch.mockResponses(
       [
-        JSON.stringify([{ id: 'v2.birth' }, { id: TENNIS_CLUB_MEMBERSHIP }]),
+        JSON.stringify([{ id: 'birth' }, { id: TENNIS_CLUB_MEMBERSHIP }]),
         { status: 200 }
       ],
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],

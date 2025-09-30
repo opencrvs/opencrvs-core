@@ -47,10 +47,6 @@ export default interface EventActionsTable {
   /** References the original action if this is an asynchronous confirmation of it. */
   originalActionId: ColumnType<UUID | null, UUID | null, UUID | null>
 
-  reasonIsDuplicate: ColumnType<boolean | null, boolean | null, boolean | null>
-
-  reasonMessage: ColumnType<string | null, string | null, string | null>
-
   registrationNumber: ColumnType<string | null, string | null, string | null>
 
   requestId: ColumnType<string | null, string | null, string | null>
@@ -58,6 +54,12 @@ export default interface EventActionsTable {
   status: ColumnType<ActionStatus, ActionStatus, ActionStatus>
 
   transactionId: ColumnType<string, string, string>
+
+  content: ColumnType<
+    Record<string, any> | null,
+    Record<string, any> | null,
+    Record<string, any> | null
+  >
 }
 
 export type EventActions = Selectable<EventActionsTable>

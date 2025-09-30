@@ -60,94 +60,99 @@ const systems: System[] = [
     __typename: 'System'
   }
 ]
+const facilities: Record<string, Facility> = {
+  '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
+    id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
+    name: 'Shaheed Taj Uddin Ahmad Medical College',
+    alias: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
+    physicalType: 'Building',
+    statisticalId: '123',
+    status: 'active',
+    type: 'HEALTH_FACILITY',
+    partOf: 'Location/3a5358d0-1bcd-4ea9-b0b7-7cfb7cbcbf0f'
+  },
+  'ae5b4462-d1b2-4b22-b289-a66f912dce73': {
+    id: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
+    name: 'Kaliganj Union Sub Center',
+    alias: 'কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র',
+    physicalType: 'Building',
+    statisticalId: '123',
+    status: 'active',
+    type: 'HEALTH_FACILITY',
+    partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
+  },
+  '6abbb7b8-d02e-41cf-8a3e-5039776c1eb0': {
+    id: '6abbb7b8-d02e-41cf-8a3e-5039776c1eb0',
+    name: 'Kaliganj Upazila Health Complex',
+    alias: 'কালীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্স',
+    physicalType: 'Building',
+    statisticalId: '123',
+    status: 'active',
+    type: 'HEALTH_FACILITY',
+    partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
+  },
+  '0d8474da-0361-4d32-979e-af91f020309e': {
+    id: '0d8474da-0361-4d32-979e-af91f020309e',
+    name: 'Dholashadhukhan Cc',
+    alias: 'ধলাশাধুখান সিসি - কালিগঞ্জ',
+    physicalType: 'Building',
+    statisticalId: '123',
+    status: 'active',
+    type: 'HEALTH_FACILITY',
+    partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
+  }
+}
+
+const offices: Record<string, CRVSOffice> = {
+  '0d8474da-0361-4d32-979e-af91f012340a': {
+    id: '0d8474da-0361-4d32-979e-af91f012340a',
+    name: 'Moktarpur Union Parishad',
+    alias: 'মোক্তারপুর ইউনিয়ন পরিষদ',
+    physicalType: 'Building',
+    statisticalId: '123',
+    status: 'active',
+    type: 'CRVS_OFFICE',
+    partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
+  },
+  'da672661-eb0a-437b-aa7a-a6d9a1711dd1': {
+    id: 'da672661-eb0a-437b-aa7a-a6d9a1711dd1',
+    name: 'Comilla Union Parishad',
+    alias: 'কুমিল্লা ইউনিয়ন পরিষদ',
+    physicalType: 'Building',
+    statisticalId: '456',
+    status: 'active',
+    type: 'CRVS_OFFICE',
+    partOf: 'Location/5926982b-845c-4463-80aa-cbfb86762e0a'
+  },
+  '213ec5f3-e306-4f95-8058-f37893dbfbb6': {
+    id: '213ec5f3-e306-4f95-8058-f37893dbfbb6',
+    name: 'Chittagong Union Parishad',
+    alias: 'চট্টগ্রাম ইউনিয়ন পরিষদ',
+    physicalType: 'Building',
+    statisticalId: '234',
+    status: 'active',
+    type: 'CRVS_OFFICE',
+    partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
+  },
+  '93259d69-71af-488f-8ada-32d06678df17': {
+    id: '93259d69-71af-488f-8ada-32d06678df17',
+    name: 'Dhaka Union Parishad',
+    alias: 'ঢাকা ইউনিয়ন পরিষদ',
+    physicalType: 'Building',
+    statisticalId: '345',
+    status: 'active',
+    type: 'CRVS_OFFICE',
+    partOf: 'Location/6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+  }
+}
 
 export const mockOfflineData = {
   forms: forms.forms as IForms,
   userForms: forms.userForm,
-  facilities: {
-    '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
-      id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
-      name: 'Shaheed Taj Uddin Ahmad Medical College',
-      alias: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
-      physicalType: 'Building',
-      statisticalId: '123',
-      status: 'active',
-      type: 'HEALTH_FACILITY',
-      partOf: 'Location/3a5358d0-1bcd-4ea9-b0b7-7cfb7cbcbf0f'
-    },
-    'ae5b4462-d1b2-4b22-b289-a66f912dce73': {
-      id: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
-      name: 'Kaliganj Union Sub Center',
-      alias: 'কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র',
-      physicalType: 'Building',
-      statisticalId: '123',
-      status: 'active',
-      type: 'HEALTH_FACILITY',
-      partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
-    },
-    '6abbb7b8-d02e-41cf-8a3e-5039776c1eb0': {
-      id: '6abbb7b8-d02e-41cf-8a3e-5039776c1eb0',
-      name: 'Kaliganj Upazila Health Complex',
-      alias: 'কালীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্স',
-      physicalType: 'Building',
-      statisticalId: '123',
-      status: 'active',
-      type: 'HEALTH_FACILITY',
-      partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
-    },
-    '0d8474da-0361-4d32-979e-af91f020309e': {
-      id: '0d8474da-0361-4d32-979e-af91f020309e',
-      name: 'Dholashadhukhan Cc',
-      alias: 'ধলাশাধুখান সিসি - কালিগঞ্জ',
-      physicalType: 'Building',
-      statisticalId: '123',
-      status: 'active',
-      type: 'HEALTH_FACILITY',
-      partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
-    }
-  } satisfies Record<string, Facility>,
-  offices: {
-    '0d8474da-0361-4d32-979e-af91f012340a': {
-      id: '0d8474da-0361-4d32-979e-af91f012340a',
-      name: 'Moktarpur Union Parishad',
-      alias: 'মোক্তারপুর ইউনিয়ন পরিষদ',
-      physicalType: 'Building',
-      statisticalId: '123',
-      status: 'active',
-      type: 'CRVS_OFFICE',
-      partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
-    },
-    'da672661-eb0a-437b-aa7a-a6d9a1711dd1': {
-      id: 'da672661-eb0a-437b-aa7a-a6d9a1711dd1',
-      name: 'Comilla Union Parishad',
-      alias: 'কুমিল্লা ইউনিয়ন পরিষদ',
-      physicalType: 'Building',
-      statisticalId: '456',
-      status: 'active',
-      type: 'CRVS_OFFICE',
-      partOf: 'Location/5926982b-845c-4463-80aa-cbfb86762e0a'
-    },
-    '213ec5f3-e306-4f95-8058-f37893dbfbb6': {
-      id: '213ec5f3-e306-4f95-8058-f37893dbfbb6',
-      name: 'Chittagong Union Parishad',
-      alias: 'চট্টগ্রাম ইউনিয়ন পরিষদ',
-      physicalType: 'Building',
-      statisticalId: '234',
-      status: 'active',
-      type: 'CRVS_OFFICE',
-      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
-    },
-    '93259d69-71af-488f-8ada-32d06678df17': {
-      id: '93259d69-71af-488f-8ada-32d06678df17',
-      name: 'Dhaka Union Parishad',
-      alias: 'ঢাকা ইউনিয়ন পরিষদ',
-      physicalType: 'Building',
-      statisticalId: '345',
-      status: 'active',
-      type: 'CRVS_OFFICE',
-      partOf: 'Location/6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
-    }
-  } satisfies Record<string, CRVSOffice>,
+  facilities,
+  activeFacilities: facilities,
+  offices,
+  activeOffices: offices,
   locations: {
     '65cf62cb-864c-45e3-9c0d-5c70f0074cb4': {
       id: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
@@ -455,6 +460,24 @@ export const mockOfflineData = {
       REGISTRATION_TARGET: 45,
       PRINT_IN_ADVANCE: true
     },
+    ADMIN_STRUCTURE: [
+      {
+        id: 'province',
+        label: {
+          id: 'field.address.province.label',
+          defaultMessage: 'Province',
+          description: 'Label for province in address'
+        }
+      },
+      {
+        id: 'district',
+        label: {
+          id: 'field.address.district.label',
+          defaultMessage: 'District',
+          description: 'Label for district in address'
+        }
+      }
+    ],
     MARRIAGE: {
       REGISTRATION_TARGET: 45,
       PRINT_IN_ADVANCE: true

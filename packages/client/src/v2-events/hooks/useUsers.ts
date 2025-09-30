@@ -10,15 +10,20 @@
  */
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { FullDocumentURL, User } from '@opencrvs/commons/client'
+import {
+  FullDocumentUrl,
+  TokenUserType,
+  User,
+  UserOrSystem
+} from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 import { precacheFile } from '../features/files/useFileUpload'
 
-type UserWithFullUrlFiles = Omit<User, 'signature' | 'avatar'> & {
-  signature?: FullDocumentURL
-  avatar?: FullDocumentURL
+type UserWithFullUrlFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
+  signature?: FullDocumentUrl
+  avatar?: FullDocumentUrl
 }
 
 setQueryDefaults<
@@ -37,6 +42,10 @@ setQueryDefaults<
     }
 
     const user = await queryOptions.queryFn(...params)
+
+    if (user.type === TokenUserType.enum.system) {
+      return user
+    }
 
     if (user.signature) {
       await precacheFile(user.signature)
@@ -71,9 +80,14 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
 
     await Promise.allSettled(
       users.map(async (user) => {
+        if (user.type === TokenUserType.enum.system) {
+          return user
+        }
+
         if (user.signature) {
           return precacheFile(user.signature)
         }
+
         if (user.avatar) {
           return precacheFile(user.avatar)
         }

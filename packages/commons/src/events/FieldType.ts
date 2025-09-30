@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { z } from 'zod'
+
 export const FieldType = {
   NAME: 'NAME',
   PHONE: 'PHONE',
@@ -21,6 +23,7 @@ export const FieldType = {
   DATE: 'DATE',
   DATE_RANGE: 'DATE_RANGE', // // Internal use, only for search functionality
   SELECT_DATE_RANGE: 'SELECT_DATE_RANGE', // Internal use, only for search functionality
+  TIME: 'TIME',
   PARAGRAPH: 'PARAGRAPH',
   PAGE_HEADER: 'PAGE_HEADER',
   RADIO_GROUP: 'RADIO_GROUP',
@@ -36,8 +39,20 @@ export const FieldType = {
   FACILITY: 'FACILITY',
   OFFICE: 'OFFICE',
   SIGNATURE: 'SIGNATURE',
-  DATA: 'DATA'
+  DATA: 'DATA',
+  BUTTON: 'BUTTON',
+  HTTP: 'HTTP',
+  LINK_BUTTON: 'LINK_BUTTON'
 } as const
+
+/**
+ * Union of types that handle files. Using common type should help with compiler to know where to add new cases.
+ */
+export const FileFieldType = z.enum([
+  FieldType.FILE,
+  FieldType.FILE_WITH_OPTIONS,
+  FieldType.SIGNATURE
+])
 
 export const fieldTypes = Object.values(FieldType)
 export type FieldType = (typeof fieldTypes)[number]
@@ -50,4 +65,11 @@ export const compositeFieldTypes = [
   FieldType.ADDRESS,
   FieldType.FILE_WITH_OPTIONS,
   FieldType.FILE
+]
+
+export const FieldTypesToHideInReview = [
+  FieldType.BULLET_LIST,
+  FieldType.DIVIDER,
+  FieldType.PAGE_HEADER,
+  FieldType.PARAGRAPH
 ]

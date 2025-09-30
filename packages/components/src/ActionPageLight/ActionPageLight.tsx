@@ -87,7 +87,12 @@ export const ActionPageLight = ({
   const getHeaderRight = () => {
     return (
       goHome && (
-        <CircleButton id="crcl-btn" onClick={goHome} key="crcl-btn">
+        <CircleButton
+          data-testid="crcl-btn"
+          id="crcl-btn"
+          onClick={goHome}
+          key="crcl-btn"
+        >
           <Cross color="currentColor" />
         </CircleButton>
       )

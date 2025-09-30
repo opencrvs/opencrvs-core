@@ -16,7 +16,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Any status',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusAny'
+      id: 'advancedSearch.form.recordStatusAny'
     }
   },
   {
@@ -24,7 +24,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Notified',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusNotified'
+      id: 'advancedSearch.form.recordStatusNotified'
     }
   },
   {
@@ -32,7 +32,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Declared',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusDeclared'
+      id: 'advancedSearch.form.recordStatusDeclared'
     }
   },
   {
@@ -40,7 +40,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Validated',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusValidated'
+      id: 'advancedSearch.form.recordStatusValidated'
     }
   },
   {
@@ -48,23 +48,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Registered',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusRegistered'
-    }
-  },
-  {
-    value: EventStatus.enum.CERTIFIED,
-    label: {
-      defaultMessage: 'Certified',
-      description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusCertified'
-    }
-  },
-  {
-    value: EventStatus.enum.REJECTED,
-    label: {
-      defaultMessage: 'Rejected',
-      description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusRejected'
+      id: 'advancedSearch.form.recordStatusRegistered'
     }
   },
   {
@@ -72,7 +56,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Archived',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusArchived'
+      id: 'advancedSearch.form.recordStatusArchived'
     }
   }
 ]

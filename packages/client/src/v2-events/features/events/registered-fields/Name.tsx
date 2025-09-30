@@ -11,11 +11,15 @@
 import React, { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import {
+  alwaysTrue,
+  ConditionalType,
   FieldConfig,
   FieldType,
   getValidatorsForField,
   joinValues,
+  NameField,
   NameFieldValue,
+  not,
   TextField
 } from '@opencrvs/commons/client'
 import { mergeWithoutNullsOrUndefined } from '@client/v2-events/utils'
@@ -23,13 +27,11 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 
 interface Props {
   id: string
-  required?: boolean
   onChange: (newValue: NameFieldValue) => void
-  maxLength?: number
+  configuration?: NameField['configuration']
   validation: FieldConfig['validation']
   value?: NameFieldValue
-  includeMiddlename?: boolean
-  searchMode?: boolean
+  disabled?: boolean
 }
 
 const defailtNameFieldValue: NameFieldValue = {
@@ -112,64 +114,87 @@ function FocusNameInputsOnHash({
 }
 
 function NameInput(props: Props) {
-  const {
-    id,
-    onChange,
-    required = true,
-    value = {},
-    maxLength,
-    includeMiddlename,
-    searchMode = false
-  } = props
-  const validators = props.validation || []
+  const { id, onChange, disabled, value = {}, configuration } = props
 
-  const fields: TextField[] = [
-    {
-      id: 'firstname',
-      type: FieldType.TEXT,
-      configuration: {
-        maxLength
-      },
-      required,
-      label: {
-        defaultMessage: 'First name(s)',
-        description: 'This is the label for the firstname field',
-        id: 'v2.field.name.firstname.label'
-      },
-      validation: getValidatorsForField('firstname', validators)
-    },
-    ...(includeMiddlename
-      ? [
-          {
-            id: 'middlename',
-            type: FieldType.TEXT,
-            configuration: {
-              maxLength
-            },
-            label: {
-              defaultMessage: 'Middle name',
-              description: 'This is the label for the middlename field',
-              id: 'v2.field.name.middlename.label'
-            },
-            validation: getValidatorsForField('middlename', validators)
-          }
-        ]
-      : []),
-    {
-      id: 'surname',
-      type: FieldType.TEXT,
-      required,
-      configuration: {
-        maxLength
-      },
-      label: {
-        defaultMessage: 'Last name',
-        description: 'This is the label for the surname field',
-        id: 'v2.field.name.surname.label'
-      },
-      validation: getValidatorsForField('surname', validators)
+  const { maxLength, order } = configuration || {}
+
+  const nameConfig = configuration?.name || {
+    firstname: { required: true },
+    surname: { required: true }
+  }
+
+  const defaultNameOrder = [
+    'firstname',
+    ...(nameConfig.middlename ? ['middlename'] : []),
+    'surname'
+  ]
+
+  const validators = props.validation || []
+  const nameOrder = order || defaultNameOrder
+
+  const fields: TextField[] = nameOrder.map((field) => {
+    switch (field) {
+      case 'firstname':
+        return {
+          id: 'firstname',
+          type: FieldType.TEXT,
+          configuration: { maxLength },
+          required: nameConfig.firstname?.required,
+          conditionals: [
+            {
+              type: ConditionalType.ENABLE,
+              conditional: disabled ? not(alwaysTrue()) : not(not(alwaysTrue()))
+            }
+          ],
+          label: nameConfig.firstname?.label || {
+            defaultMessage: 'First name(s)',
+            description: 'This is the label for the firstname field',
+            id: 'field.name.firstname.label'
+          },
+          validation: getValidatorsForField('firstname', validators)
+        } satisfies TextField
+      case 'middlename':
+        return {
+          id: 'middlename',
+          type: FieldType.TEXT,
+          configuration: { maxLength },
+          required: nameConfig.middlename?.required,
+          conditionals: [
+            {
+              type: ConditionalType.ENABLE,
+              conditional: disabled ? not(alwaysTrue()) : not(not(alwaysTrue()))
+            }
+          ],
+          label: nameConfig.middlename?.label || {
+            defaultMessage: 'Middle name',
+            description: 'This is the label for the middlename field',
+            id: 'field.name.middlename.label'
+          },
+          validation: getValidatorsForField('middlename', validators)
+        }
+      case 'surname':
+        return {
+          id: 'surname',
+          type: FieldType.TEXT,
+          required: nameConfig.surname?.required,
+          conditionals: [
+            {
+              type: ConditionalType.ENABLE,
+              conditional: disabled ? not(alwaysTrue()) : not(not(alwaysTrue()))
+            }
+          ],
+          configuration: { maxLength },
+          label: nameConfig.surname?.label || {
+            defaultMessage: 'Last name',
+            description: 'This is the label for the surname field',
+            id: 'field.name.surname.label'
+          },
+          validation: getValidatorsForField('surname', validators)
+        }
+      default:
+        throw new Error(`Unknown field type: ${field}`)
     }
-  ] satisfies TextField[]
+  })
 
   return (
     <>
@@ -177,13 +202,9 @@ function NameInput(props: Props) {
         fields={fields}
         id={id}
         initialValues={{ ...value }}
+        parentId={id}
         onChange={(values) => {
-          if (searchMode) {
-            // when in search mode, we initialize empty name fields with empty string
-            // to avoid name field validation
-            values = mergeWithoutNullsOrUndefined(defailtNameFieldValue, values)
-          }
-          onChange(values as NameFieldValue)
+          onChange(mergeWithoutNullsOrUndefined(defailtNameFieldValue, values))
         }}
       />
       <FocusNameInputsOnHash id={id} value={value} />
@@ -195,10 +216,35 @@ function stringify(value?: NameFieldValue) {
   return joinValues([value?.firstname, value?.middlename, value?.surname])
 }
 
+function toCertificateVariables(value?: NameFieldValue) {
+  return {
+    fullname: stringify(value),
+    firstname: value?.firstname,
+    middlename: value?.middlename,
+    surname: value?.surname
+  }
+}
+
 export const Name = {
   Input: NameInput,
-  Output: ({ value }: { value?: NameFieldValue }) => (
-    <>{joinValues([value?.firstname, value?.middlename, value?.surname])}</>
-  ),
-  stringify
+  Output: ({
+    value,
+    configuration
+  }: {
+    value?: NameFieldValue
+    configuration?: NameField
+  }) => {
+    const defaultNameOrder = [
+      'firstname',
+      ...(configuration?.configuration?.name?.middlename ? ['middlename'] : []),
+      'surname'
+    ]
+    const order = configuration?.configuration?.order || defaultNameOrder
+
+    return joinValues(
+      order.map((field) => value?.[field as keyof NameFieldValue])
+    )
+  },
+  stringify,
+  toCertificateVariables
 }

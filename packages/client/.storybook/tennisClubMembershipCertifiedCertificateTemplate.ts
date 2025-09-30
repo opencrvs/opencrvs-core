@@ -13,14 +13,19 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
 <svg width="583" height="842" viewBox="0 0 583 842" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <g clip-path="url(#clip0_5_2)">
     <path d="M583 0H0V842H583V0Z" fill="white" />
+    {{#if $review }}
+    <text fill="#FF0000" xml:space="preserve" style="white-space: pre;" font-weight="bold" font-family="Arial" font-size="30" transform="rotate(30, 300, 50)">
+      <tspan x="300" y="50">REVIEW MODE</tspan>
+    </text>
+    {{/if}}
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-      <tspan x="62" y="426.352">{{ $lookup $metadata "modifiedAt"}}</tspan>
+      <tspan x="62" y="426.352">{{ $lookup ($action "PRINT_CERTIFICATE") "createdAt" }}</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0em">
       <tspan x="62" y="413.552">Date of certification&#10;</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-      <tspan x="62" y="460.352">{{$lookup $metadata "createdAtLocation.location"}}, {{$lookup $metadata "createdAtLocation.country"}}</tspan>
+      <tspan x="62" y="460.352">{{$lookup $metadata "createdAtLocation.name"}}, {{$lookup $metadata "createdAtLocation.country"}}</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0em">
       <tspan x="62" y="447.552">Place of certification&#10;</tspan>
@@ -35,7 +40,10 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     <path d="M309.793 475.396L505.999 476.321" stroke="#CCCCCC" stroke-width="0.782258" stroke-dasharray="3.13 1.56" />
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
       <tspan x="366.248" y="489.656">
-       Registrar {{ $lookup $metadata 'legalStatuses.REGISTERED.createdBy.name'}}
+       Registrar {{ $lookup $metadata 'legalStatuses.REGISTERED.createdBy.name'}},
+      </tspan>
+      <tspan x="366.248" y="502.656" font-weight="bold">
+       {{ $lookup $metadata 'legalStatuses.REGISTERED.createdBy.fullHonorificName' }}
       </tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
@@ -68,7 +76,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     </mask>
     <g mask="url(#mask0_5_2)">
       <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-        <tspan x="312" y="247.708">{{ $lookup $declaration "applicant.name" }}</tspan>
+        <tspan x="312" y="247.708">{{ $lookup $declaration "applicant.name.fullname" }}</tspan>
       </text>
     </g>
     <path d="M70 253.5H514" stroke="#ECECEC" />
@@ -99,7 +107,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     </mask>
     <g mask="url(#mask2_5_2)">
       <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-        <tspan x="312" y="287.708">{{ $lookup $declaration "recommender.name"  }}</tspan>
+        <tspan x="312" y="287.708">{{ $lookup $declaration "recommender.name.fullname"  }}</tspan>
       </text>
     </g>
     <path d="M70 293.5H514" stroke="#ECECEC" />

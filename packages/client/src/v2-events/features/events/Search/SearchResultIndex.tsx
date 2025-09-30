@@ -24,8 +24,8 @@ import { SearchResultComponent } from './SearchResult'
 import {
   buildSearchQuery,
   toAdvancedSearchQueryType,
-  parseFieldSearchParams,
-  deserializeSearchParams
+  deserializeSearchParams,
+  resolveAdvancedSearchConfig
 } from './utils'
 
 export const SearchResultIndex = () => {
@@ -36,49 +36,71 @@ export const SearchResultIndex = () => {
   const location = useLocation()
   const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
 
+  const fields = useMemo(() => {
+    const sections = resolveAdvancedSearchConfig(eventConfig)
+    return sections.flatMap((section) => section.fields)
+  }, [eventConfig])
+
   /*
    * SelectDateRangeValue's are converted to DateTime values which would
    * return a new value on every render, hence we need to memoize.
    */
-  const searchParams = useMemo(
-    () => SearchQueryParams.parse(deserializeSearchParams(location.search)),
-    [location.search]
+  const formValues = useMemo(() => {
+    const searchParams = SearchQueryParams.parse(
+      deserializeSearchParams(location.search)
+    )
+    return Object.fromEntries(
+      Object.entries(searchParams).filter(([key]) =>
+        fields.some((field) => field.id === key)
+      )
+    )
+  }, [location.search, fields])
+
+  const searchQuery = useMemo(
+    () =>
+      buildSearchQuery(
+        formValues,
+        fields,
+        eventConfig.advancedSearch.flatMap((section) => section.fields)
+      ),
+    [formValues, eventConfig, fields]
   )
-  const searchQuery = useMemo(() => {
-    const validSearchParams = parseFieldSearchParams(eventConfig, searchParams)
-    return buildSearchQuery(validSearchParams, eventConfig)
-  }, [searchParams, eventConfig])
 
   /*
    * useSuspenseQuery unmounts the component causing the searchQuery to be
    * re-evaluated, which leads to an infinite loop.
    */
-  const queryData =
-    searchEvent.useQuery(toAdvancedSearchQueryType(searchQuery, eventType))
-      .data ?? []
+  const queryData = searchEvent.useQuery({
+    query: toAdvancedSearchQueryType(searchQuery, eventType),
+    ...typedSearchParams
+  }).data ?? {
+    results: [],
+    total: 0
+  }
 
   return (
     <SearchResultComponent
       actions={['DEFAULT']}
       columns={mandatoryColumns}
       eventConfigs={[eventConfig]}
-      queryData={queryData}
+      queryData={queryData.results}
       tabBarContent={
         <SearchCriteriaPanel
           eventConfig={eventConfig}
-          searchParams={searchParams}
+          formValues={formValues}
         />
       }
       title={intl.formatMessage(
         {
-          id: 'v2.search.advancedSearch.result.title',
+          id: 'search.advancedSearch.result.title',
           description: 'Advanced search result title',
           defaultMessage: 'Search results ({count})'
         },
         {
-          count: queryData.length
+          count: queryData.total
         }
       )}
+      totalResults={queryData.total}
       {...typedSearchParams}
     />
   )

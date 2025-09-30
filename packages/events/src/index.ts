@@ -12,10 +12,12 @@
 import { logger } from '@opencrvs/commons'
 import '@opencrvs/commons/monitoring'
 import { env } from './environment'
-import { getAnonymousToken } from './service/auth'
-import { getEventConfigurations } from './service/config/config'
-import { ensureIndexExists } from './service/indexing/indexing'
+
 import { server } from './server'
+import { getAnonymousToken } from './service/auth'
+import { getInMemoryEventConfigurations } from './service/config/config'
+import { ensureIndexExists } from './service/indexing/indexing'
+import { ensureConnection } from './storage/postgres/events'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
@@ -25,23 +27,25 @@ const appModulePath = require('app-module-path')
 appModulePath.addPath(path.join(__dirname, '../'))
 
 export async function main() {
+  await ensureConnection()
   try {
-    const configurations = await getEventConfigurations(
-      await getAnonymousToken()
+    const anonymousToken = await getAnonymousToken()
+    const configurations = await getInMemoryEventConfigurations(
+      `Bearer ${anonymousToken}`
     )
     for (const configuration of configurations) {
       logger.info(`Loaded event configuration: ${configuration.id}`)
       await ensureIndexExists(configuration)
     }
   } catch (error) {
-    logger.error(error)
+    if (error instanceof Error) {
+      logger.error(error.message)
+    }
     if (env.isProd) {
       process.exit(1)
     }
-    /*
-     * SIGUSR2 tells nodemon to restart the process without waiting for new file changes
-     */
-    setTimeout(() => process.kill(process.pid, 'SIGUSR2'), 3000)
+    setTimeout(() => void main(), 5000)
+
     return
   }
   server().listen(5555)

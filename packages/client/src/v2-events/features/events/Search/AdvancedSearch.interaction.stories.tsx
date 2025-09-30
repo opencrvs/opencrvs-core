@@ -16,7 +16,9 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { waitFor } from '@testing-library/dom'
 import {
+  ActionType,
   footballClubMembershipEvent,
+  generateEventDocument,
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
@@ -46,7 +48,11 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const trpcHandlers = createDeclarationTrpcMsw(tRPCMsw)
+const createdEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE]
+})
+const trpcHandlers = createDeclarationTrpcMsw(tRPCMsw, createdEventDocument)
 
 const defaultHandlers = {
   events: trpcHandlers.events.handlers,
@@ -98,7 +104,7 @@ export const AdvancedSearchStory: Story = {
       ).find((btn) => btn.id === 'search')
 
       const accordion = await canvas.findByTestId(
-        'accordion-v2.advancedSearch.form.registrationDetails'
+        'accordion-advancedSearch.form.registrationDetails'
       )
       await userEvent.click(
         within(accordion).getByRole('button', { name: 'Show' })
@@ -164,7 +170,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
 
     const assertRegistration = async () => {
       const accordion = await canvas.findByTestId(
-        'accordion-v2.advancedSearch.form.registrationDetails'
+        'accordion-advancedSearch.form.registrationDetails'
       )
 
       await within(accordion).findByRole('button', { name: 'Hide' })
@@ -188,7 +194,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
         )
         await assertRegistration()
         const accordion = await canvas.findByTestId(
-          'accordion-v2.advancedSearch.form.registrationDetails'
+          'accordion-advancedSearch.form.registrationDetails'
         )
         await userEvent.click(
           await within(accordion).findByRole('button', { name: 'Hide' })
@@ -208,7 +214,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
 
     await step("Prepopulate Applicant's details", async () => {
       const accordion = await canvas.findByTestId(
-        'accordion-v2.event.tennis-club-membership.search.applicants'
+        'accordion-event.tennis-club-membership.search.applicants'
       )
 
       await within(accordion).findByRole('button', { name: 'Hide' })
@@ -222,7 +228,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
 
     await step("Prepopulate Recommender's details", async () => {
       const accordion = await canvas.findByTestId(
-        'accordion-v2.event.tennis-club-membership.search.recommender'
+        'accordion-event.tennis-club-membership.search.recommender'
       )
       await within(accordion).findByRole('button', { name: 'Hide' })
       await expect(
@@ -247,7 +253,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
 
       await userEvent.click(footballTab)
       const footballAccordion = await canvas.findByTestId(
-        'accordion-v2.advancedSearch.form.registrationDetails'
+        'accordion-advancedSearch.form.registrationDetails'
       )
       await userEvent.click(
         within(footballAccordion).getByRole('button', { name: 'Show' })
@@ -373,7 +379,7 @@ export const AdvancedSearchPartialNameSearchSupport: Story = {
         await expect(searchButton).toBeDisabled()
 
         const accordion = await canvas.findByTestId(
-          'accordion-v2.event.tennis-club-membership.search.applicants'
+          'accordion-event.tennis-club-membership.search.applicants'
         )
         await userEvent.click(
           within(accordion).getByRole('button', { name: 'Show' })

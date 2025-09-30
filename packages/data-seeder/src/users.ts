@@ -14,8 +14,11 @@ import { z } from 'zod'
 import { parseGQLResponse, raise, delay } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
-import { EventConfig, joinURL } from '@opencrvs/commons'
-import { parseScope } from '@opencrvs/commons/authentication'
+import { EventConfig, joinUrl } from '@opencrvs/commons'
+import {
+  parseLiteralScope,
+  parseConfigurableScope
+} from '@opencrvs/commons/authentication'
 import { fromZodError } from 'zod-validation-error'
 
 const MAX_RETRY = 5
@@ -32,9 +35,10 @@ const RoleSchema = (eventIds: string[]) =>
       }),
       scopes: z.array(
         z.string().superRefine((scope, ctx) => {
-          const parsed = parseScope(scope)
+          const parsedConfigurableScope = parseConfigurableScope(scope)
+          const parsedLiteralScope = parseLiteralScope(scope)
 
-          if (!parsed) {
+          if (!parsedConfigurableScope && !parsedLiteralScope) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `Invalid scope: "${scope}"`
@@ -42,8 +46,8 @@ const RoleSchema = (eventIds: string[]) =>
             return
           }
 
-          if (parsed.type === 'search') {
-            const options = parsed.options
+          if (parsedConfigurableScope?.type === 'search') {
+            const options = parsedConfigurableScope.options
             const invalidEventIds = options.event.filter(
               (id) => !eventIds.includes(id)
             )
@@ -122,8 +126,8 @@ async function getUsers(token: string) {
 
   const userRoles = parsedUsers.data.map((user) => user.role)
 
-  const rolesUrl = joinURL(env.COUNTRY_CONFIG_HOST, 'roles')
-  const eventsUrl = joinURL(env.COUNTRY_CONFIG_HOST, 'events')
+  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'roles')
+  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'events')
 
   const [rolesResponse, eventsResponse] = await Promise.all([
     fetch(rolesUrl),

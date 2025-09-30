@@ -10,7 +10,7 @@
  */
 import { defineConditional } from '../conditionals/conditionals'
 import { defineConfig } from '../events/defineConfig'
-import { ActionType } from '../events/ActionType'
+import { ActionType, DeclarationActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
@@ -21,18 +21,20 @@ import {
   TENNIS_CLUB_DECLARATION_FORM,
   TENNIS_CLUB_DECLARATION_REVIEW
 } from './forms'
+import { Clause, EventConfig } from '../events'
+import { and, field as dedupField } from '../events/deduplication'
 
 export const tennisClubMembershipEvent = defineConfig({
   id: TENNIS_CLUB_MEMBERSHIP,
   label: {
     defaultMessage: 'Tennis club membership application',
     description: 'This is what this event is referred as in the system',
-    id: 'v2.event.tennis-club-membership.label'
+    id: 'event.tennis-club-membership.label'
   },
   title: {
     defaultMessage: '{applicant.name.firstname} {applicant.name.surname}',
     description: 'This is the title of the summary',
-    id: 'v2.event.tennis-club-membership.title'
+    id: 'event.tennis-club-membership.title'
   },
   summary: {
     fields: [
@@ -58,7 +60,7 @@ export const tennisClubMembershipEvent = defineConfig({
     {
       type: ActionType.READ,
       label: {
-        id: 'v2.event.tennis-club-membership.action.read.label',
+        id: 'event.tennis-club-membership.action.read.label',
         defaultMessage: 'Read',
         description: 'Title of the read only page'
       },
@@ -104,7 +106,7 @@ export const tennisClubMembershipEvent = defineConfig({
       },
       correctionForm: {
         label: {
-          id: 'v2.event.tennis-club-membership.action.request-correction.label',
+          id: 'event.tennis-club-membership.action.request-correction.label',
           defaultMessage: 'Request correction',
           description:
             'This is shown as the action name anywhere the user can trigger the action from'
@@ -133,7 +135,7 @@ export const tennisClubMembershipEvent = defineConfig({
                 id: 'correction.requester.relationship',
                 type: 'RADIO_GROUP',
                 label: {
-                  id: 'v2.correction.corrector.title',
+                  id: 'correction.corrector.title',
                   defaultMessage: 'Who is requesting a change to this record?',
                   description: 'The title for the corrector form'
                 },
@@ -142,7 +144,7 @@ export const tennisClubMembershipEvent = defineConfig({
                   {
                     value: 'INFORMANT',
                     label: {
-                      id: 'v2.correction.corrector.informant',
+                      id: 'informant.name',
                       defaultMessage: 'Informant',
                       description:
                         'Label for informant option in certificate correction form'
@@ -151,7 +153,7 @@ export const tennisClubMembershipEvent = defineConfig({
                   {
                     value: 'ANOTHER_AGENT',
                     label: {
-                      id: 'v2.correction.corrector.anotherAgent',
+                      id: 'correction.corrector.anotherAgent',
                       defaultMessage:
                         'Another registration agent or field agent',
                       description:
@@ -161,7 +163,7 @@ export const tennisClubMembershipEvent = defineConfig({
                   {
                     value: 'REGISTRAR',
                     label: {
-                      id: 'v2.correction.corrector.me',
+                      id: 'correction.corrector.me',
                       defaultMessage: 'Me (Registrar)',
                       description:
                         'Label for registrar option in certificate correction form'
@@ -170,7 +172,7 @@ export const tennisClubMembershipEvent = defineConfig({
                   {
                     value: 'OTHER',
                     label: {
-                      id: 'v2.correction.corrector.others',
+                      id: 'correction.corrector.others',
                       defaultMessage: 'Someone else',
                       description:
                         'Label for someone else option in certificate correction form'
@@ -182,46 +184,45 @@ export const tennisClubMembershipEvent = defineConfig({
           },
           {
             id: 'identity-check',
-            type: PageTypes.enum.FORM,
+            type: PageTypes.enum.VERIFICATION,
             title: {
-              id: 'event.tennis-club-membership.action.requestCorrection.form.section.verify',
-              defaultMessage: 'Verify their identity',
+              id: 'event.birth.action.correction.form.section.requester.identity.verify.title',
+              defaultMessage: 'Verify ID',
               description: 'This is the title of the section'
             },
-            fields: [
-              {
-                id: 'correction.identity-check.instructions',
-                type: 'PAGE_HEADER',
+            fields: [],
+            actions: {
+              verify: {
                 label: {
-                  id: 'correction.corrector.identity.instruction',
-                  defaultMessage:
-                    'Please verify the identity of the person making this request',
-                  description: 'The title for the corrector form'
+                  defaultMessage: 'Verified',
+                  description: 'This is the label for the verification button',
+                  id: 'event.birth.action.correction.form.verify'
                 }
               },
-              {
-                id: 'correction.identity-check.verified',
-                type: 'RADIO_GROUP',
+              cancel: {
                 label: {
-                  id: 'correction.corrector.identity.verified.label',
-                  defaultMessage: 'Identity verified',
-                  description: 'The title for the corrector form'
+                  defaultMessage: 'Identity does not match',
+                  description:
+                    'This is the label for the verification cancellation button',
+                  id: 'event.birth.action.correction.form.cancel'
                 },
-                defaultValue: '',
-                required: true,
-                options: [
-                  {
-                    value: 'VERIFIED',
-                    label: {
-                      id: 'correction.corrector.identity.verified',
-                      defaultMessage: 'I have verified their identity',
-                      description:
-                        'Label for verified option in corrector identity check page'
-                    }
+                confirmation: {
+                  title: {
+                    defaultMessage: 'Correct without proof of ID?',
+                    description:
+                      'This is the title for the verification cancellation modal',
+                    id: 'event.birth.action.correction.form.cancel.confirmation.title'
+                  },
+                  body: {
+                    defaultMessage:
+                      'Please be aware that if you proceed, you will be responsible for making a change to this record without the necessary proof of identification',
+                    description:
+                      'This is the body for the verification cancellation modal',
+                    id: 'event.birth.action.correction.form.cancel.confirmation.body'
                   }
-                ]
+                }
               }
-            ]
+            }
           },
           {
             id: 'correction-request.supporting-documents',
@@ -322,7 +323,7 @@ export const tennisClubMembershipEvent = defineConfig({
     {
       type: ActionType.PRINT_CERTIFICATE,
       label: {
-        id: 'v2.event.tennis-club-membership.action.collect-certificate.label',
+        id: 'event.tennis-club-membership.action.collect-certificate.label',
         defaultMessage: 'Print certificate',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
@@ -371,7 +372,7 @@ export const tennisClubMembershipEvent = defineConfig({
     {
       type: ActionType.ARCHIVE,
       label: {
-        id: 'v2.event.tennis-club-membership.action.archive.label',
+        id: 'event.tennis-club-membership.action.archive.label',
         defaultMessage: 'Archive',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
@@ -380,7 +381,7 @@ export const tennisClubMembershipEvent = defineConfig({
     {
       type: ActionType.REJECT,
       label: {
-        id: 'v2.event.tennis-club-membership.action.reject.label',
+        id: 'event.tennis-club-membership.action.reject.label',
         defaultMessage: 'Reject',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
@@ -392,7 +393,7 @@ export const tennisClubMembershipEvent = defineConfig({
       title: {
         defaultMessage: 'Registration details',
         description: 'The title of Registration details accordion',
-        id: 'v2.advancedSearch.form.registrationDetails'
+        id: 'advancedSearch.form.registrationDetails'
       },
       fields: [
         event('legalStatuses.REGISTERED.createdAtLocation').exact(),
@@ -405,7 +406,7 @@ export const tennisClubMembershipEvent = defineConfig({
       title: {
         defaultMessage: "Applicant's details",
         description: 'Applicant details search field section title',
-        id: 'v2.event.tennis-club-membership.search.applicants'
+        id: 'event.tennis-club-membership.search.applicants'
       },
       fields: [
         field('applicant.name').fuzzy(),
@@ -417,10 +418,45 @@ export const tennisClubMembershipEvent = defineConfig({
       title: {
         defaultMessage: "Recommender's details",
         description: 'Recommender details search field section title',
-        id: 'v2.event.tennis-club-membership.search.recommender'
+        id: 'event.tennis-club-membership.search.recommender'
       },
       fields: [field('recommender.name').fuzzy()]
     }
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM
 })
+
+/** @knipignore */
+export function tennisClubMembershipEventWithDedupCheck(
+  ...actionsToCheck: DeclarationActionType[]
+): EventConfig {
+  return {
+    ...tennisClubMembershipEvent,
+    actions: tennisClubMembershipEvent.actions.map((action) => {
+      if (!actionsToCheck.includes(action.type as DeclarationActionType)) {
+        return action
+      }
+      return {
+        ...action,
+        deduplication: {
+          id: 'tennis-club-membership-deduplication',
+          label: {
+            defaultMessage: 'Tennis club membership deduplication',
+            description:
+              'This is shown as the label for the deduplication configuration',
+            id: 'event.tennis-club-membership.deduplication.label'
+          },
+          query: Clause.parse(
+            and(
+              dedupField('applicant.name').fuzzyMatches(),
+              dedupField('applicant.email').strictMatches(),
+              dedupField('applicant.dob').dateRangeMatches({
+                days: 3 * 365
+              })
+            )
+          )
+        }
+      }
+    })
+  }
+}

@@ -1,0 +1,88 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getAvailableActions should return the correct actions for "ARCHIVED" status with no flags 1`] = `
+[
+  "READ",
+  "ASSIGN",
+  "UNASSIGN",
+]
+`;
+
+exports[`getAvailableActions should return the correct actions for "CREATED" status with no flags 1`] = `
+[
+  "READ",
+  "DECLARE",
+  "NOTIFY",
+  "DELETE",
+]
+`;
+
+exports[`getAvailableActions should return the correct actions for "DECLARED" status with no flags 1`] = `
+[
+  "READ",
+  "VALIDATE",
+  "ARCHIVE",
+  "REJECT",
+]
+`;
+
+exports[`getAvailableActions should return the correct actions for "DECLARED" status with rejected flag 1`] = `
+[
+  "READ",
+  "DECLARE",
+  "NOTIFY",
+  "ARCHIVE",
+]
+`;
+
+exports[`getAvailableActions should return the correct actions for "NOTIFIED" status with no flags 1`] = `
+[
+  "READ",
+  "DECLARE",
+  "ARCHIVE",
+  "REJECT",
+]
+`;
+
+exports[`getAvailableActions should return the correct actions for "NOTIFIED" status with rejected flag 1`] = `
+[
+  "READ",
+  "DECLARE",
+  "NOTIFY",
+  "ARCHIVE",
+]
+`;
+
+exports[`getAvailableActions should return the correct actions for "REGISTERED" status with correction-requested flag 1`] = `
+[
+  "READ",
+  "APPROVE_CORRECTION",
+  "REJECT_CORRECTION",
+  "REVIEW_CORRECTION_REQUEST",
+]
+`;
+
+exports[`getAvailableActions should return the correct actions for "REGISTERED" status with no flags 1`] = `
+[
+  "READ",
+  "PRINT_CERTIFICATE",
+  "REQUEST_CORRECTION",
+]
+`;
+
+exports[`getAvailableActions should return the correct actions for "VALIDATED" status with no flags 1`] = `
+[
+  "READ",
+  "REGISTER",
+  "ARCHIVE",
+  "REJECT",
+]
+`;
+
+exports[`getAvailableActions should return the correct actions for "VALIDATED" status with rejected flag 1`] = `
+[
+  "READ",
+  "VALIDATE",
+  "ARCHIVE",
+]
+`;

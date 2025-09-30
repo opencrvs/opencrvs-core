@@ -23,7 +23,7 @@ import {
   FieldConfig,
   File,
   FileUploadWithOptions,
-  Location,
+  LocationInput,
   Office,
   PageHeader,
   Paragraph,
@@ -38,7 +38,11 @@ import {
   PhoneField,
   IdField,
   DateRangeField,
-  SelectDateRangeField
+  SelectDateRangeField,
+  TimeField,
+  HttpField,
+  ButtonField,
+  LinkButtonField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -52,7 +56,9 @@ import {
   TextValue,
   DataFieldValue,
   DateRangeFieldValue,
-  SelectDateRangeValue
+  SelectDateRangeValue,
+  TimeValue,
+  ButtonFieldValue
 } from './FieldValue'
 
 import { FullDocumentPath } from '../documents'
@@ -64,7 +70,8 @@ import {
   FileFieldWithOptionValue,
   AddressType,
   NameFieldValue,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  HttpFieldUpdateValue
 } from './CompositeFieldValue'
 
 /**
@@ -92,6 +99,9 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.DATE:
       schema = DateValue
       break
+    case FieldType.TIME:
+      schema = TimeValue
+      break
     case FieldType.EMAIL:
       schema = EmailValue
       break
@@ -115,6 +125,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.PHONE:
+    case FieldType.LINK_BUTTON:
     case FieldType.ID:
       schema = required ? NonEmptyTextValue : TextValue
       break
@@ -140,6 +151,12 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.NAME:
       schema = required ? NameFieldValue : NameFieldUpdateValue
       break
+    case FieldType.BUTTON:
+      schema = ButtonFieldValue
+      break
+    case FieldType.HTTP:
+      schema = HttpFieldUpdateValue
+      break
   }
 
   return required ? schema : schema.nullish()
@@ -152,7 +169,7 @@ export function createValidationSchema(config: FieldConfig[]) {
   > = {}
 
   for (const field of config) {
-    shape[field.id] = mapFieldTypeToZod(field.type, field.required)
+    shape[field.id] = mapFieldTypeToZod(field.type, !!field.required)
   }
 
   return z.object(shape)
@@ -179,27 +196,25 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.NUMBER:
     case FieldType.EMAIL:
     case FieldType.DATE:
+    case FieldType.TIME:
     case FieldType.CHECKBOX:
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
     case FieldType.DATA:
     case FieldType.NAME:
     case FieldType.PHONE:
+    case FieldType.BUTTON:
+    case FieldType.HTTP:
+    case FieldType.LINK_BUTTON:
     case FieldType.ID:
       return null
     case FieldType.ADDRESS:
       return {
-        country: null,
+        country: '',
         addressType: AddressType.DOMESTIC,
-        province: null,
-        district: null,
-        urbanOrRural: 'URBAN', // Default to urban needed for validation
-        town: null,
-        residentialArea: null,
-        street: null,
-        number: null,
-        zipCode: null
-      }
+        administrativeArea: '',
+        streetLevelDetails: {}
+      } satisfies AddressFieldValue
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
@@ -224,6 +239,13 @@ export const isDateFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: DateField } => {
   return field.config.type === FieldType.DATE
+}
+
+export const isTimeFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: TimeField } => {
+  return field.config.type === FieldType.TIME
 }
 
 export const isDateRangeFieldType = (field: {
@@ -310,7 +332,6 @@ export const isFileFieldType = (field: {
   config: FieldConfig
   value: FieldValue
 }): field is { value: FileFieldValue; config: File } => {
-  // @TODO?
   return field.config.type === FieldType.FILE
 }
 
@@ -369,7 +390,7 @@ export const isRadioGroupFieldType = (field: {
 export const isLocationFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: string; config: Location } => {
+}): field is { value: string; config: LocationInput } => {
   return field.config.type === FieldType.LOCATION
 }
 
@@ -408,12 +429,35 @@ export const isDataFieldType = (field: {
   return field.config.type === FieldType.DATA
 }
 
+export const isButtonFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: ButtonField } => {
+  return field.config.type === FieldType.BUTTON
+}
+
+export const isHttpFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: HttpField } => {
+  return field.config.type === FieldType.HTTP
+}
+
+export const isLinkButtonFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: LinkButtonField } => {
+  return field.config.type === FieldType.LINK_BUTTON
+}
+
 export type NonInteractiveFieldType =
   | Divider
   | PageHeader
   | Paragraph
   | BulletList
   | DataField
+  | HttpField
+  | LinkButtonField
 
 export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
 
@@ -425,6 +469,8 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.PAGE_HEADER ||
     field.type === FieldType.PARAGRAPH ||
     field.type === FieldType.BULLET_LIST ||
-    field.type === FieldType.DATA
+    field.type === FieldType.DATA ||
+    field.type === FieldType.HTTP ||
+    field.type === FieldType.LINK_BUTTON
   )
 }

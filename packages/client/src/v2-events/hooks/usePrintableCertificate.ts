@@ -9,16 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Location } from '@events/service/locations/locations'
+import { useSelector } from 'react-redux'
 import {
-  EventDocument,
-  getCurrentEventState,
-  isMinioUrl,
-  User,
+  ActionDocument,
+  ActionType,
   CertificateTemplateConfig,
-  LanguageConfig,
   EventConfig,
-  FieldType
+  EventDocument,
+  FieldType,
+  getCurrentEventState,
+  getUUID,
+  isMinioUrl,
+  LanguageConfig,
+  Location,
+  PrintCertificateAction,
+  UUID,
+  UserOrSystem
 } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
@@ -27,7 +33,10 @@ import {
   svgToPdfTemplate
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { getOfflineData } from '@client/offline/selectors'
 import { useEventConfiguration } from '../features/events/useEventConfiguration'
+import { useEvents } from '../features/events/useEvents/useEvents'
 
 async function replaceMinioUrlWithBase64(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,7 +76,7 @@ export const usePrintableCertificate = ({
   event: EventDocument
   config: EventConfig
   locations: Location[]
-  users: User[]
+  users: UserOrSystem[]
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
 }) => {
@@ -76,17 +85,59 @@ export const usePrintableCertificate = ({
     event,
     eventConfiguration
   )
+  const { getEvent } = useEvents()
+  const userDetails = useSelector(getUserDetails)
+  const { config: appConfig } = useSelector(getOfflineData)
+
+  const adminLevels = appConfig.ADMIN_STRUCTURE
+
+  const actions = getEvent.getFromCache(event.id).actions
+  if (!userDetails) {
+    throw new Error('User details are not available')
+  }
+
+  const userFromUsersList = users.find((user) => user.id === userDetails.id)
+  if (!userFromUsersList) {
+    throw new Error(`User with id ${userDetails.id} not found in users list`)
+  }
+
+  const actionsWithAnOptimisticPrintAction = actions.concat({
+    type: ActionType.PRINT_CERTIFICATE,
+    id: getUUID(),
+    transactionId: getUUID(),
+    createdByUserType: 'user',
+    createdAt: new Date().toISOString(),
+    createdBy: userFromUsersList.id,
+    createdByRole: userFromUsersList.role,
+    status: 'Accepted',
+    declaration: {},
+    annotation: null,
+    originalActionId: null,
+    createdBySignature: userFromUsersList.signature,
+    createdAtLocation: userDetails.primaryOffice.id as UUID,
+    content: {
+      templateId: certificateConfig?.id
+    }
+  } satisfies PrintCertificateAction)
+
+  const copiesPrintedForTemplate = actionsWithAnOptimisticPrintAction.filter(
+    (action) =>
+      action.type === ActionType.PRINT_CERTIFICATE &&
+      (action as PrintCertificateAction).content?.templateId ===
+        certificateConfig?.id
+  ).length
 
   const modifiedMetadata = {
     ...metadata,
     // Temporarily add `modifiedAt` to the last action's data to display
     // the current certification date in the certificate preview on the review page.
-    modifiedAt: new Date().toISOString()
+    modifiedAt: new Date().toISOString(),
     // Since 'modifiedDate' represents the last action's 'createdAt' date, and when
     // we actually print certificate, in this particular case, last action is PRINT_CERTIFICATE
+    copiesPrintedForTemplate
   }
 
-  if (!language || !certificateConfig) {
+  if (!language || !certificateConfig?.svg) {
     return { svgCode: null }
   }
 
@@ -96,15 +147,25 @@ export const usePrintableCertificate = ({
     templateString: certificateConfig.svg,
     $metadata: modifiedMetadata,
     $declaration: declaration,
+    $actions: actionsWithAnOptimisticPrintAction as ActionDocument[],
+    review: true,
     locations,
     users,
     language,
-    config
+    config,
+    adminLevels
   })
 
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
-  const handleCertify = async (updatedEvent: EventDocument) => {
+  /**
+   * NOTE: We have separated the preparing and printing of the PDF certificate. Without the separation, user is already unassigned from the event and cache is cleared. We end up losing the images in the PDF unless we run actions in correct order.
+   * 1. Prepare 2. Trigger print action 3. Open the PDF in a new window 4. Redirect user to workqueue.
+   *
+   * Prepares the PDF certificate by resolving image urls to base64 and compiles them into SVG template.
+   * @returns function that opens a new window with the PDF certificate
+   */
+  const preparePdfCertificate = async (updatedEvent: EventDocument) => {
     const { declaration: updatedDeclaration, ...updatedMetadata } =
       getCurrentEventState(updatedEvent, eventConfiguration)
     const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
@@ -118,13 +179,17 @@ export const usePrintableCertificate = ({
         ...updatedMetadata,
         // Temporarily add `modifiedAt` to the last action's data to display
         // the current certification date in the certificate preview on the review page.
-        modifiedAt: new Date().toISOString()
+        modifiedAt: new Date().toISOString(),
+        copiesPrintedForTemplate
       },
       $declaration: declarationWithResolvedImages,
+      $actions: actionsWithAnOptimisticPrintAction as ActionDocument[],
       locations,
+      review: false,
       users,
       language,
-      config
+      config,
+      adminLevels
     })
 
     const compiledSvgWithFonts = addFontsToSvg(compiledSvg, certificateFonts)
@@ -133,11 +198,11 @@ export const usePrintableCertificate = ({
       certificateFonts
     )
 
-    printAndDownloadPdf(pdfTemplate, event.id)
+    return () => printAndDownloadPdf(pdfTemplate, event.id)
   }
 
   return {
     svgCode,
-    handleCertify
+    preparePdfCertificate
   }
 }

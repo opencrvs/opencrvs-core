@@ -33,18 +33,20 @@ function FileInput({
   maxFileSize,
   label,
   error,
-  touched
+  touched,
+  disabled
 }: {
   width?: 'full' | 'auto'
   acceptedFileTypes?: MimeType[]
   maxFileSize: number
   value: FileFieldValue | undefined
-  onChange: (file?: FileFieldValue) => void
+  onChange: (file: FileFieldValue | null) => void
   name: string
   description?: string
   error?: string
   label: string
   touched?: boolean
+  disabled?: boolean
 }) {
   const [file, setFile] = React.useState(value)
 
@@ -52,14 +54,14 @@ function FileInput({
     onSuccess: ({ path, originalFilename, type }) => {
       setFile({
         path,
-        originalFilename: originalFilename,
-        type: type
+        originalFilename,
+        type
       })
 
       onChange({
         path,
-        originalFilename: originalFilename,
-        type: type
+        originalFilename,
+        type
       })
     }
   })
@@ -68,6 +70,7 @@ function FileInput({
     <SimpleDocumentUploader
       acceptedFileTypes={acceptedFileTypes}
       description={description}
+      disabled={disabled}
       error={error}
       file={file}
       label={label}
@@ -89,7 +92,7 @@ function FileInput({
           setFile(undefined)
         }
         setFile(undefined)
-        onChange(undefined)
+        onChange(null)
       }}
     />
   )

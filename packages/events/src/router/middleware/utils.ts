@@ -15,7 +15,7 @@ import { TrpcContext } from '@events/context'
  * TRPC Middleware options with correct context.
  * Actual middleware type definition is only for internal use within TRPC.
  */
-export type MiddlewareOptions = Omit<
+export type MiddlewareOptions<Context = TrpcContext> = Omit<
   Parameters<AnyTRPCMiddlewareFunction>[0],
   'ctx'
-> & { ctx: TrpcContext }
+> & { ctx: Context }

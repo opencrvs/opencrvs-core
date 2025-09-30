@@ -70,7 +70,8 @@ export const WorkqueueConfig = z
       })
     ),
     columns: z.array(WorkqueueColumn).default(mandatoryColumns),
-    icon: AvailableIcons
+    icon: AvailableIcons,
+    emptyMessage: TranslationConfig.optional()
   })
   .describe('Configuration for workqueue.')
 
@@ -92,7 +93,8 @@ export const WorkqueueConfigInput = z.object({
     })
   ),
   columns: z.array(WorkqueueColumn).default(mandatoryColumns),
-  icon: AvailableIcons
+  icon: AvailableIcons,
+  emptyMessage: TranslationConfig.optional()
 })
 
 export type WorkqueueConfig = z.infer<typeof WorkqueueConfig>

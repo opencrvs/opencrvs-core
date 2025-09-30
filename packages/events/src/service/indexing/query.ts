@@ -10,11 +10,10 @@
  */
 import { estypes } from '@elastic/elasticsearch'
 import {
-  AddressFieldValue,
   EventConfig,
   FieldType,
   getAllUniqueFields,
-  Inferred,
+  FieldConfig,
   QueryExpression,
   QueryType,
   DateCondition,
@@ -22,10 +21,12 @@ import {
   SearchScopeAccessLevels,
   timePeriodToDateRange
 } from '@opencrvs/commons/events'
+import { getOrThrow } from '@opencrvs/commons'
+import { getChildLocations } from '../locations/locations'
 import {
   encodeFieldId,
   generateQueryForAddressField,
-  getAlternateFieldMap
+  nameQueryKey
 } from './utils'
 
 /** Convert API date clause format to elastic syntax */
@@ -68,142 +69,97 @@ function generateQuery(
   event: QueryInputType,
   eventConfigs: EventConfig[]
 ): estypes.QueryDslQueryContainer {
-  const allEventFields = eventConfigs.reduce<Inferred[]>((acc, eventConfig) => {
-    const fields = getAllUniqueFields(eventConfig)
-    return acc.concat(fields)
-  }, [])
+  const allEventFields = eventConfigs.reduce<FieldConfig[]>(
+    (acc, eventConfig) => {
+      const fields = getAllUniqueFields(eventConfig)
+      return acc.concat(fields)
+    },
+    []
+  )
 
-  const nameFieldIds = allEventFields
-    .filter((field) => field.type === FieldType.NAME)
-    .map((f) => f.id)
+  const must = Object.entries(event).map(([fieldId, search]) => {
+    const esFieldName = `declaration.${encodeFieldId(fieldId)}`
+    const field = getOrThrow(
+      allEventFields.find((f) => f.id === fieldId),
+      `Tried to search with a field id ${fieldId} but it is not found in event configuration`
+    )
 
-  const addressFieldIds = allEventFields
-    .filter((field) => field.type === FieldType.ADDRESS)
-    .map((f) => f.id)
+    if (field.type === FieldType.ADDRESS) {
+      return generateQueryForAddressField(fieldId, search)
+    }
 
-  const alternateFieldMap = getAlternateFieldMap(eventConfigs)
-
-  const must = Object.entries(event)
-    // Exclude fields from Search query that are meant to
-    .filter(([fieldId]) => {
-      const fieldSearchConfig = eventConfigs
-        .flatMap((x) => x.advancedSearch)
-        .flatMap((s) => s.fields)
-        .find((f) => f.fieldId === fieldId)
-      if (
-        fieldSearchConfig?.fieldType === 'field' &&
-        fieldSearchConfig.excludeInSearchQuery
-      ) {
-        return false
-      }
-      return true
-    })
-    .map(([fieldId, search]) => {
-      const field = `declaration.${encodeFieldId(fieldId)}`
-
-      if (search.type === 'exact') {
-        const allIds = [fieldId, ...(alternateFieldMap[fieldId] ?? [])]
-
-        if (
-          fieldId in alternateFieldMap &&
-          alternateFieldMap[fieldId].length > 0
-        ) {
-          const queries: estypes.QueryDslQueryContainer[] = allIds.map((id) => {
-            if (addressFieldIds.includes(id)) {
-              const parsed = AddressFieldValue.safeParse(
-                JSON.parse(search.term)
-              )
-              if (parsed.success) {
-                return generateQueryForAddressField(
-                  `declaration.${encodeFieldId(id)}`,
-                  parsed.data
-                )
-              }
-            }
-
-            // For non-address or failed parse, return simple match
-            return {
-              match: {
-                [`declaration.${encodeFieldId(id)}`]: search.term
-              }
-            }
-          })
-
-          return {
-            bool: { should: queries, minimum_should_match: 1 }
-          }
-        }
-
-        // default exact match
-        return {
-          match: {
-            [field]: search.term
-          }
-        }
-      }
-
-      // Step 3: Fuzzy
+    if (field.type === FieldType.NAME) {
       if (search.type === 'fuzzy') {
-        /**
-         * If the current field is a NAME-type field (determined by checking its ID against known name field IDs),
-         * return a match query on the `${field}.__fullname` subfield. This allows Elasticsearch to perform
-         * a fuzzy search on the full name, improving matching for name-related fields (e.g., handling typos or variations).
-         */
-        if (nameFieldIds.includes(fieldId)) {
-          return {
-            match: {
-              [`${field}.__fullname`]: {
-                query: search.term,
-                fuzziness: 'AUTO'
-              }
-            }
-          }
-        }
-
         return {
           match: {
-            [field]: {
+            [nameQueryKey(esFieldName)]: {
               query: search.term,
               fuzziness: 'AUTO'
             }
           }
         }
       }
+      return {
+        match: {
+          [nameQueryKey(esFieldName)]: search.term
+        }
+      }
+    }
 
-      if (search.type === 'anyOf') {
-        return {
-          terms: {
-            [field]: search.terms
+    if (search.type === 'exact') {
+      return {
+        match: {
+          [esFieldName]: search.term
+        }
+      }
+    }
+
+    if (search.type === 'fuzzy') {
+      return {
+        match: {
+          [esFieldName]: {
+            query: search.term,
+            fuzziness: 'AUTO'
           }
         }
       }
+    }
 
-      if (search.type === 'range') {
-        return {
-          range: {
-            [field]: {
-              gte: search.gte,
-              lte: search.lte
-            }
+    if (search.type === 'anyOf') {
+      return {
+        terms: {
+          [esFieldName]: search.terms
+        }
+      }
+    }
+
+    if (search.type === 'range') {
+      return {
+        range: {
+          [esFieldName]: {
+            gte: search.gte,
+            lte: search.lte
           }
         }
       }
+    }
 
-      throw new Error(`Unsupported query type: ${search.type}`)
-    })
+    throw new Error(`Unsupported query type: ${search.type}`)
+  })
 
   return {
     bool: { must, should: undefined }
   } satisfies estypes.QueryDslQueryContainer
 }
 
-const EXACT_SEARCH_LOCATION_DISTANCE = '10km'
-
 function typedKeys<T extends object>(obj: T): (keyof T)[] {
   return Object.keys(obj) as (keyof T)[]
 }
 
-function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
+async function buildClause(
+  clause: QueryExpression,
+  eventConfigs: EventConfig[]
+) {
   const must: estypes.QueryDslQueryContainer[] = []
 
   for (const key of typedKeys(clause)) {
@@ -256,15 +212,23 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
 
       case 'createdAtLocation':
       case 'updatedAtLocation':
+      case 'legalStatuses.DECLARED.createdAtLocation':
       case 'legalStatuses.REGISTERED.createdAtLocation': {
         const value = clause[key]
+
         if (value.type === 'exact') {
           must.push({ term: { [key]: value.term } })
         } else {
+          const childLocations = await getChildLocations(value.location)
+          const locationIds = [
+            value.location,
+            ...childLocations.map((location) => location.id)
+          ]
+
           must.push({
-            geo_distance: {
-              distance: EXACT_SEARCH_LOCATION_DISTANCE,
-              location: value.location
+            bool: {
+              should: locationIds.map((id) => ({ term: { [key]: id } })),
+              minimum_should_match: 1
             }
           })
         }
@@ -309,13 +273,16 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
   return must
 }
 
-export function buildElasticQueryFromSearchPayload(
+export async function buildElasticQueryFromSearchPayload(
   input: QueryType,
   eventConfigs: EventConfig[]
-): estypes.QueryDslQueryContainer {
-  const must = input.clauses.flatMap((clause) =>
-    buildClause(clause, eventConfigs)
+): Promise<estypes.QueryDslQueryContainer> {
+  const mustResults = await Promise.all(
+    input.clauses.map(async (clause) => buildClause(clause, eventConfigs))
   )
+
+  const must = mustResults.flat()
+
   switch (input.type) {
     case 'and': {
       return {
@@ -328,14 +295,16 @@ export function buildElasticQueryFromSearchPayload(
       }
     }
     case 'or': {
-      const should = input.clauses.flatMap((clause) => ({
-        bool: {
-          must: buildClause(clause, eventConfigs),
-          // Explicitly setting `should` to `undefined` to satisfy QueryDslBoolQuery type requirements
-          // when no `should` clauses are provided.
-          should: undefined
-        }
-      }))
+      const should = await Promise.all(
+        input.clauses.map(async (clause) => ({
+          bool: {
+            must: await buildClause(clause, eventConfigs),
+            // Explicitly setting `should` to `undefined` to satisfy QueryDslBoolQuery type requirements
+            // when no `should` clauses are provided.
+            should: undefined
+          }
+        }))
+      )
 
       return {
         bool: {

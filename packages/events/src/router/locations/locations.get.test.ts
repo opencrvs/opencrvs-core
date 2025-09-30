@@ -8,36 +8,28 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { generateUuid, SCOPES } from '@opencrvs/commons'
+import { generateUuid, Location, LocationType, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('Returns single location in right format', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const setLocationPayload = [
+  const locationId = generateUuid()
+
+  const setLocationPayload: Location[] = [
     {
-      id: generateUuid(),
-      partOf: null,
+      id: locationId,
+      parentId: null,
       name: 'Location foobar',
-      externalId: 'ext-id-123'
+      validUntil: null,
+      locationType: LocationType.enum.ADMIN_STRUCTURE
     }
   ]
 
   await client.locations.set(setLocationPayload)
 
-  const locations = await client.locations.get()
+  const one = await client.locations.get(locationId)
 
-  expect(locations).toHaveLength(1)
-  expect(locations).toMatchObject(setLocationPayload)
-})
-
-test('Returns multiple locations', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
-  await client.locations.set(generator.locations.set(5))
-
-  const locations = await client.locations.get()
-
-  expect(locations).toHaveLength(5)
+  expect(one).toMatchObject(setLocationPayload[0])
 })

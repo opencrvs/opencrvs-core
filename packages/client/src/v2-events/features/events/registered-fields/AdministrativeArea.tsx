@@ -10,13 +10,17 @@
  */
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Location } from '@events/service/locations/locations'
-import { FieldProps } from '@opencrvs/commons/client'
+import {
+  Location,
+  FieldPropsWithoutReferenceValue
+} from '@opencrvs/commons/client'
 import { getAdminStructureLocations } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Select } from './Select'
+import { LocationSearch } from './LocationSearch'
 
 function useAdminLocations(partOf: string) {
   const locationMap = useSelector(getAdminStructureLocations)
@@ -29,11 +33,7 @@ function useAdminLocations(partOf: string) {
 
   return filteredLocations.map((location) => ({
     value: location.id,
-    label: {
-      id: 'v2.location.' + location.id,
-      description: 'Label for location: ' + location.name,
-      defaultMessage: location.name
-    }
+    label: location.name
   }))
 }
 
@@ -42,10 +42,11 @@ function AdministrativeAreaInput({
   value,
   partOf,
   ...props
-}: FieldProps<'ADMINISTRATIVE_AREA'> & {
+}: FieldPropsWithoutReferenceValue<'ADMINISTRATIVE_AREA'> & {
   onChange: (val: string | undefined) => void
   partOf: string | null
   value?: string
+  disabled?: boolean
 }) {
   const options = useAdminLocations(partOf ?? '0')
 
@@ -72,15 +73,21 @@ function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
   return location ? location.name : ''
 }
 
-function stringify(locations: Location[], value: string) {
-  const location = locations.find((l) => l.id === value)
+function stringify(value: string, context: { locations: Location[] }) {
+  const location = context.locations.find((l) => l.id === value)
 
   const name = location?.name
   return name ?? EMPTY_TOKEN
 }
 
+function isAdministrativeAreaEmpty(value: Stringifiable) {
+  return !value.toString()
+}
+
 export const AdministrativeArea = {
-  Input: AdministrativeAreaInput,
+  Input: withSuspense(AdministrativeAreaInput),
   Output: AdministrativeAreaOutput,
-  stringify
+  stringify,
+  toCertificateVariables: LocationSearch.toCertificateVariables,
+  isEmptyValue: isAdministrativeAreaEmpty
 }

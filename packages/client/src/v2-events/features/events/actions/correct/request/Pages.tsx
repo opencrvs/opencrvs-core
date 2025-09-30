@@ -16,6 +16,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import {
+  ActionType,
   getDeclarationPages,
   isNonInteractiveFieldType,
   PageConfig
@@ -53,7 +54,6 @@ export function Pages() {
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const eventIndex = getCurrentEventState(event, configuration)
 
   const formPages = getDeclarationPages(configuration)
   const correctablePages = getCorrectablePages(formPages)
@@ -84,7 +84,7 @@ export function Pages() {
     <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       {modal}
       <PagesComponent
-        declaration={eventIndex.declaration}
+        actionType={ActionType.REQUEST_CORRECTION}
         eventConfig={configuration}
         form={form}
         formPages={correctablePages}

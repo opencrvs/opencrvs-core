@@ -9,42 +9,64 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-import { UUID } from '@opencrvs/commons'
+import { Location, LocationType, UUID } from '@opencrvs/commons'
 import * as locationsRepo from '@events/storage/postgres/events/locations'
-
-export const Location = z.object({
-  id: UUID,
-  externalId: z.string().nullable(),
-  name: z.string(),
-  partOf: UUID.nullable()
-})
-
-export type Location = z.infer<typeof Location>
+import * as config from '@events/service/config/config'
 
 /**
  * Sets incoming locations in the database for events. Should be only run as part of the initial seeding.
  * @param incomingLocations - Locations to be set
  */
 
-export async function setLocations(incomingLocations: Array<Location>) {
+export async function setLocations(locations: Location[]) {
   return locationsRepo.setLocations(
-    incomingLocations.map(({ id, externalId, name, partOf }) => ({
+    locations.map(({ id, name, parentId, validUntil, locationType }) => ({
       id,
-      externalId,
       name,
-      parentId: partOf
+      parentId,
+      validUntil: validUntil ? new Date(validUntil).toISOString() : null,
+      locationType
     }))
   )
 }
 
-export const getLocations = async () => {
-  const locations = await locationsRepo.getLocations()
+/**
+ * Syncs locations from V1 to V2 database.
+ * @param incomingLocations - Locations to be set
+ */
 
-  return locations.map(({ id, externalId, name, parentId }) => ({
+export async function syncLocations() {
+  const locations = await config.getLocations()
+  return setLocations(locations)
+}
+
+/**
+ * NOTE: Be cautious when calling this function as it fetches all locations from the database.
+ * Do you really need all of them? Consider using more specific functions if possible. Act as if there could be hundreds of thousands of locations.
+ *
+ */
+export async function getLocations(params?: {
+  locationType?: LocationType
+  locationIds?: UUID[]
+  isActive?: boolean
+}) {
+  const locations = await locationsRepo.getLocations(params)
+
+  return locations
+}
+
+export const getChildLocations = async (parentIdToSearch: string) => {
+  const locations = await locationsRepo.getChildLocations(parentIdToSearch)
+
+  return locations.map(({ id, name, parentId, validUntil, locationType }) => ({
     id,
-    externalId,
     name,
-    partOf: parentId
+    validUntil,
+    parentId,
+    locationType
   }))
+}
+
+export const getLocationById = async (id: UUID) => {
+  return locationsRepo.getLocationById(id)
 }

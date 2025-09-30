@@ -112,9 +112,6 @@ const server = setupServer(
 
   tRPCMsw.event.config.get.query(() => {
     return [tennisClubMembershipEvent]
-  }),
-  tRPCMsw.event.list.query(() => {
-    return [tennisClubMembershipEventIndex]
   })
 )
 
@@ -135,7 +132,7 @@ interface TestContext {
 }
 
 function wrapper({ children }: PropsWithChildren) {
-  return <TRPCProvider>{children}</TRPCProvider>
+  return <TRPCProvider waitForClientRestored={false}>{children}</TRPCProvider>
 }
 
 beforeEach<TestContext>(async (testContext) => {

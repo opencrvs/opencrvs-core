@@ -10,10 +10,17 @@
  */
 
 import React from 'react'
+import { first } from 'lodash'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
-import { EventDocument, mandatoryColumns } from '@opencrvs/commons/client'
-import { getCurrentEventState } from '@opencrvs/commons/client'
+import {
+  EventDocument,
+  getOrThrow,
+  mandatoryColumns,
+  getCurrentEventState,
+  applyDraftToEventIndex
+} from '@opencrvs/commons/client'
+
 import { ROUTES } from '@client/v2-events/routes'
 import { CoreWorkqueues, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
 import { useEventConfigurations } from '../events/useEventConfiguration'
@@ -32,18 +39,32 @@ export function Draft() {
 
   const { getAllRemoteDrafts } = useDrafts()
 
-  const drafts = getAllRemoteDrafts()
+  const drafts = getAllRemoteDrafts({
+    refetchOnMount: 'always',
+    staleTime: 0,
+    refetchInterval: 20000
+  })
 
   const eventsWithDrafts = drafts
     .map(({ eventId }) => findLocalEventDocument(eventId))
     .filter((event): event is EventDocument => !!event)
-    .map((event) =>
-      getCurrentEventState(
-        event,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        eventConfigs.find(({ id }) => id === event.type)!
+    .map((event) => {
+      const draft = first(drafts.filter((d) => d.eventId === event.id))
+      const configuration = getOrThrow(
+        eventConfigs.find(({ id }) => id === event.type),
+        `Event configuration not found for ${event.type}`
       )
-    )
+
+      const currentEventState = getCurrentEventState(event, configuration)
+      return draft
+        ? applyDraftToEventIndex(currentEventState, draft, configuration)
+        : currentEventState
+    })
+
+  const currentPageDrafts = eventsWithDrafts.slice(
+    searchParams.offset || 0,
+    searchParams.offset + searchParams.limit
+  )
 
   return (
     <SearchResultComponent
@@ -51,8 +72,9 @@ export function Draft() {
       actions={['DEFAULT']}
       columns={mandatoryColumns}
       eventConfigs={eventConfigs}
-      queryData={eventsWithDrafts}
+      queryData={currentPageDrafts}
       title={intl.formatMessage(WORKQUEUE_DRAFT.name)}
+      totalResults={eventsWithDrafts.length}
       {...searchParams}
     />
   )

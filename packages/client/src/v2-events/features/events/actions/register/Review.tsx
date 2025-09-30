@@ -22,7 +22,8 @@ import {
   getActionAnnotation,
   getDeclaration,
   getActionReview,
-  EventStatus
+  InherentFlags,
+  LocationType
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -42,6 +43,7 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { useSuspenseAdminLeafLevelLocations } from '@client/v2-events/hooks/useLocations'
 import { reviewMessages } from '../messages'
 
 function getTranslations(hasErrors: boolean) {
@@ -63,9 +65,11 @@ export function Review() {
   const drafts = useDrafts()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
-  const { redirectToOrigin } = useEventFormNavigation()
+  const { closeActionView: closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
+
+  const locationIds = useSuspenseAdminLeafLevelLocations()
 
   const registerMutation = events.actions.register
 
@@ -93,7 +97,8 @@ export function Review() {
     formConfig,
     form,
     annotation,
-    reviewFields: reviewConfig.fields
+    reviewFields: reviewConfig.fields,
+    locationIds
   })
 
   const messages = getTranslations(incomplete)
@@ -153,7 +158,7 @@ export function Review() {
         transactionId: uuid(),
         annotation
       })
-      redirectToOrigin(slug)
+      closeActionView(slug)
     }
   }
 
@@ -170,21 +175,30 @@ export function Review() {
           declaration: {},
           transactionId: uuid(),
           annotation: {},
-          reason: { message }
+          content: { reason: message }
         })
       }
 
       if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
-        events.actions.archive.mutate({
-          eventId,
-          declaration: {},
-          transactionId: uuid(),
-          annotation: {},
-          reason: { message, isDuplicate }
-        })
+        if (isDuplicate) {
+          events.customActions.archiveOnDuplicate.mutate({
+            eventId,
+            declaration: {},
+            transactionId: uuid(),
+            content: { reason: message }
+          })
+        } else {
+          events.actions.archive.mutate({
+            eventId,
+            declaration: {},
+            transactionId: uuid(),
+            annotation: {},
+            content: { reason: message }
+          })
+        }
       }
 
-      redirectToOrigin(slug)
+      closeActionView(slug)
     }
   }
 
@@ -194,7 +208,7 @@ export function Review() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          redirectToOrigin(slug)
+          closeActionView(slug)
         })
       }
     >
@@ -202,6 +216,7 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
+        locationIds={locationIds}
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
@@ -215,7 +230,7 @@ export function Review() {
           primaryButtonType="positive"
           onConfirm={handleRegistration}
           onReject={
-            currentEventState.status === EventStatus.enum.REJECTED
+            currentEventState.flags.includes(InherentFlags.REJECTED)
               ? undefined
               : handleRejection
           }

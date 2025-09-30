@@ -13,39 +13,45 @@ import { v4 as uuid } from 'uuid'
 import {
   EventState,
   DeclarationFormConfig,
-  Scope,
-  SCOPES,
   FieldConfig,
-  EventStatus
+  EventStatus,
+  ActionType,
+  UUID
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { reviewMessages } from '@client/v2-events/features/events/actions/messages'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 
 export function useReviewActionConfig({
   formConfig,
   declaration,
   annotation,
   reviewFields,
-  scopes,
-  status
+  status,
+  locationIds,
+  eventType
 }: {
   formConfig: DeclarationFormConfig
   declaration: EventState
   annotation?: EventState
   reviewFields: FieldConfig[]
-  scopes?: Scope[]
   status: EventStatus
+  locationIds: Array<{ id: UUID }>
+  eventType: string
 }) {
   const events = useEvents()
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form: declaration,
     annotation,
-    reviewFields
+    reviewFields,
+    locationIds
   })
 
-  if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
+  const { isActionAllowed } = useUserAllowedActions(eventType)
+
+  if (isActionAllowed(ActionType.REGISTER)) {
     return {
       buttonType: 'positive' as const,
       incomplete,
@@ -72,7 +78,7 @@ export function useReviewActionConfig({
     } as const
   }
 
-  if (scopes?.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL)) {
+  if (isActionAllowed(ActionType.VALIDATE)) {
     return {
       buttonType: 'positive' as const,
       incomplete,
@@ -89,8 +95,7 @@ export function useReviewActionConfig({
           eventId,
           declaration,
           annotation,
-          transactionId: uuid(),
-          duplicates: []
+          transactionId: uuid()
         })
       },
       messages: incomplete

@@ -11,10 +11,10 @@
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons'
+import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
 import { Flag, InherentFlags } from '@opencrvs/commons/client'
 
-const Flex = styled.div`
+export const Flex = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
@@ -41,7 +41,7 @@ const STATUS_TO_COLOR_MAP = {
   ISSUED: 'blue'
 }
 
-const Icon = styled.div`
+export const Icon = styled.div`
   flex-shrink: 0;
   display: flex;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -50,7 +50,7 @@ const Icon = styled.div`
   width: 24px;
 `
 
-function getIconColor(
+export function getIconColor(
   status: keyof typeof STATUS_TO_COLOR_MAP,
   flags?: Flag[]
 ) {
@@ -81,11 +81,15 @@ export function IconWithName({
   return (
     <Flex id="flex">
       <Icon>
-        <DeclarationIcon
-          color={getIconColor(status, flags)}
-          isArchive={isArchived}
-          isValidatedOnReview={isValidatedOnReview}
-        />
+        {flags?.includes(InherentFlags.POTENTIAL_DUPLICATE) ? (
+          <Duplicate />
+        ) : (
+          <DeclarationIcon
+            color={getIconColor(status, flags)}
+            isArchive={isArchived}
+            isValidatedOnReview={isValidatedOnReview}
+          />
+        )}
       </Icon>
       {name}
     </Flex>

@@ -24,17 +24,17 @@ export function isBase64FileString(str: string) {
   return strSplit.length > 0 && strSplit[0] === 'data'
 }
 
-export const isMinioUrl = (url: string): url is FullDocumentURL =>
+export const isMinioUrl = (url: string): url is FullDocumentUrl =>
   MINIO_REGEX.test(url)
 
-export const FullDocumentURL = z
+export const FullDocumentUrl = z
   .string()
-  .brand('FullDocumentURL')
+  .brand('FullDocumentUrl')
   .describe(
     'A full url with protocol, host, bucket name, starting from the root of the S3 server, https://minio/bucket-name/document-id.jpg'
   )
 
-export type FullDocumentURL = z.infer<typeof FullDocumentURL>
+export type FullDocumentUrl = z.infer<typeof FullDocumentUrl>
 
 export const FullDocumentPath = z
   .string()

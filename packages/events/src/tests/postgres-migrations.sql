@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.4 (Debian 17.4-1.pgdg120+2)
--- Dumped by pg_dump version 17.4 (Debian 17.4-1.pgdg120+2)
+-- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
+-- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -49,21 +49,36 @@ CREATE TYPE app.action_type AS ENUM (
     'DECLARE',
     'VALIDATE',
     'REGISTER',
-    'DETECT_DUPLICATE',
+    'DUPLICATE_DETECTED',
     'REJECT',
-    'MARKED_AS_DUPLICATE',
+    'MARK_AS_DUPLICATE',
     'ARCHIVE',
     'PRINT_CERTIFICATE',
     'REQUEST_CORRECTION',
+    'CORRECT',
     'REJECT_CORRECTION',
     'APPROVE_CORRECTION',
     'READ',
     'ASSIGN',
-    'UNASSIGN'
+    'UNASSIGN',
+    'MARK_AS_NOT_DUPLICATE'
 );
 
 
 ALTER TYPE app.action_type OWNER TO events_migrator;
+
+--
+-- Name: location_type; Type: TYPE; Schema: app; Owner: events_migrator
+--
+
+CREATE TYPE app.location_type AS ENUM (
+    'HEALTH_FACILITY',
+    'CRVS_OFFICE',
+    'ADMIN_STRUCTURE'
+);
+
+
+ALTER TYPE app.location_type OWNER TO events_migrator;
 
 --
 -- Name: user_type; Type: TYPE; Schema: app; Owner: events_migrator
@@ -128,13 +143,12 @@ CREATE TABLE app.event_actions (
     event_id uuid NOT NULL,
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     original_action_id uuid,
-    reason_is_duplicate boolean,
-    reason_message text,
     registration_number text,
     request_id text,
     status app.action_status NOT NULL,
     transaction_id text NOT NULL,
-    CONSTRAINT event_actions_check CHECK ((((action_type = 'ASSIGN'::app.action_type) AND (assigned_to IS NOT NULL)) OR ((action_type = 'UNASSIGN'::app.action_type) AND (assigned_to IS NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Accepted'::app.action_status) AND (registration_number IS NOT NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Requested'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Rejected'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REJECT'::app.action_type) AND ((reason_message IS NULL) OR (reason_message <> ''::text)) AND (reason_is_duplicate IS NOT NULL)) OR ((action_type = 'REJECT_CORRECTION'::app.action_type) AND (request_id IS NOT NULL)) OR ((action_type = 'APPROVE_CORRECTION'::app.action_type) AND (request_id IS NOT NULL)) OR (action_type <> ALL (ARRAY['ASSIGN'::app.action_type, 'UNASSIGN'::app.action_type, 'REGISTER'::app.action_type, 'REJECT'::app.action_type, 'REJECT_CORRECTION'::app.action_type, 'APPROVE_CORRECTION'::app.action_type]))))
+    content jsonb,
+    CONSTRAINT event_actions_check CHECK ((((action_type = 'ASSIGN'::app.action_type) AND (assigned_to IS NOT NULL)) OR ((action_type = 'UNASSIGN'::app.action_type) AND (assigned_to IS NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Accepted'::app.action_status) AND (registration_number IS NOT NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Requested'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Rejected'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REJECT'::app.action_type) AND ((content -> 'reason'::text) IS NOT NULL) AND ((content ->> 'reason'::text) <> ''::text)) OR ((action_type = 'REJECT_CORRECTION'::app.action_type) AND (request_id IS NOT NULL)) OR ((action_type = 'APPROVE_CORRECTION'::app.action_type) AND (request_id IS NOT NULL)) OR (action_type <> ALL (ARRAY['ASSIGN'::app.action_type, 'UNASSIGN'::app.action_type, 'REGISTER'::app.action_type, 'REJECT'::app.action_type, 'REJECT_CORRECTION'::app.action_type, 'APPROVE_CORRECTION'::app.action_type]))))
 );
 
 
@@ -183,12 +197,13 @@ COMMENT ON TABLE app.events IS 'Stores life events associated with individuals, 
 
 CREATE TABLE app.locations (
     id uuid NOT NULL,
-    external_id text,
     name text NOT NULL,
     parent_id uuid,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    deleted_at timestamp with time zone
+    deleted_at timestamp with time zone,
+    location_type app.location_type,
+    valid_until timestamp with time zone
 );
 
 
@@ -237,19 +252,19 @@ ALTER TABLE ONLY app.pgmigrations ALTER COLUMN id SET DEFAULT nextval('app.pgmig
 
 
 --
+-- Name: event_action_drafts event_action_drafts_event_id_created_by_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.event_action_drafts
+    ADD CONSTRAINT event_action_drafts_event_id_created_by_key UNIQUE (event_id, created_by);
+
+
+--
 -- Name: event_action_drafts event_action_drafts_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
 ALTER TABLE ONLY app.event_action_drafts
     ADD CONSTRAINT event_action_drafts_pkey PRIMARY KEY (id);
-
-
---
--- Name: event_action_drafts event_action_drafts_transaction_id_action_type_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
---
-
-ALTER TABLE ONLY app.event_action_drafts
-    ADD CONSTRAINT event_action_drafts_transaction_id_action_type_key UNIQUE (transaction_id, action_type);
 
 
 --
@@ -269,11 +284,11 @@ ALTER TABLE ONLY app.event_actions
 
 
 --
--- Name: event_actions event_actions_transaction_id_action_type_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+-- Name: event_actions event_actions_transaction_id_action_type_status_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
 ALTER TABLE ONLY app.event_actions
-    ADD CONSTRAINT event_actions_transaction_id_action_type_key UNIQUE (transaction_id, action_type);
+    ADD CONSTRAINT event_actions_transaction_id_action_type_status_key UNIQUE (transaction_id, action_type, status);
 
 
 --
@@ -298,14 +313,6 @@ ALTER TABLE ONLY app.events
 
 ALTER TABLE ONLY app.events
     ADD CONSTRAINT events_transaction_id_event_type_key UNIQUE (transaction_id, event_type);
-
-
---
--- Name: locations locations_external_id_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
---
-
-ALTER TABLE ONLY app.locations
-    ADD CONSTRAINT locations_external_id_key UNIQUE (external_id);
 
 
 --
@@ -410,4 +417,3 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 --
 -- PostgreSQL database dump complete
 --
-

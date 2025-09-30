@@ -10,6 +10,7 @@
  */
 
 import { type estypes } from '@elastic/elasticsearch'
+import { z } from 'zod'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
@@ -22,10 +23,12 @@ import {
   FieldType,
   getCurrentEventState,
   getDeclarationFields,
-  QueryType,
   WorkqueueCountInput,
   getEventConfigById,
-  SearchScopeAccessLevels
+  SearchScopeAccessLevels,
+  SearchQuery,
+  DateRangeField,
+  SelectDateRangeField
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
@@ -35,16 +38,20 @@ import {
 } from '@events/storage/elasticsearch'
 import {
   decodeEventIndex,
-  DEFAULT_SIZE,
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
+  NAME_QUERY_KEY,
   removeSecuredFields
 } from './utils'
 import {
   buildElasticQueryFromSearchPayload,
   withJurisdictionFilters
 } from './query'
+
+// Elasticsearch has a limit of 10,000 results for a query, and
+// trying to get beyond that will result in a “Result window is too large“ error
+const ELASTICSEARCH_MAXIMUM_QUERY_SIZE = 10000
 
 function eventToEventIndex(
   event: EventDocument,
@@ -72,23 +79,28 @@ async function ensureAlias(indexName: string) {
   return res
 }
 
-function mapFieldTypeToElasticsearch(field: FieldConfig) {
+function mapFieldTypeToElasticsearch(
+  field: FieldConfig
+): estypes.MappingProperty {
   switch (field.type) {
     case FieldType.NUMBER:
       return { type: 'double' }
     case FieldType.DATE:
       return { type: 'date' }
+    case FieldType.DATE_RANGE:
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
+    case FieldType.EMAIL:
+    case FieldType.TIME:
+    case FieldType.LINK_BUTTON:
       return { type: 'text' }
     case FieldType.EMAIL:
       return {
         type: 'keyword',
-        // apply custom normalyzer
-        normalizer: 'lowercase_normalizer'
+        normalizer: 'lowercase'
       }
     case FieldType.DIVIDER:
     case FieldType.RADIO_GROUP:
@@ -100,6 +112,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.DATA:
+    case FieldType.BUTTON:
     case FieldType.ID:
     case FieldType.PHONE:
       return { type: 'keyword' }
@@ -107,22 +120,11 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       const addressProperties = {
         country: { type: 'keyword' },
         addressType: { type: 'keyword' },
-        province: { type: 'keyword' },
-        district: { type: 'keyword' },
-        urbanOrRural: { type: 'keyword' },
-        town: { type: 'keyword' },
-        residentialArea: { type: 'keyword' },
-        street: { type: 'keyword' },
-        number: { type: 'keyword' },
-        zipCode: { type: 'keyword' },
-        village: { type: 'keyword' },
-        state: { type: 'keyword' },
-        district2: { type: 'keyword' },
-        cityOrTown: { type: 'keyword' },
-        addressLine1: { type: 'keyword' },
-        addressLine2: { type: 'keyword' },
-        addressLine3: { type: 'keyword' },
-        postcodeOrZip: { type: 'keyword' }
+        administrativeArea: { type: 'keyword' },
+        streetLevelDetails: {
+          type: 'object',
+          properties: {}
+        }
       } satisfies {
         [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
       }
@@ -144,9 +146,9 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return {
         type: 'object',
         properties: {
-          firstname: { type: 'text', analyzer: 'human_name' },
-          surname: { type: 'text', analyzer: 'human_name' },
-          __fullname: { type: 'text', analyzer: 'human_name' }
+          firstname: { type: 'text', analyzer: 'classic' },
+          surname: { type: 'text', analyzer: 'classic' },
+          [NAME_QUERY_KEY]: { type: 'text', analyzer: 'classic' }
         }
       }
     case FieldType.FILE_WITH_OPTIONS:
@@ -159,31 +161,39 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
           option: { type: 'keyword' }
         }
       }
-    // @TODO: other option would be to throw an error, since these should not be used in declaration form.
-    case FieldType.DATE_RANGE:
-    case FieldType.SELECT_DATE_RANGE:
+    case FieldType.HTTP:
+      /**
+       * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
+       * The field still lands in `_source`.
+       */
       return {
         type: 'object',
-        properties: {
-          start: { type: 'date' },
-          end: { type: 'date' }
-        }
+        enabled: false
       }
+    case FieldType.DATE_RANGE:
+    case FieldType.SELECT_DATE_RANGE:
     default:
-      const _exhaustiveCheck: never = field
+      /**
+       * The remaining fields are "search" only fields so should not be
+       * encountered when indexing events.
+       */
+      const _exhaustiveCheck: DateRangeField | SelectDateRangeField = field
       throw new Error(
-        `Unhandled field type: ${JSON.stringify(_exhaustiveCheck)}`
+        `Unsupported indexing field type: ${JSON.stringify(_exhaustiveCheck)}`
       )
   }
 }
 
 function formFieldsToDataMapping(fields: FieldConfig[]) {
-  return fields.reduce((acc, field) => {
-    return {
-      ...acc,
-      [encodeFieldId(field.id)]: mapFieldTypeToElasticsearch(field)
-    }
-  }, {})
+  return fields.reduce(
+    (acc, field) => {
+      return {
+        ...acc,
+        [encodeFieldId(field.id)]: mapFieldTypeToElasticsearch(field)
+      }
+    },
+    {} as Record<string, estypes.MappingProperty>
+  )
 }
 
 export async function createIndex(
@@ -195,28 +205,6 @@ export async function createIndex(
   await client.indices.create({
     index: indexName,
     body: {
-      // Define a custom normalizer to make keyword fields case-insensitive by applying a lowercase filter
-      settings: {
-        analysis: {
-          normalizer: {
-            lowercase_normalizer: {
-              type: 'custom',
-              filter: ['lowercase']
-            }
-          },
-          analyzer: {
-            /*
-             * Human name can contain
-             * Special characters including hyphens, underscores and spaces
-             */
-            human_name: {
-              type: 'custom',
-              tokenizer: 'standard',
-              filter: ['lowercase', 'word_delimiter']
-            }
-          }
-        }
-      },
       mappings: {
         properties: {
           id: { type: 'keyword' },
@@ -272,7 +260,14 @@ export async function createIndex(
               }
             }
           },
-          flags: { type: 'keyword' }
+          flags: { type: 'keyword' },
+          potentialDuplicates: {
+            type: 'object',
+            properties: {
+              id: { type: 'keyword' },
+              trackingId: { type: 'keyword' }
+            }
+          }
         } satisfies EventIndexMapping
       }
     }
@@ -281,7 +276,10 @@ export async function createIndex(
   return ensureAlias(indexName)
 }
 
-export async function ensureIndexExists(eventConfiguration: EventConfig) {
+export async function ensureIndexExists(
+  eventConfiguration: EventConfig,
+  { overwrite }: { overwrite?: boolean } = { overwrite: false }
+) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(eventConfiguration.id)
   const hasEventsIndex = await esClient.indices.exists({
@@ -292,7 +290,12 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
     logger.info(`Creating index ${indexName}`)
     await createIndex(indexName, getDeclarationFields(eventConfiguration))
   } else {
-    logger.info(`Index ${indexName} already exists.\n`)
+    logger.info(`Index ${indexName} already exists.`)
+    if (overwrite) {
+      logger.info(`. - Overwriting index ${indexName}`)
+      await esClient.indices.delete({ index: indexName })
+      await createIndex(indexName, getDeclarationFields(eventConfiguration))
+    }
   }
   return ensureAlias(indexName)
 }
@@ -305,6 +308,20 @@ type _Combine<
 type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
 
+export async function indexEventsInBulk(
+  batch: EventDocument[],
+  configs: EventConfig[]
+) {
+  const esClient = getOrCreateClient()
+
+  const body = batch.flatMap((doc) => [
+    { index: { _index: getEventIndexName(doc.type), _id: doc.id } },
+    eventToEventIndex(doc, getEventConfigById(configs, doc.type))
+  ])
+
+  return esClient.bulk({ refresh: false, body })
+}
+
 export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
@@ -316,18 +333,6 @@ export async function indexEvent(event: EventDocument, config: EventConfig) {
     document: eventToEventIndex(event, config),
     refresh: 'wait_for'
   })
-}
-
-export async function deleteEventIndex(event: EventDocument) {
-  const esClient = getOrCreateClient()
-
-  const response = await esClient.delete({
-    index: getEventIndexName(event.type),
-    id: event.id,
-    refresh: 'wait_for'
-  })
-
-  return response
 }
 
 export async function getIndexedEvents(
@@ -375,7 +380,7 @@ export async function getIndexedEvents(
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
     query,
-    size: DEFAULT_SIZE,
+    size: ELASTICSEARCH_MAXIMUM_QUERY_SIZE,
     request_cache: false
   })
 
@@ -389,26 +394,50 @@ export async function getIndexedEvents(
     })
 }
 
-export async function getIndex(
-  eventParams: QueryType,
+function valueFromTotal(total?: number | estypes.SearchTotalHits) {
+  if (!total) {
+    return 0
+  }
+  if (typeof total === 'number') {
+    return total
+  } else {
+    return total.value
+  }
+}
+
+export async function findRecordsByQuery(
+  search: SearchQuery,
   eventConfigs: EventConfig[],
   options: Record<string, SearchScopeAccessLevels>,
   userOfficeId: string | undefined
 ) {
   const esClient = getOrCreateClient()
-  const query = withJurisdictionFilters(
-    buildElasticQueryFromSearchPayload(eventParams, eventConfigs),
+
+  const { query, limit, offset } = search
+
+  const esQuery = withJurisdictionFilters(
+    await buildElasticQueryFromSearchPayload(query, eventConfigs),
     options,
     userOfficeId
   )
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
-    size: DEFAULT_SIZE,
+    size: limit,
+    from: offset,
+    track_total_hits: true,
     request_cache: false,
-    query,
-    sort: {
+    query: esQuery,
+    sort: search.sort?.map((sort) => ({
+      [sort.field]: {
+        order: sort.direction,
+        unmapped_type: 'keyword'
+      }
+    })) || {
       _score: {
+        order: 'desc'
+      },
+      updatedAt: {
         order: 'desc'
       }
     }
@@ -423,8 +452,21 @@ export async function getIndex(
       return removeSecuredFields(eventConfig, decodedEventIndex)
     })
 
-  return events
+  return { results: events, total: valueFromTotal(response.hits.total) }
 }
+
+/*
+ * The types provided by the Elasticsearch client library.
+ * Left the code having to check for almost all fields.
+ */
+const MsearchResponseSchema = z.object({
+  status: z.number(),
+  hits: z.object({
+    total: z.object({
+      value: z.number()
+    })
+  })
+})
 
 export async function getEventCount(
   queries: WorkqueueCountInput,
@@ -432,20 +474,32 @@ export async function getEventCount(
   options: Record<string, SearchScopeAccessLevels>,
   userOfficeId: string | undefined
 ) {
-  return (
-    //  @TODO: write a query that does everything in one go.
-    (
-      await Promise.all(
-        queries.map(async ({ slug, query }) => {
-          const count = (
-            await getIndex(query, eventConfigs, options, userOfficeId)
-          ).length
-          return { slug, count }
-        })
-      )
-    ).reduce((acc: Record<string, number>, { slug, count }) => {
-      acc[slug] = count
-      return acc
-    }, {})
+  const esClient = getOrCreateClient()
+
+  const esQueries = queries.map(async (query) =>
+    buildElasticQueryFromSearchPayload(query.query, eventConfigs)
   )
+
+  const filteredQueries = (await Promise.all(esQueries)).map((query) =>
+    withJurisdictionFilters(query, options, userOfficeId)
+  )
+  const { responses } = await esClient.msearch({
+    searches: filteredQueries.flatMap((query) => [
+      { index: getEventAliasName() },
+      { size: 0, track_total_hits: true, query }
+    ])
+  })
+
+  return responses.reduce((acc: Record<string, number>, response, index) => {
+    const slug = queries[index].slug
+
+    const validatedResponse = MsearchResponseSchema.safeParse(response)
+
+    return {
+      ...acc,
+      [slug]: validatedResponse.success
+        ? validatedResponse.data.hits.total.value
+        : 0
+    }
+  }, {})
 }

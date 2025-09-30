@@ -17,32 +17,34 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEvents } from './useEvents/useEvents'
+import { useEventFormData } from './useEventFormData'
+import { useActionAnnotation } from './useActionAnnotation'
 
 const modalMessages = defineMessages({
   cancel: {
-    id: 'v2.exitModal.cancel',
+    id: 'exitModal.cancel',
     defaultMessage: 'Cancel'
   },
   confirm: {
-    id: 'v2.buttons.confirm',
+    id: 'buttons.confirm',
     defaultMessage: 'Confirm'
   },
   exitWithoutSavingTitle: {
-    id: 'v2.exitModal.exitWithoutSaving',
+    id: 'exitModal.exitWithoutSaving',
     defaultMessage: 'Exit without saving changes?'
   },
   exitWithoutSavingDescription: {
-    id: 'v2.exitModal.exitWithoutSavingDescription',
+    id: 'exitModal.exitWithoutSavingDescription',
     defaultMessage:
       'You have unsaved changes on your declaration form. Are you sure you want to exit without saving?'
   },
   deleteDeclarationTitle: {
-    id: 'v2.register.form.modal.title.deleteDeclarationConfirm',
+    id: 'register.form.modal.title.deleteDeclarationConfirm',
     defaultMessage: 'Delete draft?',
     description: 'Title for delete declaration confirmation modal'
   },
   deleteDeclarationDescription: {
-    id: 'v2.register.form.modal.desc.deleteDeclarationConfirm',
+    id: 'register.form.modal.description.deleteDeclarationConfirm',
     defaultMessage: `Are you certain you want to delete this draft declaration form? Please note, this action can't be undone.`,
     description: 'Description for delete declaration confirmation modal'
   }
@@ -57,6 +59,10 @@ export function useEventFormNavigation() {
   const remoteDrafts = getAllRemoteDrafts()
   const deleteEvent = events.deleteEvent.useMutation()
 
+  const { setLocalDraft } = useDrafts()
+  const clearForm = useEventFormData((state) => state.clear)
+  const clearAnnotation = useActionAnnotation((state) => state.clear)
+
   const [modal, openModal] = useModal()
 
   function goToHome() {
@@ -65,6 +71,33 @@ export function useEventFormNavigation() {
 
   function goToWorkqueue(slug: string) {
     navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
+  }
+
+  function clearEphemeralFormState() {
+    setLocalDraft(null)
+    clearForm()
+    clearAnnotation()
+  }
+
+  function createNewDeclaration() {
+    clearEphemeralFormState()
+    navigate(ROUTES.V2.EVENTS.CREATE.path)
+  }
+
+  /**
+   * Accepts an optional workqueue slug to navigate to after closing the view.
+   *
+   * DO NOT pass this function directly to `onClick` handlers like `onClick={closeActionView}`
+   * because React will inject a MouseEvent as the first argument.
+   *
+   * Always wrap in an arrow function instead: `onClick={() => closeActionView()}`
+   *
+   * If you have a `string | undefined` (e.g. `slug`), you can pass it directly:
+   * `closeActionView(slug)`
+   */
+  function closeActionView(workqueueToGoBackTo?: string) {
+    workqueueToGoBackTo ? goToWorkqueue(workqueueToGoBackTo) : goToHome()
+    clearEphemeralFormState()
   }
 
   async function exit(event: EventIndex) {
@@ -114,7 +147,7 @@ export function useEventFormNavigation() {
       deleteEvent.mutate({ eventId: event.id })
     }
 
-    goToHome()
+    closeActionView()
   }
 
   async function deleteDeclaration(eventId: string) {
@@ -158,19 +191,16 @@ export function useEventFormNavigation() {
 
     if (deleteConfirm) {
       deleteEvent.mutate({ eventId })
-      goToHome()
+      closeActionView()
     }
-  }
-
-  function redirectToOrigin(slug?: string) {
-    slug ? goToWorkqueue(slug) : goToHome()
   }
 
   return {
     exit,
     modal,
-    goToHome,
+    createNewDeclaration,
     deleteDeclaration,
-    redirectToOrigin
+    closeActionView,
+    clearEphemeralFormState
   }
 }

@@ -9,228 +9,197 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import React, { useEffect } from 'react'
-import { Outlet } from 'react-router-dom'
-import superjson from 'superjson'
-import { expect, waitFor, within, userEvent } from '@storybook/test'
-import { ActionType } from '@opencrvs/commons/client'
-import { testDataGenerator } from '@client/tests/test-data-generators'
-import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import {
+  ActionStatus,
+  ActionType,
+  generateActionDocument,
+  tennisClubMembershipEvent,
+  TestUserRole,
+  TokenUserType,
+  generateUuid,
+  createPrng,
+  Draft
+} from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
-import { AppRouter } from '@client/v2-events/trpc'
 import { router } from './router'
 import * as Request from './index'
 
 const meta: Meta<typeof Request.Pages> = {
-  title: 'CorrectionRequest'
+  title: 'CorrectionRequest',
+  parameters: {
+    userRole: TestUserRole.enum.REGISTRATION_AGENT
+  }
 }
-
 export default meta
 
 type Story = StoryObj<typeof Request.Pages>
-const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [
-    httpLink({
-      url: '/api/events'
-    })
-  ],
-  transformer: { input: superjson, output: superjson }
+
+const prng = createPrng(99887766)
+
+const createAction = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.CREATE
 })
 
-const draft = testDataGenerator().event.draft({
-  eventId: tennisClubMembershipEventDocument.id,
-  actionType: ActionType.REQUEST_CORRECTION
+const declarationActionWithAge = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.DECLARE,
+  defaults: {
+    declaration: {
+      'applicant.name': {
+        firstname: 'Riku',
+        surname: 'Rouvila'
+      },
+      'applicant.dob': '2025-01-23',
+      'applicant.address': {
+        country: 'FAR',
+        addressType: 'DOMESTIC',
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '27160bbd-32d1-4625-812f-860226bfb92a',
+        urbanOrRural: 'URBAN',
+        town: 'Example Town',
+        residentialArea: 'Example Residential Area',
+        street: 'Example Street',
+        number: '55',
+        zipCode: '123456'
+      },
+      'recommender.name': {
+        firstname: 'Euan',
+        surname: 'Millar'
+      },
+      'recommender.id': '123456789'
+    }
+  }
 })
 
-function FormClear() {
-  const drafts = useDrafts()
-  useEffect(() => {
-    drafts.setLocalDraft(draft)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  return <Outlet />
-}
-
-export const ReviewWithChanges: Story = {
-  parameters: {
-    offline: {
-      drafts: [draft]
-    },
-    reactRouter: {
-      router: {
-        path: '/',
-        element: <Outlet />,
-        children: [router]
-      },
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ]
-      }
-    }
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-
-    await waitFor(async () => {
-      await expect(
-        canvas.getByRole('button', { name: 'Continue' })
-      ).toBeDisabled()
-    })
+const validateAction = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.VALIDATE,
+  defaults: {
+    declaration: {}
   }
-}
+})
 
-export const Review: Story = {
-  parameters: {
-    offline: {
-      drafts: [draft]
-    },
-    reactRouter: {
-      router: {
-        path: '/',
-        element: <Outlet />,
-        children: [router]
-      },
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ]
-      }
-    }
-  },
-  play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement)
-
-    await waitFor(async () => {
-      await expect(
-        canvas.getByRole('button', { name: 'Continue' })
-      ).toBeDisabled()
-    })
-
-    await step('Change applicant values', async () => {
-      await userEvent.click(
-        canvas.getByTestId('change-button-applicant.address')
-      )
-
-      await userEvent.click(canvas.getByTestId('location__country'))
-      await userEvent.type(canvas.getByTestId('location__country'), 'Far')
-      await userEvent.click(canvas.getByText('Farajaland', { exact: true }))
-
-      await userEvent.type(canvas.getByTestId('text__state'), 'My State')
-      await userEvent.type(canvas.getByTestId('text__district2'), 'My District')
-      await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
-    })
-
-    await step('Go back to review', async () => {
-      await userEvent.click(
-        canvas.getByRole('button', { name: 'Back to review' })
-      )
-      await waitFor(async () => {
-        await expect(
-          canvas.getByRole('button', { name: 'Continue' })
-        ).toBeDisabled()
-      })
-    })
-
-    await step("Check applicant's profile picture", async () => {
-      const container = canvas.getByTestId('row-value-applicant.image')
-      const buttons = within(container).getAllByRole('button', {
-        name: "Applicant's profile picture"
-      })
-      await expect(buttons).toHaveLength(2)
-      await userEvent.click(buttons[0])
-      const closeButton = (await canvas.findAllByRole('button')).find(
-        (btn) => btn.id === 'preview_close'
-      )
-      if (!closeButton) {
-        throw new Error("Close button with id 'preview_close' not found")
-      }
-      await userEvent.click(closeButton)
-    })
-
-    await step('Change recommender values', async () => {
-      await userEvent.click(canvas.getByTestId('change-button-recommender.id'))
-      await userEvent.type(
-        canvas.getByTestId('text__recommender____id'),
-        '1234567890'
-      )
-    })
-
-    await step('Go back to review', async () => {
-      await userEvent.click(
-        canvas.getByRole('button', { name: 'Back to review' })
-      )
-      await waitFor(async () => {
-        await expect(
-          canvas.getByRole('button', { name: 'Continue' })
-        ).toBeEnabled()
-      })
-    })
+const registerAction = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.REGISTER,
+  defaults: {
+    declaration: {}
   }
+})
+
+const eventCorrectionAgeToDob = {
+  trackingId: generateUuid(prng),
+  type: tennisClubMembershipEvent.id,
+  id: generateUuid(prng),
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  actions: [
+    createAction,
+    declarationActionWithAge,
+    validateAction,
+    registerAction
+  ]
 }
 
-export const Summary: Story = {
+const correctionDraftAgeToDob = {
+  id: generateUuid(prng),
+  transactionId: generateUuid(prng),
+  action: {
+    createdAt: new Date(Date.now() - 500).toISOString(),
+    status: ActionStatus.Accepted,
+    transactionId: generateUuid(prng),
+    createdBy: generateUuid(prng),
+    createdByUserType: TokenUserType.Enum.user,
+    createdByRole: TestUserRole.Enum.FIELD_AGENT,
+    type: ActionType.REQUEST_CORRECTION,
+    declaration: {
+      'applicant.age': 18,
+      'applicant.dobUnknown': true
+    },
+    annotation: {}
+  },
+  createdAt: new Date().toISOString(),
+  eventId: eventCorrectionAgeToDob.id
+} satisfies Draft
+
+export const SummaryChangingDobToAge: Story = {
   parameters: {
     offline: {
-      drafts: [draft]
+      drafts: [correctionDraftAgeToDob],
+      events: [eventCorrectionAgeToDob]
     },
     reactRouter: {
       router: {
         path: '/',
-        element: <FormClear />,
         children: [router]
       },
       initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
+        eventId: eventCorrectionAgeToDob.id
       })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ]
-      }
     }
-  },
-  play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement)
-    await step('Check the summary table', async () => {
-      const button = (await canvas.findAllByRole('button')).find(
-        (x) => x.innerText === "Applicant's profile picture"
-      )
-      await expect(button).toBeInTheDocument()
+  }
+}
 
-      if (!button) {
-        throw new Error(
-          "Button with text 'Applicant's profile picture' not found"
-        )
-      }
-      await userEvent.click(button)
-      const closeButton = (await canvas.findAllByRole('button')).find(
-        (btn) => btn.id === 'preview_close'
-      )
-      if (!closeButton) {
-        throw new Error("Close button with id 'preview_close' not found")
-      }
-      await userEvent.click(closeButton)
-    })
+const declarationActionWithDob = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.DECLARE,
+  defaults: {
+    declaration: {
+      'applicant.dob': '2006-01-23'
+    }
+  }
+})
+
+const eventCorrectionDobToAge = {
+  trackingId: generateUuid(prng),
+  type: tennisClubMembershipEvent.id,
+  id: generateUuid(prng),
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  actions: [
+    createAction,
+    declarationActionWithDob,
+    validateAction,
+    registerAction
+  ]
+}
+
+const correctionDraftDobToAge = {
+  id: generateUuid(prng),
+  transactionId: generateUuid(prng),
+  action: {
+    createdAt: new Date(Date.now() - 500).toISOString(),
+    status: ActionStatus.Accepted,
+    transactionId: generateUuid(prng),
+    createdBy: generateUuid(prng),
+    createdByUserType: TokenUserType.Enum.user,
+    createdByRole: TestUserRole.Enum.FIELD_AGENT,
+    type: ActionType.REQUEST_CORRECTION,
+    declaration: {
+      'applicant.age': 25,
+      'applicant.dobUnknown': true
+    },
+    annotation: {}
+  },
+  createdAt: new Date().toISOString(),
+  eventId: eventCorrectionDobToAge.id
+} satisfies Draft
+
+export const SummaryChangingAgeToDob: Story = {
+  parameters: {
+    offline: {
+      drafts: [correctionDraftDobToAge],
+      events: [eventCorrectionDobToAge]
+    },
+    reactRouter: {
+      router: {
+        path: '/',
+        children: [router]
+      },
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({
+        eventId: eventCorrectionDobToAge.id
+      })
+    }
   }
 }

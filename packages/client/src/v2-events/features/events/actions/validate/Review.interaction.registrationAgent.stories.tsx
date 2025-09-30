@@ -18,7 +18,9 @@ import {
   tennisClubMembershipEvent,
   generateEventDocument,
   getCurrentEventState,
-  FullDocumentPath
+  UUID,
+  FullDocumentPath,
+  User
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -44,7 +46,10 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
+const declarationTrpcMsw = createDeclarationTrpcMsw(
+  tRPCMsw,
+  declareEventDocument
+)
 
 const meta: Meta<typeof Review> = {
   title: 'Validate/Review/Interaction/Registration Agent',
@@ -71,26 +76,9 @@ export default meta
 
 type Story = StoryObj<typeof Review>
 
-const eventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
-})
+const eventId = declareEventDocument.id
 
-const eventId = eventDocument.id
-
-const mockUser = {
-  id: '67bda93bfc07dee78ae558cf',
-  name: [
-    {
-      use: 'en',
-      given: ['Kalusha'],
-      family: 'Bwalya'
-    }
-  ],
-  role: 'SOCIAL_WORKER',
-  signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined
-}
+const mockUser = generator.user.fieldAgent().v2
 
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   beforeEach: () => {
@@ -123,7 +111,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.registrationAgent()
+                getUser: generator.user.registrationAgent().v1
               }
             })
           }),
@@ -203,7 +191,7 @@ export const ReviewForRegistrationAgentArchiveInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.registrationAgent()
+                getUser: generator.user.registrationAgent().v1
               }
             })
           }),
@@ -309,13 +297,13 @@ export const ReviewForRegistrationAgentArchiveInteraction: Story = {
   }
 }
 
-export const ReviewForRegistratinAgentRejectInteraction: Story = {
+export const ReviewForRegistrationAgentRejectInteraction: Story = {
   beforeEach: () => {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
     addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(eventId, eventDocument)
+    setEventData(eventId, declareEventDocument)
   },
   parameters: {
     reactRouter: {
@@ -332,7 +320,7 @@ export const ReviewForRegistratinAgentRejectInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.registrationAgent().v1
               }
             })
           }),
