@@ -189,6 +189,7 @@
     "glob": "^7.1.2",
     "globals": "^16.0.0",
     "jsonwebtoken": "^9.0.0",
+    "lean-qr": "^2.6.0",
     "msw": "^2.7.0",
     "opener": "^1.5.1",
     "prettier": "3.5.3",
