@@ -496,7 +496,7 @@ export const GeneratedInputField = React.memo(
     if (isSignatureFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <SignatureField
+          <SignatureField.Input
             {...field.config}
             disabled={disabled}
             maxFileSize={field.config.configuration.maxFileSize}

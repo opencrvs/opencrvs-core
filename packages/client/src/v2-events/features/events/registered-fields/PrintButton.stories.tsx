@@ -14,6 +14,7 @@ import React, { useState } from 'react'
 import { within, userEvent, expect, waitFor } from '@storybook/test'
 import styled from 'styled-components'
 import { action } from '@storybook/addon-actions'
+import { noop } from 'lodash'
 
 interface PrintButtonProps {
   id: string
@@ -101,6 +102,6 @@ export const Default: Story = {
       defaultMessage: 'Print'
     },
     disabled: false,
-    onChange: action('onChange')
+    onChange: () => noop()
   }
 }

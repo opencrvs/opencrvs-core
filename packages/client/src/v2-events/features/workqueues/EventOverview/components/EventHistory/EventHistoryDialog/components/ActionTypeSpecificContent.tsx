@@ -9,27 +9,32 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { z } from 'zod'
+import { ActionType, EventDocument } from '@opencrvs/commons/client'
 import {
-  ActionDocument,
-  ActionType,
-  DeclarationActions,
-  EventDocument
-} from '@opencrvs/commons/client'
+  DECLARATION_ACTION_UPDATE,
+  EventHistoryActionDocument
+} from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { RequestCorrection } from './RequestCorrection'
 import { PrintCertificate } from './PrintCertificate'
 import { DeclarationUpdate } from './DeclarationUpdate'
+
+const SyntheticDeclarationActionTypes = z.enum([DECLARATION_ACTION_UPDATE])
 
 export function ActionTypeSpecificContent({
   action,
   fullEvent
 }: {
-  action: ActionDocument
+  action: EventHistoryActionDocument
   fullEvent: EventDocument
 }) {
   const { type } = action
 
-  const isDeclarationAction = DeclarationActions.safeParse(type).success
-  if (isDeclarationAction) {
+  const isDeclarationUpdate =
+    SyntheticDeclarationActionTypes.safeParse(type).success
+
+  if (isDeclarationUpdate) {
+    // We only show the updated modal for synthetic UPDATE action
     return <DeclarationUpdate action={action} fullEvent={fullEvent} />
   }
 

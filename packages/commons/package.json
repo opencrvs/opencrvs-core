@@ -26,7 +26,7 @@
     "postinstall": "yarn build",
     "build": "wireit",
     "build:watch": "yarn build --watch",
-    "build:clean": "rm -rf build"
+    "build:clean": "rm -rf build && rm -rf ./.wireit"
   },
   "wireit": {
     "build": {
