@@ -4536,14 +4536,14 @@ components:
             configuration:
               type: object
               properties:
-                text:
+                status:
                   $ref: "#/components/schemas/TranslationConfig"
                   description: Text to display on the status pill.
                 description:
                   $ref: "#/components/schemas/TranslationConfig"
-                  description: Explaining text on the banner and review page.
+                  description: Explaining text on the banner in form.
               required:
-                - text
+                - status
                 - description
           required:
             - id
