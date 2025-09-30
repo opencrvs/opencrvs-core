@@ -214,6 +214,39 @@ export function omitHiddenPaginatedFields(
 }
 
 /**
+ * Removes values from the form that correspond to hidden fields.
+ * This function recursively omits any fields from the form values that are not visible
+ * according to their FieldConfig and the current form state. It ensures that only values
+ * for visible fields are retained, which is useful for conditional forms where hidden field
+ * values should not affect validation or submission.
+ *
+ * @template T - The type of the form values
+ * @param {T} formValues - The current form values
+ * @param {FieldConfig[]} fields - The list of field configurations to check visibility against
+ * @returns {Partial<T>} A new object containing only the values for visible fields
+ */
+export function stripHiddenFields<T extends EventState | ActionUpdate>(
+  formValues: T,
+  fields: FieldConfig[]
+): Partial<T> {
+  const base = cloneDeep(formValues)
+
+  function fn(prevVisibilityContext: Partial<T>): Partial<T> {
+    const cleaned = omitBy<Partial<T>>(base, (_, fieldId) => {
+      const fieldConfig = fields.filter((f) => f.id === fieldId)
+
+      return fieldConfig.length
+        ? fieldConfig.every((f) => !isFieldVisible(f, prevVisibilityContext))
+        : false
+    })
+
+    return isEqual(cleaned, prevVisibilityContext) ? cleaned : fn(cleaned)
+  }
+
+  return fn(base)
+}
+
+/**
  *
  * @returns a draft for the event that has been created since the last non-read action.
  */

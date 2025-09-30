@@ -97,6 +97,8 @@ export function validationErrorsInActionFormExist({
   locationIds: Array<{ id: UUID }>
 }): boolean {
   // We don't want to validate hidden fields
+
+  // TODO CIHAN: use recursive function here?
   const formWithoutHiddenFields = omitHiddenPaginatedFields(formConfig, form)
 
   const visibleAnnotationFields = omitHiddenFields(

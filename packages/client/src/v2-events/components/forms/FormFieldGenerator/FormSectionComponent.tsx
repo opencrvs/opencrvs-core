@@ -30,7 +30,8 @@ import {
   SystemVariables,
   InteractiveFieldType,
   FieldReference,
-  getAllUniqueFields
+  getAllUniqueFields,
+  stripHiddenFields
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -412,36 +413,19 @@ export function FormSectionComponent({
   const declarationFields = eventConfig?.declaration.pages.flatMap(
     (p) => p.fields
   )
+  // TODO CIHAN: do we need this allFields?
   const allFields = [...(declarationFields ?? []), ...fieldsWithDotSeparator]
-
-  // TODO CIHAN: make it recursive
-  const valuesWithoutHiddenFields = omitBy(completeForm, (_, fieldId) => {
-    // There can be multiple field configurations with the same id, with e.g. different options and conditions
-    const fieldConfigs = allFields.filter((f) => f.id === fieldId)
-
-    return fieldConfigs.length
-      ? fieldConfigs.every((f) => !isFieldVisible(f, completeForm))
-      : false
-  })
-
-  const valuesWithoutHiddenFields2 = omitBy(completeForm, (_, fieldId) => {
-    // There can be multiple field configurations with the same id, with e.g. different options and conditions
-    const fieldConfigs = allFields.filter((f) => f.id === fieldId)
-
-    return fieldConfigs.length
-      ? fieldConfigs.every((f) => !isFieldVisible(f, valuesWithoutHiddenFields))
-      : false
-  })
+  const visibleFieldValues = stripHiddenFields(completeForm, allFields)
 
   return (
     <section className={className}>
       {fieldsWithFormikSeparator.map((field) => {
-        if (!isFieldVisible(field, valuesWithoutHiddenFields2)) {
+        if (!isFieldVisible(field, visibleFieldValues)) {
           return null
         }
 
         const isDisabled =
-          !isFieldEnabled(field, valuesWithoutHiddenFields2) ||
+          !isFieldEnabled(field, visibleFieldValues) ||
           (isCorrection && field.uncorrectable)
 
         const visibleError = errors[field.id]?.errors[0]?.message
