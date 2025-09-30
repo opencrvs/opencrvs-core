@@ -612,7 +612,7 @@ const QueryParamReaderField = BaseField.extend({
       .optional()
       .describe('Projection of the field value after parsing the query string')
   })
-})
+}).describe('A field that maps URL query params into form values and clears them afterward')
 
 export type QueryParamReaderField = z.infer<typeof QueryParamReaderField>
 
