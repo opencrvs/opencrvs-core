@@ -42,7 +42,8 @@ import {
   isSelectDateRangeFieldType,
   isLocationFieldType,
   EventState,
-  FormConfig
+  FormConfig,
+  isSignatureFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -123,7 +124,7 @@ export function ValueOutput(
     return <Number.Output {...field} />
   }
 
-  if (isFileFieldType(field)) {
+  if (isFileFieldType(field) || isSignatureFieldType(field)) {
     return <File.Output {...field} />
   }
 

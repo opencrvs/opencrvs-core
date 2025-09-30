@@ -31,7 +31,7 @@ const meta: Meta<typeof SignatureField> = {
       router: {
         path: '/event/:eventId',
         element: (
-          <SignatureField
+          <SignatureField.Input
             maxFileSize={5 * 1024 * 1024}
             modalTitle={'Upload Signature'}
             name={'Upload Signature'}

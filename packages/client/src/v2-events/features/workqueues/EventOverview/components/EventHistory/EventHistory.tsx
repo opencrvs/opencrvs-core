@@ -21,7 +21,6 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
-  ActionDocument,
   ActionType,
   EventDocument,
   getAcceptedActions
@@ -34,7 +33,11 @@ import { useEventOverviewContext } from '@client/v2-events/features/workqueues/E
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
-import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
+import {
+  expandWithUpdateActions,
+  EventHistoryActionDocument,
+  useActionForHistory
+} from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import {
   EventHistoryDialog,
@@ -145,7 +148,9 @@ function useActionCreator() {
   const { findUser } = useEventOverviewContext()
   const { systems } = useSelector(getOfflineData)
 
-  const getActionCreator = (action: ActionDocument): ActionCreator => {
+  const getActionCreator = (
+    action: EventHistoryActionDocument
+  ): ActionCreator => {
     if (action.createdByUserType === 'system') {
       const system = systems.find((s) => s._id === action.createdBy)
       return {
@@ -169,7 +174,7 @@ function useActionCreator() {
   return { getActionCreator }
 }
 
-function User({ action }: { action: ActionDocument }) {
+function User({ action }: { action: EventHistoryActionDocument }) {
   const intl = useIntl()
   const { findUser } = useEventOverviewContext()
   const navigate = useNavigate()
@@ -211,7 +216,7 @@ function User({ action }: { action: ActionDocument }) {
   )
 }
 
-function Integration({ action }: { action: ActionDocument }) {
+function Integration({ action }: { action: EventHistoryActionDocument }) {
   const { getActionCreator } = useActionCreator()
 
   const { type, name } = getActionCreator(action)
@@ -230,7 +235,7 @@ function Integration({ action }: { action: ActionDocument }) {
   )
 }
 
-function ActionCreator({ action }: { action: ActionDocument }) {
+function ActionCreator({ action }: { action: EventHistoryActionDocument }) {
   const intl = useIntl()
   if (action.createdByUserType === 'system') {
     return <Integration action={action} />
@@ -248,7 +253,7 @@ function ActionCreator({ action }: { action: ActionDocument }) {
   return <User action={action} />
 }
 
-function ActionRole({ action }: { action: ActionDocument }) {
+function ActionRole({ action }: { action: EventHistoryActionDocument }) {
   const intl = useIntl()
   const role = action.createdByRole
   const { getActionCreator } = useActionCreator()
@@ -265,7 +270,7 @@ function ActionRole({ action }: { action: ActionDocument }) {
   )
 }
 
-function ActionLocation({ action }: { action: ActionDocument }) {
+function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
   const { findUser, getLocation } = useEventOverviewContext()
   const { canAccessOffice } = usePermissions()
   const navigate = useNavigate()
@@ -333,7 +338,18 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const { getActionTypeForHistory } = useActionForHistory()
   const { getActionCreator } = useActionCreator()
 
-  const onHistoryRowClick = (item: ActionDocument, userName: string) => {
+  const history = getAcceptedActions(fullEvent)
+
+  const historyWithUpdatedActions = expandWithUpdateActions(history)
+
+  const visibleHistoryWithUpdatedActions = historyWithUpdatedActions.filter(
+    ({ type }) => type !== ActionType.CREATE
+  )
+
+  const onHistoryRowClick = (
+    item: EventHistoryActionDocument,
+    userName: string
+  ) => {
     void openModal<void>((close) => (
       <EventHistoryDialog
         action={item}
@@ -344,22 +360,17 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     ))
   }
 
-  const history = getAcceptedActions(fullEvent)
-
-  const visibleHistory = history.filter(
-    ({ type }) => type !== ActionType.CREATE
-  )
-
-  const historyRows = visibleHistory
+  const historyRows = visibleHistoryWithUpdatedActions
     .map((x) => {
       if (x.type === ActionType.REQUEST_CORRECTION) {
-        const immediateApprovedCorrection = visibleHistory.find(
-          (h) =>
-            h.type === ActionType.APPROVE_CORRECTION &&
-            (h.requestId === x.id || h.requestId === x.originalActionId) &&
-            h.annotation?.isImmediateCorrection &&
-            h.createdBy === x.createdBy
-        )
+        const immediateApprovedCorrection =
+          visibleHistoryWithUpdatedActions.find(
+            (h) =>
+              h.type === ActionType.APPROVE_CORRECTION &&
+              (h.requestId === x.id || h.requestId === x.originalActionId) &&
+              h.annotation?.isImmediateCorrection &&
+              h.createdBy === x.createdBy
+          )
         // Adding flag on immediately approved REQUEST_CORRECTION to show it
         // as 'Record corrected' in history table
         if (immediateApprovedCorrection) {
@@ -456,11 +467,13 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
           noResultText=""
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
         />
-        {visibleHistory.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
+        {visibleHistoryWithUpdatedActions.length >
+          DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
           <Pagination
             currentPage={currentPageNumber}
             totalPages={Math.ceil(
-              visibleHistory.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+              visibleHistoryWithUpdatedActions.length /
+                DEFAULT_HISTORY_RECORD_PAGE_SIZE
             )}
             onPageChange={(page) => setCurrentPageNumber(page)}
           />
