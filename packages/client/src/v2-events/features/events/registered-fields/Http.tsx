@@ -155,5 +155,5 @@ function HttpInput({
 export const Http = {
   Input: HttpInput,
   Output: null,
-  stringify: (value: HttpFieldValue) => value
+  toCertificateVariables: (value: HttpFieldValue) => value
 }
