@@ -88,12 +88,10 @@ function getReviewFormFields(configuration: EventConfig) {
  */
 function sliceEventAt(
   fullEvent: EventHistoryDocument,
-  actionId?: string,
+  actionId: string,
   includeCurrent = false
 ): EventHistoryDocument {
-  const index = actionId
-    ? fullEvent.actions.findIndex((a) => a.id === actionId)
-    : -1
+  const index = fullEvent.actions.findIndex((a) => a.id === actionId)
 
   if (index === -1) {
     return fullEvent
@@ -134,8 +132,13 @@ export function DeclarationComparisonTableComponent({
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
-  const eventBeforeUpdate = sliceEventAt(fullEvent, action?.id, false)
-  const currentEvent = sliceEventAt(fullEvent, action?.id, true)
+  const eventBeforeUpdate = action
+    ? sliceEventAt(fullEvent, action.id, false)
+    : fullEvent
+
+  const currentEvent = action
+    ? sliceEventAt(fullEvent, action.id, true)
+    : fullEvent
 
   const currentState = getCurrentEventStateSafe(
     currentEvent,
