@@ -72,7 +72,7 @@ export function testDataGenerator(rngSeed?: number) {
             family: 'Bwalya'
           }
         ],
-        role: 'SOCIAL_WORKER',
+        role: 'HOSPITAL_CLERK',
         fullHonorificName: undefined,
         signature: undefined,
         avatar: undefined,
@@ -90,9 +90,9 @@ export function testDataGenerator(rngSeed?: number) {
         role: {
           id: 'SOCIAL_WORKER',
           label: {
-            id: 'userRole.socialWorker',
-            defaultMessage: 'Social Worker',
-            description: 'Name for user role Social Worker',
+            id: 'userRole.hospitalClerk',
+            defaultMessage: 'Hospital Clerk',
+            description: 'Name for user role Hospital Clerk',
             __typename: 'I18nMessage'
           },
           __typename: 'UserRole'
