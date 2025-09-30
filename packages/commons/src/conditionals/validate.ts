@@ -195,18 +195,6 @@ export function isFieldVisible(
   return isFieldConditionMet(field, form, ConditionalType.SHOW)
 }
 
-export function getOnlyVisibleFormValues(
-  field: FieldConfig[],
-  form: EventState
-) {
-  return field.reduce((acc, f) => {
-    if (isFieldVisible(f, form) && form[f.id] !== undefined) {
-      acc[f.id] = form[f.id]
-    }
-    return acc
-  }, {} as EventState)
-}
-
 function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
   const fieldValue = form[field.id]
   return !field.required && (fieldValue === undefined || fieldValue === '')
@@ -281,12 +269,20 @@ function createIntlError(message: TranslationConfig) {
  * Form error message definitions for Zod validation errors.
  * Overrides zod internal type error messages (string) to match the OpenCRVS error messages (TranslationConfig).
  */
-function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
+function zodToIntlErrorMap(
+  issue: ZodIssueOptionalMessage,
+  _ctx: ErrorMapCtx,
+  field: FieldConfig
+) {
+  const requiredMessage: TranslationConfig =
+    field.required && typeof field.required === 'object'
+      ? field.required.message
+      : errorMessages.requiredField
   // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
   switch (issue.code) {
     case 'invalid_string': {
       if (_ctx.data === '') {
-        return createIntlError(errorMessages.requiredField)
+        return createIntlError(requiredMessage)
       }
 
       if (issue.validation === 'date') {
@@ -305,14 +301,14 @@ function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
         issue.expected !== issue.received &&
         (issue.received === 'undefined' || issue.received === 'null')
       ) {
-        return createIntlError(errorMessages.requiredField)
+        return createIntlError(requiredMessage)
       }
 
       break
     }
     case 'too_small': {
       if (issue.message === undefined) {
-        return createIntlError(errorMessages.requiredField)
+        return createIntlError(requiredMessage)
       }
 
       break
@@ -321,13 +317,14 @@ function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
       for (const { issues } of issue.unionErrors) {
         for (const e of issues) {
           if (
-            zodToIntlErrorMap(e, _ctx).message.message.id !== 'error.required'
+            zodToIntlErrorMap(e, _ctx, field).message.message.id !==
+            'error.required'
           ) {
             return createIntlError(errorMessages.invalidInput)
           }
         }
       }
-      return createIntlError(errorMessages.requiredField)
+      return createIntlError(requiredMessage)
     }
   }
 
@@ -378,9 +375,12 @@ export function validateFieldInput({
   field: FieldConfig
   value: FieldUpdateValue
 }) {
-  const zodType = mapFieldTypeToZod(field.type, field.required)
-  // @ts-expect-error
-  const rawError = zodType.safeParse(value, { errorMap: zodToIntlErrorMap })
+  const zodType = mapFieldTypeToZod(field.type, !!field.required)
+
+  const rawError = zodType.safeParse(value, {
+    // @ts-expect-error
+    errorMap: (issue, _ctx) => zodToIntlErrorMap(issue, _ctx, field)
+  })
 
   // We have overridden the standard error messages
   return (rawError.error?.issues.map((issue) => issue.message) ??

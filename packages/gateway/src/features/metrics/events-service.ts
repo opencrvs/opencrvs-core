@@ -9,17 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import { api } from '@gateway/v2-events/events/service'
 
-export const SystemRole = z.enum([
-  'HEALTH',
-  'NATIONAL_ID',
-  'RECORD_SEARCH',
-  'REINDEX',
-  'WEBHOOK',
-  'IMPORT_EXPORT'
-])
-
-export const REINDEX_USER_ID = '__ANONYMOUS_REINDEX_USER__'
-
-export type SystemRole = z.infer<typeof SystemRole>
+export async function getEventActions(
+  query: Parameters<typeof api.user.actions.query>[0],
+  authHeader: Record<string, string>
+) {
+  const actions = await api.user.actions.query(query, {
+    context: {
+      headers: authHeader
+    }
+  })
+  return actions
+}

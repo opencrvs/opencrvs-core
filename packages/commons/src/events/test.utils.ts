@@ -182,6 +182,7 @@ export function mapFieldTypeToMockValue(
     case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
     case FieldType.OFFICE:
+    case FieldType.LINK_BUTTON:
       return `${field.id}-${field.type}-${i}`
     case FieldType.NAME:
       return generateRandomName(rng)

@@ -63,7 +63,7 @@ function useActionGuard(
   // If the action is not available for the event, redirect to the overview page
   if (!availableActions.includes(actionType)) {
     throw new Error(
-      `Action ${actionType} not available for the event ${event.id} with status ${getCurrentEventState(event, configuration).status} ${eventState.flags.length > 0 ? `(flags: ${eventState.flags.join(', ')})` : ''}`
+      `Action ${actionType} not available for the event ${event.id} with status ${eventState.status} ${eventState.flags.length > 0 ? `(flags: ${eventState.flags.join(', ')})` : ''}`
     )
   }
 
@@ -104,7 +104,7 @@ function DeclarationActionComponent({
       console.warn(
         `Event with id ${eventId} not found in cache. Redirecting to overview.`
       )
-      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId: eventId }))
+      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
     }
   }, [event, eventId, navigate])
 

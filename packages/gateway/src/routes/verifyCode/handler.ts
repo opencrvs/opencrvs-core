@@ -24,7 +24,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import fetch from '@gateway/fetch'
 import { unauthorized } from '@hapi/boom'
-import { logger } from '@opencrvs/commons'
+import { IUserName, logger } from '@opencrvs/commons'
 import * as t from 'io-ts'
 import * as F from 'fp-ts'
 
@@ -46,12 +46,6 @@ interface ISendVerifyCodeResponse {
   status: string
   mobile?: string
   email?: string
-}
-
-interface IUserName {
-  use: string
-  family: string
-  given: string[]
 }
 
 interface ISendVerifyCodePayload {

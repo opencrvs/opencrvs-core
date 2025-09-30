@@ -42,6 +42,7 @@ import {
   TimeField,
   HttpField,
   ButtonField,
+  LinkButtonField,
   QueryParamReaderField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
@@ -126,6 +127,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.PHONE:
+    case FieldType.LINK_BUTTON:
     case FieldType.ID:
       schema = required ? NonEmptyTextValue : TextValue
       break
@@ -172,7 +174,7 @@ export function createValidationSchema(config: FieldConfig[]) {
   > = {}
 
   for (const field of config) {
-    shape[field.id] = mapFieldTypeToZod(field.type, field.required)
+    shape[field.id] = mapFieldTypeToZod(field.type, !!field.required)
   }
 
   return z.object(shape)
@@ -208,6 +210,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.PHONE:
     case FieldType.BUTTON:
     case FieldType.HTTP:
+    case FieldType.LINK_BUTTON:
     case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
       return null
@@ -446,6 +449,13 @@ export const isHttpFieldType = (field: {
   return field.config.type === FieldType.HTTP
 }
 
+export const isLinkButtonFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: LinkButtonField } => {
+  return field.config.type === FieldType.LINK_BUTTON
+}
+
 export const isQueryParamReaderFieldType = (field: {
   config: FieldConfig
   value: FieldValue
@@ -462,6 +472,8 @@ export type NonInteractiveFieldType =
   | Paragraph
   | BulletList
   | DataField
+  | HttpField
+  | LinkButtonField
   | QueryParamReaderField
 
 export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
@@ -476,6 +488,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
     field.type === FieldType.HTTP ||
+    field.type === FieldType.LINK_BUTTON ||
     field.type === FieldType.QUERY_PARAM_READER
   )
 }
