@@ -535,7 +535,7 @@ describe('getCurrentEventState()', () => {
     expect(eventState2.declaration['applicant.age']).toBe(20)
   })
 
-  test('should correctly merge the declaration from actions even when original action is not available', () => {
+  test('should correctly merge the declaration from actions even when originalActionId is not available', () => {
     const fullEvent = {
       trackingId: getUUID(),
       type: tennisClubMembershipEvent.id,
@@ -586,6 +586,8 @@ describe('getCurrentEventState()', () => {
             }
           },
           status: 'Accepted',
+          // the originalActionId is an action with a `status: 'Requested'` that is not in the actions array
+          // should still merge the declaration information when originalActionId is not listed
           originalActionId: '2c93fd07-3c54-4b7c-93a6-4b1e79506fd8' as UUID,
           type: 'NOTIFY',
           annotation: {}
