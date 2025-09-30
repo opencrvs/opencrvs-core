@@ -67,7 +67,6 @@ import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import { z } from 'zod'
 import { FullDocumentPath } from '../documents'
-import { ValidatorContext } from '../conditionals/validate'
 
 /**
  * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
@@ -250,18 +249,6 @@ function fieldConfigsToActionPayload(
   )
 }
 
-export const testContext = {
-  user: {
-    sub: 'user_12345',
-    scope: ['declare'],
-    role: 'LOCAL_REGISTRAR',
-    exp: '1678890000',
-    algorithm: 'RS256',
-    userType: TokenUserType.enum.user
-  },
-  leafAdminStructureLocationIds: []
-} satisfies ValidatorContext
-
 export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType,
@@ -284,7 +271,7 @@ export function generateActionDeclarationInput(
         ...declaration,
         ...overrides
       },
-      testContext
+      {} // Intentionally empty. Allow generating fields with custom conditionals.
     )
   }
 
@@ -339,7 +326,7 @@ export function generateActionAnnotationInput(
   const fieldBasedPayload = omitHiddenFields(
     annotationFields,
     annotation,
-    testContext
+    {} // Intentionally empty. Allow generating fields with custom conditionals.
   )
 
   return {

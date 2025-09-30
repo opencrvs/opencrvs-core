@@ -19,16 +19,8 @@ import {
   createPrng,
   getRandomDatetime
 } from '@opencrvs/commons/client'
+import { getTestValidatorContext } from '../../../../../../../../.storybook/decorators'
 import { EventHistoryDialog } from './EventHistoryDialog'
-
-const meta: Meta<typeof EventHistoryDialog> = {
-  title: 'Components/EventHistoryDialog',
-  component: EventHistoryDialog
-}
-
-export default meta
-
-type Story = StoryObj<typeof EventHistoryDialog>
 
 const declaration = {
   'applicant.email': 'foo@bar.fi',
@@ -104,10 +96,26 @@ const fullEvent = {
 const argbase = {
   userName: 'Jhon Doe',
   fullEvent,
+  validatorContext: getTestValidatorContext(),
   action: {
     ...actionBase
   }
 }
+
+const meta: Meta<typeof EventHistoryDialog> = {
+  title: 'Components/EventHistoryDialog',
+  component: EventHistoryDialog,
+  args: {
+    userName: 'Jhon Doe',
+    fullEvent,
+    validatorContext: getTestValidatorContext()
+  }
+}
+
+export default meta
+
+type Story = StoryObj<typeof EventHistoryDialog>
+
 export const Created: Story = {
   args: {
     ...argbase,

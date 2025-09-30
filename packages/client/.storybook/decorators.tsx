@@ -30,13 +30,8 @@ const generator = testDataGenerator()
  * @example Setting up meta for a story:
  *
  * const meta: Meta<FormFieldGeneratorProps> = {
-    title: 'Inputs/Data',
-    component: FormFieldGenerator,
-    argTypes: {
-      validatorContext: { control: false }
-    },
     decorators: [
-      (Story, context) => <TRPCProvider>{Story(context)}</TRPCProvider>,
+      (Story, context) => <TRPCProvider><Story {...context} /></TRPCProvider>,
       withValidatorContext
     ]
   }
