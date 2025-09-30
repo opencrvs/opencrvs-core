@@ -23,7 +23,8 @@ import {
   getDeclarationFields,
   getCurrentEventState,
   EventDocument,
-  ActionType
+  ActionType,
+  omitHiddenFields
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -110,7 +111,11 @@ export function Summary() {
           return false
         }
 
-        return hasFieldChanged(field, form, previousFormValues)
+        return hasFieldChanged(
+          field,
+          omitHiddenFields(fields, form),
+          previousFormValues
+        )
       })
     )
 
