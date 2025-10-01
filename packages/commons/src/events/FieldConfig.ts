@@ -170,7 +170,10 @@ export const DocumentMimeType = z.enum([
 
 export type ImageMimeType = z.infer<typeof ImageMimeType>
 
-export const MimeType = z.union([DocumentMimeType, ImageMimeType])
+export const MimeType = z.enum([
+  ...ImageMimeType.options,
+  ...DocumentMimeType.options
+])
 export type MimeType = z.infer<typeof MimeType>
 
 const DEFAULT_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
@@ -604,6 +607,7 @@ const ButtonField = BaseField.extend({
 
 export type ButtonField = z.infer<typeof ButtonField>
 
+// This is an alpha version of the print button and it is not recommended for use and will change in the future
 const AlphaPrintButton = BaseField.extend({
   type: z.literal(FieldType.ALPHA_PRINT_BUTTON),
   configuration: z.object({

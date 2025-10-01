@@ -625,10 +625,8 @@ export const GeneratedInputField = React.memo(
           disabled={disabled}
           id={fieldDefinition.id}
           template={field.config.configuration.template}
-          value={form[fieldDefinition.id] as string}
-          onChange={(val: string) =>
-            onFieldValueChange(fieldDefinition.id, val)
-          }
+          value={field.value}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )
     }

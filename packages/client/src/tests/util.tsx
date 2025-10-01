@@ -11,7 +11,8 @@
 import {
   Scope,
   SCOPES,
-  DEFAULT_ROLES_DEFINITION
+  DEFAULT_ROLES_DEFINITION,
+  TestUserRole
 } from '@opencrvs/commons/client'
 import { EventType, Status, FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -351,7 +352,7 @@ export const userDetails: UserDetails = {
     { use: 'bn', firstNames: '', familyName: '' }
   ],
   role: {
-    id: 'FIELD_AGENT',
+    id: TestUserRole.Enum.FIELD_AGENT,
     label: {
       defaultMessage: 'Field Agent',
       description: 'Name for user role Field Agent',

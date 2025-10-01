@@ -10,6 +10,7 @@
  */
 
 import { useSelector } from 'react-redux'
+import { cloneDeep } from 'lodash'
 import {
   ActionDocument,
   ActionType,
@@ -25,7 +26,9 @@ import {
   Location,
   PrintCertificateAction,
   UUID,
-  UserOrSystem
+  UserOrSystem,
+  Draft,
+  findActiveDraftForEvent
 } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
@@ -42,13 +45,11 @@ import { useDrafts } from '../features/drafts/useDrafts'
 import { getEventDrafts } from '../features/events/components/Action/utils'
 
 async function replaceMinioUrlWithBase64(
-  declaration: Record<string, unknown>,
+  declaration: EventState,
   config: EventConfig
 ) {
   // Clone to avoid mutating the original declaration
-  const declarationClone: Record<string, unknown> = JSON.parse(
-    JSON.stringify(declaration)
-  )
+  const declarationClone: EventState = cloneDeep(declaration)
 
   const fileFieldIds = config.declaration.pages
     .flatMap((page) => page.fields)
@@ -163,7 +164,7 @@ export const usePrintableCertificate = ({
 
   const certificateFonts = certificateConfig.fonts ?? {}
   const isEmptyDeclaration = Object.keys(declaration).length === 0
-  const declarationToUse = isEmptyDeclaration
+  const declarationToUse: EventState = isEmptyDeclaration
     ? (localDeclaration ?? declaration)
     : declaration
 

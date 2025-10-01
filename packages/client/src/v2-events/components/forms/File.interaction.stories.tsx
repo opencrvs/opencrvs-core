@@ -152,7 +152,7 @@ export const FileInputWithOptionTest: StoryObj<
       'Prevents upload of a file with an invalid file size',
       async () => {
         const largeFile = new File(['a'.repeat(1024 * 1025)], 'large.jpg', {
-          type: 'image/jpeg' satisfies MimeType
+          type: MimeType.enum['image/jpeg']
         })
 
         await userEvent.upload(input, largeFile)
@@ -164,7 +164,7 @@ export const FileInputWithOptionTest: StoryObj<
       'Accepts file of valid size and type when option is selected',
       async () => {
         const validFile = new File(['a'.repeat(512 * 512)], 'valid.jpg', {
-          type: 'image/jpeg' satisfies MimeType
+          type: MimeType.enum['image/jpeg']
         })
 
         await userEvent.upload(input, validFile)
@@ -231,7 +231,7 @@ export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
         await userEvent.click(fileInput)
 
         const svgFile = new File(['treeSvg'], 'tree.svg', {
-          type: 'image/svg+xml' satisfies MimeType
+          type: MimeType.enum['image/svg+xml']
         })
 
         await userEvent.upload(input, svgFile)
@@ -245,7 +245,7 @@ export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
       'Prevents upload of a file with an invalid file size',
       async () => {
         const largeFile = new File(['a'.repeat(1024 * 1025)], 'large.jpg', {
-          type: 'image/jpeg' satisfies MimeType
+          type: MimeType.enum['image/jpeg']
         })
 
         await userEvent.upload(input, largeFile)
@@ -256,7 +256,7 @@ export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
     await step('Accepts file of valid size and type', async () => {
       const filename = 'valid.jpg'
       const validFile = new File(['a'.repeat(512 * 512)], filename, {
-        type: 'image/jpeg' satisfies MimeType
+        type: MimeType.enum['image/jpeg']
       })
 
       await userEvent.upload(input, validFile)

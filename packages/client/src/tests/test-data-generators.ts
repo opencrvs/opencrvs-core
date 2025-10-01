@@ -88,7 +88,7 @@ export function testDataGenerator(rngSeed?: number) {
         mobile: '+260911111111',
         email: 'kalushabwalya17@gmail.com',
         role: {
-          id: 'SOCIAL_WORKER',
+          id: TestUserRole.Enum.SOCIAL_WORKER,
           label: {
             id: 'userRole.hospitalClerk',
             defaultMessage: 'Hospital Clerk',
@@ -139,7 +139,7 @@ export function testDataGenerator(rngSeed?: number) {
         mobile: '+260922222222',
         email: 'kalushabwalya17+@gmail.com',
         role: {
-          id: 'REGISTRATION_AGENT',
+          id: TestUserRole.Enum.REGISTRATION_AGENT,
           label: {
             id: 'userRole.registrationAgent',
             defaultMessage: 'Registration Agent',
@@ -190,7 +190,7 @@ export function testDataGenerator(rngSeed?: number) {
         mobile: '+260933333333',
         email: 'kalushabwalya1.7@gmail.com',
         role: {
-          id: 'LOCAL_REGISTRAR',
+          id: TestUserRole.Enum.LOCAL_REGISTRAR,
           label: {
             id: 'userRole.localRegistrar',
             defaultMessage: 'Local Registrar',
@@ -245,7 +245,7 @@ export function testDataGenerator(rngSeed?: number) {
         email: 'kalushab.walya17@gmail.com',
         fullHonorificName: null,
         role: {
-          id: 'LOCAL_SYSTEM_ADMIN',
+          id: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN,
           label: {
             id: 'userRole.localSystemAdmin',
             defaultMessage: 'Local System Admin',

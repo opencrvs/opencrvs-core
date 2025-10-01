@@ -12,6 +12,7 @@
 import { useSelector } from 'react-redux'
 import { getLocations } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { getUsersFullName } from '../utils'
 
 export function useUserDetails() {
   const userDetails = useSelector(getUserDetails)
