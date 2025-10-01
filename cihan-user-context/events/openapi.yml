@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 09f5e210-d582-4105-8ca1-fffe2d8acb96
+                transactionId: 8711ac61-cb8a-4078-b974-f97dbc2e846d
                 type: birth
       responses:
         "200":
@@ -247,6 +247,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                   default: &a3 {}
                 annotation:
                   type: object
@@ -373,6 +376,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                 originalActionId:
                   type: string
                   format: uuid
@@ -395,7 +401,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: b343ac1e-c207-4c69-8e96-717afe5f3b4d
+                transactionId: 2d515dc6-428c-4221-b431-1b0445d9cba5
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -575,6 +581,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                   default: *a3
                 annotation:
                   type: object
@@ -701,6 +710,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                 originalActionId:
                   type: string
                   format: uuid
@@ -897,6 +909,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                   default: *a3
                 annotation:
                   type: object
@@ -1023,6 +1038,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                 originalActionId:
                   type: string
                   format: uuid
@@ -1222,6 +1240,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                   default: *a3
                 annotation:
                   type: object
@@ -1348,6 +1369,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                 originalActionId:
                   type: string
                   format: uuid
@@ -5996,7 +6020,22 @@ components:
                 params:
                   type: object
                   additionalProperties:
-                    type: string
+                    anyOf:
+                      - type: string
+                      - type: object
+                        properties:
+                          $$field:
+                            type: string
+                            description: Unique identifier for the field
+                          $$subfield:
+                            type: array
+                            items:
+                              type: string
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        required:
+                          - $$field
+                        description: Reference to a field by its ID
                 timeout:
                   type: number
                   default: 15000
@@ -6011,7 +6050,7 @@ components:
             - label
             - type
             - configuration
-          description: HTTP request function triggered by a button click
+          description: HTTP request function triggered by a button click or other event
         - type: object
           properties:
             id:
@@ -7328,6 +7367,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -7454,6 +7496,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: &a15
@@ -7631,6 +7676,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -7757,6 +7805,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -7931,6 +7982,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -8057,6 +8111,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -8241,6 +8298,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -8367,6 +8427,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -8560,6 +8623,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -8686,6 +8752,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -8860,6 +8929,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -8986,6 +9058,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -9168,6 +9243,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -9294,6 +9372,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -9478,6 +9559,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -9604,6 +9688,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -9778,6 +9865,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -9904,6 +9994,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -10080,6 +10173,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -10206,6 +10302,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -10380,6 +10479,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -10506,6 +10608,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -10683,6 +10788,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -10809,6 +10917,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -10983,6 +11094,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -11109,6 +11223,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -11286,6 +11403,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -11412,6 +11532,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -11599,6 +11722,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -11725,6 +11851,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -11899,6 +12028,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -12025,6 +12157,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -12205,6 +12340,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -12331,6 +12469,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -12989,6 +13130,10 @@ components:
                   data: {}
                 required:
                   - loading
+              - type: object
+                nullable: true
+                additionalProperties:
+                  type: string
       required:
         - id
         - type
