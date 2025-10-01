@@ -63,50 +63,30 @@ export async function importEvent(
   return createdEvent
 }
 
-export interface BulkImportResult {
-  successful: EventDocument[]
-  failed: Array<{
-    event: EventDocument
-    error: string
-  }>
-}
-
 export async function bulkImportEvents(
   events: EventDocument[],
   token: TokenWithBearer
-): Promise<BulkImportResult> {
-  const result: BulkImportResult = {
-    successful: [],
-    failed: []
-  }
+) {
+  const toIndex = []
 
   const eventConfigs = await getInMemoryEventConfigurations(token)
 
   for (const eventDocument of events) {
-    try {
-      const transactionId = getUUID()
-      const { actions, ...event } = eventDocument
+    const transactionId = getUUID()
+    const { actions, ...event } = eventDocument
 
-      const eventType = event.type
-      const eventActions = mapEventActions(actions)
+    const eventType = event.type
+    const eventActions = mapEventActions(actions)
 
-      const createdEvent = await upsertEventWithActions(
-        { ...omit(event, 'type'), eventType, transactionId },
-        eventActions
-      )
+    const createdEvent = await upsertEventWithActions(
+      { ...omit(event, 'type'), eventType, transactionId },
+      eventActions
+    )
 
-      result.successful.push(createdEvent)
-    } catch (error) {
-      result.failed.push({
-        event: eventDocument,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      })
-    }
+    toIndex.push(createdEvent)
   }
 
-  if (result.successful.length > 0) {
-    await indexEventsInBulk(result.successful, eventConfigs)
+  if (toIndex.length > 0) {
+    await indexEventsInBulk(toIndex, eventConfigs)
   }
-
-  return result
 }

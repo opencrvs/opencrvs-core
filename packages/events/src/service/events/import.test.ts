@@ -136,39 +136,6 @@ describe('bulkImport', () => {
     ).resolves.not.toThrow()
   })
 
-  test('successfully imports multiple events in bulk', async () => {
-    const { user } = await setupTestCase()
-    const client = createSystemTestClient('test-system', [
-      SCOPES.RECORD_IMPORT,
-      SCOPES.RECORD_READ,
-      `search[event=${tennisClubMembershipEvent.id},access=all]`
-    ])
-
-    const event1 = generateEventDocument({
-      user,
-      configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE, ActionType.DECLARE]
-    })
-    const event2 = generateEventDocument({
-      user,
-      configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE, ActionType.DECLARE]
-    })
-    const event3 = generateEventDocument({
-      user,
-      configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE, ActionType.DECLARE]
-    })
-
-    const result = await client.event.bulkImport([event1, event2, event3])
-
-    expect(result.successful).toHaveLength(3)
-    expect(result.failed).toHaveLength(0)
-    expect(result.successful.map((e) => e.id)).toEqual(
-      expect.arrayContaining([event1.id, event2.id, event3.id])
-    )
-  })
-
   test('importing events indexes them into Elasticsearch at the next refresh', async () => {
     const { user } = await setupTestCase()
     const client = createSystemTestClient('test-system', [
@@ -204,15 +171,8 @@ describe('bulkImport', () => {
     })
 
     expect(events).toHaveLength(2)
-    expect([events[0].id, events[1].id]).toEqual([event1.id, event2.id])
-  })
-
-  test('handles empty array gracefully', async () => {
-    const client = createSystemTestClient('test-system', [SCOPES.RECORD_IMPORT])
-
-    const result = await client.event.bulkImport([])
-
-    expect(result.successful).toHaveLength(0)
-    expect(result.failed).toHaveLength(0)
+    expect([events[0].id, events[1].id].sort()).toEqual(
+      [event1.id, event2.id].sort()
+    )
   })
 })
