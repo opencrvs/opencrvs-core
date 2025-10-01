@@ -179,6 +179,7 @@ export function mapFieldTypeToMockValue(
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.PHONE:
+    case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
     case FieldType.OFFICE:
     case FieldType.LINK_BUTTON:

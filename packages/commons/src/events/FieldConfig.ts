@@ -615,13 +615,15 @@ const HttpField = BaseField.extend({
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
     headers: z.record(z.string()).optional(),
     body: z.record(z.string()).optional(),
-    params: z.record(z.string()).optional(),
+    params: z
+      .record(z.string(), z.union([z.string(), FieldReference]))
+      .optional(),
     timeout: z
       .number()
       .default(15000)
       .describe('Request timeout in milliseconds')
   })
-}).describe('HTTP request function triggered by a button click')
+}).describe('HTTP request function triggered by a button click or other event')
 
 export type HttpField = z.infer<typeof HttpField>
 
@@ -634,6 +636,20 @@ const LinkButtonField = BaseField.extend({
 }).describe('Button that opens a link')
 
 export type LinkButtonField = z.infer<typeof LinkButtonField>
+
+const QueryParamReaderField = BaseField.extend({
+  type: z.literal(FieldType.QUERY_PARAM_READER),
+  configuration: z.object({
+    formProjection: z
+      .record(z.string())
+      .optional()
+      .describe('Projection of the field value after parsing the query string')
+  })
+}).describe(
+  'A field that maps URL query params into form values and clears them afterward'
+)
+
+export type QueryParamReaderField = z.infer<typeof QueryParamReaderField>
 
 /** @knipignore */
 export type FieldConfig =
@@ -668,6 +684,7 @@ export type FieldConfig =
   | z.infer<typeof ButtonField>
   | z.infer<typeof HttpField>
   | z.infer<typeof LinkButtonField>
+  | z.infer<typeof QueryParamReaderField>
 
 /** @knipignore */
 /**
@@ -705,6 +722,7 @@ export type FieldConfigInput =
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
   | z.input<typeof LinkButtonField>
+  | z.input<typeof QueryParamReaderField>
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
  *  referenced quite extensively througout various other schemas. Leaving the
