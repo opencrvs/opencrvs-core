@@ -10,98 +10,85 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import React, { useState } from 'react'
-import { within, userEvent, expect, waitFor } from '@storybook/test'
+import { fn } from '@storybook/test'
+import React from 'react'
 import styled from 'styled-components'
-import { action } from '@storybook/addon-actions'
-import { noop } from 'lodash'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import superjson from 'superjson'
+import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import { ROUTES } from '@client/v2-events/routes'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 
-interface PrintButtonProps {
-  id: string
-  template: string
-  buttonLabel?: { id: string; defaultMessage: string }
-  disabled?: boolean
-  value?: string
-  onChange?: (value: string) => void
-}
+import { noop } from '@client/v2-events'
+import { tennisClubMembershipEventDocument } from '../fixtures'
 
-const Container = styled.div`
-  width: 400px;
-  margin: 0 auto;
-`
-
-function MockPrintButton({
-  id,
-  buttonLabel,
-  disabled,
-  template = 'v2-birth-certificate',
-  value,
-  onChange
-}: PrintButtonProps) {
-  const addedButtonLabel = { id: 'print.certificate', defaultMessage: 'Print' }
-  const label = buttonLabel?.defaultMessage ?? addedButtonLabel.defaultMessage
-  const alreadyPrinted = Boolean(value)
-
-  const handlePrint = () => {
-    onChange?.(new Date().toISOString())
-    alert('Simulated print (in a real run, this would open the prepared PDF).')
-  }
-
-  return (
-    <button
-      disabled={disabled || alreadyPrinted}
-      id={id}
-      style={{
-        padding: '8px 14px',
-        borderRadius: 6,
-        cursor: disabled || alreadyPrinted ? 'not-allowed' : 'pointer'
-      }}
-      onClick={handlePrint}
-    >
-      {label}
-    </button>
-  )
-}
-
-const meta: Meta<typeof MockPrintButton> = {
+const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/PrintButton',
-  component: MockPrintButton,
-  parameters: { layout: 'centered' }
-}
-export default meta
-type Story = StoryObj<typeof MockPrintButton>
-
-export const Default: Story = {
-  render: (args: Story['args']) => {
-    const [value, setValue] = useState<string | undefined>(undefined)
-    return (
-      <Container>
-        <MockPrintButton
-          {...(args as PrintButtonProps)}
-          value={value}
-          onChange={(val) => {
-            setValue(val)
-            args?.onChange?.(val)
-          }}
-        />
-      </Container>
+  args: { onChange: fn() },
+  decorators: [
+    (Story) => (
+      <TRPCProvider>
+        <Story />
+      </TRPCProvider>
     )
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const button = await canvas.findByRole('button', { name: /print/i })
-    await expect(button).toBeEnabled()
-    await userEvent.click(button)
-    await waitFor(async () => expect(button).toBeDisabled())
-  },
-  args: {
-    id: 'print-certificate',
-    template: 'v2-birth-certificate',
-    buttonLabel: {
-      id: 'print.certificate',
-      defaultMessage: 'Print'
+  ]
+}
+
+export default meta
+
+const tRPCMsw = createTRPCMsw<AppRouter>({
+  links: [
+    httpLink({
+      url: '/api/events'
+    })
+  ],
+  transformer: { input: superjson, output: superjson }
+})
+
+const StyledFormFieldGenerator = styled(FormFieldGenerator)`
+  width: 400px;
+`
+export const Default: StoryObj<typeof FormFieldGenerator> = {
+  parameters: {
+    reactRouter: {
+      router: {
+        path: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+          eventId: tennisClubMembershipEventDocument.id
+        }),
+        element: (
+          <StyledFormFieldGenerator
+            fields={[
+              {
+                id: 'storybook.name',
+                type: FieldType.PRINT_BUTTON,
+                label: {
+                  id: 'storybook.name.label',
+                  defaultMessage: 'Name',
+                  description: 'The title for the name input'
+                },
+                configuration: {
+                  template: 'tennis-club-membership-certificate'
+                }
+              }
+            ]}
+            id="my-form"
+            onChange={() => noop()}
+          />
+        )
+      },
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
     },
-    disabled: false,
-    onChange: () => noop()
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          })
+        ]
+      }
+    }
   }
 }
