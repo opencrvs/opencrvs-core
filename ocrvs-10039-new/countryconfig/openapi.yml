@@ -4260,7 +4260,7 @@ components:
                 away
             type:
               type: string
-              const: PRINT_BUTTON
+              const: ALPHA_PRINT_BUTTON
             configuration:
               type: object
               properties:

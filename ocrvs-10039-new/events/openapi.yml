@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 172906c6-3072-4a4c-ace4-34b9ad7e4ca9
+                transactionId: 15a3f70a-59c0-4e24-a8f3-151a30645285
                 type: birth
       responses:
         "200":
@@ -401,7 +401,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: ae1a6dbb-6f6e-4879-9277-844d0c5c74f4
+                transactionId: 0b0f5998-ea28-4351-bf43-a71c8c4c2819
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -5970,7 +5970,7 @@ components:
             type:
               type: string
               enum:
-                - PRINT_BUTTON
+                - ALPHA_PRINT_BUTTON
             configuration:
               type: object
               properties:
