@@ -4306,7 +4306,22 @@ components:
                 params:
                   type: object
                   additionalProperties:
-                    type: string
+                    anyOf:
+                      - type: string
+                      - type: object
+                        properties:
+                          $$field:
+                            type: string
+                            description: Unique identifier for the field
+                          $$subfield:
+                            type: array
+                            items:
+                              type: string
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        required:
+                          - $$field
+                        description: Reference to a field by its ID
                 timeout:
                   type: number
                   default: 15000
@@ -4321,7 +4336,7 @@ components:
             - label
             - type
             - configuration
-          description: HTTP request function triggered by a button click
+          description: HTTP request function triggered by a button click or other event
         - type: object
           properties:
             id:
@@ -5518,6 +5533,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -5651,6 +5669,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum:
@@ -5837,6 +5858,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -5970,6 +5994,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
@@ -6152,6 +6179,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -6285,6 +6315,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
@@ -6477,6 +6510,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -6610,6 +6646,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
@@ -6811,6 +6850,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -6944,6 +6986,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
@@ -7126,6 +7171,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -7259,6 +7307,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
@@ -7449,6 +7500,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -7582,6 +7636,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
@@ -7774,6 +7831,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -7907,6 +7967,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
@@ -8089,6 +8152,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -8222,6 +8288,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
@@ -8406,6 +8475,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -8539,6 +8611,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
@@ -8721,6 +8796,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -8854,6 +8932,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
@@ -9039,6 +9120,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -9172,6 +9256,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
@@ -9354,6 +9441,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -9487,6 +9577,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
@@ -9672,6 +9765,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -9805,6 +9901,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
@@ -10000,6 +10099,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -10133,6 +10235,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
@@ -10315,6 +10420,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -10448,6 +10556,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
@@ -10637,6 +10748,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type:
             - object
@@ -10770,6 +10884,9 @@ components:
                           data:
                             type: "null"
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a13
