@@ -112,6 +112,7 @@ export function validationErrorsInActionFormExist({
         formWithoutHiddenFields,
         locationIds
       )
+
       return Object.values(fieldErrors).some((field) => field.errors.length > 0)
     })
 
