@@ -180,8 +180,7 @@ export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
  */
 export function omitHiddenFields<T extends EventState | ActionUpdate>(
   fields: FieldConfig[],
-  formValues: T,
-  visibleVerificationPageIds: string[] = []
+  formValues: T
 ): Partial<T> {
   const base = cloneDeep(formValues)
 
@@ -190,10 +189,6 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
   function fn(prevVisibilityContext: Partial<T>): Partial<T> {
     const cleaned = omitBy<Partial<T>>(base, (_, fieldId) => {
       const fieldConfig = fields.filter((f) => f.id === fieldId)
-
-      if (visibleVerificationPageIds.includes(fieldId)) {
-        return false
-      }
 
       return fieldConfig.length
         ? fieldConfig.every((f) => !isFieldVisible(f, prevVisibilityContext))
@@ -294,27 +289,6 @@ export function getVisibleVerificationPageIds(
     .map((page) => page.id)
 }
 
-function getActionVerificationPageIds(
-  actionConfig: ActionConfig,
-  annotation: ActionUpdate
-): string[] {
-  if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
-    return getVisibleVerificationPageIds(
-      actionConfig.correctionForm.pages,
-      annotation
-    )
-  }
-
-  if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
-    return getVisibleVerificationPageIds(
-      actionConfig.printForm.pages,
-      annotation
-    )
-  }
-
-  return []
-}
-
 export function omitHiddenAnnotationFields(
   actionConfig: ActionConfig,
   declaration: EventState,
@@ -322,16 +296,7 @@ export function omitHiddenAnnotationFields(
 ) {
   const annotationFields = getActionAnnotationFields(actionConfig)
 
-  const visibleVerificationPageIds = getActionVerificationPageIds(
-    actionConfig,
-    annotation
-  )
-
-  return omitHiddenFields(
-    annotationFields,
-    { ...declaration, ...annotation },
-    visibleVerificationPageIds
-  )
+  return omitHiddenFields(annotationFields, { ...declaration, ...annotation })
 }
 
 /**
