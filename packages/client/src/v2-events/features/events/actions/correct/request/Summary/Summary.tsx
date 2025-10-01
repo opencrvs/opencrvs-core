@@ -134,7 +134,8 @@ export function Summary() {
       },
       transactionId: generateTransactionId(),
       annotation,
-      event
+      event,
+      fullEvent: event
     }
 
     if (userMayCorrect) {

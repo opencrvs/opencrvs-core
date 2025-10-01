@@ -83,8 +83,16 @@ function getCleanedDeclarationDiff(
   originalDeclaration?: EventState,
   declarationDiff?: EventState
 ): ActionUpdate | undefined {
-  if (isEmpty(declarationDiff) || isEmpty(originalDeclaration)) {
+  if (isEmpty(declarationDiff)) {
     return declarationDiff
+  }
+
+  // If there's no original declaration, just clean the update and return it
+  if (isEmpty(originalDeclaration)) {
+    return omitHiddenPaginatedFields(
+      eventConfiguration.declaration,
+      declarationDiff
+    )
   }
 
   // Merge original + updates so we get the final event state
