@@ -22,7 +22,8 @@ import {
   uniqBy,
   cloneDeep,
   orderBy,
-  groupBy
+  groupBy,
+  isEqual
 } from 'lodash'
 import {
   ActionType,
@@ -50,6 +51,7 @@ import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
 import { SelectDateRangeValue } from './FieldValue'
 import { subDays } from 'date-fns'
+import { ConditionalType } from './Conditional'
 
 function isDeclarationActionConfig(
   action: ActionConfig
@@ -164,38 +166,63 @@ export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
   return isConditionMet(page.conditional, formValues)
 }
 
+/**
+ * Removes values from the form that correspond to hidden fields.
+ * This function recursively omits any fields from the form values that are not visible
+ * according to their FieldConfig and the current form state. It ensures that only values
+ * for visible fields are retained, which is useful for conditional forms where hidden field
+ * values should not affect validation or submission.
+ *
+ * @template T - The type of the form values
+ * @param {T} formValues - The current form values
+ * @param {FieldConfig[]} fields - The list of field configurations to check visibility against
+ * @returns {Partial<T>} A new object containing only the values for visible fields
+ */
 export function omitHiddenFields<T extends EventState | ActionUpdate>(
   fields: FieldConfig[],
-  values: T,
-  visibleVerificationPageIds: string[] = []
-) {
-  return omitBy<T>(values, (_, fieldId) => {
-    // We dont want to omit visible verification page values
-    if (visibleVerificationPageIds.includes(fieldId)) {
-      return false
-    }
+  formValues: T
+): Partial<T> {
+  const base = cloneDeep(formValues)
 
-    // There can be multiple field configurations with the same id, with e.g. different options and conditions
-    const fieldConfigs = fields.filter((f) => f.id === fieldId)
+  // The omitting is done recursively until the object does not change.
+  // This is because the previously removed fields might affect the visibility of other fields.
+  function fn(prevVisibilityContext: Partial<T>): Partial<T> {
+    const cleaned = omitBy<Partial<T>>(base, (_, fieldId) => {
+      const fieldConfig = fields.filter((f) => f.id === fieldId)
 
-    if (!fieldConfigs.length) {
-      return true
-    }
+      return fieldConfig.length
+        ? fieldConfig.every((f) => !isFieldVisible(f, prevVisibilityContext))
+        : false
+    })
 
-    // As long as one of the field configs is visible, the field should be included
-    return fieldConfigs.every((f) => !isFieldVisible(f, values))
-  })
+    return isEqual(cleaned, prevVisibilityContext) ? cleaned : fn(cleaned)
+  }
+
+  return fn(base)
 }
 
 export function omitHiddenPaginatedFields(
   formConfig: FormConfig,
-  declaration: EventState
+  values: EventState
 ) {
-  const visiblePagesFormFields = formConfig.pages
-    .filter((p) => isPageVisible(p, declaration))
-    .flatMap((p) => p.fields)
+  // If a page has a conditional, we set it as one of the field's conditionals with ConditionalType.SHOW
+  const fields = formConfig.pages.flatMap((p) =>
+    p.fields.map((f) => {
+      if (!p.conditional) {
+        return f
+      }
 
-  return omitHiddenFields(visiblePagesFormFields, declaration)
+      return {
+        ...f,
+        conditionals: [
+          ...(f.conditionals ?? []),
+          { type: ConditionalType.SHOW, conditional: p.conditional }
+        ]
+      }
+    })
+  )
+
+  return omitHiddenFields(fields, values)
 }
 
 /**
@@ -262,27 +289,6 @@ export function getVisibleVerificationPageIds(
     .map((page) => page.id)
 }
 
-export function getActionVerificationPageIds(
-  actionConfig: ActionConfig,
-  annotation: ActionUpdate
-): string[] {
-  if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
-    return getVisibleVerificationPageIds(
-      actionConfig.correctionForm.pages,
-      annotation
-    )
-  }
-
-  if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
-    return getVisibleVerificationPageIds(
-      actionConfig.printForm.pages,
-      annotation
-    )
-  }
-
-  return []
-}
-
 export function omitHiddenAnnotationFields(
   actionConfig: ActionConfig,
   declaration: EventState,
@@ -290,16 +296,7 @@ export function omitHiddenAnnotationFields(
 ) {
   const annotationFields = getActionAnnotationFields(actionConfig)
 
-  const visibleVerificationPageIds = getActionVerificationPageIds(
-    actionConfig,
-    annotation
-  )
-
-  return omitHiddenFields(
-    annotationFields,
-    { ...declaration, ...annotation },
-    visibleVerificationPageIds
-  )
+  return omitHiddenFields(annotationFields, { ...declaration, ...annotation })
 }
 
 /**

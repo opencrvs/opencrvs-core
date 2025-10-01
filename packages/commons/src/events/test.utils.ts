@@ -294,7 +294,7 @@ export function generateActionDuplicateDeclarationInput(
   })
 }
 
-export function generateActionAnnotationInput(
+function generateActionAnnotationInput(
   configuration: EventConfig,
   action: ActionType,
   rng: () => number
