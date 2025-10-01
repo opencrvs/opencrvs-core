@@ -108,8 +108,6 @@ export function createTemporaryId() {
  * @param meta: Metadata fields such as '$user', '$event', and others.
  *
  * @returns Resolves template variables in the default value and returns the resolved value.
- *
-
  */
 export function replacePlaceholders({
   fieldType,

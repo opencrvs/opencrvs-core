@@ -41,7 +41,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
-import { hasFieldChanged } from '../../utils'
+import { hasDeclarationFieldChanged } from '../../utils'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
@@ -110,7 +110,12 @@ export function Summary() {
           return false
         }
 
-        return hasFieldChanged(field, form, previousFormValues)
+        return hasDeclarationFieldChanged(
+          field,
+          form,
+          previousFormValues,
+          eventConfiguration
+        )
       })
     )
 
@@ -150,7 +155,8 @@ export function Summary() {
     annotation,
     previousFormValues,
     navigate,
-    userMayCorrect
+    userMayCorrect,
+    eventConfiguration
   ])
 
   return (
