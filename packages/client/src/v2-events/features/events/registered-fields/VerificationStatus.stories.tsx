@@ -41,8 +41,6 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
     layout: 'centered'
   },
   render: function Component() {
-    const [formData, setFormData] = React.useState({})
-
     return (
       <StyledFormFieldGenerator
         fields={[
@@ -55,7 +53,7 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
               description: 'The title for the status field label'
             },
             configuration: {
-              text: {
+              status: {
                 id: 'storybook.pending.pending',
                 defaultMessage: 'Pending',
                 description: 'Status text when the informant is pending'
@@ -76,7 +74,7 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
               description: 'The title for the status field label'
             },
             configuration: {
-              text: {
+              status: {
                 id: 'storybook.verified.verified',
                 defaultMessage: 'Verified',
                 description: 'Status text when the informant is verified'
@@ -97,7 +95,7 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
               description: 'The title for the status field label'
             },
             configuration: {
-              text: {
+              status: {
                 id: 'storybook.authenticated.authenticated',
                 defaultMessage: 'Authenticated',
                 description: 'Status text when the informant is authenticated'
@@ -119,7 +117,7 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
               description: 'The title for the status field label'
             },
             configuration: {
-              text: {
+              status: {
                 id: 'storybook.failed.failed',
                 defaultMessage: 'Failed',
                 description: 'Status text when the informant is failed'
