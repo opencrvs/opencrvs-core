@@ -235,7 +235,8 @@ export async function generateAndSendVerificationCode(
 const tokenPayload = t.type({
   sub: t.string,
   scope: t.array(t.string),
-  role: t.string,
+  // @TODO: Does role need to be here?
+  // role: t.string,
   iat: t.number,
   exp: t.number,
   aud: t.array(t.string)
