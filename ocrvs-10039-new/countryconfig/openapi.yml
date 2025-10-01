@@ -621,7 +621,7 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default:
-            &a11 []
+            &a10 []
         draft:
           type: boolean
         type:
@@ -2862,21 +2862,17 @@ components:
                 acceptedFileTypes:
                   type: array
                   items:
-                    anyOf:
-                      - type: string
-                        enum:
-                          &a9
-                          - application/pdf
-                          - application/msword
-                          - application/vnd.openxmlformats-officedocument.wordprocessingml.document
-                          - application/vnd.oasis.opendocument.text
-                      - type: string
-                        enum:
-                          &a10
-                          - image/png
-                          - image/jpg
-                          - image/jpeg
-                          - image/svg+xml
+                    type: string
+                    enum:
+                      &a9
+                      - image/png
+                      - image/jpg
+                      - image/jpeg
+                      - image/svg+xml
+                      - application/pdf
+                      - application/msword
+                      - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+                      - application/vnd.oasis.opendocument.text
                   description: List of allowed file formats for the signature
                 style:
                   type: object
@@ -3645,11 +3641,8 @@ components:
                 acceptedFileTypes:
                   type: array
                   items:
-                    anyOf:
-                      - type: string
-                        enum: *a9
-                      - type: string
-                        enum: *a10
+                    type: string
+                    enum: *a9
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -3910,11 +3903,8 @@ components:
                 acceptedFileTypes:
                   type: array
                   items:
-                    anyOf:
-                      - type: string
-                        enum: *a9
-                      - type: string
-                        enum: *a10
+                    type: string
+                    enum: *a9
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -4648,7 +4638,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a11
+          default: *a10
         draft:
           type: boolean
         type:
@@ -4831,7 +4821,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a11
+          default: *a10
         draft:
           type: boolean
         type:
@@ -4903,7 +4893,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a11
+          default: *a10
         draft:
           type: boolean
         type:
@@ -4946,7 +4936,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a11
+          default: *a10
         draft:
           type: boolean
         type:
@@ -4989,7 +4979,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a11
+          default: *a10
         draft:
           type: boolean
         type:
@@ -5061,7 +5051,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a11
+          default: *a10
         draft:
           type: boolean
         type:
@@ -5104,7 +5094,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a11
+          default: *a10
         draft:
           type: boolean
         type:
@@ -5236,7 +5226,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a11
+          default: *a10
         draft:
           type: boolean
         type:
@@ -5313,7 +5303,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a11
+          default: *a10
         draft:
           type: boolean
         type:
@@ -5356,7 +5346,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a11
+          default: *a10
         draft:
           type: boolean
         type:
@@ -5395,7 +5385,7 @@ components:
                   createdByUserType:
                     type: string
                     enum:
-                      &a12
+                      &a11
                       - user
                       - system
                   createdAt:
@@ -5505,7 +5495,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -5545,7 +5535,7 @@ components:
                   addressType:
                     type: string
                     enum:
-                      &a13
+                      &a12
                       - DOMESTIC
                       - INTERNATIONAL
                   administrativeArea:
@@ -5683,7 +5673,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -5799,7 +5789,7 @@ components:
         status:
           type: string
           enum:
-            &a14
+            &a13
             - Requested
             - Accepted
             - Rejected
@@ -5833,7 +5823,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -5872,7 +5862,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -6008,7 +5998,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -6123,7 +6113,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -6154,7 +6144,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -6193,7 +6183,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -6329,7 +6319,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -6444,7 +6434,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -6485,7 +6475,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -6524,7 +6514,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -6660,7 +6650,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -6775,7 +6765,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -6825,7 +6815,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -6864,7 +6854,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -7000,7 +6990,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -7115,7 +7105,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -7146,7 +7136,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -7185,7 +7175,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -7321,7 +7311,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -7436,7 +7426,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -7475,7 +7465,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -7514,7 +7504,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -7650,7 +7640,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -7765,7 +7755,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -7806,7 +7796,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -7845,7 +7835,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -7981,7 +7971,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -8096,7 +8086,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -8127,7 +8117,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -8166,7 +8156,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -8302,7 +8292,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -8417,7 +8407,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -8450,7 +8440,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -8489,7 +8479,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -8625,7 +8615,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -8740,7 +8730,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -8771,7 +8761,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -8810,7 +8800,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -8946,7 +8936,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -9061,7 +9051,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -9095,7 +9085,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -9134,7 +9124,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -9270,7 +9260,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -9385,7 +9375,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -9416,7 +9406,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -9455,7 +9445,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -9591,7 +9581,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -9706,7 +9696,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -9740,7 +9730,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -9779,7 +9769,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -9915,7 +9905,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -10030,7 +10020,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -10074,7 +10064,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -10113,7 +10103,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -10249,7 +10239,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -10364,7 +10354,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -10395,7 +10385,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -10434,7 +10424,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -10570,7 +10560,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -10685,7 +10675,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -10723,7 +10713,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -10762,7 +10752,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -10898,7 +10888,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a13
+                    enum: *a12
                   administrativeArea:
                     type:
                       - string
@@ -11013,7 +11003,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a14
+          enum: *a13
         originalActionId:
           type:
             - string

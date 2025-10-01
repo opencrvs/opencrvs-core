@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 5972a161-0657-44e5-8bda-557ce4b6be98
+                transactionId: 45c8a608-5d7a-4339-9f56-b5697d0d622b
                 type: birth
       responses:
         "200":
@@ -401,7 +401,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: b1a4b73a-a33c-4be7-89be-619df7f15bae
+                transactionId: 7ba6e427-fded-46ee-8e63-e0e9d3b0db19
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1460,7 +1460,7 @@ paths:
                       - eventType: tennis-club-membership
                         status:
                           type: anyOf
-                          terms: &a17
+                          terms: &a16
                             - CREATED
                             - NOTIFIED
                             - DECLARED
@@ -1576,7 +1576,7 @@ paths:
                             type: string
                           createdByUserType:
                             type: string
-                            enum: &a14
+                            enum: &a13
                               - user
                               - system
                           createdAt:
@@ -1606,7 +1606,7 @@ paths:
                               or accepted by 3rd party integration.
                           type:
                             type: string
-                            enum: &a15
+                            enum: &a14
                               - NOTIFY
                               - DECLARE
                               - VALIDATE
@@ -2268,7 +2268,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: &a13 []
+          default: &a12 []
         draft:
           type: boolean
         type:
@@ -2465,7 +2465,7 @@ components:
                   type: string
                 addressType:
                   type: string
-                  enum: &a18
+                  enum: &a17
                     - DOMESTIC
                     - INTERNATIONAL
                 administrativeArea:
@@ -4548,19 +4548,16 @@ components:
                 acceptedFileTypes:
                   type: array
                   items:
-                    anyOf:
-                      - type: string
-                        enum: &a11
-                          - application/pdf
-                          - application/msword
-                          - application/vnd.openxmlformats-officedocument.wordprocessingml.document
-                          - application/vnd.oasis.opendocument.text
-                      - type: string
-                        enum: &a12
-                          - image/png
-                          - image/jpg
-                          - image/jpeg
-                          - image/svg+xml
+                    type: string
+                    enum: &a11
+                      - image/png
+                      - image/jpg
+                      - image/jpeg
+                      - image/svg+xml
+                      - application/pdf
+                      - application/msword
+                      - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+                      - application/vnd.oasis.opendocument.text
                   description: List of allowed file formats for the signature
                 style:
                   type: object
@@ -5344,11 +5341,8 @@ components:
                 acceptedFileTypes:
                   type: array
                   items:
-                    anyOf:
-                      - type: string
-                        enum: *a11
-                      - type: string
-                        enum: *a12
+                    type: string
+                    enum: *a11
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -5613,11 +5607,8 @@ components:
                 acceptedFileTypes:
                   type: array
                   items:
-                    anyOf:
-                      - type: string
-                        enum: *a11
-                      - type: string
-                        enum: *a12
+                    type: string
+                    enum: *a11
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -6368,7 +6359,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a13
+          default: *a12
         draft:
           type: boolean
         type:
@@ -6561,7 +6552,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a13
+          default: *a12
         draft:
           type: boolean
         type:
@@ -6637,7 +6628,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a13
+          default: *a12
         draft:
           type: boolean
         type:
@@ -6683,7 +6674,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a13
+          default: *a12
         draft:
           type: boolean
         type:
@@ -6729,7 +6720,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a13
+          default: *a12
         draft:
           type: boolean
         type:
@@ -6805,7 +6796,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a13
+          default: *a12
         draft:
           type: boolean
         type:
@@ -6851,7 +6842,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a13
+          default: *a12
         draft:
           type: boolean
         type:
@@ -6991,7 +6982,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a13
+          default: *a12
         draft:
           type: boolean
         type:
@@ -7074,7 +7065,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a13
+          default: *a12
         draft:
           type: boolean
         type:
@@ -7120,7 +7111,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a13
+          default: *a12
         draft:
           type: boolean
         type:
@@ -7252,7 +7243,7 @@ components:
                     type: string
                   createdByUserType:
                     type: string
-                    enum: *a14
+                    enum: *a13
                   createdAt:
                     type: string
                     format: date-time
@@ -7280,7 +7271,7 @@ components:
                       or accepted by 3rd party integration.
                   type:
                     type: string
-                    enum: *a15
+                    enum: *a14
                 required:
                   - id
                   - transactionId
@@ -7348,7 +7339,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -7623,7 +7614,7 @@ components:
                   type: string
         status:
           type: string
-          enum: &a16
+          enum: &a15
             - Requested
             - Accepted
             - Rejected
@@ -7657,7 +7648,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -7932,7 +7923,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -7963,7 +7954,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -8238,7 +8229,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -8279,7 +8270,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -8554,7 +8545,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -8604,7 +8595,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -8879,7 +8870,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -8910,7 +8901,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -9185,7 +9176,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -9224,7 +9215,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -9499,7 +9490,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -9540,7 +9531,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -9815,7 +9806,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -9846,7 +9837,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -10121,7 +10112,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -10154,7 +10145,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -10429,7 +10420,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -10460,7 +10451,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -10735,7 +10726,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -10769,7 +10760,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -11044,7 +11035,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -11075,7 +11066,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -11350,7 +11341,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -11384,7 +11375,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -11659,7 +11650,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -11703,7 +11694,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -11978,7 +11969,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -12009,7 +12000,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -12284,7 +12275,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -12321,7 +12312,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a14
+          enum: *a13
         createdAt:
           type: string
           format: date-time
@@ -12596,7 +12587,7 @@ components:
                   type: string
         status:
           type: string
-          enum: *a16
+          enum: *a15
         originalActionId:
           type: string
           nullable: true
@@ -12669,7 +12660,7 @@ components:
             - eventType: tennis-club-membership
               status:
                 type: anyOf
-                terms: *a17
+                terms: *a16
               updatedAt:
                 type: range
                 gte: 2025-05-22
@@ -12738,7 +12729,7 @@ components:
           type: array
           items:
             type: string
-            enum: *a17
+            enum: *a16
       required:
         - type
         - terms
@@ -12751,7 +12742,7 @@ components:
             - exact
         term:
           type: string
-          enum: *a17
+          enum: *a16
       required:
         - type
         - term
@@ -12845,7 +12836,7 @@ components:
             - exact
         term:
           type: string
-          enum: *a14
+          enum: *a13
       required:
         - type
         - term
@@ -12949,7 +12940,7 @@ components:
           description: The type of event, such as birth, death, or marriage.
         status:
           type: string
-          enum: *a17
+          enum: *a16
         legalStatuses:
           type: object
           properties:
@@ -13140,7 +13131,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a18
+                    enum: *a17
                   administrativeArea:
                     type: string
                     format: uuid
