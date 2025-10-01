@@ -42,7 +42,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { hasFieldChanged } from '../../utils'
+import { hasDeclarationFieldChanged } from '../../utils'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
@@ -113,10 +113,11 @@ export function Summary() {
           return false
         }
 
-        return hasFieldChanged(
+        return hasDeclarationFieldChanged(
           field,
           form,
           previousFormValues,
+          eventConfiguration,
           validatorContext
         )
       })
@@ -164,7 +165,8 @@ export function Summary() {
     previousFormValues,
     navigate,
     userMayCorrect,
-    validatorContext
+    validatorContext,
+    eventConfiguration
   ])
 
   return (

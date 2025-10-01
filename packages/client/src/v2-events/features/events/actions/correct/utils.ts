@@ -18,7 +18,10 @@ import {
   ActionType,
   FieldValue,
   ValidatorContext,
-  deepMerge
+  deepMerge,
+  omitHiddenFields,
+  getDeclarationFields,
+  EventConfig
 } from '@opencrvs/commons/client'
 
 /**
@@ -55,6 +58,27 @@ export function hasFieldChanged(
   const valueHasChanged = !isEqualFieldValue(prevValue, currValue) && !bothNil
 
   return isVisible && valueHasChanged
+}
+
+export function hasDeclarationFieldChanged(
+  f: FieldConfig,
+  form: EventState,
+  previousFormValues: EventState,
+  eventConfiguration: EventConfig,
+  validatorContext: ValidatorContext
+) {
+  const fields = getDeclarationFields(eventConfiguration)
+  const formWithoutHiddenFields = omitHiddenFields(
+    fields,
+    form,
+    validatorContext
+  )
+  return hasFieldChanged(
+    f,
+    formWithoutHiddenFields,
+    previousFormValues,
+    validatorContext
+  )
 }
 
 export function isLastActionCorrectionRequest(event: EventDocument) {

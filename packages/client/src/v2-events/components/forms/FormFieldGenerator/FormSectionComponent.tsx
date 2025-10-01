@@ -29,9 +29,10 @@ import {
   InteractiveFieldType,
   FieldReference,
   getAllUniqueFields,
-  isFieldVisible,
+  omitHiddenFields,
   isFieldEnabled,
-  ValidatorContext
+  ValidatorContext,
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -388,7 +389,6 @@ export function FormSectionComponent({
   ])
 
   // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
-  // Address is the only deep value.
   const completeForm = { ...initialValues, ...form }
 
   const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
@@ -406,15 +406,31 @@ export function FormSectionComponent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validateAllFields])
 
+  /*
+   * For the conditional check data, we want to only include values from visible fields so values of hidden fields don’t affect them.
+   *
+   * You might wonder why values of hidden fields aren’t filtered out completely earlier.
+   * That’s intentional — we persist their values so if the fields become visible again, the previous values are restored instead of resetting.
+   */
+  const declarationFields = eventConfig?.declaration.pages.flatMap(
+    (p) => p.fields
+  )
+  const allFields = [...(declarationFields ?? []), ...fieldsWithDotSeparator]
+  const visibleFieldValues = omitHiddenFields(
+    allFields,
+    completeForm,
+    validatorContext
+  )
+
   return (
     <section className={className}>
       {fieldsWithFormikSeparator.map((field) => {
-        if (!isFieldVisible(field, completeForm, validatorContext)) {
+        if (!isFieldVisible(field, visibleFieldValues, validatorContext)) {
           return null
         }
 
         const isDisabled =
-          !isFieldEnabled(field, completeForm, validatorContext) ||
+          !isFieldEnabled(field, visibleFieldValues, validatorContext) ||
           (isCorrection && field.uncorrectable)
 
         const visibleError = errors[field.id]?.errors[0]?.message

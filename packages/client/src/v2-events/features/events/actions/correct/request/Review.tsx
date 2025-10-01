@@ -17,8 +17,8 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
-  getCurrentEventState,
-  getDeclaration
+  getDeclaration,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
@@ -32,7 +32,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { hasFieldChanged } from '../utils'
+import { hasDeclarationFieldChanged, hasFieldChanged } from '../utils'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
@@ -60,7 +60,13 @@ export function Review() {
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)
   const changedFields = formFields.filter((f) =>
-    hasFieldChanged(f, form, previousFormValues, validatorContext)
+    hasDeclarationFieldChanged(
+      f,
+      form,
+      previousFormValues,
+      configuration,
+      validatorContext
+    )
   )
   const anyValuesHaveChanged = changedFields.length > 0
 
