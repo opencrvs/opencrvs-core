@@ -43,6 +43,7 @@ import { useEventConfiguration } from '../features/events/useEventConfiguration'
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { useDrafts } from '../features/drafts/useDrafts'
 import { getEventDrafts } from '../features/events/components/Action/utils'
+import { hasStringFilename } from '../utils'
 
 async function replaceMinioUrlWithBase64(
   declaration: EventState,
@@ -59,13 +60,7 @@ async function replaceMinioUrlWithBase64(
   for (const fieldId of fileFieldIds) {
     const field = declarationClone[fieldId]
 
-    if (
-      field &&
-      typeof field === 'object' &&
-      'filename' in field &&
-      typeof field.filename === 'string' &&
-      isMinioUrl(field.filename)
-    ) {
+    if (hasStringFilename(field) && isMinioUrl(field.filename)) {
       // TypeScript now knows `field` has a `filename` property of type string
       field.filename = await fetchImageAsBase64(field.filename)
     }

@@ -28,8 +28,16 @@ export function useUserDetails() {
 
     const provinceId = district?.partOf.split('/')[1]
 
+    const normalizedName = userDetails.name.map((n) => ({
+      use: n.use ?? 'official',
+      family: n.familyName ?? '',
+      given: n.firstNames ? [n.firstNames] : []
+    }))
+
+    const name = getUsersFullName(normalizedName, 'en')
+
     return {
-      name: `${userDetails.name[0].firstNames} ${userDetails.name[0].familyName}`,
+      name,
       role: userDetails.role.id,
       district: districtId ?? '',
       province: provinceId ?? ''
