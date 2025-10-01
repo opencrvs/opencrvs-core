@@ -40,7 +40,7 @@ import {
   DateRangeField,
   SelectDateRangeField,
   TimeField,
-  PrintButton,
+  AlphaPrintButton,
   HttpField,
   ButtonField,
   LinkButtonField,
@@ -157,7 +157,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.BUTTON:
       schema = ButtonFieldValue
       break
-    case FieldType.PRINT_BUTTON:
+    case FieldType.ALPHA_PRINT_BUTTON:
       schema = TextValue
       break
     case FieldType.HTTP:
@@ -213,7 +213,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.NAME:
     case FieldType.PHONE:
     case FieldType.BUTTON:
-    case FieldType.PRINT_BUTTON:
+    case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.HTTP:
     case FieldType.LINK_BUTTON:
     case FieldType.QUERY_PARAM_READER:
@@ -450,8 +450,8 @@ export const isButtonFieldType = (field: {
 export const isPrintButtonFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: undefined; config: PrintButton } => {
-  return field.config.type === FieldType.PRINT_BUTTON
+}): field is { value: undefined; config: AlphaPrintButton } => {
+  return field.config.type === FieldType.ALPHA_PRINT_BUTTON
 }
 
 export const isHttpFieldType = (field: {
@@ -484,7 +484,7 @@ export type NonInteractiveFieldType =
   | Paragraph
   | BulletList
   | DataField
-  | PrintButton
+  | AlphaPrintButton
   | HttpField
   | LinkButtonField
   | QueryParamReaderField
@@ -500,7 +500,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.PARAGRAPH ||
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
-    field.type === FieldType.PRINT_BUTTON ||
+    field.type === FieldType.ALPHA_PRINT_BUTTON ||
     field.type === FieldType.HTTP ||
     field.type === FieldType.LINK_BUTTON ||
     field.type === FieldType.QUERY_PARAM_READER

@@ -30,7 +30,7 @@ import { SelectCountry } from './SelectCountry'
 import { SelectDateRangeField } from './SelectDateRangeField'
 import { Text } from './Text'
 import { TimeField } from './TimeField'
-import { PrintButton } from './PrintButton'
+import { AlphaPrintButton } from './AlphaPrintButton'
 import { LinkButton } from './LinkButton'
 
 export * from './Address'
@@ -52,7 +52,7 @@ export * from './SelectCountry'
 export * from './SelectDateRangeField'
 export * from './Text'
 export * from './TimeField'
-export * from './PrintButton'
+export * from './AlphaPrintButton'
 export * from './LinkButton'
 
 export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
@@ -73,8 +73,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return DateField
     case FieldType.TIME:
       return TimeField
-    case FieldType.PRINT_BUTTON:
-      return PrintButton
+    case FieldType.ALPHA_PRINT_BUTTON:
+      return AlphaPrintButton
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:

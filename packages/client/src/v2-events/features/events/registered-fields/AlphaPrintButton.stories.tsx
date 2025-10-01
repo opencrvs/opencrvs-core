@@ -24,7 +24,7 @@ import { noop } from '@client/v2-events'
 import { tennisClubMembershipEventDocument } from '../fixtures'
 
 const meta: Meta<typeof FormFieldGenerator> = {
-  title: 'Inputs/PrintButton',
+  title: 'Inputs/AlphaPrintButton',
   args: { onChange: fn() },
   decorators: [
     (Story) => (
@@ -61,7 +61,7 @@ export const Default: StoryObj<typeof FormFieldGenerator> = {
             fields={[
               {
                 id: 'storybook.name',
-                type: FieldType.PRINT_BUTTON,
+                type: FieldType.ALPHA_PRINT_BUTTON,
                 label: {
                   id: 'storybook.name.label',
                   defaultMessage: 'Name',

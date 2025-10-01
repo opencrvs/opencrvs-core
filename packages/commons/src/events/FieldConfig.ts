@@ -604,8 +604,8 @@ const ButtonField = BaseField.extend({
 
 export type ButtonField = z.infer<typeof ButtonField>
 
-const PrintButton = BaseField.extend({
-  type: z.literal(FieldType.PRINT_BUTTON),
+const AlphaPrintButton = BaseField.extend({
+  type: z.literal(FieldType.ALPHA_PRINT_BUTTON),
   configuration: z.object({
     template: z
       .string()
@@ -616,7 +616,7 @@ const PrintButton = BaseField.extend({
   })
 }).describe('Print button field for printing certificates')
 
-export type PrintButton = z.infer<typeof PrintButton>
+export type AlphaPrintButton = z.infer<typeof AlphaPrintButton>
 
 const HttpField = BaseField.extend({
   type: z.literal(FieldType.HTTP),
@@ -694,7 +694,7 @@ export type FieldConfig =
   | z.infer<typeof EmailField>
   | z.infer<typeof DataField>
   | z.infer<typeof ButtonField>
-  | z.infer<typeof PrintButton>
+  | z.infer<typeof AlphaPrintButton>
   | z.infer<typeof HttpField>
   | z.infer<typeof LinkButtonField>
   | z.infer<typeof QueryParamReaderField>
@@ -709,7 +709,7 @@ export type FieldConfigInput =
   | z.input<typeof TimeField>
   | z.input<typeof SelectDateRangeField>
   | z.input<typeof ButtonField>
-  | z.input<typeof PrintButton>
+  | z.input<typeof AlphaPrintButton>
   | z.input<typeof NumberField>
   | z.input<typeof TextAreaField>
   | z.input<typeof DateField>
@@ -778,7 +778,7 @@ export const FieldConfig: z.ZodType<
     FileUploadWithOptions,
     DataField,
     ButtonField,
-    PrintButton,
+    AlphaPrintButton,
     HttpField,
     LinkButtonField
   ])

@@ -78,7 +78,7 @@ import {
   SelectDateRangeField,
   TimeField,
   Button,
-  PrintButton,
+  AlphaPrintButton,
   Http,
   LinkButton
 } from '@client/v2-events/features/events/registered-fields'
@@ -620,7 +620,7 @@ export const GeneratedInputField = React.memo(
 
     if (isPrintButtonFieldType(field)) {
       return (
-        <PrintButton.Input
+        <AlphaPrintButton.Input
           buttonLabel={field.config.configuration.buttonLabel}
           disabled={disabled}
           id={fieldDefinition.id}

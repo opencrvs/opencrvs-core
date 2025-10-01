@@ -37,7 +37,7 @@ interface PrintButtonProps {
 
 const addedButtonLabel = { id: 'print.certificate', defaultMessage: 'Print' }
 
-export const PrintButton = {
+export const AlphaPrintButton = {
   Input: ({
     id,
     template,
