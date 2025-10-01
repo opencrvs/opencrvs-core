@@ -276,7 +276,7 @@ describe('Declare action', () => {
           ActionType.DECLARE,
           () => 0.1
         ),
-        'recommender.firstname': 'this should not be here'
+        'recommender.name': { firstname: 'John', surname: 'Doe' }
       }
     })
 

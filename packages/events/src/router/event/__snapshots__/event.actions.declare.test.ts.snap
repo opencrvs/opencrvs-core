@@ -6,6 +6,6 @@ exports[`Declare action > Validation error message contains all the offending fi
 
 exports[`Declare action > gives validation error when a conditional page, which is visible, has a required field 1`] = `[TRPCError: [{"message":"Required","id":"senior-pass.id"},{"message":"Required","id":"senior-pass.recommender"}]]`;
 
-exports[`Declare action > validation prevents including hidden fields 1`] = `[TRPCError: [{"message":"Hidden or disabled field should not receive a value","id":"recommender.firstname","value":"this should not be here"}]]`;
+exports[`Declare action > validation prevents including hidden fields 1`] = `[TRPCError: [{"message":"Hidden or disabled field should not receive a value","id":"recommender.name.firstname","value":"John"},{"message":"Hidden or disabled field should not receive a value","id":"recommender.name.surname","value":"Doe"}]]`;
 
 exports[`Declare action > when mandatory field is invalid, conditional hidden fields are still skipped 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-1-2024"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-1-2024"}]]`;
