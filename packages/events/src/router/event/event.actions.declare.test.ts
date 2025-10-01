@@ -285,6 +285,25 @@ describe('Declare action', () => {
     ).rejects.matchSnapshot()
   })
 
+  test('validation prevents including miscellaneous fields', async () => {
+    const client = createTestClient(user)
+
+    const data = generator.event.actions.declare(eventId, {
+      declaration: {
+        ...generateActionDeclarationInput(
+          tennisClubMembershipEvent,
+          ActionType.DECLARE,
+          () => 0.1
+        ),
+        'foo.bar': { firstname: 'John', surname: 'Doe' }
+      }
+    })
+
+    await expect(
+      client.event.actions.declare.request(data)
+    ).rejects.matchSnapshot()
+  })
+
   test('valid action is appended to event actions', async () => {
     const client = createTestClient(user)
 

@@ -8,4 +8,6 @@ exports[`Declare action > gives validation error when a conditional page, which 
 
 exports[`Declare action > validation prevents including hidden fields 1`] = `[TRPCError: [{"message":"Hidden or disabled field should not receive a value","id":"recommender.name.firstname","value":"John"},{"message":"Hidden or disabled field should not receive a value","id":"recommender.name.surname","value":"Doe"}]]`;
 
+exports[`Declare action > validation prevents including miscellaneous fields 1`] = `[TRPCError: Field with id foo.bar not found in event config]`;
+
 exports[`Declare action > when mandatory field is invalid, conditional hidden fields are still skipped 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-1-2024"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-1-2024"}]]`;
