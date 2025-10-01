@@ -8,6 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { get } from 'lodash'
+import {
+  FieldReference,
+  FieldValue,
+  HttpField,
+  isFieldReference
+} from '@opencrvs/commons/client'
 import { IndexMap } from '@client/utils'
 import {
   makeFormFieldIdFormikCompatible,
@@ -41,4 +48,34 @@ export function makeFormikFieldIdsOpenCRVSCompatible<T>(
       value
     ])
   )
+}
+
+function parseFieldReferenceToValue(
+  fieldReference: FieldReference,
+  fieldValues: Record<string, FieldValue>
+) {
+  return fieldReference.$$subfield && fieldReference.$$subfield.length > 0
+    ? get(fieldValues[fieldReference.$$field], fieldReference.$$subfield)
+    : fieldValues[fieldReference.$$field]
+}
+
+export function parseFieldReferencesInConfiguration(
+  configuration: HttpField['configuration'],
+  form: Record<string, FieldValue>
+) {
+  const result = {
+    ...configuration,
+    params: configuration.params
+      ? Object.fromEntries(
+          Object.entries(configuration.params).map(([key, value]) => [
+            key,
+            isFieldReference(value)
+              ? parseFieldReferenceToValue(value, form)
+              : value
+          ])
+        )
+      : undefined
+  }
+
+  return result
 }

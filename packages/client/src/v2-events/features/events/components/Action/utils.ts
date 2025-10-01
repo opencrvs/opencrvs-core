@@ -45,6 +45,7 @@ export function getEventDrafts(
 
 export type AvailableActionTypes = Extract<
   ActionType,
+  | 'NOTIFY'
   | 'DECLARE'
   | 'VALIDATE'
   | 'REGISTER'
@@ -66,10 +67,13 @@ export function getPreviousDeclarationActionType(
   /** NOTE: If event is rejected before registration, there might be previous action of the same type present.
    * Action arrays are intentionally ordered to get the latest prefilled annotation.
    * */
-
   let actionTypes: (DeclarationUpdateActionType | typeof ActionType.NOTIFY)[]
 
   switch (currentActionType) {
+    case ActionType.NOTIFY: {
+      actionTypes = [ActionType.NOTIFY]
+      break
+    }
     case ActionType.DECLARE: {
       actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
       break
