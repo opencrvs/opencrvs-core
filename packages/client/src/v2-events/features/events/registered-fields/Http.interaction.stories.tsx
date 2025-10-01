@@ -430,6 +430,7 @@ export const HttpTextResponseInCopy: StoryObj<typeof Review> = {
     const allFields = fetchNidFields.flat()
     const stringifier = useFormDataStringifier()
     const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
+
     const FORM_DATA = {
       'child.http-fetch': {
         data: '1234567890',
