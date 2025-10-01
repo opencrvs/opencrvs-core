@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.8.1](https://github.com/opencrvs/opencrvs-core/compare/v1.8.1...v1.8.2)
+
+- **Switch back to default redis image** [#10173](https://github.com/opencrvs/opencrvs-core/issues/10173)
+
 ## [1.8.1](https://github.com/opencrvs/opencrvs-core/compare/v1.8.0...v1.8.1)
 
 ### Bug fixes
