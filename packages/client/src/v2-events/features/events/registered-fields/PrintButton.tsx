@@ -11,7 +11,7 @@
 
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useLocation } from 'react-router-dom'
 import { Button, Icon } from '@opencrvs/components'
 import { getAcceptedActions, SystemRole } from '@opencrvs/commons/client'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
@@ -21,7 +21,6 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
-import { ROUTES } from '@client/v2-events/routes'
 
 interface PrintButtonProps {
   id: string
@@ -48,7 +47,9 @@ export const PrintButton = {
     onChange
   }: PrintButtonProps) => {
     const intl = useIntl()
-    const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
+    const location = useLocation()
+    const parts = location.pathname.split('/')
+    const eventId = parts[4]
     const { getEvent } = useEvents()
     const { certificateTemplates, language } = useAppConfig()
     const { getUsers } = useUsers()
