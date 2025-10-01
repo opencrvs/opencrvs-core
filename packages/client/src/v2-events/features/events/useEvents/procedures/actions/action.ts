@@ -83,16 +83,8 @@ function getCleanedDeclarationDiff(
   originalDeclaration?: EventState,
   declarationDiff?: EventState
 ): ActionUpdate | undefined {
-  if (isEmpty(declarationDiff)) {
+  if (isEmpty(declarationDiff) || isEmpty(originalDeclaration)) {
     return declarationDiff
-  }
-
-  // If there's no original declaration, just clean the update and return it
-  if (isEmpty(originalDeclaration)) {
-    return omitHiddenPaginatedFields(
-      eventConfiguration.declaration,
-      declarationDiff
-    )
   }
 
   // Merge original + updates so we get the final event state
@@ -108,10 +100,9 @@ function getCleanedDeclarationDiff(
 
   // From the update, keep only fields that are valid in the cleaned declaration
   // (Prevents applying updates to hidden/invalid fields)
-  const cleanedDeclarationDiff: ActionUpdate = Object.fromEntries(
+  return Object.fromEntries(
     Object.entries(declarationDiff).filter(([key]) => key in cleanedDeclaration)
   )
-  return cleanedDeclarationDiff
 }
 
 setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
