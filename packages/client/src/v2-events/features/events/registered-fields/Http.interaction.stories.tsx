@@ -258,7 +258,7 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
               timeout: 5000,
               method: 'POST',
               headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'text/plain'
               },
               body: {
                 user: '$user.province'
@@ -369,7 +369,7 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
                 conditional: never()
               }
             ],
-            value: field('child.http-fetch').get('data.nid')
+            value: field('child.http-fetch').get('data')
           }
         ]}
         id="my-form"
