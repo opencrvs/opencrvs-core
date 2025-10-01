@@ -51,6 +51,7 @@ import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
 import { SelectDateRangeValue } from './FieldValue'
 import { subDays } from 'date-fns'
+import { ConditionalType } from './Conditional'
 
 function isDeclarationActionConfig(
   action: ActionConfig
@@ -209,11 +210,24 @@ export function omitHiddenPaginatedFields(
   formConfig: FormConfig,
   values: EventState
 ) {
-  const visiblePagesFormFields = formConfig.pages
-    .filter((p) => isPageVisible(p, values))
-    .flatMap((p) => p.fields)
+  // If a page has a conditional, we set it as one of the field's conditionals with ConditionalType.SHOW
+  const fields = formConfig.pages.flatMap((p) =>
+    p.fields.map((f) => {
+      if (!p.conditional) {
+        return f
+      }
 
-  return omitHiddenFields(visiblePagesFormFields, values)
+      return {
+        ...f,
+        conditionals: [
+          ...(f.conditionals ?? []),
+          { type: ConditionalType.SHOW, conditional: p.conditional }
+        ]
+      }
+    })
+  )
+
+  return omitHiddenFields(fields, values)
 }
 
 /**
