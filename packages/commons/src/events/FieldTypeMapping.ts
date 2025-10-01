@@ -43,7 +43,8 @@ import {
   PrintButton,
   HttpField,
   ButtonField,
-  LinkButtonField
+  LinkButtonField,
+  QueryParamReaderField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -72,7 +73,8 @@ import {
   AddressType,
   NameFieldValue,
   NameFieldUpdateValue,
-  HttpFieldUpdateValue
+  HttpFieldUpdateValue,
+  QueryParamReaderFieldUpdateValue
 } from './CompositeFieldValue'
 
 /**
@@ -161,6 +163,9 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.HTTP:
       schema = HttpFieldUpdateValue
       break
+    case FieldType.QUERY_PARAM_READER:
+      schema = QueryParamReaderFieldUpdateValue
+      break
   }
 
   return required ? schema : schema.nullish()
@@ -211,6 +216,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.PRINT_BUTTON:
     case FieldType.HTTP:
     case FieldType.LINK_BUTTON:
+    case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
       return null
     case FieldType.ADDRESS:
@@ -462,6 +468,16 @@ export const isLinkButtonFieldType = (field: {
   return field.config.type === FieldType.LINK_BUTTON
 }
 
+export const isQueryParamReaderFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is {
+  value: undefined
+  config: QueryParamReaderField
+} => {
+  return field.config.type === FieldType.QUERY_PARAM_READER
+}
+
 export type NonInteractiveFieldType =
   | Divider
   | PageHeader
@@ -471,6 +487,7 @@ export type NonInteractiveFieldType =
   | PrintButton
   | HttpField
   | LinkButtonField
+  | QueryParamReaderField
 
 export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
 
@@ -485,6 +502,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.DATA ||
     field.type === FieldType.PRINT_BUTTON ||
     field.type === FieldType.HTTP ||
-    field.type === FieldType.LINK_BUTTON
+    field.type === FieldType.LINK_BUTTON ||
+    field.type === FieldType.QUERY_PARAM_READER
   )
 }
