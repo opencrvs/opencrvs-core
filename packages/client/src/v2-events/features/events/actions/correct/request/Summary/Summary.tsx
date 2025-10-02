@@ -20,10 +20,9 @@ import {
   FieldConfig,
   generateTransactionId,
   getDeclarationFields,
-  EventDocument,
-  ActionType,
+  isFieldVisible,
   getCurrentEventState,
-  isFieldVisible
+  ActionType
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -77,7 +76,6 @@ export function Summary() {
   const { eventId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
-
   const [{ workqueue }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
@@ -89,7 +87,7 @@ export function Summary() {
   const intl = useIntl()
 
   const events = useEvents()
-  const event: EventDocument = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const togglePrompt = () => setShowPrompt(!showPrompt)
@@ -144,7 +142,8 @@ export function Summary() {
       transactionId: generateTransactionId(),
       annotation,
       event,
-      context: {}
+      context: validatorContext,
+      fullEvent: event
     }
 
     if (userMayCorrect) {
