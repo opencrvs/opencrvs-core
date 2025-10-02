@@ -9,6 +9,7 @@
 - **Certificate Template Conditionals**: Certificate template conditionals allow dynamic template selection based on print history using the template conditional helpers.. [#7585](https://github.com/opencrvs/opencrvs-core/issues/7585)
 - Expose number of copies printed for a certificate template so it can be printed on the certificate. [#7586](https://github.com/opencrvs/opencrvs-core/issues/7586)
 - Add Import/Export system client and `record.export` scope to enable data migrations [#10415](https://github.com/opencrvs/opencrvs-core/issues/10415)
+- Add bulk import endpoint [#10590](https://github.com/opencrvs/opencrvs-core/pull/10590)
 
 ### Improvements
 
