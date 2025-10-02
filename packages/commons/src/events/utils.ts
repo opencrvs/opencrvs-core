@@ -479,26 +479,18 @@ function isAcceptedAction(a: Action): a is ActionDocument {
   return a.status === ActionStatus.Accepted
 }
 
-function getPendingActions(actions: Action[]): ActionDocument[] {
-  const actionGroups: Record<string, Action[]> = groupBy(
-    actions,
-    ({ transactionId, type }: Action) => `${transactionId}::${type}`
-  )
-
-  const pendingActions = Object.values(actionGroups)
-    .filter((actionsInGroup) => actionsInGroup.length === 1)
-    .map((actionsInGroup) => actionsInGroup[0])
-    .filter(isRequestedAction)
-
-  return pendingActions
-}
-
 export function getPendingAction(actions: Action[]): ActionDocument {
-  const pendingActions = getPendingActions(actions)
+  const requestedActions = actions.filter(isRequestedAction)
+  const pendingActions = requestedActions.filter(
+    ({ id }) =>
+      !actions.some(
+        (action) => isAcceptedAction(action) && action.originalActionId === id
+      )
+  )
 
   if (pendingActions.length !== 1) {
     throw new Error(
-      `Expected exactly one pending action, but found ${pendingActions.length}`
+      `Expected exactly one pending action, but found ${pendingActions.map(({ id }) => id).join(', ')}`
     )
   }
 
