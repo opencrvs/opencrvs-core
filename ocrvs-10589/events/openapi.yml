@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: f4cb0832-23ec-441a-9d18-8ffd384b61fe
+                transactionId: e93756e3-8d93-458d-b700-43be8a622f25
                 type: birth
       responses:
         "200":
@@ -401,7 +401,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 3e58592d-167f-4731-8d79-b3b169ba01b9
+                transactionId: 8aa70b1f-72d3-457a-9ad3-ba6ec9c8a3fb
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -4671,6 +4671,10 @@ components:
                       - image/jpg
                       - image/jpeg
                       - image/svg+xml
+                      - application/pdf
+                      - application/msword
+                      - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+                      - application/vnd.oasis.opendocument.text
                   description: List of allowed file formats for the signature
                 style:
                   type: object
