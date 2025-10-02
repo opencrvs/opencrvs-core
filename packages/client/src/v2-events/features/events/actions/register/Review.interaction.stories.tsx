@@ -17,9 +17,7 @@ import {
   ActionType,
   tennisClubMembershipEvent,
   generateEventDocument,
-  getCurrentEventState,
-  FullDocumentPath,
-  UUID
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'

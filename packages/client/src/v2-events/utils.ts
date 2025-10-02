@@ -331,6 +331,6 @@ export function hasStringFilename(
     !!field &&
     typeof field === 'object' &&
     'filename' in field &&
-    typeof (field as any).filename === 'string'
+    typeof field.filename === 'string'
   )
 }

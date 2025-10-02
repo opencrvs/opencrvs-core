@@ -148,7 +148,10 @@ export const Outbox: Story = {
       const { firstname, surname } = getCurrentEventState(
         declareEventDocument,
         tennisClubMembershipEvent
-      ).declaration['applicant.name'] as { firstname: string; surname: string }
+      ).declaration['applicant.name'] as {
+        firstname: string
+        surname: string
+      }
 
       await expect(searchResult).toHaveTextContent(`${firstname} ${surname}`)
 

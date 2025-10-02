@@ -12,7 +12,8 @@ import {
   and,
   defineConditional,
   never,
-  not
+  not,
+  user
 } from '../conditionals/conditionals'
 import {
   defineActionForm,
@@ -1115,6 +1116,24 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               }
             ]
           }
+        },
+        {
+          id: 'applicant.isRecommendedByFieldAgent',
+          type: FieldType.CHECKBOX,
+          analytics: true,
+          required: false,
+          label: {
+            defaultMessage:
+              'Field shown when field agent is submitting application.',
+            description: 'This is the label for the field',
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.isRecommendedByFieldAgent.label'
+          },
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional: user.hasRole('FIELD_AGENT')
+            }
+          ]
         }
       ]
     },

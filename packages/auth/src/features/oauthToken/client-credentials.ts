@@ -53,6 +53,7 @@ export async function clientCredentialsHandler(
       ? WEB_USER_JWT_AUDIENCES.concat([NOTIFICATION_API_USER_AUDIENCE])
       : WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER,
+    undefined,
     true,
     TokenUserType.enum.system
   )

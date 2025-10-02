@@ -22,7 +22,7 @@ import {
   isNonInteractiveFieldType,
   joinValues,
   SystemVariables,
-  Location
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import {
@@ -56,7 +56,7 @@ function mapFieldsToValues(
     }, {})
 }
 
-interface FormFieldGeneratorProps {
+export interface FormFieldGeneratorProps {
   /** form id */
   id: string
   fieldsToShowValidationErrors?: FieldConfig[]
@@ -72,7 +72,7 @@ interface FormFieldGeneratorProps {
   onAllFieldsValidated?: (success: boolean) => void
   isCorrection?: boolean
   parentId?: string // `child____name` part of `child____name____firstname`
-  locations?: Location[]
+  validatorContext: ValidatorContext
 }
 
 export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
@@ -89,11 +89,10 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     onAllFieldsValidated,
     isCorrection = false,
     parentId,
-    locations
+    validatorContext
   }) => {
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
-
     const updateTouchFields = (
       touched: Record<string, boolean | undefined>
     ) => {
@@ -143,7 +142,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
           getValidationErrorsForForm(
             fields,
             makeFormikFieldIdsOpenCRVSCompatible(values),
-            locations ?? []
+            validatorContext
           )
         }
         validateOnMount={true}
@@ -186,6 +185,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               systemVariables={systemVariables}
               touched={{ ...formikProps.touched, ...initialTouchedFields }}
               validateAllFields={validateAllFields}
+              validatorContext={validatorContext}
               values={formikProps.values}
               onAllFieldsValidated={onAllFieldsValidated}
               onChange={formikOnChange}

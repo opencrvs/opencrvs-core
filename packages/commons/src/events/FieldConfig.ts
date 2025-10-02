@@ -168,8 +168,6 @@ export const DocumentMimeType = z.enum([
   'application/vnd.oasis.opendocument.text'
 ])
 
-export type ImageMimeType = z.infer<typeof ImageMimeType>
-
 export const MimeType = z.enum([
   ...ImageMimeType.options,
   ...DocumentMimeType.options

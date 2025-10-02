@@ -19,7 +19,8 @@ import {
   EventConfig,
   ArchiveActionInput,
   MarkAsDuplicateActionInput,
-  ActionStatus
+  ActionStatus,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
 
@@ -35,6 +36,7 @@ export interface CustomMutationParams {
 
 export interface CorrectionRequestParams extends CustomMutationParams {
   event: EventDocument
+  context: ValidatorContext
 }
 
 export interface ArchiveOnDuplicateParams extends CustomMutationParams {
@@ -220,7 +222,8 @@ export async function makeCorrectionOnRequest({
   annotation: declarationMixedUpAnnotation,
   transactionId,
   event,
-  eventConfiguration
+  eventConfiguration,
+  context
 }: CorrectionRequestParams) {
   // Let's find the REQUEST_CORRECTION action configuration. Because the annotation passed down here is mixed up
   // with declaration in the REQUEST_CORRECTION page form, we need to cleanup the annotation from declaration
@@ -238,7 +241,8 @@ export async function makeCorrectionOnRequest({
       ? omitHiddenAnnotationFields(
           actionConfiguration,
           originalDeclaration,
-          declarationMixedUpAnnotation
+          declarationMixedUpAnnotation,
+          context
         )
       : {}
 

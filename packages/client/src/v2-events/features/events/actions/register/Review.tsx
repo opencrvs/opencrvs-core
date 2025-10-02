@@ -42,7 +42,7 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { useSuspenseAdminLeafLevelLocations } from '@client/v2-events/hooks/useLocations'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { reviewMessages } from '../messages'
 
 function getTranslations(hasErrors: boolean) {
@@ -62,13 +62,12 @@ export function Review() {
   )
   const events = useEvents()
   const drafts = useDrafts()
+  const validatorContext = useValidatorContext()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { closeActionView: closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
-
-  const locationIds = useSuspenseAdminLeafLevelLocations()
 
   const registerMutation = events.actions.register
 
@@ -95,9 +94,9 @@ export function Review() {
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form,
+    context: validatorContext,
     annotation,
-    reviewFields: reviewConfig.fields,
-    locationIds
+    reviewFields: reviewConfig.fields
   })
 
   const messages = getTranslations(incomplete)
@@ -215,10 +214,10 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
-        locationIds={locationIds}
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
+        validatorContext={validatorContext}
         onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       >

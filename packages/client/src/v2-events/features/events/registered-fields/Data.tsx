@@ -20,6 +20,7 @@ import {
   TranslationConfig
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 function getFieldFromDataEntry({
   intl,
@@ -108,6 +109,7 @@ function DataInput({
   declarationFields: FieldConfig[]
 }) {
   const intl = useIntl()
+  const validatorContext = useValidatorContext()
   const { subtitle, data } = configuration
   const title = label.defaultMessage ? intl.formatMessage(label) : ''
 
@@ -133,7 +135,10 @@ function DataInput({
       <dl>
         {fields
           // We don't want to display fields that are conditionally hidden in the original form configuration
-          .filter(({ config }) => config && isFieldVisible(config, formData))
+          .filter(
+            ({ config }) =>
+              config && isFieldVisible(config, formData, validatorContext)
+          )
           .map(({ config, value }) => {
             if (!config) {
               return null
