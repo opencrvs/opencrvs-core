@@ -10,11 +10,10 @@
  */
 
 import { Meta, StoryObj } from '@storybook/react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { fn } from '@storybook/test'
-import { generate } from 'lean-qr'
-import { makeAsyncComponent } from 'lean-qr/extras/react'
 import styled from 'styled-components'
+import QRCode from 'qrcode'
 import {
   ConditionalType,
   field,
@@ -25,9 +24,7 @@ import { Stack, Text } from '@opencrvs/components'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 
-const QR = makeAsyncComponent(React, generate)
-
-const StyledQR = styled(QR)`
+const StyledImg = styled.img`
   width: 300px;
 `
 
@@ -49,6 +46,32 @@ const meta: Meta<Args> = {
 
 export default meta
 
+function QRCodeGenerator({ content }: { content: string }) {
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>('')
+
+  useEffect(() => {
+    if (!content) {
+      return
+    }
+
+    void QRCode.toDataURL(content, { width: 300, margin: 2 }).then((url) =>
+      setQrCodeUrl(url)
+    )
+  }, [content])
+
+  return (
+    <div>
+      {qrCodeUrl ? (
+        <StyledImg alt="QR Code" src={qrCodeUrl} />
+      ) : (
+        <Text element="p" variant="reg16">
+          {'Generating QR code...'}
+        </Text>
+      )}
+    </div>
+  )
+}
+
 export const Default: StoryObj<Args> = {
   name: 'Default Demo',
   render: () => {
@@ -58,7 +81,7 @@ export const Default: StoryObj<Args> = {
           {'Scan below QR code to fill the form'}
         </Text>
         <Stack>
-          <StyledQR
+          <QRCodeGenerator
             content={JSON.stringify({
               name: { firstname: 'John', surname: 'Doe' }
             })}
