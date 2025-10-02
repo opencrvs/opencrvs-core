@@ -14,10 +14,11 @@ import { fn, expect, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { userEvent } from '@storybook/testing-library'
-import { FieldType, MimeType } from '@opencrvs/commons/client'
+import { FieldType, MimeType, TestUserRole } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { noop } from '@client/v2-events'
+import { getTestValidatorContext } from '../../../../.storybook/decorators'
 
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: '400px';
@@ -105,6 +106,9 @@ export const FileInputWithOptionTest: StoryObj<
               }
             ]}
             id="my-form"
+            validatorContext={getTestValidatorContext(
+              TestUserRole.Enum.LOCAL_REGISTRAR
+            )}
             onChange={(data) => {
               meta.args?.onChange(data) ?? noop()
             }}
@@ -205,6 +209,9 @@ export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
               }
             ]}
             id="my-form"
+            validatorContext={getTestValidatorContext(
+              TestUserRole.Enum.LOCAL_REGISTRAR
+            )}
             onChange={(data) => {
               meta.args?.onChange(data) ?? noop()
             }}

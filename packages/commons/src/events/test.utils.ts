@@ -268,10 +268,14 @@ export function generateActionDeclarationInput(
 
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
-    return omitHiddenPaginatedFields(declarationConfig, {
-      ...declaration,
-      ...overrides
-    })
+    return omitHiddenPaginatedFields(
+      declarationConfig,
+      {
+        ...declaration,
+        ...overrides
+      },
+      {} // Intentionally empty. Allow generating fields with custom conditionals.
+    )
   }
 
   // eslint-disable-next-line no-console
@@ -322,7 +326,11 @@ function generateActionAnnotationInput(
     {}
   )
 
-  const fieldBasedPayload = omitHiddenFields(annotationFields, annotation)
+  const fieldBasedPayload = omitHiddenFields(
+    annotationFields,
+    annotation,
+    {} // Intentionally empty. Allow generating fields with custom conditionals.
+  )
 
   return {
     ...fieldBasedPayload,

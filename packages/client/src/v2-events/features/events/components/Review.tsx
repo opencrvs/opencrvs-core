@@ -36,8 +36,8 @@ import {
   isFieldDisplayedOnReview,
   isPageVisible,
   runFieldValidations,
-  UUID,
-  FieldTypesToHideInReview
+  FieldTypesToHideInReview,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
@@ -277,19 +277,19 @@ function FormReview({
   formConfig,
   form,
   previousForm,
-  locationIds,
   onEdit,
   showPreviouslyMissingValuesAsChanged,
   readonlyMode,
   isCorrection = false,
-  isReviewCorrection = false
+  isReviewCorrection = false,
+  validatorContext
 }: {
   formConfig: FormConfig
   form: EventState
   previousForm: EventState
-  locationIds?: Array<{ id: UUID }>
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
+  validatorContext: ValidatorContext
   readonlyMode?: boolean
   isCorrection?: boolean
   isReviewCorrection?: boolean
@@ -304,7 +304,9 @@ function FormReview({
       <ReviewContainter>
         {visiblePages.map((page) => {
           const fields = page.fields
-            .filter((field) => isFieldDisplayedOnReview(field, form))
+            .filter((field) =>
+              isFieldDisplayedOnReview(field, form, validatorContext)
+            )
             .map((field) => {
               const value = form[field.id]
               const previousValue = previousForm[field.id]
@@ -323,16 +325,10 @@ function FormReview({
                 />
               )
 
-              const context = locationIds
-                ? {
-                    leafAdminStructureLocationIds: locationIds
-                  }
-                : undefined
-
               const error = runFieldValidations({
                 field,
                 values: form,
-                context
+                context: validatorContext
               })
 
               const errorDisplay =
@@ -450,7 +446,7 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   form,
-  locationIds,
+  validatorContext,
   annotation,
   onEdit,
   children,
@@ -465,7 +461,7 @@ function ReviewComponent({
   children?: React.ReactNode
   formConfig: FormConfig
   form: EventState
-  locationIds?: Array<{ id: UUID }>
+  validatorContext: ValidatorContext
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
@@ -511,12 +507,12 @@ function ReviewComponent({
             formConfig={formConfig}
             isCorrection={isCorrection}
             isReviewCorrection={isReviewCorrection}
-            locationIds={locationIds}
             previousForm={previousForm}
             readonlyMode={readonlyMode}
             showPreviouslyMissingValuesAsChanged={
               showPreviouslyMissingValuesAsChanged
             }
+            validatorContext={validatorContext}
             onEdit={onEdit}
           />
 
@@ -528,6 +524,7 @@ function ReviewComponent({
                   id={'review'}
                   initialValues={annotation}
                   readonlyMode={readonlyMode}
+                  validatorContext={validatorContext}
                   onChange={onAnnotationChange}
                 />
               </ReviewContainter>

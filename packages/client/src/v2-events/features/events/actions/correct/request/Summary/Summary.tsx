@@ -19,10 +19,9 @@ import {
 import {
   FieldConfig,
   generateTransactionId,
-  isFieldVisible,
   getDeclarationFields,
+  isFieldVisible,
   getCurrentEventState,
-  EventDocument,
   ActionType
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -41,6 +40,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { hasDeclarationFieldChanged } from '../../utils'
 import { CorrectionDetails } from './CorrectionDetails'
 
@@ -76,20 +76,21 @@ export function Summary() {
   const { eventId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
-
   const [{ workqueue }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
+
+  const validatorContext = useValidatorContext()
   const [showPrompt, setShowPrompt] = React.useState(false)
-  const togglePrompt = () => setShowPrompt(!showPrompt)
   const eventFormNavigation = useEventFormNavigation()
   const navigate = useNavigate()
   const intl = useIntl()
 
   const events = useEvents()
-  const event: EventDocument = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const togglePrompt = () => setShowPrompt(!showPrompt)
 
   const previousFormValues = eventIndex.declaration
   const getFormValues = useEventFormData((state) => state.getFormValues)
@@ -114,14 +115,19 @@ export function Summary() {
           field,
           form,
           previousFormValues,
-          eventConfiguration
+          eventConfiguration,
+          validatorContext
         )
       })
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
-      const wasVisible = isFieldVisible(field, previousFormValues)
-      const isHidden = !isFieldVisible(field, form)
+      const wasVisible = isFieldVisible(
+        field,
+        previousFormValues,
+        validatorContext
+      )
+      const isHidden = !isFieldVisible(field, form, validatorContext)
       return wasVisible && isHidden
     })
 
@@ -135,7 +141,9 @@ export function Summary() {
       },
       transactionId: generateTransactionId(),
       annotation,
-      event
+      event,
+      context: validatorContext,
+      fullEvent: event
     }
 
     if (userMayCorrect) {
@@ -156,6 +164,7 @@ export function Summary() {
     previousFormValues,
     navigate,
     userMayCorrect,
+    validatorContext,
     eventConfiguration
   ])
 
@@ -208,6 +217,7 @@ export function Summary() {
             event={event}
             form={form}
             requesting={!userMayCorrect}
+            validatorContext={validatorContext}
             workqueue={workqueue}
           />
         </Content>

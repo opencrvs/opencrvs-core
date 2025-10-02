@@ -10,23 +10,28 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { FieldType, NameField, NameFieldValue } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { FormFieldGeneratorProps } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
 import { ValueOutput } from '../components/Output'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorProps> = {
   title: 'Inputs/Name',
-  args: { onChange: fn() },
+  component: FormFieldGenerator,
+  argTypes: {
+    validatorContext: { control: false }
+  },
   decorators: [
-    (Story) => (
+    (Story, context) => (
       <TRPCProvider>
-        <Story />
+        <Story {...context} />
       </TRPCProvider>
-    )
+    ),
+    withValidatorContext
   ]
 }
 
@@ -41,9 +46,10 @@ export const FirstNameLastNameRequired: StoryObj<typeof FormFieldGenerator> = {
   parameters: {
     layout: 'centered'
   },
-  render: function Component(args) {
+  render: (args) => {
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={[
           {
             id: 'storybook.name',
@@ -74,6 +80,7 @@ export const FirstNameLastNameRequiredMiddleNameOptional: StoryObj<
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={[
           {
             id: 'storybook.name',
@@ -92,10 +99,6 @@ export const FirstNameLastNameRequiredMiddleNameOptional: StoryObj<
             }
           }
         ]}
-        id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }
@@ -159,6 +162,7 @@ export const NameWithAllOptions: StoryObj<typeof FormFieldGenerator> = {
         <strong>{'Form:'}</strong>
 
         <StyledFormFieldGenerator
+          {...args}
           fields={[field]}
           id="storybook.name"
           onChange={(data) => {

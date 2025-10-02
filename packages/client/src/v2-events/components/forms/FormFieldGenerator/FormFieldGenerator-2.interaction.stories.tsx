@@ -28,6 +28,7 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { noop } from '@client/v2-events'
+import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'FormFieldGenerator/Interaction',
@@ -467,6 +468,7 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
             }))}
             id="my-form"
             initialValues={declaration}
+            validatorContext={getTestValidatorContext()}
             onChange={(data) => {
               meta.args?.onChange?.(data) ?? noop()
             }}
@@ -511,13 +513,14 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
           <StyledFormFieldGenerator
             fields={fields}
             id="my-form"
-            // Setting 'membership.duration' to a single date value allows us to demonstrate the enabled field
-            // scenario. The original defaultValue is a range (ex: `{ start: '2025-01-01', end: '2025-12-31' }`), which
-            // disables the date field component, making it difficult to check if all fields are enabled via looping.
             initialValues={{
               ...declaration,
               'membership.duration': '2025-12-31'
             }}
+            // Setting 'membership.duration' to a single date value allows us to demonstrate the enabled field
+            // scenario. The original defaultValue is a range (ex: `{ start: '2025-01-01', end: '2025-12-31' }`), which
+            // disables the date field component, making it difficult to check if all fields are enabled via looping.
+            validatorContext={getTestValidatorContext()}
             onChange={(data) => {
               meta.args?.onChange?.(data) ?? noop()
             }}
@@ -582,6 +585,7 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
               'membership.duration': '2025-12-31',
               'applicant.age': 30
             }}
+            validatorContext={getTestValidatorContext()}
             onChange={(data) => {
               meta.args?.onChange?.(data) ?? noop()
             }}

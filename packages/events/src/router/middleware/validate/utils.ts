@@ -11,7 +11,15 @@
 
 import { TRPCError } from '@trpc/server'
 import _ from 'lodash'
-import { ActionUpdate, errorMessages } from '@opencrvs/commons/events'
+import {
+  ActionUpdate,
+  errorMessages,
+  LocationType,
+  ValidatorContext
+} from '@opencrvs/commons/events'
+import { getOrThrow } from '@opencrvs/commons'
+import { getTokenPayload } from '@opencrvs/commons/authentication'
+import { getLeafLocationIds } from '@events/storage/postgres/events/locations'
 
 type ValidationError = {
   message: string
@@ -89,4 +97,16 @@ export function getInvalidUpdateKeys<T>({
       id: key,
       value
     }))
+}
+
+export async function getValidatorContext(
+  token: string
+): Promise<ValidatorContext> {
+  const leafAdminStructureLocationIds = await getLeafLocationIds({
+    locationTypes: [LocationType.enum.ADMIN_STRUCTURE]
+  })
+
+  const user = getOrThrow(getTokenPayload(token), 'Token is missing.')
+
+  return { leafAdminStructureLocationIds, user }
 }

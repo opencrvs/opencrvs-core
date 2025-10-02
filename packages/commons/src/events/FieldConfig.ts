@@ -162,7 +162,18 @@ export const ImageMimeType = z.enum([
   'image/svg+xml'
 ])
 
-export const MimeType = ImageMimeType
+export const DocumentMimeType = z.enum([
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.oasis.opendocument.text'
+])
+
+export const MimeType = z.enum([
+  ...ImageMimeType.options,
+  ...DocumentMimeType.options
+])
+
 export type MimeType = z.infer<typeof MimeType>
 
 const DEFAULT_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024

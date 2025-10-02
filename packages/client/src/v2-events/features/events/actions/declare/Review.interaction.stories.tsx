@@ -19,9 +19,7 @@ import {
   tennisClubMembershipEvent,
   generateEventDocument,
   generateEventDraftDocument,
-  getCurrentEventState,
-  FullDocumentPath,
-  UUID
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'

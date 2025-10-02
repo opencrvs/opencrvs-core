@@ -27,17 +27,18 @@ import { Review } from '@client/v2-events/features/events/components/Review'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Address',
   args: { onChange: fn() },
   decorators: [
-    (Story) => (
+    (Story, context) => (
       <TRPCProvider>
-        <Story />
+        <Story {...context} />
       </TRPCProvider>
-    )
+    ),
+    withValidatorContext
   ]
 }
 
@@ -58,6 +59,7 @@ export const EmptyAddressField: StoryObj<typeof FormFieldGenerator> = {
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={[
           {
             id: 'storybook.address',
@@ -88,6 +90,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={[
           {
             id: 'storybook.address',
@@ -171,16 +174,15 @@ const eventConfig: EventConfig = tennisClubMembershipEvent
 
 const declarationForm = getDeclaration(eventConfig)
 
-export const AddressReviewInvalid: StoryObj<typeof Review> = {
+export const AddressReviewInvalid: StoryObj<typeof FormFieldGenerator> = {
   name: 'Review output (Invalid)',
   parameters: {
     layout: 'centered'
   },
-  render: function Component() {
-    const { getLocations } = useLocations()
-    const [locations] = getLocations.useSuspenseQuery()
+  render: function Component(args) {
     return (
       <Review.Body
+        {...args}
         form={{
           'applicant.address': {
             country: 'FAR',
@@ -189,7 +191,6 @@ export const AddressReviewInvalid: StoryObj<typeof Review> = {
           } as AddressFieldValue
         }}
         formConfig={declarationForm}
-        locationIds={locations}
         title="My address form with address output"
         // eslint-disable-next-line no-console
         onEdit={(values) => console.log(values)}
@@ -199,14 +200,15 @@ export const AddressReviewInvalid: StoryObj<typeof Review> = {
     )
   }
 }
-export const AddressReviewEmpty: StoryObj<typeof Review> = {
+export const AddressReviewEmpty: StoryObj<typeof FormFieldGenerator> = {
   name: 'Review output (Empty)',
   parameters: {
     layout: 'centered'
   },
-  render: function Component() {
+  render: function Component(args) {
     return (
       <Review.Body
+        {...args}
         form={{}}
         formConfig={declarationForm}
         title="My address form with address output"
@@ -218,14 +220,15 @@ export const AddressReviewEmpty: StoryObj<typeof Review> = {
     )
   }
 }
-export const AddressReviewChanged: StoryObj<typeof Review> = {
+export const AddressReviewChanged: StoryObj<typeof FormFieldGenerator> = {
   name: 'Review with changed address',
   parameters: {
     layout: 'centered'
   },
-  render: function Component() {
+  render: function Component(args) {
     return (
       <Review.Body
+        {...args}
         form={{
           'applicant.address': {
             country: 'FAR',
@@ -241,11 +244,6 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
           }
         }}
         formConfig={declarationForm}
-        locationIds={[
-          {
-            id: leafAdminStructureLocationId
-          }
-        ]}
         previousFormValues={{
           'applicant.address': {
             country: 'FAR',

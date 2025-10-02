@@ -29,6 +29,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { TestImage } from '@client/v2-events/features/events/fixtures'
 import { noop } from '@client/v2-events'
+import { getTestValidatorContext } from '../../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/SignatureField/Interaction',
@@ -132,6 +133,7 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
               }
             ]}
             id="my-form"
+            validatorContext={getTestValidatorContext()}
             onChange={(data) => {
               meta.args?.onChange?.(data) ?? noop()
             }}
@@ -246,6 +248,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
                 }
               ]}
               id="my-form"
+              validatorContext={getTestValidatorContext()}
               onChange={(data) => {
                 meta.args?.onChange?.(data) ?? noop()
               }}
