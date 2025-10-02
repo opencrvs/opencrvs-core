@@ -23,6 +23,7 @@ import { mockDeclarationData, flushPromises } from '@client/tests/util'
 import { storage } from '@client/storage'
 import { vi } from 'vitest'
 import { UserDetails } from '@client/utils/userUtils'
+import { TestUserRole } from '@opencrvs/commons/client'
 
 describe('query result filtering tests', () => {
   describe('.filterProcessingDeclarations()', () => {
@@ -338,7 +339,7 @@ describe('archiveDeclaration tests', () => {
       creationDate: '2133213212',
       mobile: '09123433',
       role: {
-        id: 'FIELD_AGENT',
+        id: TestUserRole.Enum.FIELD_AGENT,
         label: {
           id: 'userRoles.fieldAgent',
           defaultMessage: 'Field Agent',
