@@ -11,6 +11,7 @@
 
 import { useSelector } from 'react-redux'
 import { cloneDeep } from 'lodash'
+import { useMemo } from 'react'
 import {
   ActionDocument,
   ActionType,
@@ -27,8 +28,11 @@ import {
   PrintCertificateAction,
   UUID,
   UserOrSystem,
+  dangerouslyGetCurrentEventStateWithDrafts,
   Draft,
-  findActiveDraftForEvent
+  findActiveDraftForEvent,
+  createEmptyDraft,
+  mergeDrafts
 } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
@@ -42,15 +46,14 @@ import { getOfflineData } from '@client/offline/selectors'
 import { useEventConfiguration } from '../features/events/useEventConfiguration'
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { useDrafts } from '../features/drafts/useDrafts'
-import { getEventDrafts } from '../features/events/components/Action/utils'
-import { hasStringFilename } from '../utils'
+import { createTemporaryId, hasStringFilename } from '../utils'
 
 async function replaceMinioUrlWithBase64(
   declaration: EventState,
   config: EventConfig
 ) {
   // Clone to avoid mutating the original declaration
-  const declarationClone: EventState = cloneDeep(declaration)
+  const declarationClone = cloneDeep(declaration)
 
   const fileFieldIds = config.declaration.pages
     .flatMap((page) => page.fields)
@@ -92,6 +95,11 @@ export const usePrintableCertificate = ({
   const { getEvent } = useEvents()
   const userDetails = useSelector(getUserDetails)
   const { config: appConfig } = useSelector(getOfflineData)
+  const { getLocalDraftOrDefault, getRemoteDraftByEventId } = useDrafts()
+
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
+  )
 
   const adminLevels = appConfig.ADMIN_STRUCTURE
 
@@ -131,17 +139,43 @@ export const usePrintableCertificate = ({
         certificateConfig?.id
   ).length
 
-  // Offline flow
-  const { getLocalDraftOrDefault, getRemoteDraftByEventId } = useDrafts()
   const remoteDraft = getRemoteDraftByEventId(event.id)
-  const eventDrafts = remoteDraft
-    ? getEventDrafts(event.id, getLocalDraftOrDefault(remoteDraft), [
-        remoteDraft
-      ])
-    : []
-  const localDeclaration = eventDrafts[0]?.action?.declaration as
-    | EventState
-    | undefined
+
+  const activeRemoteDraft = remoteDraft
+    ? findActiveDraftForEvent(event, remoteDraft)
+    : undefined
+
+  const emptyDraft = createEmptyDraft(event.id, createTemporaryId(), 'DECLARE')
+
+  const localDraft = getLocalDraftOrDefault(
+    activeRemoteDraft
+      ? { ...activeRemoteDraft, transactionId: getUUID() }
+      : emptyDraft
+  )
+
+  const localDraftWithAdjustedTimestamp = {
+    ...localDraft,
+    createdAt: new Date().toISOString(),
+    eventId: event.id,
+    action: {
+      ...localDraft.action,
+      createdAt: new Date().toISOString()
+    }
+  }
+
+  const mergedDraft: Draft = activeRemoteDraft
+    ? mergeDrafts(activeRemoteDraft, localDraftWithAdjustedTimestamp)
+    : localDraftWithAdjustedTimestamp
+
+  const eventStateWithDrafts = useMemo(
+    () =>
+      dangerouslyGetCurrentEventStateWithDrafts({
+        event,
+        draft: mergedDraft,
+        configuration
+      }),
+    [mergedDraft, event, configuration]
+  )
 
   const modifiedMetadata = {
     ...metadata,
@@ -160,7 +194,7 @@ export const usePrintableCertificate = ({
   const certificateFonts = certificateConfig.fonts ?? {}
   const isEmptyDeclaration = Object.keys(declaration).length === 0
   const declarationToUse: EventState = isEmptyDeclaration
-    ? (localDeclaration ?? declaration)
+    ? eventStateWithDrafts.declaration
     : declaration
 
   const svgWithoutFonts = compileSvg({
@@ -192,13 +226,13 @@ export const usePrintableCertificate = ({
     // use the local draft (declarationToUse)
     const updatedDeclarationToUse =
       Object.keys(updatedDeclaration).length === 0
-        ? declarationToUse
+        ? eventStateWithDrafts.declaration
         : updatedDeclaration
 
-    const declarationWithResolvedImages = (await replaceMinioUrlWithBase64(
+    const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
       updatedDeclarationToUse,
       config
-    )) as EventState
+    )
 
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
