@@ -22,7 +22,6 @@ import {
   isFieldVisible,
   getDeclarationFields,
   getCurrentEventState,
-  EventDocument,
   ActionType
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -76,10 +75,10 @@ export function Summary() {
   const { eventId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
-
   const [{ workqueue }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
+
   const [showPrompt, setShowPrompt] = React.useState(false)
   const togglePrompt = () => setShowPrompt(!showPrompt)
   const eventFormNavigation = useEventFormNavigation()
@@ -87,7 +86,7 @@ export function Summary() {
   const intl = useIntl()
 
   const events = useEvents()
-  const event: EventDocument = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
 
@@ -135,7 +134,8 @@ export function Summary() {
       },
       transactionId: generateTransactionId(),
       annotation,
-      event
+      event,
+      fullEvent: event
     }
 
     if (userMayCorrect) {

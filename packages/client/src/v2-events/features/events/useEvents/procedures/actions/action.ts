@@ -108,10 +108,9 @@ function getCleanedDeclarationDiff(
 
   // From the update, keep only fields that are valid in the cleaned declaration
   // (Prevents applying updates to hidden/invalid fields)
-  const cleanedDeclarationDiff: ActionUpdate = Object.fromEntries(
+  return Object.fromEntries(
     Object.entries(declarationDiff).filter(([key]) => key in cleanedDeclaration)
   )
-  return cleanedDeclarationDiff
 }
 
 setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
