@@ -22,6 +22,7 @@ import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 
 import { noop } from '@client/v2-events'
 import { tennisClubMembershipEventDocument } from '../fixtures'
+import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/AlphaPrintButton',
@@ -73,6 +74,7 @@ export const Default: StoryObj<typeof FormFieldGenerator> = {
               }
             ]}
             id="my-form"
+            validatorContext={getTestValidatorContext()}
             onChange={() => noop()}
           />
         )
