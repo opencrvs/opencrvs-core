@@ -22,7 +22,6 @@ import {
   uniqBy,
   cloneDeep,
   orderBy,
-  groupBy,
   isEqual
 } from 'lodash'
 import {
