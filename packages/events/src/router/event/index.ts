@@ -49,7 +49,7 @@ import {
   throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
-import { importEvent } from '@events/service/events/import'
+import { importEvent, bulkImportEvents } from '@events/service/events/import'
 import { findRecordsByQuery } from '@events/service/indexing/indexing'
 import { reindex } from '@events/service/events/reindex'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
@@ -346,6 +346,19 @@ export const eventRouter = router({
     .input(EventDocument)
     .output(EventDocument)
     .mutation(async ({ input, ctx }) => importEvent(input, ctx.token)),
+  bulkImport: systemProcedure
+    .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
+    .meta({
+      openapi: {
+        summary: 'Import multiple full event records',
+        method: 'POST',
+        path: '/events/bulk-import',
+        tags: ['events']
+      }
+    })
+    .input(z.array(EventDocument))
+    .output(z.void())
+    .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token)),
   reindex: systemProcedure
     .input(z.void())
     .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
