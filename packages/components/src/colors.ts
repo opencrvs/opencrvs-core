@@ -11,9 +11,9 @@
 
 export const colors = {
   // Primary Blue
-  primary: '#0B68F9',
-  primaryDark: '#1447b9',
-  primaryDarker: '#002661',
+  primary: '#1447B9',
+  primaryDark: '#0D3691',
+  primaryDarker: '#0E225D',
   primaryLight: '#C7DDFF',
   primaryLighter: '#E7F0FC',
 
