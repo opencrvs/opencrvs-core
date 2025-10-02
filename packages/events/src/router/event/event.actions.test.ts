@@ -765,7 +765,7 @@ describe('Conditionals based on user role', () => {
       })
     })
 
-    expect(users).toHaveLength(5)
+    expect(users).toHaveLength(6)
     for (const u of users) {
       const userClient = createTestClient(u)
 
