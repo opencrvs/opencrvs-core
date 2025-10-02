@@ -18,6 +18,16 @@ export function useUserDetails() {
   const userDetails = useSelector(getUserDetails)
   const locations = useSelector(getLocations)
 
+  const normalizedName =
+    userDetails &&
+    userDetails.name.map((n) => ({
+      use: n.use ?? 'official',
+      family: n.familyName ?? '',
+      given: n.firstNames ? [n.firstNames] : []
+    }))
+
+  const name = normalizedName ? getUsersFullName(normalizedName, 'en') : ''
+
   const primaryOfficeId = userDetails?.primaryOffice.id
 
   if (primaryOfficeId) {
@@ -28,14 +38,6 @@ export function useUserDetails() {
 
     const provinceId = district?.partOf.split('/')[1]
 
-    const normalizedName = userDetails.name.map((n) => ({
-      use: n.use ?? 'official',
-      family: n.familyName ?? '',
-      given: n.firstNames ? [n.firstNames] : []
-    }))
-
-    const name = getUsersFullName(normalizedName, 'en')
-
     return {
       name,
       role: userDetails.role.id,
@@ -45,7 +47,7 @@ export function useUserDetails() {
   }
 
   return {
-    name: `${userDetails?.name[0].firstNames} ${userDetails?.name[0].familyName}`,
+    name,
     role: userDetails?.role.id,
     district: '',
     province: ''
