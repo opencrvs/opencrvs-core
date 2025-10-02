@@ -14,9 +14,10 @@ import { fn, userEvent, within } from '@storybook/test'
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { noop } from 'lodash'
-import { FieldType } from '@opencrvs/commons/client'
+import { FieldType, TestUserRole } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/VerificationStatus',
@@ -137,6 +138,9 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
           'storybook.authenticated': 'authenticated',
           'storybook.failed': 'failed'
         }}
+        validatorContext={getTestValidatorContext(
+          TestUserRole.Enum.LOCAL_REGISTRAR
+        )}
         onChange={noop}
       />
     )
