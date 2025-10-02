@@ -273,7 +273,7 @@ export const routesConfig = {
      *  New 'WorkqueueLayout' requires TRPCProvider so we need to wrap these legacy routes inside V2 for minimal risk.
      */
     {
-      path: V1_LEGACY_ROUTES.TEAM_USER_LIST,
+      path: ROUTES.V2.path + V1_LEGACY_ROUTES.TEAM_USER_LIST,
       element: (
         <ProtectedRoute
           scopes={[
@@ -289,7 +289,7 @@ export const routesConfig = {
       )
     },
     {
-      path: V1_LEGACY_ROUTES.USER_PROFILE,
+      path: ROUTES.V2.path + V1_LEGACY_ROUTES.USER_PROFILE,
       element: (
         <ProtectedRoute
           scopes={[
@@ -305,7 +305,7 @@ export const routesConfig = {
       )
     },
     {
-      path: V1_LEGACY_ROUTES.ORGANISATIONS_INDEX,
+      path: ROUTES.V2.path + V1_LEGACY_ROUTES.ORGANISATIONS_INDEX,
       element: (
         <ProtectedRoute
           scopes={[
@@ -321,7 +321,7 @@ export const routesConfig = {
       )
     },
     {
-      path: V1_LEGACY_ROUTES.SYSTEM_LIST,
+      path: ROUTES.V2.path + V1_LEGACY_ROUTES.SYSTEM_LIST,
       element: (
         <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
           <WorkqueueLayout>
@@ -331,7 +331,7 @@ export const routesConfig = {
       )
     },
     {
-      path: V1_LEGACY_ROUTES.ALL_USER_EMAIL,
+      path: ROUTES.V2.path + V1_LEGACY_ROUTES.ALL_USER_EMAIL,
       element: (
         <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
           <WorkqueueLayout>
