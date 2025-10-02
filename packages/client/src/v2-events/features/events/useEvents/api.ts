@@ -9,14 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { matchMutation, Query } from '@tanstack/react-query'
+import { matchMutation } from '@tanstack/react-query'
 import {
   DecorateQueryProcedure,
   inferInput,
   inferOutput
 } from '@trpc/tanstack-react-query'
 import {
-  ActionType,
   Draft,
   EventConfig,
   EventDocument,

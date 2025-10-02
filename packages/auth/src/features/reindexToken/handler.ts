@@ -26,6 +26,7 @@ export default async function reindexingTokenHandler(
     ['record.reindex'],
     ['opencrvs:events-user'],
     'opencrvs:auth-service',
+    undefined,
     true,
     TokenUserType.enum.system
   )

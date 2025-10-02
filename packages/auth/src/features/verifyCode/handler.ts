@@ -20,8 +20,9 @@ import {
   createToken
 } from '@auth/features/authenticate/service'
 import { postUserActionToMetrics } from '@auth/metrics'
-import { logger } from '@opencrvs/commons'
+import { logger, TokenUserType } from '@opencrvs/commons'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
+
 interface IVerifyPayload {
   nonce: string
   code: string
@@ -41,13 +42,18 @@ export default async function authenticateHandler(
     logger.error(err)
     return unauthorized()
   }
-  const { userId, scope } = await getStoredUserInformation(nonce)
+  const { userId, scope, role } = await getStoredUserInformation(nonce)
+
   const token = await createToken(
     userId,
     scope,
     WEB_USER_JWT_AUDIENCES,
-    JWT_ISSUER
+    JWT_ISSUER,
+    role,
+    false,
+    TokenUserType.enum.user
   )
+
   await deleteUsedVerificationCode(nonce)
   const response: IVerifyResponse = { token }
   const remoteAddress =

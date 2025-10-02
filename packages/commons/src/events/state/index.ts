@@ -211,7 +211,7 @@ export function getCurrentEventState(
   // Includes only accepted actions metadata. Sometimes (e.g. on updatedAt) we want to show the accepted timestamp rather than the request timestamp.
   const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
 
-  const declaration = aggregateActionDeclarations(event, config)
+  const declaration = aggregateActionDeclarations(event)
 
   return deepDropNulls({
     id: event.id,

@@ -19,7 +19,8 @@ import {
   EventState,
   getAcceptedActions,
   getDeclaration,
-  isFieldDisplayedOnReview
+  isFieldDisplayedOnReview,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { Table } from '@opencrvs/components/lib/Table'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -45,6 +46,7 @@ const TableHeader = styled.th`
 interface BaseDeclarationComparisonTableProps {
   fullEvent: EventDocument
   eventConfig: EventConfig
+  validatorContext: ValidatorContext
   id: string
 }
 
@@ -114,7 +116,8 @@ export function DeclarationComparisonTableComponent({
   form,
   fullEvent: fullEventWithoutUpdatedAction,
   eventConfig,
-  id
+  id,
+  validatorContext
 }: DeclarationComparisonTableProps) {
   const acceptedActions = getAcceptedActions(fullEventWithoutUpdatedAction)
   const historyWithUpdatedActions = expandWithUpdateActions(acceptedActions)
@@ -164,10 +167,14 @@ export function DeclarationComparisonTableComponent({
 
   // Collect all changed review fields once
   const changedAnnotationFields = reviewFormFields
-    .filter((f) => getAnnotationComparison(f, fullEvent, index).valueHasChanged)
+    .filter(
+      (f) =>
+        getAnnotationComparison(f, fullEvent, index, validatorContext)
+          .valueHasChanged
+    )
     .map((f) => {
       const { currentAnnotations, previousAnnotations } =
-        getAnnotationComparison(f, fullEvent, index)
+        getAnnotationComparison(f, fullEvent, index, validatorContext)
 
       const previous = (
         <Output
@@ -198,9 +205,16 @@ export function DeclarationComparisonTableComponent({
     <>
       {declarationConfig.pages.map((page) => {
         const changedFields = page.fields
-          .filter((field) => isFieldDisplayedOnReview(field, latestDeclaration))
+          .filter((field) =>
+            isFieldDisplayedOnReview(field, latestDeclaration, validatorContext)
+          )
           .filter((f) =>
-            hasFieldChanged(f, latestDeclaration, previousDeclaration)
+            hasFieldChanged(
+              f,
+              latestDeclaration,
+              previousDeclaration,
+              validatorContext
+            )
           )
           .map((f) => {
             const previous = (

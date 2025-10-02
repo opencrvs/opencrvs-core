@@ -26,7 +26,6 @@ import {
 import { useTRPC } from '@client/v2-events/trpc'
 import { useDrafts } from '../../drafts/useDrafts'
 import { useEventConfigurations } from '../useEventConfiguration'
-import { prefetchPotentialDuplicates } from '../actions/dedup/getDuplicates'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'

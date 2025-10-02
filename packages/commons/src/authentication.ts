@@ -181,6 +181,7 @@ export interface ITokenPayload {
   algorithm: string
   scope: Scope[]
   userType: TokenUserType
+  role: string
   eventId?: UUID
   actionId?: UUID
 }
