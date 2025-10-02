@@ -321,12 +321,13 @@ function AddressInput(props: Props) {
       values,
       adminLevelIds
     )
+    const { country, addressType } = values
+
     const addressValue = {
-      ...values,
+      country,
+      addressType,
       administrativeArea:
-        values.addressType === AddressType.DOMESTIC
-          ? leafAdminLevelValue
-          : undefined,
+        addressType === AddressType.DOMESTIC ? leafAdminLevelValue : undefined,
       streetLevelDetails: addressLines
     }
 
