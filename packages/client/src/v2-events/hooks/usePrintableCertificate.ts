@@ -11,7 +11,6 @@
 
 import { useSelector } from 'react-redux'
 import { cloneDeep } from 'lodash'
-import { useMemo } from 'react'
 import {
   ActionDocument,
   ActionType,
@@ -21,18 +20,11 @@ import {
   EventState,
   FieldType,
   getCurrentEventState,
-  getUUID,
   isMinioUrl,
   LanguageConfig,
   Location,
   PrintCertificateAction,
-  UUID,
-  UserOrSystem,
-  dangerouslyGetCurrentEventStateWithDrafts,
-  Draft,
-  findActiveDraftForEvent,
-  createEmptyDraft,
-  mergeDrafts
+  UserOrSystem
 } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
@@ -41,12 +33,9 @@ import {
   svgToPdfTemplate
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
-import { getUserDetails } from '@client/profile/profileSelectors'
 import { getOfflineData } from '@client/offline/selectors'
 import { useEventConfiguration } from '../features/events/useEventConfiguration'
-import { useEvents } from '../features/events/useEvents/useEvents'
-import { useDrafts } from '../features/drafts/useDrafts'
-import { createTemporaryId, hasStringFilename } from '../utils'
+import { hasStringFilename } from '../utils'
 
 async function replaceMinioUrlWithBase64(
   declaration: EventState,
@@ -88,94 +77,17 @@ export const usePrintableCertificate = ({
   language?: LanguageConfig
 }) => {
   const { eventConfiguration } = useEventConfiguration(event.type)
+  const { config: appConfig } = useSelector(getOfflineData)
   const { declaration, ...metadata } = getCurrentEventState(
     event,
     eventConfiguration
   )
-  const { getEvent } = useEvents()
-  const userDetails = useSelector(getUserDetails)
-  const { config: appConfig } = useSelector(getOfflineData)
-  const { getLocalDraftOrDefault, getRemoteDraftByEventId } = useDrafts()
-
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
-
-  const adminLevels = appConfig.ADMIN_STRUCTURE
-
-  const actions = getEvent.getFromCache(event.id).actions
-  if (!userDetails) {
-    throw new Error('User details are not available')
-  }
-
-  const userFromUsersList = users.find((user) => user.id === userDetails.id)
-  if (!userFromUsersList) {
-    throw new Error(`User with id ${userDetails.id} not found in users list`)
-  }
-
-  const actionsWithAnOptimisticPrintAction = actions.concat({
-    type: ActionType.PRINT_CERTIFICATE,
-    id: getUUID(),
-    transactionId: getUUID(),
-    createdByUserType: 'user',
-    createdAt: new Date().toISOString(),
-    createdBy: userFromUsersList.id,
-    createdByRole: userFromUsersList.role,
-    status: 'Accepted',
-    declaration: {},
-    annotation: null,
-    originalActionId: null,
-    createdBySignature: userFromUsersList.signature,
-    createdAtLocation: userDetails.primaryOffice.id as UUID,
-    content: {
-      templateId: certificateConfig?.id
-    }
-  } satisfies PrintCertificateAction)
-
-  const copiesPrintedForTemplate = actionsWithAnOptimisticPrintAction.filter(
+  const copiesPrintedForTemplate = event.actions.filter(
     (action) =>
       action.type === ActionType.PRINT_CERTIFICATE &&
       (action as PrintCertificateAction).content?.templateId ===
         certificateConfig?.id
   ).length
-
-  const remoteDraft = getRemoteDraftByEventId(event.id)
-
-  const activeRemoteDraft = remoteDraft
-    ? findActiveDraftForEvent(event, remoteDraft)
-    : undefined
-
-  const emptyDraft = createEmptyDraft(event.id, createTemporaryId(), 'DECLARE')
-
-  const localDraft = getLocalDraftOrDefault(
-    activeRemoteDraft
-      ? { ...activeRemoteDraft, transactionId: getUUID() }
-      : emptyDraft
-  )
-
-  const localDraftWithAdjustedTimestamp = {
-    ...localDraft,
-    createdAt: new Date().toISOString(),
-    eventId: event.id,
-    action: {
-      ...localDraft.action,
-      createdAt: new Date().toISOString()
-    }
-  }
-
-  const mergedDraft: Draft = activeRemoteDraft
-    ? mergeDrafts(activeRemoteDraft, localDraftWithAdjustedTimestamp)
-    : localDraftWithAdjustedTimestamp
-
-  const eventStateWithDrafts = useMemo(
-    () =>
-      dangerouslyGetCurrentEventStateWithDrafts({
-        event,
-        draft: mergedDraft,
-        configuration
-      }),
-    [mergedDraft, event, configuration]
-  )
 
   const modifiedMetadata = {
     ...metadata,
@@ -191,17 +103,15 @@ export const usePrintableCertificate = ({
     return { svgCode: null }
   }
 
+  const adminLevels = appConfig.ADMIN_STRUCTURE
+
   const certificateFonts = certificateConfig.fonts ?? {}
-  const isEmptyDeclaration = Object.keys(declaration).length === 0
-  const declarationToUse: EventState = isEmptyDeclaration
-    ? eventStateWithDrafts.declaration
-    : declaration
 
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
     $metadata: modifiedMetadata,
-    $declaration: declarationToUse,
-    $actions: actionsWithAnOptimisticPrintAction as ActionDocument[],
+    $declaration: declaration,
+    $actions: event.actions as ActionDocument[],
     review: true,
     locations,
     users,
@@ -222,15 +132,8 @@ export const usePrintableCertificate = ({
   const preparePdfCertificate = async (updatedEvent: EventDocument) => {
     const { declaration: updatedDeclaration, ...updatedMetadata } =
       getCurrentEventState(updatedEvent, eventConfiguration)
-    // Same fallback logic used for preview: if server-side declaration is empty,
-    // use the local draft (declarationToUse)
-    const updatedDeclarationToUse =
-      Object.keys(updatedDeclaration).length === 0
-        ? eventStateWithDrafts.declaration
-        : updatedDeclaration
-
     const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
-      updatedDeclarationToUse,
+      updatedDeclaration,
       config
     )
 
@@ -244,7 +147,7 @@ export const usePrintableCertificate = ({
         copiesPrintedForTemplate
       },
       $declaration: declarationWithResolvedImages,
-      $actions: actionsWithAnOptimisticPrintAction as ActionDocument[],
+      $actions: event.actions as ActionDocument[],
       locations,
       review: false,
       users,

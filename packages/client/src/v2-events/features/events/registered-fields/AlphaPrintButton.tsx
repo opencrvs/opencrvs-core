@@ -12,15 +12,22 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useLocation } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { Button, Icon } from '@opencrvs/components'
-import { getAcceptedActions, SystemRole } from '@opencrvs/commons/client'
+import {
+  getAcceptedActions,
+  getUUID,
+  UUID,
+  EventDocument
+} from '@opencrvs/commons/client'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
-import { getUserIdsFromActions } from '@client/v2-events/utils'
+import { useEventFormData } from '../useEventFormData'
 
 interface PrintButtonProps {
   id: string
@@ -37,6 +44,12 @@ interface PrintButtonProps {
 
 const addedButtonLabel = { id: 'print.certificate', defaultMessage: 'Print' }
 
+/**
+ * Indicates that declaration action changed declaration content. Satisfies V1 spec.
+ */
+export const DECLARATION_ACTION_UPDATE = 'UPDATE' as const
+type DECLARATION_ACTION_UPDATE = typeof DECLARATION_ACTION_UPDATE
+
 export const AlphaPrintButton = {
   Input: ({
     id,
@@ -52,23 +65,51 @@ export const AlphaPrintButton = {
     const eventId = parts[4]
     const { getEvent } = useEvents()
     const { certificateTemplates, language } = useAppConfig()
-    const { getUsers } = useUsers()
+    const { getUser } = useUsers()
     const { getLocations } = useLocations()
     const event = getEvent.getFromCache(eventId)
     const actions = getAcceptedActions(event)
-    const userIds = getUserIdsFromActions(actions, [SystemRole.enum.HEALTH])
-    // Get users and locations for the certificate
-    const [users] = getUsers.useSuspenseQuery(userIds)
+    const users = getUser.getAllCached()
+
     const [locations] = getLocations.useSuspenseQuery()
     const { eventConfiguration } = useEventConfiguration(event.type)
+    const formDeclaration = useEventFormData((state) => state.getFormValues())
+
+    const userDetails = useSelector(getUserDetails)
 
     // Find the certificate template configuration
     const certificateConfig = certificateTemplates.find(
       (cert) => cert.id === template
     )
 
+    if (!userDetails) {
+      throw new Error('User details are not available')
+    }
+
+    const actionsWithAnOptimisticPrintAction = [
+      ...actions,
+      {
+        type: DECLARATION_ACTION_UPDATE,
+        id: getUUID(),
+        transactionId: getUUID(),
+        createdByUserType: 'user',
+        createdAt: new Date().toISOString(),
+        createdBy: userDetails.id,
+        createdByRole: userDetails.role,
+        status: 'Accepted',
+        declaration: formDeclaration,
+        annotation: null,
+        originalActionId: null,
+        createdBySignature: userDetails.localRegistrar?.signature,
+        createdAtLocation: userDetails.primaryOffice.id as UUID
+      }
+    ]
+
     const { preparePdfCertificate } = usePrintableCertificate({
-      event,
+      event: {
+        ...event,
+        actions: actionsWithAnOptimisticPrintAction
+      } as EventDocument,
       config: eventConfiguration,
       locations,
       users,
@@ -86,7 +127,10 @@ export const AlphaPrintButton = {
       onChange?.(new Date().toISOString())
 
       // Follow the new print flow: prepare first, then mutate, then print in the prepared window
-      const openPreparedPdf = await preparePdfCertificate(event)
+      const openPreparedPdf = await preparePdfCertificate({
+        ...event,
+        actions: actionsWithAnOptimisticPrintAction
+      } as EventDocument)
       // Defer recording print action to the dedicated review flow; button just opens prepared PDF
       openPreparedPdf()
     }
