@@ -69,7 +69,7 @@ export const Default: StoryObj<typeof FormFieldGenerator> = {
                   description: 'The title for the name input'
                 },
                 configuration: {
-                  template: 'tennis-club-membership-certificate'
+                  template: 'simple-certificate'
                 }
               }
             ]}

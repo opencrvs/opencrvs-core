@@ -185,6 +185,11 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
     throw Error(res.statusText)
   }
   const response: IApplicationConfigResponse = await res.json()
+  /*
+   * We need to download all fonts used by certificates on app initialisation
+   * so that if and when a certificate is printed while offline, the fonts are
+   * already cached in the browser
+   */
   const fonts = response.certificates.flatMap((c) =>
     Object.values(c.fonts || {}).flatMap((p) => Object.values(p))
   )

@@ -2124,6 +2124,11 @@ export const handlers = {
     })
   ],
   config: [
+    http.get('/api/countryconfig/certificates/simple-certificate.svg', () => {
+      return HttpResponse.text(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100"><text x="10" y="20">Simple Certificate</text></svg>`
+      )
+    }),
     http.get(
       '/api/countryconfig/certificates/tennis-club-membership-certificate.svg',
       () => {
@@ -2142,7 +2147,15 @@ export const handlers = {
     ),
 
     http.get('/api/countryconfig/fonts/*.ttf', async () => {
-      return HttpResponse.arrayBuffer(new ArrayBuffer(8))
+      const fontArrayBuffer = await fetch(
+        '/assets/small-filesize-font-for-tests.ttf'
+      ).then((res) => res.arrayBuffer())
+
+      return new HttpResponse(fontArrayBuffer, {
+        headers: {
+          'Content-Type': 'font/ttf'
+        }
+      })
     }),
 
     http.get('http://localhost:2021/config', () => {
@@ -2151,6 +2164,31 @@ export const handlers = {
 
         config: mockOfflineData.config,
         certificates: [
+          {
+            id: 'simple-certificate',
+            isV2Template: true,
+            event: TENNIS_CLUB_MEMBERSHIP,
+            label: {
+              id: 'certificates.simple.certificate.copy',
+              defaultMessage: 'Simple Certificate copy',
+              description: 'The label for a simple certificate'
+            },
+            isDefault: false,
+            fee: {
+              onTime: 7,
+              late: 10.6,
+              delayed: 18
+            },
+            svgUrl: '/api/countryconfig/certificates/simple-certificate.svg',
+            fonts: {
+              'Noto Sans': {
+                normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+                bold: '/api/countryconfig/fonts/NotoSans-Bold.ttf',
+                italics: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+                bolditalics: '/api/countryconfig/fonts/NotoSans-Regular.ttf'
+              }
+            }
+          },
           {
             id: 'tennis-club-membership-certificate',
             isV2Template: true,
