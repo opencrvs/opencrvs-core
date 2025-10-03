@@ -2149,6 +2149,14 @@ export const handlers = {
       return HttpResponse.arrayBuffer(fontArrayBuffer)
     }),
 
+    http.get('/api/countryconfig/fonts/NotoSans-Bold.ttf', async () => {
+      const fontResponse = await fetch(
+        'http://localhost:3040/fonts/NotoSans-Bold.ttf'
+      )
+      const fontArrayBuffer = await fontResponse.arrayBuffer()
+      return HttpResponse.arrayBuffer(fontArrayBuffer)
+    }),
+
     http.get('http://localhost:2021/config', () => {
       return HttpResponse.json({
         systems: [],
