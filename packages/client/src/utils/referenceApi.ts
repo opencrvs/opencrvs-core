@@ -20,8 +20,11 @@ import {
 } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { EventType, System } from '@client/utils/gateway'
+import { cacheFile } from '@client/v2-events/cache'
 import { TranslationConfig } from '@opencrvs/commons/client'
 import { IntlShape } from 'react-intl'
+import { fetchFileFromUrl } from './imageUtils'
+import { last } from 'lodash'
 
 export interface ILocationDataResponse {
   [locationId: string]: AdminStructure
@@ -181,7 +184,21 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
   if (res && res.status !== 200) {
     throw Error(res.statusText)
   }
-  const response = await res.json()
+  const response: IApplicationConfigResponse = await res.json()
+  const fonts = response.certificates.flatMap((c) =>
+    Object.values(c.fonts || {}).flatMap((p) => Object.values(p))
+  )
+  const uniqueFonts = [...new Set(fonts)]
+  const fontFiles = await Promise.all(
+    uniqueFonts.map(async (font: string) => {
+      return {
+        url: font,
+        file: (await fetchFileFromUrl(font, last(font.split('/'))!))!
+      }
+    })
+  )
+
+  await Promise.all(fontFiles.map((f) => cacheFile(f)))
   return response
 }
 
