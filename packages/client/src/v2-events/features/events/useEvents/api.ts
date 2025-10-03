@@ -146,9 +146,9 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
   )
 
   /**
-   * Keeps the React Query cache in sync when an event is updated.
+   * Keeps the cache in sync when an event is updated.
    *
-   * - Iterates through all cached queries matching `event.search`.
+   * - Iterates through all cached queries e.g. - workqueue queries.
    * - If cached data exists, replaces the matching event in `results`
    *   while preserving the original `total`.
    * - If no cached data exists, seeds the cache with a minimal entry
@@ -156,7 +156,7 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
    *
    * Ensures components depending on these queries re-render with fresh data.
    */
-  getQueriesData(trpcOptionsProxy.event.search).forEach(([queryKey, data]) => {
+  getQueriesData(trpcOptionsProxy.event.search).forEach(([queryKey]) => {
     queryClient.setQueryData<inferOutput<typeof trpcOptionsProxy.event.search>>(
       queryKey,
       (oldData) => {
