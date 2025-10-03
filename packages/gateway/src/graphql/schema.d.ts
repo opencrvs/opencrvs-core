@@ -1370,6 +1370,7 @@ export interface GQLUserAuditLogItemWithComposition
   action: string
   practitionerId: string
   data: GQLAdditionalIdWithCompositionId
+  isV2?: boolean
 }
 
 export interface GQLUserAuditLogItem extends GQLAuditLogItemBase {
@@ -1378,6 +1379,7 @@ export interface GQLUserAuditLogItem extends GQLAuditLogItemBase {
   userAgent: string
   action: string
   practitionerId: string
+  isV2?: boolean
 }
 
 export interface GQLRegistrationSearchSet {
@@ -1565,6 +1567,7 @@ export interface GQLAuditLogItemBase {
   userAgent: string
   action: string
   practitionerId: string
+  isV2?: boolean
 }
 
 /** Use this to resolve interface type AuditLogItemBase */
@@ -9176,6 +9179,7 @@ export interface GQLUserAuditLogItemWithCompositionTypeResolver<TParent = any> {
   action?: UserAuditLogItemWithCompositionToActionResolver<TParent>
   practitionerId?: UserAuditLogItemWithCompositionToPractitionerIdResolver<TParent>
   data?: UserAuditLogItemWithCompositionToDataResolver<TParent>
+  isV2?: UserAuditLogItemWithCompositionToIsV2Resolver<TParent>
 }
 
 export interface UserAuditLogItemWithCompositionToTimeResolver<
@@ -9250,12 +9254,25 @@ export interface UserAuditLogItemWithCompositionToDataResolver<
   ): TResult
 }
 
+export interface UserAuditLogItemWithCompositionToIsV2Resolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLUserAuditLogItemTypeResolver<TParent = any> {
   time?: UserAuditLogItemToTimeResolver<TParent>
   ipAddress?: UserAuditLogItemToIpAddressResolver<TParent>
   userAgent?: UserAuditLogItemToUserAgentResolver<TParent>
   action?: UserAuditLogItemToActionResolver<TParent>
   practitionerId?: UserAuditLogItemToPractitionerIdResolver<TParent>
+  isV2?: UserAuditLogItemToIsV2Resolver<TParent>
 }
 
 export interface UserAuditLogItemToTimeResolver<TParent = any, TResult = any> {
@@ -9307,6 +9324,15 @@ export interface UserAuditLogItemToPractitionerIdResolver<
   TParent = any,
   TResult = any
 > {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface UserAuditLogItemToIsV2Resolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
