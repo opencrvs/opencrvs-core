@@ -93,8 +93,7 @@ const updateActions = ActionTypes.extract([
   ActionType.REJECT,
   ActionType.ARCHIVE,
   ActionType.PRINT_CERTIFICATE,
-  ActionType.REQUEST_CORRECTION,
-  'UPDATE' as any
+  ActionType.REQUEST_CORRECTION
 ])
 
 /**
