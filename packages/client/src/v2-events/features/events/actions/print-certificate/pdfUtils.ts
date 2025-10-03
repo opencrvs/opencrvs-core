@@ -426,7 +426,7 @@ export function compileSvg({
     ) {
       // If even one of the parts is undefined or null, then return empty string
       const idParts = args.slice(0, -1)
-      if (idParts.some((part) => !isNil(part))) {
+      if (idParts.some((part) => isNil(part))) {
         return ''
       }
 
