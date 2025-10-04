@@ -29,7 +29,7 @@ const StyledImg = styled.img`
 `
 
 interface Args {
-  onScan: (data: unknown) => void
+  onChange: (data: unknown) => void
 }
 
 const meta: Meta<Args> = {
@@ -72,9 +72,10 @@ function QRCodeGenerator({ content }: { content: string }) {
   )
 }
 
+const onChangeSpy = fn()
 export const Default: StoryObj<Args> = {
   name: 'Default Demo',
-  render: () => {
+  render: ({ onChange }) => {
     return (
       <Stack direction="column">
         <Text element="h2" variant="h2">
@@ -127,10 +128,13 @@ export const Default: StoryObj<Args> = {
               }
             ]}
             id="id-form"
-            onChange={fn()}
+            onChange={onChange}
           />
         </Stack>
       </Stack>
     )
+  },
+  args: {
+    onChange: onChangeSpy
   }
 }
