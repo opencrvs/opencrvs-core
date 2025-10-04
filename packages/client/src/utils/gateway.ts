@@ -2691,6 +2691,7 @@ export type FetchUserQuery = {
     status: Status
     role: {
       __typename?: 'UserRole'
+      id: string
       label: {
         __typename?: 'I18nMessage'
         id: string

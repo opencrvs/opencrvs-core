@@ -323,3 +323,14 @@ export function getAdminLevelHierarchy(
 
   return hierarchy
 }
+
+export function hasStringFilename(
+  field: unknown
+): field is { filename: string } {
+  return (
+    !!field &&
+    typeof field === 'object' &&
+    'filename' in field &&
+    typeof field.filename === 'string'
+  )
+}
