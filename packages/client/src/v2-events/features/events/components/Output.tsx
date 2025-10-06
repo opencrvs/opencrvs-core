@@ -43,6 +43,7 @@ import {
   isLocationFieldType,
   EventState,
   FormConfig,
+  isVerificationStatusType,
   isSignatureFieldType
 } from '@opencrvs/commons/client'
 import {
@@ -61,7 +62,8 @@ import {
   Number,
   Text,
   TimeField,
-  getRegisteredFieldByFieldConfig
+  getRegisteredFieldByFieldConfig,
+  VerificationStatus
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
@@ -185,6 +187,16 @@ export function ValueOutput(
   if (isFacilityFieldType(field)) {
     return <LocationSearch.Output value={field.value} />
   }
+
+  if (isVerificationStatusType(field)) {
+    return (
+      <VerificationStatus.Output
+        configuration={field.config.configuration}
+        id={field.config.id}
+        value={field.value ?? 'pending'}
+      />
+    )
+  }
 }
 
 function findPreviousValueWithSameLabel(
@@ -289,7 +301,7 @@ export function Output({
       return '-'
     }
 
-    return <ValueOutput config={field} value={''} />
+    return <ValueOutput config={field} value={undefined} />
   }
 
   const hasPreviousValue = previousValue !== undefined

@@ -117,6 +117,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.ID:
     case FieldType.PHONE:
+    case FieldType.VERIFICATION_STATUS:
       return { type: 'keyword' }
     case FieldType.ADDRESS:
       const streetLevelDetails = Object.fromEntries(
