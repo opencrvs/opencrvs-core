@@ -131,7 +131,6 @@ export const FieldUpdateValue = z.union([
   StreetLevelDetailsUpdateValue,
   TextValue,
   DateValue,
-  AgeValue,
   TimeValue,
   AddressFieldUpdateValue,
   DateRangeFieldValue,
@@ -143,7 +142,8 @@ export const FieldUpdateValue = z.union([
   DataFieldValue,
   NameFieldUpdateValue,
   HttpFieldUpdateValue,
-  QueryParamReaderFieldUpdateValue
+  QueryParamReaderFieldUpdateValue,
+  AgeValue
 ])
 
 export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
