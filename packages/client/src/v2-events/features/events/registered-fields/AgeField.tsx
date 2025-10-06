@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
+import { AgeValue } from '@opencrvs/commons/client'
 import { Number, NumberInputProps } from './Number'
 
 type AgeInputProps = Omit<NumberInputProps, 'min'>
@@ -19,5 +20,5 @@ function AgeInput(props: AgeInputProps) {
 
 export const AgeField = {
   Input: AgeInput,
-  Output: Number.Output
+  Output: ({ value }: { value?: AgeValue }) => value?.age ?? ''
 }
