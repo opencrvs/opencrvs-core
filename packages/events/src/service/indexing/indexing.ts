@@ -114,6 +114,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.OFFICE:
     case FieldType.DATA:
     case FieldType.BUTTON:
+    case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.ID:
     case FieldType.PHONE:
     case FieldType.VERIFICATION_STATUS:

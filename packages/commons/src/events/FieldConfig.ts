@@ -173,7 +173,6 @@ export const MimeType = z.enum([
   ...ImageMimeType.options,
   ...DocumentMimeType.options
 ])
-
 export type MimeType = z.infer<typeof MimeType>
 
 const DEFAULT_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
@@ -607,6 +606,21 @@ const ButtonField = BaseField.extend({
 
 export type ButtonField = z.infer<typeof ButtonField>
 
+// This is an alpha version of the print button and it is not recommended for use and will change in the future
+const AlphaPrintButton = BaseField.extend({
+  type: z.literal(FieldType.ALPHA_PRINT_BUTTON),
+  configuration: z.object({
+    template: z
+      .string()
+      .describe('Template ID from countryconfig templates to use for printing'),
+    buttonLabel: TranslationConfig.optional().describe(
+      'Label for the print button'
+    )
+  })
+}).describe('Print button field for printing certificates')
+
+export type AlphaPrintButton = z.infer<typeof AlphaPrintButton>
+
 const HttpField = BaseField.extend({
   type: z.literal(FieldType.HTTP),
   defaultValue: HttpFieldValue.optional(),
@@ -696,6 +710,7 @@ export type FieldConfig =
   | z.infer<typeof EmailField>
   | z.infer<typeof DataField>
   | z.infer<typeof ButtonField>
+  | z.infer<typeof AlphaPrintButton>
   | z.infer<typeof HttpField>
   | z.infer<typeof LinkButtonField>
   | z.infer<typeof VerificationStatus>
@@ -711,6 +726,7 @@ export type FieldConfigInput =
   | z.input<typeof TimeField>
   | z.input<typeof SelectDateRangeField>
   | z.input<typeof ButtonField>
+  | z.input<typeof AlphaPrintButton>
   | z.input<typeof NumberField>
   | z.input<typeof TextAreaField>
   | z.input<typeof DateField>
@@ -780,6 +796,7 @@ export const FieldConfig: z.ZodType<
     FileUploadWithOptions,
     DataField,
     ButtonField,
+    AlphaPrintButton,
     HttpField,
     LinkButtonField,
     VerificationStatus

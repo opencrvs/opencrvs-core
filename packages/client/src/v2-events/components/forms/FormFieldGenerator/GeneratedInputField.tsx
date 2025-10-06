@@ -54,6 +54,7 @@ import {
   SelectDateRangeValue,
   isTimeFieldType,
   isButtonFieldType,
+  isPrintButtonFieldType,
   isHttpFieldType,
   isLinkButtonFieldType,
   isVerificationStatusType,
@@ -79,11 +80,11 @@ import {
   SelectDateRangeField,
   TimeField,
   Button,
+  AlphaPrintButton,
   Http,
   LinkButton,
   VerificationStatus
 } from '@client/v2-events/features/events/registered-fields'
-
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
@@ -620,6 +621,19 @@ export const GeneratedInputField = React.memo(
           {...field.config}
           declarationFields={getDeclarationFields(eventConfig)}
           formData={form}
+        />
+      )
+    }
+
+    if (isPrintButtonFieldType(field)) {
+      return (
+        <AlphaPrintButton.Input
+          buttonLabel={field.config.configuration.buttonLabel}
+          disabled={disabled}
+          id={fieldDefinition.id}
+          template={field.config.configuration.template}
+          value={field.value}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )
     }
