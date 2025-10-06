@@ -167,6 +167,11 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
     .filter(Boolean)
     .reverse()
 
+  const location = locations.find(({ id }) => id === value.toString())
+
+  if (location?.locationType === LocationType.Enum.ADMIN_STRUCTURE) {
+    return joinValues([...resolvedAdminLevels, country], ', ')
+  }
   return joinValues([name, ...resolvedAdminLevels, country], ', ')
 }
 
