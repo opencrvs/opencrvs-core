@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -61,39 +60,9 @@ export const AdvancedSearchStory: Story = {
         ]
       }
     }
-  }
-}
-
-const tennisClubMembershipEventWithoutMiddlename = {
-  ...tennisClubMembershipEvent
-}
-
-delete (
-  tennisClubMembershipEventWithoutMiddlename.declaration.pages[0]
-    .fields[0] as any
-).configuration
-
-export const AdvancedSearchName: Story = {
-  parameters: {
-    reactRouter: {
-      router: {
-        path: ROUTES.V2.ADVANCED_SEARCH.buildPath({}),
-        element: <AdvancedSearch />
-      },
-      initialPath: ROUTES.V2.ADVANCED_SEARCH.buildPath({})
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          })
-        ]
-      }
-    }
   },
   play: async () => {
-    const applicantSection = await screen.findByText("Applicant's details")
-    await userEvent.click(applicantSection)
+    const recommenderSection = await screen.findByText("Recommender's details")
+    await userEvent.click(recommenderSection)
   }
 }
