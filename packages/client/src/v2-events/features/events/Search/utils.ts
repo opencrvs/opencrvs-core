@@ -400,10 +400,12 @@ function applySearchFieldOverridesToFieldConfig(
             ...field.configuration?.name?.surname,
             required: false
           },
-          middlename: {
-            ...field.configuration?.name?.middlename,
-            required: false
-          }
+          middlename: field.configuration?.name?.middlename
+            ? {
+                ...field.configuration.name.middlename,
+                required: false
+              }
+            : undefined
         }
       }
     }
