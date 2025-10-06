@@ -16,8 +16,12 @@ import {
   isMetaAction,
   EventDocument,
   ActionType,
+  FieldValue,
+  ValidatorContext,
   deepMerge,
-  FieldValue
+  omitHiddenFields,
+  getDeclarationFields,
+  EventConfig
 } from '@opencrvs/commons/client'
 
 /**
@@ -40,9 +44,10 @@ import {
 export function hasFieldChanged(
   f: FieldConfig,
   form: EventState,
-  previousFormValues: EventState
+  previousFormValues: EventState,
+  context: ValidatorContext
 ) {
-  const isVisible = isFieldVisible(f, form)
+  const isVisible = isFieldVisible(f, form, context)
 
   const prevValue = previousFormValues[f.id]
   const currValue = form[f.id]
@@ -53,6 +58,27 @@ export function hasFieldChanged(
   const valueHasChanged = !isEqualFieldValue(prevValue, currValue) && !bothNil
 
   return isVisible && valueHasChanged
+}
+
+export function hasDeclarationFieldChanged(
+  f: FieldConfig,
+  form: EventState,
+  previousFormValues: EventState,
+  eventConfiguration: EventConfig,
+  validatorContext: ValidatorContext
+) {
+  const fields = getDeclarationFields(eventConfiguration)
+  const formWithoutHiddenFields = omitHiddenFields(
+    fields,
+    form,
+    validatorContext
+  )
+  return hasFieldChanged(
+    f,
+    formWithoutHiddenFields,
+    previousFormValues,
+    validatorContext
+  )
 }
 
 export function isLastActionCorrectionRequest(event: EventDocument) {
@@ -81,7 +107,8 @@ function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
 export function getAnnotationComparison(
   field: FieldConfig,
   fullEvent: EventHistoryDocument,
-  currentActionIndex: number
+  currentActionIndex: number,
+  context: ValidatorContext
 ) {
   if (currentActionIndex < 0) {
     return {
@@ -103,7 +130,8 @@ export function getAnnotationComparison(
   const valueHasChanged = hasFieldChanged(
     field,
     currentAnnotations,
-    previousAnnotations
+    previousAnnotations,
+    context
   )
 
   return { currentAnnotations, previousAnnotations, valueHasChanged }

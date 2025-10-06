@@ -16,7 +16,12 @@ import { ActionStatus, EventState } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { AddressType } from '../CompositeFieldValue'
 import { EventStatus, InherentFlags } from '../EventMetadata'
-import { generateActionDocument, generateEventDocument } from '../test.utils'
+import {
+  generateActionDocument,
+  generateEventDocument,
+  generateUuid,
+  TestUserRole
+} from '../test.utils'
 import { EventIndex } from '../EventIndex'
 import { TENNIS_CLUB_MEMBERSHIP } from '../Constants'
 import { TokenUserType } from '../../authentication'
@@ -487,6 +492,54 @@ describe('getCurrentEventState()', () => {
     expect(
       getCurrentEventState(event3, tennisClubMembershipEvent).flags.length
     ).toEqual(0)
+  })
+
+  test('Ensure fields that have user conditional fields are included', () => {
+    const event = {
+      id: generateUuid(),
+      trackingId: 'VM5Y53',
+      type: tennisClubMembershipEvent.id,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      actions: [
+        generateActionDocument({
+          configuration: tennisClubMembershipEvent,
+          action: ActionType.CREATE
+        }),
+        generateActionDocument({
+          configuration: tennisClubMembershipEvent,
+          action: ActionType.DECLARE,
+          defaults: {
+            createdByRole: TestUserRole.Enum.FIELD_AGENT,
+            declaration: {
+              'applicant.dob': '2025-07-22',
+              'applicant.name': {
+                surname: 'Feest',
+                firstname: 'Jordan',
+                middlename: 'Day'
+              },
+              'recommender.id': '123456789',
+              'senior-pass.id': '123123',
+              'recommender.name': {
+                surname: 'Feest',
+                firstname: 'Jordan',
+                middlename: 'Day'
+              },
+              'recommender.none': false,
+              'applicant.isRecommendedByFieldAgent': true
+            }
+          }
+        })
+      ]
+    } satisfies EventDocument
+
+    const declaration = getCurrentEventState(
+      event,
+      tennisClubMembershipEvent
+    ).declaration
+
+    // getCurrentEventState should never depend on who is calling it.
+    expect(declaration['applicant.isRecommendedByFieldAgent']).toBe(true)
   })
 
   test('Filter hidden fields while getting current event state', () => {

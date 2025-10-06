@@ -10,10 +10,10 @@
  */
 import React from 'react'
 import {
-  ActionDocument,
   EventDocument,
   EventStatus,
-  getStatusFromActions
+  getStatusFromActions,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
@@ -26,10 +26,12 @@ import { EventHistoryActionDocument } from '@client/v2-events/features/events/ac
  */
 export function DeclarationUpdateComponent({
   action,
-  fullEvent
+  fullEvent,
+  validatorContext
 }: {
   action: EventHistoryActionDocument
   fullEvent: EventDocument
+  validatorContext: ValidatorContext
 }) {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
@@ -47,6 +49,7 @@ export function DeclarationUpdateComponent({
       eventConfig={eventConfiguration}
       fullEvent={fullEvent}
       id={'declaration-update'}
+      validatorContext={validatorContext}
     />
   )
 }

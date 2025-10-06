@@ -29,7 +29,8 @@ import {
   AddressField,
   AdministrativeArea,
   DefaultAddressFieldValue,
-  LocationType
+  LocationType,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -39,6 +40,7 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 // ADDRESS field may not contain another ADDRESS field
@@ -52,6 +54,7 @@ type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
   value?: AddressFieldValue
   configuration?: AddressField['configuration']
   disabled?: boolean
+  validatorContext: ValidatorContext
 }
 
 const COUNTRY_FIELD = {
@@ -223,7 +226,14 @@ function getLeafAdministrativeLevel(
  * - In search mode, only displays admin structure and town/village fields.
  */
 function AddressInput(props: Props) {
-  const { onChange, defaultValue, disabled, value, ...otherProps } = props
+  const {
+    onChange,
+    defaultValue,
+    disabled,
+    value,
+    validatorContext,
+    ...otherProps
+  } = props
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
@@ -311,12 +321,13 @@ function AddressInput(props: Props) {
       values,
       adminLevelIds
     )
+    const { country, addressType } = values
+
     const addressValue = {
-      ...values,
+      country,
+      addressType,
       administrativeArea:
-        values.addressType === AddressType.DOMESTIC
-          ? leafAdminLevelValue
-          : undefined,
+        addressType === AddressType.DOMESTIC ? leafAdminLevelValue : undefined,
       streetLevelDetails: addressLines
     }
 
@@ -332,8 +343,8 @@ function AddressInput(props: Props) {
       {...otherProps}
       fields={fields}
       initialValues={{ ...resolvedValue, ...derivedAdminLevels }}
-      locations={adminStructureLocations}
       parentId={props.id}
+      validatorContext={validatorContext}
       onChange={handleChange}
     />
   )
@@ -348,6 +359,7 @@ function AddressOutput({
   lineSeparator?: React.ReactNode
   configuration?: AddressField
 }) {
+  const validatorContext = useValidatorContext()
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
   const { config } = useSelector(getOfflineData)
@@ -408,7 +420,8 @@ function AddressOutput({
         field.value &&
         isFieldDisplayedOnReview(
           field.field satisfies FieldConfig,
-          addressValues
+          addressValues,
+          validatorContext
         )
     )
 

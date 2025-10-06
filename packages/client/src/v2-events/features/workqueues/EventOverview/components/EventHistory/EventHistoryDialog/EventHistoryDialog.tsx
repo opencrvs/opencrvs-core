@@ -18,7 +18,8 @@ import {
   ActionType,
   EventDocument,
   getAcceptedActions,
-  UUID
+  UUID,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
 import {
@@ -111,12 +112,14 @@ export function EventHistoryDialog({
   action,
   userName,
   close,
-  fullEvent
+  fullEvent,
+  validatorContext
 }: {
   action: EventHistoryActionDocument
   userName: string
   close: () => void
   fullEvent: EventDocument
+  validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
   const { getActionTypeForHistory } = useActionForHistory()
@@ -197,7 +200,11 @@ export function EventHistoryDialog({
           noResultText=" "
         />
       )}
-      <ActionTypeSpecificContent action={action} fullEvent={fullEvent} />
+      <ActionTypeSpecificContent
+        action={action}
+        fullEvent={fullEvent}
+        validatorContext={validatorContext}
+      />
     </ResponsiveModal>
   )
 }

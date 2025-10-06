@@ -11,7 +11,9 @@
 import {
   Scope,
   SCOPES,
-  DEFAULT_ROLES_DEFINITION
+  DEFAULT_ROLES_DEFINITION,
+  TestUserRole,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { EventType, Status, FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -351,6 +353,7 @@ export const userDetails: UserDetails = {
     { use: 'bn', firstNames: '', familyName: '' }
   ],
   role: {
+    id: TestUserRole.Enum.FIELD_AGENT,
     label: {
       defaultMessage: 'Field Agent',
       description: 'Name for user role Field Agent',
@@ -1186,6 +1189,7 @@ export function loginAsFieldAgent(store: AppStore) {
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
           mobile: '+8801711111111',
           role: {
+            id: 'CHA',
             label: {
               id: 'userRoles.CHA',
               defaultMessage: 'CHA',
@@ -1776,6 +1780,7 @@ export function fetchUserMock(officeId: string): FetchUserQuery {
       practitionerId: '4651d1cc-6072-4e34-bf20-b583f421a9f1',
       creationDate: '1701241360173',
       role: {
+        id: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN,
         label: {
           id: 'userRoles.localSystemAdmin',
           defaultMessage: 'Local System Admin',
@@ -1786,15 +1791,30 @@ export function fetchUserMock(officeId: string): FetchUserQuery {
   }
 }
 
-export function generateToken(scope: Scope[], subject?: string) {
+export function generateToken({
+  scope,
+  userType,
+  role,
+  subject
+}: {
+  scope: Scope[]
+  subject?: string
+  userType?: TokenUserType
+  role?: TestUserRole
+}) {
   if (subject) {
-    return jwt.sign({ scope }, readFileSync('./test/cert.key'), {
-      subject,
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:gateway-user'
-    })
+    return jwt.sign(
+      { scope, userType, role },
+      readFileSync('./test/cert.key'),
+      {
+        subject,
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
   }
+
   return jwt.sign({ scope }, readFileSync('./test/cert.key'), {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
@@ -1803,7 +1823,7 @@ export function generateToken(scope: Scope[], subject?: string) {
 }
 
 export function setScopes(scope: Scope[], store: AppStore) {
-  const token = generateToken(scope)
+  const token = generateToken({ scope })
 
   window.history.replaceState({}, '', '?token=' + token)
 

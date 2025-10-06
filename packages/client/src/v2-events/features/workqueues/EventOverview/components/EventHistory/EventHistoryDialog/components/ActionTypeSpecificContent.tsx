@@ -10,7 +10,11 @@
  */
 import React from 'react'
 import { z } from 'zod'
-import { ActionType, EventDocument } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  EventDocument,
+  ValidatorContext
+} from '@opencrvs/commons/client'
 import {
   DECLARATION_ACTION_UPDATE,
   EventHistoryActionDocument
@@ -23,10 +27,12 @@ const SyntheticDeclarationActionTypes = z.enum([DECLARATION_ACTION_UPDATE])
 
 export function ActionTypeSpecificContent({
   action,
-  fullEvent
+  fullEvent,
+  validatorContext
 }: {
   action: EventHistoryActionDocument
   fullEvent: EventDocument
+  validatorContext: ValidatorContext
 }) {
   const { type } = action
 
@@ -35,15 +41,33 @@ export function ActionTypeSpecificContent({
 
   if (isDeclarationUpdate) {
     // We only show the updated modal for synthetic UPDATE action
-    return <DeclarationUpdate action={action} fullEvent={fullEvent} />
+    return (
+      <DeclarationUpdate
+        action={action}
+        fullEvent={fullEvent}
+        validatorContext={validatorContext}
+      />
+    )
   }
 
   if (type === ActionType.REQUEST_CORRECTION) {
-    return <RequestCorrection action={action} fullEvent={fullEvent} />
+    return (
+      <RequestCorrection
+        action={action}
+        fullEvent={fullEvent}
+        validatorContext={validatorContext}
+      />
+    )
   }
 
   if (type === ActionType.PRINT_CERTIFICATE) {
-    return <PrintCertificate action={action} event={fullEvent} />
+    return (
+      <PrintCertificate
+        action={action}
+        event={fullEvent}
+        validatorContext={validatorContext}
+      />
+    )
   }
 
   return null

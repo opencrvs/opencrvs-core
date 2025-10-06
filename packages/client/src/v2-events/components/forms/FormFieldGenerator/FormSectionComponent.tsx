@@ -20,8 +20,6 @@ import {
   FieldConfig,
   FieldType,
   FieldValue,
-  isFieldEnabled,
-  isFieldVisible,
   AddressType,
   TranslationConfig,
   IndexMap,
@@ -30,7 +28,11 @@ import {
   SystemVariables,
   InteractiveFieldType,
   FieldReference,
-  getAllUniqueFields
+  getAllUniqueFields,
+  omitHiddenFields,
+  isFieldEnabled,
+  ValidatorContext,
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -78,6 +80,7 @@ type AllProps = {
   isCorrection?: boolean
   systemVariables: SystemVariables
   parentId?: string
+  validatorContext: ValidatorContext
 } & UsedFormikProps
 
 /**
@@ -190,7 +193,8 @@ export function FormSectionComponent({
   onAllFieldsValidated,
   isCorrection = false,
   systemVariables,
-  parentId
+  parentId,
+  validatorContext
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not -
   useOnlineStatus()
@@ -256,7 +260,6 @@ export function FormSectionComponent({
       fieldErrors: AllProps['errors']
     ) => {
       // this can be any field. Even though we call this only when parent triggers the change.
-
       const childFieldOcrvsId = makeFormikFieldIdOpenCRVSCompatible(
         childField.id
       )
@@ -386,13 +389,12 @@ export function FormSectionComponent({
   ])
 
   // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
-  // Address is the only deep value.
   const completeForm = { ...initialValues, ...form }
 
   const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
     const fieldErrors = errors[field.id]?.errors
     const hasErrors = fieldErrors && fieldErrors.length > 0
-    return isFieldVisible(field, completeForm) && hasErrors
+    return isFieldVisible(field, completeForm, validatorContext) && hasErrors
   })
 
   useEffect(() => {
@@ -404,15 +406,31 @@ export function FormSectionComponent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validateAllFields])
 
+  /*
+   * For the conditional check data, we want to only include values from visible fields so values of hidden fields don’t affect them.
+   *
+   * You might wonder why values of hidden fields aren’t filtered out completely earlier.
+   * That’s intentional — we persist their values so if the fields become visible again, the previous values are restored instead of resetting.
+   */
+  const declarationFields = eventConfig?.declaration.pages.flatMap(
+    (p) => p.fields
+  )
+  const allFields = [...(declarationFields ?? []), ...fieldsWithDotSeparator]
+  const visibleFieldValues = omitHiddenFields(
+    allFields,
+    completeForm,
+    validatorContext
+  )
+
   return (
     <section className={className}>
       {fieldsWithFormikSeparator.map((field) => {
-        if (!isFieldVisible(field, completeForm)) {
+        if (!isFieldVisible(field, visibleFieldValues, validatorContext)) {
           return null
         }
 
         const isDisabled =
-          !isFieldEnabled(field, completeForm) ||
+          !isFieldEnabled(field, visibleFieldValues, validatorContext) ||
           (isCorrection && field.uncorrectable)
 
         const visibleError = errors[field.id]?.errors[0]?.message
@@ -444,6 +462,7 @@ export function FormSectionComponent({
                         ] || touched[parentId]
                       : touched[field.id]) ?? false
                   }
+                  validatorContext={validatorContext}
                   value={formikField.value}
                   onBlur={formikField.onBlur}
                   onFieldValueChange={onFieldValueChange}

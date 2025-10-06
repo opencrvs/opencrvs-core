@@ -13,7 +13,11 @@ import { UUID } from '../uuid'
 import { cloneDeep } from 'lodash'
 import { Action } from './ActionDocument'
 import { ActionType } from './ActionType'
-import { findLastAssignmentAction, getMixedPath } from './utils'
+import {
+  findLastAssignmentAction,
+  getMixedPath,
+  getPendingAction
+} from './utils'
 import { TokenUserType } from '../authentication'
 
 const commonAction = {
@@ -342,5 +346,174 @@ describe('deepMerge', () => {
     // Make sure the method is not mutating the payload.
     expect(obj1).toEqual(cloneObj1)
     expect(obj2).toEqual(cloneObj2)
+  })
+})
+
+describe('getPendingAction', () => {
+  it('throws when it finds more than one pending action', () => {
+    const created = {
+      ...commonAction,
+      type: ActionType.CREATE,
+      createdByUserType: TokenUserType.Enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Accepted' as const
+    }
+
+    const requested1 = {
+      ...commonAction,
+      id: 'action-id-2' as UUID,
+      type: ActionType.DECLARE,
+      createdByUserType: TokenUserType.Enum.user,
+      createdAt: '2023-02-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    const requested2 = {
+      ...commonAction,
+      id: 'action-id-3' as UUID,
+      type: ActionType.REQUEST_CORRECTION,
+      createdByUserType: TokenUserType.Enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    expect(() =>
+      getPendingAction([created, requested1, requested2])
+    ).toThrowError(
+      'Expected exactly one pending action, but found action-id-2, action-id-3'
+    )
+  })
+
+  it('finds the pending action', () => {
+    const created = {
+      ...commonAction,
+      type: ActionType.CREATE,
+      createdByUserType: TokenUserType.Enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Accepted' as const
+    }
+
+    const requested1 = {
+      ...commonAction,
+      id: 'action-id-2' as UUID,
+      type: ActionType.DECLARE,
+      createdByUserType: TokenUserType.Enum.user,
+      createdAt: '2023-02-01T00:00:00Z',
+      status: 'Accepted' as const
+    }
+
+    const requested2 = {
+      ...commonAction,
+      id: 'action-id-3' as UUID,
+      type: ActionType.REQUEST_CORRECTION,
+      createdByUserType: TokenUserType.Enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    expect(getPendingAction([created, requested1, requested2])).toMatchObject(
+      requested2
+    )
+  })
+
+  it('handles the history having already a Requested & Accepted pair: still finds the one pending', () => {
+    const creates = {
+      ...commonAction,
+      type: ActionType.CREATE,
+      createdByUserType: TokenUserType.Enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Accepted' as const
+    }
+
+    const requests = {
+      ...commonAction,
+      id: 'action-id-2' as UUID,
+      type: ActionType.DECLARE,
+      createdByUserType: TokenUserType.Enum.user,
+      createdAt: '2023-02-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    const accepts = {
+      ...commonAction,
+      id: 'action-id-4' as UUID,
+      type: ActionType.DECLARE,
+      createdByUserType: TokenUserType.Enum.user,
+      createdAt: '2023-02-01T00:00:00Z',
+      status: 'Accepted' as const,
+      originalActionId: 'action-id-2' as UUID
+    }
+
+    const requestsAgain = {
+      ...commonAction,
+      id: 'action-id-3' as UUID,
+      type: ActionType.REQUEST_CORRECTION,
+      createdByUserType: TokenUserType.Enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    expect(
+      getPendingAction([creates, requests, accepts, requestsAgain])
+    ).toMatchObject(requestsAgain)
+  })
+
+  it('handles the history having already a Requested & Accepted pair: still throws on two requested', () => {
+    const creates = {
+      ...commonAction,
+      type: ActionType.CREATE,
+      createdByUserType: TokenUserType.Enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Accepted' as const
+    }
+
+    const requests = {
+      ...commonAction,
+      id: 'action-id-2' as UUID,
+      type: ActionType.DECLARE,
+      createdByUserType: TokenUserType.Enum.user,
+      createdAt: '2023-02-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    const accepts = {
+      ...commonAction,
+      id: 'action-id-3' as UUID,
+      type: ActionType.DECLARE,
+      createdByUserType: TokenUserType.Enum.user,
+      createdAt: '2023-02-01T00:00:00Z',
+      status: 'Accepted' as const,
+      originalActionId: 'action-id-2' as UUID
+    }
+
+    const requestsAgain = {
+      ...commonAction,
+      id: 'action-id-4' as UUID,
+      type: ActionType.REQUEST_CORRECTION,
+      createdByUserType: TokenUserType.Enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    const requestsOnceTooMany = {
+      ...commonAction,
+      id: 'action-id-5' as UUID,
+      type: ActionType.REGISTER,
+      createdByUserType: TokenUserType.Enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    expect(() =>
+      getPendingAction([
+        creates,
+        requests,
+        accepts,
+        requestsAgain,
+        requestsOnceTooMany
+      ])
+    ).toThrowError(
+      'Expected exactly one pending action, but found action-id-4, action-id-5'
+    )
   })
 })

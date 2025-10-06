@@ -23,12 +23,13 @@ import {
   ActionStatus,
   ActionUpdate,
   EventDocument,
-  getCurrentEventState,
   omitHiddenAnnotationFields,
   omitHiddenPaginatedFields,
   deepMerge,
   EventState,
-  EventConfig
+  EventConfig,
+  getCurrentEventState,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -53,6 +54,7 @@ import {
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
 import { ToastKey } from '@client/v2-events/routes/Toaster'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 function retryUnlessConflict(
   _failureCount: number,
@@ -78,11 +80,17 @@ function errorToastOnConflict(error: TRPCClientError<AppRouter>) {
 // For example: if the correction payload contains only `informant.name`, but not `informant.relation`,
 // running omitHiddenPaginatedFields on the payload alone would remove `informant.name` (since its parent `informant.relation` is missing).
 // By merging first, we preserve such dependencies, and then run a diff to keep only the valid correction fields.
-function getCleanedDeclarationDiff(
-  eventConfiguration: EventConfig,
-  originalDeclaration?: EventState,
+function getCleanedDeclarationDiff({
+  eventConfiguration,
+  originalDeclaration,
+  declarationDiff,
+  validatorContext
+}: {
+  eventConfiguration: EventConfig
+  originalDeclaration?: EventState
   declarationDiff?: EventState
-): ActionUpdate | undefined {
+  validatorContext: ValidatorContext
+}): ActionUpdate | undefined {
   if (isEmpty(declarationDiff)) {
     return declarationDiff
   }
@@ -91,7 +99,8 @@ function getCleanedDeclarationDiff(
   if (isEmpty(originalDeclaration)) {
     return omitHiddenPaginatedFields(
       eventConfiguration.declaration,
-      declarationDiff
+      declarationDiff,
+      validatorContext
     )
   }
 
@@ -103,15 +112,15 @@ function getCleanedDeclarationDiff(
   // (Ensures we only consider fields relevant to the event configuration)
   const cleanedDeclaration = omitHiddenPaginatedFields(
     eventConfiguration.declaration,
-    merged
+    merged,
+    validatorContext
   )
 
   // From the update, keep only fields that are valid in the cleaned declaration
   // (Prevents applying updates to hidden/invalid fields)
-  const cleanedDeclarationDiff: ActionUpdate = Object.fromEntries(
+  return Object.fromEntries(
     Object.entries(declarationDiff).filter(([key]) => key in cleanedDeclaration)
   )
-  return cleanedDeclarationDiff
 }
 
 setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
@@ -371,6 +380,8 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   trpcProcedure: P
 ) {
   const eventConfigurations = useEventConfigurations()
+  // @TODO: consider whether this should be here.
+  const validatorContext = useValidatorContext()
 
   const allOptions = {
     ...trpcProcedure.mutationOptions(),
@@ -433,17 +444,19 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       ? omitHiddenAnnotationFields(
           actionConfiguration,
           originalDeclaration,
-          params.annotation
+          params.annotation,
+          {}
         )
       : {}
 
     return {
       ...params,
-      declaration: getCleanedDeclarationDiff(
+      declaration: getCleanedDeclarationDiff({
         eventConfiguration,
         originalDeclaration,
-        params.declaration
-      ),
+        declarationDiff: params.declaration,
+        validatorContext
+      }),
       annotation
     }
   }
@@ -460,6 +473,8 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
   mutationName: T
 ) {
   const eventConfigurations = useEventConfigurations()
+  // @TODO: consider whether this should be here.
+  const validatorContext = useValidatorContext()
   const mutationKey = customMutationKeys[mutationName]
   const mutation = useMutation({
     mutationKey,
@@ -493,11 +508,12 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
       return mutation.mutate({
         ...params,
         eventConfiguration,
-        declaration: getCleanedDeclarationDiff(
+        declaration: getCleanedDeclarationDiff({
           eventConfiguration,
           originalDeclaration,
-          params.declaration
-        )
+          declarationDiff: params.declaration,
+          validatorContext
+        })
       })
     }
   }

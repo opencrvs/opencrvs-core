@@ -16,7 +16,8 @@ import {
   EventConfig,
   isPageVisible,
   PageTypes,
-  PageConfig
+  PageConfig,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -34,6 +35,7 @@ interface PagesProps {
   formPages: PageConfig[]
   onPageChange: (nextPageId: string) => void
   onSubmit: () => void
+  validatorContext: ValidatorContext
   continueButtonText?: string
   eventConfig?: EventConfig
   validateBeforeNextPage?: boolean
@@ -65,7 +67,8 @@ export function Pages({
   declaration,
   validateBeforeNextPage = false,
   // When isCorrection is true, we should disabled fields with 'uncorrectable' set to true, or skip pages where all fields have 'uncorrectable' set to true
-  isCorrection = false
+  isCorrection = false,
+  validatorContext
 }: PagesProps & DeclarationProps) {
   const intl = useIntl()
   const visiblePages = formPages.filter((page) => isPageVisible(page, form))
@@ -146,6 +149,7 @@ export function Pages({
       initialValues={{ ...declaration, ...form }}
       isCorrection={isCorrection}
       validateAllFields={validateAllFields}
+      validatorContext={validatorContext}
       onAllFieldsValidated={(success) => {
         setValidateAllFields(false)
         if (success) {

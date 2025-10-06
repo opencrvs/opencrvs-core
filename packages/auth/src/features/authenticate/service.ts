@@ -117,10 +117,11 @@ export async function createToken(
   scope: string[],
   audience: string[],
   issuer: string,
-  temporary?: boolean,
+  role?: string | number | undefined,
+  temporary = false,
   userType: TokenUserType = TokenUserType.enum.user
 ): Promise<string> {
-  return sign({ scope, userType }, cert, {
+  return sign({ scope, userType, role }, cert, {
     subject: userId,
     algorithm: 'RS256',
     expiresIn: temporary
@@ -183,11 +184,12 @@ export async function storeUserInformation(
   userId: string,
   scope: string[],
   mobile?: string,
-  email?: string
+  email?: string,
+  role?: string | number
 ) {
   return redis.set(
     `user_information_${nonce}`,
-    JSON.stringify({ userId, scope, userFullName, mobile, email })
+    JSON.stringify({ userId, scope, userFullName, mobile, email, role })
   )
 }
 
@@ -206,10 +208,13 @@ export async function generateAndSendVerificationCode(
   notificationEvent: NotificationEvent,
   userFullName: IUserName[],
   mobile?: string,
-  email?: string
+  email?: string,
+  role?: string | number
 ) {
   const isDemoUser = scope.indexOf('demo') > -1 || env.QA_ENV
-  logger.info(`Is demo user: ${isDemoUser}. Scopes: ${scope.join(', ')}`)
+  logger.info(
+    `Is demo user: ${isDemoUser}. Scopes: ${scope.join(', ')} Role: ${role}`
+  )
   let verificationCode
   if (isDemoUser) {
     verificationCode = '000000'
@@ -230,6 +235,8 @@ export async function generateAndSendVerificationCode(
 const tokenPayload = t.type({
   sub: t.string,
   scope: t.array(t.string),
+  // @TODO: Does role need to be here?
+  // role: t.string,
   iat: t.number,
   exp: t.number,
   aud: t.array(t.string)

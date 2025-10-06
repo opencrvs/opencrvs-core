@@ -320,8 +320,7 @@ describe('when a correction request exists', () => {
         ...generateActionDeclarationInput(
           tennisClubMembershipEvent,
           ActionType.DECLARE,
-          rng,
-          { locations: [] }
+          rng
         ),
         'applicant.name': {
           firstname: 'Johnny',
