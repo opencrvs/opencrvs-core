@@ -1960,6 +1960,7 @@ export enum SystemType {
   ImportExport = 'IMPORT_EXPORT',
   NationalId = 'NATIONAL_ID',
   RecordSearch = 'RECORD_SEARCH',
+  Reindex = 'REINDEX',
   Webhook = 'WEBHOOK'
 }
 

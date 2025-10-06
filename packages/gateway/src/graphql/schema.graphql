@@ -1076,6 +1076,7 @@ enum SystemType {
   RECORD_SEARCH
   WEBHOOK
   IMPORT_EXPORT
+  REINDEX
 }
 
 enum IntegratingSystemType {
