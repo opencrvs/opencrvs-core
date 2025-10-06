@@ -142,7 +142,6 @@ function mapFieldTypeToElasticsearch(
         type: 'object',
         properties: addressProperties
       }
-    case FieldType.SIGNATURE:
     case FieldType.AGE:
       return {
         type: 'object',
@@ -153,6 +152,7 @@ function mapFieldTypeToElasticsearch(
           [K in keyof AgeValue]: estypes.MappingProperty
         }
       }
+    case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
         type: 'object',
