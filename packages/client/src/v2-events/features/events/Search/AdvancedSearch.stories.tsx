@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,6 +13,7 @@ import { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { screen, userEvent } from '@storybook/test'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes'
@@ -59,5 +61,39 @@ export const AdvancedSearchStory: Story = {
         ]
       }
     }
+  }
+}
+
+const tennisClubMembershipEventWithoutMiddlename = {
+  ...tennisClubMembershipEvent
+}
+
+delete (
+  tennisClubMembershipEventWithoutMiddlename.declaration.pages[0]
+    .fields[0] as any
+).configuration
+
+export const AdvancedSearchName: Story = {
+  parameters: {
+    reactRouter: {
+      router: {
+        path: ROUTES.V2.ADVANCED_SEARCH.buildPath({}),
+        element: <AdvancedSearch />
+      },
+      initialPath: ROUTES.V2.ADVANCED_SEARCH.buildPath({})
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          })
+        ]
+      }
+    }
+  },
+  play: async () => {
+    const applicantSection = await screen.findByText("Applicant's details")
+    await userEvent.click(applicantSection)
   }
 }
