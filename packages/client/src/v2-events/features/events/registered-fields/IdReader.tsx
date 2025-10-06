@@ -1,16 +1,12 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import {
-  FieldType,
+  EventState,
   IdReaderField,
   IdReaderFieldValue
 } from '@opencrvs/commons/client'
-import { QrReader } from '@opencrvs/components/src/IdReader/readers/QrReader/QrReader'
 import { IdReader as IdReaderUI } from '@opencrvs/components/src/IdReader'
-import {
-  tutorialMessages,
-  messages as qrReaderMessages
-} from '@client/i18n/messages/views/qr-reader'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 
 const messages = {
   or: {
@@ -25,51 +21,19 @@ const messages = {
   }
 }
 
-function GeneratedReaderInput(
-  props: IdReaderField['methods'][number] & {
-    onChange: (data: IdReaderFieldValue) => void
-  }
-) {
-  const intl = useIntl()
-  if (props.type === FieldType.QR_READER) {
-    return (
-      <QrReader
-        labels={{
-          button: intl.formatMessage(qrReaderMessages.button),
-          scannerDialogSupportingCopy: intl.formatMessage(
-            qrReaderMessages.scannerDialogSupportingCopy
-          ),
-          tutorial: {
-            cameraCleanliness: intl.formatMessage(
-              tutorialMessages.cameraCleanliness
-            ),
-            distance: intl.formatMessage(tutorialMessages.distance),
-            lightBalance: intl.formatMessage(tutorialMessages.lightBalance)
-          }
-        }}
-        validator={props.configuration?.validator}
-        onScan={(data) => props.onChange(data)}
-      />
-    )
-  }
-
-  // TODO: complete
-  // if (props.type === FieldType.EXTERNAL_AUTHENTICATOR) {
-  //   return <LinkButton.Input configuration={props.configuration} id="" />
-  // }
-
-  throw new Error('Unsupported reading method type: ' + props.type)
-}
-
 function IdReaderInput({
+  id,
   methods,
   onChange
 }: {
+  id: string
   methods: IdReaderField['methods']
   onChange: (data: IdReaderFieldValue) => void
 }) {
   const intl = useIntl()
-
+  const handleChange = (values: EventState) => {
+    onChange(Object.values(values)[0])
+  }
   return (
     <IdReaderUI
       dividerLabel={intl.formatMessage(messages.or)}
@@ -77,13 +41,7 @@ function IdReaderInput({
         messages.manualInputInstructionLabel
       )}
     >
-      {methods.map((method) => (
-        <GeneratedReaderInput
-          key={method.type}
-          onChange={onChange}
-          {...method}
-        />
-      ))}
+      <FormFieldGenerator fields={methods} id={id} onChange={handleChange} />
     </IdReaderUI>
   )
 }

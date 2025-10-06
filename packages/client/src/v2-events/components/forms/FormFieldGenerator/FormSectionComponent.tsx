@@ -350,6 +350,7 @@ export function FormSectionComponent({
 
   useEffect(() => {
     const userChangedForm = !isEqual(values, prevValuesRef.current)
+    console.log('userChangedForm', values, prevValuesRef.current)
 
     const sectionChanged = prevIdRef.current !== id
 

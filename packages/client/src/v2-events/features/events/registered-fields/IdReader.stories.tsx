@@ -14,6 +14,7 @@ import React, { useEffect, useState } from 'react'
 import { fn } from '@storybook/test'
 import styled from 'styled-components'
 import QRCode from 'qrcode'
+import { config } from 'localforage'
 import {
   ConditionalType,
   field,
@@ -72,9 +73,128 @@ function QRCodeGenerator({ content }: { content: string }) {
   )
 }
 
+const fieldsWithQrReader = [
+  {
+    id: 'id-reader',
+    type: FieldType.ID_READER,
+    label: {
+      id: 'events.id-reader.label',
+      defaultMessage: 'ID Reader',
+      description: 'Label for the ID reader'
+    },
+    methods: [
+      {
+        id: 'id-reader.qr',
+        label: {
+          id: 'events.qr-reader.label',
+          defaultMessage: 'QR Reader',
+          description: 'Label for the QR reader'
+        },
+        type: FieldType.QR_READER
+      }
+    ]
+  },
+  {
+    id: 'name',
+    type: FieldType.NAME,
+    parent: field('id-reader'),
+    label: {
+      id: 'events.name.label',
+      defaultMessage: 'Fields',
+      description: 'Label for the name'
+    },
+    conditionals: [
+      {
+        type: ConditionalType.ENABLE,
+        conditional: never()
+      }
+    ],
+    value: field('id-reader').get('name')
+  }
+]
+
+const fieldsWithQrReaderAndLinkButton = [
+  {
+    id: 'id-reader',
+    type: FieldType.ID_READER,
+    label: {
+      id: 'events.id-reader.label',
+      defaultMessage: 'ID Reader',
+      description: 'Label for the ID reader'
+    },
+    methods: [
+      {
+        id: 'id-reader.qr',
+        label: {
+          id: 'events.qr-reader.label',
+          defaultMessage: 'QR Reader',
+          description: 'Label for the QR reader'
+        },
+        type: FieldType.QR_READER
+      },
+      {
+        id: 'id-reader.link',
+        label: {
+          id: 'events.link-button.label',
+          defaultMessage: 'Link Button',
+          description: 'Label for the link button'
+        },
+        type: FieldType.LINK_BUTTON,
+        configuration: {
+          url: 'https://opencrvs.org',
+          text: {
+            id: 'events.link-button.label',
+            defaultMessage: 'Link Button',
+            description: 'Label for the link button'
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'name',
+    type: FieldType.NAME,
+    parent: field('id-reader'),
+    label: {
+      id: 'events.name.label',
+      defaultMessage: 'Fields',
+      description: 'Label for the name'
+    },
+    conditionals: [
+      {
+        type: ConditionalType.ENABLE,
+        conditional: never()
+      }
+    ],
+    value: field('id-reader').get('name')
+  },
+  {
+    id: 'name',
+    type: FieldType.NAME,
+    parent: field('id-reader'),
+    label: {
+      id: 'events.name.label',
+      defaultMessage: 'Fields',
+      description: 'Label for the name'
+    },
+    conditionals: [
+      {
+        type: ConditionalType.ENABLE,
+        conditional: never()
+      },
+      {
+        type: ConditionalType.SHOW,
+        conditional: field('id-reader').get('name').isEqualTo('John Doe')
+      }
+    ],
+    value: field('id-reader').get('name')
+  }
+]
+
 const onChangeSpy = fn()
-export const Default: StoryObj<Args> = {
-  name: 'Default Demo',
+
+export const WithQrReader: StoryObj<Args> = {
+  name: 'With QR Reader',
   render: ({ onChange }) => {
     return (
       <Stack direction="column">
@@ -88,45 +208,35 @@ export const Default: StoryObj<Args> = {
             })}
           />
           <FormFieldGenerator
-            fields={[
-              {
-                id: 'id-reader',
-                type: FieldType.ID_READER,
-                label: {
-                  id: 'events.id-reader.label',
-                  defaultMessage: 'ID Reader',
-                  description: 'Label for the ID reader'
-                },
-                methods: [
-                  {
-                    id: 'id-reader.qr',
-                    label: {
-                      id: 'events.qr-reader.label',
-                      defaultMessage: 'QR Reader',
-                      description: 'Label for the QR reader'
-                    },
-                    type: FieldType.QR_READER
-                  }
-                ]
-              },
-              {
-                id: 'name',
-                type: FieldType.NAME,
-                parent: field('id-reader'),
-                label: {
-                  id: 'events.name.label',
-                  defaultMessage: 'Fields',
-                  description: 'Label for the name'
-                },
-                conditionals: [
-                  {
-                    type: ConditionalType.ENABLE,
-                    conditional: never()
-                  }
-                ],
-                value: field('id-reader').get('name')
-              }
-            ]}
+            fields={fieldsWithQrReader}
+            id="id-form"
+            onChange={onChange}
+          />
+        </Stack>
+      </Stack>
+    )
+  },
+  args: {
+    onChange: onChangeSpy
+  }
+}
+
+export const WithQrReaderAndLinkButton: StoryObj<Args> = {
+  name: 'With QR Reader & Link Button',
+  render: ({ onChange }) => {
+    return (
+      <Stack direction="column">
+        <Text element="h2" variant="h2">
+          {'Scan below QR code to fill the form'}
+        </Text>
+        <Stack>
+          <QRCodeGenerator
+            content={JSON.stringify({
+              name: { firstname: 'John', surname: 'Doe' }
+            })}
+          />
+          <FormFieldGenerator
+            fields={fieldsWithQrReaderAndLinkButton}
             id="id-form"
             onChange={onChange}
           />

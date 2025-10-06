@@ -654,22 +654,11 @@ const QrReaderField = BaseField.extend({
 
 export type QrReaderField = z.infer<typeof QrReaderField>
 
-const ExternalAuthenticator = BaseField.extend({
-  type: z.literal(FieldType.EXTERNAL_AUTHENTICATOR),
-  configuration: z.object({
-    link: FieldReference,
-    queryParamReader: FieldReference,
-    http: FieldReference
-  })
-})
-
-export type ExternalAuthenticator = z.infer<typeof ExternalAuthenticator>
-
 const IdReaderField = BaseField.extend({
   type: z.literal(FieldType.ID_READER),
   methods: z.array(
     z
-      .union([QrReaderField, ExternalAuthenticator])
+      .union([QrReaderField, LinkButtonField])
       .describe('Methods for reading an ID')
   )
 })

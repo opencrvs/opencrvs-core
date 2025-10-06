@@ -133,7 +133,6 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.PHONE:
     case FieldType.LINK_BUTTON:
     case FieldType.ID:
-    case FieldType.EXTERNAL_AUTHENTICATOR:
       schema = required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
@@ -224,6 +223,8 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.LINK_BUTTON:
     case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
+    case FieldType.QR_READER:
+    case FieldType.ID_READER:
       return null
     case FieldType.ADDRESS:
       return {
@@ -241,10 +242,6 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
       } satisfies FileFieldValue
     case FieldType.FILE_WITH_OPTIONS:
       return [] satisfies FileFieldWithOptionValue
-    case FieldType.QR_READER:
-      return Object.create(null) satisfies QrReaderFieldValue
-    case FieldType.ID_READER:
-      return Object.create(null) satisfies IdReaderFieldValue
   }
 }
 

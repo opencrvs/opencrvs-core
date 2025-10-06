@@ -57,7 +57,8 @@ import {
   isHttpFieldType,
   isLinkButtonFieldType,
   isQueryParamReaderFieldType,
-  isIdReaderFieldType
+  isIdReaderFieldType,
+  isQrReaderFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -89,6 +90,7 @@ import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileIn
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { IdReader } from '@client/v2-events/features/events/registered-fields/IdReader'
+import { QrReader } from '@client/v2-events/features/events/registered-fields/QrReader'
 import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
 import { QueryParamReader } from '../inputs/QueryParamReader'
@@ -672,10 +674,18 @@ export const GeneratedInputField = React.memo(
     if (isIdReaderFieldType(field)) {
       return (
         <IdReader.Input
+          id={field.config.id}
           methods={field.config.methods}
-          onChange={(val) => {
-            onFieldValueChange(fieldDefinition.id, val)
-          }}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isQrReaderFieldType(field)) {
+      return (
+        <QrReader.Input
+          configuration={field.config.configuration}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )
     }
