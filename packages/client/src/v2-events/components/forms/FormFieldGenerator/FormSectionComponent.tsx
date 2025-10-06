@@ -31,7 +31,8 @@ import {
   isFieldEnabled,
   ValidatorContext,
   isFieldVisible,
-  isAgeFieldType
+  AgeValue,
+  DateValue
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -220,6 +221,12 @@ export function FormSectionComponent({
     return fieldsWithDotSeparator
   }, [eventConfig, fieldsWithDotSeparator])
 
+  const ageFields = useMemo(
+    () =>
+      allFieldsWithDotSeparator.filter((field) => field.type === FieldType.AGE),
+    [allFieldsWithDotSeparator]
+  )
+
   // Create a reference map of parent fields and their their children for quick access.
   // This is used to reset the values of child fields when a parent field changes.
   const fieldsByParentId: IndexMap<FieldConfig[]> = useMemo(
@@ -281,26 +288,16 @@ export function FormSectionComponent({
     [fieldsWithDotSeparator, systemVariables]
   )
 
-  function setAsOfDateIfAgeField(
-    child: FieldConfig,
+  function setAsOfDate(
+    ageField: Extract<FieldConfig, { type: 'AGE' }>,
     fieldValues: EventState,
     parentFormikFieldId: string
   ) {
-    const parentFieldId = makeFormFieldIdFormikCompatible(parentFormikFieldId)
-    const formikFieldId = makeFormFieldIdFormikCompatible(child.id)
-    const field = {
-      config: child,
-      value: fieldValues[formikFieldId]
-    }
-    if (
-      !isAgeFieldType(field) ||
-      field.config.configuration.asOfDate.$$field !== parentFieldId
-    ) {
-      return
-    }
+    const formikFieldId = makeFormFieldIdFormikCompatible(ageField.id)
+    const maybeDate = fieldValues[parentFormikFieldId]
     set(fieldValues, formikFieldId, {
-      ...field.value,
-      asOfDate: fieldValues[parentFormikFieldId]
+      ...(fieldValues[formikFieldId] as AgeValue),
+      asOfDate: DateValue.safeParse(maybeDate).data
     })
   }
 
@@ -322,7 +319,19 @@ export function FormSectionComponent({
 
       for (const child of interactiveChildren) {
         setValuesForListenerFields(child, updatedValues, updatedErrors)
-        setAsOfDateIfAgeField(child, updatedValues, formikFieldId)
+      }
+
+      const dependentAgeFields = ageFields.filter(
+        (f) => f.configuration.asOfDate.$$field === ocrvsFieldId
+      )
+
+      for (const ageField of dependentAgeFields) {
+        const formikAgeFieldId = makeFormFieldIdFormikCompatible(ageField.id)
+        const maybeDate = updatedValues[formikFieldId]
+        set(updatedValues, formikAgeFieldId, {
+          ...(updatedValues[formikAgeFieldId] as AgeValue),
+          asOfDate: DateValue.safeParse(maybeDate).data
+        })
       }
 
       // @TODO: we should not reference field id 'country' directly.
@@ -355,6 +364,7 @@ export function FormSectionComponent({
       setTouched,
       touched,
       errorsWithDotSeparator,
+      ageFields,
       setErrors,
       setAllTouchedFields,
       setValuesForListenerFields
