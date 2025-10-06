@@ -36,7 +36,12 @@ import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 extendZodWithOpenApi(z)
 
-const FieldId = z.string().describe('Unique identifier for the field')
+const FieldId = z
+  .string()
+  .refine((val) => !val.includes('_'), {
+    message: "id must not contain '_'"
+  })
+  .describe('Unique identifier for the field')
 
 export const FieldReference = z
   .object({
