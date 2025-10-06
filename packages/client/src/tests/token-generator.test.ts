@@ -39,10 +39,17 @@ it('Generates tokens', () => {
       subject: generator.user.id.localSystemAdmin,
       userType: TokenUserType.enum.user,
       role: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN
+    }),
+    nationalSystemAdmin: generateToken({
+      scope: generator.user.scopes.nationalSystemAdmin,
+      subject: generator.user.id.nationalSystemAdmin,
+      userType: TokenUserType.enum.user,
+      role: TestUserRole.Enum.NATIONAL_SYSTEM_ADMIN
     })
   }
   expect(token.fieldAgent).toMatchSnapshot('fieldAgent token')
   expect(token.registrationAgent).toMatchSnapshot('registrationAgent token')
   expect(token.localRegistrar).toMatchSnapshot('localRegistrar token')
   expect(token.localSystemAdmin).toMatchSnapshot('localSystemAdmin token')
+  expect(token.nationalSystemAdmin).toMatchSnapshot('nationalSystemAdmin token')
 })

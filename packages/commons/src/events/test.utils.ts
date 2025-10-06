@@ -83,7 +83,8 @@ export const TestUserRole = z.enum([
   'LOCAL_REGISTRAR',
   'LOCAL_SYSTEM_ADMIN',
   'NATIONAL_REGISTRAR',
-  'REGISTRATION_AGENT'
+  'REGISTRATION_AGENT',
+  'NATIONAL_SYSTEM_ADMIN'
 ])
 
 export type TestUserRole = z.infer<typeof TestUserRole>

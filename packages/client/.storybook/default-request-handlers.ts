@@ -1210,6 +1210,102 @@ export const handlers = {
     })
   ],
   user: [
+    graphql.query('getUserAuditLog', (input) => {
+      return HttpResponse.json({
+        data: {
+          getUserAuditLog: {
+            total: 7,
+            results: [
+              {
+                time: '2025-10-03T10:44:55.012Z',
+                userAgent: 'undefined',
+                practitionerId: input.variables.userId,
+                ipAddress: '127.0.0.1',
+                action: 'LOGGED_IN',
+                isV2: null,
+                __typename: 'UserAuditLogItem'
+              },
+              {
+                time: '2025-10-03T10:44:49.362Z',
+                userAgent: 'undefined',
+                practitionerId: input.variables.userId,
+                ipAddress: '127.0.0.1',
+                action: 'LOGGED_OUT',
+                isV2: null,
+                __typename: 'UserAuditLogItem'
+              },
+              {
+                time: '2025-10-03T10:43:16.704Z',
+                userAgent:
+                  'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
+                practitionerId: input.variables.userId,
+                ipAddress: '127.0.0.1',
+                action: 'ASSIGNED',
+                isV2: null,
+                data: {
+                  compositionId: '0458a3ba-3f30-4345-be16-9ec81aa39b89',
+                  trackingId: 'BSK4XRC',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:24:25.604Z',
+                userAgent: '',
+                practitionerId: '68df9529f8f3a73007a44264',
+                ipAddress: '',
+                action: 'VIEWED',
+                isV2: true,
+                data: {
+                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+                  trackingId: 'MOX89J',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:24:25.604Z',
+                userAgent: '',
+                practitionerId: input.variables.userId,
+                ipAddress: '',
+                action: 'ASSIGNED',
+                isV2: true,
+                data: {
+                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+                  trackingId: 'MOX89J',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:24:25.604Z',
+                userAgent: '',
+                practitionerId: input.variables.userId,
+                ipAddress: '',
+                action: 'VIEWED',
+                isV2: true,
+                data: {
+                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+                  trackingId: 'MOX89J',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:22:10.128Z',
+                userAgent: 'undefined',
+                practitionerId: input.variables.userId,
+                ipAddress: '127.0.0.1',
+                action: 'LOGGED_IN',
+                isV2: null,
+                __typename: 'UserAuditLogItem'
+              }
+            ],
+            __typename: 'UserAuditLogResultSet'
+          }
+        }
+      })
+    }),
     graphql.query('fetchUser', (input) => {
       const userId = input.variables.userId
       const generator = testDataGenerator()
@@ -1221,6 +1317,31 @@ export const handlers = {
         response = generator.user.registrationAgent().v1
       } else if (userId == generator.user.id.localSystemAdmin) {
         response = generator.user.localSystemAdmin()
+      } else if (userId == generator.user.id.nationalSystemAdmin) {
+        response = generator.user.nationalSystemAdmin().v1
+      } else {
+        response = generator.user.localRegistrar().v1
+      }
+
+      return HttpResponse.json({
+        data: {
+          getUser: response
+        }
+      })
+    }),
+    graphql.query('getUser', (input) => {
+      const userId = input.variables.userId
+      const generator = testDataGenerator()
+      let response
+
+      if (userId == generator.user.id.fieldAgent) {
+        response = generator.user.fieldAgent().v1
+      } else if (userId == generator.user.id.registrationAgent) {
+        response = generator.user.registrationAgent().v1
+      } else if (userId == generator.user.id.localSystemAdmin) {
+        response = generator.user.localSystemAdmin()
+      } else if (userId == generator.user.id.nationalSystemAdmin) {
+        response = generator.user.nationalSystemAdmin().v1
       } else {
         response = generator.user.localRegistrar().v1
       }
@@ -2269,6 +2390,148 @@ export const handlers = {
     }),
     tRPCMsw.workqueue.config.list.query(() => {
       return generateWorkqueues()
+    })
+  ],
+  searchUsers: [
+    graphql.query('searchUsers', () => {
+      return HttpResponse.json({
+        data: {
+          searchUsers: {
+            totalItems: 4,
+            results: [
+              {
+                id: '68df9529f8f3a73007a44274',
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Emmanuel',
+                    familyName: 'Mayuka',
+                    __typename: 'HumanName'
+                  }
+                ],
+                mobile: '+260921681112',
+                email: 'kalushabwalya.17@gmail.com',
+                fullHonorificName: null,
+                primaryOffice: {
+                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  __typename: 'Location'
+                },
+                role: {
+                  id: 'LOCAL_SYSTEM_ADMIN',
+                  label: {
+                    id: 'userRole.administrator',
+                    defaultMessage: 'Administrator',
+                    description: 'Name for user role Administrator',
+                    __typename: 'I18nMessage'
+                  },
+                  __typename: 'UserRole'
+                },
+                status: 'active',
+                underInvestigation: false,
+                avatar: null,
+                __typename: 'User'
+              },
+              {
+                id: '68df9529f8f3a73007a4426c',
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Kennedy',
+                    familyName: 'Mweene',
+                    __typename: 'HumanName'
+                  }
+                ],
+                mobile: '+260933333333',
+                email: 'kalushabwalya1.7@gmail.com',
+                fullHonorificName: null,
+                primaryOffice: {
+                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  __typename: 'Location'
+                },
+                role: {
+                  id: 'LOCAL_REGISTRAR',
+                  label: {
+                    id: 'userRole.localRegistrar',
+                    defaultMessage: 'Local Registrar',
+                    description: 'Name for user role Local Registrar',
+                    __typename: 'I18nMessage'
+                  },
+                  __typename: 'UserRole'
+                },
+                status: 'active',
+                underInvestigation: false,
+                avatar: null,
+                __typename: 'User'
+              },
+              {
+                id: '68df9529f8f3a73007a44264',
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Felix',
+                    familyName: 'Katongo',
+                    __typename: 'HumanName'
+                  }
+                ],
+                mobile: '+260922222222',
+                email: 'kalushabwalya17+@gmail.com',
+                fullHonorificName: null,
+                primaryOffice: {
+                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  __typename: 'Location'
+                },
+                role: {
+                  id: 'REGISTRATION_AGENT',
+                  label: {
+                    id: 'userRole.registrationOfficer',
+                    defaultMessage: 'Registration Officer',
+                    description: 'Name for user role Registration Officer',
+                    __typename: 'I18nMessage'
+                  },
+                  __typename: 'UserRole'
+                },
+                status: 'active',
+                underInvestigation: false,
+                avatar: null,
+                __typename: 'User'
+              },
+              {
+                id: '68df9529f8f3a73007a4425c',
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Kalusha',
+                    familyName: 'Bwalya',
+                    __typename: 'HumanName'
+                  }
+                ],
+                mobile: '+260911111111',
+                email: 'kalushabwalya17@gmail.com',
+                fullHonorificName: null,
+                primaryOffice: {
+                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  __typename: 'Location'
+                },
+                role: {
+                  id: 'HOSPITAL_CLERK',
+                  label: {
+                    id: 'userRole.hospitalClerk',
+                    defaultMessage: 'Hospital Clerk',
+                    description: 'Name for user role Hospital Clerk',
+                    __typename: 'I18nMessage'
+                  },
+                  __typename: 'UserRole'
+                },
+                status: 'active',
+                underInvestigation: false,
+                avatar: null,
+                __typename: 'User'
+              }
+            ],
+            __typename: 'SearchUserResult'
+          }
+        }
+      })
     })
   ]
 }

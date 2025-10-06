@@ -262,6 +262,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   }
 
   const systemToLabel = (system: System) => {
+    // @ts-ignore
     return system.type !== 'REINDEX'
       ? systemTypeLabels[system.type]
       : 'INVALID_SYSTEM_TYPE__REINDEX'
