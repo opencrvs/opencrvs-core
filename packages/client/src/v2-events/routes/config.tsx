@@ -291,17 +291,9 @@ export const routesConfig = {
     {
       path: ROUTES.V2.path + V1_LEGACY_ROUTES.USER_PROFILE,
       element: (
-        <ProtectedRoute
-          scopes={[
-            SCOPES.ORGANISATION_READ_LOCATIONS,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
-          ]}
-        >
-          <WorkqueueLayout>
-            <UserAudit hideNavigation={true} />
-          </WorkqueueLayout>
-        </ProtectedRoute>
+        <WorkqueueLayout>
+          <UserAudit hideNavigation={true} />
+        </WorkqueueLayout>
       )
     },
     {
