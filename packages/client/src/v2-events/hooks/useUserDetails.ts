@@ -12,10 +12,21 @@
 import { useSelector } from 'react-redux'
 import { getLocations } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { getUsersFullName } from '../utils'
 
-export function useUserAddress() {
+export function useUserDetails() {
   const userDetails = useSelector(getUserDetails)
   const locations = useSelector(getLocations)
+
+  const normalizedName =
+    userDetails &&
+    userDetails.name.map((n) => ({
+      use: n.use ?? 'official',
+      family: n.familyName ?? '',
+      given: n.firstNames ? [n.firstNames] : []
+    }))
+
+  const name = normalizedName ? getUsersFullName(normalizedName, 'en') : ''
 
   const primaryOfficeId = userDetails?.primaryOffice.id
 
@@ -28,12 +39,16 @@ export function useUserAddress() {
     const provinceId = district?.partOf.split('/')[1]
 
     return {
+      name,
+      role: userDetails.role.id,
       district: districtId ?? '',
       province: provinceId ?? ''
     }
   }
 
   return {
+    name,
+    role: userDetails?.role.id,
     district: '',
     province: ''
   }

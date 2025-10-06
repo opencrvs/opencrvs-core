@@ -215,8 +215,11 @@ export const GetEventHook: Story = {
 
     await step('Caches the files', async () => {
       const cache = await getCache(CACHE_NAME)
+
       await waitFor(async () => {
-        await expect(cache.matchAll()).resolves.toHaveLength(1)
+        await expect(
+          (await cache.keys()).filter((r) => r.url.endsWith('.png'))
+        ).toHaveLength(1)
       })
     })
   }

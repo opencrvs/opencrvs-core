@@ -180,8 +180,8 @@ export interface ITokenPayload {
   exp: string
   algorithm: string
   scope: Scope[]
-  userType: TokenUserType
   role: string
+  userType: TokenUserType
   eventId?: UUID
   actionId?: UUID
 }

@@ -20,12 +20,16 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import ReactTooltip from 'react-tooltip'
 import toast from 'react-hot-toast'
+import { useSelector } from 'react-redux'
 import {
   ActionType,
   EventConfig,
   getOrThrow,
   getAcceptedActions,
-  SystemRole
+  SystemRole,
+  getUUID,
+  UUID,
+  PrintCertificateAction
 } from '@opencrvs/commons/client'
 import {
   Box,
@@ -52,7 +56,7 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useOnlineStatus } from '@client/utils'
-import { getScope } from '@client/profile/profileSelectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
@@ -187,9 +191,38 @@ export function Review() {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const formConfig = getPrintForm(eventConfiguration)
   const { isActionAllowed } = useUserAllowedActions(fullEvent.type)
+  const userDetails = useSelector(getUserDetails)
+
+  if (!userDetails) {
+    throw new Error('User details are not available')
+  }
+
+  const userFromUsersList = users.find((user) => user.id === userDetails.id)
+  if (!userFromUsersList) {
+    throw new Error(`User with id ${userDetails.id} not found in users list`)
+  }
+
+  const actionsWithAnOptimisticPrintAction = actions.concat({
+    type: ActionType.PRINT_CERTIFICATE,
+    id: getUUID(),
+    transactionId: getUUID(),
+    createdByUserType: 'user',
+    createdAt: new Date().toISOString(),
+    createdBy: userFromUsersList.id,
+    createdByRole: userFromUsersList.role,
+    status: 'Accepted',
+    declaration: {},
+    annotation: null,
+    originalActionId: null,
+    createdBySignature: userFromUsersList.signature,
+    createdAtLocation: userDetails.primaryOffice.id as UUID,
+    content: {
+      templateId: certificateConfig?.id
+    }
+  } satisfies PrintCertificateAction)
 
   const { svgCode, preparePdfCertificate } = usePrintableCertificate({
-    event: fullEvent,
+    event: { ...fullEvent, actions: actionsWithAnOptimisticPrintAction },
     config: eventConfiguration,
     locations,
     users,
