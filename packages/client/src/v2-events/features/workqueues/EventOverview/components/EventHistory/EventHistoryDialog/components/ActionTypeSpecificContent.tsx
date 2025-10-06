@@ -9,36 +9,65 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { z } from 'zod'
 import {
-  ActionDocument,
   ActionType,
-  DeclarationActions,
-  EventDocument
+  EventDocument,
+  ValidatorContext
 } from '@opencrvs/commons/client'
+import {
+  DECLARATION_ACTION_UPDATE,
+  EventHistoryActionDocument
+} from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { RequestCorrection } from './RequestCorrection'
 import { PrintCertificate } from './PrintCertificate'
 import { DeclarationUpdate } from './DeclarationUpdate'
 
+const SyntheticDeclarationActionTypes = z.enum([DECLARATION_ACTION_UPDATE])
+
 export function ActionTypeSpecificContent({
   action,
-  fullEvent
+  fullEvent,
+  validatorContext
 }: {
-  action: ActionDocument
+  action: EventHistoryActionDocument
   fullEvent: EventDocument
+  validatorContext: ValidatorContext
 }) {
   const { type } = action
 
-  const isDeclarationAction = DeclarationActions.safeParse(type).success
-  if (isDeclarationAction) {
-    return <DeclarationUpdate action={action} fullEvent={fullEvent} />
+  const isDeclarationUpdate =
+    SyntheticDeclarationActionTypes.safeParse(type).success
+
+  if (isDeclarationUpdate) {
+    // We only show the updated modal for synthetic UPDATE action
+    return (
+      <DeclarationUpdate
+        action={action}
+        fullEvent={fullEvent}
+        validatorContext={validatorContext}
+      />
+    )
   }
 
   if (type === ActionType.REQUEST_CORRECTION) {
-    return <RequestCorrection action={action} fullEvent={fullEvent} />
+    return (
+      <RequestCorrection
+        action={action}
+        fullEvent={fullEvent}
+        validatorContext={validatorContext}
+      />
+    )
   }
 
   if (type === ActionType.PRINT_CERTIFICATE) {
-    return <PrintCertificate action={action} event={fullEvent} />
+    return (
+      <PrintCertificate
+        action={action}
+        event={fullEvent}
+        validatorContext={validatorContext}
+      />
+    )
   }
 
   return null

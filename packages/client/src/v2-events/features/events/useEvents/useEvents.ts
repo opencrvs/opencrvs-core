@@ -26,7 +26,6 @@ import {
 import { useTRPC } from '@client/v2-events/trpc'
 import { useDrafts } from '../../drafts/useDrafts'
 import { useEventConfigurations } from '../useEventConfiguration'
-import { prefetchPotentialDuplicates } from '../actions/dedup/getDuplicates'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
@@ -36,7 +35,7 @@ import {
   useEventCustomAction,
   useIsMutating
 } from './procedures/actions/action'
-import { useGetEventCounts } from './procedures/count'
+import { useGetEventCountsByWorkqueue } from './procedures/count'
 import { findLocalEventDocument, findLocalEventIndex } from './api'
 import { QueryOptions } from './procedures/utils'
 
@@ -82,7 +81,7 @@ export function useEvents() {
     createEvent: useCreateEvent,
     /** Returns an event with full history. If you only need the state of the event, use getEventState. */
     getEvent,
-    useGetEventCounts,
+    useGetEventCountsByWorkqueue,
     deleteEvent: {
       useMutation: useDeleteEvent
     },

@@ -69,10 +69,12 @@ export const Number = {
 
     const intl = useIntl()
     const prefix = config.configuration?.prefix
+    const postfix = config.configuration?.postfix
     return (
       <>
         {prefix && intl.formatMessage(prefix)}
         {value.toString() || ''}
+        {postfix && intl.formatMessage(postfix)}
       </>
     )
   }

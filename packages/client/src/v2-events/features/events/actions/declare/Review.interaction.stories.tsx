@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-/* eslint-disable max-lines */
+
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
@@ -19,9 +19,7 @@ import {
   tennisClubMembershipEvent,
   generateEventDocument,
   generateEventDraftDocument,
-  getCurrentEventState,
-  FullDocumentPath,
-  UUID
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -76,20 +74,7 @@ export default meta
 
 type Story = StoryObj<typeof ReviewIndex>
 
-const mockUser = {
-  id: '67bda93bfc07dee78ae558cf',
-  name: [
-    {
-      use: 'en',
-      given: ['Kalusha'],
-      family: 'Bwalya'
-    }
-  ],
-  role: 'SOCIAL_WORKER',
-  signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined,
-  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-}
+const mockUser = generator.user.fieldAgent().v2
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
@@ -150,7 +135,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
@@ -236,7 +221,7 @@ const msw = {
       graphql.query('fetchUser', () => {
         return HttpResponse.json({
           data: {
-            getUser: generator.user.registrationAgent()
+            getUser: generator.user.registrationAgent().v1
           }
         })
       }),
@@ -274,7 +259,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
       })
     },
     chromatic: { disableSnapshot: true },
-    msw: msw
+    msw
   },
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
@@ -331,7 +316,7 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
       })
     },
     chromatic: { disableSnapshot: true },
-    msw: msw
+    msw
   },
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
@@ -396,7 +381,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: eventId
+        eventId
       })
     },
     offline: {
@@ -431,7 +416,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.fieldAgent()
+                getUser: generator.user.fieldAgent().v1
               }
             })
           }),
@@ -504,7 +489,7 @@ export const ReviewForIncompleteNameInteraction: Story = {
       })
     },
     chromatic: { disableSnapshot: true },
-    msw: msw
+    msw
   },
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {

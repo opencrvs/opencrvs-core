@@ -58,6 +58,15 @@ export const ValidationConfig = z.object({
 })
 
 export type ValidationConfig = z.infer<typeof ValidationConfig>
+const requiredSchema = z
+  .union([
+    z.boolean(),
+    z.object({
+      message: TranslationConfig.describe('Custom required validation message')
+    })
+  ])
+  .default(false)
+  .optional()
 
 const BaseField = z.object({
   id: FieldId,
@@ -65,7 +74,8 @@ const BaseField = z.object({
   parent: FieldReference.optional().describe(
     'Reference to a parent field. If a field has a parent, it will be reset when the parent field is changed.'
   ),
-  required: z.boolean().default(false).optional(),
+  required: requiredSchema,
+  disabled: z.boolean().default(false).optional(),
   conditionals: z.array(FieldConditional).default([]).optional(),
   secured: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),
@@ -151,7 +161,17 @@ export const ImageMimeType = z.enum([
   'image/svg+xml'
 ])
 
-export const MimeType = ImageMimeType
+export const DocumentMimeType = z.enum([
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.oasis.opendocument.text'
+])
+
+export const MimeType = z.enum([
+  ...ImageMimeType.options,
+  ...DocumentMimeType.options
+])
 export type MimeType = z.infer<typeof MimeType>
 
 const DEFAULT_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
@@ -378,13 +398,13 @@ export type SelectDateRangeField = z.infer<typeof SelectDateRangeField>
 
 export const NameConfig = z.object({
   firstname: z
-    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .object({ required: requiredSchema, label: TranslationConfig.optional() })
     .optional(),
   middlename: z
-    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .object({ required: requiredSchema, label: TranslationConfig.optional() })
     .optional(),
   surname: z
-    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .object({ required: requiredSchema, label: TranslationConfig.optional() })
     .optional()
 })
 
@@ -531,7 +551,7 @@ const Address = BaseField.extend({
         .array(
           z.object({
             id: z.string(),
-            required: z.boolean(),
+            required: requiredSchema,
             label: TranslationConfig,
             type: z.literal(FieldType.TEXT),
             conditionals: z.array(FieldConditional).default([]).optional(),
@@ -585,6 +605,21 @@ const ButtonField = BaseField.extend({
 
 export type ButtonField = z.infer<typeof ButtonField>
 
+// This is an alpha version of the print button and it is not recommended for use and will change in the future
+const AlphaPrintButton = BaseField.extend({
+  type: z.literal(FieldType.ALPHA_PRINT_BUTTON),
+  configuration: z.object({
+    template: z
+      .string()
+      .describe('Template ID from countryconfig templates to use for printing'),
+    buttonLabel: TranslationConfig.optional().describe(
+      'Label for the print button'
+    )
+  })
+}).describe('Print button field for printing certificates')
+
+export type AlphaPrintButton = z.infer<typeof AlphaPrintButton>
+
 const HttpField = BaseField.extend({
   type: z.literal(FieldType.HTTP),
   defaultValue: HttpFieldValue.optional(),
@@ -594,15 +629,41 @@ const HttpField = BaseField.extend({
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
     headers: z.record(z.string()).optional(),
     body: z.record(z.string()).optional(),
-    params: z.record(z.string()).optional(),
+    params: z
+      .record(z.string(), z.union([z.string(), FieldReference]))
+      .optional(),
     timeout: z
       .number()
       .default(15000)
       .describe('Request timeout in milliseconds')
   })
-}).describe('HTTP request function triggered by a button click')
+}).describe('HTTP request function triggered by a button click or other event')
 
 export type HttpField = z.infer<typeof HttpField>
+
+const LinkButtonField = BaseField.extend({
+  type: z.literal(FieldType.LINK_BUTTON),
+  configuration: z.object({
+    url: z.string().describe('URL to open'),
+    text: TranslationConfig.describe('Text to display on the button')
+  })
+}).describe('Button that opens a link')
+
+export type LinkButtonField = z.infer<typeof LinkButtonField>
+
+const QueryParamReaderField = BaseField.extend({
+  type: z.literal(FieldType.QUERY_PARAM_READER),
+  configuration: z.object({
+    formProjection: z
+      .record(z.string())
+      .optional()
+      .describe('Projection of the field value after parsing the query string')
+  })
+}).describe(
+  'A field that maps URL query params into form values and clears them afterward'
+)
+
+export type QueryParamReaderField = z.infer<typeof QueryParamReaderField>
 
 /** @knipignore */
 export type FieldConfig =
@@ -635,7 +696,10 @@ export type FieldConfig =
   | z.infer<typeof EmailField>
   | z.infer<typeof DataField>
   | z.infer<typeof ButtonField>
+  | z.infer<typeof AlphaPrintButton>
   | z.infer<typeof HttpField>
+  | z.infer<typeof LinkButtonField>
+  | z.infer<typeof QueryParamReaderField>
 
 /** @knipignore */
 /**
@@ -647,6 +711,7 @@ export type FieldConfigInput =
   | z.input<typeof TimeField>
   | z.input<typeof SelectDateRangeField>
   | z.input<typeof ButtonField>
+  | z.input<typeof AlphaPrintButton>
   | z.input<typeof NumberField>
   | z.input<typeof TextAreaField>
   | z.input<typeof DateField>
@@ -672,6 +737,8 @@ export type FieldConfigInput =
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
+  | z.input<typeof LinkButtonField>
+  | z.input<typeof QueryParamReaderField>
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
  *  referenced quite extensively througout various other schemas. Leaving the
@@ -713,7 +780,9 @@ export const FieldConfig: z.ZodType<
     FileUploadWithOptions,
     DataField,
     ButtonField,
-    HttpField
+    AlphaPrintButton,
+    HttpField,
+    LinkButtonField
   ])
   .openapi({
     description: 'Form field configuration',

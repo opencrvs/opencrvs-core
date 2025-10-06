@@ -96,6 +96,17 @@ export async function getLocations({
   return query.execute()
 }
 
+export async function getLocationById(id: UUID) {
+  const db = getClient()
+  return db
+    .selectFrom('locations')
+    .select(['id', 'name', 'parentId', 'validUntil', 'locationType'])
+    .where('id', '=', id)
+    .where('deletedAt', 'is', null)
+    .$narrowType<{ deletedAt: null }>()
+    .executeTakeFirst()
+}
+
 export async function getChildLocations(parentId: string) {
   const db = getClient()
 

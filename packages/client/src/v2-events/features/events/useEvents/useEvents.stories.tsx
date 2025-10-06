@@ -161,7 +161,7 @@ export const GetEventHook: Story = {
   ],
   parameters: {
     reactRouter: {
-      router: router,
+      router,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
         eventId: createdEvent.id
       })
@@ -215,8 +215,11 @@ export const GetEventHook: Story = {
 
     await step('Caches the files', async () => {
       const cache = await getCache(CACHE_NAME)
+
       await waitFor(async () => {
-        await expect(cache.matchAll()).resolves.toHaveLength(1)
+        await expect(
+          (await cache.keys()).filter((r) => r.url.endsWith('.png'))
+        ).toHaveLength(1)
       })
     })
   }

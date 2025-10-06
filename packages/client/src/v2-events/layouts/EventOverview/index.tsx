@@ -14,21 +14,12 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { applyDraftToEventIndex, deepDropNulls } from '@opencrvs/commons/client'
-import {
-  AppBar,
-  Button,
-  Frame,
-  INavigationType,
-  Stack
-} from '@opencrvs/components'
+import { AppBar, Button, Frame, Stack } from '@opencrvs/components'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { Plus } from '@opencrvs/components/src/icons'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import {
-  useEventConfiguration,
-  useEventConfigurations
-} from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/components/ActionMenu'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -42,15 +33,6 @@ import { Sidebar } from '../sidebar/Sidebar'
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
 
-const messagesToDefine = {
-  header: {
-    id: 'home.header.advancedSearch',
-    defaultMessage: 'Advanced Search',
-    description: 'Search menu advanced search type'
-  }
-}
-const messages = defineMessages(messagesToDefine)
-
 export function EventOverviewLayout({
   children
 }: {
@@ -60,7 +42,6 @@ export function EventOverviewLayout({
   const { searchEventById } = useEvents()
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(eventId)
-  const allEvents = useEventConfigurations()
   const navigate = useNavigate()
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()

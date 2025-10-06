@@ -220,7 +220,7 @@ describe('event.actions.notify', () => {
 
       await dataSeedingClient.locations.set(locationPayload)
 
-      const locations = await dataSeedingClient.locations.get()
+      const locations = await dataSeedingClient.locations.list()
 
       const client = createSystemTestClient('test-system', [
         `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,

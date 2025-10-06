@@ -32,6 +32,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { FormHeader } from '@client/v2-events/layouts/form/FormHeader'
 import { findLocalEventDocument } from '../../useEvents/api'
+import { useValidatorContext } from '../../../../hooks/useValidatorContext'
 import { DuplicateForm } from './DuplicateForm'
 import { DuplicateComparison } from './DuplicateComparison'
 
@@ -126,6 +127,8 @@ const TopBar = styled.div`
 function ReviewDuplicate() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
 
+  const validatorContext = useValidatorContext()
+
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
@@ -213,6 +216,7 @@ function ReviewDuplicate() {
             formConfig={formConfig}
             reviewFields={fields}
             title={formatMessage(title, eventState.declaration)}
+            validatorContext={validatorContext}
             onEdit={noop}
           >
             {null}

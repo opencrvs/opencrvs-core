@@ -23,6 +23,7 @@ import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 interface SearchLocation {
   id: string
@@ -72,6 +73,7 @@ function LocationSearchInput({
   searchableResource: ('locations' | 'facilities' | 'offices')[]
   value?: string
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
+  disabled?: boolean
 }) {
   const locationList = useAdministrativeAreas(searchableResource)
   const selectedLocation = locationList.find(
@@ -173,8 +175,8 @@ function isLocationEmpty(value: Stringifiable) {
 }
 
 export const LocationSearch = {
-  Input: LocationSearchInput,
+  Input: withSuspense(LocationSearchInput),
   Output: LocationSearchOutput,
-  toCertificateVariables: toCertificateVariables,
+  toCertificateVariables,
   isEmptyValue: isLocationEmpty
 }

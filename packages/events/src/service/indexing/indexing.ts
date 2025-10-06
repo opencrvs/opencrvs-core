@@ -95,6 +95,8 @@ function mapFieldTypeToElasticsearch(
     case FieldType.PAGE_HEADER:
     case FieldType.EMAIL:
     case FieldType.TIME:
+    case FieldType.LINK_BUTTON:
+    case FieldType.QUERY_PARAM_READER:
       return { type: 'text' }
     case FieldType.EMAIL:
       return {
@@ -112,6 +114,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.OFFICE:
     case FieldType.DATA:
     case FieldType.BUTTON:
+    case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.ID:
     case FieldType.PHONE:
       return { type: 'keyword' }

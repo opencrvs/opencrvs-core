@@ -12,8 +12,8 @@
 import { hashKey, MutationKey, useMutationState } from '@tanstack/react-query'
 import * as z from 'zod'
 import {
-  getCurrentEventState,
-  applyDeclarationToEventIndex
+  applyDeclarationToEventIndex,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { EventState } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
@@ -46,6 +46,9 @@ export function useOutbox() {
 
   const outboxEvents = pendingMutations
     .map((mutation) => {
+      if (mutation.options.meta?.ignoreOutbox) {
+        return null
+      }
       const maybeVariables = mutation.state.variables
 
       const parsedVariables = MutationVariables.safeParse(maybeVariables)

@@ -83,7 +83,8 @@ export const TestUserRole = z.enum([
   'LOCAL_REGISTRAR',
   'LOCAL_SYSTEM_ADMIN',
   'NATIONAL_REGISTRAR',
-  'REGISTRATION_AGENT'
+  'REGISTRATION_AGENT',
+  'SOCIAL_WORKER'
 ])
 
 export type TestUserRole = z.infer<typeof TestUserRole>
@@ -179,8 +180,10 @@ export function mapFieldTypeToMockValue(
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.PHONE:
+    case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
     case FieldType.OFFICE:
+    case FieldType.LINK_BUTTON:
       return `${field.id}-${field.type}-${i}`
     case FieldType.NAME:
       return generateRandomName(rng)
@@ -209,6 +212,8 @@ export function mapFieldTypeToMockValue(
       return '2021-01-01'
     case FieldType.TIME:
       return '09:33'
+    case FieldType.ALPHA_PRINT_BUTTON:
+      return undefined
     case FieldType.DATE_RANGE:
       return {
         start: '2021-01-01',
@@ -264,10 +269,14 @@ export function generateActionDeclarationInput(
 
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
-    return omitHiddenPaginatedFields(declarationConfig, {
-      ...declaration,
-      ...overrides
-    })
+    return omitHiddenPaginatedFields(
+      declarationConfig,
+      {
+        ...declaration,
+        ...overrides
+      },
+      {} // Intentionally empty. Allow generating fields with custom conditionals.
+    )
   }
 
   // eslint-disable-next-line no-console
@@ -290,7 +299,7 @@ export function generateActionDuplicateDeclarationInput(
   })
 }
 
-export function generateActionAnnotationInput(
+function generateActionAnnotationInput(
   configuration: EventConfig,
   action: ActionType,
   rng: () => number
@@ -318,7 +327,11 @@ export function generateActionAnnotationInput(
     {}
   )
 
-  const fieldBasedPayload = omitHiddenFields(annotationFields, annotation)
+  const fieldBasedPayload = omitHiddenFields(
+    annotationFields,
+    annotation,
+    {} // Intentionally empty. Allow generating fields with custom conditionals.
+  )
 
   return {
     ...fieldBasedPayload,
