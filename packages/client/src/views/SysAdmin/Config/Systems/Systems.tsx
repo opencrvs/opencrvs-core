@@ -17,6 +17,7 @@ import {
   EventType,
   System,
   SystemStatus,
+  SystemType,
   WebhookPermission
 } from '@client/utils/gateway'
 import { Label } from '@client/views/Settings/items/components'
@@ -547,9 +548,9 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
               >
                 <Select
                   onChange={(val) => {
-                    setNewSystemType(val as SystemRole)
+                    setNewSystemType(val as SystemType)
                   }}
-                  value={newSystemType ?? SystemRole.enum.HEALTH}
+                  value={newSystemType ?? SystemType.Health}
                   options={[
                     {
                       label: intl.formatMessage(
