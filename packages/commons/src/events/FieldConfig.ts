@@ -376,7 +376,17 @@ export type BulletList = z.infer<typeof BulletList>
 const Select = BaseField.extend({
   type: z.literal(FieldType.SELECT),
   defaultValue: TextValue.optional(),
-  options: z.array(SelectOption).describe('A list of options')
+  options: z.array(SelectOption).describe('A list of options'),
+  noOptionsMessage: z
+    .function()
+    .args(
+      z.object({
+        inputValue: z.string()
+      })
+    )
+    .returns(z.string().nullable())
+    .optional()
+    .openapi({ type: 'string', description: 'No options message function' })
 }).describe('Select input')
 
 export const SelectDateRangeOption = z.object({

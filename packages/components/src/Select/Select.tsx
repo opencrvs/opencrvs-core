@@ -161,6 +161,7 @@ export interface ISelectProps
   onChange: (value: string) => void
   value: string
   searchableLength?: number
+  noOptionsMessage?: (obj: { inputValue: string }) => string | null
 }
 
 type ControlProps = React.ComponentProps<typeof components.Control>
