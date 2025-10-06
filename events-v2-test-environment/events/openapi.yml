@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 710249a3-e2c6-4811-8837-a34ff4679f35
+                transactionId: 82f34567-ca74-4b59-a2e3-85f4c92808c1
                 type: birth
       responses:
         "200":
@@ -247,6 +247,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                   default: &a3 {}
                 annotation:
                   type: object
@@ -373,6 +376,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                 originalActionId:
                   type: string
                   format: uuid
@@ -395,7 +401,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: d45524ea-db41-4b11-bca5-58a5532b7066
+                transactionId: 579cca32-fc8e-4871-8afe-e4642a3b08f5
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -575,6 +581,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                   default: *a3
                 annotation:
                   type: object
@@ -701,6 +710,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                 originalActionId:
                   type: string
                   format: uuid
@@ -897,6 +909,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                   default: *a3
                 annotation:
                   type: object
@@ -1023,6 +1038,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                 originalActionId:
                   type: string
                   format: uuid
@@ -1222,6 +1240,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                   default: *a3
                 annotation:
                   type: object
@@ -1348,6 +1369,9 @@ paths:
                                   data:
                                     nullable: true
                               - type: "null"
+                      - type: object
+                        additionalProperties:
+                          type: string
                 originalActionId:
                   type: string
                   format: uuid
@@ -1552,7 +1576,7 @@ paths:
                             type: string
                           createdByUserType:
                             type: string
-                            enum: &a13
+                            enum: &a4
                               - user
                               - system
                           createdAt:
@@ -1582,7 +1606,7 @@ paths:
                               or accepted by 3rd party integration.
                           type:
                             type: string
-                            enum: &a14
+                            enum: &a5
                               - NOTIFY
                               - DECLARE
                               - VALIDATE
@@ -1618,6 +1642,123 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventDocument"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.BAD_REQUEST"
+        "401":
+          description: Authorization not provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.UNAUTHORIZED"
+        "403":
+          description: Insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.FORBIDDEN"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+  /events/bulk-import:
+    post:
+      operationId: event-bulkImport
+      summary: Import multiple full event records
+      tags:
+        - events
+      security:
+        - Authorization: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                type:
+                  type: string
+                createdAt:
+                  type: string
+                  format: date-time
+                updatedAt:
+                  type: string
+                  format: date-time
+                actions:
+                  type: array
+                  items:
+                    anyOf:
+                      - $ref: "#/components/schemas/ActionDocument"
+                      - type: object
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          transactionId:
+                            type: string
+                          createdByUserType:
+                            type: string
+                            enum: *a4
+                          createdAt:
+                            type: string
+                            format: date-time
+                          createdBy:
+                            type: string
+                          createdByRole:
+                            type: string
+                          createdBySignature:
+                            type: string
+                            nullable: true
+                            description: Reference to signature of the user who created the action
+                          createdAtLocation:
+                            type: string
+                            nullable: true
+                            format: uuid
+                          status:
+                            type: string
+                            enum:
+                              - Rejected
+                          originalActionId:
+                            type: string
+                            nullable: true
+                            format: uuid
+                            description: Reference to the original action that was asynchronously rejected
+                              or accepted by 3rd party integration.
+                          type:
+                            type: string
+                            enum: *a5
+                        required:
+                          - id
+                          - transactionId
+                          - createdByUserType
+                          - createdAt
+                          - createdBy
+                          - createdByRole
+                          - status
+                          - type
+                trackingId:
+                  type: string
+              required:
+                - id
+                - type
+                - createdAt
+                - updatedAt
+                - actions
+                - trackingId
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema: {}
         "400":
           description: Invalid input data
           content:
@@ -1766,7 +1907,7 @@ components:
                             - conditional
                           description: If 'SHOW' conditional is defined, the component is shown to the
                             user only if the condition is met
-                        default: &a4 []
+                        default: &a6 []
                       id:
                         type: string
                         description: Id of summary field
@@ -1802,7 +1943,7 @@ components:
                             - conditional
                           description: If 'SHOW' conditional is defined, the component is shown to the
                             user only if the condition is met
-                        default: *a4
+                        default: *a6
                       fieldId:
                         type: string
                       label:
@@ -1867,7 +2008,7 @@ components:
                           properties:
                             type:
                               type: string
-                              enum: &a5
+                              enum: &a7
                                 - fuzzy
                                 - exact
                                 - range
@@ -1949,7 +2090,7 @@ components:
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
-                          default: &a6 []
+                          default: &a8 []
                           description: "
 
                             \       In advanced search, we sometimes need to
@@ -1991,7 +2132,7 @@ components:
                             required:
                               - validator
                               - message
-                          default: &a7 []
+                          default: &a9 []
                           description: In advanced search, we sometimes need to override the default field
                             validations.
                         fieldId:
@@ -2011,7 +2152,7 @@ components:
                           properties:
                             type:
                               type: string
-                              enum: *a5
+                              enum: *a7
                               description: Determines the type of field
                           required:
                             - type
@@ -2089,7 +2230,7 @@ components:
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
-                          default: *a6
+                          default: *a8
                           description: "
 
                             \       In advanced search, we sometimes need to
@@ -2131,7 +2272,7 @@ components:
                             required:
                               - validator
                               - message
-                          default: *a7
+                          default: *a9
                           description: In advanced search, we sometimes need to override the default field
                             validations.
                         fieldId:
@@ -2244,7 +2385,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: &a12 []
+          default: &a14 []
         draft:
           type: boolean
         type:
@@ -2298,13 +2439,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: &a8 []
+              default: &a10 []
             secured:
               type: boolean
               default: false
@@ -2322,7 +2475,7 @@ components:
                 required:
                   - validator
                   - message
-              default: &a9 []
+              default: &a11 []
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -2381,7 +2534,17 @@ components:
                       id:
                         type: string
                       required:
-                        type: boolean
+                        anyOf:
+                          - type: boolean
+                          - type: object
+                            properties:
+                              message:
+                                description: Custom required validation message
+                                allOf:
+                                  - $ref: "#/components/schemas/TranslationConfig"
+                            required:
+                              - message
+                        default: false
                       label:
                         $ref: "#/components/schemas/TranslationConfig"
                       type:
@@ -2410,7 +2573,6 @@ components:
                         description: Reference to a field by its ID
                     required:
                       - id
-                      - required
                       - label
                       - type
             defaultValue:
@@ -2478,13 +2640,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -2502,7 +2676,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -2586,13 +2760,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -2610,7 +2796,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -2689,13 +2875,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -2713,7 +2911,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -2798,13 +2996,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -2822,7 +3032,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -2897,13 +3107,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -2921,7 +3143,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -2995,13 +3217,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -3019,7 +3253,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -3110,13 +3344,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -3134,7 +3380,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -3219,13 +3465,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -3243,7 +3501,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -3289,7 +3547,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: &a10
+                      enum: &a12
                         - reg12
                         - reg14
                         - reg16
@@ -3333,13 +3591,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -3357,7 +3627,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -3452,13 +3722,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -3476,7 +3758,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -3526,7 +3808,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: *a10
+                      enum: *a12
               default: {}
           required:
             - id
@@ -3559,13 +3841,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -3583,7 +3877,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -3650,13 +3944,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -3674,7 +3980,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -3758,13 +4064,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -3782,7 +4100,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -3839,29 +4157,53 @@ components:
                       type: object
                       properties:
                         required:
-                          type: boolean
+                          anyOf:
+                            - type: boolean
+                            - type: object
+                              properties:
+                                message:
+                                  description: Custom required validation message
+                                  allOf:
+                                    - $ref: "#/components/schemas/TranslationConfig"
+                              required:
+                                - message
+                          default: false
                         label:
                           $ref: "#/components/schemas/TranslationConfig"
-                      required:
-                        - required
                     middlename:
                       type: object
                       properties:
                         required:
-                          type: boolean
+                          anyOf:
+                            - type: boolean
+                            - type: object
+                              properties:
+                                message:
+                                  description: Custom required validation message
+                                  allOf:
+                                    - $ref: "#/components/schemas/TranslationConfig"
+                              required:
+                                - message
+                          default: false
                         label:
                           $ref: "#/components/schemas/TranslationConfig"
-                      required:
-                        - required
                     surname:
                       type: object
                       properties:
                         required:
-                          type: boolean
+                          anyOf:
+                            - type: boolean
+                            - type: object
+                              properties:
+                                message:
+                                  description: Custom required validation message
+                                  allOf:
+                                    - $ref: "#/components/schemas/TranslationConfig"
+                              required:
+                                - message
+                          default: false
                         label:
                           $ref: "#/components/schemas/TranslationConfig"
-                      required:
-                        - required
                   default:
                     firstname:
                       required: true
@@ -3917,13 +4259,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -3941,7 +4295,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -4008,13 +4362,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -4032,7 +4398,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -4099,13 +4465,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -4123,7 +4501,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -4191,13 +4569,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -4215,7 +4605,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -4276,11 +4666,15 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: &a11
+                    enum: &a13
                       - image/png
                       - image/jpg
                       - image/jpeg
                       - image/svg+xml
+                      - application/pdf
+                      - application/msword
+                      - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+                      - application/vnd.oasis.opendocument.text
                   description: List of allowed file formats for the signature
                 style:
                   type: object
@@ -4328,13 +4722,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -4352,7 +4758,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -4419,13 +4825,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -4443,7 +4861,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -4531,13 +4949,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -4555,7 +4985,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -4618,13 +5048,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -4642,7 +5084,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -4723,13 +5165,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -4747,7 +5201,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -4814,13 +5268,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -4838,7 +5304,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -4905,13 +5371,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -4929,7 +5407,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -4981,7 +5459,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a11
+                    enum: *a13
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -5018,13 +5496,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -5042,7 +5532,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -5116,13 +5606,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -5140,7 +5642,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -5223,7 +5725,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a11
+                    enum: *a13
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -5259,13 +5761,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -5283,7 +5797,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -5376,13 +5890,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -5400,7 +5926,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -5482,13 +6008,25 @@ components:
               description: Reference to a parent field. If a field has a parent, it will be
                 reset when the parent field is changed.
             required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
               type: boolean
               default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a10
             secured:
               type: boolean
               default: false
@@ -5506,7 +6044,120 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a11
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
+            type:
+              type: string
+              enum:
+                - ALPHA_PRINT_BUTTON
+            configuration:
+              type: object
+              properties:
+                template:
+                  type: string
+                  description: Template ID from countryconfig templates to use for printing
+                buttonLabel:
+                  description: Label for the print button
+                  allOf:
+                    - $ref: "#/components/schemas/TranslationConfig"
+              required:
+                - template
+          required:
+            - id
+            - label
+            - type
+            - configuration
+          description: Print button field for printing certificates
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
+              type: boolean
+              default: false
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a10
+            secured:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a11
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
@@ -5599,7 +6250,22 @@ components:
                 params:
                   type: object
                   additionalProperties:
-                    type: string
+                    anyOf:
+                      - type: string
+                      - type: object
+                        properties:
+                          $$field:
+                            type: string
+                            description: Unique identifier for the field
+                          $$subfield:
+                            type: array
+                            items:
+                              type: string
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        required:
+                          - $$field
+                        description: Reference to a field by its ID
                 timeout:
                   type: number
                   default: 15000
@@ -5614,7 +6280,121 @@ components:
             - label
             - type
             - configuration
-          description: HTTP request function triggered by a button click
+          description: HTTP request function triggered by a button click or other event
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
+              type: boolean
+              default: false
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a10
+            secured:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a11
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
+            type:
+              type: string
+              enum:
+                - LINK_BUTTON
+            configuration:
+              type: object
+              properties:
+                url:
+                  type: string
+                  description: URL to open
+                text:
+                  description: Text to display on the button
+                  allOf:
+                    - $ref: "#/components/schemas/TranslationConfig"
+              required:
+                - url
+                - text
+          required:
+            - id
+            - label
+            - type
+            - configuration
+          description: Button that opens a link
       description: Form field configuration
     FieldConditional:
       oneOf:
@@ -5696,7 +6476,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a12
+          default: *a14
         draft:
           type: boolean
         type:
@@ -5889,7 +6669,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a12
+          default: *a14
         draft:
           type: boolean
         type:
@@ -5965,7 +6745,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a12
+          default: *a14
         draft:
           type: boolean
         type:
@@ -6011,7 +6791,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a12
+          default: *a14
         draft:
           type: boolean
         type:
@@ -6057,7 +6837,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a12
+          default: *a14
         draft:
           type: boolean
         type:
@@ -6133,7 +6913,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a12
+          default: *a14
         draft:
           type: boolean
         type:
@@ -6179,7 +6959,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a12
+          default: *a14
         draft:
           type: boolean
         type:
@@ -6319,7 +7099,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a12
+          default: *a14
         draft:
           type: boolean
         type:
@@ -6402,7 +7182,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a12
+          default: *a14
         draft:
           type: boolean
         type:
@@ -6448,7 +7228,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a12
+          default: *a14
         draft:
           type: boolean
         type:
@@ -6580,7 +7360,7 @@ components:
                     type: string
                   createdByUserType:
                     type: string
-                    enum: *a13
+                    enum: *a4
                   createdAt:
                     type: string
                     format: date-time
@@ -6608,7 +7388,7 @@ components:
                       or accepted by 3rd party integration.
                   type:
                     type: string
-                    enum: *a14
+                    enum: *a5
                 required:
                   - id
                   - transactionId
@@ -6676,7 +7456,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -6817,6 +7597,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -6943,6 +7726,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: &a15
@@ -6979,7 +7765,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -7120,6 +7906,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -7246,6 +8035,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -7279,7 +8071,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -7420,6 +8212,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -7546,6 +8341,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -7589,7 +8387,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -7730,6 +8528,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -7856,6 +8657,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -7908,7 +8712,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -8049,6 +8853,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -8175,6 +8982,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -8208,7 +9018,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -8349,6 +9159,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -8475,6 +9288,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -8516,7 +9332,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -8657,6 +9473,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -8783,6 +9602,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -8826,7 +9648,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -8967,6 +9789,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -9093,6 +9918,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -9126,7 +9954,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -9267,6 +10095,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -9393,6 +10224,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -9428,7 +10262,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -9569,6 +10403,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -9695,6 +10532,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -9728,7 +10568,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -9869,6 +10709,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -9995,6 +10838,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -10031,7 +10877,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -10172,6 +11018,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -10298,6 +11147,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -10331,7 +11183,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -10472,6 +11324,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -10598,6 +11453,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -10634,7 +11492,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -10775,6 +11633,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -10901,6 +11762,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -10947,7 +11811,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -11088,6 +11952,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -11214,6 +12081,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -11247,7 +12117,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -11388,6 +12258,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -11514,6 +12387,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -11553,7 +12429,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a4
         createdAt:
           type: string
           format: date-time
@@ -11694,6 +12570,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         annotation:
           type: object
           nullable: true
@@ -11820,6 +12699,9 @@ components:
                           data:
                             nullable: true
                       - type: "null"
+              - type: object
+                additionalProperties:
+                  type: string
         status:
           type: string
           enum: *a15
@@ -12071,7 +12953,7 @@ components:
             - exact
         term:
           type: string
-          enum: *a13
+          enum: *a4
       required:
         - type
         - term
@@ -12478,6 +13360,10 @@ components:
                   data: {}
                 required:
                   - loading
+              - type: object
+                nullable: true
+                additionalProperties:
+                  type: string
       required:
         - id
         - type
