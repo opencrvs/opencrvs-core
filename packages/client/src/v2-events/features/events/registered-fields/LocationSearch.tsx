@@ -11,7 +11,6 @@
 import React from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { uniq } from 'lodash'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
 import {
   FieldPropsWithoutReferenceValue,
@@ -168,7 +167,12 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
     .filter(Boolean)
     .reverse()
 
-  return joinValues(uniq([name, ...resolvedAdminLevels, country]), ', ')
+  const location = locations.find(({ id }) => id === value.toString())
+
+  if (location?.locationType === LocationType.Enum.ADMIN_STRUCTURE) {
+    return joinValues([...resolvedAdminLevels, country], ', ')
+  }
+  return joinValues([name, ...resolvedAdminLevels, country], ', ')
 }
 
 function isLocationEmpty(value: Stringifiable) {
