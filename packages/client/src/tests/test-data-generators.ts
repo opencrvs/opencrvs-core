@@ -303,6 +303,7 @@ export function testDataGenerator(rngSeed?: number) {
         email: 'kalushabwaly.a17@gmail.com',
         fullHonorificName: null,
         role: {
+          id: TestUserRole.Enum.NATIONAL_SYSTEM_ADMIN,
           label: {
             id: 'userRole.nationalAdministrator',
             defaultMessage: 'National Administrator',
