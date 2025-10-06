@@ -629,6 +629,7 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
       }
     })
     const [resolvedAddress, setResolvedAddress] =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       React.useState<Record<string, any>>()
     const { getLocations } = useLocations()
     const [locations] = getLocations.useSuspenseQuery()
