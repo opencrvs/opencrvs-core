@@ -459,7 +459,7 @@ function toCertificateVariables(
   const stringifiedResult = stringifier(ALL_ADDRESS_FIELDS, value as EventState)
   const { administrativeArea, streetLevelDetails } = value
 
-  if (value.country !== window.config.COUNTRY) {
+  if (value.addressType === AddressType.INTERNATIONAL) {
     return { ...stringifiedResult, streetLevelDetails }
   }
   const appConfigAdminLevels = adminLevels?.map((level) => level.id)

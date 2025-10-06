@@ -672,7 +672,6 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
         />
         {resolvedAddress && (
           <div>
-            <>{JSON.stringify(resolvedAddress, null, 2)}</>
             <div data-testid="country">
               {'Country:'} {resolvedAddress.country}
             </div>
