@@ -27,7 +27,8 @@ import {
   tennisClubMembershipEvent,
   footballClubMembershipEvent,
   libraryMembershipEvent,
-  LocationType
+  LocationType,
+  TestUserRole
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 
@@ -2428,13 +2429,15 @@ export const handlers = {
   ],
   searchUsers: [
     graphql.query('searchUsers', () => {
+      const generator = testDataGenerator()
+
       return HttpResponse.json({
         data: {
           searchUsers: {
             totalItems: 4,
             results: [
               {
-                id: '68df9529f8f3a73007a44274',
+                id: generator.user.localSystemAdmin().id as UUID,
                 name: [
                   {
                     use: 'en',
@@ -2446,12 +2449,13 @@ export const handlers = {
                 mobile: '+260921681112',
                 email: 'kalushabwalya.17@gmail.com',
                 fullHonorificName: null,
+                signature: null,
                 primaryOffice: {
                   id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
                   __typename: 'Location'
                 },
                 role: {
-                  id: 'LOCAL_SYSTEM_ADMIN',
+                  id: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
                   label: {
                     id: 'userRole.administrator',
                     defaultMessage: 'Administrator',
@@ -2466,7 +2470,7 @@ export const handlers = {
                 __typename: 'User'
               },
               {
-                id: '68df9529f8f3a73007a4426c',
+                id: generator.user.localRegistrar().v2.id,
                 name: [
                   {
                     use: 'en',
@@ -2478,12 +2482,13 @@ export const handlers = {
                 mobile: '+260933333333',
                 email: 'kalushabwalya1.7@gmail.com',
                 fullHonorificName: null,
+                signature: null,
                 primaryOffice: {
                   id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
                   __typename: 'Location'
                 },
                 role: {
-                  id: 'LOCAL_REGISTRAR',
+                  id: TestUserRole.enum.LOCAL_REGISTRAR,
                   label: {
                     id: 'userRole.localRegistrar',
                     defaultMessage: 'Local Registrar',
@@ -2498,7 +2503,7 @@ export const handlers = {
                 __typename: 'User'
               },
               {
-                id: '68df9529f8f3a73007a44264',
+                id: generator.user.registrationAgent().v2.id,
                 name: [
                   {
                     use: 'en',
@@ -2510,12 +2515,13 @@ export const handlers = {
                 mobile: '+260922222222',
                 email: 'kalushabwalya17+@gmail.com',
                 fullHonorificName: null,
+                signature: null,
                 primaryOffice: {
                   id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
                   __typename: 'Location'
                 },
                 role: {
-                  id: 'REGISTRATION_AGENT',
+                  id: TestUserRole.enum.REGISTRATION_AGENT,
                   label: {
                     id: 'userRole.registrationOfficer',
                     defaultMessage: 'Registration Officer',
@@ -2530,7 +2536,7 @@ export const handlers = {
                 __typename: 'User'
               },
               {
-                id: '68df9529f8f3a73007a4425c',
+                id: generator.user.fieldAgent().v2.id,
                 name: [
                   {
                     use: 'en',
@@ -2542,6 +2548,7 @@ export const handlers = {
                 mobile: '+260911111111',
                 email: 'kalushabwalya17@gmail.com',
                 fullHonorificName: null,
+                signature: null,
                 primaryOffice: {
                   id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
                   __typename: 'Location'

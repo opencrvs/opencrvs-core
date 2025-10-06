@@ -86,6 +86,7 @@ export function testDataGenerator(rngSeed?: number) {
       v1: {
         id: userIds.fieldAgent,
         userMgntUserID: generateUuid(),
+        fullHonorificName: null,
         creationDate: '1736421510056',
         username: 'k.bwalya',
         practitionerId: generateUuid(),
@@ -142,6 +143,7 @@ export function testDataGenerator(rngSeed?: number) {
         practitionerId: generateUuid(),
         mobile: '+260922222222',
         email: 'kalushabwalya17+@gmail.com',
+        fullHonorificName: null,
         role: {
           id: TestUserRole.Enum.REGISTRATION_AGENT,
           label: {
