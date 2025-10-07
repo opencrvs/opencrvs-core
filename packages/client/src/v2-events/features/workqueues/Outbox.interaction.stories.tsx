@@ -13,15 +13,13 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { graphql, HttpResponse } from 'msw'
 import { userEvent, within, expect, waitFor } from '@storybook/test'
+import { TRPCError } from '@trpc/server'
 import {
   ActionType,
   tennisClubMembershipEvent,
   generateEventDocument,
   getCurrentEventState,
-  footballClubMembershipEvent,
-  FullDocumentPath,
-  UUID,
-  User
+  footballClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -88,7 +86,7 @@ const declarationTrpcMsw = {
 
 const mockUser = generator.user.fieldAgent().v2
 
-export const Outbox: Story = {
+export const SuccessfulMutation: Story = {
   loaders: [
     async () => {
       window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
@@ -112,6 +110,110 @@ export const Outbox: Story = {
     msw: {
       handlers: {
         events: [...declarationTrpcMsw.events.handlers],
+        user: [
+          graphql.query('fetchUser', () => {
+            return HttpResponse.json({
+              data: {
+                getUser: generator.user.registrationAgent().v1
+              }
+            })
+          }),
+          tRPCMsw.user.list.query(() => {
+            return [mockUser]
+          }),
+          tRPCMsw.user.get.query(() => {
+            return mockUser
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('Send for review', async () => {
+      const submitButton = await canvas.findByText('Send for review')
+      await userEvent.click(submitButton)
+      const confirmButton = await canvas.findByText('Confirm')
+      await userEvent.click(confirmButton)
+      const outboxButton = await canvas.findByTestId(
+        'navigation_workqueue_outbox'
+      )
+      await expect(outboxButton).toHaveTextContent(/^Outbox1$/)
+
+      await userEvent.click(outboxButton)
+
+      const searchResult = await canvas.findByTestId('search-result')
+      const { firstname, surname } = getCurrentEventState(
+        declareEventDocument,
+        tennisClubMembershipEvent
+      ).declaration['applicant.name'] as {
+        firstname: string
+        surname: string
+      }
+
+      await expect(searchResult).toHaveTextContent(`${firstname} ${surname}`)
+
+      await waitFor(
+        async () => {
+          await expect(searchResult).not.toHaveTextContent(
+            `${firstname} ${surname}`
+          )
+        },
+        { timeout: OUTBOX_FREEZE_TIME + 1000 } // Allow some buffer for the freeze time
+      )
+
+      const outboxButton2 = await canvas.findByTestId(
+        'navigation_workqueue_outbox'
+      )
+      await expect(outboxButton2).toHaveTextContent(/^Outbox$/)
+    })
+  }
+}
+
+const declarationTrpcMswFail = {
+  events: wrapHandlersWithSpies([
+    {
+      name: 'event.create',
+      procedure: tRPCMsw.event.create.mutation,
+      handler: () => createdEventDocument
+    },
+    {
+      name: 'event.actions.declare.request',
+      procedure: tRPCMsw.event.actions.declare.request.mutation,
+      handler: async () => {
+        await new Promise((resolve) => setTimeout(resolve, OUTBOX_FREEZE_TIME))
+        return new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR'
+        })
+      }
+    }
+  ])
+}
+
+export const FailedMutation: Story = {
+  loaders: [
+    async () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+
+      // Ensure state is stable before seeding the mutation cache
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: createdEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    offline: {
+      events: [createdEventDocument],
+      configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
+    },
+    msw: {
+      handlers: {
+        events: [...declarationTrpcMswFail.events.handlers],
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
