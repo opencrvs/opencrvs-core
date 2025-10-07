@@ -162,7 +162,7 @@ export const GeneratedInputField = React.memo(
       name: fieldDefinition.id,
       onBlur,
       value,
-      disabled: disabled || readonlyMode,
+      disabled: fieldDefinition.disabled || readonlyMode,
       error: Boolean(error),
       touched,
       placeholder:
