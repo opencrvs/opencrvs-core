@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 6de59b98-119b-4314-acd7-b6ad8636f17f
+                transactionId: 4cc55cdb-e8de-44e3-93cf-804e1b2042e1
                 type: birth
       responses:
         "200":
@@ -401,7 +401,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: cd3c84b9-22aa-4ea2-a2b3-b4762df8d2de
+                transactionId: 2d985149-98d9-4bf5-a486-11e79ddc7452
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -4034,6 +4034,30 @@ components:
                   - value
                   - label
               description: A list of options
+            noOptionsMessage:
+              description: "
+
+                \    A translation configuration object used to display a
+                message when no options are available.
+
+                \    It must follow the shape: { id: string; defaultMessage:
+                string; description?: string }.
+
+                \    The message is rendered via
+                intl.formatMessage(noOptionsMessage, { input }),
+
+                \    where 'input' represents the text entered in the Select
+                field.
+
+                \    You can reference this variable in your message, for
+                example:
+
+                \    { ..., defaultMessage: \"'{input}' is not listed among the
+                health facilities.\" }
+
+                \  "
+              allOf:
+                - $ref: "#/components/schemas/TranslationConfig"
           required:
             - id
             - label
