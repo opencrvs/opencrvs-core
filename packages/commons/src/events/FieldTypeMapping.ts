@@ -44,6 +44,7 @@ import {
   HttpField,
   ButtonField,
   LinkButtonField,
+  VerificationStatus,
   QueryParamReaderField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
@@ -60,7 +61,8 @@ import {
   DateRangeFieldValue,
   SelectDateRangeValue,
   TimeValue,
-  ButtonFieldValue
+  ButtonFieldValue,
+  VerificationStatusValue
 } from './FieldValue'
 
 import { FullDocumentPath } from '../documents'
@@ -129,6 +131,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.OFFICE:
     case FieldType.PHONE:
     case FieldType.LINK_BUTTON:
+    case FieldType.VERIFICATION_STATUS:
     case FieldType.ID:
       schema = required ? NonEmptyTextValue : TextValue
       break
@@ -218,6 +221,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.LINK_BUTTON:
     case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
+    case FieldType.VERIFICATION_STATUS:
       return null
     case FieldType.ADDRESS:
       return {
@@ -466,6 +470,16 @@ export const isLinkButtonFieldType = (field: {
   value: FieldValue
 }): field is { value: undefined; config: LinkButtonField } => {
   return field.config.type === FieldType.LINK_BUTTON
+}
+
+export const isVerificationStatusType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is {
+  value: VerificationStatusValue | undefined
+  config: VerificationStatus
+} => {
+  return field.config.type === FieldType.VERIFICATION_STATUS
 }
 
 export const isQueryParamReaderFieldType = (field: {
