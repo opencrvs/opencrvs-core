@@ -152,6 +152,13 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         {(formikProps) => {
           const { touched } = formikProps
 
+          // On the initial render, we need to call the onChange with formikProps.values to ensure that the default values
+          // end up on the form (non-formik) state.
+          useEffect(() => {
+            formikOnChange(formikProps.values)
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+          }, [])
+
           useEffect(() => {
             /**
              * Because 'enableReinitialize' prop is set to 'true' above, whenever initialValue changes,
