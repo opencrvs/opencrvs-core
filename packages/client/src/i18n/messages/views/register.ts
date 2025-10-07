@@ -18,6 +18,7 @@ interface IRegisterMessages
   submitDescription: MessageDescriptor
   registerFormQueryError: MessageDescriptor
   goToReviewButton: MessageDescriptor
+  backToReviewButton: MessageDescriptor
   saveDeclarationConfirmModalTitle: MessageDescriptor
   saveDeclarationConfirmModalDescription: MessageDescriptor
   deleteDeclarationConfirmModalTitle: MessageDescriptor
@@ -66,6 +67,10 @@ const messagesToDefine: IRegisterMessages = {
   goToReviewButton: {
     id: 'register.selectVitalEvent.goToReviewButton',
     defaultMessage: 'Go to review'
+  },
+  backToReviewButton: {
+    id: 'register.selectVitalEvent.backToReviewButton',
+    defaultMessage: 'Back to review'
   },
   saveDeclarationConfirmModalTitle: {
     id: 'register.form.modal.title.saveDeclarationConfirm',
