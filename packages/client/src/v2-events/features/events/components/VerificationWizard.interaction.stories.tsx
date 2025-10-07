@@ -70,7 +70,6 @@ export const VerificationWizardModal: Story = {
           }
         }}
         pageTitle="Verification Wizard"
-        showReviewButton={false}
         onNextPage={onNextPageSpy}
         onPreviousPage={noop}
         onSubmit={noop}

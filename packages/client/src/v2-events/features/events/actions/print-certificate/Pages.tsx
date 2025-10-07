@@ -106,7 +106,6 @@ export function Pages() {
         })}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        showReviewButton={searchParams.from === 'review'}
         validateBeforeNextPage={true}
         validatorContext={validatorContext}
         onPageChange={(nextPageId: string) => {
