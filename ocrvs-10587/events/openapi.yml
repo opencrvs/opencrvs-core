@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 2ec1bf3d-ee62-46ab-8fed-e3a37e2f36eb
+                transactionId: edfd18f7-0ce4-4648-853e-34f49520d0c2
                 type: birth
       responses:
         "200":
@@ -401,7 +401,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: f3e374da-2c58-4a4d-a9ba-c393d4d38760
+                transactionId: 8ff3708c-de67-413f-a974-a35aaaa20d09
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -6078,6 +6078,119 @@ components:
             type:
               type: string
               enum:
+                - ALPHA_PRINT_BUTTON
+            configuration:
+              type: object
+              properties:
+                template:
+                  type: string
+                  description: Template ID from countryconfig templates to use for printing
+                buttonLabel:
+                  description: Label for the print button
+                  allOf:
+                    - $ref: "#/components/schemas/TranslationConfig"
+              required:
+                - template
+          required:
+            - id
+            - label
+            - type
+            - configuration
+          description: Print button field for printing certificates
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
+              type: boolean
+              default: false
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a10
+            secured:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a11
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
+            type:
+              type: string
+              enum:
                 - HTTP
             defaultValue:
               type: object
@@ -6282,6 +6395,127 @@ components:
             - type
             - configuration
           description: Button that opens a link
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
+              type: boolean
+              default: false
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a10
+            secured:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a11
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
+            type:
+              type: string
+              enum:
+                - VERIFICATION_STATUS
+            defaultValue:
+              type: string
+              enum: &a18
+                - verified
+                - authenticated
+                - failed
+                - pending
+            configuration:
+              type: object
+              properties:
+                status:
+                  description: Text to display on the status pill.
+                  allOf:
+                    - $ref: "#/components/schemas/TranslationConfig"
+                description:
+                  description: Explaining text on the banner in form.
+                  allOf:
+                    - $ref: "#/components/schemas/TranslationConfig"
+              required:
+                - status
+                - description
+          required:
+            - id
+            - label
+            - type
+            - configuration
       description: Form field configuration
     FieldConditional:
       oneOf:
@@ -13247,6 +13481,8 @@ components:
                   data: {}
                 required:
                   - loading
+              - type: string
+                enum: *a18
               - type: object
                 nullable: true
                 additionalProperties:
