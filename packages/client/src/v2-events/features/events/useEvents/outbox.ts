@@ -38,7 +38,7 @@ export function useOutbox() {
   const pendingMutations = useMutationState({
     filters: {
       predicate: (mutation) =>
-        mutation.state.status !== 'success' &&
+        mutation.state.status === 'pending' &&
         !assignmentMutation(mutation.options.mutationKey as MutationKey)
     },
     select: (mutation) => mutation
