@@ -133,11 +133,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         ...initialValues
       })
 
-    useEffect(() => {
-      formikOnChange(formikCompatibleInitialValues)
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
-
     return (
       <Formik<EventState>
         enableReinitialize={true}
