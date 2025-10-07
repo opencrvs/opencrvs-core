@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useEffect, useState } from 'react'
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import { Content } from '@opencrvs/components/lib/Content'
 import { messages } from '@client/i18n/messages/views/config'
 import { Frame } from '@opencrvs/components/lib/Frame'
@@ -38,7 +38,45 @@ const Form = styled.form`
   }
 `
 
-const AllUserEmail = () => {
+/**
+ *
+ * Wrapper component that adds Frame around the page if withFrame is true.
+ * Created only for minimising impact of possible regression during v2 regression test period.
+ */
+function WithFrame({
+  children,
+  isHidden,
+  intl
+}: {
+  children: React.ReactNode
+  isHidden: boolean
+  intl: IntlShape
+}) {
+  if (isHidden) {
+    return <>{children}</>
+  }
+
+  return (
+    <Frame
+      header={
+        <AppBar
+          desktopLeft={<HistoryNavigator />}
+          desktopRight={<ProfileMenu key="profileMenu" />}
+          mobileLeft={<HistoryNavigator hideForward />}
+          mobileTitle={intl.formatMessage(messages.emailAllUsersTitle)}
+        />
+      }
+      navigation={<Navigation />}
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
+    >
+      {children}
+    </Frame>
+  )
+}
+
+const AllUserEmail = ({ hideNavigation }: { hideNavigation?: boolean }) => {
   const intl = useIntl()
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
@@ -80,20 +118,7 @@ const AllUserEmail = () => {
 
   return (
     <>
-      <Frame
-        header={
-          <AppBar
-            desktopLeft={<HistoryNavigator />}
-            desktopRight={<ProfileMenu key="profileMenu" />}
-            mobileLeft={<HistoryNavigator hideForward />}
-            mobileTitle={intl.formatMessage(messages.emailAllUsersTitle)}
-          />
-        }
-        navigation={<Navigation />}
-        skipToContentText={intl.formatMessage(
-          constantsMessages.skipToMainContent
-        )}
-      >
+      <WithFrame isHidden={!!hideNavigation} intl={intl}>
         <Content
           title={intl.formatMessage(messages.emailAllUsersTitle)}
           titleColor="copy"
@@ -137,7 +162,7 @@ const AllUserEmail = () => {
             </Button>
           </Form>
         </Content>
-      </Frame>
+      </WithFrame>
       <ResponsiveModal
         title={intl.formatMessage(messages.emailAllUsersModalTitle)}
         show={isConfirmationModalOpen}

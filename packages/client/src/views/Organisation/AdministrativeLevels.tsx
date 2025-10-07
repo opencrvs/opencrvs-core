@@ -14,7 +14,7 @@ import { Header } from '@client/components/Header/Header'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { constantsMessages } from '@client/i18n/messages'
 import { Navigation } from '@client/components/interface/Navigation'
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
   Content,
@@ -59,7 +59,44 @@ const NoRecord = styled.div<{ isFullPage?: boolean }>`
   margin-top: 20px;
 `
 
-export function AdministrativeLevels() {
+/**
+ *
+ * Wrapper component that adds Frame around the page if withFrame is true.
+ * Created only for minimising impact of possible regression during v2 regression test period.
+ */
+function WithFrame({
+  children,
+  isHidden,
+  intl
+}: {
+  children: React.ReactNode
+  isHidden: boolean
+  intl: IntlShape
+}) {
+  if (isHidden) {
+    return <>{children}</>
+  }
+
+  return (
+    <Frame
+      header={
+        <Header title={intl.formatMessage(navigationMessages.organisation)} />
+      }
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
+      navigation={<Navigation />}
+    >
+      {children}
+    </Frame>
+  )
+}
+
+export function AdministrativeLevels({
+  hideNavigation
+}: {
+  hideNavigation?: boolean
+}) {
   const intl = useIntl()
   const { locationId } = useParams<IRouteProps>()
   const { canAccessOffice } = usePermissions()
@@ -144,15 +181,7 @@ export function AdministrativeLevels() {
   }
 
   return (
-    <Frame
-      header={
-        <Header title={intl.formatMessage(navigationMessages.organisation)} />
-      }
-      skipToContentText={intl.formatMessage(
-        constantsMessages.skipToMainContent
-      )}
-      navigation={<Navigation />}
-    >
+    <WithFrame isHidden={!!hideNavigation} intl={intl}>
       <Content
         title={intl.formatMessage(navigationMessages.organisation)}
         showTitleOnMobile={false}
@@ -241,6 +270,6 @@ export function AdministrativeLevels() {
           />
         )}
       </Content>
-    </Frame>
+    </WithFrame>
   )
 }
