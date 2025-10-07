@@ -120,6 +120,21 @@ const fullAndPayload: QueryType = {
   ]
 }
 
+const addressPayload: QueryType = {
+  type: 'and',
+  clauses: [
+    {
+      eventType: 'tennis-club-membership',
+      data: {
+        'applicant.address': {
+          type: 'exact',
+          term: '{"country":"FAR","addressType":"DOMESTIC","administrativeArea":"7a150651-15f3-49ac-8746-e907340736b0","streetLevelDetails":{"town":"Joynogor government officer\'s apartment complex"}}'
+        }
+      }
+    }
+  ]
+}
+
 describe('test buildElasticQueryFromSearchPayload', () => {
   test('builds query with exact status', async () => {
     const result = await buildElasticQueryFromSearchPayload(
@@ -484,5 +499,37 @@ describe('withJurisdictionFilters', () => {
         must: [baseQuery]
       }
     })
+  })
+})
+
+test('builds Address field query', async () => {
+  const result = await buildElasticQueryFromSearchPayload(addressPayload, [
+    tennisClubMembershipEvent
+  ])
+  expect(result).toEqual({
+    bool: {
+      must: [
+        { term: { type: 'tennis-club-membership' } },
+        {
+          bool: {
+            must: [
+              { term: { 'declaration.applicant____address.country': 'FAR' } },
+              {
+                term: {
+                  'declaration.applicant____address.administrativeArea':
+                    '7a150651-15f3-49ac-8746-e907340736b0'
+                }
+              },
+              {
+                match: {
+                  'declaration.applicant____address.streetLevelDetails.town':
+                    "Joynogor government officer's apartment complex"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
   })
 })

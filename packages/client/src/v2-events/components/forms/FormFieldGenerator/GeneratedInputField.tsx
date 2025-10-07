@@ -54,10 +54,12 @@ import {
   SelectDateRangeValue,
   isTimeFieldType,
   isButtonFieldType,
+  isPrintButtonFieldType,
   isHttpFieldType,
   isLinkButtonFieldType,
-  ValidatorContext,
-  isQueryParamReaderFieldType
+  isVerificationStatusType,
+  isQueryParamReaderFieldType,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -78,10 +80,11 @@ import {
   SelectDateRangeField,
   TimeField,
   Button,
+  AlphaPrintButton,
   Http,
-  LinkButton
+  LinkButton,
+  VerificationStatus
 } from '@client/v2-events/features/events/registered-fields'
-
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
@@ -622,6 +625,19 @@ export const GeneratedInputField = React.memo(
       )
     }
 
+    if (isPrintButtonFieldType(field)) {
+      return (
+        <AlphaPrintButton.Input
+          buttonLabel={field.config.configuration.buttonLabel}
+          disabled={disabled}
+          id={fieldDefinition.id}
+          template={field.config.configuration.template}
+          value={field.value}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
     if (isButtonFieldType(field)) {
       return (
         // Button can be always 'touched' to show errors.
@@ -660,6 +676,17 @@ export const GeneratedInputField = React.memo(
           configuration={field.config.configuration}
           disabled={inputProps.disabled}
           id={field.config.id}
+        />
+      )
+    }
+
+    if (isVerificationStatusType(field)) {
+      return (
+        <VerificationStatus.Input
+          configuration={field.config.configuration}
+          id={field.config.id}
+          value={field.value}
+          onReset={() => onFieldValueChange(fieldDefinition.id, undefined)}
         />
       )
     }

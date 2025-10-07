@@ -83,7 +83,8 @@ export const TestUserRole = z.enum([
   'LOCAL_REGISTRAR',
   'LOCAL_SYSTEM_ADMIN',
   'NATIONAL_REGISTRAR',
-  'REGISTRATION_AGENT'
+  'REGISTRATION_AGENT',
+  'SOCIAL_WORKER'
 ])
 
 export type TestUserRole = z.infer<typeof TestUserRole>
@@ -184,6 +185,8 @@ export function mapFieldTypeToMockValue(
     case FieldType.OFFICE:
     case FieldType.LINK_BUTTON:
       return `${field.id}-${field.type}-${i}`
+    case FieldType.VERIFICATION_STATUS:
+      return 'verified'
     case FieldType.NAME:
       return generateRandomName(rng)
     case FieldType.NUMBER:
@@ -211,6 +214,8 @@ export function mapFieldTypeToMockValue(
       return '2021-01-01'
     case FieldType.TIME:
       return '09:33'
+    case FieldType.ALPHA_PRINT_BUTTON:
+      return undefined
     case FieldType.DATE_RANGE:
       return {
         start: '2021-01-01',

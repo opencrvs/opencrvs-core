@@ -29,6 +29,7 @@ const FETCH_USER = gql`
       email
       fullHonorificName
       role {
+        id
         label {
           id
           defaultMessage

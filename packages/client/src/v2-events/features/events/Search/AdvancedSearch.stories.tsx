@@ -12,6 +12,7 @@ import { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { screen, userEvent } from '@storybook/test'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes'
@@ -59,5 +60,9 @@ export const AdvancedSearchStory: Story = {
         ]
       }
     }
+  },
+  play: async () => {
+    const recommenderSection = await screen.findByText("Recommender's details")
+    await userEvent.click(recommenderSection)
   }
 }
