@@ -47,6 +47,9 @@ export const UserProfile: StoryObj<typeof UserList> = {
       initialPath: `/v2/userProfile/${generator.user.registrationAgent().v2.id}`,
       router: routesConfig
     }
+  },
+  play: async () => {
+    await new Promise((resolve) => setTimeout(resolve, 500))
   }
 }
 

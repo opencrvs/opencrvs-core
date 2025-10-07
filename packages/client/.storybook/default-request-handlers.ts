@@ -2231,7 +2231,23 @@ export const handlers = {
   ],
   modules: [
     http.get('http://localhost:3040/conditionals.js', () => {
-      return HttpResponse.text('', { status: 404 })
+      const fileContent = `
+      const conditionals = {
+        isDefaultCountry: {
+          action: "hide",
+          expression: "isDefaultCountry(values.country)"
+        }
+      };
+      export {
+        conditionals
+      };
+    `
+      return new HttpResponse(fileContent, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/javascript'
+        }
+      })
     }),
     http.get('http://localhost:3040/handlebars.js', () => {
       return HttpResponse.text('', { status: 404 })
