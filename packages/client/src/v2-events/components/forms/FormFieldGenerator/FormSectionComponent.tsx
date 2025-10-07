@@ -357,7 +357,7 @@ export function FormSectionComponent({
 
     // Formik does not allow controlling the form state 'easily'.
     // We propagate changes to the non-formik state from formik
-    if (userChangedForm || sectionChanged) {
+    if (userChangedForm) {
       onChange(values)
     }
 
