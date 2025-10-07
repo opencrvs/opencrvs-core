@@ -141,7 +141,7 @@ export function Pages({
     <FormFieldGenerator
       eventConfig={eventConfig}
       fields={page.fields}
-      id="locationForm"
+      id={page.id}
       // In some Action page forms, the form data itself is not the complete declaration.
       // We still merge the optional `declaration` prop into the initial form values so that
       // read-only declaration data is available for Data components or calculations.
