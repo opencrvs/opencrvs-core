@@ -179,7 +179,16 @@ function SubPageHeader(props: HeaderProps) {
   )
 }
 
-export function SysAdminContentWrapper(props: SysAdminPage) {
+export function SysAdminContentWrapper(
+  props: SysAdminPage /**
+   * If true, the navigation will be hidden. Short-circuit added for V2 compatibility during regression for minimal intervention..*/ & {
+    isHidden?: boolean
+  }
+) {
+  if (props.isHidden) {
+    return props.children
+  }
+
   let pageHeader: JSX.Element
   let pageContent: JSX.Element
   if (isSubPage(props)) {

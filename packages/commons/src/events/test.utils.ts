@@ -84,6 +84,7 @@ export const TestUserRole = z.enum([
   'LOCAL_SYSTEM_ADMIN',
   'NATIONAL_REGISTRAR',
   'REGISTRATION_AGENT',
+  'NATIONAL_SYSTEM_ADMIN',
   'SOCIAL_WORKER'
 ])
 

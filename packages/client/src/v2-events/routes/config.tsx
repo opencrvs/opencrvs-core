@@ -13,7 +13,8 @@ import React, { useEffect } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
 import { useSelector } from 'react-redux'
-import { ActionType, LocationType } from '@opencrvs/commons/client'
+import { ActionType, LocationType, SCOPES } from '@opencrvs/commons/client'
+import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import { router as correctionReviewRouter } from '@client/v2-events/features/events/actions/correct/review/router'
@@ -29,7 +30,7 @@ import {
 import { EventSelectionIndex } from '@client/v2-events/features/events/index'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
-import { EventOverviewLayout } from '@client/v2-events/layouts'
+import { EventOverviewLayout, WorkqueueLayout } from '@client/v2-events/layouts'
 import { TRPCErrorBoundary } from '@client/v2-events/routes/TRPCErrorBoundary'
 import {
   queryClient,
@@ -47,6 +48,12 @@ import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { SearchLayout } from '../layouts/search'
 import { useWorkqueues } from '../hooks/useWorkqueue'
 import { ReviewDuplicateIndex } from '../features/events/actions/dedup/ReviewDuplicate'
+import { ProtectedRoute } from '../../components/ProtectedRoute'
+import { UserList } from '../../views/SysAdmin/Team/user/UserList'
+import { UserAudit } from '../../views/UserAudit/UserAudit'
+import { AdministrativeLevels } from '../../views/Organisation/AdministrativeLevels'
+import { SystemList } from '../../views/SysAdmin/Config/Systems/Systems'
+import AllUserEmail from '../../views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
@@ -260,6 +267,70 @@ export const routesConfig = {
     {
       path: ROUTES.V2.SETTINGS.path,
       element: <SettingsPage />
+    },
+    /** LEGACY ROUTES
+     * During regression testing QA discovered that we were still using old workqueues on some components.
+     *  New 'WorkqueueLayout' requires TRPCProvider so we need to wrap these legacy routes inside V2 for minimal risk.
+     */
+    {
+      path: ROUTES.V2.path + V1_LEGACY_ROUTES.TEAM_USER_LIST,
+      element: (
+        <ProtectedRoute
+          scopes={[
+            SCOPES.ORGANISATION_READ_LOCATIONS,
+            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+            SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
+          ]}
+        >
+          <WorkqueueLayout>
+            <UserList hideNavigation={true} />
+          </WorkqueueLayout>
+        </ProtectedRoute>
+      )
+    },
+    {
+      path: ROUTES.V2.path + V1_LEGACY_ROUTES.USER_PROFILE,
+      element: (
+        <WorkqueueLayout>
+          <UserAudit hideNavigation={true} />
+        </WorkqueueLayout>
+      )
+    },
+    {
+      path: ROUTES.V2.path + V1_LEGACY_ROUTES.ORGANISATIONS_INDEX,
+      element: (
+        <ProtectedRoute
+          scopes={[
+            SCOPES.ORGANISATION_READ_LOCATIONS,
+            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+            SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
+          ]}
+        >
+          <WorkqueueLayout>
+            <AdministrativeLevels hideNavigation={true} />
+          </WorkqueueLayout>
+        </ProtectedRoute>
+      )
+    },
+    {
+      path: ROUTES.V2.path + V1_LEGACY_ROUTES.SYSTEM_LIST,
+      element: (
+        <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
+          <WorkqueueLayout>
+            <SystemList hideNavigation={true} />
+          </WorkqueueLayout>
+        </ProtectedRoute>
+      )
+    },
+    {
+      path: ROUTES.V2.path + V1_LEGACY_ROUTES.ALL_USER_EMAIL,
+      element: (
+        <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
+          <WorkqueueLayout>
+            <AllUserEmail hideNavigation={true} />
+          </WorkqueueLayout>
+        </ProtectedRoute>
+      )
     }
   ]
 } satisfies RouteObject

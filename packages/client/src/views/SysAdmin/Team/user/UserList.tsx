@@ -24,7 +24,10 @@ import styled, { withTheme } from 'styled-components'
 import { SEARCH_USERS } from '@client/user/queries'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap, getLocalisedName } from '@client/utils/data-formatting'
-import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
+import {
+  SysAdminContentWrapper,
+  SysAdminPageVariant
+} from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { getAddressName, UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -171,7 +174,9 @@ type BaseProps = {
   offlineCountryConfig: IOfflineData
 }
 
-type IProps = BaseProps & IntlShapeProps & IOnlineStatusProps
+type IProps = BaseProps &
+  IntlShapeProps &
+  IOnlineStatusProps & { hideNavigation?: boolean }
 
 interface IStatusProps {
   status: string
@@ -801,6 +806,7 @@ function UserListComponent(props: IProps) {
       }
       isCertificatesConfigPage={true}
       hideBackground={true}
+      isHidden={props.hideNavigation}
     >
       {isOnline ? (
         <Query<SearchUsersQuery>
