@@ -42,7 +42,7 @@ interface PrintButtonProps {
   onChange?: (value: string) => void
 }
 
-const addedButtonLabel = { id: 'print.certificate', defaultMessage: 'Print' }
+const addedButtonLabel = { id: 'buttons.print', defaultMessage: 'Print' }
 
 /**
  * Indicates that declaration action changed declaration content. Satisfies V1 spec.
