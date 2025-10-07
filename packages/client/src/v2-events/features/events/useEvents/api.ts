@@ -161,7 +161,7 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
       (oldData) => {
         // In theory, this handles a cache miss. In practice, it should never run here since
         // we only update events after the corresponding search query has already been fetched and cached for workqueues.
-        // Included here to satisy typescript.
+        // Included here to satisfy typescript.
         if (!oldData) {
           return {
             results: [updatedEventIndex],
