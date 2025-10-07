@@ -152,7 +152,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               )
             ).map(([fieldId, errors]) => [
               fieldId,
-              errors?.[0].message && intl.formatMessage(errors[0].message)
+              errors?.[0]?.message && intl.formatMessage(errors[0].message)
             ])
           )
         }

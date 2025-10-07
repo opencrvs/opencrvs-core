@@ -44,10 +44,14 @@ export const DateValue = z
   .date()
   .describe('Date in the format YYYY-MM-DD')
 
-export const AgeValue = z.object({
-  age: z.number().optional(),
-  asOfDate: DateValue.optional()
-})
+export const AgeValue = z
+  .object({
+    age: z.number(),
+    asOfDate: DateValue.optional()
+  })
+  .optional()
+
+export const AgeUpdateValue = AgeValue.nullable()
 
 export type AgeValue = z.infer<typeof AgeValue>
 
@@ -132,6 +136,7 @@ export const FieldUpdateValue = z.union([
   TextValue,
   DateValue,
   TimeValue,
+  AgeUpdateValue,
   AddressFieldUpdateValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
@@ -142,8 +147,7 @@ export const FieldUpdateValue = z.union([
   DataFieldValue,
   NameFieldUpdateValue,
   HttpFieldUpdateValue,
-  QueryParamReaderFieldUpdateValue,
-  AgeValue
+  QueryParamReaderFieldUpdateValue
 ])
 
 export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
