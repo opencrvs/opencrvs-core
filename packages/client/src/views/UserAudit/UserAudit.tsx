@@ -35,7 +35,11 @@ import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { userMutations } from '@client/user/mutations'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
-import { GetUserQuery, GetUserQueryVariables } from '@client/utils/gateway'
+import {
+  GetUserQuery,
+  GetUserQueryVariables,
+  Location
+} from '@client/utils/gateway'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { AppBar, Link } from '@opencrvs/components/lib'
@@ -49,6 +53,8 @@ import styled from 'styled-components'
 import * as routes from '@client/navigation/routes'
 import { UserSection } from '@client/forms'
 import { stringify } from 'query-string'
+import { ProfileState } from '../../profile/profileReducer'
+import { RawScopes } from '@opencrvs/commons/client'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -92,7 +98,90 @@ const transformUserQueryResult = (
   }
 }
 
-export const UserAudit = () => {
+/**
+ *
+ * Wrapper component that adds Frame around the page if withFrame is true.
+ * Created only for minimising impact of possible regression during v2 regression test period.
+ */
+function WithFrame({
+  children,
+  isHidden,
+  userDetails,
+  user,
+  scope,
+  getMenuItems,
+  canEditUser,
+  intl
+}: {
+  children: React.ReactNode
+  isHidden: boolean
+  userDetails: ProfileState['userDetails']
+  user: ReturnType<typeof transformUserQueryResult> | null | undefined
+  scope: RawScopes[] | null
+  getMenuItems: (
+    userId: string,
+    status: string
+  ) => {
+    label: string
+    handler: () => void
+  }[]
+  canEditUser: (user: {
+    primaryOffice: Location
+    role: {
+      id: string
+    }
+  }) => boolean
+  intl: IntlShape
+}) {
+  if (isHidden) {
+    return <>{children}</>
+  }
+
+  return (
+    <Frame
+      header={
+        <AppBar
+          mobileTitle={user?.name}
+          desktopLeft={<HistoryNavigator />}
+          desktopRight={<ProfileMenu key="profileMenu" />}
+          mobileLeft={<HistoryNavigator hideForward />}
+          mobileRight={
+            userDetails &&
+            scope &&
+            user && (
+              <>
+                <Status status={user.status || 'pending'} />
+                <ToggleMenu
+                  id={`sub-page-header-munu-button`}
+                  toggleButton={
+                    <Icon
+                      name="DotsThreeVertical"
+                      color="primary"
+                      size="large"
+                    />
+                  }
+                  menuItems={getMenuItems(
+                    user.id as string,
+                    user.status as string
+                  )}
+                  hide={!canEditUser(user)}
+                />
+              </>
+            )
+          }
+        />
+      }
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
+      navigation={<Navigation />}
+    >
+      {children}
+    </Frame>
+  )
+}
+
+export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
   const intl = useIntl()
   const navigate = useNavigate()
   const { userId } = useParams()
@@ -244,43 +333,14 @@ export const UserAudit = () => {
   }
 
   return (
-    <Frame
-      header={
-        <AppBar
-          mobileTitle={user?.name}
-          desktopLeft={<HistoryNavigator />}
-          desktopRight={<ProfileMenu key="profileMenu" />}
-          mobileLeft={<HistoryNavigator hideForward />}
-          mobileRight={
-            userDetails &&
-            scope &&
-            user && (
-              <>
-                <Status status={user.status || 'pending'} />
-                <ToggleMenu
-                  id={`sub-page-header-munu-button`}
-                  toggleButton={
-                    <Icon
-                      name="DotsThreeVertical"
-                      color="primary"
-                      size="large"
-                    />
-                  }
-                  menuItems={getMenuItems(
-                    user.id as string,
-                    user.status as string
-                  )}
-                  hide={!canEditUser(user)}
-                />
-              </>
-            )
-          }
-        />
-      }
-      skipToContentText={intl.formatMessage(
-        constantsMessages.skipToMainContent
-      )}
-      navigation={<Navigation />}
+    <WithFrame
+      isHidden={!!hideNavigation}
+      userDetails={userDetails}
+      user={user}
+      scope={scope}
+      getMenuItems={getMenuItems}
+      canEditUser={canEditUser}
+      intl={intl}
     >
       {loading ? (
         <Loader id="user_loader" marginPercent={35} />
@@ -514,6 +574,6 @@ export const UserAudit = () => {
           )}
         </Content>
       )}
-    </Frame>
+    </WithFrame>
   )
 }
