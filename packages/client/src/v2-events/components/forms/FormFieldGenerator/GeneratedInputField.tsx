@@ -91,9 +91,9 @@ import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileIn
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
+import { QueryParamReader } from '@client/v2-events/features/events/registered-fields/QueryParamReader'
 import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
-import { QueryParamReader } from '../inputs/QueryParamReader'
 import {
   makeFormikFieldIdsOpenCRVSCompatible,
   parseFieldReferencesInConfiguration
