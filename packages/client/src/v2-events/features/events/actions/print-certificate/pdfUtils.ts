@@ -339,7 +339,7 @@ export function compileSvg({
         return getMixedPath(resolvedMetadata, propertyPath)
       }
 
-      if (isEqual(resolvedDeclaration, obj)) {
+      if (isEqual($declaration, obj)) {
         return getMixedPath(resolvedDeclaration, propertyPath)
       }
 
@@ -564,8 +564,7 @@ export function compileSvg({
   const template = Handlebars.compile(templateString)
 
   const data = {
-    $declaration: resolvedDeclaration,
-    $originalDeclaration: $declaration,
+    $declaration,
     $metadata,
     $review: review,
     $references: {

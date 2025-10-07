@@ -615,6 +615,19 @@ export const AddressFieldInteractionDomesticToInternational: StoryObj<
   }
 }
 
+interface ResolvedAddress {
+  country?: string
+  addressType?: string
+  province?: string
+  district?: string
+  streetLevelDetails?: {
+    state?: string
+    district2?: string
+    town?: string
+    cityOrTown?: string
+  }
+}
+
 export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
   name: 'Certificate Variables',
   parameters: {
@@ -629,8 +642,7 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
       }
     })
     const [resolvedAddress, setResolvedAddress] =
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      React.useState<Record<string, any>>()
+      React.useState<ResolvedAddress>()
     const { getLocations } = useLocations()
     const [locations] = getLocations.useSuspenseQuery()
     const { config: appConfig } = useSelector(getOfflineData)
@@ -667,7 +679,10 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
                 locations,
                 adminLevels
               })
-              setResolvedAddress((prev) => ({ ...prev, ...resolved }))
+              setResolvedAddress((prev) => ({
+                ...prev,
+                ...(resolved satisfies ResolvedAddress)
+              }))
             }
           }}
         />
@@ -689,23 +704,23 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
                 {'District:'} {resolvedAddress.district}
               </div>
             )}
-            {resolvedAddress.streetLevelDetails.state && (
+            {resolvedAddress.streetLevelDetails?.state && (
               <div data-testid="state">
                 {'State:'} {resolvedAddress.streetLevelDetails.state}
               </div>
             )}
-            {resolvedAddress.streetLevelDetails.district2 && (
+            {resolvedAddress.streetLevelDetails?.district2 && (
               <div data-testid="district2">
                 {'District:'} {resolvedAddress.streetLevelDetails.district2}
               </div>
             )}
 
-            {resolvedAddress.streetLevelDetails.town && (
+            {resolvedAddress.streetLevelDetails?.town && (
               <div data-testid="town">
                 {resolvedAddress.streetLevelDetails.town}
               </div>
             )}
-            {resolvedAddress.streetLevelDetails.cityOrTown && (
+            {resolvedAddress.streetLevelDetails?.cityOrTown && (
               <div data-testid="cityOrTown">
                 {resolvedAddress.streetLevelDetails.cityOrTown}
               </div>
