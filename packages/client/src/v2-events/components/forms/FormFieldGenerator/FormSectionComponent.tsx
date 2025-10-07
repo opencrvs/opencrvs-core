@@ -386,11 +386,6 @@ export function FormSectionComponent({
     showValidationErrors
   ])
 
-  useEffect(() => {
-    onChange(values)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
   const completeForm = { ...initialValues, ...form }
 
