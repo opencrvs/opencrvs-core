@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { matchMutation } from '@tanstack/react-query'
 import {
   DecorateQueryProcedure,
@@ -104,7 +103,7 @@ export function findLocalEventIndex(id: string): EventIndex | undefined {
     .flatMap(([, data]) => data?.results || [])[0]
 }
 
-export function setEventSearchQuery(updatedEventIndex: EventIndex | undefined) {
+function setEventSearchQuery(updatedEventIndex: EventIndex | undefined) {
   if (!updatedEventIndex) {
     return
   }

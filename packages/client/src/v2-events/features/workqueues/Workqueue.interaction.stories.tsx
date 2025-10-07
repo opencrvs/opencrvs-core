@@ -447,7 +447,6 @@ export const PaginationAfterDownload: Story = {
       }
     }
   },
-
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -458,7 +457,6 @@ export const PaginationAfterDownload: Story = {
     const assignModalButton = await canvas.findByTestId('assign')
     await userEvent.click(assignModalButton)
 
-    // click it
     await step('Clicked assign record button', async () => {
       const page0 = canvasElement.querySelector('[data-testid="page-number-0"]')
       const page1 = canvasElement.querySelector('[data-testid="page-number-1"]')
