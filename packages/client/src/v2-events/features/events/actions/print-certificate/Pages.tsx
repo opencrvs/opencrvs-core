@@ -105,11 +105,8 @@ export function Pages() {
         })}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        showReviewButton={searchParams.from === 'review'}
-        validatorContext={{
-          ...validatorContext,
-          baseFormState: eventIndex.declaration
-        }}
+        validateBeforeNextPage={true}
+        validatorContext={validatorContext}
         onPageChange={(nextPageId: string) => {
           return navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath(

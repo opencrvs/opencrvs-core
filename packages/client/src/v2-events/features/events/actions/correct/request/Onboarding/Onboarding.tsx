@@ -104,11 +104,8 @@ export function Onboarding() {
         formPages={formPages}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        showReviewButton={false}
-        validatorContext={{
-          ...validatorContext,
-          baseFormState: eventIndex.declaration
-        }}
+        validateBeforeNextPage={true}
+        validatorContext={validatorContext}
         onPageChange={(nextPageId: string) => {
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(

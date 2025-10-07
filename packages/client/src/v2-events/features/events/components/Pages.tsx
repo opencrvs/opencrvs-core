@@ -32,7 +32,6 @@ interface PagesProps {
   formData: EventState
   setFormData: (form: EventState) => void
   pageId: string
-  showReviewButton?: boolean
   formPages: PageConfig[]
   onPageChange: (nextPageId: string) => void
   onSubmit: () => void
@@ -48,7 +47,6 @@ interface PagesProps {
  */
 export function Pages({
   formData,
-  showReviewButton,
   formPages,
   onPageChange,
   onSubmit,
@@ -117,7 +115,6 @@ export function Pages({
   const wizardProps = {
     currentPage: pageIdx,
     pageTitle: intl.formatMessage(page.title),
-    showReviewButton,
     onNextPage,
     onPreviousPage,
     onSubmit
