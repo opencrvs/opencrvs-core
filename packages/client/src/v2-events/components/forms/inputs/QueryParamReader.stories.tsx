@@ -21,6 +21,7 @@ import {
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '../FormFieldGenerator'
+import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 interface Args {
   fields: FieldConfig[]
@@ -234,6 +235,7 @@ function Form(args: Args) {
     <FormFieldGenerator
       fields={args.fields}
       id="test-event-form"
+      validatorContext={getTestValidatorContext()}
       onChange={args.onChange}
     />
   )
@@ -268,9 +270,6 @@ export const Default: StoryObj<Args> = {
 export const WithForwardedParams: StoryObj<Args> = {
   name: 'With Forwarded Params',
   parameters: {
-    chromatic: {
-      disableSnapshot: true
-    },
     layout: 'centered',
     reactRouter: {
       router: {
@@ -296,9 +295,6 @@ export const WithForwardedParams: StoryObj<Args> = {
 export const WithForwardedParamsThroughFormProjection: StoryObj<Args> = {
   name: 'With Forwarded Params Through Form Projection',
   parameters: {
-    chromatic: {
-      disableSnapshot: true
-    },
     layout: 'centered',
     reactRouter: {
       router: {

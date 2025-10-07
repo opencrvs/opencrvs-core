@@ -9,31 +9,47 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { TestUserRole, TokenUserType } from '@opencrvs/commons/client'
 import { testDataGenerator } from './test-data-generators'
 import { generateToken } from './util'
 
 it('Generates tokens', () => {
   const generator = testDataGenerator()
   const token = {
-    fieldAgent: generateToken(
-      generator.user.scopes.fieldAgent,
-      generator.user.id.fieldAgent
-    ),
-    registrationAgent: generateToken(
-      generator.user.scopes.registrationAgent,
-      generator.user.id.registrationAgent
-    ),
-    localRegistrar: generateToken(
-      generator.user.scopes.localRegistrar,
-      generator.user.id.localRegistrar
-    ),
-    localSystemAdmin: generateToken(
-      generator.user.scopes.localSystemAdmin,
-      generator.user.id.localSystemAdmin
-    )
+    fieldAgent: generateToken({
+      scope: generator.user.scopes.fieldAgent,
+      subject: generator.user.id.fieldAgent,
+      userType: TokenUserType.enum.user,
+      role: TestUserRole.Enum.FIELD_AGENT
+    }),
+    registrationAgent: generateToken({
+      scope: generator.user.scopes.registrationAgent,
+      subject: generator.user.id.registrationAgent,
+      userType: TokenUserType.enum.user,
+      role: TestUserRole.Enum.REGISTRATION_AGENT
+    }),
+    localRegistrar: generateToken({
+      scope: generator.user.scopes.localRegistrar,
+      subject: generator.user.id.localRegistrar,
+      userType: TokenUserType.enum.user,
+      role: TestUserRole.Enum.LOCAL_REGISTRAR
+    }),
+    localSystemAdmin: generateToken({
+      scope: generator.user.scopes.localSystemAdmin,
+      subject: generator.user.id.localSystemAdmin,
+      userType: TokenUserType.enum.user,
+      role: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN
+    }),
+    nationalSystemAdmin: generateToken({
+      scope: generator.user.scopes.nationalSystemAdmin,
+      subject: generator.user.id.nationalSystemAdmin,
+      userType: TokenUserType.enum.user,
+      role: TestUserRole.Enum.NATIONAL_SYSTEM_ADMIN
+    })
   }
   expect(token.fieldAgent).toMatchSnapshot('fieldAgent token')
   expect(token.registrationAgent).toMatchSnapshot('registrationAgent token')
   expect(token.localRegistrar).toMatchSnapshot('localRegistrar token')
   expect(token.localSystemAdmin).toMatchSnapshot('localSystemAdmin token')
+  expect(token.nationalSystemAdmin).toMatchSnapshot('nationalSystemAdmin token')
 })

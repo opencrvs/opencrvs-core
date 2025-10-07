@@ -22,7 +22,6 @@ import {
   uniqBy,
   cloneDeep,
   orderBy,
-  groupBy,
   isEqual
 } from 'lodash'
 import {
@@ -41,7 +40,11 @@ import {
   EventState
 } from './ActionDocument'
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
-import { isConditionMet, isFieldVisible } from '../conditionals/validate'
+import {
+  isConditionMet,
+  isFieldVisible,
+  ValidatorContext
+} from '../conditionals/validate'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID, UUID } from '../uuid'
@@ -176,11 +179,13 @@ export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
  * @template T - The type of the form values
  * @param {T} formValues - The current form values
  * @param {FieldConfig[]} fields - The list of field configurations to check visibility against
+ * * @param validatorContext - custom validation context
  * @returns {Partial<T>} A new object containing only the values for visible fields
  */
 export function omitHiddenFields<T extends EventState | ActionUpdate>(
   fields: FieldConfig[],
-  formValues: T
+  formValues: T,
+  validatorContext: ValidatorContext
 ): Partial<T> {
   const base = cloneDeep(formValues)
 
@@ -191,7 +196,9 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
       const fieldConfig = fields.filter((f) => f.id === fieldId)
 
       return fieldConfig.length
-        ? fieldConfig.every((f) => !isFieldVisible(f, prevVisibilityContext))
+        ? fieldConfig.every(
+            (f) => !isFieldVisible(f, prevVisibilityContext, validatorContext)
+          )
         : false
     })
 
@@ -203,7 +210,8 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
 
 export function omitHiddenPaginatedFields(
   formConfig: FormConfig,
-  values: EventState
+  values: EventState,
+  validatorContext: ValidatorContext
 ) {
   // If a page has a conditional, we set it as one of the field's conditionals with ConditionalType.SHOW
   const fields = formConfig.pages.flatMap((p) =>
@@ -222,7 +230,7 @@ export function omitHiddenPaginatedFields(
     })
   )
 
-  return omitHiddenFields(fields, values)
+  return omitHiddenFields(fields, values, validatorContext)
 }
 
 /**
@@ -292,11 +300,16 @@ export function getVisibleVerificationPageIds(
 export function omitHiddenAnnotationFields(
   actionConfig: ActionConfig,
   declaration: EventState,
-  annotation: ActionUpdate
+  annotation: ActionUpdate,
+  context: ValidatorContext
 ) {
   const annotationFields = getActionAnnotationFields(actionConfig)
 
-  return omitHiddenFields(annotationFields, { ...declaration, ...annotation })
+  return omitHiddenFields(
+    annotationFields,
+    { ...declaration, ...annotation },
+    context
+  )
 }
 
 /**
@@ -465,26 +478,18 @@ function isAcceptedAction(a: Action): a is ActionDocument {
   return a.status === ActionStatus.Accepted
 }
 
-function getPendingActions(actions: Action[]): ActionDocument[] {
-  const actionGroups: Record<string, Action[]> = groupBy(
-    actions,
-    ({ transactionId, type }: Action) => `${transactionId}::${type}`
-  )
-
-  const pendingActions = Object.values(actionGroups)
-    .filter((actionsInGroup) => actionsInGroup.length === 1)
-    .map((actionsInGroup) => actionsInGroup[0])
-    .filter(isRequestedAction)
-
-  return pendingActions
-}
-
 export function getPendingAction(actions: Action[]): ActionDocument {
-  const pendingActions = getPendingActions(actions)
+  const requestedActions = actions.filter(isRequestedAction)
+  const pendingActions = requestedActions.filter(
+    ({ id }) =>
+      !actions.some(
+        (action) => isAcceptedAction(action) && action.originalActionId === id
+      )
+  )
 
   if (pendingActions.length !== 1) {
     throw new Error(
-      `Expected exactly one pending action, but found ${pendingActions.length}`
+      `Expected exactly one pending action, but found ${pendingActions.map(({ id }) => id).join(', ')}`
     )
   }
 
@@ -571,10 +576,7 @@ const EXCLUDED_ACTIONS = [
   ActionType.REJECT_CORRECTION
 ]
 
-export function aggregateActionDeclarations(
-  event: EventDocument,
-  config: EventConfig
-): EventState {
+export function aggregateActionDeclarations(event: EventDocument): EventState {
   const allAcceptedActions = getAcceptedActions(event)
   const aggregatedActions = allAcceptedActions
     .filter((a) => !EXCLUDED_ACTIONS.some((type) => type === a.type))

@@ -15,10 +15,10 @@ import { noop } from 'lodash'
 import {
   ActionType,
   getActionReview,
-  getCurrentEventState,
   applyDraftToEventIndex,
   getDeclaration,
-  getOrThrow
+  getOrThrow,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -28,15 +28,16 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
-import { useSuspenseAdminLeafLevelLocations } from '../../hooks/useLocations'
 import { removeCachedFiles } from '../files/cache'
 
 function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
   const event = events.getEvent.viewEvent(eventId)
+  const validatorContext = useValidatorContext()
 
   const maybeAuth = useAuthentication()
   const authentication = getOrThrow(
@@ -49,8 +50,6 @@ function ReadonlyView() {
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-
-  const locationIds = useSuspenseAdminLeafLevelLocations()
 
   const eventStateWithDraft = useMemo(() => {
     const eventState = getCurrentEventState(event, configuration)
@@ -87,9 +86,9 @@ function ReadonlyView() {
         readonlyMode
         form={eventStateWithDraft.declaration}
         formConfig={formConfig}
-        locationIds={locationIds}
         reviewFields={fields}
         title={formatMessage(title, eventStateWithDraft.declaration)}
+        validatorContext={validatorContext}
         onEdit={noop}
       >
         <></>

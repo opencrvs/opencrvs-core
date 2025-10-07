@@ -26,7 +26,10 @@ import {
   EventConfig,
   getOrThrow,
   getAcceptedActions,
-  SystemRole
+  SystemRole,
+  getUUID,
+  UUID,
+  PrintCertificateAction
 } from '@opencrvs/commons/client'
 import {
   Box,
@@ -47,17 +50,15 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import {
-  useLocations,
-  useSuspenseAdminLeafLevelLocations
-} from '@client/v2-events/hooks/useLocations'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useOnlineStatus } from '@client/utils'
-import { getScope } from '@client/profile/profileSelectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 const CertificateContainer = styled.div`
   svg {
@@ -160,6 +161,7 @@ export function Review() {
 
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
+  const validatorContext = useValidatorContext()
 
   if (!templateId) {
     throw new Error('Please select a template from the previous step')
@@ -189,17 +191,44 @@ export function Review() {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const formConfig = getPrintForm(eventConfiguration)
   const { isActionAllowed } = useUserAllowedActions(fullEvent.type)
+  const userDetails = useSelector(getUserDetails)
+
+  if (!userDetails) {
+    throw new Error('User details are not available')
+  }
+
+  const userFromUsersList = users.find((user) => user.id === userDetails.id)
+  if (!userFromUsersList) {
+    throw new Error(`User with id ${userDetails.id} not found in users list`)
+  }
+
+  const actionsWithAnOptimisticPrintAction = actions.concat({
+    type: ActionType.PRINT_CERTIFICATE,
+    id: getUUID(),
+    transactionId: getUUID(),
+    createdByUserType: 'user',
+    createdAt: new Date().toISOString(),
+    createdBy: userFromUsersList.id,
+    createdByRole: userFromUsersList.role,
+    status: 'Accepted',
+    declaration: {},
+    annotation: null,
+    originalActionId: null,
+    createdBySignature: userFromUsersList.signature,
+    createdAtLocation: userDetails.primaryOffice.id as UUID,
+    content: {
+      templateId: certificateConfig?.id
+    }
+  } satisfies PrintCertificateAction)
 
   const { svgCode, preparePdfCertificate } = usePrintableCertificate({
-    event: fullEvent,
+    event: { ...fullEvent, actions: actionsWithAnOptimisticPrintAction },
     config: eventConfiguration,
     locations,
     users,
     certificateConfig,
     language
   })
-
-  const locationIds = useSuspenseAdminLeafLevelLocations()
   /**
    * If there are validation errors in the form, redirect to the
    * print certificate form page, since the user should not be able to
@@ -208,7 +237,7 @@ export function Review() {
   const validationErrorExist = validationErrorsInActionFormExist({
     formConfig,
     form: annotation,
-    locationIds
+    context: validatorContext
   })
 
   if (validationErrorExist) {

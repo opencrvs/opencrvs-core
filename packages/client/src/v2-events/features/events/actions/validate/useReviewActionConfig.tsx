@@ -16,7 +16,7 @@ import {
   FieldConfig,
   EventStatus,
   ActionType,
-  UUID
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -29,24 +29,25 @@ export function useReviewActionConfig({
   annotation,
   reviewFields,
   status,
-  locationIds,
-  eventType
+  eventType,
+  validatorContext
 }: {
   formConfig: DeclarationFormConfig
   declaration: EventState
   annotation?: EventState
   reviewFields: FieldConfig[]
   status: EventStatus
-  locationIds: Array<{ id: UUID }>
   eventType: string
+  validatorContext: ValidatorContext
 }) {
   const events = useEvents()
+
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form: declaration,
     annotation,
     reviewFields,
-    locationIds
+    context: validatorContext
   })
 
   const { isActionAllowed } = useUserAllowedActions(eventType)

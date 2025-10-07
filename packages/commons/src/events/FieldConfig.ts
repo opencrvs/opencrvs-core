@@ -23,7 +23,8 @@ import {
   SignatureFieldValue,
   SelectDateRangeValue,
   TimeValue,
-  ButtonFieldValue
+  ButtonFieldValue,
+  VerificationStatusValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -161,7 +162,17 @@ export const ImageMimeType = z.enum([
   'image/svg+xml'
 ])
 
-export const MimeType = ImageMimeType
+export const DocumentMimeType = z.enum([
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.oasis.opendocument.text'
+])
+
+export const MimeType = z.enum([
+  ...ImageMimeType.options,
+  ...DocumentMimeType.options
+])
 export type MimeType = z.infer<typeof MimeType>
 
 const DEFAULT_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
@@ -365,7 +376,17 @@ export type BulletList = z.infer<typeof BulletList>
 const Select = BaseField.extend({
   type: z.literal(FieldType.SELECT),
   defaultValue: TextValue.optional(),
-  options: z.array(SelectOption).describe('A list of options')
+  options: z.array(SelectOption).describe('A list of options'),
+  noOptionsMessage: TranslationConfig.optional().describe(
+    `
+    A translation configuration object used to display a message when no options are available.
+    It must follow the shape: { id: string; defaultMessage: string; description?: string }.
+    The message is rendered via intl.formatMessage(noOptionsMessage, { input }),
+    where 'input' represents the text entered in the Select field.
+    You can reference this variable in your message, for example:
+    { ..., defaultMessage: "'{input}' is not listed among the health facilities." }
+  `
+  )
 }).describe('Select input')
 
 export const SelectDateRangeOption = z.object({
@@ -595,6 +616,21 @@ const ButtonField = BaseField.extend({
 
 export type ButtonField = z.infer<typeof ButtonField>
 
+// This is an alpha version of the print button and it is not recommended for use and will change in the future
+const AlphaPrintButton = BaseField.extend({
+  type: z.literal(FieldType.ALPHA_PRINT_BUTTON),
+  configuration: z.object({
+    template: z
+      .string()
+      .describe('Template ID from countryconfig templates to use for printing'),
+    buttonLabel: TranslationConfig.optional().describe(
+      'Label for the print button'
+    )
+  })
+}).describe('Print button field for printing certificates')
+
+export type AlphaPrintButton = z.infer<typeof AlphaPrintButton>
+
 const HttpField = BaseField.extend({
   type: z.literal(FieldType.HTTP),
   defaultValue: HttpFieldValue.optional(),
@@ -625,6 +661,19 @@ const LinkButtonField = BaseField.extend({
 }).describe('Button that opens a link')
 
 export type LinkButtonField = z.infer<typeof LinkButtonField>
+
+const VerificationStatus = BaseField.extend({
+  type: z.literal(FieldType.VERIFICATION_STATUS),
+  defaultValue: VerificationStatusValue.optional(),
+  configuration: z.object({
+    status: TranslationConfig.describe('Text to display on the status pill.'),
+    description: TranslationConfig.describe(
+      'Explaining text on the banner in form.'
+    )
+  })
+})
+
+export type VerificationStatus = z.infer<typeof VerificationStatus>
 
 const QueryParamReaderField = BaseField.extend({
   type: z.literal(FieldType.QUERY_PARAM_READER),
@@ -671,8 +720,10 @@ export type FieldConfig =
   | z.infer<typeof EmailField>
   | z.infer<typeof DataField>
   | z.infer<typeof ButtonField>
+  | z.infer<typeof AlphaPrintButton>
   | z.infer<typeof HttpField>
   | z.infer<typeof LinkButtonField>
+  | z.infer<typeof VerificationStatus>
   | z.infer<typeof QueryParamReaderField>
 
 /** @knipignore */
@@ -685,6 +736,7 @@ export type FieldConfigInput =
   | z.input<typeof TimeField>
   | z.input<typeof SelectDateRangeField>
   | z.input<typeof ButtonField>
+  | z.input<typeof AlphaPrintButton>
   | z.input<typeof NumberField>
   | z.input<typeof TextAreaField>
   | z.input<typeof DateField>
@@ -711,6 +763,7 @@ export type FieldConfigInput =
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
   | z.input<typeof LinkButtonField>
+  | z.input<typeof VerificationStatus>
   | z.input<typeof QueryParamReaderField>
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
@@ -753,8 +806,10 @@ export const FieldConfig: z.ZodType<
     FileUploadWithOptions,
     DataField,
     ButtonField,
+    AlphaPrintButton,
     HttpField,
-    LinkButtonField
+    LinkButtonField,
+    VerificationStatus
   ])
   .openapi({
     description: 'Form field configuration',

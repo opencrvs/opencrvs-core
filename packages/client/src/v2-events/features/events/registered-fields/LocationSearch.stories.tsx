@@ -132,3 +132,12 @@ export const LocationSearchOutputResolved: StoryObj<
     value: healthFacilityLocationId
   }
 }
+
+export const LocationSearchOutputResolvedPualula: StoryObj<
+  typeof LocationSearch.Output
+> = {
+  render: (props) => <LocationSearch.Output {...props} />,
+  args: {
+    value: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' // Pualula
+  }
+}

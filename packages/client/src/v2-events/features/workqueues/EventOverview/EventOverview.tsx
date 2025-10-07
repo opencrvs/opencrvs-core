@@ -39,6 +39,7 @@ import {
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useAuthentication } from '@client/utils/userUtils'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
@@ -62,6 +63,7 @@ function EventOverviewFull({
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const validatorContext = useValidatorContext()
   const { status } = eventIndex
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(eventIndex.id, {
@@ -120,7 +122,7 @@ function EventOverviewFull({
         eventConfiguration={eventConfiguration}
         flags={flags}
       />
-      <EventHistory fullEvent={event} />
+      <EventHistory fullEvent={event} validatorContext={validatorContext} />
     </Content>
   )
 }

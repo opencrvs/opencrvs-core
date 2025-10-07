@@ -26,7 +26,9 @@ import {
   UUID,
   tennisClubMembershipEvent,
   footballClubMembershipEvent,
-  libraryMembershipEvent
+  libraryMembershipEvent,
+  LocationType,
+  TestUserRole
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 
@@ -53,6 +55,165 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+export const V2_DEFAULT_MOCK_LOCATIONS = [
+  {
+    id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    name: 'Central',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: null,
+    validUntil: null
+  },
+  {
+    id: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
+    name: 'Sulaka',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: null,
+    validUntil: null
+  },
+  {
+    id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
+    name: 'Pualula',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: null,
+    validUntil: null
+  },
+  {
+    id: '6d1a59df-988c-4021-a846-ccbc021931a7' as UUID,
+    name: 'Chuminga',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: null,
+    validUntil: null
+  },
+  {
+    id: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    name: 'Ibombo',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    validUntil: null
+  },
+  {
+    // @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
+    // @TODO:  Find a way to give out context aware mock values in the future.
+    id: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
+    name: 'Isango',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    validUntil: null
+  },
+  {
+    id: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
+    name: 'Isamba',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    validUntil: null
+  },
+  {
+    id: '89a33893-b17d-481d-a26d-6461e7ac1651' as UUID,
+    name: 'Itambo',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    validUntil: null
+  },
+  {
+    id: 'd42ab2fe-e7ed-470e-8b31-4fb27f9b8250' as UUID,
+    name: 'Ezhi',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    validUntil: null
+  },
+  {
+    id: '423d000f-101b-47c0-8b86-21a908067cee' as UUID,
+    name: 'Chamakubi Health Post',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '4d3279be-d026-420c-88f7-f0a4ae986973' as UUID,
+    name: 'Ibombo Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '190902f4-1d77-476a-8947-41145af1db7d' as UUID,
+    name: 'Chikobo Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: 'f5ecbd9b-a01e-4a65-910e-70e86ab41b71' as UUID,
+    name: 'Chilochabalenje Health Post',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: 'dbfc178f-7295-4b90-b28d-111c95b03127' as UUID,
+    name: 'Chipeso Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '09862bfe-c7ac-46cd-987b-668681533c80' as UUID,
+    name: 'Chisamba Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '834ce389-e95b-4fb0-96a0-33e9ab323059' as UUID,
+    name: 'Chitanda Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '0431c433-6062-4a4c-aee9-25271aec61ee' as UUID,
+    name: 'Golden Valley Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: 'bc84d0b6-7ba7-480d-a339-5d9920d90eb2' as UUID,
+    name: 'Ipongo Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '4cf1f53b-b730-41d2-8649-dff7eeed970d' as UUID,
+    name: 'Itumbwe Health Post',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '4b3676cb-9355-4942-9eb9-2ce46acaf0e0' as UUID,
+    name: 'Kabangalala Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+    name: 'Ibombo District Office',
+    locationType: LocationType.enum.CRVS_OFFICE,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '62a0ccb4-4f30-4f30-8882-f256007dff9f' as UUID,
+    name: 'Isamba District Office',
+    locationType: LocationType.enum.CRVS_OFFICE,
+    parentId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
+    validUntil: null
+  }
+]
+
 export const handlers = {
   drafts: [
     tRPCMsw.event.draft.list.query(() => {
@@ -75,164 +236,7 @@ export const handlers = {
   ],
   eventLocations: [
     tRPCMsw.locations.list.query(() => {
-      return [
-        {
-          id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-          name: 'Central',
-          locationType: 'ADMIN_STRUCTURE',
-          parentId: null,
-          validUntil: null
-        },
-        {
-          id: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
-          name: 'Sulaka',
-          locationType: 'ADMIN_STRUCTURE',
-          parentId: null,
-          validUntil: null
-        },
-        {
-          id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
-          name: 'Pualula',
-          locationType: 'ADMIN_STRUCTURE',
-          parentId: null,
-          validUntil: null
-        },
-        {
-          id: '6d1a59df-988c-4021-a846-ccbc021931a7' as UUID,
-          name: 'Chuminga',
-          locationType: 'ADMIN_STRUCTURE',
-          parentId: null,
-          validUntil: null
-        },
-        {
-          id: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          name: 'Ibombo',
-          locationType: 'ADMIN_STRUCTURE',
-          parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-          validUntil: null
-        },
-        {
-          // @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
-          // @TODO:  Find a way to give out context aware mock values in the future.
-          id: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
-          name: 'Isango',
-          locationType: 'ADMIN_STRUCTURE',
-          parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-          validUntil: null
-        },
-        {
-          id: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
-          name: 'Isamba',
-          locationType: 'ADMIN_STRUCTURE',
-          parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-          validUntil: null
-        },
-        {
-          id: '89a33893-b17d-481d-a26d-6461e7ac1651' as UUID,
-          name: 'Itambo',
-          locationType: 'ADMIN_STRUCTURE',
-          parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-          validUntil: null
-        },
-        {
-          id: 'd42ab2fe-e7ed-470e-8b31-4fb27f9b8250' as UUID,
-          name: 'Ezhi',
-          locationType: 'ADMIN_STRUCTURE',
-          parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-          validUntil: null
-        },
-        {
-          id: '423d000f-101b-47c0-8b86-21a908067cee' as UUID,
-          name: 'Chamakubi Health Post',
-          locationType: 'HEALTH_FACILITY',
-          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          validUntil: null
-        },
-        {
-          id: '4d3279be-d026-420c-88f7-f0a4ae986973' as UUID,
-          name: 'Ibombo Rural Health Centre',
-          locationType: 'HEALTH_FACILITY',
-          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          validUntil: null
-        },
-        {
-          id: '190902f4-1d77-476a-8947-41145af1db7d' as UUID,
-          name: 'Chikobo Rural Health Centre',
-          locationType: 'HEALTH_FACILITY',
-          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          validUntil: null
-        },
-        {
-          id: 'f5ecbd9b-a01e-4a65-910e-70e86ab41b71' as UUID,
-          name: 'Chilochabalenje Health Post',
-          locationType: 'HEALTH_FACILITY',
-          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          validUntil: null
-        },
-        {
-          id: 'dbfc178f-7295-4b90-b28d-111c95b03127' as UUID,
-          name: 'Chipeso Rural Health Centre',
-          locationType: 'HEALTH_FACILITY',
-          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          validUntil: null
-        },
-        {
-          id: '09862bfe-c7ac-46cd-987b-668681533c80' as UUID,
-          name: 'Chisamba Rural Health Centre',
-          locationType: 'HEALTH_FACILITY',
-          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          validUntil: null
-        },
-        {
-          id: '834ce389-e95b-4fb0-96a0-33e9ab323059' as UUID,
-          name: 'Chitanda Rural Health Centre',
-          locationType: 'HEALTH_FACILITY',
-          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          validUntil: null
-        },
-        {
-          id: '0431c433-6062-4a4c-aee9-25271aec61ee' as UUID,
-          name: 'Golden Valley Rural Health Centre',
-          locationType: 'HEALTH_FACILITY',
-          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          validUntil: null
-        },
-        {
-          id: 'bc84d0b6-7ba7-480d-a339-5d9920d90eb2' as UUID,
-          name: 'Ipongo Rural Health Centre',
-          locationType: 'HEALTH_FACILITY',
-          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          validUntil: null
-        },
-        {
-          id: '4cf1f53b-b730-41d2-8649-dff7eeed970d' as UUID,
-          name: 'Itumbwe Health Post',
-          locationType: 'HEALTH_FACILITY',
-          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          validUntil: null
-        },
-        {
-          id: '4b3676cb-9355-4942-9eb9-2ce46acaf0e0' as UUID,
-          name: 'Kabangalala Rural Health Centre',
-          locationType: 'HEALTH_FACILITY',
-          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          validUntil: null
-        },
-        {
-          id: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
-          name: 'Ibombo District Office',
-          locationType: 'CRVS_OFFICE',
-          parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-          validUntil: null
-        },
-        {
-          id: '62a0ccb4-4f30-4f30-8882-f256007dff9f' as UUID,
-          name: 'Isamba District Office',
-          locationType: 'CRVS_OFFICE',
-          parentId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
-          validUntil: null
-        }
-      ]
+      return V2_DEFAULT_MOCK_LOCATIONS
     })
   ],
   getUserRoles: [
@@ -1207,6 +1211,102 @@ export const handlers = {
     })
   ],
   user: [
+    graphql.query('getUserAuditLog', (input) => {
+      return HttpResponse.json({
+        data: {
+          getUserAuditLog: {
+            total: 7,
+            results: [
+              {
+                time: '2025-10-03T10:44:55.012Z',
+                userAgent: 'undefined',
+                practitionerId: input.variables.userId,
+                ipAddress: '127.0.0.1',
+                action: 'LOGGED_IN',
+                isV2: null,
+                __typename: 'UserAuditLogItem'
+              },
+              {
+                time: '2025-10-03T10:44:49.362Z',
+                userAgent: 'undefined',
+                practitionerId: input.variables.userId,
+                ipAddress: '127.0.0.1',
+                action: 'LOGGED_OUT',
+                isV2: null,
+                __typename: 'UserAuditLogItem'
+              },
+              {
+                time: '2025-10-03T10:43:16.704Z',
+                userAgent:
+                  'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
+                practitionerId: input.variables.userId,
+                ipAddress: '127.0.0.1',
+                action: 'ASSIGNED',
+                isV2: null,
+                data: {
+                  compositionId: '0458a3ba-3f30-4345-be16-9ec81aa39b89',
+                  trackingId: 'BSK4XRC',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:24:25.604Z',
+                userAgent: '',
+                practitionerId: '68df9529f8f3a73007a44264',
+                ipAddress: '',
+                action: 'VIEWED',
+                isV2: true,
+                data: {
+                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+                  trackingId: 'MOX89J',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:24:25.604Z',
+                userAgent: '',
+                practitionerId: input.variables.userId,
+                ipAddress: '',
+                action: 'ASSIGNED',
+                isV2: true,
+                data: {
+                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+                  trackingId: 'MOX89J',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:24:25.604Z',
+                userAgent: '',
+                practitionerId: input.variables.userId,
+                ipAddress: '',
+                action: 'VIEWED',
+                isV2: true,
+                data: {
+                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+                  trackingId: 'MOX89J',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:22:10.128Z',
+                userAgent: 'undefined',
+                practitionerId: input.variables.userId,
+                ipAddress: '127.0.0.1',
+                action: 'LOGGED_IN',
+                isV2: null,
+                __typename: 'UserAuditLogItem'
+              }
+            ],
+            __typename: 'UserAuditLogResultSet'
+          }
+        }
+      })
+    }),
     graphql.query('fetchUser', (input) => {
       const userId = input.variables.userId
       const generator = testDataGenerator()
@@ -1218,6 +1318,31 @@ export const handlers = {
         response = generator.user.registrationAgent().v1
       } else if (userId == generator.user.id.localSystemAdmin) {
         response = generator.user.localSystemAdmin()
+      } else if (userId == generator.user.id.nationalSystemAdmin) {
+        response = generator.user.nationalSystemAdmin().v1
+      } else {
+        response = generator.user.localRegistrar().v1
+      }
+
+      return HttpResponse.json({
+        data: {
+          getUser: response
+        }
+      })
+    }),
+    graphql.query('getUser', (input) => {
+      const userId = input.variables.userId
+      const generator = testDataGenerator()
+      let response
+
+      if (userId == generator.user.id.fieldAgent) {
+        response = generator.user.fieldAgent().v1
+      } else if (userId == generator.user.id.registrationAgent) {
+        response = generator.user.registrationAgent().v1
+      } else if (userId == generator.user.id.localSystemAdmin) {
+        response = generator.user.localSystemAdmin()
+      } else if (userId == generator.user.id.nationalSystemAdmin) {
+        response = generator.user.nationalSystemAdmin().v1
       } else {
         response = generator.user.localRegistrar().v1
       }
@@ -2106,7 +2231,23 @@ export const handlers = {
   ],
   modules: [
     http.get('http://localhost:3040/conditionals.js', () => {
-      return HttpResponse.text('', { status: 404 })
+      const fileContent = `
+      const conditionals = {
+        isDefaultCountry: {
+          action: "hide",
+          expression: "isDefaultCountry(values.country)"
+        }
+      };
+      export {
+        conditionals
+      };
+    `
+      return new HttpResponse(fileContent, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/javascript'
+        }
+      })
     }),
     http.get('http://localhost:3040/handlebars.js', () => {
       return HttpResponse.text('', { status: 404 })
@@ -2121,6 +2262,11 @@ export const handlers = {
     })
   ],
   config: [
+    http.get('/api/countryconfig/certificates/simple-certificate.svg', () => {
+      return HttpResponse.text(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100"><text x="10" y="20">Simple Certificate</text></svg>`
+      )
+    }),
     http.get(
       '/api/countryconfig/certificates/tennis-club-membership-certificate.svg',
       () => {
@@ -2138,12 +2284,16 @@ export const handlers = {
       }
     ),
 
-    http.get('/api/countryconfig/fonts/NotoSans-Regular.ttf', async () => {
-      const fontResponse = await fetch(
-        'http://localhost:3040/fonts/NotoSans-Regular.ttf'
-      )
-      const fontArrayBuffer = await fontResponse.arrayBuffer()
-      return HttpResponse.arrayBuffer(fontArrayBuffer)
+    http.get('/api/countryconfig/fonts/*.ttf', async () => {
+      const fontArrayBuffer = await fetch(
+        '/assets/small-filesize-font-for-tests.ttf'
+      ).then((res) => res.arrayBuffer())
+
+      return new HttpResponse(fontArrayBuffer, {
+        headers: {
+          'Content-Type': 'font/ttf'
+        }
+      })
     }),
 
     http.get('http://localhost:2021/config', () => {
@@ -2152,6 +2302,31 @@ export const handlers = {
 
         config: mockOfflineData.config,
         certificates: [
+          {
+            id: 'simple-certificate',
+            isV2Template: true,
+            event: TENNIS_CLUB_MEMBERSHIP,
+            label: {
+              id: 'certificates.simple.certificate.copy',
+              defaultMessage: 'Simple Certificate copy',
+              description: 'The label for a simple certificate'
+            },
+            isDefault: false,
+            fee: {
+              onTime: 7,
+              late: 10.6,
+              delayed: 18
+            },
+            svgUrl: '/api/countryconfig/certificates/simple-certificate.svg',
+            fonts: {
+              'Noto Sans': {
+                normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+                bold: '/api/countryconfig/fonts/NotoSans-Bold.ttf',
+                italics: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+                bolditalics: '/api/countryconfig/fonts/NotoSans-Regular.ttf'
+              }
+            }
+          },
           {
             id: 'tennis-club-membership-certificate',
             isV2Template: true,
@@ -2266,6 +2441,154 @@ export const handlers = {
     }),
     tRPCMsw.workqueue.config.list.query(() => {
       return generateWorkqueues()
+    })
+  ],
+  searchUsers: [
+    graphql.query('searchUsers', () => {
+      const generator = testDataGenerator()
+
+      return HttpResponse.json({
+        data: {
+          searchUsers: {
+            totalItems: 4,
+            results: [
+              {
+                id: generator.user.localSystemAdmin().id as UUID,
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Emmanuel',
+                    familyName: 'Mayuka',
+                    __typename: 'HumanName'
+                  }
+                ],
+                mobile: '+260921681112',
+                email: 'kalushabwalya.17@gmail.com',
+                fullHonorificName: null,
+                signature: null,
+                primaryOffice: {
+                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  __typename: 'Location'
+                },
+                role: {
+                  id: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+                  label: {
+                    id: 'userRole.administrator',
+                    defaultMessage: 'Administrator',
+                    description: 'Name for user role Administrator',
+                    __typename: 'I18nMessage'
+                  },
+                  __typename: 'UserRole'
+                },
+                status: 'active',
+                underInvestigation: false,
+                avatar: null,
+                __typename: 'User'
+              },
+              {
+                id: generator.user.localRegistrar().v2.id,
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Kennedy',
+                    familyName: 'Mweene',
+                    __typename: 'HumanName'
+                  }
+                ],
+                mobile: '+260933333333',
+                email: 'kalushabwalya1.7@gmail.com',
+                fullHonorificName: null,
+                signature: null,
+                primaryOffice: {
+                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  __typename: 'Location'
+                },
+                role: {
+                  id: TestUserRole.enum.LOCAL_REGISTRAR,
+                  label: {
+                    id: 'userRole.localRegistrar',
+                    defaultMessage: 'Local Registrar',
+                    description: 'Name for user role Local Registrar',
+                    __typename: 'I18nMessage'
+                  },
+                  __typename: 'UserRole'
+                },
+                status: 'active',
+                underInvestigation: false,
+                avatar: null,
+                __typename: 'User'
+              },
+              {
+                id: generator.user.registrationAgent().v2.id,
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Felix',
+                    familyName: 'Katongo',
+                    __typename: 'HumanName'
+                  }
+                ],
+                mobile: '+260922222222',
+                email: 'kalushabwalya17+@gmail.com',
+                fullHonorificName: null,
+                signature: null,
+                primaryOffice: {
+                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  __typename: 'Location'
+                },
+                role: {
+                  id: TestUserRole.enum.REGISTRATION_AGENT,
+                  label: {
+                    id: 'userRole.registrationOfficer',
+                    defaultMessage: 'Registration Officer',
+                    description: 'Name for user role Registration Officer',
+                    __typename: 'I18nMessage'
+                  },
+                  __typename: 'UserRole'
+                },
+                status: 'active',
+                underInvestigation: false,
+                avatar: null,
+                __typename: 'User'
+              },
+              {
+                id: generator.user.fieldAgent().v2.id,
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Kalusha',
+                    familyName: 'Bwalya',
+                    __typename: 'HumanName'
+                  }
+                ],
+                mobile: '+260911111111',
+                email: 'kalushabwalya17@gmail.com',
+                fullHonorificName: null,
+                signature: null,
+                primaryOffice: {
+                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  __typename: 'Location'
+                },
+                role: {
+                  id: 'HOSPITAL_CLERK',
+                  label: {
+                    id: 'userRole.hospitalClerk',
+                    defaultMessage: 'Hospital Clerk',
+                    description: 'Name for user role Hospital Clerk',
+                    __typename: 'I18nMessage'
+                  },
+                  __typename: 'UserRole'
+                },
+                status: 'active',
+                underInvestigation: false,
+                avatar: null,
+                __typename: 'User'
+              }
+            ],
+            __typename: 'SearchUserResult'
+          }
+        }
+      })
     })
   ]
 }
