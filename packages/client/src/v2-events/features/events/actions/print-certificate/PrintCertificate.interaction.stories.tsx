@@ -23,10 +23,7 @@ import {
   tennisClubMembershipEvent,
   field
 } from '@opencrvs/commons/client'
-import {
-  tennisClubMembershipEventIndex,
-  tennisClubMembershipEventDocument
-} from '@client/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -318,6 +315,14 @@ export const NoTemplateAvailable: Story = {
           })
         ],
         config: [
+          http.get(
+            '/api/countryconfig/certificates/simple-certificate.svg',
+            () => {
+              return HttpResponse.text(
+                `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100"><text x="10" y="20">Simple Certificate</text></svg>`
+              )
+            }
+          ),
           http.get('http://localhost:2021/config', () => {
             return HttpResponse.json({
               systems: [],

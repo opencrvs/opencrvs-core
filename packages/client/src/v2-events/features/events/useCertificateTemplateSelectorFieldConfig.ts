@@ -10,7 +10,6 @@
  */
 
 import formatISO from 'date-fns/formatISO'
-import { useIntl } from 'react-intl'
 import {
   areCertificateConditionsMet,
   EventDocument,
@@ -26,7 +25,6 @@ export const useCertificateTemplateSelectorFieldConfig = (
   declaration: EventState,
   event: EventDocument
 ): FieldConfig => {
-  const intl = useIntl()
   const { certificateTemplates } = useAppConfig()
 
   const declarationWithEventMetadata = {
@@ -63,12 +61,11 @@ export const useCertificateTemplateSelectorFieldConfig = (
       description: 'This is the label for the field',
       id: 'event.default.action.certificate.template.type.label'
     },
-    noOptionsMessage: () =>
-      intl.formatMessage({
-        id: 'event.default.action.certificate.template.type.notFound',
-        description: 'Select certificate template options not found',
-        defaultMessage: 'No template available for this event, contact Admin'
-      }),
+    noOptionsMessage: {
+      id: 'event.default.action.certificate.template.type.notFound',
+      description: 'Select certificate template options not found',
+      defaultMessage: 'No template available for this event, contact Admin'
+    },
     defaultValue,
     options
   }

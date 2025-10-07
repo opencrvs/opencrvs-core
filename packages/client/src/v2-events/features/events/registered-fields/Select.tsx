@@ -27,10 +27,15 @@ export type SelectInputProps = Omit<
   value?: string
   label?: TranslationConfig
   disabled?: boolean
-  noOptionsMessage?: (obj: { inputValue: string }) => string | null
+  noOptionsMessage?: TranslationConfig
 } & { 'data-testid'?: string }
 
-function SelectInput({ onChange, value, ...props }: SelectInputProps) {
+function SelectInput({
+  onChange,
+  noOptionsMessage,
+  value,
+  ...props
+}: SelectInputProps) {
   const intl = useIntlWithFormData()
   const { options } = props
   const selectedOption = options.find((option) => option.value === value)
@@ -44,10 +49,16 @@ function SelectInput({ onChange, value, ...props }: SelectInputProps) {
 
   const inputValue = selectedOption?.value ?? ''
 
+  const formattedNoOptionsMessage = noOptionsMessage
+    ? ({ inputValue: input }: { inputValue: string }) =>
+        intl.formatMessage(noOptionsMessage, { input })
+    : undefined
+
   return (
     <SelectComponent
       {...props}
       data-testid={props['data-testid'] || `select__${props.id}`}
+      noOptionsMessage={formattedNoOptionsMessage}
       options={formattedOptions}
       value={inputValue}
       onChange={onChange}

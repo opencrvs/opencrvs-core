@@ -377,16 +377,16 @@ const Select = BaseField.extend({
   type: z.literal(FieldType.SELECT),
   defaultValue: TextValue.optional(),
   options: z.array(SelectOption).describe('A list of options'),
-  noOptionsMessage: z
-    .function()
-    .args(
-      z.object({
-        inputValue: z.string()
-      })
-    )
-    .returns(z.string().nullable())
-    .optional()
-    .openapi({ type: 'string', description: 'No options message function' })
+  noOptionsMessage: TranslationConfig.optional().describe(
+    `
+    A translation configuration object used to display a message when no options are available.
+    It must follow the shape: { id: string; defaultMessage: string; description?: string }.
+    The message is rendered via intl.formatMessage(noOptionsMessage, { input }),
+    where 'input' represents the text entered in the Select field.
+    You can reference this variable in your message, for example:
+    { ..., defaultMessage: "'{input}' is not listed among the health facilities." }
+  `
+  )
 }).describe('Select input')
 
 export const SelectDateRangeOption = z.object({
