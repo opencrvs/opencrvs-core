@@ -40,9 +40,10 @@ extendZodWithOpenApi(z)
 const FieldId = z
   .string()
   // Field id must not contain '_' since they cause issues with Formik field ids
-  .refine((val) => !val.includes('_'), {
-    message: "id must not contain '_'"
-  })
+  .refine(
+    (val) => !val.includes('_'),
+    (val) => ({ message: `id: '${val}' must not contain '_'` })
+  )
   .describe('Unique identifier for the field')
 
 export const FieldReference = z
