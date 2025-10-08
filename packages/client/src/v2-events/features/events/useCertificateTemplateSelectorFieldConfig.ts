@@ -34,9 +34,23 @@ export const useCertificateTemplateSelectorFieldConfig = (
   }
 
   // Filter out certificates that are not for the event type and are not v2 templates
-  const eventCertificateTemplates = certificateTemplates.filter(
-    (x) => x.event === eventType && x.isV2Template
+  const validTemplates = certificateTemplates.filter(
+    (template) =>
+      template.event === eventType &&
+      template.isV2Template &&
+      (!template.conditionals ||
+        areCertificateConditionsMet(
+          template.conditionals,
+          declarationWithEventMetadata
+        ))
   )
+
+  const defaultValue = validTemplates.find((template) => template.isDefault)?.id
+
+  const options = validTemplates.map((template) => ({
+    label: template.label,
+    value: template.id
+  }))
 
   return {
     id: CERT_TEMPLATE_ID,
@@ -47,18 +61,12 @@ export const useCertificateTemplateSelectorFieldConfig = (
       description: 'This is the label for the field',
       id: 'event.default.action.certificate.template.type.label'
     },
-    defaultValue: eventCertificateTemplates.find(
-      (x) => x.event === eventType && x.isDefault
-    )?.id,
-    options: eventCertificateTemplates
-      .filter(
-        (template) =>
-          !template.conditionals ||
-          areCertificateConditionsMet(
-            template.conditionals,
-            declarationWithEventMetadata
-          )
-      )
-      .map((x) => ({ label: x.label, value: x.id }))
+    noOptionsMessage: {
+      id: 'event.default.action.certificate.template.type.notFound',
+      description: 'Select certificate template options not found',
+      defaultMessage: 'No template available for this event, contact Admin'
+    },
+    defaultValue,
+    options
   }
 }

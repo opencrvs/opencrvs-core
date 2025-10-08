@@ -84,6 +84,7 @@ export const TestUserRole = z.enum([
   'LOCAL_SYSTEM_ADMIN',
   'NATIONAL_REGISTRAR',
   'REGISTRATION_AGENT',
+  'NATIONAL_SYSTEM_ADMIN',
   'SOCIAL_WORKER'
 ])
 
@@ -185,6 +186,8 @@ export function mapFieldTypeToMockValue(
     case FieldType.OFFICE:
     case FieldType.LINK_BUTTON:
       return `${field.id}-${field.type}-${i}`
+    case FieldType.VERIFICATION_STATUS:
+      return 'verified'
     case FieldType.NAME:
       return generateRandomName(rng)
     case FieldType.NUMBER:
