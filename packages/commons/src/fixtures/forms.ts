@@ -235,7 +235,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           type: FieldType.TEXT
         },
         {
-          id: 'collector.DRIVINGLICENSE.details',
+          id: 'collector.DRIVING_LICENSE.details',
           conditionals: [
             {
               type: ConditionalType.SHOW,
@@ -286,7 +286,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           type: FieldType.TEXT
         },
         {
-          id: 'collector.REFUGEENUMBER.details',
+          id: 'collector.REFUGEE_NUMBER.details',
           conditionals: [
             {
               type: ConditionalType.SHOW,
@@ -337,7 +337,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           type: FieldType.TEXT
         },
         {
-          id: 'collector.ALIENNUMBER.details',
+          id: 'collector.ALIEN_NUMBER.details',
           conditionals: [
             {
               type: ConditionalType.SHOW,
