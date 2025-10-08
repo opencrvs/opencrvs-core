@@ -43,9 +43,12 @@ export function declareActionProcedures() {
       .use(middleware.validateAction)
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
-        const { token, user, isDuplicateAction } = ctx
+        const { token, user, existingAction } = ctx
 
-        if (isDuplicateAction) {
+        if (
+          existingAction &&
+          existingAction.status !== ActionStatus.Requested
+        ) {
           return ctx.event
         }
 
