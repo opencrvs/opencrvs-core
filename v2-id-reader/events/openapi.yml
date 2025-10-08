@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 618640d4-98d9-483f-b5fe-26901dbe11e2
+                transactionId: 217e2c12-2cdf-43c5-bd55-870a933de03a
                 type: birth
       responses:
         "200":
@@ -401,7 +401,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 0b97c493-385e-415c-96ff-4db9a53ac362
+                transactionId: 4c72779b-7f7a-46da-a0ac-730bb2d61361
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -4034,6 +4034,30 @@ components:
                   - value
                   - label
               description: A list of options
+            noOptionsMessage:
+              description: "
+
+                \    A translation configuration object used to display a
+                message when no options are available.
+
+                \    It must follow the shape: { id: string; defaultMessage:
+                string; description?: string }.
+
+                \    The message is rendered via
+                intl.formatMessage(noOptionsMessage, { input }),
+
+                \    where 'input' represents the text entered in the Select
+                field.
+
+                \    You can reference this variable in your message, for
+                example:
+
+                \    { ..., defaultMessage: \"'{input}' is not listed among the
+                health facilities.\" }
+
+                \  "
+              allOf:
+                - $ref: "#/components/schemas/TranslationConfig"
           required:
             - id
             - label
@@ -6945,6 +6969,116 @@ components:
             - label
             - type
             - methods
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            disabled:
+              type: boolean
+              default: false
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a10
+            secured:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a11
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
+            type:
+              type: string
+              enum:
+                - QUERY_PARAM_READER
+            configuration:
+              type: object
+              properties:
+                formProjection:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: Projection of the field value after parsing the query string
+          required:
+            - id
+            - label
+            - type
+            - configuration
+          description: A field that maps URL query params into form values and clears them
+            afterward
       description: Form field configuration
     FieldConditional:
       oneOf:
