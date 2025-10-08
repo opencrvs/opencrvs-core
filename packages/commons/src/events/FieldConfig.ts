@@ -840,7 +840,8 @@ export const FieldConfig: z.ZodType<
     LinkButtonField,
     VerificationStatus,
     QrReaderField,
-    IdReaderField
+    IdReaderField,
+    QueryParamReaderField
   ])
   .openapi({
     description: 'Form field configuration',

@@ -1,12 +1,15 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { useIntl } from 'react-intl'
+import { isEqual } from 'lodash'
 import {
   EventState,
+  FieldValue,
   IdReaderField,
   IdReaderFieldValue
 } from '@opencrvs/commons/client'
 import { IdReader as IdReaderUI } from '@opencrvs/components/src/IdReader'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 const messages = {
   or: {
@@ -31,9 +34,26 @@ function IdReaderInput({
   onChange: (data: IdReaderFieldValue) => void
 }) {
   const intl = useIntl()
+  const validatorContext = useValidatorContext()
+  const fieldValues = useRef<FieldValue | undefined>(undefined)
+
+  /**
+   *
+   * @param updated values of the reading methods
+   * @returns only the updated value of one of the reading methods
+   */
   const handleChange = (values: EventState) => {
-    onChange(Object.values(values)[0])
+    const prevValues = fieldValues.current
+
+    for (const key of Object.keys(values)) {
+      if (!isEqual(prevValues?.[key], values[key])) {
+        fieldValues.current = values
+        onChange(values as IdReaderFieldValue)
+        return
+      }
+    }
   }
+
   return (
     <IdReaderUI
       dividerLabel={intl.formatMessage(messages.or)}
@@ -41,7 +61,12 @@ function IdReaderInput({
         messages.manualInputInstructionLabel
       )}
     >
-      <FormFieldGenerator fields={methods} id={id} onChange={handleChange} />
+      <FormFieldGenerator
+        fields={methods}
+        id={id}
+        validatorContext={validatorContext}
+        onChange={handleChange}
+      />
     </IdReaderUI>
   )
 }
