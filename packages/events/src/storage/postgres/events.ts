@@ -45,6 +45,8 @@ export function getClient() {
 
     db = new Kysely<Schema>({
       dialect,
+      // We considered adding 'maintainNestedObjectKeys: true' option to CamelCasePlugin,
+      // but it causes issues when creating SQL queries which use e.g. json_agg() or to_jsonb() to aggregate results.
       plugins: [new CamelCasePlugin()]
     })
   }
