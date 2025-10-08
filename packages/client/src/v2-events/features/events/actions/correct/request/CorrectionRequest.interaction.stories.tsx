@@ -160,7 +160,7 @@ export const ReviewWithParentFieldChanges: Story = {
 
     await step('Change senior pass values', async () => {
       await userEvent.click(
-        canvas.getByRole('button', { name: 'Back to review' })
+        canvas.getByRole('button', { name: 'Go to review' })
       )
       await userEvent.click(canvas.getByTestId('change-button-senior-pass.id'))
       await userEvent.type(
@@ -186,7 +186,7 @@ export const ReviewWithParentFieldChanges: Story = {
         })
       )
       await userEvent.click(
-        canvas.getByRole('button', { name: 'Back to review' })
+        canvas.getByRole('button', { name: 'Go to review' })
       )
     })
 
@@ -234,9 +234,9 @@ export const ReviewWithParentFieldChanges: Story = {
       )
     })
 
-    await step('Go back to review', async () => {
+    await step('Go to review', async () => {
       await userEvent.click(
-        canvas.getByRole('button', { name: 'Back to review' })
+        canvas.getByRole('button', { name: 'Go to review' })
       )
     })
 
@@ -249,7 +249,7 @@ export const ReviewWithParentFieldChanges: Story = {
       )
 
       await userEvent.click(
-        canvas.getByRole('button', { name: 'Back to review' })
+        canvas.getByRole('button', { name: 'Go to review' })
       )
     })
 
@@ -332,7 +332,7 @@ export const AddressStaysUnchangedInSummaryWhenNotEdited: Story = {
     const canvas = within(canvasElement)
     await step('Validate review content', async () => {
       await userEvent.click(
-        await canvas.findByRole('button', { name: 'Back to review' })
+        await canvas.findByRole('button', { name: 'Go to review' })
       )
 
       await canvas.findByText("Applicant's address")
@@ -354,7 +354,7 @@ export const AddressStaysUnchangedInSummaryWhenNotEdited: Story = {
       await canvas.findByText("Applicant's address")
 
       await userEvent.click(
-        await canvas.findByRole('button', { name: 'Back to review' })
+        await canvas.findByRole('button', { name: 'Go to review' })
       )
     })
 
