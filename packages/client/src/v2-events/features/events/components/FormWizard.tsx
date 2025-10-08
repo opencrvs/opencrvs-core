@@ -25,7 +25,7 @@ export const messages = defineMessages({
   goToReview: {
     defaultMessage: 'Go to review',
     description: 'Go to review button text',
-    id: 'v2.buttons.goToReview'
+    id: 'buttons.goToReview'
   }
 })
 
