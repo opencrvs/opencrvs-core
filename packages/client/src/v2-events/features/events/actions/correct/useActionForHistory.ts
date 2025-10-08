@@ -50,18 +50,21 @@ function getPreviousActions(arr: ActionDocument[], id: string) {
   const index = arr.findIndex((item) => item.id === id)
   return index === -1 ? arr : take(arr, index)
 }
+
 function hasDeclarationChanged(
   actions: ActionDocument[],
   action: Extract<Action, { type: DeclarationActionType }>
 ) {
-  const previousActions = getPreviousActions(actions, action.id)
+  // We are doing a first-to-last search with a find operation, so reverse the previous actions
+  // and get the first matching declaration action.
+  const previousActions = getPreviousActions(actions, action.id).reverse()
   const previousActionType = getPreviousDeclarationActionType(
     previousActions,
     action.type
   )
 
   const previousDeclarationAction = previousActionType
-    ? actions.find((act) => act.type === previousActionType)
+    ? previousActions.find((act) => act.type === previousActionType)
     : undefined
 
   const currentActionHasUpdates = Object.keys(action.declaration).length > 0
@@ -114,7 +117,8 @@ export function expandWithUpdateActions(
       action.type === ActionTypes.enum.VALIDATE ||
       action.type === ActionTypes.enum.REGISTER ||
       action.type === ActionTypes.enum.DECLARE ||
-      action.type === ActionTypes.enum.NOTIFY
+      action.type === ActionTypes.enum.NOTIFY ||
+      action.type === ActionTypes.enum.DUPLICATE_DETECTED
     ) {
       if (!hasDeclarationChanged(actions, action)) {
         return [action]

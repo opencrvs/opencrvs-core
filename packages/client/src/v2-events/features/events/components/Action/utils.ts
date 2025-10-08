@@ -52,6 +52,7 @@ export type AvailableActionTypes = Extract<
   | 'REQUEST_CORRECTION'
   | 'APPROVE_CORRECTION'
   | 'REJECT_CORRECTION'
+  | 'DUPLICATE_DETECTED'
 >
 
 /**
@@ -75,15 +76,23 @@ export function getPreviousDeclarationActionType(
       break
     }
     case ActionType.DECLARE: {
-      actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
+      actionTypes = [
+        ActionType.DUPLICATE_DETECTED,
+        ActionType.DECLARE,
+        ActionType.NOTIFY
+      ]
       break
     }
     case ActionType.VALIDATE: {
-      actionTypes = [ActionType.VALIDATE, ActionType.DECLARE]
+      actionTypes = [
+        ActionType.DUPLICATE_DETECTED,
+        ActionType.VALIDATE,
+        ActionType.DECLARE
+      ]
       break
     }
     case ActionType.REGISTER: {
-      actionTypes = [ActionType.VALIDATE]
+      actionTypes = [ActionType.VALIDATE, ActionType.DUPLICATE_DETECTED]
       break
     }
     case ActionType.REQUEST_CORRECTION: {
@@ -93,6 +102,10 @@ export function getPreviousDeclarationActionType(
     case ActionType.APPROVE_CORRECTION:
     case ActionType.REJECT_CORRECTION: {
       actionTypes = [ActionType.REQUEST_CORRECTION]
+      break
+    }
+    case ActionType.DUPLICATE_DETECTED: {
+      actionTypes = [ActionType.DUPLICATE_DETECTED]
       break
     }
     default: {
