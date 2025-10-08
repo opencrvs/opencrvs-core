@@ -208,8 +208,8 @@ export function Summary() {
           title={intl.formatMessage(correctionMessages.correctionSummaryTitle)}
           topActionButtons={[
             <SecondaryButton
-              key="back-to-review"
-              id="back-to-review"
+              key="go-to-review"
+              id="go-to-review"
               onClick={() =>
                 navigate(
                   ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
@@ -221,7 +221,7 @@ export function Summary() {
                 )
               }
             >
-              {intl.formatMessage(registerMessages.backToReviewButton)}
+              {intl.formatMessage(registerMessages.goToReviewButton)}
             </SecondaryButton>
           ]}
         >
