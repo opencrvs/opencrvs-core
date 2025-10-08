@@ -24,7 +24,10 @@ import {
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { Output } from '@client/v2-events/features/events/components/Output'
+import {
+  isEmptyValue,
+  Output
+} from '@client/v2-events/features/events/components/Output'
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
@@ -71,6 +74,7 @@ export function PrintCertificate({
   const content = formPages.flatMap((page) => {
     const fields = page.fields
       .filter((f) => isFieldVisible(f, annotation, validatorContext))
+      .filter((f) => !isEmptyValue(f, annotation[f.id]))
       .map((field) => {
         const valueDisplay = (
           <Output
@@ -93,7 +97,8 @@ export function PrintCertificate({
             id: page.id,
             label: page.title,
             type: FieldType.CHECKBOX,
-            defaultValue: false
+            defaultValue: false,
+            required: true
           }}
           showPreviouslyMissingValuesAsChanged={false}
           value={annotation[page.id]}
