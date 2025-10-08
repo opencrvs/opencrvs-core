@@ -140,7 +140,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
               }
             },
             {
-              value: 'DRIVING-LICENSE',
+              value: 'DRIVING_LICENSE',
               label: {
                 id: 'event.tennis-club-membership.action.form.section.idType.drivingLicense.label',
                 defaultMessage: 'Driving License',
@@ -235,7 +235,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           type: FieldType.TEXT
         },
         {
-          id: 'collector.DRIVING_LICENSE.details',
+          id: 'collector.DRIVING-LICENSE.details',
           conditionals: [
             {
               type: ConditionalType.SHOW,
@@ -286,7 +286,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           type: FieldType.TEXT
         },
         {
-          id: 'collector.REFUGEE_NUMBER.details',
+          id: 'collector.REFUGEE-NUMBER.details',
           conditionals: [
             {
               type: ConditionalType.SHOW,
