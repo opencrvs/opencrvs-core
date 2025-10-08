@@ -1105,7 +1105,7 @@ export const MarkedAsDuplicate: Story = {
   }
 }
 
-export const PrintCertificate: Story = {
+export const Certified: Story = {
   args: {
     ...argbase,
     action: {
@@ -1115,6 +1115,65 @@ export const PrintCertificate: Story = {
       annotation: {
         'collector.identity.verify': true,
         'collector.requesterId': 'INFORMANT'
+      },
+      content: {
+        templateId: 'tennis-club-membership-certified-certificate'
+      }
+    },
+    fullEvent: {
+      id: getUUID(),
+      type: 'tennis-club-membership',
+      actions: [
+        {
+          ...actionBase,
+          id: generateUuid(prng),
+          type: ActionType.CREATE
+        },
+        {
+          ...actionBase,
+          id: generateUuid(prng),
+          type: ActionType.DECLARE,
+          declaration
+        },
+        {
+          ...actionBase,
+          id: generateUuid(prng),
+          type: ActionType.VALIDATE,
+          declaration
+        },
+        {
+          ...actionBase,
+          id: generateUuid(prng),
+          type: ActionType.REGISTER,
+          declaration
+        }
+      ],
+      trackingId: 'ABCD123',
+      updatedAt: '2021-01-01',
+      createdAt: '2021-01-01'
+    }
+  }
+}
+
+export const CertifiedBySomeoneElse: Story = {
+  args: {
+    ...argbase,
+    action: {
+      ...argbase.action,
+      id: generateUuid(prng),
+      type: ActionType.PRINT_CERTIFICATE,
+      annotation: {
+        'collector.requesterId': 'OTHER',
+        'collector.OTHER.idType': 'PASSPORT',
+        'collector.PASSPORT.details': '1234567890',
+        'collector.OTHER.firstName': 'Paul',
+        'collector.OTHER.lastName': 'Printterguy',
+        'collector.OTHER.relationshipToMember': 'Brother',
+        // random field which should not be visible
+        'random-field': 'random-value'
+      },
+      content: {
+        templateId: 'tennis-club-membership-certificate'
       }
     },
     fullEvent: {
