@@ -37,21 +37,19 @@ import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 extendZodWithOpenApi(z)
 
-/*
- * Formik has a feature that automatically nests all form keys that have a dot in them.
- * Because our form field ids can have dots in them, we temporarily transform those dots
- * to a different character before passing the data to Formik.
- *
- * For this reason, we can not allow a field id to contain the formik field separator, as it causes issues with the transformation.
- */
-export const FORMIK_FIELD_SEPARATOR = '____'
-
 const FieldId = z
   .string()
   .refine(
-    (val) => !val.includes(FORMIK_FIELD_SEPARATOR),
+    /*
+     * Disallow underscores '_' in field ids.
+     * Why? Theres two reasons:
+     *   1. We transform dots to underscores as separator in Formik field ids, so this avoids any issues with the Formik transformations.
+     *   2. On Kysely-SQL queries, we use the CamelCasePlugin. This plugin transforms snake_case to camelCase also on nested (jsonb) object keys.
+     *      This could be disabled via 'maintainNestedObjectKeys: true', but this would also affect SQL queries which use e.g. json_agg() or to_jsonb() to aggregate results.
+     */
+    (val) => !val.includes('_'),
     (val) => ({
-      message: `id: '${val}' must not contain four consecutive underscores '${FORMIK_FIELD_SEPARATOR}'`
+      message: `id: '${val}' must not contain underscores '_'`
     })
   )
   .describe('Unique identifier for the field')

@@ -14,19 +14,24 @@ import {
   EventState,
   SystemVariables,
   isFieldConfigDefaultValue,
-  InteractiveFieldType,
-  FORMIK_FIELD_SEPARATOR
+  InteractiveFieldType
 } from '@opencrvs/commons/client'
 import { replacePlaceholders } from '@client/v2-events/utils'
 
+/*
+ * Formik has a feature that automatically nests all form keys that have a dot in them.
+ * Because our form field ids can have dots in them, we temporarily transform those dots
+ * to a different character before passing the data to Formik. This function unflattens
+ */
+export const FIELD_SEPARATOR = '____'
 const DOT_SEPARATOR = '.'
 
 export function makeFormFieldIdFormikCompatible(fieldId: string) {
-  return fieldId.replaceAll(DOT_SEPARATOR, FORMIK_FIELD_SEPARATOR)
+  return fieldId.replaceAll(DOT_SEPARATOR, FIELD_SEPARATOR)
 }
 
 export function makeFormikFieldIdOpenCRVSCompatible(fieldId: string): string {
-  return fieldId.replaceAll(FORMIK_FIELD_SEPARATOR, DOT_SEPARATOR)
+  return fieldId.replaceAll(FIELD_SEPARATOR, DOT_SEPARATOR)
 }
 
 export function handleDefaultValue({
@@ -72,7 +77,7 @@ export function makeDatesFormatted<T extends EventState>(
   values: T
 ): T {
   return fields.reduce((acc, field) => {
-    const fieldId = field.id.replaceAll(DOT_SEPARATOR, FORMIK_FIELD_SEPARATOR)
+    const fieldId = field.id.replaceAll(DOT_SEPARATOR, FIELD_SEPARATOR)
 
     if (field.type === FieldType.DATE && fieldId in values) {
       const value = values[fieldId as keyof typeof values]

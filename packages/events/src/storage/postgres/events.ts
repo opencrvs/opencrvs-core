@@ -45,10 +45,9 @@ export function getClient() {
 
     db = new Kysely<Schema>({
       dialect,
-      // Don't modify nested object keys.
-      // Before this option was added, we had bugs where field id used in jsonb columns such as `annotation` or `declaration`
-      // were modified during SELECT queries.
-      plugins: [new CamelCasePlugin({ maintainNestedObjectKeys: true })]
+      // We considered adding 'maintainNestedObjectKeys: true' option to CamelCasePlugin,
+      // but it causes issues when creating SQL queries which use e.g. json_agg() or to_jsonb() to aggregate results.
+      plugins: [new CamelCasePlugin()]
     })
   }
 
