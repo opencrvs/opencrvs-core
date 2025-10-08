@@ -180,6 +180,23 @@ export const user = Object.assign(userSerializer, {
       },
       required: ['$user']
     }),
+  hasRole: (role: string) =>
+    defineConditional({
+      type: 'object',
+      properties: {
+        $user: {
+          type: 'object',
+          required: ['role'],
+          properties: {
+            role: {
+              type: 'string',
+              const: role
+            }
+          }
+        }
+      },
+      required: ['$user']
+    }),
   isOnline: () =>
     defineConditional({
       type: 'object',
@@ -239,7 +256,7 @@ function getDateRangeToFieldReference(
 }
 
 type FieldReference = { $$field: string }
-function isFieldReference(value: unknown): value is FieldReference {
+export function isFieldReference(value: unknown): value is FieldReference {
   return typeof value === 'object' && value !== null && '$$field' in value
 }
 

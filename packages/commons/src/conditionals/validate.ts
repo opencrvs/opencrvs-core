@@ -11,15 +11,17 @@
 
 import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
-import { ConditionalParameters, JSONSchema } from './conditionals'
-import { formatISO, isAfter, isBefore } from 'date-fns'
 import { ErrorMapCtx, z, ZodIssueOptionalMessage } from 'zod'
+import { formatISO, isAfter, isBefore } from 'date-fns'
+
+import { ConditionalParameters, JSONSchema } from './conditionals'
 import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
+import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
 
 const ajv = new Ajv({
@@ -118,7 +120,6 @@ ajv.addKeyword({
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
-
   const result = validator(data) as boolean
 
   return result
@@ -150,6 +151,7 @@ function getConditionalActionsForField(
   if (!field.conditionals) {
     return []
   }
+
   return field.conditionals
     .filter((conditional) => validate(conditional.conditional, values))
     .map((conditional) => conditional.type)
@@ -164,10 +166,16 @@ export function areConditionsMet(
   )
 }
 
+export type ValidatorContext = {
+  user?: ITokenPayload
+  leafAdminStructureLocationIds?: Array<{ id: UUID }>
+}
+
 function isFieldConditionMet(
   field: FieldConfig,
   form: ActionUpdate | EventState,
-  conditionalType: ConditionalType
+  conditionalType: ConditionalType,
+  context: ValidatorContext
 ) {
   const hasRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === conditionalType
@@ -179,10 +187,9 @@ function isFieldConditionMet(
 
   const validConditionals = getConditionalActionsForField(field, {
     $form: form,
-    $now: formatISO(new Date(), {
-      representation: 'date'
-    }),
-    $online: isOnline()
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $online: isOnline(),
+    $user: context.user
   })
 
   return validConditionals.includes(conditionalType)
@@ -190,21 +197,10 @@ function isFieldConditionMet(
 
 export function isFieldVisible(
   field: FieldConfig,
-  form: ActionUpdate | EventState
+  form: ActionUpdate | EventState,
+  context: ValidatorContext
 ) {
-  return isFieldConditionMet(field, form, ConditionalType.SHOW)
-}
-
-export function getOnlyVisibleFormValues(
-  field: FieldConfig[],
-  form: EventState
-) {
-  return field.reduce((acc, f) => {
-    if (isFieldVisible(f, form) && form[f.id] !== undefined) {
-      acc[f.id] = form[f.id]
-    }
-    return acc
-  }, {} as EventState)
+  return isFieldConditionMet(field, form, ConditionalType.SHOW, context)
 }
 
 function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
@@ -214,19 +210,21 @@ function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
 
 export function isFieldEnabled(
   field: FieldConfig,
-  form: ActionUpdate | EventState
+  form: ActionUpdate | EventState,
+  context: ValidatorContext
 ) {
-  return isFieldConditionMet(field, form, ConditionalType.ENABLE)
+  return isFieldConditionMet(field, form, ConditionalType.ENABLE, context)
 }
 
 // Fields are displayed on review if both the 'ConditionalType.SHOW' and 'ConditionalType.DISPLAY_ON_REVIEW' conditions are met
 export function isFieldDisplayedOnReview(
   field: FieldConfig,
-  form: ActionUpdate | EventState
+  form: ActionUpdate | EventState,
+  context: ValidatorContext
 ) {
   return (
-    isFieldVisible(field, form) &&
-    isFieldConditionMet(field, form, ConditionalType.DISPLAY_ON_REVIEW)
+    isFieldVisible(field, form, context) &&
+    isFieldConditionMet(field, form, ConditionalType.DISPLAY_ON_REVIEW, context)
   )
 }
 
@@ -403,13 +401,15 @@ export function validateFieldInput({
 
 export function runStructuralValidations({
   field,
-  values
+  values,
+  context
 }: {
   field: FieldConfig
   values: ActionUpdate
+  context: ValidatorContext
 }) {
   if (
-    !isFieldVisible(field, values) ||
+    !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
     return {
@@ -434,10 +434,10 @@ export function runFieldValidations({
 }: {
   field: FieldConfig
   values: ActionUpdate
-  context?: { leafAdminStructureLocationIds: Array<{ id: UUID }> }
+  context: ValidatorContext
 }) {
   if (
-    !isFieldVisible(field, values) ||
+    !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
     return {
@@ -455,9 +455,9 @@ export function runFieldValidations({
      *
      * Loading few megabytes of locations to memory just for validation is not efficient and will choke the application.
      */
-    $leafAdminStructureLocationIds:
-      context?.leafAdminStructureLocationIds ?? [],
-    $online: isOnline()
+    $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? [],
+    $online: isOnline(),
+    $user: context.user
   }
 
   const fieldValidationResult = validateFieldInput({

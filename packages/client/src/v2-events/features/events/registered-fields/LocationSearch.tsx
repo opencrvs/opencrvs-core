@@ -23,6 +23,7 @@ import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 interface SearchLocation {
   id: string
@@ -166,6 +167,11 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
     .filter(Boolean)
     .reverse()
 
+  const location = locations.find(({ id }) => id === value.toString())
+
+  if (location?.locationType === LocationType.Enum.ADMIN_STRUCTURE) {
+    return joinValues([...resolvedAdminLevels, country], ', ')
+  }
   return joinValues([name, ...resolvedAdminLevels, country], ', ')
 }
 
@@ -174,7 +180,7 @@ function isLocationEmpty(value: Stringifiable) {
 }
 
 export const LocationSearch = {
-  Input: LocationSearchInput,
+  Input: withSuspense(LocationSearchInput),
   Output: LocationSearchOutput,
   toCertificateVariables,
   isEmptyValue: isLocationEmpty

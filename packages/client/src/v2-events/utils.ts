@@ -30,11 +30,16 @@ import {
   joinValues,
   UUID,
   SystemRole,
-  Location
+  Location,
+  UserOrSystem
 } from '@opencrvs/commons/client'
 
-export function getUsersFullName(names: User['name'], language: string) {
-  const match = names.find((name) => name.use === language) ?? names[0]
+export function getUsersFullName(name: UserOrSystem['name'], language: string) {
+  if (typeof name === 'string') {
+    return name
+  }
+
+  const match = name.find((n) => n.use === language) ?? name[0]
 
   return joinValues([...match.given, match.family])
 }
@@ -103,8 +108,6 @@ export function createTemporaryId() {
  * @param meta: Metadata fields such as '$user', '$event', and others.
  *
  * @returns Resolves template variables in the default value and returns the resolved value.
- *
-
  */
 export function replacePlaceholders({
   fieldType,
@@ -319,4 +322,15 @@ export function getAdminLevelHierarchy(
   }
 
   return hierarchy
+}
+
+export function hasStringFilename(
+  field: unknown
+): field is { filename: string } {
+  return (
+    !!field &&
+    typeof field === 'object' &&
+    'filename' in field &&
+    typeof field.filename === 'string'
+  )
 }

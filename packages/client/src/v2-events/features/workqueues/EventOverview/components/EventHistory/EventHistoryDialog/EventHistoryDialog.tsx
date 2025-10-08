@@ -18,10 +18,15 @@ import {
   ActionType,
   EventDocument,
   getAcceptedActions,
-  UUID
+  UUID,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
-import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
+import {
+  EventHistoryActionDocument,
+  EventHistoryDocument,
+  useActionForHistory
+} from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { ActionTypeSpecificContent } from './components'
 
 export const eventHistoryStatusMessage = {
@@ -53,7 +58,7 @@ const messages = defineMessages({
   }
 })
 
-function prepareComments(history: ActionDocument) {
+function prepareComments(history: EventHistoryActionDocument) {
   const comments: { comment: string }[] = []
 
   if (
@@ -66,7 +71,7 @@ function prepareComments(history: ActionDocument) {
   return comments
 }
 
-function prepareReason(history: ActionDocument) {
+function prepareReason(history: EventHistoryActionDocument) {
   const reason: { message?: string } = {}
 
   if (history.type === ActionType.REJECT_CORRECTION) {
@@ -77,7 +82,7 @@ function prepareReason(history: ActionDocument) {
 }
 
 function prepareDuplicateOf(
-  history: ActionDocument,
+  history: EventHistoryActionDocument,
   fullHistory: ActionDocument[]
 ): string | null {
   if (history.type !== ActionType.MARK_AS_DUPLICATE) {
@@ -107,12 +112,14 @@ export function EventHistoryDialog({
   action,
   userName,
   close,
-  fullEvent
+  fullEvent,
+  validatorContext
 }: {
-  action: ActionDocument
+  action: EventHistoryActionDocument
   userName: string
   close: () => void
   fullEvent: EventDocument
+  validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
   const { getActionTypeForHistory } = useActionForHistory()
@@ -193,7 +200,11 @@ export function EventHistoryDialog({
           noResultText=" "
         />
       )}
-      <ActionTypeSpecificContent action={action} fullEvent={fullEvent} />
+      <ActionTypeSpecificContent
+        action={action}
+        fullEvent={fullEvent}
+        validatorContext={validatorContext}
+      />
     </ResponsiveModal>
   )
 }

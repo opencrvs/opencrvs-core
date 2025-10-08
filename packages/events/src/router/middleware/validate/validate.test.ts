@@ -8,8 +8,27 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ConditionalType, field, FieldType } from '@opencrvs/commons'
+import {
+  ConditionalType,
+  field,
+  FieldType,
+  TestUserRole,
+  TokenUserType,
+  user
+} from '@opencrvs/commons'
 import { getFieldErrors } from './index'
+
+export const testContext = {
+  user: {
+    sub: 'user_12345',
+    scope: ['declare'],
+    role: TestUserRole.Enum.LOCAL_REGISTRAR,
+    exp: '1678890000',
+    algorithm: 'RS256',
+    userType: TokenUserType.enum.user
+  },
+  leafAdminStructureLocationIds: []
+}
 
 describe('getFieldErrors()', () => {
   it('should return an empty array there are no fields to validate', () => {
@@ -33,7 +52,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       {},
-      {}
+      testContext
     )
     expect(errors).toMatchSnapshot()
   })
@@ -53,7 +72,8 @@ describe('getFieldErrors()', () => {
           }
         }
       ],
-      { 'test.checkbox': true }
+      { 'test.checkbox': true },
+      testContext
     )
 
     expect(errors).toMatchSnapshot()
@@ -81,7 +101,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.checkbox': true },
-      {}
+      testContext
     )
 
     expect(errors).toMatchSnapshot()
@@ -109,7 +129,91 @@ describe('getFieldErrors()', () => {
         }
       ],
       {},
-      {}
+      testContext
+    )
+
+    expect(errors).toMatchSnapshot()
+  })
+
+  it('should not return an error if a value for a user-based conditionally hidden required field is not provided', () => {
+    const errors = getFieldErrors(
+      [
+        {
+          id: 'test.checkbox',
+          type: FieldType.CHECKBOX,
+          required: true,
+          defaultValue: false,
+          label: {
+            id: 'test.field.label',
+            defaultMessage: 'Test Field',
+            description: 'Test Field Description'
+          },
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional: user.hasRole(TestUserRole.Enum.FIELD_AGENT)
+            }
+          ]
+        }
+      ],
+      {},
+      testContext
+    )
+
+    expect(errors).toMatchSnapshot()
+  })
+
+  it('should return an error if a value for a user-based conditionally required field is not provided', () => {
+    const errors = getFieldErrors(
+      [
+        {
+          id: 'test.text',
+          type: FieldType.TEXT,
+          required: true,
+          label: {
+            id: 'test.field.label',
+            defaultMessage: 'Test Field',
+            description: 'Test Field Description'
+          },
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional: user.hasRole(TestUserRole.Enum.LOCAL_REGISTRAR)
+            }
+          ]
+        }
+      ],
+      {},
+      testContext
+    )
+
+    expect(errors).toMatchSnapshot()
+  })
+
+  it('should not return an error if a value for a user-based conditionally required field is provided', () => {
+    const errors = getFieldErrors(
+      [
+        {
+          id: 'test.text',
+          type: FieldType.TEXT,
+          required: true,
+          label: {
+            id: 'test.field.label',
+            defaultMessage: 'Test Field',
+            description: 'Test Field Description'
+          },
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional: user.hasRole(TestUserRole.Enum.LOCAL_REGISTRAR)
+            }
+          ]
+        }
+      ],
+      {
+        'test.text': 'some value'
+      },
+      testContext
     )
 
     expect(errors).toMatchSnapshot()
@@ -137,6 +241,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.checkbox': true },
+      testContext,
       { 'test.text': 'helloooo' }
     )
 
@@ -180,6 +285,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.checkbox': true },
+      testContext,
       { 'test.text': 'helloooo' }
     )
 
@@ -211,7 +317,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.input': 'not hello!' },
-      {}
+      testContext
     )
 
     expect(errors).toMatchSnapshot()
@@ -242,7 +348,7 @@ describe('getFieldErrors()', () => {
         }
       ],
       { 'test.input': 'helloooo' },
-      {}
+      testContext
     )
 
     expect(errors).toMatchSnapshot()

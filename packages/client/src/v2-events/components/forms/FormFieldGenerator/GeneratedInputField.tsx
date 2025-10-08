@@ -54,8 +54,12 @@ import {
   SelectDateRangeValue,
   isTimeFieldType,
   isButtonFieldType,
+  isPrintButtonFieldType,
   isHttpFieldType,
-  isLinkButtonFieldType
+  isLinkButtonFieldType,
+  isVerificationStatusType,
+  isQueryParamReaderFieldType,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -76,10 +80,11 @@ import {
   SelectDateRangeField,
   TimeField,
   Button,
+  AlphaPrintButton,
   Http,
-  LinkButton
+  LinkButton,
+  VerificationStatus
 } from '@client/v2-events/features/events/registered-fields'
-
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
@@ -88,7 +93,11 @@ import { DateRangeField } from '@client/v2-events/features/events/registered-fie
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
-import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
+import { QueryParamReader } from '../inputs/QueryParamReader'
+import {
+  makeFormikFieldIdsOpenCRVSCompatible,
+  parseFieldReferencesInConfiguration
+} from './utils'
 
 interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
@@ -108,11 +117,13 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   disabled?: boolean
   eventConfig?: EventConfig
   readonlyMode?: boolean
+  validatorContext: ValidatorContext
 }
 
 export const GeneratedInputField = React.memo(
   <T extends FieldConfig>({
     fieldDefinition,
+    validatorContext,
     onBlur,
     onFieldValueChange,
     error,
@@ -195,6 +206,7 @@ export const GeneratedInputField = React.memo(
             disabled={disabled}
             id={fieldDefinition.id}
             validation={validation}
+            validatorContext={validatorContext}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
@@ -435,6 +447,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             configuration={field.config.configuration}
             disabled={disabled}
+            validatorContext={validatorContext}
             value={field.value}
             //@TODO: We need to come up with a general solution for complex types.
             // @ts-ignore
@@ -495,7 +508,7 @@ export const GeneratedInputField = React.memo(
     if (isSignatureFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <SignatureField
+          <SignatureField.Input
             {...field.config}
             disabled={disabled}
             maxFileSize={field.config.configuration.maxFileSize}
@@ -612,6 +625,19 @@ export const GeneratedInputField = React.memo(
       )
     }
 
+    if (isPrintButtonFieldType(field)) {
+      return (
+        <AlphaPrintButton.Input
+          buttonLabel={field.config.configuration.buttonLabel}
+          disabled={disabled}
+          id={fieldDefinition.id}
+          template={field.config.configuration.template}
+          value={field.value}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
     if (isButtonFieldType(field)) {
       return (
         // Button can be always 'touched' to show errors.
@@ -634,7 +660,10 @@ export const GeneratedInputField = React.memo(
       return (
         <Http.Input
           key={fieldDefinition.id}
-          configuration={field.config.configuration}
+          configuration={parseFieldReferencesInConfiguration(
+            field.config.configuration,
+            form
+          )}
           parentValue={form[field.config.configuration.trigger.$$field]}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
@@ -647,6 +676,26 @@ export const GeneratedInputField = React.memo(
           configuration={field.config.configuration}
           disabled={inputProps.disabled}
           id={field.config.id}
+        />
+      )
+    }
+
+    if (isVerificationStatusType(field)) {
+      return (
+        <VerificationStatus.Input
+          configuration={field.config.configuration}
+          id={field.config.id}
+          value={field.value}
+          onReset={() => onFieldValueChange(fieldDefinition.id, undefined)}
+        />
+      )
+    }
+
+    if (isQueryParamReaderFieldType(field)) {
+      return (
+        <QueryParamReader.Input
+          configuration={field.config.configuration}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )
     }

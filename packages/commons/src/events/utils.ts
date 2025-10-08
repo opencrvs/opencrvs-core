@@ -22,7 +22,7 @@ import {
   uniqBy,
   cloneDeep,
   orderBy,
-  groupBy
+  isEqual
 } from 'lodash'
 import {
   ActionType,
@@ -41,9 +41,9 @@ import {
 } from './ActionDocument'
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import {
-  getOnlyVisibleFormValues,
   isConditionMet,
-  isFieldVisible
+  isFieldVisible,
+  ValidatorContext
 } from '../conditionals/validate'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
@@ -54,6 +54,7 @@ import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
 import { SelectDateRangeValue } from './FieldValue'
 import { subDays } from 'date-fns'
+import { ConditionalType } from './Conditional'
 
 function isDeclarationActionConfig(
   action: ActionConfig
@@ -168,38 +169,68 @@ export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
   return isConditionMet(page.conditional, formValues)
 }
 
+/**
+ * Removes values from the form that correspond to hidden fields.
+ * This function recursively omits any fields from the form values that are not visible
+ * according to their FieldConfig and the current form state. It ensures that only values
+ * for visible fields are retained, which is useful for conditional forms where hidden field
+ * values should not affect validation or submission.
+ *
+ * @template T - The type of the form values
+ * @param {T} formValues - The current form values
+ * @param {FieldConfig[]} fields - The list of field configurations to check visibility against
+ * * @param validatorContext - custom validation context
+ * @returns {Partial<T>} A new object containing only the values for visible fields
+ */
 export function omitHiddenFields<T extends EventState | ActionUpdate>(
   fields: FieldConfig[],
-  values: T,
-  visibleVerificationPageIds: string[] = []
-) {
-  return omitBy<T>(values, (_, fieldId) => {
-    // We dont want to omit visible verification page values
-    if (visibleVerificationPageIds.includes(fieldId)) {
-      return false
-    }
+  formValues: T,
+  validatorContext: ValidatorContext
+): Partial<T> {
+  const base = cloneDeep(formValues)
 
-    // There can be multiple field configurations with the same id, with e.g. different options and conditions
-    const fieldConfigs = fields.filter((f) => f.id === fieldId)
+  // The omitting is done recursively until the object does not change.
+  // This is because the previously removed fields might affect the visibility of other fields.
+  function fn(prevVisibilityContext: Partial<T>): Partial<T> {
+    const cleaned = omitBy<Partial<T>>(base, (_, fieldId) => {
+      const fieldConfig = fields.filter((f) => f.id === fieldId)
 
-    if (!fieldConfigs.length) {
-      return true
-    }
+      return fieldConfig.length
+        ? fieldConfig.every(
+            (f) => !isFieldVisible(f, prevVisibilityContext, validatorContext)
+          )
+        : false
+    })
 
-    // As long as one of the field configs is visible, the field should be included
-    return fieldConfigs.every((f) => !isFieldVisible(f, values))
-  })
+    return isEqual(cleaned, prevVisibilityContext) ? cleaned : fn(cleaned)
+  }
+
+  return fn(base)
 }
 
 export function omitHiddenPaginatedFields(
   formConfig: FormConfig,
-  declaration: EventState
+  values: EventState,
+  validatorContext: ValidatorContext
 ) {
-  const visiblePagesFormFields = formConfig.pages
-    .filter((p) => isPageVisible(p, declaration))
-    .flatMap((p) => p.fields)
+  // If a page has a conditional, we set it as one of the field's conditionals with ConditionalType.SHOW
+  const fields = formConfig.pages.flatMap((p) =>
+    p.fields.map((f) => {
+      if (!p.conditional) {
+        return f
+      }
 
-  return omitHiddenFields(visiblePagesFormFields, declaration)
+      return {
+        ...f,
+        conditionals: [
+          ...(f.conditionals ?? []),
+          { type: ConditionalType.SHOW, conditional: p.conditional }
+        ]
+      }
+    })
+  )
+
+  return omitHiddenFields(fields, values, validatorContext)
 }
 
 /**
@@ -266,43 +297,18 @@ export function getVisibleVerificationPageIds(
     .map((page) => page.id)
 }
 
-export function getActionVerificationPageIds(
-  actionConfig: ActionConfig,
-  annotation: ActionUpdate
-): string[] {
-  if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
-    return getVisibleVerificationPageIds(
-      actionConfig.correctionForm.pages,
-      annotation
-    )
-  }
-
-  if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
-    return getVisibleVerificationPageIds(
-      actionConfig.printForm.pages,
-      annotation
-    )
-  }
-
-  return []
-}
-
 export function omitHiddenAnnotationFields(
   actionConfig: ActionConfig,
   declaration: EventState,
-  annotation: ActionUpdate
+  annotation: ActionUpdate,
+  context: ValidatorContext
 ) {
   const annotationFields = getActionAnnotationFields(actionConfig)
-
-  const visibleVerificationPageIds = getActionVerificationPageIds(
-    actionConfig,
-    annotation
-  )
 
   return omitHiddenFields(
     annotationFields,
     { ...declaration, ...annotation },
-    visibleVerificationPageIds
+    context
   )
 }
 
@@ -472,26 +478,18 @@ function isAcceptedAction(a: Action): a is ActionDocument {
   return a.status === ActionStatus.Accepted
 }
 
-function getPendingActions(actions: Action[]): ActionDocument[] {
-  const actionGroups: Record<string, Action[]> = groupBy(
-    actions,
-    ({ transactionId, type }: Action) => `${transactionId}::${type}`
-  )
-
-  const pendingActions = Object.values(actionGroups)
-    .filter((actionsInGroup) => actionsInGroup.length === 1)
-    .map((actionsInGroup) => actionsInGroup[0])
-    .filter(isRequestedAction)
-
-  return pendingActions
-}
-
 export function getPendingAction(actions: Action[]): ActionDocument {
-  const pendingActions = getPendingActions(actions)
+  const requestedActions = actions.filter(isRequestedAction)
+  const pendingActions = requestedActions.filter(
+    ({ id }) =>
+      !actions.some(
+        (action) => isAcceptedAction(action) && action.originalActionId === id
+      )
+  )
 
   if (pendingActions.length !== 1) {
     throw new Error(
-      `Expected exactly one pending action, but found ${pendingActions.length}`
+      `Expected exactly one pending action, but found ${pendingActions.map(({ id }) => id).join(', ')}`
     )
   }
 
@@ -550,14 +548,15 @@ export function getCompleteActionDeclaration(
     const originalAction = event.actions.find(
       ({ id }) => id === action.originalActionId
     )
-    if (originalAction?.status !== ActionStatus.Requested) {
-      return declaration
-    }
 
-    return deepMerge(
-      deepMerge(declaration, originalAction.declaration),
-      action.declaration
-    )
+    // Requested actions may carry partial declaration data.
+    // Merge original declaration with the current one to preserve completeness.
+    if (originalAction?.status === ActionStatus.Requested) {
+      return deepMerge(
+        deepMerge(declaration, originalAction.declaration),
+        action.declaration
+      )
+    }
   }
   return deepMerge(declaration, action.declaration)
 }
@@ -577,41 +576,30 @@ const EXCLUDED_ACTIONS = [
   ActionType.REJECT_CORRECTION
 ]
 
-export function aggregateActionDeclarations(
-  event: EventDocument,
-  config: EventConfig
-): EventState {
+export function aggregateActionDeclarations(event: EventDocument): EventState {
   const allAcceptedActions = getAcceptedActions(event)
   const aggregatedActions = allAcceptedActions
     .filter((a) => !EXCLUDED_ACTIONS.some((type) => type === a.type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  const aggregatedDeclaration = aggregatedActions.reduce(
-    (declaration, action) => {
-      /*
-       * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
-       * details in the correction. To do this, we find the original request that this
-       * approval is for and merge its details with the current data of the record.
-       */
-      if (action.type === ActionType.APPROVE_CORRECTION) {
-        const requestAction = allAcceptedActions.find(
-          ({ id }) => id === action.requestId
-        )
+  return aggregatedActions.reduce((declaration, action) => {
+    /*
+     * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
+     * details in the correction. To do this, we find the original request that this
+     * approval is for and merge its details with the current data of the record.
+     */
+    if (action.type === ActionType.APPROVE_CORRECTION) {
+      const requestAction = allAcceptedActions.find(
+        ({ id }) => id === action.requestId
+      )
 
-        if (!requestAction) {
-          return declaration
-        }
-
-        return getCompleteActionDeclaration(declaration, event, requestAction)
+      if (!requestAction) {
+        return declaration
       }
 
-      return getCompleteActionDeclaration(declaration, event, action)
-    },
-    {}
-  )
+      return getCompleteActionDeclaration(declaration, event, requestAction)
+    }
 
-  return getOnlyVisibleFormValues(
-    config.declaration.pages.flatMap(({ fields }) => fields),
-    aggregatedDeclaration
-  )
+    return getCompleteActionDeclaration(declaration, event, action)
+  }, {})
 }

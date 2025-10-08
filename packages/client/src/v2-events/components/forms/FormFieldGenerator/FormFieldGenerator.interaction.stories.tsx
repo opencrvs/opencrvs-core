@@ -27,16 +27,18 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormWizard } from '@client/v2-events/features/events/components/FormWizard'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'FormFieldGenerator/Interaction',
   args: { onChange: fn() },
   decorators: [
-    (Story) => (
+    (Story, context) => (
       <TRPCProvider>
-        <Story />
+        <Story {...context} />
       </TRPCProvider>
-    )
+    ),
+    withValidatorContext
   ]
 }
 
@@ -109,6 +111,7 @@ export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={fields}
         id="my-form"
         initialValues={declaration}
@@ -216,6 +219,7 @@ export const UpdateParentFieldValues: StoryObj<typeof FormFieldGenerator> = {
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={tennisFamilyMembership}
         id="my-form"
         initialValues={tennisFamilyMembershipDeclaration}
@@ -320,6 +324,7 @@ export const EmptiesWhenParentChanges: StoryObj<typeof FormFieldGenerator> = {
 
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={tennisStyleFields}
         id="my-form"
         initialValues={initialValues}
@@ -401,6 +406,7 @@ export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
 
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={tennisStyleFields}
         id="my-form"
         initialValues={initialValues}
@@ -455,6 +461,7 @@ export const CustomRequiredValidationMessage: StoryObj<
         onSubmit={noop}
       >
         <StyledFormFieldGenerator
+          {...args}
           fields={tennisStyleFields.map((f) => {
             const { parent, ...rest } = f
             return {

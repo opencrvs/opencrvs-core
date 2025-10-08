@@ -25,7 +25,7 @@ export const colors = {
   purpleLighter: '#F0ECF9',
 
   // Secondary Orange
-  orange: '#EA8A25',
+  orange: '#E99B63',
   orangeDark: '#B65618',
   orangeDarker: '#753919',
   orangeLight: '#F9DFAF',
@@ -42,8 +42,8 @@ export const colors = {
   red: '#D53F3F',
   redDark: '#B02525',
   redDarker: '#792323',
-  redLight: '#E79393',
-  redLighter: '#FAE6E6',
+  redLight: '#FCE4E4',
+  redLighter: '#FDF3F3',
 
   // Secondary Yellow
   yellow: '#FBD91E',
@@ -53,11 +53,11 @@ export const colors = {
   yellowLighter: '#FEFDE8',
 
   // Secondary Teal
-  teal: '#1E7F93',
-  tealDark: '#225968',
+  teal: '#4A8AD7',
+  tealDark: '#2B70C3',
   tealDarker: '#0A3944',
-  tealLight: '#AEDFEA',
-  tealLighter: '#EBF7FA',
+  tealLight: '#9EC0E9',
+  tealLighter: '#DCE8F7',
 
   // Grey
   white: '#FFFFFF',

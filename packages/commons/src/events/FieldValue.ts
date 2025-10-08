@@ -19,7 +19,9 @@ import {
   HttpFieldUpdateValue,
   HttpFieldValue,
   StreetLevelDetailsValue,
-  StreetLevelDetailsUpdateValue
+  StreetLevelDetailsUpdateValue,
+  QueryParamReaderFieldValue,
+  QueryParamReaderFieldUpdateValue
 } from './CompositeFieldValue'
 /**
  * FieldValues defined in this file are primitive field values.
@@ -80,6 +82,13 @@ export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
 
 export const ButtonFieldValue = z.number()
 export type ButtonFieldValue = z.infer<typeof ButtonFieldValue>
+export const VerificationStatusValue = z.enum([
+  'verified',
+  'authenticated',
+  'failed',
+  'pending'
+])
+export type VerificationStatusValue = z.infer<typeof VerificationStatusValue>
 
 export const FieldValue = z.union([
   /**
@@ -100,7 +109,9 @@ export const FieldValue = z.union([
   NameFieldValue,
   NameFieldUpdateValue,
   ButtonFieldValue,
-  HttpFieldValue
+  HttpFieldValue,
+  VerificationStatusValue,
+  QueryParamReaderFieldValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>
@@ -122,7 +133,8 @@ export const FieldUpdateValue = z.union([
   FileFieldWithOptionValue,
   DataFieldValue,
   NameFieldUpdateValue,
-  HttpFieldUpdateValue
+  HttpFieldUpdateValue,
+  QueryParamReaderFieldUpdateValue
 ])
 
 export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
@@ -157,6 +169,7 @@ export type FieldUpdateValueSchema =
   | typeof NameFieldValue
   | typeof NameFieldUpdateValue
   | typeof HttpFieldUpdateValue
+  | typeof QueryParamReaderFieldUpdateValue
   | typeof ButtonFieldValue
   | z.ZodString
   | z.ZodBoolean

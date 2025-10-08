@@ -25,8 +25,10 @@ import {
   isPageVisible,
   PageConfig,
   PageTypes,
+  RequestedCorrectionAction,
   TranslationConfig,
-  User
+  User,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment, Link } from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
@@ -115,6 +117,7 @@ function buildCorrectionDetails(
   intl: IntlShape,
   users: User[],
   locations: ReturnType<typeof getLocations>,
+  validatorContext: ValidatorContext,
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
   const details: CorrectionDetail[] = correctionFormPages
@@ -136,7 +139,9 @@ function buildCorrectionDetails(
         ]
       }
       return page.fields
-        .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
+        .filter((f) =>
+          isFieldVisible(f, { ...form, ...annotation }, validatorContext)
+        )
         .filter((f) => !isEmptyValue(f, { ...form, ...annotation }[f.id]))
         .map((field) => ({
           label: field.label,
@@ -194,15 +199,17 @@ export function CorrectionDetails({
   requesting,
   editable = false,
   workqueue,
-  correctionRequestAction
+  correctionRequestAction,
+  validatorContext
 }: {
   event: EventDocument
   form: EventState
   annotation: EventState
   requesting: boolean
-  correctionRequestAction?: Action
+  correctionRequestAction?: RequestedCorrectionAction
   editable?: boolean
   workqueue?: string
+  validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(event.type)
@@ -224,6 +231,7 @@ export function CorrectionDetails({
     intl,
     users,
     locations,
+    validatorContext,
     correctionRequestAction
   )
 
@@ -296,6 +304,7 @@ export function CorrectionDetails({
         form={form}
         fullEvent={event}
         id={'corrections-table'}
+        validatorContext={validatorContext}
       />
     </>
   )
