@@ -60,10 +60,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: ${{ 
-          ((github.ref_type == 'tag' || inputs.build_arm == true) && fromJSON('["ubuntu-24.04", "ubuntu-24.04-arm"]')) || 
-          fromJSON('["ubuntu-24.04"]') 
-          }}
+        runner: ${{ (inputs.build_arm == true && fromJSON('["ubuntu-24.04", "ubuntu-24.04-arm"]')) || fromJSON('["ubuntu-24.04"]') }}
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v5
@@ -143,7 +140,7 @@ jobs:
           password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
       - name: Create and push multi-arch manifest
         env:
-          BUILD_ARM: ${{ github.ref_type == 'tag' || inputs.build_arm == true }}
+          BUILD_ARM: ${{ inputs.build_arm == true }}
         run: |
           REPO="ghcr.io/opencrvs/ocrvs-base"
           for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
@@ -162,7 +159,7 @@ jobs:
       fail-fast: false
       matrix:
         runner: ${{ 
-          ((github.ref_type == 'tag' || inputs.build_arm == true) && fromJSON('["ubuntu-24.04", "ubuntu-24.04-arm"]')) || 
+          (inputs.build_arm == true && fromJSON('["ubuntu-24.04", "ubuntu-24.04-arm"]')) || 
           fromJSON('["ubuntu-24.04"]') 
           }}
         service: ${{ fromJSON(needs.base.outputs.services) }}
@@ -230,7 +227,7 @@ jobs:
 
       - name: Create and push multi-arch manifest
         env:
-          BUILD_ARM: ${{ github.ref_type == 'tag' || inputs.build_arm == true }}
+          BUILD_ARM: ${{ inputs.build_arm == true }}
         run: |
           REPO_PREFIX="ghcr.io/opencrvs/ocrvs"
 
