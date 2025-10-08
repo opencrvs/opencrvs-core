@@ -37,12 +37,22 @@ import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 extendZodWithOpenApi(z)
 
+/*
+ * Formik has a feature that automatically nests all form keys that have a dot in them.
+ * Because our form field ids can have dots in them, we temporarily transform those dots
+ * to a different character before passing the data to Formik.
+ *
+ * For this reason, we can not allow a field id to contain the formik field separator, as it causes issues with the transformation.
+ */
+export const FORMIK_FIELD_SEPARATOR = '____'
+
 const FieldId = z
   .string()
-  // Field id must not contain '_' since they cause issues with Formik field ids
   .refine(
-    (val) => !val.includes('_'),
-    (val) => ({ message: `id: '${val}' must not contain '_'` })
+    (val) => !val.includes(FORMIK_FIELD_SEPARATOR),
+    (val) => ({
+      message: `id: '${val}' must not contain four consecutive underscores '${FORMIK_FIELD_SEPARATOR}'`
+    })
   )
   .describe('Unique identifier for the field')
 

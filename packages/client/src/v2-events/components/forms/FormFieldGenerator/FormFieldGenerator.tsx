@@ -22,13 +22,11 @@ import {
   isNonInteractiveFieldType,
   joinValues,
   SystemVariables,
-  ValidatorContext
+  ValidatorContext,
+  FORMIK_FIELD_SEPARATOR
 } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import {
-  FIELD_SEPARATOR,
-  handleDefaultValue
-} from '@client/v2-events/components/forms/utils'
+import { handleDefaultValue } from '@client/v2-events/components/forms/utils'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
 import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
 import {
@@ -110,7 +108,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
                  * If we are touching  `firstname` from `child____name`,
                  * we mark `child____name____firstname` as dirty
                  */
-                [joinValues([parentId, fieldId], FIELD_SEPARATOR)]: true
+                [joinValues([parentId, fieldId], FORMIK_FIELD_SEPARATOR)]: true
               }),
               {}
             )

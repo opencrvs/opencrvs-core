@@ -32,10 +32,10 @@ import {
   omitHiddenFields,
   isFieldEnabled,
   ValidatorContext,
-  isFieldVisible
+  isFieldVisible,
+  FORMIK_FIELD_SEPARATOR
 } from '@opencrvs/commons/client'
 import {
-  FIELD_SEPARATOR,
   handleDefaultValue,
   makeDatesFormatted,
   makeFormFieldIdFormikCompatible,
@@ -456,7 +456,10 @@ export function FormSectionComponent({
                      */
                     (parentId
                       ? touched[
-                          joinValues([parentId, FIELD_SEPARATOR, field.id], '')
+                          joinValues(
+                            [parentId, FORMIK_FIELD_SEPARATOR, field.id],
+                            ''
+                          )
                         ] || touched[parentId]
                       : touched[field.id]) ?? false
                   }
