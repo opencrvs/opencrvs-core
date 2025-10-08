@@ -14,19 +14,12 @@ import {
   EventIndex,
   WorkqueueActionsWithDefault,
   isMetaAction,
-  getOrThrow,
-  ActionType
+  getOrThrow
 } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 import { useAuthentication } from '@client/utils/userUtils'
-import {
-  ActionMenuActionType,
-  useAllowedActionConfigurations
-} from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useAllowedActionConfigurations } from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { withSuspense } from '../../../components/withSuspense'
-
-// Actions which should never be shown as a CTA
-const EXCLUDED_ACTIONS: ActionMenuActionType[] = [ActionType.ARCHIVE]
 
 /**
  * @returns next available action cta based on the given event.
@@ -47,7 +40,11 @@ function ActionCtaComponent({
     'Authentication is not available but is required'
   )
 
-  const [, allowedActionConfigs] = useAllowedActionConfigurations(event, auth)
+  const [, allowedActionConfigs] = useAllowedActionConfigurations(
+    event,
+    auth,
+    true
+  )
 
   const config =
     actionType === 'DEFAULT'
@@ -55,7 +52,7 @@ function ActionCtaComponent({
       : // If action type is not allowed, we don't provide it.
         allowedActionConfigs.find((item) => item.type === actionType)
 
-  if (!config || EXCLUDED_ACTIONS.includes(config.type)) {
+  if (!config) {
     return null
   }
 
