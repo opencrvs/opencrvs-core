@@ -35,24 +35,6 @@ function IdReaderInput({
 }) {
   const intl = useIntl()
   const validatorContext = useValidatorContext()
-  const fieldValues = useRef<FieldValue | undefined>(undefined)
-
-  /**
-   *
-   * @param updated values of the reading methods
-   * @returns only the updated value of one of the reading methods
-   */
-  const handleChange = (values: EventState) => {
-    const prevValues = fieldValues.current
-
-    for (const key of Object.keys(values)) {
-      if (!isEqual(prevValues?.[key], values[key])) {
-        fieldValues.current = values
-        onChange(values as IdReaderFieldValue)
-        return
-      }
-    }
-  }
 
   return (
     <IdReaderUI
@@ -65,7 +47,7 @@ function IdReaderInput({
         fields={methods}
         id={id}
         validatorContext={validatorContext}
-        onChange={handleChange}
+        onChange={(values) => onChange(Object.values(values)[0])}
       />
     </IdReaderUI>
   )
