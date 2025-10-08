@@ -89,3 +89,32 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
     )
   }
 }
+
+export const DateInputDisabled: StoryObj<typeof FormFieldGenerator> = {
+  parameters: {
+    layout: 'centered'
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={[
+          {
+            id: 'storybook.date',
+            type: FieldType.DATE,
+            label: {
+              id: 'storybook.date.label',
+              defaultMessage: 'Date input',
+              description: 'The title for the date input'
+            },
+            disabled: true
+          }
+        ]}
+        id="my-form"
+        onChange={(data) => {
+          args.onChange(data)
+        }}
+      />
+    )
+  }
+}
