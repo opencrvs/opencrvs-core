@@ -38,6 +38,7 @@ export type FormWizardProps = PropsWithChildren<{
   /** Callback when the user submits the form wizard */
   onSubmit: () => void
   pageTitle: string
+  showReviewButton?: boolean
 }>
 
 export const FormWizard = ({
@@ -47,6 +48,7 @@ export const FormWizard = ({
   pageTitle,
   onNextPage,
   onPreviousPage,
+  showReviewButton,
   continueButtonText = 'Continue'
 }: FormWizardProps & {
   continueButtonText?: string
@@ -76,9 +78,11 @@ export const FormWizard = ({
             >
               {continueButtonText}
             </Button>
-            <Button size="large" type="secondary" onClick={onSubmit}>
-              {intl.formatMessage(messages.goToReview)}
-            </Button>
+            {showReviewButton && (
+              <Button size="large" type="secondary" onClick={onSubmit}>
+                {intl.formatMessage(messages.goToReview)}
+              </Button>
+            )}
           </Stack>
         </Content>
       </Frame.Section>
