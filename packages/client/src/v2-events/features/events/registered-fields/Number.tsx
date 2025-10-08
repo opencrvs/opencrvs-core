@@ -63,7 +63,7 @@ function NumberInput({ value, disabled, ...props }: NumberInputProps) {
 export const Number = {
   Input: NumberInput,
   Output: ({ value, config }: { value?: number; config: NumberField }) => {
-    if (typeof value !== 'number') {
+    if (value === undefined) {
       return null
     }
 
