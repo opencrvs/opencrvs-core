@@ -182,7 +182,7 @@ const declarationTrpcMswFail = {
       procedure: tRPCMsw.event.actions.declare.request.mutation,
       handler: async () => {
         await new Promise((resolve) => setTimeout(resolve, OUTBOX_FREEZE_TIME))
-        return new TRPCError({
+        throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR'
         })
       }
@@ -257,6 +257,105 @@ export const FailedMutation: Story = {
 
       await expect(searchResult).toHaveTextContent(`${firstname} ${surname}`)
 
+      await new Promise((resolve) =>
+        setTimeout(resolve, OUTBOX_FREEZE_TIME + 1000)
+      ) // Allow some buffer for the freeze time
+
+      const outboxButton2 = await canvas.findByTestId(
+        'navigation_workqueue_outbox'
+      )
+      await expect(outboxButton2).toHaveTextContent(/^Outbox1$/)
+    })
+  }
+}
+
+const declarationTrpcMswConflict = {
+  events: wrapHandlersWithSpies([
+    {
+      name: 'event.create',
+      procedure: tRPCMsw.event.create.mutation,
+      handler: () => createdEventDocument
+    },
+    {
+      name: 'event.actions.declare.request',
+      procedure: tRPCMsw.event.actions.declare.request.mutation,
+      handler: async () => {
+        await new Promise((resolve) => setTimeout(resolve, OUTBOX_FREEZE_TIME))
+        throw new TRPCError({
+          code: 'CONFLICT'
+        })
+      }
+    }
+  ])
+}
+
+export const FailedMutationConflict: Story = {
+  loaders: [
+    async () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+
+      // Ensure state is stable before seeding the mutation cache
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: createdEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    offline: {
+      events: [createdEventDocument],
+      configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
+    },
+    msw: {
+      handlers: {
+        events: [...declarationTrpcMswConflict.events.handlers],
+        user: [
+          graphql.query('fetchUser', () => {
+            return HttpResponse.json({
+              data: {
+                getUser: generator.user.registrationAgent().v1
+              }
+            })
+          }),
+          tRPCMsw.user.list.query(() => {
+            return [mockUser]
+          }),
+          tRPCMsw.user.get.query(() => {
+            return mockUser
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('Send for review', async () => {
+      const submitButton = await canvas.findByText('Send for review')
+      await userEvent.click(submitButton)
+      const confirmButton = await canvas.findByText('Confirm')
+      await userEvent.click(confirmButton)
+      const outboxButton = await canvas.findByTestId(
+        'navigation_workqueue_outbox'
+      )
+      await expect(outboxButton).toHaveTextContent(/^Outbox1$/)
+
+      await userEvent.click(outboxButton)
+
+      const searchResult = await canvas.findByTestId('search-result')
+      const { firstname, surname } = getCurrentEventState(
+        declareEventDocument,
+        tennisClubMembershipEvent
+      ).declaration['applicant.name'] as {
+        firstname: string
+        surname: string
+      }
+
+      await expect(searchResult).toHaveTextContent(`${firstname} ${surname}`)
+
       await waitFor(
         async () => {
           await expect(searchResult).not.toHaveTextContent(
@@ -265,6 +364,10 @@ export const FailedMutation: Story = {
         },
         { timeout: OUTBOX_FREEZE_TIME + 1000 } // Allow some buffer for the freeze time
       )
+
+      await expect(
+        await canvas.findByText("You've been unassigned from the event")
+      ).toBeVisible()
 
       const outboxButton2 = await canvas.findByTestId(
         'navigation_workqueue_outbox'
