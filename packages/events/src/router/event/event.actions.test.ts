@@ -290,17 +290,6 @@ describe('Action updates', () => {
       http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
         return HttpResponse.json([multiFileConfig, tennisClubMembershipEvent])
       }),
-      http.post(
-        `${env.COUNTRY_CONFIG_URL}/events/multi-file-event/actions/:action`,
-        (ctx) => {
-          const payload =
-            ctx.params.action === ActionType.REGISTER
-              ? { registrationNumber: `ABC${Number(new Date())}` }
-              : {}
-
-          return HttpResponse.json(payload)
-        }
-      ),
       http.head(`${env.DOCUMENTS_URL}/files/:filePath*`, (req) => {
         fileExistsMock(
           typeof req.params.filePath === 'string'
@@ -309,7 +298,6 @@ describe('Action updates', () => {
         )
         return HttpResponse.json({ ok: true })
       }),
-
       http.delete(`${env.DOCUMENTS_URL}/files/:filePath*`, (req) => {
         deleteFileMock(
           typeof req.params.filePath === 'string'
