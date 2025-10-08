@@ -92,7 +92,11 @@ export function getPreviousDeclarationActionType(
       break
     }
     case ActionType.REGISTER: {
-      actionTypes = [ActionType.VALIDATE, ActionType.DUPLICATE_DETECTED]
+      actionTypes = [
+        ActionType.DECLARE,
+        ActionType.VALIDATE,
+        ActionType.DUPLICATE_DETECTED
+      ]
       break
     }
     case ActionType.REQUEST_CORRECTION: {
@@ -116,34 +120,42 @@ export function getPreviousDeclarationActionType(
 
   for (const type of actionTypes) {
     const foundAction = actions.find((a) => a.type === type)
-    if (foundAction) {
-      const actionTransactionId = foundAction.transactionId
-      const actionsWithSameTransactionId = actions.filter(
-        (a) => a.transactionId === actionTransactionId && a.type === type
-      )
+    if (!foundAction) {
+      continue
+    }
 
-      if (actionsWithSameTransactionId.length > 0) {
-        const declarationAction = actionsWithSameTransactionId.find(
-          (a) => 'declaration' in a && Object.keys(a.declaration).length > 0
-        )
+    // When a record is created by a registration agent, a DECLARE action is created
+    // containing a non-empty 'declaration' object. A VALIDATE action is also created,
+    // but its 'declaration' is empty.
+    //
+    // Later, when determining the previousDeclarationActionType for a REGISTER action,
+    // we may find the VALIDATE action first. However, unlike the case where a field
+    // agent DECLAREs and a registration agent VALIDATEs (with a non-empty declaration),
+    // this VALIDATE action’s declaration is empty.
+    //
+    // To handle this, we look for another action with the same transactionId that
+    // contains a non-empty declaration — the original DECLARE action.
+    const sameTxnActions = actions.filter(
+      (a) => a.transactionId === foundAction.transactionId
+    )
 
-        if (
-          declarationAction &&
-          actionTypes.includes(
-            declarationAction.type as
-              | DeclarationUpdateActionType
-              | typeof ActionType.NOTIFY
-          )
-        ) {
-          return declarationAction.type as
-            | DeclarationUpdateActionType
-            | typeof ActionType.NOTIFY
-        } else {
-          continue
-        }
-      }
+    if (sameTxnActions.length === 1) {
+      continue
+    }
 
-      return type
+    const declarationAction = sameTxnActions.find(
+      (
+        a
+      ): a is (typeof actions)[number] & {
+        type: DeclarationUpdateActionType | typeof ActionType.NOTIFY
+      } =>
+        'declaration' in a &&
+        Object.keys(a.declaration).length > 0 &&
+        a.id !== foundAction.id
+    )
+
+    if (declarationAction && actionTypes.includes(declarationAction.type)) {
+      return declarationAction.type
     }
   }
 
