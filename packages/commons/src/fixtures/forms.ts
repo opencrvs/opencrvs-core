@@ -140,7 +140,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
               }
             },
             {
-              value: 'DRIVING_LICENSE',
+              value: 'DRIVING-LICENSE',
               label: {
                 id: 'event.tennis-club-membership.action.form.section.idType.drivingLicense.label',
                 defaultMessage: 'Driving License',
@@ -149,7 +149,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
               }
             },
             {
-              value: 'REFUGEE_NUMBER',
+              value: 'REFUGEE-NUMBER',
               label: {
                 id: 'event.tennis-club-membership.action.form.section.idType.refugeeNumber.label',
                 defaultMessage: 'Refugee Number',
@@ -337,7 +337,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           type: FieldType.TEXT
         },
         {
-          id: 'collector.ALIEN_NUMBER.details',
+          id: 'collector.ALIEN-NUMBER.details',
           conditionals: [
             {
               type: ConditionalType.SHOW,
