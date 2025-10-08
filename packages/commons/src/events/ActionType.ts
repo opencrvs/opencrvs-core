@@ -134,8 +134,7 @@ export const workqueueActions = ActionTypes.exclude([
   ActionType.REJECT,
   ActionType.MARK_AS_NOT_DUPLICATE,
   ActionType.REJECT_CORRECTION,
-  ActionType.APPROVE_CORRECTION,
-  ActionType.ARCHIVE
+  ActionType.APPROVE_CORRECTION
 ])
 
 export type WorkqueueActionType = z.infer<typeof workqueueActions>
