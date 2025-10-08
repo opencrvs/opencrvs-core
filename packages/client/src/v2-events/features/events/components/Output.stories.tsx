@@ -172,6 +172,28 @@ export const NumberOutputValueUndefinedWithPostfix: Story = {
   }
 }
 
+export const NumberOutputValueEmptyStringWithPostfix: Story = {
+  args: {
+    value: '',
+    field: {
+      type: FieldType.NUMBER,
+      id: 'applicant.firstname',
+      label: {
+        id: 'applicant.firstname',
+        defaultMessage: 'First name',
+        description: 'The first name of the applicant'
+      },
+      configuration: {
+        postfix: {
+          defaultMessage: ' grammes',
+          description: 'This is the postfix for the weight field',
+          id: 'event.birth.action.declare.form.section.child.field.weightAtBirth.postfix'
+        }
+      }
+    }
+  }
+}
+
 export const CheckboxOutput: Story = {
   args: {
     value: true,
