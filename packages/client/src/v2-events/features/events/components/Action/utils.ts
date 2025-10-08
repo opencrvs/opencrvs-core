@@ -115,7 +115,34 @@ export function getPreviousDeclarationActionType(
   }
 
   for (const type of actionTypes) {
-    if (actions.find((a) => a.type === type)) {
+    const foundAction = actions.find((a) => a.type === type)
+    if (foundAction) {
+      const actionTransactionId = foundAction.transactionId
+      const actionsWithSameTransactionId = actions.filter(
+        (a) => a.transactionId === actionTransactionId && a.type === type
+      )
+
+      if (actionsWithSameTransactionId.length > 0) {
+        const declarationAction = actionsWithSameTransactionId.find(
+          (a) => 'declaration' in a && Object.keys(a.declaration).length > 0
+        )
+
+        if (
+          declarationAction &&
+          actionTypes.includes(
+            declarationAction.type as
+              | DeclarationUpdateActionType
+              | typeof ActionType.NOTIFY
+          )
+        ) {
+          return declarationAction.type as
+            | DeclarationUpdateActionType
+            | typeof ActionType.NOTIFY
+        } else {
+          continue
+        }
+      }
+
       return type
     }
   }
