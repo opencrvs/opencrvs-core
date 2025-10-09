@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 69dbcb2a-641b-40b7-9260-d7a0608132a3
+                transactionId: f79e4b78-1b45-48f6-b2c9-9aa92b6ff442
                 type: birth
       responses:
         "200":
@@ -401,7 +401,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 922b7b45-3300-433b-b8fb-8c2ea43647b8
+                transactionId: 9948b586-ef80-4983-b8cc-05cfa1262e88
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -13118,7 +13118,6 @@ components:
                   - rejected
                   - correction-requested
                   - potential-duplicate
-                  - in-external-validation
         noneOf:
           type: array
           items:
@@ -13132,7 +13131,6 @@ components:
                   - rejected
                   - correction-requested
                   - potential-duplicate
-                  - in-external-validation
     QueryInput:
       anyOf:
         - oneOf:
@@ -13376,7 +13374,6 @@ components:
                   - rejected
                   - correction-requested
                   - potential-duplicate
-                  - in-external-validation
         declaration:
           type: object
           additionalProperties:
