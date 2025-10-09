@@ -47,7 +47,8 @@ export const FieldType = {
   VERIFICATION_STATUS: 'VERIFICATION_STATUS',
   QUERY_PARAM_READER: 'QUERY_PARAM_READER',
   QR_READER: 'QR_READER',
-  ID_READER: 'ID_READER'
+  ID_READER: 'ID_READER',
+  LOADER: 'LOADER'
 } as const
 
 /**
@@ -77,5 +78,7 @@ export const FieldTypesToHideInReview = [
   FieldType.BULLET_LIST,
   FieldType.DIVIDER,
   FieldType.PAGE_HEADER,
-  FieldType.PARAGRAPH
+  FieldType.PARAGRAPH,
+  FieldType.ID_READER,
+  FieldType.LOADER
 ]

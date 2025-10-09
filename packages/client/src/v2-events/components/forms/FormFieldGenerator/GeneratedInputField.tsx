@@ -61,7 +61,8 @@ import {
   isQueryParamReaderFieldType,
   ValidatorContext,
   isIdReaderFieldType,
-  isQrReaderFieldType
+  isQrReaderFieldType,
+  isLoaderFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -96,6 +97,7 @@ import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { IdReader } from '@client/v2-events/features/events/registered-fields/IdReader'
 import { QrReader } from '@client/v2-events/features/events/registered-fields/QrReader'
 import { QueryParamReader } from '@client/v2-events/features/events/registered-fields/QueryParamReader'
+import { Loader } from '@client/v2-events/features/events/registered-fields/Loader'
 import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
 import {
@@ -718,6 +720,15 @@ export const GeneratedInputField = React.memo(
         <QrReader.Input
           configuration={field.config.configuration}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isLoaderFieldType(field)) {
+      return (
+        <Loader.Input
+          configuration={field.config.configuration}
+          id={field.config.id}
         />
       )
     }

@@ -733,6 +733,17 @@ const IdReaderField = BaseField.extend({
 
 export type IdReaderField = z.infer<typeof IdReaderField>
 
+const LoaderField = BaseField.extend({
+  type: z.literal(FieldType.LOADER),
+  configuration: z.object({
+    text: TranslationConfig.describe('Display text above the loading spinner')
+  })
+}).describe(
+  'A non-interactive field that indicates an in progress operation in form'
+)
+
+export type LoaderField = z.infer<typeof LoaderField>
+
 /** @knipignore */
 export type FieldConfig =
   | z.infer<typeof Address>
@@ -771,6 +782,7 @@ export type FieldConfig =
   | z.infer<typeof QueryParamReaderField>
   | z.infer<typeof QrReaderField>
   | z.infer<typeof IdReaderField>
+  | z.infer<typeof LoaderField>
 
 /** @knipignore */
 /**
@@ -811,8 +823,9 @@ export type FieldConfigInput =
   | z.input<typeof LinkButtonField>
   | z.input<typeof VerificationStatus>
   | z.input<typeof QueryParamReaderField>
-  | z.infer<typeof QrReaderField>
-  | z.infer<typeof IdReaderField>
+  | z.input<typeof QrReaderField>
+  | z.input<typeof IdReaderField>
+  | z.input<typeof LoaderField>
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
  *  referenced quite extensively througout various other schemas. Leaving the
@@ -860,7 +873,8 @@ export const FieldConfig: z.ZodType<
     VerificationStatus,
     QrReaderField,
     IdReaderField,
-    QueryParamReaderField
+    QueryParamReaderField,
+    LoaderField
   ])
   .openapi({
     description: 'Form field configuration',
