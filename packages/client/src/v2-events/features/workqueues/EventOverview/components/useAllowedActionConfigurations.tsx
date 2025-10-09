@@ -165,11 +165,9 @@ interface ActionConfig {
   onClick: (workqueue?: string) => Promise<void> | void
   disabled?: boolean
   hidden?: boolean
-  // Certain actions should not be used as workqueue CTAs
-  hideFromCta?: boolean
 }
 
-type ActionMenuActionType = WorkqueueActionType | ClientSpecificAction
+export type ActionMenuActionType = WorkqueueActionType | ClientSpecificAction
 
 interface ActionMenuItem extends ActionConfig {
   type: ActionMenuActionType
@@ -362,8 +360,7 @@ function useViewableActionConfigurations(
         onClick: async () => {
           await onArchive(event.id)
         },
-        disabled: !isDownloadedAndAssignedToUser,
-        hideFromCta: true
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
@@ -499,8 +496,7 @@ export function useUserAllowedActions(eventType: string) {
  */
 export function useAllowedActionConfigurations(
   event: EventIndex,
-  authentication: ITokenPayload,
-  isCta: boolean = false
+  authentication: ITokenPayload
 ) {
   const { isActionAllowed } = useUserAllowedActions(event.type)
   const drafts = useDrafts()
@@ -548,7 +544,6 @@ export function useAllowedActionConfigurations(
     // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
     .map((a) => ({ ...config[a], type: a }))
     .filter((a: ActionConfig) => !a.hidden)
-    .filter((a: ActionConfig) => !isCta || a.hideFromCta)
 
   // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
   const hasOnlyMetaActions = allowedWorkqueueConfigs.every(({ type }) =>
