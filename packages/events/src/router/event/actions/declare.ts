@@ -45,6 +45,12 @@ export function declareActionProcedures() {
       .mutation(async ({ ctx, input }) => {
         const { token, user, existingAction } = ctx
 
+        // If an action exists but is not in the REQUESTED state,
+        // then we consider the action to have been fully handled already.
+        // For future reference, it would also make sense to have the pending state
+        // of the country config HTTP request be persisted in the database
+        // so that even if you ran the request twice consecutively, it would not
+        // trigger two country config requests in parallel.
         if (
           existingAction &&
           existingAction.status !== ActionStatus.Requested
