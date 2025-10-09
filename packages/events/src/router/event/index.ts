@@ -155,7 +155,7 @@ export const eventRouter = router({
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
-      if (ctx.isDuplicateAction) {
+      if (ctx.existingAction) {
         return ctx.event
       }
 
