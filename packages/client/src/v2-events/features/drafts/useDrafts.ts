@@ -12,14 +12,20 @@
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { deepDropNulls, Draft, UUID } from '@opencrvs/commons/client'
+import {
+  ActionDocument,
+  deepDropNulls,
+  Draft,
+  UUID
+} from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import {
   clearPendingDraftCreationRequests,
   findLocalEventDocument,
   refetchDraftsList,
   refetchAllSearchQueries,
-  setDraftData
+  setDraftData,
+  updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   createEventActionMutationFn,
@@ -248,6 +254,22 @@ export function useDrafts() {
       }
 
       return eventDrafts[0]
+    },
+    prefetch: () => {
+      const drafts = getAllRemoteDrafts()
+      drafts.forEach((draft) => {
+        const localEvent = findLocalEventDocument(draft.eventId)
+
+        if (localEvent) {
+          localEvent.actions.push({
+            ...draft.action,
+            id: createTemporaryId(),
+            createdBy: 'offline',
+            type: draft.action.type
+          } as ActionDocument)
+          updateLocalEventIndex(draft.eventId, localEvent)
+        }
+      })
     }
   }
 }
