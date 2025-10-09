@@ -672,7 +672,11 @@ const LinkButtonField = BaseField.extend({
   type: z.literal(FieldType.LINK_BUTTON),
   configuration: z.object({
     url: z.string().describe('URL to open'),
-    text: TranslationConfig.describe('Text to display on the button')
+    text: TranslationConfig.describe('Text to display on the button'),
+    icon: z
+      .string()
+      .optional()
+      .describe('Icon for the button. You can find icons from OpenCRVS UI-Kit.')
   })
 }).describe('Button that opens a link')
 
