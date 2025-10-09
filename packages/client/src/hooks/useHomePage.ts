@@ -14,9 +14,7 @@ import {
   TEAM_USER_LIST,
   SYSTEM_LIST,
   ALL_USER_EMAIL,
-  PERFORMANCE_LEADER_BOARDS,
-  PERFORMANCE_STATISTICS,
-  PERFORMANCE_DASHBOARD
+  DASHBOARD
 } from '@client/navigation/routes'
 import { Path, useLocation } from 'react-router'
 import { useNavigation } from './useNavigation'
@@ -78,13 +76,7 @@ export const useHomePage = () => {
       path = ALL_USER_EMAIL
       break
     case WORKQUEUE_TABS.dashboard:
-      path = PERFORMANCE_DASHBOARD
-      break
-    case WORKQUEUE_TABS.statistics:
-      path = PERFORMANCE_STATISTICS
-      break
-    case WORKQUEUE_TABS.leaderboards:
-      path = PERFORMANCE_LEADER_BOARDS
+      path = DASHBOARD
       break
     case WORKQUEUE_TABS.performance:
       path = generatePerformanceHomeUrl({
