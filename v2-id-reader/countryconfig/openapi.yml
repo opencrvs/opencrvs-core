@@ -4576,6 +4576,9 @@ components:
                 text:
                   $ref: "#/components/schemas/TranslationConfig"
                   description: Text to display on the button
+                icon:
+                  type: string
+                  description: Icon for the button. You can find icons from OpenCRVS UI-Kit.
               required:
                 - url
                 - text
@@ -5107,6 +5110,9 @@ components:
                           text:
                             $ref: "#/components/schemas/TranslationConfig"
                             description: Text to display on the button
+                          icon:
+                            type: string
+                            description: Icon for the button. You can find icons from OpenCRVS UI-Kit.
                         required:
                           - url
                           - text
