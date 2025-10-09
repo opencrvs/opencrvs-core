@@ -37,7 +37,22 @@ import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 extendZodWithOpenApi(z)
 
-const FieldId = z.string().describe('Unique identifier for the field')
+const FieldId = z
+  .string()
+  .refine(
+    /*
+     * Disallow underscores '_' in field ids.
+     * Why? Theres two reasons:
+     *   1. We transform dots to underscores as separator in Formik field ids, so this avoids any issues with the Formik transformations.
+     *   2. On Kysely-SQL queries, we use the CamelCasePlugin. This plugin transforms snake_case to camelCase also on nested (jsonb) object keys.
+     *      This could be disabled via 'maintainNestedObjectKeys: true', but this would also affect SQL queries which use e.g. json_agg() or to_jsonb() to aggregate results.
+     */
+    (val) => !val.includes('_'),
+    (val) => ({
+      message: `id: '${val}' must not contain underscores '_'`
+    })
+  )
+  .describe('Unique identifier for the field')
 
 export const FieldReference = z
   .object({
