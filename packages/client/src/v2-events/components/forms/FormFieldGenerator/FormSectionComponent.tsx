@@ -224,10 +224,25 @@ export function FormSectionComponent({
 
   // Create a reference map of parent fields and their their children for quick access.
   // This is used to reset the values of child fields when a parent field changes.
-  const fieldsByParentId: IndexMap<FieldConfig[]> = useMemo(
-    () => groupBy(allFieldsWithDotSeparator, (field) => field.parent?.$$field),
-    [allFieldsWithDotSeparator]
-  )
+  const fieldsByParentId = useMemo(() => {
+    const result: IndexMap<FieldConfig[]> = {}
+
+    for (const field of allFieldsWithDotSeparator) {
+      // eslint-disable-next-line no-nested-ternary
+      const parents = Array.isArray(field.parent)
+        ? field.parent
+        : field.parent
+          ? [field.parent]
+          : []
+
+      for (const parent of parents) {
+        const listenersParentId = parent.$$field
+        ;(result[listenersParentId] ||= []).push(field)
+      }
+    }
+
+    return result
+  }, [allFieldsWithDotSeparator])
 
   const errors = makeFormFieldIdsFormikCompatible(errorsWithDotSeparator)
   const form = makeFormikFieldIdsOpenCRVSCompatible(
@@ -266,19 +281,36 @@ export function FormSectionComponent({
 
       const referenceToAnotherField = fieldsWithDotSeparator.find(
         (f) => f.id === childFieldOcrvsId
-      )?.value as FieldReference | undefined
+      )?.value as FieldReference | FieldReference[] | undefined
 
       const childFieldFormikId = makeFormFieldIdFormikCompatible(childField.id)
 
-      const updatedValue = getUpdatedChildValueOnChange({
-        childField,
-        fieldReference: referenceToAnotherField,
-        fieldValues,
-        systemVariables
-      })
+      if (!Array.isArray(referenceToAnotherField)) {
+        const updatedValue = getUpdatedChildValueOnChange({
+          childField,
+          fieldReference: referenceToAnotherField,
+          fieldValues,
+          systemVariables
+        })
 
-      set(fieldValues, childFieldFormikId, updatedValue)
-      set(fieldErrors, childField.id, { errors: [] })
+        set(fieldValues, childFieldFormikId, updatedValue)
+        set(fieldErrors, childField.id, { errors: [] })
+      } else {
+        for (const reference of referenceToAnotherField) {
+          const updatedValue = getUpdatedChildValueOnChange({
+            childField,
+            fieldReference: reference,
+            fieldValues,
+            systemVariables
+          })
+
+          if (updatedValue) {
+            set(fieldValues, childFieldFormikId, updatedValue)
+            set(fieldErrors, childField.id, { errors: [] })
+            break
+          }
+        }
+      }
     },
     [fieldsWithDotSeparator, systemVariables]
   )
