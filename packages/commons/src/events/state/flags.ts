@@ -14,6 +14,7 @@ import { getStatusFromActions } from '.'
 import { Action, ActionStatus } from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
 import { InherentFlags, EventStatus, Flag } from '../EventMetadata'
+import { getPendingAction } from '../utils'
 
 function isPendingCertification(actions: Action[]) {
   if (getStatusFromActions(actions) !== EventStatus.enum.REGISTERED) {
@@ -69,6 +70,16 @@ function isPotentialDuplicate(actions: Action[]): boolean {
   }, false)
 }
 
+function isInExternalValidation(actions: Action[]) {
+  try {
+    getPendingAction(actions)
+
+    return true
+  } catch {
+    return false
+  }
+}
+
 export function getFlagsFromActions(actions: Action[]): Flag[] {
   const sortedActions = actions
     .filter(({ type }) => !isMetaAction(type))
@@ -111,6 +122,9 @@ export function getFlagsFromActions(actions: Action[]): Flag[] {
   }
   if (isPotentialDuplicate(sortedActions)) {
     flags.push(InherentFlags.POTENTIAL_DUPLICATE)
+  }
+  if (isInExternalValidation(sortedActions)) {
+    flags.push(InherentFlags.IN_EXTERNAL_VALIDATION)
   }
 
   return flags

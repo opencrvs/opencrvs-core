@@ -35,7 +35,8 @@ export const InherentFlags = {
   INCOMPLETE: 'incomplete',
   REJECTED: 'rejected',
   CORRECTION_REQUESTED: 'correction-requested',
-  POTENTIAL_DUPLICATE: 'potential-duplicate'
+  POTENTIAL_DUPLICATE: 'potential-duplicate',
+  IN_EXTERNAL_VALIDATION: 'in-external-validation'
 } as const
 
 export type InherentFlags = (typeof InherentFlags)[keyof typeof InherentFlags]

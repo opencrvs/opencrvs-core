@@ -63,22 +63,34 @@ const ACTION_FILTERS: {
   [K in DisplayableAction]?: (flags: Flag[]) => boolean
 } = {
   [ActionType.PRINT_CERTIFICATE]: (flags) =>
-    !flags.includes(InherentFlags.CORRECTION_REQUESTED),
+    !flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
+    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
   [ActionType.REQUEST_CORRECTION]: (flags) =>
-    !flags.includes(InherentFlags.CORRECTION_REQUESTED),
+    !flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
+    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
   [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: (flags) =>
-    flags.includes(InherentFlags.CORRECTION_REQUESTED),
+    flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
+    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
   [ActionType.APPROVE_CORRECTION]: (flags) =>
-    flags.includes(InherentFlags.CORRECTION_REQUESTED),
+    flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
+    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
   [ActionType.REJECT_CORRECTION]: (flags) =>
-    flags.includes(InherentFlags.CORRECTION_REQUESTED),
+    flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
+    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
   [ActionType.MARK_AS_DUPLICATE]: (flags) =>
-    flags.includes(InherentFlags.POTENTIAL_DUPLICATE),
+    flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
+    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
   [ActionType.VALIDATE]: (flags) =>
-    !flags.includes(InherentFlags.POTENTIAL_DUPLICATE),
+    !flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
+    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
   [ActionType.REGISTER]: (flags) =>
-    !flags.includes(InherentFlags.POTENTIAL_DUPLICATE),
-  [ActionType.REJECT]: (flags) => !flags.includes(InherentFlags.REJECTED)
+    !flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
+    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
+  [ActionType.REJECT]: (flags) =>
+    !flags.includes(InherentFlags.REJECTED) &&
+    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
+  [ActionType.ARCHIVE]: (flags) =>
+    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION)
 }
 
 /**
