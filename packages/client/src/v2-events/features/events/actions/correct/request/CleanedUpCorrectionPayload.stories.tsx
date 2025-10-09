@@ -141,7 +141,7 @@ const overriddenEventConfig = {
           },
           {
             id: 'recommender.age',
-            type: FieldType.TEXT,
+            type: FieldType.NUMBER,
             required: true,
             label: generateTranslationConfig('Age of recommender'),
             configuration: { postfix: generateTranslationConfig('years') },
@@ -234,7 +234,7 @@ export const CleanedUpCorrectionPayload: Story = {
             declaration: {
               'recommender.dob': '2002-05-12',
               'recommender.dobUnknown': true,
-              'recommender.age': '45',
+              'recommender.age': 45,
               'recommender.name': { firstname: 'Mohammed', surname: 'Karim' }
             }
           }
@@ -271,7 +271,7 @@ export const CleanedUpCorrectionPayload: Story = {
               // all the valid fields are available in the correction request endpoint
               await expect(payload.declaration).toEqual({
                 'recommender.dobUnknown': true,
-                'recommender.age': '45',
+                'recommender.age': 45,
                 'recommender.name': { firstname: 'Mohammed', surname: 'Karim' }
               })
               // since recommender.dobKnown is true, recommender.dob is filtered in the client

@@ -164,7 +164,7 @@ const overriddenEventConfig = {
           },
           {
             id: 'recommender.age',
-            type: FieldType.TEXT,
+            type: FieldType.NUMBER,
             required: true,
             label: generateTranslationConfig('Age of recommender'),
             configuration: {
@@ -272,7 +272,7 @@ export const FormFieldParentChildReset: Story = {
                   surname: 'Doe'
                 },
                 'recommender.dobUnknown': true,
-                'recommender.age': '36'
+                'recommender.age': 36
               })
               return {
                 ...overridenEvent,
