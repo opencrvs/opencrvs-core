@@ -95,9 +95,9 @@ import { DateRangeField } from '@client/v2-events/features/events/registered-fie
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { IdReader } from '@client/v2-events/features/events/registered-fields/IdReader'
 import { QrReader } from '@client/v2-events/features/events/registered-fields/QrReader'
+import { QueryParamReader } from '@client/v2-events/features/events/registered-fields/QueryParamReader'
 import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
-import { QueryParamReader } from '../inputs/QueryParamReader'
 import {
   makeFormikFieldIdsOpenCRVSCompatible,
   parseFieldReferencesInConfiguration

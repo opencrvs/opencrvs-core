@@ -886,6 +886,7 @@ export function generateEventDocument({
     primaryOfficeId: UUID
     role: TestUserRole
     id: string
+    assignedTo: string
   }>
   /**
    * Overrides for default event state
@@ -902,7 +903,8 @@ export function generateEventDocument({
         rng,
         defaults: {
           createdBy: user?.id,
-          createdAtLocation: user?.primaryOfficeId
+          createdAtLocation: user?.primaryOfficeId,
+          assignedTo: user?.assignedTo
         },
         declarationOverrides
       })
