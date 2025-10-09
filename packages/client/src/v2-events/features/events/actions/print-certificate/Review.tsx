@@ -182,7 +182,7 @@ export function Review() {
   const formConfig = getPrintForm(eventConfiguration)
   const { isActionAllowed } = useUserAllowedActions(fullEvent.type)
   const userDetails = useSelector(getUserDetails)
-  const [isPrinting, setIsPrinting] = useState(false)
+  const { isPending } = onlineActions.printCertificate
 
   if (!userDetails) {
     throw new Error('User details are not available')
@@ -272,7 +272,7 @@ export function Review() {
           </Button>,
           <Button
             key="print-certificate"
-            disabled={!isOnline || isPrinting}
+            disabled={!isOnline || isPending}
             id="print-certificate"
             type="primary"
             onClick={() => close(true)}
@@ -296,7 +296,6 @@ export function Review() {
     if (confirmed) {
       try {
         const printCertificate = await preparePdfCertificate(fullEvent)
-        setIsPrinting(true)
 
         await onlineActions.printCertificate.mutateAsync({
           fullEvent,
@@ -309,7 +308,6 @@ export function Review() {
         })
 
         printCertificate()
-        setIsPrinting(false)
 
         toast.custom(
           <Toast
@@ -382,7 +380,7 @@ export function Review() {
               >
                 <Button
                   fullWidth
-                  disabled={!isOnline || isPrinting}
+                  disabled={!isOnline || isPending}
                   id="confirm-print"
                   size="large"
                   type="positive"
