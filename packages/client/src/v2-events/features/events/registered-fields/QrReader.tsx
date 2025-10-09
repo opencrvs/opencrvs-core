@@ -16,6 +16,7 @@ function QrReaderInput(props: QrReaderInputProps) {
   const intl = useIntl()
   return (
     <QrReaderUI
+      fullWidth
       labels={{
         button: intl.formatMessage(qrReaderMessages.button),
         scannerDialogSupportingCopy: intl.formatMessage(

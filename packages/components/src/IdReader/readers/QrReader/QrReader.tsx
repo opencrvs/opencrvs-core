@@ -34,8 +34,10 @@ const Info = styled(Stack)`
   width: 100%;
 `
 
-export const QrReader = (props: ScannableQrReader) => {
-  const { labels, validator, onScan, onError } = props
+export const QrReader = (
+  props: ScannableQrReader & { fullWidth?: boolean }
+) => {
+  const { labels, validator, onScan, onError, fullWidth } = props
   const [isScannerDialogOpen, setScannerDialogOpen] = useState(false)
   const windowSize = useWindowSize()
   const theme = getTheme()
@@ -69,6 +71,7 @@ export const QrReader = (props: ScannableQrReader) => {
           setScannerDialogOpen(true)
           setError('')
         }}
+        fullWidth={fullWidth}
       >
         <Icon name="QrCode" size="medium" />
         {labels.button}
