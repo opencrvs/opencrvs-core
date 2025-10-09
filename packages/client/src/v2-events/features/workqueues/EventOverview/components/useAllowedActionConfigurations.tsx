@@ -10,7 +10,7 @@
  */
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import {
   ActionType,
@@ -207,13 +207,20 @@ function useViewableActionConfigurations(
     locations.find((l) => l.id === assignedOffice)?.name || ''
   const { archiveModal, onArchive } = useArchiveModal()
 
+  const { modal: deleteModal, deleteDeclaration } = useEventFormNavigation()
+  const onDelete = useCallback(
+    async (workqueue?: string) => {
+      await deleteDeclaration(event.id, workqueue)
+    },
+    [event, deleteDeclaration]
+  )
+
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
    * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
    */
   const { refetch: refetchEvent } = events.getEvent.findFromCache(event.id)
 
-  const { mutate: deleteEvent } = events.deleteEvent.useMutation()
   const { eventConfiguration } = useEventConfiguration(event.type)
 
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
@@ -269,7 +276,7 @@ function useViewableActionConfigurations(
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
   return {
-    modals: [assignModal, archiveModal],
+    modals: [assignModal, archiveModal, deleteModal],
     config: {
       [ActionType.READ]: {
         label: actionLabels[ActionType.READ],
@@ -406,14 +413,8 @@ function useViewableActionConfigurations(
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
         icon: 'Trash' as const,
-        onClick: (workqueue?: string) => {
-          deleteEvent({
-            eventId: event.id
-          })
-          // What if there is a workqueue?
-          if (!workqueue) {
-            navigate(ROUTES.V2.buildPath({}))
-          }
+        onClick: async (workqueue?: string) => {
+          await onDelete(workqueue)
         },
         disabled: !isDownloadedAndAssignedToUser
       },
