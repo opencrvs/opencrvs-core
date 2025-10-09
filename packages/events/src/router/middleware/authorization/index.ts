@@ -13,6 +13,7 @@ import { TRPCError } from '@trpc/server'
 import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import z from 'zod'
+import { findLast } from 'lodash'
 import {
   ActionDocument,
   ActionInputWithType,
@@ -221,7 +222,8 @@ export const requireAssignment: MiddlewareFunction<
 
   // Check for duplicate only when we know the user is assigned to the event. Otherwise we will effectively leak the event (allow reading it) to users who are not assigned to it.
   if ('transactionId' in input) {
-    const existingAction = event.actions.find(
+    const existingAction = findLast(
+      event.actions,
       (action) =>
         action.transactionId === input.transactionId &&
         action.type === input.type
