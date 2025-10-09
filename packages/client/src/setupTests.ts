@@ -73,7 +73,7 @@ const config = {
     {
       id: 'test',
       title: {
-        id: 'dashboard.test.title',
+        id: 'navigation.dashboard',
         defaultMessage: 'Test Dashboard',
         description: 'Title for the test dashboard'
       },
