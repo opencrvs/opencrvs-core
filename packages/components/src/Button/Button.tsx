@@ -98,6 +98,7 @@ export const Button = ({
       variant={type}
       loading={loading}
       as={element}
+      data-testid={props.id}
       {...props}
     >
       {loading && (

@@ -91,15 +91,16 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     parentId,
     validatorContext
   }) => {
-    const { setAllTouchedFields, touchedFields: initialTouchedFields } =
-      useEventFormData()
+    const { setAllTouchedFields, touchedFields } = useEventFormData()
+
     const updateTouchFields = (
       touched: Record<string, boolean | undefined>
     ) => {
       const newlyTouched =
         Object.keys(touched).length > 0 &&
-        !isEqual(touched, initialTouchedFields) &&
-        Object.keys(touched).filter((key) => !(key in initialTouchedFields))
+        !isEqual(touched, touchedFields) &&
+        Object.keys(touched).filter((key) => !(key in touchedFields))
+
       if (newlyTouched && newlyTouched.length > 0) {
         const newlyTouchedFields = parentId
           ? newlyTouched.reduce(
@@ -116,7 +117,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
           : touched
 
         setAllTouchedFields({
-          ...initialTouchedFields,
+          ...touchedFields,
           ...newlyTouchedFields
         })
       }
@@ -136,7 +137,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     return (
       <Formik<EventState>
         enableReinitialize={true}
-        initialTouched={initialTouchedFields}
+        initialTouched={touchedFields}
         initialValues={formikCompatibleInitialValues}
         validate={(values) =>
           getValidationErrorsForForm(
@@ -183,7 +184,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
               systemVariables={systemVariables}
-              touched={{ ...formikProps.touched, ...initialTouchedFields }}
+              touched={{ ...formikProps.touched, ...touchedFields }}
               validateAllFields={validateAllFields}
               validatorContext={validatorContext}
               values={formikProps.values}
