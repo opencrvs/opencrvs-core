@@ -64,33 +64,33 @@ const ACTION_FILTERS: {
 } = {
   [ActionType.PRINT_CERTIFICATE]: (flags) =>
     !flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
-    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
+    !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.REQUEST_CORRECTION]: (flags) =>
     !flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
-    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
+    !flags.some((flag) => flag.endsWith(':requested')),
   [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: (flags) =>
     flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
-    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
+    !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.APPROVE_CORRECTION]: (flags) =>
     flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
-    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
+    !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.REJECT_CORRECTION]: (flags) =>
     flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
-    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
+    !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.MARK_AS_DUPLICATE]: (flags) =>
     flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
-    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
+    !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.VALIDATE]: (flags) =>
     !flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
-    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
+    !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.REGISTER]: (flags) =>
     !flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
-    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
+    !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.REJECT]: (flags) =>
     !flags.includes(InherentFlags.REJECTED) &&
-    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION),
+    !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.ARCHIVE]: (flags) =>
-    !flags.includes(InherentFlags.IN_EXTERNAL_VALIDATION)
+    !flags.some((flag) => flag.endsWith(':requested'))
 }
 
 /**
