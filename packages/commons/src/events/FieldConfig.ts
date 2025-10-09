@@ -35,7 +35,7 @@ import {
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
-import { JSONSchema } from 'src/client'
+import { JSONSchema } from '../client'
 extendZodWithOpenApi(z)
 
 const FieldId = z.string().describe('Unique identifier for the field')
