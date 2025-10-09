@@ -74,7 +74,7 @@ export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
 export const NumberFieldValue = z.number()
 export type NumberFieldValue = z.infer<typeof NumberFieldValue>
-export const DataFieldValue = z.undefined()
+export const DataFieldValue = z.record(z.string(), z.string())
 export type DataFieldValue = z.infer<typeof DataFieldValue>
 
 export const SignatureFieldValue = z.string()
