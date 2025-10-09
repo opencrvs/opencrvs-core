@@ -37,7 +37,8 @@ export const ActionType = {
   // General actions
   READ: 'READ',
   ASSIGN: 'ASSIGN',
-  UNASSIGN: 'UNASSIGN'
+  UNASSIGN: 'UNASSIGN',
+  UPDATE: 'UPDATE'
 } as const
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType]
@@ -74,7 +75,8 @@ export const ActionTypes = z.enum([
   'APPROVE_CORRECTION',
   'READ',
   'ASSIGN',
-  'UNASSIGN'
+  'UNASSIGN',
+  'UPDATE'
 ])
 
 /**
@@ -133,7 +135,8 @@ export const workqueueActions = ActionTypes.exclude([
   ActionType.REJECT,
   ActionType.MARK_AS_NOT_DUPLICATE,
   ActionType.REJECT_CORRECTION,
-  ActionType.APPROVE_CORRECTION
+  ActionType.APPROVE_CORRECTION,
+  ActionType.UPDATE
 ])
 
 export type WorkqueueActionType = z.infer<typeof workqueueActions>

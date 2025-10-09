@@ -18,7 +18,8 @@ import {
   getAcceptedActions,
   getUUID,
   UUID,
-  EventDocument
+  EventDocument,
+  ActionType
 } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
@@ -43,12 +44,6 @@ interface PrintButtonProps {
 }
 
 const addedButtonLabel = { id: 'buttons.print', defaultMessage: 'Print' }
-
-/**
- * Indicates that declaration action changed declaration content. Satisfies V1 spec.
- */
-export const DECLARATION_ACTION_UPDATE = 'UPDATE' as const
-type DECLARATION_ACTION_UPDATE = typeof DECLARATION_ACTION_UPDATE
 
 export const AlphaPrintButton = {
   Input: ({
@@ -89,7 +84,7 @@ export const AlphaPrintButton = {
     const actionsWithAnOptimisticPrintAction = [
       ...actions,
       {
-        type: DECLARATION_ACTION_UPDATE,
+        type: ActionType.UPDATE,
         id: getUUID(),
         transactionId: getUUID(),
         createdByUserType: 'user',

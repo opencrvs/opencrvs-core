@@ -65,7 +65,10 @@ const rng = createPrng(72)
 function getMockActions(
   createdBy: string
 ): Record<
-  ActionType | DisplayableAction | 'ASSIGNED_TO_SELF' | 'ASSIGNED_TO_OTHERS',
+  | Exclude<ActionType, 'UPDATE'>
+  | Exclude<DisplayableAction, 'UPDATE'>
+  | 'ASSIGNED_TO_SELF'
+  | 'ASSIGNED_TO_OTHERS',
   Action
 > {
   return {

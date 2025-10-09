@@ -269,7 +269,7 @@ export function findActiveDraftForEvent(
 export function createEmptyDraft(
   eventId: UUID,
   draftId: UUID,
-  actionType: Exclude<ActionType, 'DELETE'>
+  actionType: Exclude<ActionType, 'DELETE' | 'UPDATE'>
 ): Draft {
   return {
     id: draftId,

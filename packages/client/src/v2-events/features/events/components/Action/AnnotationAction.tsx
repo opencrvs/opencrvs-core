@@ -27,7 +27,9 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 
-type Props = PropsWithChildren<{ actionType: Exclude<ActionType, 'DELETE'> }>
+type Props = PropsWithChildren<{
+  actionType: Exclude<ActionType, 'DELETE' | 'UPDATE'>
+}>
 
 /**
  * Creates a wrapper component for the annotation action.
