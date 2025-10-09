@@ -773,7 +773,9 @@ export function eventPayloadGenerator(
   }
 }
 
-export function generateActionDocument<T extends ActionType>({
+export function generateActionDocument<
+  T extends Exclude<ActionType, 'UPDATE'>
+>({
   configuration,
   action,
   rng = () => 0.1,
@@ -781,7 +783,7 @@ export function generateActionDocument<T extends ActionType>({
   declarationOverrides
 }: {
   configuration: EventConfig
-  action: T
+  action: Exclude<T, 'UPDATE'>
   rng?: () => number
   defaults?: Partial<Extract<ActionDocument, { type: T }>>
   declarationOverrides?: Partial<EventState>
@@ -889,7 +891,7 @@ export function generateEventDocument({
 }: {
   configuration: EventConfig
   actions: {
-    type: ActionType
+    type: Exclude<ActionType, 'UPDATE'>[]
     /**
      * Overrides for default event state per action
      */
@@ -938,7 +940,7 @@ export function generateEventDraftDocument({
   declaration = {}
 }: {
   eventId: UUID
-  actionType: ActionType
+  actionType: Exclude<ActionType, 'UPDATE'>
   rng?: () => number
   declaration?: EventState
   annotation?: EventState
