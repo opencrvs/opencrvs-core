@@ -354,12 +354,12 @@ export function EventHistory({
   )
 
   const onHistoryRowClick = (
-    item: EventHistoryActionDocument,
+    action: EventHistoryActionDocument,
     userName: string
   ) => {
     void openModal<void>((close) => (
       <EventHistoryDialog
-        action={item}
+        action={action}
         close={close}
         fullEvent={fullEvent}
         userName={userName}
