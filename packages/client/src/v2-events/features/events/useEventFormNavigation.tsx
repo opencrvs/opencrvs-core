@@ -150,7 +150,10 @@ export function useEventFormNavigation() {
     closeActionView()
   }
 
-  async function deleteDeclaration(eventId: string) {
+  async function deleteDeclaration(
+    eventId: string,
+    workqueueToGoBackTo?: string
+  ) {
     const deleteConfirm = await openModal<boolean | null>((close) => (
       <ResponsiveModal
         autoHeight
@@ -191,7 +194,7 @@ export function useEventFormNavigation() {
 
     if (deleteConfirm) {
       deleteEvent.mutate({ eventId })
-      closeActionView()
+      closeActionView(workqueueToGoBackTo)
     }
   }
 
