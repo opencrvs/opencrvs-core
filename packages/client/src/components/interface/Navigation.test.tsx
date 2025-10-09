@@ -621,7 +621,7 @@ describe('Given a user with scopes views Navigation', () => {
   })
 
   describe('Dashboard', async () => {
-    const id = `#navigation_${WORKQUEUE_TABS.dashboard}`
+    const id = `#navigation_${WORKQUEUE_TABS.dashboard}_test`
 
     const requiredScopes = [SCOPES.PERFORMANCE_READ_DASHBOARDS] as Scope[]
 

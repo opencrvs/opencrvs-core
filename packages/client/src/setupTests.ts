@@ -69,6 +69,17 @@ const config = {
       }
     }
   ],
+  DASHBOARDS: [
+    {
+      id: 'test',
+      title: {
+        id: 'dashboard.test.title',
+        defaultMessage: 'Test Dashboard',
+        description: 'Title for the test dashboard'
+      },
+      url: '/'
+    }
+  ],
   FEATURES: {
     DEATH_REGISTRATION: true,
     MARRIAGE_REGISTRATION: true,
@@ -101,6 +112,7 @@ import {
   getItem,
   setItem
 } from './tests/util'
+import { DASHBOARD } from './navigation/routes'
 
 vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
   createUserForm: mockOfflineData.userForms
