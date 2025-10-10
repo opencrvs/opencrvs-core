@@ -12,6 +12,7 @@
 import { useMemo } from 'react'
 import { getOrThrow, ValidatorContext } from '@opencrvs/commons/client'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
+import { useAuthentication } from '../../utils/userUtils'
 import { useSuspenseAdminLeafLevelLocations } from './useLocations'
 
 /**
@@ -20,15 +21,11 @@ import { useSuspenseAdminLeafLevelLocations } from './useLocations'
  * decoding token is synchronous process, which blocks the main thread for a very short time. Since this is called all-around the app, it cascades.
  */
 function useUser() {
-  const token = getToken()
+  const maybeAuth = useAuthentication()
 
   return useMemo(
-    () =>
-      getOrThrow(
-        getTokenPayload(token),
-        'Token payload missing. User is not logged in'
-      ),
-    [token]
+    () => getOrThrow(maybeAuth, 'Token payload missing. User is not logged in'),
+    [maybeAuth]
   )
 }
 
