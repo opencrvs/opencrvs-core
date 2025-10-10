@@ -10,7 +10,7 @@
  */
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useIntl } from 'react-intl'
 import {
   ActionType,
@@ -470,13 +470,17 @@ function useViewableActionConfigurations(
 }
 
 export function useUserAllowedActions(eventType: string) {
-  const scopes = useSelector(getScope) ?? []
+  const scopes = useSelector(getScope)
 
   const actions = Object.values(ActionType)
   const clientSpecificActions = Object.values(ClientSpecificAction)
 
-  const allowedActions = [...actions, ...clientSpecificActions].filter(
-    (action) => isActionInScope(scopes, action, eventType)
+  const allowedActions = useMemo(
+    () =>
+      [...actions, ...clientSpecificActions].filter((action) =>
+        isActionInScope(scopes ?? [], action, eventType)
+      ),
+    [scopes, eventType, actions, clientSpecificActions]
   )
 
   return {
