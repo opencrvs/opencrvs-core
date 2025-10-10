@@ -228,12 +228,7 @@ export function FormSectionComponent({
     const result: IndexMap<FieldConfig[]> = {}
 
     for (const field of allFieldsWithDotSeparator) {
-      // eslint-disable-next-line no-nested-ternary
-      const parents = Array.isArray(field.parent)
-        ? field.parent
-        : field.parent
-          ? [field.parent]
-          : []
+      const parents = ([] as FieldReference[]).concat(field.parent ?? [])
 
       for (const parent of parents) {
         const listenersParentId = parent.$$field
@@ -279,36 +274,26 @@ export function FormSectionComponent({
         childField.id
       )
 
-      const referenceToAnotherField = fieldsWithDotSeparator.find(
+      const referenceOrReferencesToOtherFields = fieldsWithDotSeparator.find(
         (f) => f.id === childFieldOcrvsId
-      )?.value as FieldReference | FieldReference[] | undefined
-
+      )?.value
+      const referencesToOtherFields = ([] as FieldReference[]).concat(
+        referenceOrReferencesToOtherFields ?? []
+      )
       const childFieldFormikId = makeFormFieldIdFormikCompatible(childField.id)
 
-      if (!Array.isArray(referenceToAnotherField)) {
+      for (const reference of referencesToOtherFields) {
         const updatedValue = getUpdatedChildValueOnChange({
           childField,
-          fieldReference: referenceToAnotherField,
+          fieldReference: reference,
           fieldValues,
           systemVariables
         })
 
-        set(fieldValues, childFieldFormikId, updatedValue)
-        set(fieldErrors, childField.id, { errors: [] })
-      } else {
-        for (const reference of referenceToAnotherField) {
-          const updatedValue = getUpdatedChildValueOnChange({
-            childField,
-            fieldReference: reference,
-            fieldValues,
-            systemVariables
-          })
-
-          if (updatedValue) {
-            set(fieldValues, childFieldFormikId, updatedValue)
-            set(fieldErrors, childField.id, { errors: [] })
-            break
-          }
+        if (updatedValue) {
+          set(fieldValues, childFieldFormikId, updatedValue)
+          set(fieldErrors, childField.id, { errors: [] })
+          break
         }
       }
     },
