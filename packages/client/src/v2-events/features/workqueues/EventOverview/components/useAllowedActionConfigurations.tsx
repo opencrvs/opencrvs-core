@@ -167,8 +167,10 @@ interface ActionConfig {
   hidden?: boolean
 }
 
+export type ActionMenuActionType = WorkqueueActionType | ClientSpecificAction
+
 interface ActionMenuItem extends ActionConfig {
-  type: WorkqueueActionType | ClientSpecificAction
+  type: ActionMenuActionType
 }
 
 /**
@@ -465,7 +467,7 @@ function useViewableActionConfigurations(
         disabled: !isDownloadedAndAssignedToUser,
         hidden: !eventIsWaitingForCorrection
       }
-    } satisfies Record<WorkqueueActionType & ClientSpecificAction, ActionConfig>
+    } satisfies Record<ActionMenuActionType, ActionConfig>
   }
 }
 
@@ -531,7 +533,7 @@ export function useAllowedActionConfigurations(
     // deduplicate after adding the draft
     .filter((action, index, self) => self.indexOf(action) === index)
     .filter(
-      (action): action is WorkqueueActionType | ClientSpecificAction =>
+      (action): action is ActionMenuActionType =>
         ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
         workqueueActions.safeParse(action).success
     )
