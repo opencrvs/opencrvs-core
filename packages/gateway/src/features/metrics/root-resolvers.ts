@@ -14,7 +14,7 @@ import { getUser, inScope } from '@gateway/features/user/utils'
 import { getMetrics } from './service'
 import { getEventActions } from './events-service'
 import { SCOPES } from '@opencrvs/commons/authentication'
-import { ActionType } from '@opencrvs/commons'
+import { ActionType, ActionTypes } from '@opencrvs/commons'
 
 export interface IMetricsParam {
   timeStart?: string
@@ -74,7 +74,7 @@ type V1ActionType =
 
 function V2ActionTypeToV1ActionType(
   actionType: ActionType
-): V1ActionType | null {
+): V1ActionType | null | '-' {
   switch (actionType) {
     case ActionType.DECLARE:
       return 'DECLARED'
@@ -267,6 +267,7 @@ export const resolvers: GQLResolver = {
       return metricsData
     },
     async getUserAuditLog(_, params, { headers: authHeader }) {
+      // 1. Skip, timeStart and timeEnd must remain as the defaults in order for us to know the number of pages and full size of the results
       const metricsData = await getMetrics(
         '/audit/events',
         {
@@ -286,39 +287,53 @@ export const resolvers: GQLResolver = {
         authHeader
       )
 
+      // 1. Skip, timeStart and timeEnd must remain as the defaults in order for us to know the number of pages and full size of the results
       const eventActionsData = await getEventActions(
         {
           userId: user._id,
           skip: 0,
           count: params.count + (params.skip || 0),
           timeStart: params.timeStart,
-          timeEnd: params.timeEnd
+          timeEnd: params.timeEnd,
+          // In order to get the correct action total, we need to exclude actions that are not mapped to V1 actions.
+          // Removing them after the fact will break the pagination and result to "no results found" pages.
+          actionTypes: ActionTypes.exclude([
+            ActionTypes.enum.DELETE,
+            ActionTypes.enum.CREATE,
+            ActionTypes.Enum.DUPLICATE_DETECTED,
+            ActionTypes.Enum.NOTIFY
+          ]).options
         },
         { ...authHeader }
       )
 
+      const cleanedEventActions = eventActionsData.results.map((action) => ({
+        isV2: true,
+        action: V2ActionTypeToV1ActionType(action.actionType as ActionType),
+        ipAddress: '', // Not available in event actions
+        practitionerId: action.createdBy,
+        time: action.createdAt,
+        userAgent: '', // Not available in event actions
+        data: {
+          compositionId: action.eventId,
+          trackingId: action.trackingId
+        }
+      }))
+      // .filter((a) => a.action !== null)
+
+      // 2. Combine and sort the results by time.
       const combinedResults = [
         ...(metricsData.results || []),
-        ...eventActionsData.results
-          .map((action) => ({
-            isV2: true,
-            action: V2ActionTypeToV1ActionType(action.actionType as ActionType),
-            ipAddress: '', // Not available in event actions
-            practitionerId: action.createdBy,
-            time: action.createdAt,
-            userAgent: '', // Not available in event actions
-            data: {
-              compositionId: action.eventId,
-              trackingId: action.trackingId
-            }
-          }))
-          .filter((a) => a.action !== null)
+        ...cleanedEventActions
       ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
 
-      // Apply pagination to combined results
+      // 3. Paginate the combined results. Ensure slicing stays within the bounds of the array.
+      const start = params.skip || 0
+      const end = start + (params.count || 10)
+
       const paginatedResults = combinedResults.slice(
-        params.skip || 0,
-        params.count || 10
+        start,
+        Math.min(end, combinedResults.length)
       )
 
       return {
