@@ -128,6 +128,23 @@ export function replacePlaceholders({
     return undefined
   }
 
+  if (isFieldValueWithoutTemplates(defaultValue)) {
+    return defaultValue
+  }
+
+  if (isTemplateVariable(defaultValue)) {
+    const resolvedValue = get(systemVariables, defaultValue)
+    const validator = mapFieldTypeToZod(fieldType)
+
+    const parsedValue = validator.safeParse(resolvedValue)
+
+    if (parsedValue.success) {
+      return parsedValue.data as FieldValue
+    }
+
+    throw new Error(`Could not resolve ${defaultValue}: ${parsedValue.error}`)
+  }
+
   if (
     compositeFieldTypes.some((ft) => ft === fieldType) &&
     typeof defaultValue === 'object'
@@ -163,23 +180,6 @@ export function replacePlaceholders({
         defaultValue
       )}. Error: ${parsedResult.error}`
     )
-  }
-
-  if (isFieldValueWithoutTemplates(defaultValue)) {
-    return defaultValue
-  }
-
-  if (isTemplateVariable(defaultValue)) {
-    const resolvedValue = get(systemVariables, defaultValue)
-    const validator = mapFieldTypeToZod(fieldType)
-
-    const parsedValue = validator.safeParse(resolvedValue)
-
-    if (parsedValue.success) {
-      return parsedValue.data as FieldValue
-    }
-
-    throw new Error(`Could not resolve ${defaultValue}: ${parsedValue.error}`)
   }
 
   throw new Error(

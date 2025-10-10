@@ -589,15 +589,21 @@ const Address = BaseField.extend({
   defaultValue: DefaultAddressFieldValue.optional()
 }).describe('Address input field – a combination of location and text fields')
 
-export const DataEntry = z.union([
-  z.object({
+export const StaticDataEntry = z
+  .object({
+    id: z.string().describe('ID for the data entry.'),
     label: TranslationConfig,
     value: TranslationConfig.or(z.string())
-  }),
-  z.object({
-    fieldId: z.string()
   })
-])
+  .describe('Static data entry')
+
+export type StaticDataEntry = z.infer<typeof StaticDataEntry>
+
+export const DataEntry = z
+  .union([StaticDataEntry, z.object({ fieldId: z.string() })])
+  .describe(
+    'Data entry can be either a static data entry, or a reference to another field in the current form or the declaration.'
+  )
 export type DataEntry = z.infer<typeof DataEntry>
 
 const DataField = BaseField.extend({

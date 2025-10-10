@@ -17,8 +17,10 @@ import {
   FieldType,
   FieldConfig,
   isFieldVisible,
-  TranslationConfig,
-  DataFieldValue
+  DataFieldValue,
+  DataField,
+  StaticDataEntry,
+  FieldValue
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -30,7 +32,7 @@ function getFieldFromDataEntry({
 }: {
   intl: IntlShape
   formData: EventState
-  entry: { value: TranslationConfig | string; label: TranslationConfig }
+  entry: StaticDataEntry
 }) {
   const { label, value: rawValue } = entry
 
@@ -63,7 +65,7 @@ function getFieldFromDataEntry({
     value: resolvedValue,
     config: {
       type: FieldType.TEXT,
-      id: label.id,
+      id: entry.id,
       label
     }
   }
@@ -177,7 +179,62 @@ function DataInput({
   )
 }
 
+function DataOutput({
+  value,
+  field
+}: {
+  value: DataFieldValue
+  field: DataField
+}) {
+  const intl = useIntl()
+
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (!value) {
+    return null
+  }
+
+  const entries = Object.entries(value)
+    .map(([id, val]) => {
+      const dataEntryConfig = field.configuration.data.find(
+        (d) => 'id' in d && d.id === id
+      )
+
+      if (!dataEntryConfig || !('label' in dataEntryConfig)) {
+        return null
+      }
+
+      const { label } = dataEntryConfig
+
+      const valueDisplay = (
+        <Output
+          field={{ type: FieldType.TEXT, id, label }}
+          showPreviouslyMissingValuesAsChanged={false}
+          // TODO CIHAN: fix type
+          value={val as FieldValue}
+        />
+      )
+
+      return {
+        label,
+        valueDisplay,
+        id
+      }
+    })
+    .filter((e) => e !== null)
+
+  return (
+    <>
+      {entries.map(({ label, valueDisplay, id }) => (
+        <div key={`${field.id}-${id}`}>
+          <b>{intl.formatMessage(label)}</b>
+          <div>{valueDisplay}</div>
+        </div>
+      ))}
+    </>
+  )
+}
+
 export const Data = {
   Input: DataInput,
-  Output: null
+  Output: DataOutput
 }

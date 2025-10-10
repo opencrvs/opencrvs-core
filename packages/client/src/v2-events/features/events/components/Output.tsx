@@ -44,7 +44,8 @@ import {
   EventState,
   FormConfig,
   isVerificationStatusType,
-  isSignatureFieldType
+  isSignatureFieldType,
+  isDataFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -70,6 +71,7 @@ import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { isEqualFieldValue } from '../actions/correct/utils'
+import { Data } from '../registered-fields/Data'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -86,10 +88,7 @@ const DeletedEmpty = styled(Deleted)`
  *  @returns sensible default value for the field type given the field configuration.
  */
 export function ValueOutput(
-  field: {
-    config: FieldConfig
-    value: FieldValue
-  },
+  field: { config: FieldConfig; value: FieldValue },
   searchMode?: {} | boolean
 ) {
   if (
@@ -197,6 +196,10 @@ export function ValueOutput(
       />
     )
   }
+
+  if (isDataFieldType(field)) {
+    return <Data.Output field={field.config} value={field.value} />
+  }
 }
 
 function findPreviousValueWithSameLabel(
@@ -258,6 +261,7 @@ export function Output({
   field: FieldConfig
   value?: FieldValue
   previousValue?: FieldValue
+  // TODO CIHAN: should be false by default??
   showPreviouslyMissingValuesAsChanged?: boolean
   previousForm?: EventState
   formConfig?: FormConfig

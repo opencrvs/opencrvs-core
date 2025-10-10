@@ -76,6 +76,8 @@ export function PrintCertificate({
       .filter((f) => isFieldVisible(f, annotation, validatorContext))
       .filter((f) => !isEmptyValue(f, annotation[f.id]))
       .map((field) => {
+        console.log('FIELD', field.id)
+        console.log(annotation[field.id])
         const valueDisplay = (
           <Output
             field={field}
