@@ -19,7 +19,8 @@ import {
   tennisClubMembershipEvent,
   generateEventDocument,
   getCurrentEventState,
-  footballClubMembershipEvent
+  footballClubMembershipEvent,
+  TestUserRole
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -87,15 +88,8 @@ const declarationTrpcMsw = {
 const mockUser = generator.user.fieldAgent().v2
 
 export const SuccessfulMutation: Story = {
-  loaders: [
-    async () => {
-      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
-
-      // Ensure state is stable before seeding the mutation cache
-      await new Promise((resolve) => setTimeout(resolve, 50))
-    }
-  ],
   parameters: {
+    userRole: TestUserRole.Enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
@@ -109,22 +103,7 @@ export const SuccessfulMutation: Story = {
     },
     msw: {
       handlers: {
-        events: [...declarationTrpcMsw.events.handlers],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent().v1
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(() => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query(() => {
-            return mockUser
-          })
-        ]
+        events: [...declarationTrpcMsw.events.handlers]
       }
     }
   },
@@ -191,15 +170,8 @@ const declarationTrpcMswFail = {
 }
 
 export const FailedMutation: Story = {
-  loaders: [
-    async () => {
-      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
-
-      // Ensure state is stable before seeding the mutation cache
-      await new Promise((resolve) => setTimeout(resolve, 50))
-    }
-  ],
   parameters: {
+    userRole: TestUserRole.Enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
@@ -213,22 +185,7 @@ export const FailedMutation: Story = {
     },
     msw: {
       handlers: {
-        events: [...declarationTrpcMswFail.events.handlers],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent().v1
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(() => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query(() => {
-            return mockUser
-          })
-        ]
+        events: [...declarationTrpcMswFail.events.handlers]
       }
     }
   },
@@ -290,15 +247,8 @@ const declarationTrpcMswConflict = {
 }
 
 export const FailedMutationConflict: Story = {
-  loaders: [
-    async () => {
-      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
-
-      // Ensure state is stable before seeding the mutation cache
-      await new Promise((resolve) => setTimeout(resolve, 50))
-    }
-  ],
   parameters: {
+    userRole: TestUserRole.Enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
@@ -312,22 +262,7 @@ export const FailedMutationConflict: Story = {
     },
     msw: {
       handlers: {
-        events: [...declarationTrpcMswConflict.events.handlers],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent().v1
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(() => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query(() => {
-            return mockUser
-          })
-        ]
+        events: [...declarationTrpcMswConflict.events.handlers]
       }
     }
   },
