@@ -55,6 +55,7 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.ASSIGN]: null,
   [ActionType.UNASSIGN]: null,
   [ActionType.DUPLICATE_DETECTED]: [],
+  // ActionType.UPDATE: a virtual action so that getCurrentEventState can be tricked to include data not really persisted on the record’s history
   [ActionType.UPDATE]: null
 } satisfies Record<DisplayableAction, RecordScopeType[] | AlwaysAllowed>
 

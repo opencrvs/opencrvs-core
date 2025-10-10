@@ -38,6 +38,7 @@ export const ActionType = {
   READ: 'READ',
   ASSIGN: 'ASSIGN',
   UNASSIGN: 'UNASSIGN',
+  // UPDATE: a virtual action so that getCurrentEventState can be tricked to include data not really persisted on the record’s history
   UPDATE: 'UPDATE'
 } as const
 
@@ -76,6 +77,7 @@ export const ActionTypes = z.enum([
   'READ',
   'ASSIGN',
   'UNASSIGN',
+  // UPDATE: a virtual action so that getCurrentEventState can be tricked to include data not really persisted on the record’s history
   'UPDATE'
 ])
 
@@ -136,6 +138,7 @@ export const workqueueActions = ActionTypes.exclude([
   ActionType.MARK_AS_NOT_DUPLICATE,
   ActionType.REJECT_CORRECTION,
   ActionType.APPROVE_CORRECTION,
+  // ActionType.UPDATE: a virtual action so that getCurrentEventState can be tricked to include data not really persisted on the record’s history
   ActionType.UPDATE
 ])
 

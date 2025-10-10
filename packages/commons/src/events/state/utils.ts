@@ -94,6 +94,7 @@ const updateActions = ActionTypes.extract([
   ActionType.ARCHIVE,
   ActionType.PRINT_CERTIFICATE,
   ActionType.REQUEST_CORRECTION,
+  // ActionType.UPDATE: a virtual action so that getCurrentEventState can be tricked to include data not really persisted on the record’s history
   ActionType.UPDATE
 ])
 
