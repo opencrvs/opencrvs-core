@@ -92,7 +92,6 @@ const BaseField = z.object({
     'Reference to a parent field. If a field has a parent, it will be reset when the parent field is changed.'
   ),
   required: requiredSchema,
-  disabled: z.boolean().default(false).optional(),
   conditionals: z.array(FieldConditional).default([]).optional(),
   secured: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),

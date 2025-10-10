@@ -10,23 +10,15 @@
  */
 
 import * as React from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useIntl } from 'react-intl'
+import { useNavigate } from 'react-router-dom'
+import { SCOPES } from '@opencrvs/commons/client'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
-import {
-  TAB_GROUPS,
-  WORKQUEUE_TABS
-} from '@client/components/interface/WorkQueueTabs'
+import { usePermissions } from '@client/hooks/useAuthorization'
+import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
-import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { useHasAccessToNavigationItem } from '@client/components/interface/useHasAccessToNavigationItem'
-import {
-  showLeaderboard,
-  showRegDashboard,
-  showStatistics
-} from '@client/components/interface/Navigation'
 
 /**
  * Based on packages/client/src/components/interface/Navigation.tsx
@@ -38,56 +30,36 @@ export function PerformanceNavigationGroup({
 }: {
   currentWorkqueueSlug?: string
 }) {
-  const navigate = useNavigate()
   const intl = useIntl()
-
-  const { hasAccess } = useHasAccessToNavigationItem()
-
+  const navigate = useNavigate()
+  const { hasScope } = usePermissions()
   return (
     <>
-      {hasAccess(TAB_GROUPS.performance) && (
+      {hasScope(SCOPES.PERFORMANCE_READ_DASHBOARDS) && (
         <NavigationGroup>
           {
             <>
-              {showRegDashboard && hasAccess(WORKQUEUE_TABS.dashboard) && (
-                <NavigationItem
-                  icon={() => <Icon name="ChartLine" size="small" />}
-                  id={`navigation_${WORKQUEUE_TABS.dashboard}`}
-                  isSelected={currentWorkqueueSlug === 'dashboard'}
-                  label={intl.formatMessage(navigationMessages['dashboard'])}
-                  onClick={() =>
-                    navigate(routes.PERFORMANCE_DASHBOARD, {
-                      state: { isNavigatedInsideApp: true }
-                    })
-                  }
-                />
-              )}
-              {showStatistics && hasAccess(WORKQUEUE_TABS.statistics) && (
-                <NavigationItem
-                  icon={() => <Icon name="Activity" size="small" />}
-                  id={`navigation_${WORKQUEUE_TABS.statistics}`}
-                  isSelected={currentWorkqueueSlug === 'statistics'}
-                  label={intl.formatMessage(navigationMessages['statistics'])}
-                  onClick={() =>
-                    navigate(routes.PERFORMANCE_STATISTICS, {
-                      state: { isNavigatedInsideApp: true }
-                    })
-                  }
-                />
-              )}
-              {showLeaderboard && hasAccess(WORKQUEUE_TABS.leaderboards) && (
-                <NavigationItem
-                  icon={() => <Icon name="Medal" size="small" />}
-                  id={`navigation_${WORKQUEUE_TABS.leaderboards}`}
-                  isSelected={currentWorkqueueSlug === 'leaderboards'}
-                  label={intl.formatMessage(navigationMessages['leaderboards'])}
-                  onClick={() =>
-                    navigate(routes.PERFORMANCE_LEADER_BOARDS, {
-                      state: { isNavigatedInsideApp: true }
-                    })
-                  }
-                />
-              )}
+              {window.config.DASHBOARDS.map((config) => {
+                return (
+                  <NavigationItem
+                    key={config.id}
+                    icon={() => <Icon name="ChartLine" size="small" />}
+                    id={`navigation_dashboard_${config.id}`}
+                    isSelected={currentWorkqueueSlug === 'dashboard'}
+                    label={intl.formatMessage(config.title)}
+                    onClick={() =>
+                      navigate(
+                        formatUrl(routes.DASHBOARD, {
+                          id: config.id
+                        }),
+                        {
+                          state: { isNavigatedInsideApp: true }
+                        }
+                      )
+                    }
+                  />
+                )
+              })}
             </>
           }
         </NavigationGroup>
