@@ -44,10 +44,15 @@ export function useOutbox() {
 
   const pendingMutations = useMutationState({
     filters: {
-      predicate: (mutation) =>
-        mutation.state.status !== 'success' &&
-        !hasConflict(mutation.state.error) &&
-        !assignmentMutation(mutation.options.mutationKey as MutationKey)
+      predicate: (mutation) => {
+        if (hasConflict(mutation.state.error)) {
+          queryClient.getMutationCache().remove(mutation)
+        }
+        return (
+          mutation.state.status !== 'success' &&
+          !assignmentMutation(mutation.options.mutationKey as MutationKey)
+        )
+      }
     },
     select: (mutation) => mutation
   })
