@@ -271,7 +271,8 @@ export const Validated: Story = {
 
 const updateActionForValidate = expandWithUpdateActions(
   eventWhenValidateUpdatesDeclaration,
-  getTestValidatorContext()
+  getTestValidatorContext(),
+  tennisClubMembershipEvent
 ).find((a) => a.type === DECLARATION_ACTION_UPDATE)
 
 export const ValidatedOnDeclarationUpdate: Story = {
@@ -805,7 +806,8 @@ const newFullEvent = {
 
 const updateActions = expandWithUpdateActions(
   newFullEvent,
-  getTestValidatorContext()
+  getTestValidatorContext(),
+  tennisClubMembershipEvent
 ).filter((a) => a.type === DECLARATION_ACTION_UPDATE)
 
 export const DeclarationUpdateOnDeclare: Story = {
@@ -1025,7 +1027,8 @@ const eventWithNotifyActions = {
 
 const updateActionsForNotifyActions = expandWithUpdateActions(
   eventWithNotifyActions,
-  getTestValidatorContext()
+  getTestValidatorContext(),
+  tennisClubMembershipEvent
 ).filter((a) => a.type === DECLARATION_ACTION_UPDATE)
 
 export const DeclarationUpdateNotify: Story = {
@@ -1057,7 +1060,8 @@ export const Registered: Story = {
 
 const updateActionForRegister = expandWithUpdateActions(
   eventWhenRegisterUpdatesDeclaration,
-  getTestValidatorContext()
+  getTestValidatorContext(),
+  tennisClubMembershipEvent
 ).find((a) => a.type === DECLARATION_ACTION_UPDATE)
 
 export const RegisteredOnDeclarationUpdate: Story = {

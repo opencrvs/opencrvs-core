@@ -237,9 +237,9 @@ export function getDeclarationComparison(
 export function getAnnotationComparison(
   fullEvent: EventDocument,
   currentAction: ActionDocument,
-  validatorContext: ValidatorContext
+  validatorContext: ValidatorContext,
+  eventConfiguration: EventConfig
 ) {
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const reviewFormFields = getReviewFormFields(eventConfiguration)
 
   const index = fullEvent.actions.findIndex((a) => a.id === currentAction.id)

@@ -63,7 +63,8 @@ function hasDeclarationChanged(
   const hasUpdatedAnnotationValues = getAnnotationComparison(
     fullEvent,
     action,
-    validatorContext
+    validatorContext,
+    eventConfiguration
   )
 
   const hasUpdatedValues =
