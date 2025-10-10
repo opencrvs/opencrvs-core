@@ -122,7 +122,11 @@ function EventOverviewFull({
         eventConfiguration={eventConfiguration}
         flags={flags}
       />
-      <EventHistory fullEvent={event} validatorContext={validatorContext} />
+      <EventHistory
+        eventConfiguration={eventConfiguration}
+        fullEvent={event}
+        validatorContext={validatorContext}
+      />
     </Content>
   )
 }
