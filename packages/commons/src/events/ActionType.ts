@@ -93,8 +93,7 @@ const declarationActionValues = [
   ActionTypes.enum.REGISTER,
   // @TODO: Check whether NOTIFY should be included here or not.
   // It is not a declaration action strictly speaking, but it can change declaration data.
-  ActionTypes.enum.NOTIFY,
-  ActionTypes.enum.DUPLICATE_DETECTED
+  ActionTypes.enum.NOTIFY
 ] as const
 
 /** Actions which change event data (declaration) before registration / during declaration. */

@@ -52,7 +52,6 @@ export type AvailableActionTypes = Extract<
   | 'REQUEST_CORRECTION'
   | 'APPROVE_CORRECTION'
   | 'REJECT_CORRECTION'
-  | 'DUPLICATE_DETECTED'
 >
 
 /**
@@ -76,27 +75,15 @@ export function getPreviousDeclarationActionType(
       break
     }
     case ActionType.DECLARE: {
-      actionTypes = [
-        ActionType.DUPLICATE_DETECTED,
-        ActionType.DECLARE,
-        ActionType.NOTIFY
-      ]
+      actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
       break
     }
     case ActionType.VALIDATE: {
-      actionTypes = [
-        ActionType.DUPLICATE_DETECTED,
-        ActionType.VALIDATE,
-        ActionType.DECLARE
-      ]
+      actionTypes = [ActionType.VALIDATE, ActionType.DECLARE]
       break
     }
     case ActionType.REGISTER: {
-      actionTypes = [
-        ActionType.DECLARE,
-        ActionType.VALIDATE,
-        ActionType.DUPLICATE_DETECTED
-      ]
+      actionTypes = [ActionType.VALIDATE]
       break
     }
     case ActionType.REQUEST_CORRECTION: {
@@ -108,10 +95,6 @@ export function getPreviousDeclarationActionType(
       actionTypes = [ActionType.REQUEST_CORRECTION]
       break
     }
-    case ActionType.DUPLICATE_DETECTED: {
-      actionTypes = [ActionType.DUPLICATE_DETECTED]
-      break
-    }
     default: {
       const _check: never = currentActionType
       actionTypes = []
@@ -119,43 +102,8 @@ export function getPreviousDeclarationActionType(
   }
 
   for (const type of actionTypes) {
-    const foundAction = actions.find((a) => a.type === type)
-    if (!foundAction) {
-      continue
-    }
-
-    // When a record is created by a registration agent, a DECLARE action is created
-    // containing a non-empty 'declaration' object. A VALIDATE action is also created,
-    // but its 'declaration' is empty.
-    //
-    // Later, when determining the previousDeclarationActionType for a REGISTER action,
-    // we may find the VALIDATE action first. However, unlike the case where a field
-    // agent DECLAREs and a registration agent VALIDATEs (with a non-empty declaration),
-    // this VALIDATE action’s declaration is empty.
-    //
-    // To handle this, we look for another action with the same transactionId that
-    // contains a non-empty declaration — the original DECLARE action.
-    const sameTxnActions = actions.filter(
-      (a) => a.transactionId === foundAction.transactionId
-    )
-
-    if (sameTxnActions.length === 1) {
-      continue
-    }
-
-    const declarationAction = sameTxnActions.find(
-      (
-        a
-      ): a is (typeof actions)[number] & {
-        type: DeclarationUpdateActionType | typeof ActionType.NOTIFY
-      } =>
-        'declaration' in a &&
-        Object.keys(a.declaration).length > 0 &&
-        a.id !== foundAction.id
-    )
-
-    if (declarationAction && actionTypes.includes(declarationAction.type)) {
-      return declarationAction.type
+    if (actions.find((a) => a.type === type)) {
+      return type
     }
   }
 
