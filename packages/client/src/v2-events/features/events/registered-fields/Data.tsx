@@ -19,8 +19,7 @@ import {
   isFieldVisible,
   DataFieldValue,
   DataField,
-  StaticDataEntry,
-  FieldValue
+  StaticDataEntry
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -179,6 +178,7 @@ function DataInput({
   )
 }
 
+// TODO CIHAN: also handle reference fields?
 function DataOutput({
   value,
   field
@@ -209,8 +209,7 @@ function DataOutput({
         <Output
           field={{ type: FieldType.TEXT, id, label }}
           showPreviouslyMissingValuesAsChanged={false}
-          // TODO CIHAN: fix type
-          value={val as FieldValue}
+          value={val}
         />
       )
 
