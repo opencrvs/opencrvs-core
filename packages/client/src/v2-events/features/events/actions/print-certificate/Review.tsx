@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -75,6 +75,7 @@ const TooltipMessage = styled.p`
   ${({ theme }) => theme.fonts.reg19};
   max-width: 200px;
 `
+
 const messages = defineMessages({
   printTitle: {
     id: 'printAction.title',
@@ -87,21 +88,10 @@ const messages = defineMessages({
       'Please confirm that the informant has reviewed that the information on the certificate is correct and that it is ready to print.',
     description: 'The description for print action'
   },
-  printModalTitle: {
-    id: 'print.certificate.review.printModalTitle',
-    defaultMessage: 'Print certificate?',
-    description: 'Print certificate modal title text'
-  },
   printAndIssueModalTitle: {
     id: 'print.certificate.review.printAndIssueModalTitle',
     defaultMessage: 'Print and issue certificate?',
     description: 'Print and issue certificate modal title text'
-  },
-  printModalBody: {
-    id: 'print.certificate.review.modal.body.print',
-    defaultMessage:
-      'A Pdf of the certificate will open in a new tab for printing. The record will move to the ready-to-issue queue.',
-    description: 'Print certificate modal body text'
   },
   printAndIssueModalBody: {
     id: 'print.certificate.review.modal.body.printAndIssue',
@@ -192,6 +182,7 @@ export function Review() {
   const formConfig = getPrintForm(eventConfiguration)
   const { isActionAllowed } = useUserAllowedActions(fullEvent.type)
   const userDetails = useSelector(getUserDetails)
+  const { isPending } = onlineActions.printCertificate
 
   if (!userDetails) {
     throw new Error('User details are not available')
@@ -281,6 +272,7 @@ export function Review() {
           </Button>,
           <Button
             key="print-certificate"
+            disabled={!isOnline || isPending}
             id="print-certificate"
             type="primary"
             onClick={() => close(true)}
@@ -388,7 +380,7 @@ export function Review() {
               >
                 <Button
                   fullWidth
-                  disabled={!isOnline}
+                  disabled={!isOnline || isPending}
                   id="confirm-print"
                   size="large"
                   type="positive"

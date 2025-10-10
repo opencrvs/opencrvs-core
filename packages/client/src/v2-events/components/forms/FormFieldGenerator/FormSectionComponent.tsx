@@ -353,7 +353,6 @@ export function FormSectionComponent({
 
   useEffect(() => {
     const userChangedForm = !isEqual(values, prevValuesRef.current)
-
     const sectionChanged = prevIdRef.current !== id
 
     // Formik does not allow controlling the form state 'easily'.
