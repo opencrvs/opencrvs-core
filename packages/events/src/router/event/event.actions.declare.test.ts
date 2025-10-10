@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { TRPCError } from '@trpc/server'
-import { http, HttpResponse } from 'msw'
+import { http, HttpResponse, HttpResponseInit } from 'msw'
 import {
   ActionStatus,
   ActionType,
@@ -329,7 +329,7 @@ describe('Declare action', () => {
     ])
   })
 
-  test(`${ActionType.DECLARE} is idempotent`, async () => {
+  test(`DECLARE is idempotent`, async () => {
     const client = createTestClient(user)
 
     const data = generator.event.actions.declare(eventId, {
@@ -340,6 +340,37 @@ describe('Declare action', () => {
     const secondResponse = await client.event.actions.declare.request(data)
 
     expect(firstResponse).toEqual(secondResponse)
+  })
+
+  test(`DECLARE action can be resubmitted after it fails in country config`, async () => {
+    const spy = vi.fn()
+    mswServer.use(
+      http.post(
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/DECLARE`,
+        () => {
+          spy()
+          return new HttpResponse(null, { status: 500 } as HttpResponseInit)
+        }
+      )
+    )
+    const client = createTestClient(user)
+
+    const data = generator.event.actions.declare(eventId, {
+      keepAssignment: true
+    })
+
+    await expect(client.event.actions.declare.request(data)).rejects.toThrow()
+    mswServer.use(
+      http.post(
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/DECLARE`,
+        () => {
+          spy()
+          return HttpResponse.json()
+        }
+      )
+    )
+    await client.event.actions.declare.request(data)
+    expect(spy).toHaveBeenCalledTimes(2)
   })
 })
 

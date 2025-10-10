@@ -23,7 +23,8 @@ import {
   SignatureFieldValue,
   SelectDateRangeValue,
   TimeValue,
-  ButtonFieldValue
+  ButtonFieldValue,
+  VerificationStatusValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -36,7 +37,22 @@ import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 extendZodWithOpenApi(z)
 
-const FieldId = z.string().describe('Unique identifier for the field')
+const FieldId = z
+  .string()
+  .refine(
+    /*
+     * Disallow underscores '_' in field ids.
+     * Why? Theres two reasons:
+     *   1. We transform dots to underscores as separator in Formik field ids, so this avoids any issues with the Formik transformations.
+     *   2. On Kysely-SQL queries, we use the CamelCasePlugin. This plugin transforms snake_case to camelCase also on nested (jsonb) object keys.
+     *      This could be disabled via 'maintainNestedObjectKeys: true', but this would also affect SQL queries which use e.g. json_agg() or to_jsonb() to aggregate results.
+     */
+    (val) => !val.includes('_'),
+    (val) => ({
+      message: `id: '${val}' must not contain underscores '_'`
+    })
+  )
+  .describe('Unique identifier for the field')
 
 export const FieldReference = z
   .object({
@@ -75,7 +91,6 @@ const BaseField = z.object({
     'Reference to a parent field. If a field has a parent, it will be reset when the parent field is changed.'
   ),
   required: requiredSchema,
-  disabled: z.boolean().default(false).optional(),
   conditionals: z.array(FieldConditional).default([]).optional(),
   secured: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),
@@ -375,7 +390,17 @@ export type BulletList = z.infer<typeof BulletList>
 const Select = BaseField.extend({
   type: z.literal(FieldType.SELECT),
   defaultValue: TextValue.optional(),
-  options: z.array(SelectOption).describe('A list of options')
+  options: z.array(SelectOption).describe('A list of options'),
+  noOptionsMessage: TranslationConfig.optional().describe(
+    `
+    A translation configuration object used to display a message when no options are available.
+    It must follow the shape: { id: string; defaultMessage: string; description?: string }.
+    The message is rendered via intl.formatMessage(noOptionsMessage, { input }),
+    where 'input' represents the text entered in the Select field.
+    You can reference this variable in your message, for example:
+    { ..., defaultMessage: "'{input}' is not listed among the health facilities." }
+  `
+  )
 }).describe('Select input')
 
 export const SelectDateRangeOption = z.object({
@@ -651,6 +676,19 @@ const LinkButtonField = BaseField.extend({
 
 export type LinkButtonField = z.infer<typeof LinkButtonField>
 
+const VerificationStatus = BaseField.extend({
+  type: z.literal(FieldType.VERIFICATION_STATUS),
+  defaultValue: VerificationStatusValue.optional(),
+  configuration: z.object({
+    status: TranslationConfig.describe('Text to display on the status pill.'),
+    description: TranslationConfig.describe(
+      'Explaining text on the banner in form.'
+    )
+  })
+})
+
+export type VerificationStatus = z.infer<typeof VerificationStatus>
+
 const QueryParamReaderField = BaseField.extend({
   type: z.literal(FieldType.QUERY_PARAM_READER),
   configuration: z.object({
@@ -699,6 +737,7 @@ export type FieldConfig =
   | z.infer<typeof AlphaPrintButton>
   | z.infer<typeof HttpField>
   | z.infer<typeof LinkButtonField>
+  | z.infer<typeof VerificationStatus>
   | z.infer<typeof QueryParamReaderField>
 
 /** @knipignore */
@@ -738,6 +777,7 @@ export type FieldConfigInput =
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
   | z.input<typeof LinkButtonField>
+  | z.input<typeof VerificationStatus>
   | z.input<typeof QueryParamReaderField>
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
@@ -782,7 +822,9 @@ export const FieldConfig: z.ZodType<
     ButtonField,
     AlphaPrintButton,
     HttpField,
-    LinkButtonField
+    LinkButtonField,
+    VerificationStatus,
+    QueryParamReaderField
   ])
   .openapi({
     description: 'Form field configuration',

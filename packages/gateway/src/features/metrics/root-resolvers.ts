@@ -301,6 +301,7 @@ export const resolvers: GQLResolver = {
         ...(metricsData.results || []),
         ...eventActionsData.results
           .map((action) => ({
+            isV2: true,
             action: V2ActionTypeToV1ActionType(action.actionType as ActionType),
             ipAddress: '', // Not available in event actions
             practitionerId: action.createdBy,

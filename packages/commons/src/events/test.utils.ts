@@ -84,6 +84,7 @@ export const TestUserRole = z.enum([
   'LOCAL_SYSTEM_ADMIN',
   'NATIONAL_REGISTRAR',
   'REGISTRATION_AGENT',
+  'NATIONAL_SYSTEM_ADMIN',
   'SOCIAL_WORKER'
 ])
 
@@ -185,6 +186,8 @@ export function mapFieldTypeToMockValue(
     case FieldType.OFFICE:
     case FieldType.LINK_BUTTON:
       return `${field.id}-${field.type}-${i}`
+    case FieldType.VERIFICATION_STATUS:
+      return 'verified'
     case FieldType.NAME:
       return generateRandomName(rng)
     case FieldType.NUMBER:
@@ -879,6 +882,7 @@ export function generateEventDocument({
     primaryOfficeId: UUID
     role: TestUserRole
     id: string
+    assignedTo: string
   }>
   /**
    * Overrides for default event state
@@ -895,7 +899,8 @@ export function generateEventDocument({
         rng,
         defaults: {
           createdBy: user?.id,
-          createdAtLocation: user?.primaryOfficeId
+          createdAtLocation: user?.primaryOfficeId,
+          assignedTo: user?.assignedTo
         },
         declarationOverrides
       })

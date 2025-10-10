@@ -211,6 +211,15 @@ const preview: Preview = {
           primaryOfficeId,
           type: TokenUserType.enum.user
         })
+      } else if (
+        options.parameters.userRole === TestUserRole.Enum.NATIONAL_SYSTEM_ADMIN
+      ) {
+        window.localStorage.setItem(
+          'opencrvs',
+          generator.user.token.nationalSystemAdmin
+        )
+
+        addUserToQueryData(generator.user.nationalSystemAdmin().v2)
       } else {
         window.localStorage.setItem(
           'opencrvs',
