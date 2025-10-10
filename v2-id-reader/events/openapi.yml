@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 3e905855-5878-4195-9621-e8fa6ad582d4
+                transactionId: edd6bd7f-f907-41bb-a0a3-c0d61e1f5ea4
                 type: birth
       responses:
         "200":
@@ -401,7 +401,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 2930e7fe-3731-44f4-b24e-6ec82cbde088
+                transactionId: ef278321-a4d3-4428-a3fe-4ea9bb3b1126
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -6271,6 +6271,8 @@ components:
                   type: object
                   additionalProperties:
                     type: string
+                errorValue:
+                  description: Value to set if the request fails
                 params:
                   type: object
                   additionalProperties:

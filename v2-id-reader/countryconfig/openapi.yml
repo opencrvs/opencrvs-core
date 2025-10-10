@@ -4440,6 +4440,8 @@ components:
                   type: object
                   additionalProperties:
                     type: string
+                errorValue:
+                  description: Value to set if the request fails
                 params:
                   type: object
                   additionalProperties:
