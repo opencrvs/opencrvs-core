@@ -31,11 +31,15 @@ import {
   ConfigurableScopes,
   getAuthorizedEventsFromScopes,
   getTokenPayload,
-  canUserReadEvent
+  canUserReadEvent,
+  hasScope,
+  SCOPES
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
+import { getUserOrSystem } from '../../../service/users/api'
+import { isOfficeUnderJurisdiction } from '../../../storage/postgres/events/locations'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -341,4 +345,58 @@ export const userCanReadEvent: MiddlewareFunction<
 
   // Throw not found to avoid leaking the existence of the event
   throw new EventNotFoundError(input)
+}
+
+export const userCanReadOtherUser: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext & { userId: string },
+  string
+> = async ({ next, ctx, input }) => {
+  const { token, user: userReading } = ctx
+
+  const otherUser = await getUserOrSystem(input, token)
+
+  // Don't reveal the existence of the user
+  if (!otherUser) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+
+  // @TODO: Check if there is a need to allow  users to read other systems
+  if (otherUser.type === TokenUserType.Enum.system) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+  if (!userReading.primaryOfficeId) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+
+  if (hasScope(token, SCOPES.USER_READ)) {
+    return next()
+  }
+
+  if (
+    hasScope(token, SCOPES.USER_READ_MY_OFFICE) &&
+    userReading.primaryOfficeId === otherUser.primaryOfficeId
+  ) {
+    return next()
+  }
+
+  const isUnderJurisdiction = await isOfficeUnderJurisdiction({
+    jurisdictionLocationId: userReading.primaryOfficeId,
+    officeLocationId: otherUser.primaryOfficeId
+  })
+
+  if (
+    hasScope(token, SCOPES.USER_READ_MY_JURISDICTION) &&
+    isUnderJurisdiction
+  ) {
+    return next()
+  }
+
+  if (hasScope(token, SCOPES.USER_READ_ONLY_MY_AUDIT)) {
+    return next()
+  }
+
+  throw new TRPCError({ code: 'NOT_FOUND' })
 }

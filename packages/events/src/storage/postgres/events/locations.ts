@@ -179,3 +179,25 @@ export async function getLeafLocationIds({
 
   return query.execute()
 }
+
+export async function isOfficeUnderJurisdiction({
+  jurisdictionLocationId,
+  officeLocationId
+}: {
+  jurisdictionLocationId: UUID
+  officeLocationId: UUID
+}) {
+  const db = getClient()
+
+  const officeId = await db
+    .selectFrom('locations')
+    .select('id')
+    .where('id', '=', officeLocationId)
+    // @TODO: ask whether any location goes
+    .where('locationType', '=', LocationType.Enum.CRVS_OFFICE)
+    .where('parentId', '=', jurisdictionLocationId)
+    .where('deletedAt', 'is', null)
+    .executeTakeFirst()
+
+  return !!officeId
+}
