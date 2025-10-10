@@ -177,13 +177,9 @@ export function getDeclarationComparison(
     (a) => a.type === ActionType.DECLARE || a.type === ActionType.NOTIFY
   )
 
-  const filteredPreviousActions = eventUpToPreviousAction.filter(
-    (a) => !isMetaAction(a.type)
-  )
-
   if (
     currentActionIndex < 0 ||
-    firstDeclareOrNotifyAction?.id === filteredPreviousActions.at(-1)?.id
+    firstDeclareOrNotifyAction?.id === currentAction.id
   ) {
     return {
       updatedValues: {},
