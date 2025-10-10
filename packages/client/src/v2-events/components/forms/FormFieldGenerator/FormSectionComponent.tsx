@@ -110,23 +110,6 @@ const FormItem = styled.div<{
     ignoreBottomMargin ? '0px' : '22px'};
 `
 
-/**
- * Given a parent field id, retrieve all of the child configs.
- * Used to reset the values of child fields when a parent field changes.
- */
-function retrieveChildFields(
-  parentId: string,
-  fieldParentMap: IndexMap<FieldConfig[]>
-) {
-  const childFields = fieldParentMap[parentId]
-
-  if (!childFields) {
-    return []
-  }
-
-  return childFields
-}
-
 function focusElementByHash() {
   const hash = window.location.hash.slice(1)
   if (!hash) {
@@ -139,6 +122,17 @@ function focusElementByHash() {
 
   input?.focus()
   window.scrollTo(0, document.documentElement.scrollTop - 100)
+}
+
+function resolveFieldReferenceValue(
+  { $$field, $$subfield }: FieldReference,
+  fieldValues: EventState
+) {
+  const referenceKeyInFormikFormat = makeFormFieldIdFormikCompatible($$field)
+
+  return $$subfield && $$subfield.length > 0
+    ? get(fieldValues[referenceKeyInFormikFormat], $$subfield)
+    : fieldValues[referenceKeyInFormikFormat]
 }
 
 function getUpdatedChildValueOnChange({
@@ -162,13 +156,30 @@ function getUpdatedChildValueOnChange({
     )
   }
 
-  const referenceKeyInFormikFormat = makeFormFieldIdFormikCompatible(
-    fieldReference.$$field
-  )
+  return resolveFieldReferenceValue(fieldReference, fieldValues)
+}
 
-  return fieldReference.$$subfield && fieldReference.$$subfield.length > 0
-    ? get(fieldValues[referenceKeyInFormikFormat], fieldReference.$$subfield)
-    : fieldValues[referenceKeyInFormikFormat]
+/**
+ * Create a reference map of visible parent fields and their their children for quick access.
+ * This is used to reset the values of child fields when a parent field changes.
+ *
+ * @returns `Record<parentFieldId, FieldConfig[]>` mapping parent field IDs to their child fields
+ */
+function getParentsOfListenerFields(fields: FieldConfig[]) {
+  // Create a reference map of visible parent fields and their their children for quick access.
+  // This is used to reset the values of child fields when a parent field changes.
+  const fieldsByParentId: IndexMap<FieldConfig[]> = {}
+
+  for (const field of fields) {
+    const parents = ([] as FieldReference[]).concat(field.parent ?? [])
+
+    for (const parent of parents) {
+      const listenersParentId = parent.$$field
+      ;(fieldsByParentId[listenersParentId] ||= []).push(field)
+    }
+  }
+
+  return fieldsByParentId
 }
 
 // @TODO: Clarify and unify the naming of the props. What is from formik and what is from the state.
@@ -207,37 +218,9 @@ export function FormSectionComponent({
     id: makeFormFieldIdFormikCompatible(field.id)
   }))
 
-  // fieldsWithDotSeparator may fallback to pageFieldsWithDotIds when eventConfig
-  // isn’t loaded yet. This guarantees we always have a usable set of fields.
-  // Once eventConfig is available, we derive all fields (with dot-separated IDs)
-  // so parent → child relationships can be resolved consistently across pages.
-  const allFieldsWithDotSeparator: FieldConfig[] = useMemo(() => {
-    if (eventConfig) {
-      const allConfigFields = getAllUniqueFields(eventConfig)
-      return allConfigFields.map((field) => ({
-        ...field,
-        id: makeFormFieldIdFormikCompatible(field.id)
-      }))
-    }
-    return fieldsWithDotSeparator
-  }, [eventConfig, fieldsWithDotSeparator])
-
-  // Create a reference map of parent fields and their their children for quick access.
-  // This is used to reset the values of child fields when a parent field changes.
-  const fieldsByParentId = useMemo(() => {
-    const result: IndexMap<FieldConfig[]> = {}
-
-    for (const field of allFieldsWithDotSeparator) {
-      const parents = ([] as FieldReference[]).concat(field.parent ?? [])
-
-      for (const parent of parents) {
-        const listenersParentId = parent.$$field
-        ;(result[listenersParentId] ||= []).push(field)
-      }
-    }
-
-    return result
-  }, [allFieldsWithDotSeparator])
+  const listenerFieldsByParentId = getParentsOfListenerFields(
+    eventConfig ? getAllUniqueFields(eventConfig) : fieldsWithDotSeparator
+  )
 
   const errors = makeFormFieldIdsFormikCompatible(errorsWithDotSeparator)
   const form = makeFormikFieldIdsOpenCRVSCompatible(
@@ -263,38 +246,43 @@ export function FormSectionComponent({
   )
 
   /** Sets the value for fields that listen to another field via `parent` and `value` properties */
-  const setValuesForListenerFields = useCallback(
+  const setValueForListenerField = useCallback(
     (
-      childField: InteractiveFieldType,
+      listenerField: InteractiveFieldType,
       fieldValues: Record<string, FieldValue>,
       fieldErrors: AllProps['errors']
     ) => {
       // this can be any field. Even though we call this only when parent triggers the change.
-      const childFieldOcrvsId = makeFormikFieldIdOpenCRVSCompatible(
-        childField.id
+      const listenerFieldOcrvsId = makeFormikFieldIdOpenCRVSCompatible(
+        listenerField.id
       )
 
       const referenceOrReferencesToOtherFields = fieldsWithDotSeparator.find(
-        (f) => f.id === childFieldOcrvsId
+        (f) => f.id === listenerFieldOcrvsId
       )?.value
       const referencesToOtherFields = ([] as FieldReference[]).concat(
         referenceOrReferencesToOtherFields ?? []
       )
-      const childFieldFormikId = makeFormFieldIdFormikCompatible(childField.id)
+      const listenerFieldFormikId = makeFormFieldIdFormikCompatible(
+        listenerField.id
+      )
 
-      for (const reference of referencesToOtherFields) {
-        const updatedValue = getUpdatedChildValueOnChange({
-          childField,
-          fieldReference: reference,
-          fieldValues,
-          systemVariables
-        })
+      const changedReference = referencesToOtherFields.find((reference) => {
+        const updatedValue = resolveFieldReferenceValue(reference, fieldValues)
+        const previousValue = prevValuesRef.current[listenerFieldFormikId]
+        return !isEqual(updatedValue, previousValue)
+      })
 
-        if (updatedValue) {
-          set(fieldValues, childFieldFormikId, updatedValue)
-          set(fieldErrors, childField.id, { errors: [] })
-          break
-        }
+      const updatedValue = getUpdatedChildValueOnChange({
+        childField: listenerField,
+        fieldReference: changedReference,
+        fieldValues,
+        systemVariables
+      })
+
+      if (updatedValue) {
+        set(fieldValues, listenerFieldFormikId, updatedValue)
+        set(fieldErrors, listenerFieldFormikId, { errors: [] })
       }
     },
     [fieldsWithDotSeparator, systemVariables]
@@ -306,18 +294,16 @@ export function FormSectionComponent({
       const updatedErrors = cloneDeep(errorsWithDotSeparator)
 
       const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
-
-      const children = retrieveChildFields(ocrvsFieldId, fieldsByParentId)
-
-      const interactiveChildren = children.filter(
+      const listenerFields = listenerFieldsByParentId[ocrvsFieldId] ?? []
+      const interactiveListenerFields = listenerFields.filter(
         (c): c is InteractiveFieldType => !isNonInteractiveFieldType(c)
       )
 
       // update the value of the field that was changed
       set(updatedValues, formikFieldId, value)
 
-      for (const child of interactiveChildren) {
-        setValuesForListenerFields(child, updatedValues, updatedErrors)
+      for (const listenerField of interactiveListenerFields) {
+        setValueForListenerField(listenerField, updatedValues, updatedErrors)
       }
 
       // @TODO: we should not reference field id 'country' directly.
@@ -332,11 +318,11 @@ export function FormSectionComponent({
         )
       }
 
-      const formikChildIds = children.map((child) =>
+      const formikListenerFieldIds = listenerFields.map((child) =>
         makeFormFieldIdFormikCompatible(child.id)
       )
 
-      const updatedTouched = omit(touched, formikChildIds)
+      const updatedTouched = omit(touched, formikListenerFieldIds)
 
       // @TODO: Formik does not type errors well. Actual error message differs from the type.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -348,13 +334,13 @@ export function FormSectionComponent({
     [
       values,
       setValues,
-      fieldsByParentId,
+      listenerFieldsByParentId,
       setTouched,
       touched,
       errorsWithDotSeparator,
       setErrors,
       setAllTouchedFields,
-      setValuesForListenerFields
+      setValueForListenerField
     ]
   )
 
