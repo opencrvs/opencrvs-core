@@ -10,7 +10,7 @@
  */
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useIntl } from 'react-intl'
 import {
   ActionType,
@@ -167,8 +167,10 @@ interface ActionConfig {
   hidden?: boolean
 }
 
+export type ActionMenuActionType = WorkqueueActionType | ClientSpecificAction
+
 interface ActionMenuItem extends ActionConfig {
-  type: WorkqueueActionType | ClientSpecificAction
+  type: ActionMenuActionType
 }
 
 /**
@@ -281,6 +283,7 @@ function useViewableActionConfigurations(
       [ActionType.READ]: {
         label: actionLabels[ActionType.READ],
         icon: 'Eye' as const,
+        disabled: !isOnline,
         onClick: () => navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId }))
       },
       [ActionType.ASSIGN]: {
@@ -465,18 +468,22 @@ function useViewableActionConfigurations(
         disabled: !isDownloadedAndAssignedToUser,
         hidden: !eventIsWaitingForCorrection
       }
-    } satisfies Record<WorkqueueActionType & ClientSpecificAction, ActionConfig>
+    } satisfies Record<ActionMenuActionType, ActionConfig>
   }
 }
 
 export function useUserAllowedActions(eventType: string) {
-  const scopes = useSelector(getScope) ?? []
+  const scopes = useSelector(getScope)
 
   const actions = Object.values(ActionType)
   const clientSpecificActions = Object.values(ClientSpecificAction)
 
-  const allowedActions = [...actions, ...clientSpecificActions].filter(
-    (action) => isActionInScope(scopes, action, eventType)
+  const allowedActions = useMemo(
+    () =>
+      [...actions, ...clientSpecificActions].filter((action) =>
+        isActionInScope(scopes ?? [], action, eventType)
+      ),
+    [scopes, eventType, actions, clientSpecificActions]
   )
 
   return {
@@ -527,7 +534,7 @@ export function useAllowedActionConfigurations(
     // deduplicate after adding the draft
     .filter((action, index, self) => self.indexOf(action) === index)
     .filter(
-      (action): action is WorkqueueActionType | ClientSpecificAction =>
+      (action): action is ActionMenuActionType =>
         ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
         workqueueActions.safeParse(action).success
     )
