@@ -105,8 +105,10 @@ function DeclarationComparisonTableComponent({
   id,
   validatorContext
 }: DeclarationComparisonTableProps) {
-  const acceptedActions = getAcceptedActions(fullEventWithoutUpdatedAction)
-  const historyWithUpdatedActions = expandWithUpdateActions(acceptedActions)
+  const historyWithUpdatedActions = expandWithUpdateActions(
+    fullEventWithoutUpdatedAction,
+    validatorContext
+  )
 
   const fullEvent = {
     ...fullEventWithoutUpdatedAction,

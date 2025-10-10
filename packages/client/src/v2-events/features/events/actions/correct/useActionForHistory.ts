@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { isEqual, take } from 'lodash'
 import {
   Action,
   ActionDocument,
@@ -18,10 +17,12 @@ import {
   DeclarationActionType,
   EventConfig,
   EventDocument,
+  getAcceptedActions,
   getCurrentEventState,
-  UUID
+  UUID,
+  ValidatorContext
 } from '@opencrvs/commons/client'
-import { getPreviousDeclarationActionType } from '../../components/Action/utils'
+import { getAnnotationComparisonReal, getDecalarationComparison } from './utils'
 
 /**
  * Indicates that declaration action changed declaration content. Satisfies V1 spec.
@@ -46,50 +47,27 @@ export type EventHistoryDocument = Omit<EventDocument, 'actions'> & {
   actions: EventHistoryActionDocument[]
 }
 
-function getPreviousActions(arr: ActionDocument[], id: string) {
-  const index = arr.findIndex((item) => item.id === id)
-  return index === -1 ? arr : take(arr, index)
-}
-
 function hasDeclarationChanged(
-  actions: ActionDocument[],
-  action: Extract<Action, { type: DeclarationActionType }>
+  fullEvent: EventDocument,
+  action: Extract<Action, { type: DeclarationActionType }>,
+  validatorContext: ValidatorContext
 ) {
-  // We are doing a first-to-last search with a find operation, so reverse the previous actions
-  // and get the first matching declaration action.
-  const previousActions = getPreviousActions(actions, action.id).reverse()
-  const previousActionType = getPreviousDeclarationActionType(
-    previousActions,
-    action.type
+  const hasUpdatedDeclarationValues = getDecalarationComparison(
+    fullEvent,
+    action,
+    validatorContext
+  ).valueHasChanged
+
+  const hasUpdatedAnnotationValues = getAnnotationComparisonReal(
+    fullEvent,
+    action,
+    validatorContext
   )
-
-  const previousDeclarationAction = previousActionType
-    ? previousActions.find((act) => act.type === previousActionType)
-    : undefined
-
-  const currentActionHasUpdates = Object.keys(action.declaration).length > 0
-  const previousActionHasDeclaration = !!previousDeclarationAction?.declaration
-
-  const hasUpdatedDeclarationValues = Object.entries(action.declaration).some(
-    ([key, value]) => {
-      const prevValue = previousDeclarationAction?.declaration[key]
-      return !isEqual(prevValue, value)
-    }
-  )
-
-  const hasUpdatedAnnotationValues =
-    action.annotation &&
-    Object.entries(action.annotation).some(([key, value]) => {
-      const prevValue = previousDeclarationAction?.annotation?.[key]
-      return !isEqual(prevValue, value)
-    })
 
   const hasUpdatedValues =
     hasUpdatedDeclarationValues || hasUpdatedAnnotationValues
 
-  return (
-    currentActionHasUpdates && previousActionHasDeclaration && hasUpdatedValues
-  )
+  return hasUpdatedValues
 }
 
 /**
@@ -110,9 +88,11 @@ function hasDeclarationChanged(
  * // → [ { ...actions }, { ...synthetic UPDATE for a DECLARE action}, { ...original DECLARE action }, ... ]
  */
 export function expandWithUpdateActions(
-  actions: ActionDocument[]
+  fullEvent: EventDocument,
+  validatorContext: ValidatorContext
 ): EventHistoryActionDocument[] {
-  return actions.flatMap<EventHistoryActionDocument>((action) => {
+  const history = getAcceptedActions(fullEvent)
+  return history.flatMap<EventHistoryActionDocument>((action) => {
     if (
       action.type === ActionTypes.enum.VALIDATE ||
       action.type === ActionTypes.enum.REGISTER ||
@@ -120,7 +100,7 @@ export function expandWithUpdateActions(
       action.type === ActionTypes.enum.NOTIFY ||
       action.type === ActionTypes.enum.DUPLICATE_DETECTED
     ) {
-      if (!hasDeclarationChanged(actions, action)) {
+      if (!hasDeclarationChanged(fullEvent, action, validatorContext)) {
         return [action]
       }
 

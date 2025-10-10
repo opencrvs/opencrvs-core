@@ -21,8 +21,13 @@ import {
   deepMerge,
   omitHiddenFields,
   getDeclarationFields,
-  EventConfig
+  EventConfig,
+  getDeclaration,
+  isFieldDisplayedOnReview,
+  getCurrentEventState,
+  ActionDocument
 } from '@opencrvs/commons/client'
+import { useEventConfiguration } from '../../useEventConfiguration'
 import {
   EventHistoryActionDocument,
   EventHistoryDocument
@@ -149,4 +154,89 @@ export function getReviewFormFields(configuration: EventConfig) {
     reviewForms.flatMap((form) => form.fields),
     (field) => field.id
   )
+}
+
+export function getDecalarationComparison(
+  fullEvent: EventDocument,
+  currentAction: ActionDocument,
+  validatorContext: ValidatorContext
+) {
+  const currentActionIndex = fullEvent.actions.findIndex(
+    (a) => a.id === currentAction.id
+  )
+  if (currentActionIndex < 0) {
+    return {
+      updatedValues: {},
+      oldValues: {},
+      valueHasChanged: false
+    }
+  }
+
+  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const declarationConfig = getDeclaration(eventConfiguration)
+
+  const eventUpToCurrentAction = fullEvent.actions.slice(
+    0,
+    currentActionIndex + 1
+  )
+  const eventUpToPreviousAction = fullEvent.actions.slice(0, currentActionIndex)
+
+  const latestDeclaration = getCurrentEventState(
+    { ...fullEvent, actions: eventUpToCurrentAction },
+    eventConfiguration
+  ).declaration
+
+  const previousDeclaration = getCurrentEventState(
+    { ...fullEvent, actions: eventUpToPreviousAction },
+    eventConfiguration
+  ).declaration
+
+  const updatedValues: Record<string, unknown> = {}
+  const oldValues: Record<string, unknown> = {}
+
+  declarationConfig.pages.flatMap((page) =>
+    page.fields
+      .filter((field) =>
+        isFieldDisplayedOnReview(field, latestDeclaration, validatorContext)
+      )
+      .map((f) => {
+        const hasChanged = hasFieldChanged(
+          f,
+          latestDeclaration,
+          previousDeclaration,
+          validatorContext
+        )
+        if (hasChanged) {
+          // Collect changed values for changed fields only
+          updatedValues[f.id] = latestDeclaration[f.id]
+          oldValues[f.id] = previousDeclaration[f.id]
+        }
+      })
+  )
+
+  return {
+    valueHasChanged: !_.isEmpty(updatedValues),
+    updatedValues,
+    oldValues
+  }
+}
+
+export function getAnnotationComparisonReal(
+  fullEvent: EventDocument,
+  currentAction: ActionDocument,
+  validatorContext: ValidatorContext
+) {
+  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const reviewFormFields = getReviewFormFields(eventConfiguration)
+
+  const index = fullEvent.actions.findIndex((a) => a.id === currentAction.id)
+
+  const changedAnnotationFields = reviewFormFields.filter(
+    (f) =>
+      // @ts-ignore
+      getAnnotationComparison(f, fullEvent, index, validatorContext)
+        .valueHasChanged
+  )
+
+  return changedAnnotationFields.length > 0
 }

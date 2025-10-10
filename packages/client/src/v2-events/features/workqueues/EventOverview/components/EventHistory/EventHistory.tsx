@@ -347,7 +347,10 @@ export function EventHistory({
 
   const history = getAcceptedActions(fullEvent)
 
-  const historyWithUpdatedActions = expandWithUpdateActions(history)
+  const historyWithUpdatedActions = expandWithUpdateActions(
+    fullEvent,
+    validatorContext
+  )
 
   const visibleHistoryWithUpdatedActions = historyWithUpdatedActions.filter(
     ({ type }) => type !== ActionType.CREATE
