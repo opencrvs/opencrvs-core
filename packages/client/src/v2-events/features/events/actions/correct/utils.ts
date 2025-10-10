@@ -164,7 +164,20 @@ export function getDecalarationComparison(
   const currentActionIndex = fullEvent.actions.findIndex(
     (a) => a.id === currentAction.id
   )
-  if (currentActionIndex < 0) {
+
+  const eventUpToCurrentAction = fullEvent.actions.slice(
+    0,
+    currentActionIndex + 1
+  )
+  const eventUpToPreviousAction = fullEvent.actions.slice(0, currentActionIndex)
+  const firstDeclareOrNotifyAction = fullEvent.actions.find(
+    (a) => a.type === ActionType.DECLARE || a.type === ActionType.NOTIFY
+  )
+
+  if (
+    currentActionIndex < 0 ||
+    firstDeclareOrNotifyAction?.id === eventUpToPreviousAction.at(-1)?.id
+  ) {
     return {
       updatedValues: {},
       oldValues: {},
@@ -174,12 +187,6 @@ export function getDecalarationComparison(
 
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const declarationConfig = getDeclaration(eventConfiguration)
-
-  const eventUpToCurrentAction = fullEvent.actions.slice(
-    0,
-    currentActionIndex + 1
-  )
-  const eventUpToPreviousAction = fullEvent.actions.slice(0, currentActionIndex)
 
   const latestDeclaration = getCurrentEventState(
     { ...fullEvent, actions: eventUpToCurrentAction },
