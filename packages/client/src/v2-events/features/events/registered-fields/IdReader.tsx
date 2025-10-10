@@ -35,6 +35,7 @@ export const ReadersContainer = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     & > section {
       flex-direction: column;
+      gap: 0;
     }
   }
 
