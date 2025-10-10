@@ -1200,7 +1200,7 @@ const notDuplicateUpdateEvent: EventDocument = {
         'applicant.dob': '1999-11-11',
         'applicant.name': {
           surname: 'Drinkwater',
-          firstname: 'Updated Danny',
+          firstname: 'Updated Danny', // updated when marked as not duplicate, should be visible in updated modal
           middlename: ''
         },
         'senior-pass.id': '23213213',
