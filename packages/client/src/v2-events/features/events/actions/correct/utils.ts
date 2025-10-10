@@ -109,7 +109,7 @@ function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
  *  - previousAnnotations: aggregated annotations up to (but not including) the current action
  *  - valueHasChanged: boolean indicating whether the field's value changed between the two states
  */
-export function getAnnotationComparison(
+export function getAnnotationComparisonForField(
   field: FieldConfig,
   fullEvent: EventHistoryDocument,
   currentActionIndex: number,
@@ -221,7 +221,7 @@ export function getDecalarationComparison(
   }
 }
 
-export function getAnnotationComparisonReal(
+export function getAnnotationComparison(
   fullEvent: EventDocument,
   currentAction: ActionDocument,
   validatorContext: ValidatorContext
@@ -234,7 +234,7 @@ export function getAnnotationComparisonReal(
   const changedAnnotationFields = reviewFormFields.filter(
     (f) =>
       // @ts-ignore
-      getAnnotationComparison(f, fullEvent, index, validatorContext)
+      getAnnotationComparisonForField(f, fullEvent, index, validatorContext)
         .valueHasChanged
   )
 

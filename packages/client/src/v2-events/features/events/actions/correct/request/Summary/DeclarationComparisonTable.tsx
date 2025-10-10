@@ -27,7 +27,7 @@ import { messages as correctionMessages } from '@client/i18n/messages/views/corr
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import {
-  getAnnotationComparison,
+  getAnnotationComparisonForField,
   getReviewFormFields,
   hasFieldChanged
 } from '@client/v2-events/features/events/actions/correct/utils'
@@ -157,12 +157,12 @@ function DeclarationComparisonTableComponent({
   const changedAnnotationFields = reviewFormFields
     .filter(
       (f) =>
-        getAnnotationComparison(f, fullEvent, index, validatorContext)
+        getAnnotationComparisonForField(f, fullEvent, index, validatorContext)
           .valueHasChanged
     )
     .map((f) => {
       const { currentAnnotations, previousAnnotations } =
-        getAnnotationComparison(f, fullEvent, index, validatorContext)
+        getAnnotationComparisonForField(f, fullEvent, index, validatorContext)
 
       const previous = (
         <Output

@@ -22,7 +22,7 @@ import {
   UUID,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { getAnnotationComparisonReal, getDecalarationComparison } from './utils'
+import { getAnnotationComparison, getDecalarationComparison } from './utils'
 
 /**
  * Indicates that declaration action changed declaration content. Satisfies V1 spec.
@@ -58,7 +58,7 @@ function hasDeclarationChanged(
     validatorContext
   ).valueHasChanged
 
-  const hasUpdatedAnnotationValues = getAnnotationComparisonReal(
+  const hasUpdatedAnnotationValues = getAnnotationComparison(
     fullEvent,
     action,
     validatorContext
