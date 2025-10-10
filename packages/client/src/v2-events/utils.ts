@@ -128,29 +128,12 @@ export function replacePlaceholders({
     return undefined
   }
 
-  if (isFieldValueWithoutTemplates(defaultValue)) {
-    return defaultValue
-  }
-
-  if (isTemplateVariable(defaultValue)) {
-    const resolvedValue = get(systemVariables, defaultValue)
-    const validator = mapFieldTypeToZod(fieldType)
-
-    const parsedValue = validator.safeParse(resolvedValue)
-
-    if (parsedValue.success) {
-      return parsedValue.data as FieldValue
-    }
-
-    throw new Error(`Could not resolve ${defaultValue}: ${parsedValue.error}`)
-  }
-
   if (
     compositeFieldTypes.some((ft) => ft === fieldType) &&
     typeof defaultValue === 'object'
   ) {
     /**
-     * defaultValue is typically an ADDRESS, FILE, or FILE_WITH_OPTIONS.
+     * defaultValue is typically an ADDRESS, FILE, FILE_WITH_OPTIONS or DATA.
      * Some STRING values within the defaultValue object may contain template variables (prefixed with $).
      */
     const result = { ...defaultValue }
@@ -181,6 +164,24 @@ export function replacePlaceholders({
       )}. Error: ${parsedResult.error}`
     )
   }
+
+  if (isFieldValueWithoutTemplates(defaultValue)) {
+    return defaultValue
+  }
+
+  if (isTemplateVariable(defaultValue)) {
+    const resolvedValue = get(systemVariables, defaultValue)
+    const validator = mapFieldTypeToZod(fieldType)
+
+    const parsedValue = validator.safeParse(resolvedValue)
+
+    if (parsedValue.success) {
+      return parsedValue.data as FieldValue
+    }
+
+    throw new Error(`Could not resolve ${defaultValue}: ${parsedValue.error}`)
+  }
+
   throw new Error(
     `Could not resolve ${fieldType}: ${JSON.stringify(defaultValue)}`
   )

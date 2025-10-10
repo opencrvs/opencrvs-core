@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
+import React, { useEffect } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
@@ -17,7 +17,8 @@ import {
   FieldType,
   FieldConfig,
   isFieldVisible,
-  TranslationConfig
+  TranslationConfig,
+  DataFieldValue
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -103,10 +104,12 @@ function DataInput({
   configuration,
   label,
   formData,
-  declarationFields
+  declarationFields,
+  onChange
 }: FieldProps<'DATA'> & {
   formData: EventState
   declarationFields: FieldConfig[]
+  onChange: (value: DataFieldValue) => void
 }) {
   const intl = useIntl()
   const validatorContext = useValidatorContext()
@@ -115,9 +118,17 @@ function DataInput({
 
   const fields = data.map((entry) => {
     if ('fieldId' in entry) {
+      const config = declarationFields.find((f) => f.id === entry.fieldId)
+
+      if (!config) {
+        throw new Error(
+          `Configuration for field: '${entry.fieldId}' in DATA not found`
+        )
+      }
+
       return {
         value: formData[entry.fieldId],
-        config: declarationFields.find((f) => f.id === entry.fieldId)
+        config
       }
     }
 
@@ -128,6 +139,17 @@ function DataInput({
     })
   })
 
+  // TODO CIHAN: write comment
+  useEffect(() => {
+    const value = fields.reduce(
+      (acc, f) => ({ ...acc, [f.config.id]: f.value }),
+      {}
+    )
+
+    onChange(value)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <Container>
       {title && <label>{title}</label>}
@@ -135,28 +157,21 @@ function DataInput({
       <dl>
         {fields
           // We don't want to display fields that are conditionally hidden in the original form configuration
-          .filter(
-            ({ config }) =>
-              config && isFieldVisible(config, formData, validatorContext)
+          .filter(({ config }) =>
+            isFieldVisible(config, formData, validatorContext)
           )
-          .map(({ config, value }) => {
-            if (!config) {
-              return null
-            }
-
-            return (
-              <React.Fragment key={config.id}>
-                <dt>{intl.formatMessage(config.label)}</dt>
-                <dd>
-                  <Output
-                    field={config}
-                    showPreviouslyMissingValuesAsChanged={false}
-                    value={value}
-                  />
-                </dd>
-              </React.Fragment>
-            )
-          })}
+          .map(({ config, value }) => (
+            <React.Fragment key={config.id}>
+              <dt>{intl.formatMessage(config.label)}</dt>
+              <dd>
+                <Output
+                  field={config}
+                  showPreviouslyMissingValuesAsChanged={false}
+                  value={value}
+                />
+              </dd>
+            </React.Fragment>
+          ))}
       </dl>
     </Container>
   )
