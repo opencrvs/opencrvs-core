@@ -270,7 +270,8 @@ export const Validated: Story = {
 }
 
 const updateActionForValidate = expandWithUpdateActions(
-  eventWhenValidateUpdatesDeclaration.actions
+  eventWhenValidateUpdatesDeclaration,
+  getTestValidatorContext()
 ).find((a) => a.type === DECLARATION_ACTION_UPDATE)
 
 export const ValidatedOnDeclarationUpdate: Story = {
@@ -803,7 +804,8 @@ const newFullEvent = {
 }
 
 const updateActions = expandWithUpdateActions(
-  getAcceptedActions(newFullEvent)
+  newFullEvent,
+  getTestValidatorContext()
 ).filter((a) => a.type === DECLARATION_ACTION_UPDATE)
 
 export const DeclarationUpdateOnDeclare: Story = {
@@ -1022,7 +1024,8 @@ const eventWithNotifyActions = {
 } satisfies EventDocument
 
 const updateActionsForNotifyActions = expandWithUpdateActions(
-  getAcceptedActions(eventWithNotifyActions)
+  eventWithNotifyActions,
+  getTestValidatorContext()
 ).filter((a) => a.type === DECLARATION_ACTION_UPDATE)
 
 export const DeclarationUpdateNotify: Story = {
@@ -1053,7 +1056,8 @@ export const Registered: Story = {
 }
 
 const updateActionForRegister = expandWithUpdateActions(
-  eventWhenRegisterUpdatesDeclaration.actions
+  eventWhenRegisterUpdatesDeclaration,
+  getTestValidatorContext()
 ).find((a) => a.type === DECLARATION_ACTION_UPDATE)
 
 export const RegisteredOnDeclarationUpdate: Story = {
