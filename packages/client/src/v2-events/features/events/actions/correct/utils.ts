@@ -23,6 +23,10 @@ import {
   getDeclarationFields,
   EventConfig
 } from '@opencrvs/commons/client'
+import {
+  EventHistoryActionDocument,
+  EventHistoryDocument
+} from './useActionForHistory'
 
 /**
  * Function we use for checking whether a field value has changed.
@@ -36,10 +40,6 @@ export function isEqualFieldValue<T extends FieldValue>(a: T, b: T) {
 
   return _.isEqual(a, b)
 }
-import {
-  EventHistoryActionDocument,
-  EventHistoryDocument
-} from './useActionForHistory'
 
 export function hasFieldChanged(
   f: FieldConfig,
@@ -135,4 +135,18 @@ export function getAnnotationComparison(
   )
 
   return { currentAnnotations, previousAnnotations, valueHasChanged }
+}
+
+function getReviewForm(configuration: EventConfig) {
+  return configuration.actions
+    .filter((action) => 'review' in action)
+    .map((action) => action.review)
+}
+
+export function getReviewFormFields(configuration: EventConfig) {
+  const reviewForms = getReviewForm(configuration)
+  return _.uniqBy(
+    reviewForms.flatMap((form) => form.fields),
+    (field) => field.id
+  )
 }
