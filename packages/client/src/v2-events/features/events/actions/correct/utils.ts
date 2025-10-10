@@ -25,7 +25,8 @@ import {
   getDeclaration,
   isFieldDisplayedOnReview,
   getCurrentEventState,
-  ActionDocument
+  ActionDocument,
+  getAcceptedActions
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import {
@@ -156,27 +157,33 @@ export function getReviewFormFields(configuration: EventConfig) {
   )
 }
 
-export function getDecalarationComparison(
+export function getDeclarationComparison(
   fullEvent: EventDocument,
   currentAction: ActionDocument,
-  validatorContext: ValidatorContext
+  validatorContext: ValidatorContext,
+  eventConfiguration: EventConfig
 ) {
-  const currentActionIndex = fullEvent.actions.findIndex(
+  const acceptedActions = getAcceptedActions(fullEvent)
+  const currentActionIndex = acceptedActions.findIndex(
     (a) => a.id === currentAction.id
   )
 
-  const eventUpToCurrentAction = fullEvent.actions.slice(
+  const eventUpToCurrentAction = acceptedActions.slice(
     0,
     currentActionIndex + 1
   )
-  const eventUpToPreviousAction = fullEvent.actions.slice(0, currentActionIndex)
-  const firstDeclareOrNotifyAction = fullEvent.actions.find(
+  const eventUpToPreviousAction = acceptedActions.slice(0, currentActionIndex)
+  const firstDeclareOrNotifyAction = acceptedActions.find(
     (a) => a.type === ActionType.DECLARE || a.type === ActionType.NOTIFY
+  )
+
+  const filteredPreviousActions = eventUpToPreviousAction.filter(
+    (a) => !isMetaAction(a.type)
   )
 
   if (
     currentActionIndex < 0 ||
-    firstDeclareOrNotifyAction?.id === eventUpToPreviousAction.at(-1)?.id
+    firstDeclareOrNotifyAction?.id === filteredPreviousActions.at(-1)?.id
   ) {
     return {
       updatedValues: {},
@@ -185,7 +192,6 @@ export function getDecalarationComparison(
     }
   }
 
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const declarationConfig = getDeclaration(eventConfiguration)
 
   const latestDeclaration = getCurrentEventState(

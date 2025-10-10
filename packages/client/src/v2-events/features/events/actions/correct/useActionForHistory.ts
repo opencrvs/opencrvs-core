@@ -22,7 +22,7 @@ import {
   UUID,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { getAnnotationComparison, getDecalarationComparison } from './utils'
+import { getAnnotationComparison, getDeclarationComparison } from './utils'
 
 /**
  * Indicates that declaration action changed declaration content. Satisfies V1 spec.
@@ -50,12 +50,14 @@ export type EventHistoryDocument = Omit<EventDocument, 'actions'> & {
 function hasDeclarationChanged(
   fullEvent: EventDocument,
   action: Extract<Action, { type: DeclarationActionType }>,
-  validatorContext: ValidatorContext
+  validatorContext: ValidatorContext,
+  eventConfiguration: EventConfig
 ) {
-  const hasUpdatedDeclarationValues = getDecalarationComparison(
+  const hasUpdatedDeclarationValues = getDeclarationComparison(
     fullEvent,
     action,
-    validatorContext
+    validatorContext,
+    eventConfiguration
   ).valueHasChanged
 
   const hasUpdatedAnnotationValues = getAnnotationComparison(
@@ -89,7 +91,8 @@ function hasDeclarationChanged(
  */
 export function expandWithUpdateActions(
   fullEvent: EventDocument,
-  validatorContext: ValidatorContext
+  validatorContext: ValidatorContext,
+  eventConfiguration: EventConfig
 ): EventHistoryActionDocument[] {
   const history = getAcceptedActions(fullEvent)
   return history.flatMap<EventHistoryActionDocument>((action) => {
@@ -100,7 +103,14 @@ export function expandWithUpdateActions(
       action.type === ActionTypes.enum.NOTIFY ||
       action.type === ActionTypes.enum.DUPLICATE_DETECTED
     ) {
-      if (!hasDeclarationChanged(fullEvent, action, validatorContext)) {
+      if (
+        !hasDeclarationChanged(
+          fullEvent,
+          action,
+          validatorContext,
+          eventConfiguration
+        )
+      ) {
         return [action]
       }
 

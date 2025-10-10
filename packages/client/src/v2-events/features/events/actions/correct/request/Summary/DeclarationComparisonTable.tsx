@@ -107,7 +107,8 @@ function DeclarationComparisonTableComponent({
 }: DeclarationComparisonTableProps) {
   const historyWithUpdatedActions = expandWithUpdateActions(
     fullEventWithoutUpdatedAction,
-    validatorContext
+    validatorContext,
+    eventConfig
   )
 
   const fullEvent = {
