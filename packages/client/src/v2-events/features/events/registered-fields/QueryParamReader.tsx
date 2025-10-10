@@ -55,7 +55,13 @@ function QueryParamReaderInput({
       ? prepareFieldValueFromFormProjection(params, formProjection)
       : Object.fromEntries(params)
 
-    void Promise.resolve().then(() => onChangeRef.current(fieldValue))
+    void Promise.resolve().then(() =>
+      onChangeRef.current({
+        ...fieldValue,
+        // to ensure formik sees it as a new value even if the params are the same
+        createdAt: Date.now().toString()
+      })
+    )
     setSearchParams(new URLSearchParams(), { replace: true })
   }, [formProjection, onChangeRef, searchString, setSearchParams])
   return null

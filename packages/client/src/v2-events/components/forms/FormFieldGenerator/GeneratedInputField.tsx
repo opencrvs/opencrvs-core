@@ -98,7 +98,10 @@ import { IdReader } from '@client/v2-events/features/events/registered-fields/Id
 import { QrReader } from '@client/v2-events/features/events/registered-fields/QrReader'
 import { QueryParamReader } from '@client/v2-events/features/events/registered-fields/QueryParamReader'
 import { Loader } from '@client/v2-events/features/events/registered-fields/Loader'
-import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
+import {
+  makeFormFieldIdFormikCompatible,
+  makeFormikFieldIdOpenCRVSCompatible
+} from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
 import {
   makeFormikFieldIdsOpenCRVSCompatible,
@@ -691,7 +694,16 @@ export const GeneratedInputField = React.memo(
           configuration={field.config.configuration}
           id={field.config.id}
           value={field.value}
-          onReset={() => onFieldValueChange(fieldDefinition.id, undefined)}
+          onReset={() => {
+            if (fieldDefinition.parent?.$$field) {
+              onFieldValueChange(
+                makeFormFieldIdFormikCompatible(fieldDefinition.parent.$$field),
+                undefined
+              )
+            } else {
+              onFieldValueChange(fieldDefinition.id, undefined)
+            }
+          }}
         />
       )
     }
