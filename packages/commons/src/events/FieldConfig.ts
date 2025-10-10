@@ -656,6 +656,10 @@ const HttpField = BaseField.extend({
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
     headers: z.record(z.string()).optional(),
     body: z.record(z.string()).optional(),
+    errorValue: z
+      .any()
+      .optional()
+      .describe('Value to set if the request fails'),
     params: z
       .record(z.string(), z.union([z.string(), FieldReference]))
       .optional(),
