@@ -288,19 +288,6 @@ export function FormSectionComponent({
     [fieldsWithDotSeparator, systemVariables]
   )
 
-  function setAsOfDate(
-    ageField: Extract<FieldConfig, { type: 'AGE' }>,
-    fieldValues: EventState,
-    parentFormikFieldId: string
-  ) {
-    const formikFieldId = makeFormFieldIdFormikCompatible(ageField.id)
-    const maybeDate = fieldValues[parentFormikFieldId]
-    set(fieldValues, formikFieldId, {
-      ...(fieldValues[formikFieldId] as AgeValue),
-      asOfDate: DateValue.safeParse(maybeDate).data
-    })
-  }
-
   const onFieldValueChange = useCallback(
     (formikFieldId: string, value: FieldValue | undefined) => {
       const updatedValues = cloneDeep(values)
