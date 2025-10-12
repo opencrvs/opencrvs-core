@@ -255,43 +255,87 @@ function getDateRangeToFieldReference(
   }
 }
 
-type FieldReference = { $$field: string }
+type FieldReference = { $$field: string; $$subfield: string[] }
 export function isFieldReference(value: unknown): value is FieldReference {
   return typeof value === 'object' && value !== null && '$$field' in value
 }
 
+function getFieldSchema(
+  field: FieldReference,
+  thisFieldSchemaOrResolver:
+    | Record<string, unknown>
+    | ((depth: number) => Record<string, unknown>),
+  comparedField?: FieldReference,
+  comparedFieldSchemaOrResolver?:
+    | Record<string, unknown>
+    | ((depth: number) => Record<string, unknown>)
+): Record<string, unknown> {
+  function getSchema(
+    nestedProperties: string[],
+    schema: Record<string, unknown> | ((d: number) => Record<string, unknown>),
+    depth = 0
+  ): Record<string, unknown> {
+    const currentProperty = nestedProperties.shift()
+    if (!currentProperty) {
+      if (typeof schema === 'function') {
+        return schema(depth)
+      }
+      return schema
+    }
+    return {
+      type: 'object',
+      properties: {
+        [currentProperty]: getSchema(nestedProperties, schema, depth + 1)
+      },
+      requied: [currentProperty]
+    }
+  }
+  if (comparedField && comparedFieldSchemaOrResolver) {
+    return {
+      type: 'object',
+      properties: {
+        [field.$$field]: getSchema(field.$$subfield, thisFieldSchemaOrResolver),
+        [comparedField.$$field]: getSchema(
+          comparedField.$$subfield,
+          comparedFieldSchemaOrResolver
+        )
+      },
+      required: [field.$$field, comparedField.$$field]
+    }
+  }
+  return {
+    type: 'object',
+    properties: {
+      [field.$$field]: getSchema(field.$$subfield, thisFieldSchemaOrResolver)
+    },
+    required: [field.$$field]
+  }
+}
+
 function defineComparison(
-  fieldId: string,
+  field: FieldReference,
   value: number | FieldReference,
   keyword: 'exclusiveMinimum' | 'exclusiveMaximum'
 ) {
   if (isFieldReference(value)) {
-    const comparedFieldId = value.$$field
-    return defineFormConditional({
-      type: 'object',
-      properties: {
-        [fieldId]: {
+    const comparedField = value
+    return defineFormConditional(
+      getFieldSchema(
+        field,
+        (d) => ({
           type: ['number'],
-          [keyword]: { $data: `1/${comparedFieldId}` }
-        },
-        [comparedFieldId]: {
-          type: 'number'
-        }
-      },
-      required: [fieldId, comparedFieldId]
-    })
+          [keyword]: {
+            $data: `${d + 1}/${[comparedField.$$field, ...comparedField.$$subfield].join('/')}`
+          }
+        }),
+        comparedField,
+        { type: 'number' }
+      )
+    )
   }
-
-  return defineFormConditional({
-    type: 'object',
-    properties: {
-      [fieldId]: {
-        type: 'number',
-        [keyword]: value
-      }
-    },
-    required: [fieldId]
-  })
+  return defineFormConditional(
+    getFieldSchema(field, { type: 'number', [keyword]: value })
+  )
 }
 
 /**
@@ -304,35 +348,30 @@ function defineComparison(
  */
 
 export function createFieldConditionals(fieldId: string) {
-  const getDayRange = (days: number, clause: 'before' | 'after') => ({
-    type: 'object',
-    properties: {
-      [fieldId]: {
-        type: 'string',
-        format: 'date',
-        daysFromNow: {
-          days,
-          clause
-        }
+  const getDayRange = (
+    field: FieldReference,
+    days: number,
+    clause: 'before' | 'after'
+  ) =>
+    getFieldSchema(field, {
+      type: 'string',
+      format: 'date',
+      daysFromNow: {
+        days,
+        clause
       }
-    },
-    required: [fieldId]
-  })
+    })
 
   const getDateRange = (
+    field: FieldReference,
     date: string | FieldReference | { $data: '/$now' },
     clause: 'formatMinimum' | 'formatMaximum'
-  ) => ({
-    type: 'object',
-    properties: {
-      [fieldId]: {
-        type: 'string',
-        format: 'date',
-        [clause]: date
-      }
-    },
-    required: [fieldId]
-  })
+  ) =>
+    getFieldSchema(field, {
+      type: 'string',
+      format: 'date',
+      [clause]: date
+    })
 
   return {
     /**
@@ -349,54 +388,78 @@ export function createFieldConditionals(fieldId: string) {
         $$subfield: fieldPath.split('.')
       }
     },
-    isAfter: () => ({
-      days: (days: number) => ({
-        inPast: () => defineFormConditional(getDayRange(-days, 'after')),
-        inFuture: () => defineFormConditional(getDayRange(days, 'after'))
-      }),
-      date: (date: string | FieldReference) => {
-        if (isFieldReference(date)) {
-          const comparedFieldId = date.$$field
-          return defineFormConditional(
-            getDateRangeToFieldReference(
-              fieldId,
-              comparedFieldId,
-              'formatMinimum'
+    asDob() {
+      return this.get('dob')
+    },
+    asAge() {
+      return this.get('age')
+    },
+    isAfter() {
+      return {
+        days: (days: number) => ({
+          inPast: () =>
+            defineFormConditional(getDayRange(this, -days, 'after')),
+          inFuture: () =>
+            defineFormConditional(getDayRange(this, days, 'after'))
+        }),
+        date: (date: string | FieldReference) => {
+          if (isFieldReference(date)) {
+            const comparedFieldId = date.$$field
+            return defineFormConditional(
+              getDateRangeToFieldReference(
+                fieldId,
+                comparedFieldId,
+                'formatMinimum'
+              )
             )
-          )
-        }
+          }
 
-        return defineFormConditional(getDateRange(date, 'formatMinimum'))
-      },
-      now: () =>
-        defineFormConditional(getDateRange({ $data: '/$now' }, 'formatMinimum'))
-    }),
-    isBefore: () => ({
-      days: (days: number) => ({
-        inPast: () => defineFormConditional(getDayRange(days, 'before')),
-        inFuture: () => defineFormConditional(getDayRange(-days, 'before'))
-      }),
-      date: (date: `${string}-${string}-${string}` | FieldReference) => {
-        if (isFieldReference(date)) {
-          const comparedFieldId = date.$$field
           return defineFormConditional(
-            getDateRangeToFieldReference(
-              fieldId,
-              comparedFieldId,
-              'formatMaximum'
-            )
+            getDateRange(this, date, 'formatMinimum')
           )
-        }
+        },
+        now: () =>
+          defineFormConditional(
+            getDateRange(this, { $data: '/$now' }, 'formatMinimum')
+          )
+      }
+    },
+    isBefore() {
+      return {
+        days: (days: number) => ({
+          inPast: () =>
+            defineFormConditional(getDayRange(this, days, 'before')),
+          inFuture: () =>
+            defineFormConditional(getDayRange(this, -days, 'before'))
+        }),
+        date: (date: `${string}-${string}-${string}` | FieldReference) => {
+          if (isFieldReference(date)) {
+            const comparedFieldId = date.$$field
+            return defineFormConditional(
+              getDateRangeToFieldReference(
+                fieldId,
+                comparedFieldId,
+                'formatMaximum'
+              )
+            )
+          }
 
-        return defineFormConditional(getDateRange(date, 'formatMaximum'))
-      },
-      now: () =>
-        defineFormConditional(getDateRange({ $data: '/$now' }, 'formatMaximum'))
-    }),
-    isGreaterThan: (value: number | FieldReference) =>
-      defineComparison(fieldId, value, 'exclusiveMinimum'),
-    isLessThan: (value: number | FieldReference) =>
-      defineComparison(fieldId, value, 'exclusiveMaximum'),
+          return defineFormConditional(
+            getDateRange(this, date, 'formatMaximum')
+          )
+        },
+        now: () =>
+          defineFormConditional(
+            getDateRange(this, { $data: '/$now' }, 'formatMaximum')
+          )
+      }
+    },
+    isGreaterThan(value: number | FieldReference) {
+      return defineComparison(this, value, 'exclusiveMinimum')
+    },
+    isLessThan(value: number | FieldReference) {
+      return defineComparison(this, value, 'exclusiveMaximum')
+    },
     isEqualTo(value: string | boolean | number | FieldReference) {
       // If the value is a reference to another field, the JSON schema uses the field reference as the 'const' value we compare to
       if (isFieldReference(value)) {

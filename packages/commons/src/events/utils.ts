@@ -52,9 +52,17 @@ import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
-import { SelectDateRangeValue } from './FieldValue'
-import { subDays } from 'date-fns'
+import { AgeValue, DateValue, SelectDateRangeValue } from './FieldValue'
+import { subDays, subYears, format } from 'date-fns'
 import { ConditionalType } from './Conditional'
+
+export function ageToDate(age: AgeValue) {
+  if (!age.asOfDate) {
+    return
+  }
+  const asOfDate = new Date(age.asOfDate)
+  return DateValue.parse(format(subYears(asOfDate, age.age), 'yyyy-MM-dd'))
+}
 
 function isDeclarationActionConfig(
   action: ActionConfig

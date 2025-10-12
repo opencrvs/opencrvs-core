@@ -19,10 +19,11 @@ import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
-import { FieldUpdateValue } from '../events/FieldValue'
+import { AgeValue, FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
+import { ageToDate } from '../events/utils'
 
 const ajv = new Ajv({
   $data: true,
@@ -120,6 +121,20 @@ ajv.addKeyword({
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
+  if ('$form' in data) {
+    data.$form = Object.fromEntries(
+      Object.entries(data.$form).map(([key, value]) => {
+        const maybeAgeValue = AgeValue.safeParse(value)
+        if (maybeAgeValue.success) {
+          return [
+            key,
+            { age: maybeAgeValue.data.age, dob: ageToDate(maybeAgeValue.data) }
+          ]
+        }
+        return [key, value]
+      })
+    )
+  }
   const result = validator(data) as boolean
 
   return result
