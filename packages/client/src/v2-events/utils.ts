@@ -150,7 +150,7 @@ export function replacePlaceholders({
     typeof defaultValue === 'object'
   ) {
     /**
-     * defaultValue is typically an ADDRESS, FILE, FILE_WITH_OPTIONS or DATA.
+     * defaultValue is typically an ADDRESS, FILE, or FILE_WITH_OPTIONS.
      * Some STRING values within the defaultValue object may contain template variables (prefixed with $).
      */
     const result = { ...defaultValue }
@@ -181,7 +181,6 @@ export function replacePlaceholders({
       )}. Error: ${parsedResult.error}`
     )
   }
-
   throw new Error(
     `Could not resolve ${fieldType}: ${JSON.stringify(defaultValue)}`
   )
