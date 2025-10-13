@@ -44,6 +44,46 @@ const development = ['127.0.0.1', 'localhost'].includes(
   window.location.hostname
 )
 
+interface StructuredError {
+  message: string
+  redirection: { label: string; path: string }
+}
+
+export const throwStructuredError = ({
+  message,
+  redirection
+}: StructuredError) => {
+  const error = JSON.stringify({ message, redirection })
+  throw new Error(error)
+}
+
+function decodeStructuredError(message: string): StructuredError | string {
+  try {
+    const parsed = JSON.parse(message)
+    if (
+      typeof parsed === 'object' &&
+      parsed !== null &&
+      'message' in parsed &&
+      'redirection' in parsed &&
+      typeof parsed.redirection === 'object' &&
+      parsed.redirection !== null &&
+      'label' in parsed.redirection &&
+      'path' in parsed.redirection
+    ) {
+      return {
+        message: String(parsed.message),
+        redirection: {
+          label: String(parsed.redirection.label),
+          path: String(parsed.redirection.path)
+        }
+      }
+    }
+    return message
+  } catch {
+    return message
+  }
+}
+
 interface Props extends IntlShapeProps {
   children: React.ReactNode
   redirectToAuthentication: typeof redirectToAuthentication
@@ -75,6 +115,8 @@ class ErrorBoundary extends Component<Props, State> {
       const error = this.state.error
       let httpCode = 500
       let message = error.message
+      let buttonLabel = intl.formatMessage(buttonMessages.goToHomepage)
+      let buttonPath = '/'
 
       if (error instanceof TRPCClientError) {
         if (
@@ -90,6 +132,16 @@ class ErrorBoundary extends Component<Props, State> {
           message = String(error.meta.response.statusText)
         }
       }
+
+      const structuredMessage = decodeStructuredError(String(error.message))
+      if (typeof structuredMessage === 'object') {
+        message = structuredMessage.message
+        buttonLabel = structuredMessage.redirection.label
+        buttonPath = structuredMessage.redirection.path
+      } else {
+        message = structuredMessage
+      }
+
       /**
        * TODO: Improve the error message design once the probable errors are defined
        * and the design/ux is ready.
@@ -127,9 +179,9 @@ class ErrorBoundary extends Component<Props, State> {
                   <ErrorMessage>{message}</ErrorMessage>
                   <TertiaryButton
                     id="GoToHomepage"
-                    onClick={() => (window.location.href = '/')}
+                    onClick={() => (window.location.href = buttonPath)}
                   >
-                    {intl.formatMessage(buttonMessages.goToHomepage)}
+                    {buttonLabel}
                   </TertiaryButton>
                 </>
               )}
