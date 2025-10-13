@@ -241,7 +241,6 @@ function DataOutput({
 }) {
   const intl = useIntl()
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!value) {
     return null
   }
