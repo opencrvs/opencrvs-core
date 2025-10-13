@@ -310,7 +310,7 @@ describe('date comparisons', () => {
   })
 })
 
-describe('age comparisons', () => {
+describe('age asDob comparisons', () => {
   it('validates comparisons where dob from age field is expected to be before a certain time', () => {
     expect(
       validate(
@@ -497,6 +497,132 @@ describe('age comparisons', () => {
           }),
           $now: '1990-01-01'
         }
+      )
+    ).toBe(false)
+  })
+})
+
+describe('age asAge comparisons', () => {
+  it('validates comparisons where age is expected to be equal to a certain value', () => {
+    expect(
+      validate(
+        field('applicant.age').asAge().isEqualTo(20),
+        getFieldParams({
+          'applicant.age': {
+            age: 20,
+            asOfDate: '1990-01-01'
+          }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age').asAge().isEqualTo(20),
+        getFieldParams({
+          'applicant.age': {
+            age: 22,
+            asOfDate: '1990-01-01'
+          }
+        })
+      )
+    ).toBe(false)
+  })
+
+  it('validates comparisons where age is expected to be equal to another age field', () => {
+    expect(
+      validate(
+        field('applicant.age').asAge().isEqualTo(field('referrer.age').asAge()),
+        getFieldParams({
+          'applicant.age': {
+            age: 20,
+            asOfDate: '1990-01-01'
+          },
+          'referrer.age': {
+            age: 20,
+            asOfDate: '1990-01-01'
+          }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age').asAge().isEqualTo(field('referrer.age').asAge()),
+        getFieldParams({
+          'applicant.age': {
+            age: 20,
+            asOfDate: '1990-01-01'
+          },
+          'referrer.age': {
+            age: 25,
+            asOfDate: '1990-01-01'
+          }
+        })
+      )
+    ).toBe(false)
+  })
+
+  it('validates comparisons where age is expected to be less than a certain value', () => {
+    expect(
+      validate(
+        field('applicant.age').asAge().isLessThan(25),
+        getFieldParams({
+          'applicant.age': {
+            age: 20,
+            asOfDate: '1990-01-01'
+          }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age').asAge().isLessThan(25),
+        getFieldParams({
+          'applicant.age': {
+            age: 30,
+            asOfDate: '1990-01-01'
+          }
+        })
+      )
+    ).toBe(false)
+  })
+
+  it('validates comparisons where age is expected to be less than another age field', () => {
+    expect(
+      validate(
+        field('applicant.age')
+          .asAge()
+          .isLessThan(field('referrer.age').asAge()),
+        getFieldParams({
+          'applicant.age': {
+            age: 20,
+            asOfDate: '1990-01-01'
+          },
+          'referrer.age': {
+            age: 22,
+            asOfDate: '1990-01-01'
+          }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age')
+          .asAge()
+          .isLessThan(field('referrer.age').asAge()),
+        getFieldParams({
+          'applicant.age': {
+            age: 20,
+            asOfDate: '1990-01-01'
+          },
+          'referrer.age': {
+            age: 18,
+            asOfDate: '1990-01-01'
+          }
+        })
       )
     ).toBe(false)
   })
