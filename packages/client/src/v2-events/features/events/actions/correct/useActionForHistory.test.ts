@@ -60,7 +60,7 @@ const eventCreatedByRegAgent = generateEventDocument({
     },
     {
       type: ActionTypes.enum.VALIDATE,
-      declarationOverrides: DECLARATION_ACTION_DETAILS,
+      declarationOverrides: {},
       user: {
         role: TestUserRole.enum.REGISTRATION_AGENT,
         id: '68e8bacf197c5cb688c4e0ee'
@@ -76,7 +76,7 @@ const eventCreatedByRegAgent = generateEventDocument({
     },
     {
       type: ActionTypes.enum.REGISTER,
-      declarationOverrides: DECLARATION_ACTION_DETAILS,
+      declarationOverrides: {},
       user: {
         role: TestUserRole.enum.LOCAL_REGISTRAR,
         id: '68e8bacf197c5cb688c4e0f6'

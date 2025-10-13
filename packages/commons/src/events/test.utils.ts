@@ -9,7 +9,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { merge, omitBy, isString, omit } from 'lodash'
+import { merge, omitBy, isString, omit, isEmpty } from 'lodash'
 import { addDays } from 'date-fns'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID, UUID } from '../uuid'
@@ -263,6 +263,10 @@ export function generateActionDeclarationInput(
   overrides?: Partial<EventState>
 ): EventState {
   const parsed = DeclarationUpdateActions.safeParse(action)
+
+  if (isEmpty(overrides) && typeof overrides === 'object') {
+    return {}
+  }
   if (parsed.success) {
     const fields = getDeclarationFields(configuration)
 
