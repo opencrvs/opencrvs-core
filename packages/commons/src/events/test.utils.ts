@@ -161,7 +161,7 @@ export function generateRandomSignature(rng: () => number): string {
 /**
  * Quick-and-dirty mock data generator for event actions.
  */
-export function mapFieldTypeToMockValue(
+function mapFieldTypeToMockValue(
   field: FieldConfig,
   i: number,
   rng: () => number
@@ -1051,7 +1051,7 @@ export const generateTranslationConfig = (
 ): TranslationConfig => ({
   defaultMessage: message,
   description: 'Description for ${message}',
-  id: message
+  id: message.trim().replace(/\s+/g, '_').toLowerCase()
 })
 
 export const BearerTokenByUserType = {
