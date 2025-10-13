@@ -28,7 +28,6 @@ import {
   ActionDocument,
   getAcceptedActions
 } from '@opencrvs/commons/client'
-import { useEventConfiguration } from '../../useEventConfiguration'
 import {
   EventHistoryActionDocument,
   EventHistoryDocument
@@ -230,7 +229,7 @@ export function getDeclarationComparison(
   }
 }
 
-export function getAnnotationComparison(
+export function hasAnnotationChanged(
   fullEvent: EventDocument,
   currentAction: ActionDocument,
   validatorContext: ValidatorContext,

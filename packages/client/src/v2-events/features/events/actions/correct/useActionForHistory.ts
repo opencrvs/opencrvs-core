@@ -13,16 +13,16 @@ import {
   Action,
   ActionDocument,
   ActionType,
-  ActionTypes,
   DeclarationActionType,
   EventConfig,
   EventDocument,
   getAcceptedActions,
   getCurrentEventState,
   UUID,
-  ValidatorContext
+  ValidatorContext,
+  DeclarationActions
 } from '@opencrvs/commons/client'
-import { getAnnotationComparison, getDeclarationComparison } from './utils'
+import { hasAnnotationChanged, getDeclarationComparison } from './utils'
 
 /**
  * Indicates that declaration action changed declaration content. Satisfies V1 spec.
@@ -60,7 +60,7 @@ function hasDeclarationChanged(
     eventConfiguration
   ).valueHasChanged
 
-  const hasUpdatedAnnotationValues = getAnnotationComparison(
+  const hasUpdatedAnnotationValues = hasAnnotationChanged(
     fullEvent,
     action,
     validatorContext,
@@ -71,6 +71,12 @@ function hasDeclarationChanged(
     hasUpdatedDeclarationValues || hasUpdatedAnnotationValues
 
   return hasUpdatedValues
+}
+
+function isDeclarationAction(
+  action: Action
+): action is Extract<Action, { type: DeclarationActionType }> {
+  return DeclarationActions.safeParse(action.type).success
 }
 
 /**
@@ -97,13 +103,7 @@ export function expandWithUpdateActions(
 ): EventHistoryActionDocument[] {
   const history = getAcceptedActions(fullEvent)
   return history.flatMap<EventHistoryActionDocument>((action) => {
-    if (
-      action.type === ActionTypes.enum.VALIDATE ||
-      action.type === ActionTypes.enum.REGISTER ||
-      action.type === ActionTypes.enum.DECLARE ||
-      action.type === ActionTypes.enum.NOTIFY ||
-      action.type === ActionTypes.enum.DUPLICATE_DETECTED
-    ) {
+    if (isDeclarationAction(action)) {
       if (
         !hasDeclarationChanged(
           fullEvent,
