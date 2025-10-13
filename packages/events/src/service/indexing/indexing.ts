@@ -95,9 +95,6 @@ function mapFieldTypeToElasticsearch(
     case FieldType.PAGE_HEADER:
     case FieldType.EMAIL:
     case FieldType.TIME:
-    case FieldType.LINK_BUTTON:
-    case FieldType.QUERY_PARAM_READER:
-    case FieldType.LOADER:
       return { type: 'text' }
     case FieldType.EMAIL:
       return {
@@ -174,6 +171,9 @@ function mapFieldTypeToElasticsearch(
     case FieldType.ID_READER:
     case FieldType.QR_READER:
     case FieldType.HTTP:
+    case FieldType.LINK_BUTTON:
+    case FieldType.QUERY_PARAM_READER:
+    case FieldType.LOADER:
       /**
        * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
        * The field still lands in `_source`.
