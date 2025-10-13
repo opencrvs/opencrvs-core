@@ -51,7 +51,7 @@ beforeEach(async () => {
   event = generateEventDocument({
     user,
     configuration: tennisClubMembershipEvent,
-    actions: [ActionType.CREATE, ActionType.DECLARE]
+    actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
   })
 
   const eventInDb = await eventsDb

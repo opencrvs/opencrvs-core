@@ -871,11 +871,16 @@ export function generateEventDocument({
   configuration,
   actions,
   rng = () => 0.1,
-  user,
-  declarationOverrides
+  user
 }: {
   configuration: EventConfig
-  actions: ActionType[]
+  actions: {
+    type: ActionType
+    /**
+     * Overrides for default event state per action
+     */
+    declarationOverrides?: Partial<EventState>
+  }[]
   rng?: () => number
   user?: Partial<{
     signature: string
@@ -884,10 +889,6 @@ export function generateEventDocument({
     id: string
     assignedTo: string
   }>
-  /**
-   * Overrides for default event state
-   */
-  declarationOverrides?: Partial<EventState>
 }): EventDocument {
   return {
     trackingId: getUUID(),
@@ -895,14 +896,14 @@ export function generateEventDocument({
     actions: actions.map((action) =>
       generateActionDocument({
         configuration,
-        action,
+        action: action.type,
         rng,
         defaults: {
           createdBy: user?.id,
           createdAtLocation: user?.primaryOfficeId,
           assignedTo: user?.assignedTo
         },
-        declarationOverrides
+        declarationOverrides: action.declarationOverrides
       })
     ),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.

@@ -41,7 +41,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 const createdEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [{ type: ActionType.CREATE }]
 })
 const declarationTrpcMsw = createDeclarationTrpcMsw(
   tRPCMsw,
@@ -50,7 +50,7 @@ const declarationTrpcMsw = createDeclarationTrpcMsw(
 
 const declaredEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
 })
 
 const meta: Meta<typeof ReviewIndex> = {
@@ -355,7 +355,7 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
 
 const eventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [{ type: ActionType.CREATE }]
 })
 
 const eventId = eventDocument.id

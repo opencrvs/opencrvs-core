@@ -303,10 +303,10 @@ export const Summary: Story = {
 const eventWithAddress = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [
-    ActionType.CREATE,
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REGISTER
+    { type: ActionType.CREATE },
+    { type: ActionType.DECLARE },
+    { type: ActionType.VALIDATE },
+    { type: ActionType.REGISTER }
   ]
 })
 

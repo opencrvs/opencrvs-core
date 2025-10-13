@@ -50,7 +50,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 const createdEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [{ type: ActionType.CREATE }]
 })
 const trpcHandlers = createDeclarationTrpcMsw(tRPCMsw, createdEventDocument)
 

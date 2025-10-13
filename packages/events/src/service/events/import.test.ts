@@ -22,7 +22,7 @@ describe('import', () => {
       client.event.import(
         generateEventDocument({
           configuration: tennisClubMembershipEvent,
-          actions: [ActionType.CREATE, ActionType.DECLARE]
+          actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
         })
       )
     ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -37,7 +37,7 @@ describe('import', () => {
         generateEventDocument({
           user,
           configuration: tennisClubMembershipEvent,
-          actions: [ActionType.CREATE, ActionType.DECLARE]
+          actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
         })
       )
     ).resolves.not.toThrow()
@@ -53,7 +53,7 @@ describe('import', () => {
     const event = generateEventDocument({
       user,
       configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE, ActionType.DECLARE]
+      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
     })
 
     await client.event.import(event)
@@ -83,7 +83,7 @@ describe('import', () => {
     const event = generateEventDocument({
       user,
       configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE, ActionType.DECLARE]
+      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
     })
 
     await client.event.import(event)
@@ -115,7 +115,7 @@ describe('bulkImport', () => {
       client.event.bulkImport([
         generateEventDocument({
           configuration: tennisClubMembershipEvent,
-          actions: [ActionType.CREATE, ActionType.DECLARE]
+          actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
         })
       ])
     ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -130,7 +130,7 @@ describe('bulkImport', () => {
         generateEventDocument({
           user,
           configuration: tennisClubMembershipEvent,
-          actions: [ActionType.CREATE, ActionType.DECLARE]
+          actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
         })
       ])
     ).resolves.not.toThrow()
@@ -146,13 +146,13 @@ describe('bulkImport', () => {
     const event1 = generateEventDocument({
       user,
       configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE, ActionType.DECLARE]
+      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
     })
 
     const event2 = generateEventDocument({
       user,
       configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE, ActionType.DECLARE]
+      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
     })
     await client.event.bulkImport([event1, event2])
 

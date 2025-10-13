@@ -46,7 +46,7 @@ function createEventByStatus(status: EventStatus) {
 
   const event = generateEventDocument({
     configuration: tennisClubMembershipEvent,
-    actions: [ActionType.CREATE]
+    actions: [{ type: ActionType.CREATE }]
   })
 
   const eventQueryData = eventQueryDataGenerator(

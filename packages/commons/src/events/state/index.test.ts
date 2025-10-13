@@ -33,7 +33,13 @@ describe('getCurrentEventState()', () => {
   test('Sets legalStatuses when event has been declared and registered', () => {
     const event = generateEventDocument({
       configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
+      actions: [
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.REGISTER }
+      ]
     })
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
@@ -456,10 +462,14 @@ describe('getCurrentEventState()', () => {
     const event1 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
       actions: [
-        ActionType.CREATE,
-        ActionType.DECLARE,
-        ActionType.REGISTER,
-        ActionType.REQUEST_CORRECTION
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.REGISTER },
+        {
+          type: ActionType.REQUEST_CORRECTION
+        }
       ]
     })
 
@@ -472,7 +482,13 @@ describe('getCurrentEventState()', () => {
 
     const event2 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
+      actions: [
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.REGISTER }
+      ]
     })
 
     expect(
@@ -482,10 +498,14 @@ describe('getCurrentEventState()', () => {
     const event3 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
       actions: [
-        ActionType.CREATE,
-        ActionType.DECLARE,
-        ActionType.REGISTER,
-        ActionType.PRINT_CERTIFICATE
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.REGISTER },
+        {
+          type: ActionType.PRINT_CERTIFICATE
+        }
       ]
     })
 
@@ -547,16 +567,27 @@ describe('getCurrentEventState()', () => {
     const event1 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
       actions: [
-        ActionType.CREATE,
-        ActionType.DECLARE,
-        ActionType.REGISTER,
-        ActionType.REQUEST_CORRECTION
-      ],
-      declarationOverrides: {
-        'applicant.dobUnknown': false,
-        'applicant.age': 20,
-        'applicant.dob': '2000-01-01'
-      }
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE,
+          declarationOverrides: {
+            'applicant.dobUnknown': false,
+            'applicant.age': 20,
+            'applicant.dob': '2000-01-01'
+          }
+        },
+        {
+          type: ActionType.REGISTER,
+          declarationOverrides: {
+            'applicant.dobUnknown': false,
+            'applicant.age': 20,
+            'applicant.dob': '2000-01-01'
+          }
+        },
+        {
+          type: ActionType.REQUEST_CORRECTION
+        }
+      ]
     })
 
     const eventState1 = getCurrentEventState(event1, tennisClubMembershipEvent)
@@ -569,16 +600,27 @@ describe('getCurrentEventState()', () => {
     const event2 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
       actions: [
-        ActionType.CREATE,
-        ActionType.DECLARE,
-        ActionType.REGISTER,
-        ActionType.REQUEST_CORRECTION
-      ],
-      declarationOverrides: {
-        'applicant.dobUnknown': true,
-        'applicant.age': 20,
-        'applicant.dob': '2000-01-01'
-      }
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE,
+          declarationOverrides: {
+            'applicant.dobUnknown': true,
+            'applicant.age': 20,
+            'applicant.dob': '2000-01-01'
+          }
+        },
+        {
+          type: ActionType.REGISTER,
+          declarationOverrides: {
+            'applicant.dobUnknown': true,
+            'applicant.age': 20,
+            'applicant.dob': '2000-01-01'
+          }
+        },
+        {
+          type: ActionType.REQUEST_CORRECTION
+        }
+      ]
     })
 
     const eventState2 = getCurrentEventState(event2, tennisClubMembershipEvent)

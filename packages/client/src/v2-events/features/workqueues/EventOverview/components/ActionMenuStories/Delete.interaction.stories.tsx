@@ -32,7 +32,7 @@ export default {
 
 const createdEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.ASSIGN],
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.ASSIGN }],
   user: {
     assignedTo: '6821c175dce4d7886d4e8210'
   }
