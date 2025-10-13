@@ -19,7 +19,8 @@ import {
   isFieldVisible,
   DataFieldValue,
   DataField,
-  StaticDataEntry
+  StaticDataEntry,
+  FormConfig
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -99,7 +100,9 @@ const Subtitle = styled.div`
 `
 
 /**
- * This is a read-only form field, that is used to display a collection of form fields from the main 'declaration' form data.
+ * This is a read-only form field, which is used to display a collection of data, which can be either:
+ *  1. static text entries
+ *  2. or entries derived from main declaration form data via 'fieldId' references
  */
 function DataInput({
   configuration,
@@ -140,7 +143,8 @@ function DataInput({
     })
   })
 
-  // TODO CIHAN: write comment
+  // When we first render the field, let's save the values of the fields to the form data.
+  // This is done because we want to send the values to the backend, so that they can be displayed in the Output later.
   useEffect(() => {
     const value = fields.reduce(
       (acc, f) => ({ ...acc, [f.config.id]: f.value }),
@@ -220,6 +224,10 @@ function DataOutput({
       }
     })
     .filter((e) => e !== null)
+
+  if (!entries.length) {
+    return null
+  }
 
   return (
     <>

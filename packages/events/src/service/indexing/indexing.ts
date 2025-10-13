@@ -119,7 +119,6 @@ function mapFieldTypeToElasticsearch(
     case FieldType.VERIFICATION_STATUS:
       return { type: 'keyword' }
     case FieldType.DATA:
-      // TODO CIHAN:
       return { type: 'object' }
     case FieldType.ADDRESS:
       const streetLevelDetails = Object.fromEntries(

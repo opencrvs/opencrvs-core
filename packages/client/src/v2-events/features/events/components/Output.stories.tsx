@@ -197,3 +197,56 @@ export const CheckboxOutputChangedFromFalseToTrue: Story = {
     }
   }
 }
+
+export const DataOutput: Story = {
+  args: {
+    field: {
+      id: 'data',
+      type: FieldType.DATA,
+      label: {
+        id: 'data.label',
+        defaultMessage: 'My data display',
+        description: 'Data display label text'
+      },
+      configuration: {
+        data: [
+          { fieldId: 'name' },
+          {
+            id: 'static.text',
+            label: {
+              defaultMessage: 'My label',
+              description: 'Static text label text',
+              id: 'some-static-data.label'
+            },
+            value: {
+              defaultMessage: 'Static text here',
+              description: 'Static text label',
+              id: 'some-static-data.value'
+            }
+          },
+          {
+            id: 'some-other-static-data',
+            label: {
+              defaultMessage: 'Some other label',
+              description: 'Some other static data label text',
+              id: 'some-static-data.label'
+            },
+            value: {
+              defaultMessage: 'Some other static text here',
+              description: 'Some other static text label',
+              id: 'some-static-data.value'
+            }
+          }
+        ]
+      }
+    },
+    value: {
+      name: {
+        firstname: 'John',
+        surname: 'Malkovich'
+      },
+      ['static.text']: 'Some static text here',
+      ['some-other-static-data']: 'Some other static text here'
+    }
+  }
+}

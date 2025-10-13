@@ -81,8 +81,6 @@ export function Pages() {
     }
   }, [pageId, currentPageId, navigate, eventId, searchParams])
 
-  console.log('ANNOTATION', annotation)
-
   return (
     <FormLayout
       appbarIcon={<Print />}
