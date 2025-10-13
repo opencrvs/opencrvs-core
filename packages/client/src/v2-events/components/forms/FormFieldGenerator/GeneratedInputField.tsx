@@ -621,7 +621,6 @@ export const GeneratedInputField = React.memo(
           {...field.config}
           declarationFields={getDeclarationFields(eventConfig)}
           formData={form}
-          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )
     }
