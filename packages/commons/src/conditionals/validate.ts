@@ -161,10 +161,11 @@ function getConditionalActionsForField(
 
 export function areConditionsMet(
   conditions: FieldConditional[],
-  values: Record<string, unknown>
+  values: Record<string, unknown>,
+  context: ValidatorContext
 ) {
   return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values)
+    isConditionMet(condition.conditional, values, context)
   )
 }
 
