@@ -37,6 +37,7 @@ type Story = StoryObj<typeof Output>
 export const TextOutput: Story = {
   args: {
     value: 'Cat',
+    showPreviouslyMissingValuesAsChanged: true,
     field: {
       type: FieldType.TEXT,
       id: 'applicant.firstname',
@@ -53,6 +54,7 @@ export const TextAreaOutput: Story = {
   args: {
     value:
       'The quick brown fox jumps over the lazy dog while juggling flaming torches and reciting Shakespeare in ancient Latin backwards on a unicycle during a thunderstorm',
+    showPreviouslyMissingValuesAsChanged: true,
     field: {
       type: FieldType.TEXTAREA,
       id: 'applicant.firstname',
@@ -68,7 +70,6 @@ export const TextAreaOutput: Story = {
 export const TextOutputWithoutPreviouslyMissingValueAsChanged: Story = {
   args: {
     value: 'Cat',
-    showPreviouslyMissingValuesAsChanged: false,
     field: {
       type: FieldType.TEXT,
       id: 'applicant.firstname',
@@ -85,6 +86,7 @@ export const TextOutputWithSamePreviousValue: Story = {
   args: {
     value: 'Cat',
     previousValue: 'Cat',
+    showPreviouslyMissingValuesAsChanged: true,
     field: {
       type: FieldType.TEXT,
       id: 'applicant.firstname',
@@ -101,6 +103,7 @@ export const TextOutputWithPreviousValue: Story = {
   args: {
     value: 'CAt',
     previousValue: 'Dog',
+    showPreviouslyMissingValuesAsChanged: true,
     field: {
       type: FieldType.TEXT,
       id: 'applicant.firstname',
@@ -117,6 +120,7 @@ export const CheckboxOutput: Story = {
   args: {
     value: true,
     previousValue: true,
+    showPreviouslyMissingValuesAsChanged: true,
     field: {
       type: FieldType.CHECKBOX,
       id: 'recommender.none',
@@ -134,6 +138,7 @@ export const CheckboxOutputWithUndefinedPreviousValue: Story = {
   args: {
     value: true,
     previousValue: undefined,
+    showPreviouslyMissingValuesAsChanged: true,
     field: {
       type: FieldType.CHECKBOX,
       id: 'recommender.none',
@@ -151,6 +156,7 @@ export const CheckboxOutputChangedFromUndefinedToTrue: Story = {
   args: {
     value: true,
     previousValue: undefined,
+    showPreviouslyMissingValuesAsChanged: true,
     field: {
       type: FieldType.CHECKBOX,
       id: 'recommender.none',
@@ -168,6 +174,7 @@ export const CheckboxOutputChangedFromTrueToFalse: Story = {
   args: {
     value: false,
     previousValue: true,
+    showPreviouslyMissingValuesAsChanged: true,
     field: {
       type: FieldType.CHECKBOX,
       id: 'recommender.none',
@@ -185,6 +192,7 @@ export const CheckboxOutputChangedFromFalseToTrue: Story = {
   args: {
     value: true,
     previousValue: false,
+    showPreviouslyMissingValuesAsChanged: true,
     field: {
       type: FieldType.CHECKBOX,
       id: 'recommender.none',
@@ -200,6 +208,7 @@ export const CheckboxOutputChangedFromFalseToTrue: Story = {
 
 export const DataOutput: Story = {
   args: {
+    showPreviouslyMissingValuesAsChanged: true,
     field: {
       id: 'data',
       type: FieldType.DATA,

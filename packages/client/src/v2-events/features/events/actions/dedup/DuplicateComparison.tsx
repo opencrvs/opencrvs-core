@@ -186,7 +186,6 @@ export function DuplicateComparison({
                 field={field}
                 formConfig={eventConfiguration.declaration}
                 previousForm={potentialDuplicateDeclaration}
-                showPreviouslyMissingValuesAsChanged={false}
                 value={potentialDuplicateDeclaration[field.id]}
               />
             ),
@@ -197,7 +196,6 @@ export function DuplicateComparison({
                 field={field}
                 formConfig={eventConfiguration.declaration}
                 previousForm={originalDeclaration}
-                showPreviouslyMissingValuesAsChanged={false}
                 value={originalDeclaration[field.id]}
               />
             )

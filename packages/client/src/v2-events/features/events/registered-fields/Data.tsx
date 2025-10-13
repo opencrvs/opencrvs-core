@@ -174,11 +174,7 @@ function DataInput({
             <React.Fragment key={config.id}>
               <dt>{intl.formatMessage(config.label)}</dt>
               <dd>
-                <Output
-                  field={config}
-                  showPreviouslyMissingValuesAsChanged={false}
-                  value={value}
-                />
+                <Output field={config} value={value} />
               </dd>
             </React.Fragment>
           ))}
@@ -206,11 +202,7 @@ function getDataOutputEntry(
     const { label } = dataEntryConfig
 
     const valueDisplay = (
-      <Output
-        field={{ type: FieldType.TEXT, id, label }}
-        showPreviouslyMissingValuesAsChanged={false}
-        value={value}
-      />
+      <Output field={{ type: FieldType.TEXT, id, label }} value={value} />
     )
 
     return {
@@ -229,13 +221,7 @@ function getDataOutputEntry(
     return null
   }
 
-  const valueDisplay = (
-    <Output
-      field={referencedFieldConfig}
-      showPreviouslyMissingValuesAsChanged={false}
-      value={value}
-    />
-  )
+  const valueDisplay = <Output field={referencedFieldConfig} value={value} />
 
   return {
     label: referencedFieldConfig.label,

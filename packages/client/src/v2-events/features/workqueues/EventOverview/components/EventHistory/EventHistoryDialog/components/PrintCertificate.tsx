@@ -80,7 +80,6 @@ export function PrintCertificate({
           <Output
             eventConfig={eventConfiguration}
             field={field}
-            showPreviouslyMissingValuesAsChanged={false}
             value={annotation[field.id]}
           />
         )
@@ -102,7 +101,6 @@ export function PrintCertificate({
             defaultValue: false,
             required: true
           }}
-          showPreviouslyMissingValuesAsChanged={false}
           value={annotation[page.id]}
         />
       )

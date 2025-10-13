@@ -146,13 +146,7 @@ function buildCorrectionDetails(
         .map((field) => ({
           label: field.label,
           id: field.id,
-          valueDisplay: (
-            <Output
-              field={field}
-              showPreviouslyMissingValuesAsChanged={false}
-              value={annotation[field.id]}
-            />
-          ),
+          valueDisplay: <Output field={field} value={annotation[field.id]} />,
           pageId: page.id
         }))
     })

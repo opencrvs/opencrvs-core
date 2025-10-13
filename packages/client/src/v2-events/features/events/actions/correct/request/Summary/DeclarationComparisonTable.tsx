@@ -182,7 +182,6 @@ export function DeclarationComparisonTableComponent({
           field={f}
           formConfig={declarationConfig}
           previousForm={previousAnnotations}
-          showPreviouslyMissingValuesAsChanged={false}
           value={previousAnnotations[f.id]}
         />
       )
@@ -191,7 +190,6 @@ export function DeclarationComparisonTableComponent({
         <Output
           eventConfig={eventConfig}
           field={f}
-          showPreviouslyMissingValuesAsChanged={false}
           value={currentAnnotations[f.id]}
         />
       )
@@ -226,7 +224,6 @@ export function DeclarationComparisonTableComponent({
                 field={f}
                 formConfig={declarationConfig}
                 previousForm={previousDeclaration}
-                showPreviouslyMissingValuesAsChanged={false}
                 value={previousDeclaration[f.id]}
               />
             )
@@ -236,7 +233,6 @@ export function DeclarationComparisonTableComponent({
                 displayEmptyAsDash
                 eventConfig={eventConfig}
                 field={f}
-                showPreviouslyMissingValuesAsChanged={false}
                 value={latestDeclaration[f.id]}
               />
             )

@@ -156,7 +156,6 @@ export function EventSummary({
           <Output
             eventConfig={eventConfiguration}
             field={config}
-            showPreviouslyMissingValuesAsChanged={false}
             value={value}
           />
         )

@@ -270,7 +270,7 @@ export function Output({
   field,
   value,
   previousValue,
-  showPreviouslyMissingValuesAsChanged = true,
+  showPreviouslyMissingValuesAsChanged = false,
   previousForm,
   formConfig,
   eventConfig,
