@@ -20,8 +20,7 @@ import {
   getPrintCertificatePages,
   getCurrentEventState,
   isFieldVisible,
-  ValidatorContext,
-  isFieldDisplayedOnReview
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -73,8 +72,6 @@ export function PrintCertificate({
   const content = formPages.flatMap((page) => {
     const fields = page.fields
       .filter((f) => isFieldVisible(f, annotation, validatorContext))
-      // If a field has an unmet 'ConditionalType.DISPLAY_ON_REVIEW' conditional, it will be hidden from the modal as well.
-      .filter((f) => isFieldDisplayedOnReview(f, annotation, validatorContext))
       .filter((f) => !isEmptyValue(f, annotation[f.id]))
       .map((field) => {
         const valueDisplay = (
