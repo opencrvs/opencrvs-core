@@ -657,39 +657,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -736,40 +718,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -890,39 +853,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -967,40 +912,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -1042,39 +968,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -1119,40 +1027,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -1189,39 +1078,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -1266,40 +1137,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -1342,39 +1194,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -1419,40 +1253,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -1484,39 +1299,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -1561,40 +1358,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -1625,39 +1403,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -1702,40 +1462,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -1783,39 +1524,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -1860,40 +1583,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -1940,39 +1644,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -2017,40 +1703,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -2099,39 +1766,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -2176,40 +1825,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -2262,39 +1892,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -2339,40 +1951,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -2413,39 +2006,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -2490,40 +2065,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -2548,39 +2104,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -2625,40 +2163,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -2723,39 +2242,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -2800,40 +2301,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -2947,39 +2429,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -3024,40 +2488,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -3082,39 +2527,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -3159,40 +2586,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -3217,39 +2625,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -3294,40 +2684,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -3353,39 +2724,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -3430,40 +2783,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -3539,39 +2873,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -3616,40 +2932,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -3674,39 +2971,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -3751,40 +3030,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -3830,39 +3090,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -3907,40 +3149,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -3961,39 +3184,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -4038,40 +3243,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -4110,39 +3296,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -4187,40 +3355,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -4245,39 +3394,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -4322,40 +3453,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -4380,39 +3492,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -4457,40 +3551,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -4536,39 +3611,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -4613,40 +3670,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -4678,39 +3716,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -4755,40 +3775,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -4865,39 +3866,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -4942,40 +3925,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -5026,39 +3990,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -5103,40 +4049,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -5175,39 +4102,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -5252,40 +4161,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -5319,39 +4209,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -5396,40 +4268,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -5538,39 +4391,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -5615,40 +4450,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -5686,39 +4502,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -5763,40 +4561,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -5837,39 +4616,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -5914,40 +4675,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -5974,39 +4716,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -6051,40 +4775,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -6105,41 +4810,21 @@ components:
                       label:
                         $ref: "#/components/schemas/TranslationConfig"
                       parent:
-                        anyOf:
-                          - type: object
-                            properties:
-                              $$field:
-                                type: string
-                                description: Unique identifier for the field
-                              $$subfield:
-                                type: array
-                                items:
-                                  type: string
-                                description: 'If the FieldValue is an object, subfield can be used to refer to
-                                  e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
-                                  }`'
-                            required:
-                              - $$field
-                            description: Reference to a field by its ID
-                          - type: array
+                        type: object
+                        properties:
+                          $$field:
+                            type: string
+                            description: Unique identifier for the field
+                          $$subfield:
+                            type: array
                             items:
-                              type: object
-                              properties:
-                                $$field:
-                                  type: string
-                                  description: Unique identifier for the field
-                                $$subfield:
-                                  type: array
-                                  items:
-                                    type: string
-                                  description: 'If the FieldValue is an object, subfield can be used to refer to
-                                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
-                                    }`'
-                              required:
-                                - $$field
-                              description: Reference to a field by its ID
-                        description: Reference to a parent field. If a field has parent(s), it will be
-                          reset when any parent field is changed.
+                              type: string
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        required:
+                          - $$field
+                        description: Reference to a parent field. If a field has a parent, it will be
+                          reset when the parent field is changed.
                       required:
                         anyOf:
                           - type: boolean
@@ -6184,42 +4869,21 @@ components:
                         default: false
                         description: Indicates if the field can be changed during a record correction.
                       value:
-                        anyOf:
-                          - type: object
-                            properties:
-                              $$field:
-                                type: string
-                                description: Unique identifier for the field
-                              $$subfield:
-                                type: array
-                                items:
-                                  type: string
-                                description: 'If the FieldValue is an object, subfield can be used to refer to
-                                  e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
-                                  }`'
-                            required:
-                              - $$field
-                            description: Reference to a field by its ID
-                          - type: array
+                        type: object
+                        properties:
+                          $$field:
+                            type: string
+                            description: Unique identifier for the field
+                          $$subfield:
+                            type: array
                             items:
-                              type: object
-                              properties:
-                                $$field:
-                                  type: string
-                                  description: Unique identifier for the field
-                                $$subfield:
-                                  type: array
-                                  items:
-                                    type: string
-                                  description: 'If the FieldValue is an object, subfield can be used to refer to
-                                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
-                                    }`'
-                              required:
-                                - $$field
-                              description: Reference to a field by its ID
+                              type: string
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        required:
+                          - $$field
                         description: Reference to a parent field. If field has a value, the value will
-                          be copied when the parent field is changed. If a list
-                          is provided, the first truthy value will be used
+                          be copied when the parent field is changed.
                       analytics:
                         type: boolean
                         default: false
@@ -6246,41 +4910,21 @@ components:
                       label:
                         $ref: "#/components/schemas/TranslationConfig"
                       parent:
-                        anyOf:
-                          - type: object
-                            properties:
-                              $$field:
-                                type: string
-                                description: Unique identifier for the field
-                              $$subfield:
-                                type: array
-                                items:
-                                  type: string
-                                description: 'If the FieldValue is an object, subfield can be used to refer to
-                                  e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
-                                  }`'
-                            required:
-                              - $$field
-                            description: Reference to a field by its ID
-                          - type: array
+                        type: object
+                        properties:
+                          $$field:
+                            type: string
+                            description: Unique identifier for the field
+                          $$subfield:
+                            type: array
                             items:
-                              type: object
-                              properties:
-                                $$field:
-                                  type: string
-                                  description: Unique identifier for the field
-                                $$subfield:
-                                  type: array
-                                  items:
-                                    type: string
-                                  description: 'If the FieldValue is an object, subfield can be used to refer to
-                                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
-                                    }`'
-                              required:
-                                - $$field
-                              description: Reference to a field by its ID
-                        description: Reference to a parent field. If a field has parent(s), it will be
-                          reset when any parent field is changed.
+                              type: string
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        required:
+                          - $$field
+                        description: Reference to a parent field. If a field has a parent, it will be
+                          reset when the parent field is changed.
                       required:
                         anyOf:
                           - type: boolean
@@ -6325,42 +4969,21 @@ components:
                         default: false
                         description: Indicates if the field can be changed during a record correction.
                       value:
-                        anyOf:
-                          - type: object
-                            properties:
-                              $$field:
-                                type: string
-                                description: Unique identifier for the field
-                              $$subfield:
-                                type: array
-                                items:
-                                  type: string
-                                description: 'If the FieldValue is an object, subfield can be used to refer to
-                                  e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
-                                  }`'
-                            required:
-                              - $$field
-                            description: Reference to a field by its ID
-                          - type: array
+                        type: object
+                        properties:
+                          $$field:
+                            type: string
+                            description: Unique identifier for the field
+                          $$subfield:
+                            type: array
                             items:
-                              type: object
-                              properties:
-                                $$field:
-                                  type: string
-                                  description: Unique identifier for the field
-                                $$subfield:
-                                  type: array
-                                  items:
-                                    type: string
-                                  description: 'If the FieldValue is an object, subfield can be used to refer to
-                                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
-                                    }`'
-                              required:
-                                - $$field
-                              description: Reference to a field by its ID
+                              type: string
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        required:
+                          - $$field
                         description: Reference to a parent field. If field has a value, the value will
-                          be copied when the parent field is changed. If a list
-                          is provided, the first truthy value will be used
+                          be copied when the parent field is changed.
                       analytics:
                         type: boolean
                         default: false
@@ -6404,39 +5027,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -6481,40 +5086,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
@@ -6546,39 +5132,21 @@ components:
             label:
               $ref: "#/components/schemas/TranslationConfig"
             parent:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
-              description: Reference to a parent field. If a field has parent(s), it will be
-                reset when any parent field is changed.
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
             required:
               anyOf:
                 - type: boolean
@@ -6623,40 +5191,21 @@ components:
               default: false
               description: Indicates if the field can be changed during a record correction.
             value:
-              anyOf:
-                - type: object
-                  properties:
-                    $$field:
-                      type: string
-                      description: Unique identifier for the field
-                    $$subfield:
-                      type: array
-                      items:
-                        type: string
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  required:
-                    - $$field
-                  description: Reference to a field by its ID
-                - type: array
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
                   items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
               description: Reference to a parent field. If field has a value, the value will
-                be copied when the parent field is changed. If a list is
-                provided, the first truthy value will be used
+                be copied when the parent field is changed.
             analytics:
               type: boolean
               default: false
