@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
@@ -190,6 +190,10 @@ function DataInput({
   )
 }
 
+/*
+ * Data entries can either be static string entries, or references to other fields.
+ * If we are handling a reference field, we generate the <Output/> component for the reference field.
+ */
 function getDataOutputEntry(
   id: string,
   dataFieldConfig: DataField,
@@ -237,6 +241,9 @@ function getDataOutputEntry(
   }
 }
 
+/**
+ * Output for FieldType.DATA fields will return a fragment which contains rows of data entries.
+ */
 function DataOutput({
   value,
   field,
