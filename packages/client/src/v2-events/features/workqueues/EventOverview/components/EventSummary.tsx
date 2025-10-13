@@ -23,6 +23,7 @@ import {
 import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
@@ -127,6 +128,7 @@ export function EventSummary({
   hideSecuredFields?: boolean
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
+  const validationContext = useValidatorContext()
   const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)
   const securedFields = declarationFields
@@ -134,7 +136,10 @@ export function EventSummary({
     .map(({ id }) => id)
 
   const configuredFields = summary.fields.map((field) => {
-    if (field.conditionals && !areConditionsMet(field.conditionals, event)) {
+    if (
+      field.conditionals &&
+      !areConditionsMet(field.conditionals, event, validationContext)
+    ) {
       return null
     }
 

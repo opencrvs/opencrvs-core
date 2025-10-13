@@ -283,6 +283,7 @@ function useViewableActionConfigurations(
       [ActionType.READ]: {
         label: actionLabels[ActionType.READ],
         icon: 'Eye' as const,
+        disabled: !isOnline,
         onClick: () => navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId }))
       },
       [ActionType.ASSIGN]: {
