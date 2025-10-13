@@ -140,6 +140,12 @@ export function never(): JSONSchema {
   return not(alwaysTrue())
 }
 
+type FieldReference = { $$field: string; $$subfield: string[] }
+
+function jsonFieldPath(field: FieldReference) {
+  return [field.$$field, ...field.$$subfield].join('/')
+}
+
 function wrapToPath(condition: Record<string, unknown>, path: string[]) {
   if (path.length === 0) {
     return condition
@@ -215,66 +221,8 @@ export const user = Object.assign(userSerializer, {
   })
 })
 
-type FieldReference = { $$field: string; $$subfield: string[] }
-
 export function isFieldReference(value: unknown): value is FieldReference {
   return typeof value === 'object' && value !== null && '$$field' in value
-}
-
-function getFieldSchema(
-  field: FieldReference,
-  thisFieldSchemaOrResolver:
-    | Record<string, unknown>
-    | ((depth: number) => Record<string, unknown>),
-  otherField?: FieldReference,
-  otherFieldSchemaOrResolver?:
-    | Record<string, unknown>
-    | ((depth: number) => Record<string, unknown>),
-  otherFieldRequired?: boolean
-): Record<string, unknown> {
-  function getSchema(
-    nestedProperties: string[],
-    schema: Record<string, unknown> | ((d: number) => Record<string, unknown>),
-    depth = 0
-  ): Record<string, unknown> {
-    const currentProperty = nestedProperties.shift()
-    if (!currentProperty) {
-      if (typeof schema === 'function') {
-        return schema(depth)
-      }
-      return schema
-    }
-    return {
-      type: 'object',
-      properties: {
-        [currentProperty]: getSchema(nestedProperties, schema, depth + 1)
-      },
-      required: [currentProperty]
-    }
-  }
-
-  if (otherField && otherFieldSchemaOrResolver) {
-    return {
-      type: 'object',
-      properties: {
-        [field.$$field]: getSchema(field.$$subfield, thisFieldSchemaOrResolver),
-        [otherField.$$field]: getSchema(
-          otherField.$$subfield,
-          otherFieldSchemaOrResolver
-        )
-      },
-      required: otherFieldRequired
-        ? [field.$$field, otherField.$$field]
-        : [field.$$field]
-    }
-  }
-  return {
-    type: 'object',
-    properties: {
-      [field.$$field]: getSchema(field.$$subfield, thisFieldSchemaOrResolver)
-    },
-    required: [field.$$field]
-  }
 }
 
 /**
@@ -303,18 +251,26 @@ function getDateRangeToFieldReference(
   comparedField: FieldReference,
   clause: 'formatMinimum' | 'formatMaximum'
 ) {
-  return getFieldSchema(
-    field,
-    (d) => ({
-      type: 'string',
-      format: 'date',
-      [clause]: {
-        $data: `${d + 1}/${[comparedField.$$field, ...comparedField.$$subfield].join('/')}`
-      }
-    }),
-    comparedField,
-    { type: 'string', format: 'date' }
-  )
+  return {
+    type: 'object',
+    properties: {
+      [field.$$field]: wrapToPath(
+        {
+          type: 'string',
+          format: 'date',
+          [clause]: {
+            $data: `${field.$$subfield.length + 1}/${jsonFieldPath(comparedField)}`
+          }
+        },
+        field.$$subfield
+      ),
+      [comparedField.$$field]: wrapToPath(
+        { type: 'string', format: 'date' },
+        comparedField.$$subfield
+      )
+    },
+    required: [field.$$field]
+  }
 }
 
 function defineComparison(
@@ -324,23 +280,36 @@ function defineComparison(
 ) {
   if (isFieldReference(value)) {
     const comparedField = value
-    return defineFormConditional(
-      getFieldSchema(
-        field,
-        (d) => ({
-          type: ['number'],
-          [keyword]: {
-            $data: `${d + 1}/${[comparedField.$$field, ...comparedField.$$subfield].join('/')}`
-          }
-        }),
-        comparedField,
-        { type: 'number' }
-      )
-    )
+    return defineFormConditional({
+      type: 'object',
+      properties: {
+        [field.$$field]: wrapToPath(
+          {
+            type: ['number'],
+            [keyword]: {
+              $data: `${field.$$subfield.length + 1}/${jsonFieldPath(comparedField)}`
+            }
+          },
+          field.$$subfield
+        ),
+        [comparedField.$$field]: wrapToPath(
+          { type: 'number' },
+          comparedField.$$subfield
+        )
+      },
+      required: [field.$$field]
+    })
   }
-  return defineFormConditional(
-    getFieldSchema(field, { type: 'number', [keyword]: value })
-  )
+  return defineFormConditional({
+    type: 'object',
+    properties: {
+      [field.$$field]: wrapToPath(
+        { type: 'number', [keyword]: value },
+        field.$$subfield
+      )
+    },
+    required: [field.$$field]
+  })
 }
 
 /**
@@ -357,26 +326,42 @@ export function createFieldConditionals(fieldId: string) {
     field: FieldReference,
     days: number,
     clause: 'before' | 'after'
-  ) =>
-    getFieldSchema(field, {
-      type: 'string',
-      format: 'date',
-      daysFromNow: {
-        days,
-        clause
-      }
-    })
+  ) => ({
+    type: 'object',
+    properties: {
+      [field.$$field]: wrapToPath(
+        {
+          type: 'string',
+          format: 'date',
+          daysFromNow: {
+            days,
+            clause
+          }
+        },
+        field.$$subfield
+      )
+    },
+    required: [field.$$field]
+  })
 
   const getDateRange = (
     field: FieldReference,
     date: string | FieldReference | { $data: '/$now' },
     clause: 'formatMinimum' | 'formatMaximum'
-  ) =>
-    getFieldSchema(field, {
-      type: 'string',
-      format: 'date',
-      [clause]: date
-    })
+  ) => ({
+    type: 'object',
+    properties: {
+      [field.$$field]: wrapToPath(
+        {
+          type: 'string',
+          format: 'date',
+          [clause]: date
+        },
+        field.$$subfield
+      )
+    },
+    required: [field.$$field]
+  })
 
   return {
     /**
@@ -462,28 +447,40 @@ export function createFieldConditionals(fieldId: string) {
       if (isFieldReference(value)) {
         const comparedField = value
 
-        return defineFormConditional(
-          getFieldSchema(
-            this,
-            {
-              type: ['string', 'boolean', 'number'],
-              const: {
-                $data: `/$form/${[comparedField.$$field, ...comparedField.$$subfield].join('/')}`
-              }
-            },
-            comparedField,
-            { type: ['string', 'boolean', 'number'] },
-            true
-          )
-        )
+        return defineFormConditional({
+          type: 'object',
+          properties: {
+            [this.$$field]: wrapToPath(
+              {
+                type: ['string', 'boolean', 'number'],
+                const: {
+                  $data: `/$form/${jsonFieldPath(comparedField)}`
+                }
+              },
+              this.$$subfield
+            ),
+            [comparedField.$$field]: wrapToPath(
+              { type: ['string', 'boolean', 'number'] },
+              comparedField.$$subfield
+            )
+          },
+          required: [this.$$field, comparedField.$$field]
+        })
       }
 
-      return defineFormConditional(
-        getFieldSchema(this, {
-          type: ['string', 'boolean', 'number'],
-          const: value
-        })
-      )
+      return defineFormConditional({
+        type: 'object',
+        properties: {
+          [this.$$field]: wrapToPath(
+            {
+              type: ['string', 'boolean', 'number'],
+              const: value
+            },
+            this.$$subfield
+          )
+        },
+        required: [this.$$field]
+      })
     },
     /**
      * Use case: Some fields are rendered when selection is not made, or boolean false is explicitly selected.
