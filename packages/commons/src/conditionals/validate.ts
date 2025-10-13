@@ -231,19 +231,6 @@ export function isFieldDisplayedOnReview(
   )
 }
 
-export function isFieldDisplayedOnAuditDetails(
-  field: FieldConfig,
-  form: ActionUpdate | EventState,
-  context: ValidatorContext
-) {
-  return isFieldConditionMet(
-    field,
-    form,
-    ConditionalType.DISPLAY_ON_AUDIT_DETAILS,
-    context
-  )
-}
-
 export const errorMessages = {
   hiddenField: {
     id: 'error.hidden',
