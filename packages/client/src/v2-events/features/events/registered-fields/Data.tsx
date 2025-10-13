@@ -230,7 +230,6 @@ function getDataOutputEntry(
   }
 }
 
-// TODO CIHAN: also handle reference fields?
 function DataOutput({
   value,
   field,

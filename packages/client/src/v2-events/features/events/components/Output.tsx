@@ -279,7 +279,6 @@ export function Output({
   field: FieldConfig
   value?: FieldValue
   previousValue?: FieldValue
-  // TODO CIHAN: should be false by default??
   showPreviouslyMissingValuesAsChanged?: boolean
   previousForm?: EventState
   eventConfig?: EventConfig
