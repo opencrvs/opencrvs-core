@@ -45,7 +45,8 @@ import {
   FormConfig,
   isVerificationStatusType,
   isSignatureFieldType,
-  isDataFieldType
+  isDataFieldType,
+  EventConfig
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -87,10 +88,19 @@ const DeletedEmpty = styled(Deleted)`
  *
  *  @returns sensible default value for the field type given the field configuration.
  */
-export function ValueOutput(
-  field: { config: FieldConfig; value: FieldValue },
+export function ValueOutput({
+  config,
+  value,
+  searchMode,
+  eventConfig
+}: {
+  config: FieldConfig
+  value: FieldValue
   searchMode?: {} | boolean
-) {
+  eventConfig?: EventConfig
+}) {
+  const field = { config, value }
+
   if (
     isEmailFieldType(field) ||
     isIdFieldType(field) ||
@@ -197,8 +207,15 @@ export function ValueOutput(
     )
   }
 
-  if (isDataFieldType(field)) {
-    return <Data.Output field={field.config} value={field.value} />
+  // For FieldType.DATA, the eventConfig is required
+  if (isDataFieldType(field) && eventConfig) {
+    return (
+      <Data.Output
+        eventConfig={eventConfig}
+        field={field.config}
+        value={field.value}
+      />
+    )
   }
 }
 
@@ -256,6 +273,7 @@ export function Output({
   showPreviouslyMissingValuesAsChanged = true,
   previousForm,
   formConfig,
+  eventConfig,
   displayEmptyAsDash = false
 }: {
   field: FieldConfig
@@ -264,6 +282,7 @@ export function Output({
   // TODO CIHAN: should be false by default??
   showPreviouslyMissingValuesAsChanged?: boolean
   previousForm?: EventState
+  eventConfig?: EventConfig
   formConfig?: FormConfig
   displayEmptyAsDash?: boolean
 }) {
@@ -296,6 +315,7 @@ export function Output({
       return (
         <ValueOutput
           config={previousValueField ?? field}
+          eventConfig={eventConfig}
           value={previousValue}
         />
       )
@@ -305,14 +325,18 @@ export function Output({
       return '-'
     }
 
-    return <ValueOutput config={field} value={undefined} />
+    return (
+      <ValueOutput config={field} eventConfig={eventConfig} value={undefined} />
+    )
   }
 
   const hasPreviousValue = previousValue !== undefined
 
   // Note, checking for previousValue !== value is not enough, as we have composite fields.
   if (hasPreviousValue && !isEqualFieldValue(previousValue, value)) {
-    let valueOutput = <ValueOutput config={field} value={value} />
+    let valueOutput = (
+      <ValueOutput config={field} eventConfig={eventConfig} value={value} />
+    )
 
     if (isEmptyValue(field, value)) {
       if (displayEmptyAsDash) {
@@ -329,6 +353,7 @@ export function Output({
             <Deleted>
               <ValueOutput
                 config={previousValueField ?? field}
+                eventConfig={eventConfig}
                 value={previousValue}
               />
             </Deleted>
@@ -342,7 +367,11 @@ export function Output({
 
   if (!hasPreviousValue && showPreviouslyMissingValuesAsChanged) {
     const deleted = (
-      <ValueOutput config={{ ...field, required: true }} value={undefined} />
+      <ValueOutput
+        config={{ ...field, required: true }}
+        eventConfig={eventConfig}
+        value={undefined}
+      />
     )
     return (
       <>
@@ -353,10 +382,10 @@ export function Output({
           <Deleted>{deleted}</Deleted>
         )}
         <br />
-        <ValueOutput config={field} value={value} />
+        <ValueOutput config={field} eventConfig={eventConfig} value={value} />
       </>
     )
   }
 
-  return <ValueOutput config={field} value={value} />
+  return <ValueOutput config={field} eventConfig={eventConfig} value={value} />
 }

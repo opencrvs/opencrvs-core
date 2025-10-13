@@ -70,8 +70,6 @@ export function PrintCertificate({
     value: templateLabel ? intl.formatMessage(templateLabel) : ''
   }
 
-  // A very similar kind of listing of "annotation" fields will be done on the correction summary and modal.
-  // When we merge phase-3 branch here, we could try refactoring this to be a shared frontend module/function.
   const content = formPages.flatMap((page) => {
     const fields = page.fields
       .filter((f) => isFieldVisible(f, annotation, validatorContext))
@@ -80,6 +78,7 @@ export function PrintCertificate({
       .map((field) => {
         const valueDisplay = (
           <Output
+            eventConfig={eventConfiguration}
             field={field}
             showPreviouslyMissingValuesAsChanged={false}
             value={annotation[field.id]}
@@ -95,6 +94,7 @@ export function PrintCertificate({
     if (page.type === PageTypes.enum.VERIFICATION) {
       const value = (
         <Output
+          eventConfig={eventConfiguration}
           field={{
             id: page.id,
             label: page.title,

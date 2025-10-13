@@ -20,7 +20,9 @@ import {
   DataFieldValue,
   DataField,
   StaticDataEntry,
-  FormConfig
+  EventConfig,
+  getDeclarationFields,
+  FieldValue
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -146,10 +148,13 @@ function DataInput({
   // When we first render the field, let's save the values of the fields to the form data.
   // This is done because we want to send the values to the backend, so that they can be displayed in the Output later.
   useEffect(() => {
-    const value = fields.reduce(
-      (acc, f) => ({ ...acc, [f.config.id]: f.value }),
-      {}
-    )
+    const value = fields.reduce((acc, f) => {
+      if (f.value === null || f.value === undefined) {
+        return acc
+      }
+
+      return { ...acc, [f.config.id]: f.value }
+    }, {})
 
     onChange(value)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -182,13 +187,72 @@ function DataInput({
   )
 }
 
+function getDataOutputEntry(
+  id: string,
+  dataFieldConfig: DataField,
+  declarationFields: FieldConfig[],
+  value: FieldValue
+) {
+  const dataEntryConfig = dataFieldConfig.configuration.data.find(
+    (d) => ('id' in d && d.id === id) || ('fieldId' in d && d.fieldId === id)
+  )
+
+  if (!dataEntryConfig) {
+    return null
+  }
+
+  // Handle static data entries
+  if ('id' in dataEntryConfig) {
+    const { label } = dataEntryConfig
+
+    const valueDisplay = (
+      <Output
+        field={{ type: FieldType.TEXT, id, label }}
+        showPreviouslyMissingValuesAsChanged={false}
+        value={value}
+      />
+    )
+
+    return {
+      label,
+      valueDisplay,
+      id
+    }
+  }
+
+  // Handle reference fields
+  const referencedFieldConfig = declarationFields.find(
+    (f) => f.id === dataEntryConfig.fieldId
+  )
+
+  if (!referencedFieldConfig) {
+    return null
+  }
+
+  const valueDisplay = (
+    <Output
+      field={referencedFieldConfig}
+      showPreviouslyMissingValuesAsChanged={false}
+      value={value}
+    />
+  )
+
+  return {
+    label: referencedFieldConfig.label,
+    valueDisplay,
+    id
+  }
+}
+
 // TODO CIHAN: also handle reference fields?
 function DataOutput({
   value,
-  field
+  field,
+  eventConfig
 }: {
   value: DataFieldValue
   field: DataField
+  eventConfig: EventConfig
 }) {
   const intl = useIntl()
 
@@ -197,32 +261,9 @@ function DataOutput({
     return null
   }
 
+  const declarationFields = getDeclarationFields(eventConfig)
   const entries = Object.entries(value)
-    .map(([id, val]) => {
-      const dataEntryConfig = field.configuration.data.find(
-        (d) => 'id' in d && d.id === id
-      )
-
-      if (!dataEntryConfig || !('label' in dataEntryConfig)) {
-        return null
-      }
-
-      const { label } = dataEntryConfig
-
-      const valueDisplay = (
-        <Output
-          field={{ type: FieldType.TEXT, id, label }}
-          showPreviouslyMissingValuesAsChanged={false}
-          value={val}
-        />
-      )
-
-      return {
-        label,
-        valueDisplay,
-        id
-      }
-    })
+    .map(([id, val]) => getDataOutputEntry(id, field, declarationFields, val))
     .filter((e) => e !== null)
 
   if (!entries.length) {

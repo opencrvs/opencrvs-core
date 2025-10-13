@@ -182,6 +182,7 @@ export function DuplicateComparison({
             rightValue: (
               <Output
                 displayEmptyAsDash={true}
+                eventConfig={eventConfiguration}
                 field={field}
                 formConfig={eventConfiguration.declaration}
                 previousForm={potentialDuplicateDeclaration}
@@ -192,6 +193,7 @@ export function DuplicateComparison({
             leftValue: (
               <Output
                 displayEmptyAsDash={true}
+                eventConfig={eventConfiguration}
                 field={field}
                 formConfig={eventConfiguration.declaration}
                 previousForm={originalDeclaration}
