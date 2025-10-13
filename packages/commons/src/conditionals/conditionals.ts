@@ -248,7 +248,7 @@ function getFieldSchema(
       properties: {
         [currentProperty]: getSchema(nestedProperties, schema, depth + 1)
       },
-      requied: [currentProperty]
+      required: [currentProperty]
     }
   }
   if (comparedField && comparedFieldSchemaOrResolver) {
