@@ -127,7 +127,7 @@ function focusElementByHash() {
 function resolveFieldReferenceValue(
   { $$field, $$subfield }: FieldReference,
   fieldValues: EventState
-) {
+): FieldValue | undefined {
   const referenceKeyInFormikFormat = makeFormFieldIdFormikCompatible($$field)
 
   return $$subfield && $$subfield.length > 0
@@ -267,22 +267,19 @@ export function FormSectionComponent({
         listenerField.id
       )
 
-      const changedReference = referencesToOtherFields.find((reference) => {
-        const updatedValue = resolveFieldReferenceValue(reference, fieldValues)
-        const previousValue = prevValuesRef.current[listenerFieldFormikId]
-        return !isEqual(updatedValue, previousValue)
-      })
+      for (const reference of referencesToOtherFields) {
+        const updatedValue = getUpdatedChildValueOnChange({
+          childField: listenerField,
+          fieldReference: reference,
+          fieldValues,
+          systemVariables
+        })
 
-      const updatedValue = getUpdatedChildValueOnChange({
-        childField: listenerField,
-        fieldReference: changedReference,
-        fieldValues,
-        systemVariables
-      })
-
-      if (updatedValue) {
-        set(fieldValues, listenerFieldFormikId, updatedValue)
-        set(fieldErrors, listenerFieldFormikId, { errors: [] })
+        if (updatedValue) {
+          set(fieldValues, listenerFieldFormikId, updatedValue)
+          set(fieldErrors, listenerFieldFormikId, { errors: [] })
+          break
+        }
       }
     },
     [fieldsWithDotSeparator, systemVariables]
