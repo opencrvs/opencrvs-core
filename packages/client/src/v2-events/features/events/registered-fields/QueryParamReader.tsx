@@ -59,7 +59,7 @@ function QueryParamReaderInput({
       onChangeRef.current({
         ...fieldValue,
         // to ensure formik sees it as a new value even if the params are the same
-        createdAt: Date.now().toString()
+        [Symbol('updated')]: true
       })
     )
     setSearchParams(new URLSearchParams(), { replace: true })
