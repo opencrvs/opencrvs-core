@@ -254,22 +254,6 @@ export function useDrafts() {
       }
 
       return eventDrafts[0]
-    },
-    prefetch: () => {
-      const drafts = getAllRemoteDrafts()
-      drafts.forEach((draft) => {
-        const localEvent = findLocalEventDocument(draft.eventId)
-
-        if (localEvent) {
-          localEvent.actions.push({
-            ...draft.action,
-            id: createTemporaryId(),
-            createdBy: 'offline',
-            type: draft.action.type
-          } as ActionDocument)
-          updateLocalEventIndex(draft.eventId, localEvent)
-        }
-      })
     }
   }
 }
