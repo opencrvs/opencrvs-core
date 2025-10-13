@@ -152,7 +152,8 @@ function DataInput({
   useEffect(() => {
     // We keep updating until the field value is actually found in the form data.
     // Previously we tried only updating the value during render once, but ran into issues with form state not being updated.
-    if (formData[makeFormikFieldIdOpenCRVSCompatible(id)]) {
+    const idWithDotSeparator = makeFormikFieldIdOpenCRVSCompatible(id)
+    if (idWithDotSeparator in formData) {
       return
     }
 
