@@ -215,47 +215,8 @@ export const user = Object.assign(userSerializer, {
   })
 })
 
-/**
- * This function will output JSONSchema which looks for example like this:
- * @example
- * {
- *   "type": "object",
- *   "properties": {
- *     "mother.dob": {
- *       "type": "string",
- *       "format": "date",
- *       "formatMinimum": {
- *         "$data": "1/child.dob"
- *       }
- *     },
- *     "child.dob": {
- *       "type": "string",
- *       "format": "date"
- *     }
- *   },
- *   "required": ["mother.dob"]
- * }
- */
-function getDateRangeToFieldReference(
-  fieldId: string,
-  comparedFieldId: string,
-  clause: 'formatMinimum' | 'formatMaximum'
-) {
-  return {
-    type: 'object',
-    properties: {
-      [fieldId]: {
-        type: 'string',
-        format: 'date',
-        [clause]: { $data: `1/${comparedFieldId}` }
-      },
-      [comparedFieldId]: { type: 'string', format: 'date' }
-    },
-    required: [fieldId]
-  }
-}
-
 type FieldReference = { $$field: string; $$subfield: string[] }
+
 export function isFieldReference(value: unknown): value is FieldReference {
   return typeof value === 'object' && value !== null && '$$field' in value
 }
@@ -300,7 +261,7 @@ function getFieldSchema(
           comparedFieldSchemaOrResolver
         )
       },
-      required: [field.$$field, comparedField.$$field]
+      required: [field.$$field]
     }
   }
   return {
@@ -310,6 +271,46 @@ function getFieldSchema(
     },
     required: [field.$$field]
   }
+}
+
+/**
+ * This function will output JSONSchema which looks for example like this:
+ * @example
+ * {
+ *   "type": "object",
+ *   "properties": {
+ *     "mother.dob": {
+ *       "type": "string",
+ *       "format": "date",
+ *       "formatMinimum": {
+ *         "$data": "1/child.dob"
+ *       }
+ *     },
+ *     "child.dob": {
+ *       "type": "string",
+ *       "format": "date"
+ *     }
+ *   },
+ *   "required": ["mother.dob"]
+ * }
+ */
+function getDateRangeToFieldReference(
+  field: FieldReference,
+  comparedField: FieldReference,
+  clause: 'formatMinimum' | 'formatMaximum'
+) {
+  return getFieldSchema(
+    field,
+    (d) => ({
+      type: 'string',
+      format: 'date',
+      [clause]: {
+        $data: `${d + 1}/${[comparedField.$$field, ...comparedField.$$subfield].join('/')}`
+      }
+    }),
+    comparedField,
+    { type: 'string', format: 'date' }
+  )
 }
 
 function defineComparison(
@@ -404,13 +405,9 @@ export function createFieldConditionals(fieldId: string) {
         }),
         date: (date: string | FieldReference) => {
           if (isFieldReference(date)) {
-            const comparedFieldId = date.$$field
+            const comparedField = date
             return defineFormConditional(
-              getDateRangeToFieldReference(
-                fieldId,
-                comparedFieldId,
-                'formatMinimum'
-              )
+              getDateRangeToFieldReference(this, comparedField, 'formatMinimum')
             )
           }
 
@@ -434,13 +431,9 @@ export function createFieldConditionals(fieldId: string) {
         }),
         date: (date: `${string}-${string}-${string}` | FieldReference) => {
           if (isFieldReference(date)) {
-            const comparedFieldId = date.$$field
+            const comparedField = date
             return defineFormConditional(
-              getDateRangeToFieldReference(
-                fieldId,
-                comparedFieldId,
-                'formatMaximum'
-              )
+              getDateRangeToFieldReference(this, comparedField, 'formatMaximum')
             )
           }
 
