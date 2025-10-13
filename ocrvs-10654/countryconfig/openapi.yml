@@ -4759,6 +4759,18 @@ components:
             'SHOW' conditions are met. This should only be used for fields
             within declaration forms, as they are the only ones with review
             pages.
+        - type: object
+          properties:
+            type:
+              type: string
+              const: DISPLAY_ON_AUDIT_DETAILS
+            conditional:
+              $ref: "#/components/schemas/Conditional"
+          required:
+            - type
+            - conditional
+          description: If 'DISPLAY_ON_AUDIT_DETAILS' conditional is defined, the component
+            is shown on the audit detail modals only if the condition is met.
       description: Field conditional configuration
     DeclareActionConfig:
       type: object

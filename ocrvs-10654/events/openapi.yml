@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 2f5ade58-59e2-46ad-ad75-694340fbbf36
+                transactionId: 93ebdb5e-f57a-4146-af42-90bb26dcc07a
                 type: birth
       responses:
         "200":
@@ -683,7 +683,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 50d6a2a7-d97e-4d8e-82aa-c0e1b1933a36
+                transactionId: f9af3136-a4f7-4459-a98a-48d6d07e2a03
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -7704,6 +7704,19 @@ components:
             'SHOW' conditions are met. This should only be used for fields
             within declaration forms, as they are the only ones with review
             pages.
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - DISPLAY_ON_AUDIT_DETAILS
+            conditional:
+              $ref: "#/components/schemas/Conditional"
+          required:
+            - type
+            - conditional
+          description: If 'DISPLAY_ON_AUDIT_DETAILS' conditional is defined, the component
+            is shown on the audit detail modals only if the condition is met.
       description: Field conditional configuration
     DeclareActionConfig:
       type: object
