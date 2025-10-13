@@ -11,7 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import React from 'react'
-import { FieldType } from '@opencrvs/commons/client'
+import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { Output } from './Output'
@@ -208,7 +208,7 @@ export const CheckboxOutputChangedFromFalseToTrue: Story = {
 
 export const DataOutput: Story = {
   args: {
-    showPreviouslyMissingValuesAsChanged: true,
+    eventConfig: tennisClubMembershipEvent,
     field: {
       id: 'data',
       type: FieldType.DATA,
@@ -219,7 +219,7 @@ export const DataOutput: Story = {
       },
       configuration: {
         data: [
-          { fieldId: 'name' },
+          { fieldId: 'applicant.name' },
           {
             id: 'static.text',
             label: {
@@ -250,7 +250,7 @@ export const DataOutput: Story = {
       }
     },
     value: {
-      name: {
+      'applicant.name': {
         firstname: 'John',
         surname: 'Malkovich'
       },
