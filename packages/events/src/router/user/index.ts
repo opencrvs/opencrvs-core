@@ -36,8 +36,8 @@ export const userRouter = router({
     .output(z.array(UserOrSystem))
     .query(async ({ input, ctx }) => getUsersById(input, ctx.token)),
   actions: publicProcedure
-    .use(userCanReadOtherUser)
     .input(UserActionsQuery)
+    .use(userCanReadOtherUser)
     .query(async ({ input }) => {
       return getUserActions(input)
     })

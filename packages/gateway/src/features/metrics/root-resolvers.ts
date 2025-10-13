@@ -74,7 +74,7 @@ type V1ActionType =
 
 function V2ActionTypeToV1ActionType(
   actionType: ActionType
-): V1ActionType | null | '-' {
+): V1ActionType | null {
   switch (actionType) {
     case ActionType.DECLARE:
       return 'DECLARED'
@@ -295,7 +295,7 @@ export const resolvers: GQLResolver = {
           count: params.count + (params.skip || 0),
           timeStart: params.timeStart,
           timeEnd: params.timeEnd,
-          // In order to get the correct action total, we need to exclude actions that are not mapped to V1 actions.
+          // 2. In order to get the correct action total, we need to exclude actions that are not mapped to V1 actions.
           // Removing them after the fact will break the pagination and result to "no results found" pages.
           actionTypes: ActionTypes.exclude([
             ActionTypes.enum.DELETE,
@@ -319,15 +319,14 @@ export const resolvers: GQLResolver = {
           trackingId: action.trackingId
         }
       }))
-      // .filter((a) => a.action !== null)
 
-      // 2. Combine and sort the results by time.
+      // 3. Combine and sort the results by time.
       const combinedResults = [
         ...(metricsData.results || []),
         ...cleanedEventActions
       ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
 
-      // 3. Paginate the combined results. Ensure slicing stays within the bounds of the array.
+      // 4. Paginate the combined results. Ensure slicing stays within the bounds of the array.
       const start = params.skip || 0
       const end = start + (params.count || 10)
 

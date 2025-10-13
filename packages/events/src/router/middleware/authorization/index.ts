@@ -352,11 +352,11 @@ export const userCanReadOtherUser: MiddlewareFunction<
   OpenApiMeta,
   TrpcContext,
   TrpcContext & { userId: string },
-  string
+  { userId: string }
 > = async ({ next, ctx, input }) => {
   const { token, user: userReading } = ctx
 
-  const otherUser = await getUserOrSystem(input, token)
+  const otherUser = await getUserOrSystem(input.userId, token)
 
   // Don't reveal the existence of the user
   if (!otherUser) {
@@ -367,6 +367,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
   if (otherUser.type === TokenUserType.Enum.system) {
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
+
   if (!userReading.primaryOfficeId) {
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
