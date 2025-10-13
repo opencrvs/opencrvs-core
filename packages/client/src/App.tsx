@@ -24,9 +24,7 @@ import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
-import { Leaderboards } from '@client/views/Performance/Leaderboards'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
-import { PerformanceStatistics } from '@client/views/Performance/Statistics'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
 import { Payment } from '@client/views/PrintCertificate/Payment'
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
@@ -148,23 +146,7 @@ export const routesConfig = config.FEATURES.V2_EVENTS
             element: <RegistrationList />
           },
           {
-            path: routes.PERFORMANCE_STATISTICS,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-                <PerformanceStatistics />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.PERFORMANCE_LEADER_BOARDS,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-                <Leaderboards />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.PERFORMANCE_DASHBOARD,
+            path: routes.DASHBOARD,
             element: (
               <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
                 <PerformanceDashboard />
@@ -388,23 +370,7 @@ export const routesConfig = config.FEATURES.V2_EVENTS
             element: <RegistrationList />
           },
           {
-            path: routes.PERFORMANCE_STATISTICS,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-                <PerformanceStatistics />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.PERFORMANCE_LEADER_BOARDS,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-                <Leaderboards />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.PERFORMANCE_DASHBOARD,
+            path: routes.DASHBOARD,
             element: (
               <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
                 <PerformanceDashboard />

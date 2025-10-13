@@ -9,20 +9,32 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { useMemo } from 'react'
 import { getOrThrow, ValidatorContext } from '@opencrvs/commons/client'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
+import { useAuthentication } from '../../utils/userUtils'
 import { useSuspenseAdminLeafLevelLocations } from './useLocations'
+
+/**
+ * Private hook for reading user details. Since the user is authenticated, we can assume the token is valid, and some other process throws an error when it becomes invalid.
+ * NOTE: Without memoization, this will decode the token on every call, running the application to a halt.
+ * decoding token is synchronous process, which blocks the main thread for a very short time. Since this is called all-around the app, it cascades.
+ */
+function useUser() {
+  const maybeAuth = useAuthentication()
+
+  return useMemo(
+    () => getOrThrow(maybeAuth, 'Token payload missing. User is not logged in'),
+    [maybeAuth]
+  )
+}
 
 export function useValidatorContext(): ValidatorContext {
   const leafAdminStructureLocationIds = useSuspenseAdminLeafLevelLocations()
-  const token = getToken()
-  const tokenPayload = getOrThrow(
-    getTokenPayload(token),
-    'Token payload missing. User is not logged in'
-  )
+  const user = useUser()
 
   return {
-    user: tokenPayload,
+    user,
     leafAdminStructureLocationIds
   }
 }
