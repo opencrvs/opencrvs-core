@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
@@ -26,6 +26,7 @@ import {
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { makeFormikFieldIdOpenCRVSCompatible } from '@client/v2-events/components/forms/utils'
 
 function getFieldFromDataEntry({
   intl,
@@ -111,7 +112,8 @@ function DataInput({
   label,
   formData,
   declarationFields,
-  onChange
+  onChange,
+  id
 }: FieldProps<'DATA'> & {
   formData: EventState
   declarationFields: FieldConfig[]
@@ -148,6 +150,12 @@ function DataInput({
   // When we first render the field, let's save the values of the fields to the form data.
   // This is done because we want to send the values to the backend, so that they can be displayed in the Output later.
   useEffect(() => {
+    // We keep updating until the field value is actually found in the form data.
+    // Previously we tried only updating the value during render once, but ran into issues with form state not being updated.
+    if (formData[makeFormikFieldIdOpenCRVSCompatible(id)]) {
+      return
+    }
+
     const value = fields.reduce((acc, f) => {
       if (f.value === null || f.value === undefined) {
         return acc
@@ -157,8 +165,7 @@ function DataInput({
     }, {})
 
     onChange(value)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [id, formData, onChange, fields])
 
   return (
     <Container>
