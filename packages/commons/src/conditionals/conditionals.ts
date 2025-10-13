@@ -226,10 +226,11 @@ function getFieldSchema(
   thisFieldSchemaOrResolver:
     | Record<string, unknown>
     | ((depth: number) => Record<string, unknown>),
-  comparedField?: FieldReference,
-  comparedFieldSchemaOrResolver?:
+  otherField?: FieldReference,
+  otherFieldSchemaOrResolver?:
     | Record<string, unknown>
-    | ((depth: number) => Record<string, unknown>)
+    | ((depth: number) => Record<string, unknown>),
+  otherFieldRequired?: boolean
 ): Record<string, unknown> {
   function getSchema(
     nestedProperties: string[],
@@ -251,17 +252,20 @@ function getFieldSchema(
       required: [currentProperty]
     }
   }
-  if (comparedField && comparedFieldSchemaOrResolver) {
+
+  if (otherField && otherFieldSchemaOrResolver) {
     return {
       type: 'object',
       properties: {
         [field.$$field]: getSchema(field.$$subfield, thisFieldSchemaOrResolver),
-        [comparedField.$$field]: getSchema(
-          comparedField.$$subfield,
-          comparedFieldSchemaOrResolver
+        [otherField.$$field]: getSchema(
+          otherField.$$subfield,
+          otherFieldSchemaOrResolver
         )
       },
-      required: [field.$$field]
+      required: otherFieldRequired
+        ? [field.$$field, otherField.$$field]
+        : [field.$$field]
     }
   }
   return {
@@ -456,38 +460,30 @@ export function createFieldConditionals(fieldId: string) {
     isEqualTo(value: string | boolean | number | FieldReference) {
       // If the value is a reference to another field, the JSON schema uses the field reference as the 'const' value we compare to
       if (isFieldReference(value)) {
-        const comparedFieldId = value.$$field
+        const comparedField = value
 
-        return defineFormConditional({
-          type: 'object',
-          properties: {
-            [fieldId]: {
+        return defineFormConditional(
+          getFieldSchema(
+            this,
+            {
               type: ['string', 'boolean', 'number'],
-              const: { $data: `/$form/${comparedFieldId}` }
+              const: {
+                $data: `/$form/${[comparedField.$$field, ...comparedField.$$subfield].join('/')}`
+              }
             },
-            [comparedFieldId]: { type: ['string', 'boolean', 'number'] }
-          },
-          required: [fieldId, comparedFieldId]
-        })
+            comparedField,
+            { type: ['string', 'boolean', 'number'] },
+            true
+          )
+        )
       }
 
-      return defineFormConditional({
-        type: 'object',
-        properties: {
-          [fieldId]: wrapToPath(
-            {
-              oneOf: [
-                { type: 'string', const: value },
-                { type: 'boolean', const: value },
-                { type: 'number', const: value }
-              ],
-              const: value
-            },
-            this.$$subfield
-          )
-        },
-        required: [fieldId]
-      })
+      return defineFormConditional(
+        getFieldSchema(this, {
+          type: ['string', 'boolean', 'number'],
+          const: value
+        })
+      )
     },
     /**
      * Use case: Some fields are rendered when selection is not made, or boolean false is explicitly selected.
