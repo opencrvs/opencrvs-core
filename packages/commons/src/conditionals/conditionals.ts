@@ -428,9 +428,9 @@ export function createFieldConditionals(fieldId: string) {
       return {
         days: (days: number) => ({
           inPast: () =>
-            defineFormConditional(getDayRange(this, days, 'before')),
+            defineFormConditional(getDayRange(this, -days, 'before')),
           inFuture: () =>
-            defineFormConditional(getDayRange(this, -days, 'before'))
+            defineFormConditional(getDayRange(this, days, 'before'))
         }),
         date: (date: `${string}-${string}-${string}` | FieldReference) => {
           if (isFieldReference(date)) {
