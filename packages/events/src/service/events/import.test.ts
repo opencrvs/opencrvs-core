@@ -35,9 +35,11 @@ describe('import', () => {
     await expect(
       client.event.import(
         generateEventDocument({
-          user,
           configuration: tennisClubMembershipEvent,
-          actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+          actions: [
+            { type: ActionType.CREATE, user },
+            { type: ActionType.DECLARE, user }
+          ]
         })
       )
     ).resolves.not.toThrow()
@@ -51,9 +53,11 @@ describe('import', () => {
       `search[event=${tennisClubMembershipEvent.id},access=all]`
     ])
     const event = generateEventDocument({
-      user,
       configuration: tennisClubMembershipEvent,
-      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+      actions: [
+        { type: ActionType.CREATE, user },
+        { type: ActionType.DECLARE, user }
+      ]
     })
 
     await client.event.import(event)
@@ -81,9 +85,11 @@ describe('import', () => {
       `search[event=${tennisClubMembershipEvent.id},access=all]`
     ])
     const event = generateEventDocument({
-      user,
       configuration: tennisClubMembershipEvent,
-      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+      actions: [
+        { type: ActionType.CREATE, user },
+        { type: ActionType.DECLARE, user }
+      ]
     })
 
     await client.event.import(event)
@@ -128,9 +134,11 @@ describe('bulkImport', () => {
     await expect(
       client.event.bulkImport([
         generateEventDocument({
-          user,
           configuration: tennisClubMembershipEvent,
-          actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+          actions: [
+            { type: ActionType.CREATE, user },
+            { type: ActionType.DECLARE, user }
+          ]
         })
       ])
     ).resolves.not.toThrow()
@@ -144,15 +152,19 @@ describe('bulkImport', () => {
       `search[event=${tennisClubMembershipEvent.id},access=all]`
     ])
     const event1 = generateEventDocument({
-      user,
       configuration: tennisClubMembershipEvent,
-      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+      actions: [
+        { type: ActionType.CREATE, user },
+        { type: ActionType.DECLARE, user }
+      ]
     })
 
     const event2 = generateEventDocument({
-      user,
       configuration: tennisClubMembershipEvent,
-      actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+      actions: [
+        { type: ActionType.CREATE, user },
+        { type: ActionType.DECLARE, user }
+      ]
     })
     await client.event.bulkImport([event1, event2])
 

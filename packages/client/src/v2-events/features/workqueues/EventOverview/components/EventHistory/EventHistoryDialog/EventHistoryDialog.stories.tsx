@@ -20,8 +20,8 @@ import {
   createPrng,
   getRandomDatetime,
   UUID,
-  getAcceptedActions,
-  EventDocument
+  EventDocument,
+  generateEventDocument
 } from '@opencrvs/commons/client'
 import {
   DECLARATION_ACTION_UPDATE,
@@ -1071,46 +1071,31 @@ export const RegisteredOnDeclarationUpdate: Story = {
   }
 }
 
-const notDuplicateUpdateEvent: EventDocument = {
-  id: 'f6b33b15-6fc1-4f7e-84ce-1ba6b8009be7' as UUID,
-  type: 'tennis-club-membership',
-  createdAt: '2025-10-10T13:16:20.507Z',
-  updatedAt: '2025-10-10T13:16:20.507Z',
+const notDuplicateUpdateEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
   actions: [
     {
-      id: '76f42842-1f95-4d60-8421-271032f3fe34' as UUID,
-      transactionId: 'tmp-e3633895-ecb7-44ce-994e-755367103b1a',
-      createdByUserType: 'user',
-      createdAt: '2025-10-10T13:16:20.507Z',
-      createdBy: '68e8bacf197c5cb688c4e0ee',
-      createdByRole: 'REGISTRATION_AGENT',
-      createdAtLocation: 'a4a42ede-2226-4602-9b07-6b41514588d0' as UUID,
-      declaration: {},
-      status: 'Accepted',
-      type: 'CREATE'
+      type: 'CREATE',
+      user: {
+        role: 'REGISTRATION_AGENT',
+        id: '68e8bacf197c5cb688c4e0ee'
+      }
     },
     {
-      id: 'aacd0ee9-f22c-4092-83f3-8ac8af446a8e' as UUID,
-      transactionId: 'tmp-e3633895-ecb7-44ce-994e-755367103b1a',
-      createdByUserType: 'user',
-      createdAt: '2025-10-10T13:16:20.507Z',
-      createdBy: '68e8bacf197c5cb688c4e0ee',
-      createdByRole: 'REGISTRATION_AGENT',
-      createdAtLocation: 'a4a42ede-2226-4602-9b07-6b41514588d0' as UUID,
-      declaration: {},
-      status: 'Accepted',
       type: 'ASSIGN',
-      assignedTo: '68e8bacf197c5cb688c4e0ee'
+      user: {
+        role: 'REGISTRATION_AGENT',
+        id: '68e8bacf197c5cb688c4e0ee',
+        assignedTo: '68e8bacf197c5cb688c4e0ee'
+      }
     },
     {
-      id: '9ebb1dda-7228-4914-a7f6-7990b98fcdaa' as UUID,
-      transactionId: '3860bd34-229f-4da8-983e-f6160963cda6',
-      createdByUserType: 'user',
-      createdAt: '2025-10-10T13:16:40.334Z',
-      createdBy: '68e8bacf197c5cb688c4e0ee',
-      createdByRole: 'REGISTRATION_AGENT',
-      createdAtLocation: 'a4a42ede-2226-4602-9b07-6b41514588d0' as UUID,
-      declaration: {
+      type: 'DECLARE',
+      user: {
+        role: 'REGISTRATION_AGENT',
+        id: '68e8bacf197c5cb688c4e0ee'
+      },
+      declarationOverrides: {
         'applicant.dob': '1999-11-11',
         'applicant.name': {
           surname: 'Drinkwater',
@@ -1120,83 +1105,52 @@ const notDuplicateUpdateEvent: EventDocument = {
         'senior-pass.id': '23213213',
         'recommender.none': true,
         'applicant.image.label': ''
-      },
-      annotation: {},
-      status: 'Accepted',
-      type: 'DECLARE'
+      }
     },
     {
-      id: '9ebb1dda-7228-4914-a7f6-7990b98fcdaa' as UUID,
-      transactionId: '3860bd34-229f-4da8-983e-f6160963cda6',
-      createdByUserType: 'user',
-      createdAt: '2025-10-10T13:16:40.334Z',
-      createdBy: '68e8bacf197c5cb688c4e0ee',
-      createdByRole: 'REGISTRATION_AGENT',
-      createdAtLocation: 'a4a42ede-2226-4602-9b07-6b41514588d0' as UUID,
-      declaration: {
-        'applicant.dob': '1999-11-11',
-        'applicant.name': {
-          surname: 'Drinkwater',
-          firstname: 'Danny',
-          middlename: ''
-        },
-        'senior-pass.id': '23213213',
-        'recommender.none': true,
-        'applicant.image.label': ''
-      },
-      annotation: {},
-      status: 'Accepted',
       type: 'DUPLICATE_DETECTED',
-      content: { duplicates: [{ id: 'some-id' as UUID, trackingId: 'VZ7FXU' }] }
+      user: {
+        role: 'REGISTRATION_AGENT',
+        id: '68e8bacf197c5cb688c4e0ee'
+      },
+      declarationOverrides: {
+        'applicant.dob': '1999-11-11',
+        'applicant.name': {
+          surname: 'Drinkwater',
+          firstname: 'Danny',
+          middlename: ''
+        },
+        'senior-pass.id': '23213213',
+        'recommender.none': true,
+        'applicant.image.label': ''
+      }
     },
     {
-      id: '01e91478-79a7-4342-9b83-c7bf68acd59f' as UUID,
-      transactionId: '6e440d40-f61a-4512-9653-d62728c2a90a',
-      createdByUserType: 'user',
-      createdAt: '2025-10-06T13:29:51.089Z',
-      createdBy: '68e37d2f026687a3debbe8c2',
-      createdByRole: 'LOCAL_REGISTRAR',
-      createdAtLocation: 'a9bc86bc-1021-4619-8207-e3539f5013b2' as UUID,
-      declaration: {},
-      status: 'Accepted',
       type: 'UNASSIGN'
     },
     {
-      id: '5b5cfc68-d114-4e6c-b087-e464eeac2bc8' as UUID,
-      transactionId: '232798ef-6cd5-49c4-9371-92e44105e0dd',
-      createdByUserType: 'user',
-      createdAt: '2025-10-06T13:30:02.093Z',
-      createdBy: '68e37d2f026687a3debbe8c2',
-      createdByRole: 'LOCAL_REGISTRAR',
-      createdAtLocation: 'a9bc86bc-1021-4619-8207-e3539f5013b2' as UUID,
-      declaration: {},
-      annotation: {},
-      status: 'Accepted',
       type: 'ASSIGN',
-      assignedTo: '68e37d2f026687a3debbe8c2'
+      user: {
+        assignedTo: '68e37d2f026687a3debbe8c2',
+        role: 'LOCAL_REGISTRAR',
+        id: '68e37d2f026687a3debbe8c2'
+      }
     },
     {
-      id: '46f97da0-d429-46ce-bdde-2bfb7fae7a8a' as UUID,
-      transactionId: '47f01b53-5e27-4c55-9a3f-919bfcd98ace',
-      createdByUserType: 'user',
-      createdAt: '2025-10-07T10:48:57.788Z',
-      createdBy: '68e37d2f026687a3debbe8c2',
-      createdByRole: 'LOCAL_REGISTRAR',
-      createdAtLocation: 'a9bc86bc-1021-4619-8207-e3539f5013b2' as UUID,
-      declaration: {},
-      annotation: {},
-      status: 'Accepted',
-      type: 'MARK_AS_NOT_DUPLICATE'
+      type: 'MARK_AS_NOT_DUPLICATE',
+      user: {
+        assignedTo: '68e37d2f026687a3debbe8c2',
+        role: 'LOCAL_REGISTRAR',
+        id: '68e37d2f026687a3debbe8c2'
+      }
     },
     {
-      id: '9ebb1dda-7228-4914-a7f6-7990b98fcdaa' as UUID,
-      transactionId: '3860bd34-229f-4da8-983e-f6160963cda6',
-      createdByUserType: 'user',
-      createdAt: '2025-10-10T13:16:40.334Z',
-      createdBy: '68e8bacf197c5cb688c4e0ee',
-      createdByRole: 'LOCAL_REGISTRAR',
-      createdAtLocation: 'a4a42ede-2226-4602-9b07-6b41514588d0' as UUID,
-      declaration: {
+      type: 'DUPLICATE_DETECTED',
+      user: {
+        role: 'LOCAL_REGISTRAR',
+        id: '68e37d2f026687a3debbe8c2'
+      },
+      declarationOverrides: {
         'applicant.dob': '1999-11-11',
         'applicant.name': {
           surname: 'Drinkwater',
@@ -1206,86 +1160,55 @@ const notDuplicateUpdateEvent: EventDocument = {
         'senior-pass.id': '23213213',
         'recommender.none': true,
         'applicant.image.label': ''
+      }
+    },
+    {
+      type: 'UNASSIGN'
+    },
+    {
+      type: 'ASSIGN',
+      user: {
+        assignedTo: '68e37d2f026687a3debbe8c2',
+        role: 'LOCAL_REGISTRAR',
+        id: '68e37d2f026687a3debbe8c2'
+      }
+    },
+    {
+      type: 'VALIDATE',
+      user: {
+        role: 'LOCAL_REGISTRAR',
+        id: '68e37d2f026687a3debbe8c2'
       },
-      annotation: {},
-      status: 'Accepted',
-      type: 'DUPLICATE_DETECTED',
-      content: { duplicates: [{ id: 'some-id' as UUID, trackingId: 'VZ7FXU' }] }
+      declarationOverrides: {
+        'applicant.dob': '1999-11-11',
+        'applicant.name': {
+          surname: 'Drinkwater',
+          firstname: 'Updated Danny', // updated when marked as not duplicate, should be visible in updated modal
+          middlename: ''
+        },
+        'senior-pass.id': '23213213',
+        'recommender.none': true,
+        'applicant.image.label': ''
+      }
     },
     {
-      id: '05d07a58-f36f-4a9f-aa1e-f58aaa30dd2e' as UUID,
-      transactionId: 'e5ab0fb6-b552-4b1f-8448-6ca694c06465',
-      createdByUserType: 'user',
-      createdAt: '2025-10-07T10:49:16.054Z',
-      createdBy: '68e37d2f026687a3debbe8c2',
-      createdByRole: 'LOCAL_REGISTRAR',
-      createdAtLocation: 'a9bc86bc-1021-4619-8207-e3539f5013b2' as UUID,
-      declaration: {},
-      status: 'Accepted',
       type: 'UNASSIGN'
     },
     {
-      id: '88d67032-3d6a-425e-b7c4-209e9e156981' as UUID,
-      transactionId: 'c24a41d7-83b5-48e5-84f9-797752949857',
-      createdByUserType: 'user',
-      createdAt: '2025-10-07T10:49:27.777Z',
-      createdBy: '68e37d2f026687a3debbe8c2',
-      createdByRole: 'LOCAL_REGISTRAR',
-      createdAtLocation: 'a9bc86bc-1021-4619-8207-e3539f5013b2' as UUID,
-      declaration: {},
-      annotation: {},
-      status: 'Accepted',
       type: 'ASSIGN',
-      assignedTo: '68e37d2f026687a3debbe8c2'
+      user: {
+        assignedTo: '68e37d2f026687a3debbe8c2',
+        role: 'LOCAL_REGISTRAR',
+        id: '68e37d2f026687a3debbe8c2'
+      }
     },
     {
-      id: '0d63b616-2dc3-4dde-b062-3b7b6810400d' as UUID,
-      transactionId: '3860bd34-229f-4da8-983e-f6160963cda6',
-      createdByUserType: 'user',
-      createdAt: '2025-10-10T13:16:41.994Z',
-      createdBy: '68e8bacf197c5cb688c4e0ee',
-      createdByRole: 'REGISTRATION_AGENT',
-      createdAtLocation: 'a4a42ede-2226-4602-9b07-6b41514588d0' as UUID,
-      declaration: {},
-      status: 'Accepted',
-      originalActionId: '18c64b98-77bf-49fd-84f5-e7130a2ec392' as UUID,
-      type: 'VALIDATE'
-    },
-    {
-      id: '53a673cd-281f-44ed-b8d3-2d3fd924cdb1' as UUID,
-      transactionId: '3860bd34-229f-4da8-983e-f6160963cda6',
-      createdByUserType: 'user',
-      createdAt: '2025-10-10T13:16:41.997Z',
-      createdBy: '68e8bacf197c5cb688c4e0ee',
-      createdByRole: 'REGISTRATION_AGENT',
-      createdAtLocation: 'a4a42ede-2226-4602-9b07-6b41514588d0' as UUID,
-      declaration: {},
-      status: 'Accepted',
-      type: 'UNASSIGN'
-    },
-    {
-      id: 'cebd8b25-9e03-4686-8dc2-f2404b27c7f0' as UUID,
-      transactionId: 'f9669152-c380-43a7-96fe-349aa2a5a2d3',
-      createdByUserType: 'user',
-      createdAt: '2025-10-10T13:16:54.195Z',
-      createdBy: '68e8bacf197c5cb688c4e0f6',
-      createdByRole: 'LOCAL_REGISTRAR',
-      createdAtLocation: 'a4a42ede-2226-4602-9b07-6b41514588d0' as UUID,
-      declaration: {},
-      annotation: {},
-      status: 'Accepted',
-      type: 'ASSIGN',
-      assignedTo: '68e8bacf197c5cb688c4e0f6'
-    },
-    {
-      id: 'f41251dc-1e56-49ba-a36d-6d4bd41e68c0' as UUID,
-      transactionId: 'a0b65404-ac2f-452a-968c-3fd5b2f26d40',
-      createdByUserType: 'user',
-      createdAt: '2025-10-10T13:16:59.571Z',
-      createdBy: '68e8bacf197c5cb688c4e0f6',
-      createdByRole: 'LOCAL_REGISTRAR',
-      createdAtLocation: 'a4a42ede-2226-4602-9b07-6b41514588d0' as UUID,
-      declaration: {
+      type: 'REGISTER',
+      user: {
+        role: 'LOCAL_REGISTRAR',
+        id: '68e37d2f026687a3debbe8c2'
+      },
+      declarationOverrides: {
         'applicant.dob': '1999-11-11',
         'applicant.name': {
           surname: 'Drinkwater',
@@ -1295,26 +1218,13 @@ const notDuplicateUpdateEvent: EventDocument = {
         'senior-pass.id': '23213213',
         'recommender.none': true,
         'applicant.image.label': ''
-      },
-      annotation: {},
-      status: 'Accepted',
-      type: 'REGISTER'
+      }
     },
     {
-      id: '89f477eb-fb67-4cc1-a9ab-ea65fa2337dd' as UUID,
-      transactionId: 'a0b65404-ac2f-452a-968c-3fd5b2f26d40',
-      createdByUserType: 'user',
-      createdAt: '2025-10-10T13:16:59.660Z',
-      createdBy: '68e8bacf197c5cb688c4e0f6',
-      createdByRole: 'LOCAL_REGISTRAR',
-      createdAtLocation: 'a4a42ede-2226-4602-9b07-6b41514588d0' as UUID,
-      declaration: {},
-      status: 'Accepted',
       type: 'UNASSIGN'
     }
-  ],
-  trackingId: 'VZ7FXU'
-} satisfies EventDocument
+  ]
+})
 
 const updateActionForNotDuplicateActions = expandWithUpdateActions(
   notDuplicateUpdateEvent,
@@ -1322,6 +1232,7 @@ const updateActionForNotDuplicateActions = expandWithUpdateActions(
   tennisClubMembershipEvent
 ).find((a) => a.type === DECLARATION_ACTION_UPDATE)
 
+// Should see updated name in the modal
 export const NotDuplicateOnDeclarationUpdate: Story = {
   args: {
     fullEvent: notDuplicateUpdateEvent,

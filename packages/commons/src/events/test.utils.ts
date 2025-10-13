@@ -870,8 +870,7 @@ export function generateActionDocument<T extends ActionType>({
 export function generateEventDocument({
   configuration,
   actions,
-  rng = () => 0.1,
-  user
+  rng = () => 0.1
 }: {
   configuration: EventConfig
   actions: {
@@ -880,15 +879,15 @@ export function generateEventDocument({
      * Overrides for default event state per action
      */
     declarationOverrides?: Partial<EventState>
+    user?: Partial<{
+      signature: string
+      primaryOfficeId: UUID
+      role: TestUserRole
+      id: string
+      assignedTo: string
+    }>
   }[]
   rng?: () => number
-  user?: Partial<{
-    signature: string
-    primaryOfficeId: UUID
-    role: TestUserRole
-    id: string
-    assignedTo: string
-  }>
 }): EventDocument {
   return {
     trackingId: getUUID(),
@@ -899,9 +898,10 @@ export function generateEventDocument({
         action: action.type,
         rng,
         defaults: {
-          createdBy: user?.id,
-          createdAtLocation: user?.primaryOfficeId,
-          assignedTo: user?.assignedTo
+          createdBy: action.user?.id,
+          createdAtLocation: action.user?.primaryOfficeId,
+          assignedTo: action.user?.assignedTo,
+          createdByRole: action.user?.role
         },
         declarationOverrides: action.declarationOverrides
       })
