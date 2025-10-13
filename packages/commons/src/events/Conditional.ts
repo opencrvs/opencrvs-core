@@ -32,7 +32,8 @@ export const Conditional = z
 export const ConditionalType = {
   SHOW: 'SHOW',
   ENABLE: 'ENABLE',
-  DISPLAY_ON_REVIEW: 'DISPLAY_ON_REVIEW'
+  DISPLAY_ON_REVIEW: 'DISPLAY_ON_REVIEW',
+  DISPLAY_ON_AUDIT_DETAILS: 'DISPLAY_ON_AUDIT_DETAILS'
 } as const
 
 export type ConditionalType =
@@ -90,6 +91,15 @@ export const DisplayOnReviewConditional = z
     "If 'DISPLAY_ON_REVIEW' conditional is defined, the component is shown on the review page only if both the 'DISPLAY_ON_REVIEW' and 'SHOW' conditions are met. This should only be used for fields within declaration forms, as they are the only ones with review pages."
   )
 
+export const DisplayOnAuditDetailsConditional = z
+  .object({
+    type: z.literal(ConditionalType.DISPLAY_ON_AUDIT_DETAILS),
+    conditional: Conditional
+  })
+  .describe(
+    "If 'DISPLAY_ON_AUDIT_DETAILS' conditional is defined, the component is shown on the audit detail modals only if the condition is met."
+  )
+
 /*
  * This needs to be exported so that Typescript can refer to the type in
  * the declaration output type. If it can't do that, you might start encountering
@@ -101,12 +111,14 @@ export type FieldConditionalType =
   | typeof ShowConditional
   | typeof EnableConditional
   | typeof DisplayOnReviewConditional
+  | typeof DisplayOnAuditDetailsConditional
 
 /** @knipignore */
 export type InferredFieldConditional =
   | z.infer<typeof ShowConditional>
   | z.infer<typeof EnableConditional>
   | z.infer<typeof DisplayOnReviewConditional>
+  | z.infer<typeof DisplayOnAuditDetailsConditional>
 
 export const FieldConditional = z
   .discriminatedUnion('type', [
@@ -115,7 +127,9 @@ export const FieldConditional = z
     // Field input can be shown to the user but as disabled
     EnableConditional,
     // Field output can be shown / hidden on the review page
-    DisplayOnReviewConditional
+    DisplayOnReviewConditional,
+    // Field output can be shown / hidden on the audit detail modals
+    DisplayOnAuditDetailsConditional
   ])
   .openapi({
     description: 'Field conditional configuration',
