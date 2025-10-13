@@ -42,12 +42,13 @@ export function EventOverviewLayout({
   const { searchEventById } = useEvents()
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(eventId)
+
+  const eventResults = searchEventById.useSuspenseQuery(eventId)
+
   const navigate = useNavigate()
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
-
-  const eventResults = searchEventById.useSuspenseQuery(eventId)
 
   if (eventResults.total === 0) {
     throw new Error(`Event details with id ${eventId} not found`)
