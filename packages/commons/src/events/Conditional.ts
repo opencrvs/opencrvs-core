@@ -32,8 +32,7 @@ export const Conditional = z
 export const ConditionalType = {
   SHOW: 'SHOW',
   ENABLE: 'ENABLE',
-  DISPLAY_ON_REVIEW: 'DISPLAY_ON_REVIEW',
-  DISPLAY_ON_AUDIT_DETAILS: 'DISPLAY_ON_AUDIT_DETAILS'
+  DISPLAY_ON_REVIEW: 'DISPLAY_ON_REVIEW'
 } as const
 
 export type ConditionalType =
