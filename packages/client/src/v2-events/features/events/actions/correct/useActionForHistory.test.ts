@@ -10,9 +10,10 @@
  */
 
 import {
+  ActionTypes,
   generateEventDocument,
   tennisClubMembershipEvent,
-  UUID
+  TestUserRole
 } from '@opencrvs/commons/client'
 import { getTestValidatorContext } from '../../../../../../.storybook/decorators'
 import {
@@ -36,52 +37,52 @@ const eventCreatedByRegAgent = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [
     {
-      type: 'CREATE',
+      type: ActionTypes.enum.CREATE,
       user: {
-        role: 'REGISTRATION_AGENT',
-        id: '68e8bacf197c5cb688c4e0ee' as UUID
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        id: '68e8bacf197c5cb688c4e0ee'
       }
     },
     {
-      type: 'ASSIGN',
+      type: ActionTypes.enum.ASSIGN,
       user: {
-        role: 'REGISTRATION_AGENT',
-        id: '68e8bacf197c5cb688c4e0ee' as UUID
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        id: '68e8bacf197c5cb688c4e0ee'
       }
     },
     {
-      type: 'DECLARE',
+      type: ActionTypes.enum.DECLARE,
       declarationOverrides: DECLARATION_ACTION_DETAILS,
       user: {
-        role: 'REGISTRATION_AGENT',
-        id: '68e8bacf197c5cb688c4e0ee' as UUID
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        id: '68e8bacf197c5cb688c4e0ee'
       }
     },
     {
-      type: 'VALIDATE',
+      type: ActionTypes.enum.VALIDATE,
       declarationOverrides: DECLARATION_ACTION_DETAILS,
       user: {
-        role: 'REGISTRATION_AGENT',
-        id: '68e8bacf197c5cb688c4e0ee' as UUID
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        id: '68e8bacf197c5cb688c4e0ee'
       }
     },
-    { type: 'UNASSIGN' },
+    { type: ActionTypes.enum.UNASSIGN },
     {
-      type: 'ASSIGN',
+      type: ActionTypes.enum.ASSIGN,
       user: {
-        role: 'LOCAL_REGISTRAR',
-        id: '68e8bacf197c5cb688c4e0f6' as UUID
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: '68e8bacf197c5cb688c4e0f6'
       }
     },
     {
-      type: 'REGISTER',
+      type: ActionTypes.enum.REGISTER,
       declarationOverrides: DECLARATION_ACTION_DETAILS,
       user: {
-        role: 'LOCAL_REGISTRAR',
-        id: '68e8bacf197c5cb688c4e0f6' as UUID
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: '68e8bacf197c5cb688c4e0f6'
       }
     },
-    { type: 'UNASSIGN' }
+    { type: ActionTypes.enum.UNASSIGN }
   ]
 })
 
