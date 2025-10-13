@@ -14,13 +14,10 @@ import React, { useEffect } from 'react'
 import { Formik } from 'formik'
 import { isEqual, noop } from 'lodash'
 import {
-  DataField,
   EventConfig,
   EventState,
   FieldConfig,
-  FieldType,
   FieldValue,
-  getDeclarationFields,
   InteractiveFieldType,
   isNonInteractiveFieldType,
   joinValues,
@@ -34,7 +31,6 @@ import {
 } from '@client/v2-events/components/forms/utils'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
 import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
-import { getDataFieldValues } from '@client/v2-events/features/events/registered-fields/Data'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -131,26 +127,11 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
       onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
 
     const systemVariables = useSystemVariables()
-    const initialValuesWithDefaults = {
-      ...mapFieldsToValues(fields, systemVariables),
-      ...initialValues
-    }
-
-    // Data fields are a special case, because:
-    //   1. They are read-only, but still the values need to be saved as part of the form
-    //   2. They don't use defaultValues
-    const dataFieldInitialValues = eventConfig
-      ? getDataFieldValues(
-          fields.filter((f): f is DataField => f.type === FieldType.DATA),
-          initialValuesWithDefaults,
-          getDeclarationFields(eventConfig)
-        )
-      : {}
 
     const formikCompatibleInitialValues =
       makeFormFieldIdsFormikCompatible<FieldValue>({
-        ...dataFieldInitialValues,
-        ...initialValuesWithDefaults
+        ...mapFieldsToValues(fields, systemVariables),
+        ...initialValues
       })
 
     return (

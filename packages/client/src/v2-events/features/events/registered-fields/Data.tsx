@@ -22,8 +22,7 @@ import {
   StaticDataEntry,
   EventConfig,
   getDeclarationFields,
-  FieldValue,
-  DataEntry
+  FieldValue
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -102,14 +101,28 @@ const Subtitle = styled.div`
   margin: 0 0 2rem;
 `
 
-function getDataFields(
-  data: DataEntry[],
-  formData: EventState,
+/**
+ * This is a read-only form field, which is used to display a collection of data, which can be either:
+ *  1. static text entries
+ *  2. or entries derived from main declaration form data via 'fieldId' references
+ */
+function DataInput({
+  configuration,
+  label,
+  formData,
+  declarationFields,
+  onChange
+}: FieldProps<'DATA'> & {
+  formData: EventState
   declarationFields: FieldConfig[]
-): { value: FieldValue; config: FieldConfig }[] {
+  onChange: (value: DataFieldValue) => void
+}) {
   const intl = useIntl()
+  const validatorContext = useValidatorContext()
+  const { subtitle, data } = configuration
+  const title = label.defaultMessage ? intl.formatMessage(label) : ''
 
-  return data.map((entry) => {
+  const fields = data.map((entry) => {
     if ('fieldId' in entry) {
       const config = declarationFields.find((f) => f.id === entry.fieldId)
 
@@ -131,59 +144,21 @@ function getDataFields(
       entry
     })
   })
-}
 
-function getDataFieldValue(
-  data: DataEntry[],
-  formData: EventState,
-  declarationFields: FieldConfig[]
-) {
-  const fields = getDataFields(data, formData, declarationFields)
-  return fields.reduce((acc, f) => {
-    if (f.value === null || f.value === undefined) {
-      return acc
-    }
+  // When we first render the field, let's save the values of the fields to the form data.
+  // This is done because we want to send the values to the backend, so that they can be displayed in the Output later.
+  useEffect(() => {
+    const value = fields.reduce((acc, f) => {
+      if (f.value === null || f.value === undefined) {
+        return acc
+      }
 
-    return { ...acc, [f.config.id]: f.value }
-  }, {})
-}
+      return { ...acc, [f.config.id]: f.value }
+    }, {})
 
-export function getDataFieldValues(
-  fields: DataField[],
-  formData: EventState,
-  declarationFields: FieldConfig[]
-) {
-  return fields.reduce((acc, f) => {
-    return {
-      ...acc,
-      [f.id]: getDataFieldValue(
-        f.configuration.data,
-        formData,
-        declarationFields
-      )
-    }
-  }, {})
-}
-
-/**
- * This is a read-only form field, which is used to display a collection of data, which can be either:
- *  1. static text entries
- *  2. or entries derived from main declaration form data via 'fieldId' references
- */
-function DataInput({
-  configuration,
-  label,
-  formData,
-  declarationFields
-}: FieldProps<'DATA'> & {
-  formData: EventState
-  declarationFields: FieldConfig[]
-}) {
-  const intl = useIntl()
-  const validatorContext = useValidatorContext()
-  const { subtitle } = configuration
-  const title = label.defaultMessage ? intl.formatMessage(label) : ''
-  const fields = getDataFields(configuration.data, formData, declarationFields)
+    onChange(value)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <Container>
