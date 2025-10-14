@@ -210,28 +210,32 @@ export function getDeclarationComparison(
     eventConfiguration
   ).declaration
 
-  const updatedValues: Record<string, unknown> = {}
-  const oldValues: Record<string, unknown> = {}
-
-  declarationConfig.pages.flatMap((page) =>
-    page.fields
-      .filter((field) =>
+  const { updatedValues, oldValues } = declarationConfig.pages
+    .flatMap((page) =>
+      page.fields.filter((field) =>
         isFieldDisplayedOnReview(field, latestDeclaration, validatorContext)
       )
-      .map((f) => {
-        const hasChanged = hasFieldChanged(
-          f,
-          latestDeclaration,
-          previousDeclaration,
-          validatorContext
-        )
-        if (hasChanged) {
-          // Collect changed values for changed fields only
-          updatedValues[f.id] = latestDeclaration[f.id]
-          oldValues[f.id] = previousDeclaration[f.id]
+    )
+    .reduce<{
+      updatedValues: Record<string, unknown>
+      oldValues: Record<string, unknown>
+    }>(
+      (acc, f) => {
+        if (
+          hasFieldChanged(
+            f,
+            latestDeclaration,
+            previousDeclaration,
+            validatorContext
+          )
+        ) {
+          acc.updatedValues[f.id] = latestDeclaration[f.id]
+          acc.oldValues[f.id] = previousDeclaration[f.id]
         }
-      })
-  )
+        return acc
+      },
+      { updatedValues: {}, oldValues: {} }
+    )
 
   return {
     valueHasChanged: !_.isEmpty(updatedValues),
