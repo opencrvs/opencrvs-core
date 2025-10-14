@@ -1,5 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`getAvailableActions returns the correct actions for "DECLARED" status with a "declared:requested" flag 1`] = `
+[
+  "READ",
+]
+`;
+
+exports[`getAvailableActions returns the correct actions for "REGISTERED" status with a "registered:requested" flag 1`] = `
+[
+  "READ",
+]
+`;
+
 exports[`getAvailableActions should return the correct actions for "ARCHIVED" status with no flags 1`] = `
 [
   "READ",
@@ -50,6 +62,12 @@ exports[`getAvailableActions should return the correct actions for "NOTIFIED" st
   "DECLARE",
   "NOTIFY",
   "ARCHIVE",
+]
+`;
+
+exports[`getAvailableActions should return the correct actions for "REGISTERED" status with "registered:requested" correction-requested flag 1`] = `
+[
+  "READ",
 ]
 `;
 
