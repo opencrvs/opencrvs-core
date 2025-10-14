@@ -19,12 +19,12 @@ import { Plus } from '@opencrvs/components/src/icons'
 import { ActionType, isActionInScope } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
-import { advancedSearchMessages } from '@client/v2-events/features/events/Search/AdvancedSearch'
 import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useAllWorkqueueConfigurations } from '@client/v2-events/features/events/useAllWorkqueueConfigurations'
 import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { emptyMessage } from '@client/v2-events/utils'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
 
@@ -87,10 +87,7 @@ export function WorkqueueLayout({
             </Button>
           }
           mobileTitle={
-            title ??
-            intl.formatMessage(
-              workqueueConfig?.name ?? advancedSearchMessages.advancedSearch
-            )
+            title ?? intl.formatMessage(workqueueConfig?.name ?? emptyMessage)
           }
         />
       }
