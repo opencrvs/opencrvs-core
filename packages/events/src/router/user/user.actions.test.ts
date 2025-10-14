@@ -26,7 +26,7 @@ import {
 } from '@events/tests/utils'
 import { mswServer } from '../../tests/msw'
 
-test('Throws error if user does not required scope', async () => {
+test('Throws error if user does not have required scope', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -62,6 +62,17 @@ test('Throws error when accessing user in different office with my office scope'
 test('Throws error when accessing oneself user without my audit scope', async () => {
   const { users } = await setupTestCase()
   const client = createTestClient(users[0])
+
+  await expect(
+    client.user.actions({
+      userId: users[1].id
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'NOT_FOUND' }))
+})
+
+test('Throws error when accessing oneself user with scope for own audit', async () => {
+  const { users } = await setupTestCase()
+  const client = createTestClient(users[0], [SCOPES.USER_READ_ONLY_MY_AUDIT])
 
   await expect(
     client.user.actions({

@@ -363,7 +363,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
-  // @TODO: Check if there is a need to allow  users to read other systems
+  // Not supported for system users
   if (otherUser.type === TokenUserType.Enum.system) {
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
@@ -398,7 +398,10 @@ export const userCanReadOtherUser: MiddlewareFunction<
     return next()
   }
 
-  if (hasScope(token, SCOPES.USER_READ_ONLY_MY_AUDIT)) {
+  if (
+    hasScope(token, SCOPES.USER_READ_ONLY_MY_AUDIT) &&
+    userReading.id === otherUser.id
+  ) {
     return next()
   }
 
