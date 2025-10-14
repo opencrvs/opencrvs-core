@@ -268,7 +268,7 @@ export const NoResults: Story = {
 const createdEvent = {
   ...generateEventDocument({
     configuration: tennisClubMembershipEvent,
-    actions: [ActionType.CREATE]
+    actions: [{ type: ActionType.CREATE }]
   })
 }
 

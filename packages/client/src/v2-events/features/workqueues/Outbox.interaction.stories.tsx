@@ -33,7 +33,7 @@ const generator = testDataGenerator()
 
 const declareEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
 })
 
 const meta: Meta<typeof ReviewIndex> = {
@@ -54,7 +54,7 @@ const OUTBOX_FREEZE_TIME = 5 * 1000 // 5 seconds
 
 const createdEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [{ type: ActionType.CREATE }]
 })
 
 type Story = StoryObj<typeof ReviewIndex>
