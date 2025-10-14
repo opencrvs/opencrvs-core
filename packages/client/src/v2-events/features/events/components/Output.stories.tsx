@@ -113,6 +113,65 @@ export const TextOutputWithPreviousValue: Story = {
   }
 }
 
+export const NumberOutput: Story = {
+  args: {
+    value: 5,
+    field: {
+      type: FieldType.NUMBER,
+      id: 'applicant.firstname',
+      label: {
+        id: 'applicant.firstname',
+        defaultMessage: 'First name',
+        description: 'The first name of the applicant'
+      }
+    }
+  }
+}
+
+export const NumberOutputWithPostfix: Story = {
+  args: {
+    value: 5,
+    field: {
+      type: FieldType.NUMBER,
+      id: 'applicant.firstname',
+      label: {
+        id: 'applicant.firstname',
+        defaultMessage: 'First name',
+        description: 'The first name of the applicant'
+      },
+      configuration: {
+        postfix: {
+          defaultMessage: ' grammes',
+          description: 'This is the postfix for the weight field',
+          id: 'event.birth.action.declare.form.section.child.field.weightAtBirth.postfix'
+        }
+      }
+    }
+  }
+}
+
+export const NumberOutputValueUndefinedWithPostfix: Story = {
+  args: {
+    value: undefined,
+    field: {
+      type: FieldType.NUMBER,
+      id: 'applicant.firstname',
+      label: {
+        id: 'applicant.firstname',
+        defaultMessage: 'First name',
+        description: 'The first name of the applicant'
+      },
+      configuration: {
+        postfix: {
+          defaultMessage: ' grammes',
+          description: 'This is the postfix for the weight field',
+          id: 'event.birth.action.declare.form.section.child.field.weightAtBirth.postfix'
+        }
+      }
+    }
+  }
+}
+
 export const CheckboxOutput: Story = {
   args: {
     value: true,

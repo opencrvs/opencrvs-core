@@ -223,7 +223,8 @@ function getUserIdByRole(role: UserRoles) {
 
 export function getMockEvent(
   actions: (keyof ReturnType<typeof getMockActions>)[],
-  role: UserRoles
+  role: UserRoles,
+  requested?: ActionType
 ): EventDocument {
   const userId = getUserIdByRole(role)
 
@@ -242,6 +243,10 @@ export function getMockEvent(
           action === AssignmentStatus.ASSIGNED_TO_SELF
         ) {
           mockAction.assignedTo = userId
+        }
+
+        if (action === requested) {
+          mockAction.status = ActionStatus.Requested
         }
 
         return mockAction
@@ -288,6 +293,8 @@ export interface Scenario {
   name: string
   recordDownloaded: boolean
   actions: (keyof ReturnType<typeof getMockActions>)[]
+  /** Sets the given ActionType as `requested` to mock async flows */
+  requested?: ActionType
   expected: Partial<Record<DisplayableAction, AssertType>>
 }
 
@@ -318,7 +325,7 @@ export function createStoriesFromScenarios(
   role: UserRoles
 ): Record<string, StoryObj<typeof ActionMenu>> {
   return scenarios.reduce(
-    (acc, { name, actions, expected, recordDownloaded }) => {
+    (acc, { name, actions, expected, recordDownloaded, requested }) => {
       // Because Validate, Register and Review correction both have same message ('Review'),
       // We need to consider them as one
       const reviewLikeActions: (keyof typeof expected)[] = [
@@ -345,7 +352,7 @@ export function createStoriesFromScenarios(
         }
       }
 
-      const event = getMockEvent(actions, role)
+      const event = getMockEvent(actions, role, requested)
       acc[name] = {
         loaders: [
           async () => {
