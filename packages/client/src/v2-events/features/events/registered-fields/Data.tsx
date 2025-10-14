@@ -269,8 +269,11 @@ function DataOutput({
     <>
       {entries.map(({ label, valueDisplay, id }) => (
         <div key={`${field.id}-${id}`}>
-          <b>{intl.formatMessage(label)}</b>
-          <div>{valueDisplay}</div>
+          <b>
+            {intl.formatMessage(label)}
+            {': '}
+          </b>
+          {valueDisplay}
         </div>
       ))}
     </>
