@@ -15,17 +15,16 @@ import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/fo
 import { Number, NumberInputProps } from './Number'
 
 interface AgeInputProps extends Omit<NumberInputProps, 'min' | 'onChange'> {
-  asOfDateRef?: string
+  asOfDateRef: string
   onChange(val: AgeValue | undefined): void
 }
 
 function AgeInput({ asOfDateRef, ...props }: AgeInputProps) {
   const { values } = useFormikContext<EventState>()
 
-  const asOfDate =
-    asOfDateRef &&
-    DateValue.safeParse(values[makeFormFieldIdFormikCompatible(asOfDateRef)])
-      .data
+  const asOfDate = DateValue.safeParse(
+    values[makeFormFieldIdFormikCompatible(asOfDateRef)]
+  ).data
 
   return (
     <Number.Input
