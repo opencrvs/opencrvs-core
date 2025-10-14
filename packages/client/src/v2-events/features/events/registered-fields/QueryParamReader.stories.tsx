@@ -20,7 +20,7 @@ import {
   never
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { FormFieldGenerator } from '../FormFieldGenerator'
+import { FormFieldGenerator } from '../../../components/forms/FormFieldGenerator'
 import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 interface Args {

@@ -261,3 +261,4 @@ export const Action = z.union([ActionDocument, AsyncRejectActionDocument])
 export type Action = ActionDocument | AsyncRejectActionDocument
 
 export type CreatedAction = z.infer<typeof CreatedAction>
+export type AssignedAction = z.infer<typeof AssignedAction>

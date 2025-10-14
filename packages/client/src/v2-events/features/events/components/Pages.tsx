@@ -71,7 +71,10 @@ export function Pages({
   validatorContext
 }: PagesProps & DeclarationProps) {
   const intl = useIntl()
-  const visiblePages = formPages.filter((page) => isPageVisible(page, form))
+  const visiblePages = formPages.filter((page) =>
+    isPageVisible(page, form, validatorContext)
+  )
+
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
   const page = pageIdx === -1 ? visiblePages[0] : visiblePages[pageIdx]
   const [validateAllFields, setValidateAllFields] = useState(false)

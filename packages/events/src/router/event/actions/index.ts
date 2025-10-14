@@ -342,7 +342,7 @@ export function getDefaultActionProcedures(
       .use(middleware.requireLocationForSystemUserAction)
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
-        const { token, user, isDuplicateAction, duplicates } = ctx
+        const { token, user, existingAction, duplicates } = ctx
         const { eventId } = input
         const event = await getEventById(eventId)
         const eventConfiguration = await getEventConfigurationById({
@@ -350,7 +350,7 @@ export function getDefaultActionProcedures(
           eventType: event.type
         })
 
-        if (isDuplicateAction) {
+        if (existingAction) {
           return ctx.event
         }
 
