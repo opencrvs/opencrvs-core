@@ -156,14 +156,16 @@ function DeclarationComparisonTableComponent({
 
   // Collect all changed review fields once
   const changedAnnotationFields = reviewFormFields
-    .filter(
-      (f) =>
-        getAnnotationComparisonForField(f, fullEvent, index, validatorContext)
-          .valueHasChanged
-    )
     .map((f) => {
-      const { currentAnnotations, previousAnnotations } =
-        getAnnotationComparisonForField(f, fullEvent, index, validatorContext)
+      const comparison = getAnnotationComparisonForField(
+        f,
+        fullEvent,
+        index,
+        validatorContext
+      )
+
+      const { currentAnnotations, previousAnnotations, valueHasChanged } =
+        comparison
 
       const previous = (
         <Output
@@ -186,9 +188,11 @@ function DeclarationComparisonTableComponent({
       return {
         fieldLabel: intl.formatMessage(f.label),
         latest,
-        previous
+        previous,
+        valueHasChanged
       }
     })
+    .filter((item) => item.valueHasChanged)
 
   return (
     <>
