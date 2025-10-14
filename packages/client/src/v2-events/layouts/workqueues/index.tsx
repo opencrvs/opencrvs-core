@@ -74,6 +74,7 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
           mobileLeft={<Hamburger />}
           mobileRight={
             <Button
+              aria-label="Go to search"
               type={'icon'}
               onClick={() => navigate(ROUTES.V2.SEARCH.buildPath({}))}
             >
