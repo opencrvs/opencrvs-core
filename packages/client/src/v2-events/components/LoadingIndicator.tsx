@@ -80,10 +80,10 @@ const MobileViewContainer = styled.div<{ noDeclaration?: boolean }>`
 
 type LoadingIndicatorCompProps = {
   loading: boolean
+  isOnline: boolean
   hasError?: boolean
   noDeclaration?: boolean
-} & IntlShapeProps &
-  OnlineStatusProps
+} & IntlShapeProps
 
 function LoadingIndicatorComp({
   loading,
@@ -116,10 +116,6 @@ function LoadingIndicatorComp({
       </MobileViewContainer>
     </Wrapper>
   )
-}
-
-export interface OnlineStatusProps {
-  isOnline: boolean
 }
 
 export function withOnlineStatus<ComponentProps>(
