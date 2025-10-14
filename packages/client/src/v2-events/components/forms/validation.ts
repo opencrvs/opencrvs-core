@@ -108,7 +108,7 @@ export function validationErrorsInActionFormExist({
   )
 
   const hasValidationErrors = formConfig.pages
-    .filter((page) => isPageVisible(page, form))
+    .filter((page) => isPageVisible(page, form, context))
     .some((page) => {
       const fieldErrors = getValidationErrorsForForm(
         page.fields,

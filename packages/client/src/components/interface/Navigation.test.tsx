@@ -621,78 +621,9 @@ describe('Given a user with scopes views Navigation', () => {
   })
 
   describe('Dashboard', async () => {
-    const id = `#navigation_${WORKQUEUE_TABS.dashboard}`
+    const id = `#navigation_${WORKQUEUE_TABS.dashboard}_test`
 
     const requiredScopes = [SCOPES.PERFORMANCE_READ_DASHBOARDS] as Scope[]
-
-    const allOtherScopes = allScopes.filter(
-      (scope) => !requiredScopes.includes(scope)
-    )
-
-    const tests = [
-      [requiredScopes, true],
-      [allOtherScopes, false]
-    ]
-
-    tests.forEach(async ([scopes, exists]) => {
-      it(`should render when user has correct scopes ${scopes}`, async () => {
-        setScopes(scopes as Scope[], store)
-        testComponent = await build()
-        expect(testComponent.exists(id)).toBe(exists)
-      })
-    })
-  })
-
-  describe('Statistics', async () => {
-    const id = `#navigation_${WORKQUEUE_TABS.statistics}`
-
-    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
-
-    const allOtherScopes = allScopes.filter(
-      (scope) => !requiredScopes.includes(scope)
-    )
-
-    const tests = [
-      [requiredScopes, true],
-      [allOtherScopes, false]
-    ]
-
-    tests.forEach(async ([scopes, exists]) => {
-      it(`should render when user has correct scopes ${scopes}`, async () => {
-        setScopes(scopes as Scope[], store)
-        testComponent = await build()
-        expect(testComponent.exists(id)).toBe(exists)
-      })
-    })
-  })
-
-  describe('Statistics', async () => {
-    const id = `#navigation_${WORKQUEUE_TABS.statistics}`
-
-    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
-
-    const allOtherScopes = allScopes.filter(
-      (scope) => !requiredScopes.includes(scope)
-    )
-
-    const tests = [
-      [requiredScopes, true],
-      [allOtherScopes, false]
-    ]
-
-    tests.forEach(async ([scopes, exists]) => {
-      it(`should render when user has correct scopes ${scopes}`, async () => {
-        setScopes(scopes as Scope[], store)
-        testComponent = await build()
-        expect(testComponent.exists(id)).toBe(exists)
-      })
-    })
-  })
-
-  describe('Statistics', async () => {
-    const id = `#navigation_${WORKQUEUE_TABS.leaderboards}`
-
-    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
