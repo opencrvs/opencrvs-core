@@ -238,11 +238,6 @@ function getDataOutputEntry(
   }
 }
 
-const LabelCell = styled.td`
-  ${({ theme }) => theme.fonts.bold16};
-  padding-right: 8px;
-`
-
 /**
  * Output for FieldType.DATA fields will return a fragment which contains rows of data entries.
  */
@@ -271,14 +266,17 @@ function DataOutput({
   }
 
   return (
-    <table>
+    <>
       {entries.map(({ label, valueDisplay, id }) => (
-        <tr key={`${field.id}-${id}`}>
-          <LabelCell>{intl.formatMessage(label)}</LabelCell>
-          <td>{valueDisplay}</td>
-        </tr>
+        <div key={`${field.id}-${id}`}>
+          <b>
+            {intl.formatMessage(label)}
+            {': '}
+          </b>
+          {valueDisplay}
+        </div>
       ))}
-    </table>
+    </>
   )
 }
 
