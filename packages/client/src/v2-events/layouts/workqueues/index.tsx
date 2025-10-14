@@ -58,7 +58,13 @@ export function DesktopCenter() {
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
-export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
+export function WorkqueueLayout({
+  children,
+  title
+}: {
+  children: React.ReactNode
+  title?: string
+}) {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const navigate = useNavigate()
   const intl = useIntl()
@@ -80,9 +86,12 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
               <Icon color="primary" name="MagnifyingGlass" size="medium" />
             </Button>
           }
-          mobileTitle={intl.formatMessage(
-            workqueueConfig?.name ?? advancedSearchMessages.advancedSearch
-          )}
+          mobileTitle={
+            title ??
+            intl.formatMessage(
+              workqueueConfig?.name ?? advancedSearchMessages.advancedSearch
+            )
+          }
         />
       }
       navigation={<Sidebar key={workqueueSlug} />}
