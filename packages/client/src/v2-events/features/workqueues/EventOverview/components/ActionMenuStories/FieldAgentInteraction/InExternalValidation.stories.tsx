@@ -26,7 +26,7 @@ export default {
   title: 'ActionMenu/FieldAgent/InExternalValidation'
 } as Meta<typeof ActionMenu>
 
-const inExternalValidationScenariosForRegistrationAgent: Scenario[] = [
+const inExternalValidationScenariosForFieldAgent: Scenario[] = [
   {
     name: 'Unassigned',
     recordDownloaded: true,
@@ -47,8 +47,8 @@ const inExternalValidationScenariosForRegistrationAgent: Scenario[] = [
 ]
 
 const stories = createStoriesFromScenarios(
-  inExternalValidationScenariosForRegistrationAgent,
+  inExternalValidationScenariosForFieldAgent,
   UserRoles.FIELD_AGENT
 )
 
-export const AssignedToSelf = stories['AssignedToSelf']
+export const Unassigned = stories['Unassigned']
