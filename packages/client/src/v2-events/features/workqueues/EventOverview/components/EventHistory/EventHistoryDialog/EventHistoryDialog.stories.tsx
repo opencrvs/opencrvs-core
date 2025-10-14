@@ -21,12 +21,14 @@ import {
   getRandomDatetime,
   UUID,
   EventDocument,
-  generateEventDocument
+  generateEventDocument,
+  TestUserRole
 } from '@opencrvs/commons/client'
 import {
   DECLARATION_ACTION_UPDATE,
   expandWithUpdateActions
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import { getTestValidatorContext } from '../../../../../../../../.storybook/decorators'
 import { EventHistoryDialog } from './EventHistoryDialog'
 
@@ -1071,29 +1073,30 @@ export const RegisteredOnDeclarationUpdate: Story = {
   }
 }
 
+const generator = testDataGenerator()
 const notDuplicateUpdateEvent = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [
     {
-      type: 'CREATE',
+      type: ActionType.CREATE,
       user: {
-        role: 'REGISTRATION_AGENT',
-        id: '68e8bacf197c5cb688c4e0ee'
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        id: generator.user.id.registrationAgent
       }
     },
     {
-      type: 'ASSIGN',
+      type: ActionType.ASSIGN,
       user: {
-        role: 'REGISTRATION_AGENT',
-        id: '68e8bacf197c5cb688c4e0ee',
-        assignedTo: '68e8bacf197c5cb688c4e0ee'
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        id: generator.user.id.registrationAgent,
+        assignedTo: generator.user.id.registrationAgent
       }
     },
     {
-      type: 'DECLARE',
+      type: ActionType.DECLARE,
       user: {
-        role: 'REGISTRATION_AGENT',
-        id: '68e8bacf197c5cb688c4e0ee'
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        id: generator.user.id.registrationAgent
       },
       declarationOverrides: {
         'applicant.dob': '1999-11-11',
@@ -1108,10 +1111,10 @@ const notDuplicateUpdateEvent = generateEventDocument({
       }
     },
     {
-      type: 'DUPLICATE_DETECTED',
+      type: ActionType.DUPLICATE_DETECTED,
       user: {
-        role: 'REGISTRATION_AGENT',
-        id: '68e8bacf197c5cb688c4e0ee'
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        id: generator.user.id.registrationAgent
       },
       declarationOverrides: {
         'applicant.dob': '1999-11-11',
@@ -1126,29 +1129,29 @@ const notDuplicateUpdateEvent = generateEventDocument({
       }
     },
     {
-      type: 'UNASSIGN'
+      type: ActionType.UNASSIGN
     },
     {
-      type: 'ASSIGN',
+      type: ActionType.ASSIGN,
       user: {
-        assignedTo: '68e37d2f026687a3debbe8c2',
-        role: 'LOCAL_REGISTRAR',
-        id: '68e37d2f026687a3debbe8c2'
+        assignedTo: generator.user.id.localRegistrar,
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: generator.user.id.localRegistrar
       }
     },
     {
-      type: 'MARK_AS_NOT_DUPLICATE',
+      type: ActionType.MARK_AS_NOT_DUPLICATE,
       user: {
-        assignedTo: '68e37d2f026687a3debbe8c2',
-        role: 'LOCAL_REGISTRAR',
-        id: '68e37d2f026687a3debbe8c2'
+        assignedTo: generator.user.id.localRegistrar,
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: generator.user.id.localRegistrar
       }
     },
     {
-      type: 'DUPLICATE_DETECTED',
+      type: ActionType.DUPLICATE_DETECTED,
       user: {
-        role: 'LOCAL_REGISTRAR',
-        id: '68e37d2f026687a3debbe8c2'
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: generator.user.id.localRegistrar
       },
       declarationOverrides: {
         'applicant.dob': '1999-11-11',
@@ -1163,21 +1166,21 @@ const notDuplicateUpdateEvent = generateEventDocument({
       }
     },
     {
-      type: 'UNASSIGN'
+      type: ActionType.UNASSIGN
     },
     {
-      type: 'ASSIGN',
+      type: ActionType.ASSIGN,
       user: {
-        assignedTo: '68e37d2f026687a3debbe8c2',
-        role: 'LOCAL_REGISTRAR',
-        id: '68e37d2f026687a3debbe8c2'
+        assignedTo: generator.user.id.localRegistrar,
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: generator.user.id.localRegistrar
       }
     },
     {
-      type: 'VALIDATE',
+      type: ActionType.VALIDATE,
       user: {
-        role: 'LOCAL_REGISTRAR',
-        id: '68e37d2f026687a3debbe8c2'
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: generator.user.id.localRegistrar
       },
       declarationOverrides: {
         'applicant.dob': '1999-11-11',
@@ -1192,21 +1195,21 @@ const notDuplicateUpdateEvent = generateEventDocument({
       }
     },
     {
-      type: 'UNASSIGN'
+      type: ActionType.UNASSIGN
     },
     {
-      type: 'ASSIGN',
+      type: ActionType.ASSIGN,
       user: {
-        assignedTo: '68e37d2f026687a3debbe8c2',
-        role: 'LOCAL_REGISTRAR',
-        id: '68e37d2f026687a3debbe8c2'
+        assignedTo: generator.user.id.localRegistrar,
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: generator.user.id.localRegistrar
       }
     },
     {
-      type: 'REGISTER',
+      type: ActionType.REGISTER,
       user: {
-        role: 'LOCAL_REGISTRAR',
-        id: '68e37d2f026687a3debbe8c2'
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: generator.user.id.localRegistrar
       },
       declarationOverrides: {
         'applicant.dob': '1999-11-11',
@@ -1221,7 +1224,7 @@ const notDuplicateUpdateEvent = generateEventDocument({
       }
     },
     {
-      type: 'UNASSIGN'
+      type: ActionType.UNASSIGN
     }
   ]
 })

@@ -15,6 +15,7 @@ import {
   tennisClubMembershipEvent,
   TestUserRole
 } from '@opencrvs/commons/client'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import { getTestValidatorContext } from '../../../../../../.storybook/decorators'
 import {
   DECLARATION_ACTION_UPDATE,
@@ -33,6 +34,7 @@ const DECLARATION_ACTION_DETAILS = {
   'applicant.image.label': ''
 }
 
+const generator = testDataGenerator()
 const eventCreatedByRegAgent = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [
@@ -40,14 +42,14 @@ const eventCreatedByRegAgent = generateEventDocument({
       type: ActionTypes.enum.CREATE,
       user: {
         role: TestUserRole.enum.REGISTRATION_AGENT,
-        id: '68e8bacf197c5cb688c4e0ee'
+        id: generator.user.id.registrationAgent
       }
     },
     {
       type: ActionTypes.enum.ASSIGN,
       user: {
         role: TestUserRole.enum.REGISTRATION_AGENT,
-        id: '68e8bacf197c5cb688c4e0ee'
+        id: generator.user.id.registrationAgent
       }
     },
     {
@@ -55,7 +57,7 @@ const eventCreatedByRegAgent = generateEventDocument({
       declarationOverrides: DECLARATION_ACTION_DETAILS,
       user: {
         role: TestUserRole.enum.REGISTRATION_AGENT,
-        id: '68e8bacf197c5cb688c4e0ee'
+        id: generator.user.id.registrationAgent
       }
     },
     {
@@ -63,7 +65,7 @@ const eventCreatedByRegAgent = generateEventDocument({
       declarationOverrides: {},
       user: {
         role: TestUserRole.enum.REGISTRATION_AGENT,
-        id: '68e8bacf197c5cb688c4e0ee'
+        id: generator.user.id.registrationAgent
       }
     },
     { type: ActionTypes.enum.UNASSIGN },
@@ -71,7 +73,7 @@ const eventCreatedByRegAgent = generateEventDocument({
       type: ActionTypes.enum.ASSIGN,
       user: {
         role: TestUserRole.enum.LOCAL_REGISTRAR,
-        id: '68e8bacf197c5cb688c4e0f6'
+        id: generator.user.id.localRegistrar
       }
     },
     {
@@ -79,7 +81,7 @@ const eventCreatedByRegAgent = generateEventDocument({
       declarationOverrides: {},
       user: {
         role: TestUserRole.enum.LOCAL_REGISTRAR,
-        id: '68e8bacf197c5cb688c4e0f6'
+        id: generator.user.id.localRegistrar
       }
     },
     { type: ActionTypes.enum.UNASSIGN }
