@@ -41,7 +41,7 @@ function QrReaderInput(props: QrReaderInputProps) {
         }
       }}
       validator={props.configuration?.validator}
-      onScan={(data) => props.onChange(data)}
+      onScan={(data) => props.onChange({ data })}
     />
   )
 }
