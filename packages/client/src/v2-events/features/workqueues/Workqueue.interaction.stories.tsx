@@ -314,7 +314,7 @@ function generateDraft() {
   const createdEvent = {
     ...generateEventDocument({
       configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE]
+      actions: [{ type: ActionType.CREATE }]
     })
   }
 
