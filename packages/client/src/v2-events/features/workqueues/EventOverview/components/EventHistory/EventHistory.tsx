@@ -264,11 +264,7 @@ function ActionRole({ action }: { action: EventHistoryActionDocument }) {
     return null
   }
 
-  return (
-    <Text element="span" variant="reg14">
-      {intl.formatMessage(messages.role, { role })}
-    </Text>
-  )
+  return <>{intl.formatMessage(messages.role, { role })}</>
 }
 
 function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
