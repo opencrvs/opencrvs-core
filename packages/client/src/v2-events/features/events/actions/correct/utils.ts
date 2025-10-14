@@ -156,6 +156,20 @@ export function getReviewFormFields(configuration: EventConfig) {
   )
 }
 
+function isFirstDeclareOrNotifyAction(
+  action: ActionDocument,
+  fullEvent: EventDocument
+) {
+  if (action.type !== ActionType.DECLARE && action.type !== ActionType.NOTIFY) {
+    return false
+  }
+  const acceptedActions = getAcceptedActions(fullEvent)
+  const firstDeclareOrNotifyAction = acceptedActions.find(
+    (a) => a.type === ActionType.DECLARE || a.type === ActionType.NOTIFY
+  )
+  return firstDeclareOrNotifyAction?.id === action.id
+}
+
 export function getDeclarationComparison(
   fullEvent: EventDocument,
   currentAction: ActionDocument,
@@ -172,13 +186,10 @@ export function getDeclarationComparison(
     currentActionIndex + 1
   )
   const eventUpToPreviousAction = acceptedActions.slice(0, currentActionIndex)
-  const firstDeclareOrNotifyAction = acceptedActions.find(
-    (a) => a.type === ActionType.DECLARE || a.type === ActionType.NOTIFY
-  )
 
   if (
     currentActionIndex < 0 ||
-    firstDeclareOrNotifyAction?.id === currentAction.id
+    isFirstDeclareOrNotifyAction(currentAction, fullEvent)
   ) {
     return {
       updatedValues: {},
@@ -235,6 +246,10 @@ export function hasAnnotationChanged(
   validatorContext: ValidatorContext,
   eventConfiguration: EventConfig
 ) {
+  if (isFirstDeclareOrNotifyAction(currentAction, fullEvent)) {
+    return false
+  }
+
   const reviewFormFields = getReviewFormFields(eventConfiguration)
 
   const index = fullEvent.actions.findIndex((a) => a.id === currentAction.id)
