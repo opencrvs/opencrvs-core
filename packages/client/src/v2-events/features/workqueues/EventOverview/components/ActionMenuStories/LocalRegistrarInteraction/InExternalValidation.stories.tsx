@@ -23,7 +23,7 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/FieldAgent/InExternalValidation'
+  title: 'ActionMenu/LocalRegistrar/InExternalValidation'
 } as Meta<typeof ActionMenu>
 
 const inExternalValidationScenariosForLocalRegistrar: Scenario[] = [
