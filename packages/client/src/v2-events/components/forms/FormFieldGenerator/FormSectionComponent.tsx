@@ -11,7 +11,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
-import { cloneDeep, isEqual, set, groupBy, omit, get } from 'lodash'
+import { cloneDeep, isEqual, set, groupBy, omit, get, merge } from 'lodash'
 import { useIntl } from 'react-intl'
 import styled, { keyframes } from 'styled-components'
 import {
@@ -341,6 +341,53 @@ export function FormSectionComponent({
     ]
   )
 
+  const onFieldValuesChange = useCallback(
+    (newValues: Partial<EventState>) => {
+      const updatedValues = cloneDeep(values)
+      const updatedErrors = cloneDeep(errorsWithDotSeparator)
+
+      // update the value of the field that was changed
+      merge(updatedValues, newValues)
+
+      const totalFormikListenerFieldIds: string[] = []
+      for (const formikFieldId of Object.keys(newValues)) {
+        const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
+        const listenerFields = listenerFieldsByParentId[ocrvsFieldId] ?? []
+        const interactiveListenerFields = listenerFields.filter(
+          (c): c is InteractiveFieldType => !isNonInteractiveFieldType(c)
+        )
+        for (const listenerField of interactiveListenerFields) {
+          setValueForListenerField(listenerField, updatedValues, updatedErrors)
+        }
+
+        const formikListenerFieldIds = listenerFields.map((child) =>
+          makeFormFieldIdFormikCompatible(child.id)
+        )
+        totalFormikListenerFieldIds.push(...formikListenerFieldIds)
+      }
+
+      const updatedTouched = omit(touched, totalFormikListenerFieldIds)
+
+      // @TODO: Formik does not type errors well. Actual error message differs from the type.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      void setErrors(updatedErrors as any)
+      void setValues(updatedValues)
+      void setTouched(updatedTouched)
+      void setAllTouchedFields(updatedTouched)
+    },
+    [
+      values,
+      setValues,
+      listenerFieldsByParentId,
+      setTouched,
+      touched,
+      errorsWithDotSeparator,
+      setErrors,
+      setAllTouchedFields,
+      setValueForListenerField
+    ]
+  )
+
   useEffect(() => {
     void setTouched({})
     if (validateAllFields) {
@@ -464,6 +511,7 @@ export function FormSectionComponent({
                   value={formikField.value}
                   onBlur={formikField.onBlur}
                   onFieldValueChange={onFieldValueChange}
+                  onFieldValuesChange={onFieldValuesChange}
                 />
               )}
             </Field>

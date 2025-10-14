@@ -112,6 +112,11 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
   /** non-native onChange. Updates Formik state by updating the value and its dependencies */
   onFieldValueChange: (name: string, value: FieldValue | undefined) => void
+  /** Optional callback that is called whenever any field value changes.
+   * This is useful for cases where the parent component needs to know about
+   * changes in the form state.
+   */
+  onFieldValuesChange: (values: Partial<EventState>) => void
   /**
    * onBlur is used to set the touched state of the field
    */
@@ -135,6 +140,7 @@ export const GeneratedInputField = React.memo(
     validatorContext,
     onBlur,
     onFieldValueChange,
+    onFieldValuesChange,
     error,
     touched,
     value,
@@ -695,13 +701,17 @@ export const GeneratedInputField = React.memo(
           id={field.config.id}
           value={field.value}
           onReset={() => {
-            if (fieldDefinition.parent?.$$field) {
-              onFieldValueChange(
-                makeFormFieldIdFormikCompatible(fieldDefinition.parent.$$field),
-                undefined
+            if (Array.isArray(fieldDefinition.parent)) {
+              const parentValues = fieldDefinition.parent.reduce(
+                (acc, parentField) => {
+                  acc[makeFormFieldIdFormikCompatible(parentField.$$field)] =
+                    undefined
+                  return acc
+                },
+                {} as Partial<EventState>
               )
-            } else {
-              onFieldValueChange(fieldDefinition.id, undefined)
+              console.log(parentValues)
+              onFieldValuesChange(parentValues)
             }
           }}
         />
