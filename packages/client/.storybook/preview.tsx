@@ -139,7 +139,26 @@ export const parameters = {
   layout: 'fullscreen',
   mockingDate: new Date(2025, 7, 12),
   msw: {
-    handlers: handlers
+    handlers
+  },
+  viewport: {
+    viewports: {
+      mobile: {
+        name: 'Mobile',
+        styles: {
+          width: '375px',
+          height: '667px'
+        }
+      },
+      tablet: {
+        name: 'Tablet',
+        styles: {
+          width: '768px',
+          height: '1024px'
+        }
+      }
+    },
+    defaultViewport: 'responsive'
   }
 }
 
