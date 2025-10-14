@@ -61,7 +61,14 @@ function useActionGuard(
   const { redirectToEventOverviewPage } = useToastAndRedirect()
   // If the action is not available for the event, redirect to the overview page
   if (!availableActions.includes(actionType)) {
-    if (import.meta.env.PROD) {
+    const isProd = import.meta.env.PROD
+
+    // Some Storybook tests expect the action guard to throw errors.
+    // In the actual app, we want explicit failures in development but silent handling in production.
+    // Storybook verifies behavior based on these development-mode failures.
+    const isStory = import.meta.env.STORYBOOK
+
+    if (isProd && !isStory) {
       // In prod mode, show a toast explaining why the action is not available
       // and then redirect to the overview page
       return redirectToEventOverviewPage({

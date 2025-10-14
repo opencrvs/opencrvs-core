@@ -10,6 +10,7 @@
  */
 import React, { Component } from 'react'
 import * as Sentry from '@sentry/react'
+import { z } from 'zod'
 import styled from 'styled-components'
 import { TRPCClientError } from '@trpc/client'
 import { connect } from 'react-redux'
@@ -44,39 +45,30 @@ const development = ['127.0.0.1', 'localhost'].includes(
   window.location.hostname
 )
 
-interface StructuredError {
-  message: string
-  redirection: { label: string; path: string }
-}
+const StructuredError = z.object({
+  message: z.string(),
+  redirection: z.object({
+    label: z.string(),
+    path: z.string()
+  })
+})
 
 export const throwStructuredError = ({
   message,
   redirection
-}: StructuredError) => {
+}: z.infer<typeof StructuredError>) => {
   const error = JSON.stringify({ message, redirection })
   throw new Error(error)
 }
 
-function decodeStructuredError(message: string): StructuredError | string {
+function decodeStructuredError(
+  message: string
+): z.infer<typeof StructuredError> | string {
   try {
     const parsed = JSON.parse(message)
-    if (
-      typeof parsed === 'object' &&
-      parsed !== null &&
-      'message' in parsed &&
-      'redirection' in parsed &&
-      typeof parsed.redirection === 'object' &&
-      parsed.redirection !== null &&
-      'label' in parsed.redirection &&
-      'path' in parsed.redirection
-    ) {
-      return {
-        message: String(parsed.message),
-        redirection: {
-          label: String(parsed.redirection.label),
-          path: String(parsed.redirection.path)
-        }
-      }
+    const result = StructuredError.safeParse(parsed)
+    if (result.success) {
+      return result.data
     }
     return message
   } catch {
