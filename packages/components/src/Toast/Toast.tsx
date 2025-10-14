@@ -20,7 +20,7 @@ import { Icon } from '../Icon'
 
 const TOAST_DEFAULT_DURATION_MS = 8000
 
-type ToastType = 'success' | 'warning' | 'loading' | 'error' | 'info'
+export type ToastType = 'success' | 'warning' | 'loading' | 'error' | 'info'
 
 const deepToast = keyframes`
   from { bottom: -10px; }
