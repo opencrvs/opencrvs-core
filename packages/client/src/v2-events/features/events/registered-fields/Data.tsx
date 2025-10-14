@@ -202,27 +202,24 @@ function getDataOutputEntry(
   declarationFields: FieldConfig[]
 ) {
   if ('id' in dataEntryConfig) {
-    if (!value[dataEntryConfig.id]) {
+    const { id, label } = dataEntryConfig
+
+    if (!Boolean(value[id])) {
       return null
     }
-
-    const { id, label } = dataEntryConfig
 
     return {
       id,
       label,
       valueDisplay: (
-        <Output
-          field={{ type: FieldType.TEXT, id, label }}
-          value={value[dataEntryConfig.id]}
-        />
+        <Output field={{ type: FieldType.TEXT, id, label }} value={value[id]} />
       )
     }
   }
 
   const { fieldId } = dataEntryConfig
 
-  if (!value[fieldId]) {
+  if (!Boolean(value[fieldId])) {
     return null
   }
 
