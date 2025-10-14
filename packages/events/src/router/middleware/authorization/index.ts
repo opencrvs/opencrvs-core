@@ -39,7 +39,7 @@ import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
 import { getUserOrSystem } from '../../../service/users/api'
-import { isOfficeUnderJurisdiction } from '../../../storage/postgres/events/locations'
+import { isLocationUnderJurisdiction } from '../../../storage/postgres/events/locations'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -377,15 +377,18 @@ export const userCanReadOtherUser: MiddlewareFunction<
   }
 
   if (
-    hasScope(token, SCOPES.USER_READ_MY_OFFICE) &&
+    inScope(token, [
+      SCOPES.USER_READ_MY_OFFICE,
+      SCOPES.USER_READ_MY_JURISDICTION
+    ]) &&
     userReading.primaryOfficeId === otherUser.primaryOfficeId
   ) {
     return next()
   }
 
-  const isUnderJurisdiction = await isOfficeUnderJurisdiction({
+  const isUnderJurisdiction = await isLocationUnderJurisdiction({
     jurisdictionLocationId: userReading.primaryOfficeId,
-    officeLocationId: otherUser.primaryOfficeId
+    locationToSearchId: otherUser.primaryOfficeId
   })
 
   if (

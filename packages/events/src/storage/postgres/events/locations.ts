@@ -107,10 +107,9 @@ export async function getLocationById(id: UUID) {
     .executeTakeFirst()
 }
 
-export async function getChildLocations(parentId: string) {
-  const db = getClient()
-
-  const { rows } = await sql<Locations>`
+/** @returns a recursive CTE that can be used to get all child locations of a given location */
+function childLocationsCte(parentId: UUID) {
+  return sql`
     WITH RECURSIVE r AS (
       SELECT id, parent_id
       FROM app.locations
@@ -120,11 +119,32 @@ export async function getChildLocations(parentId: string) {
       FROM app.locations l
       JOIN r ON l.parent_id = r.id
     )
+  `
+}
+
+function getChildLocationsQuery(parentId: UUID) {
+  return sql<Locations>`
+    ${childLocationsCte(parentId)}
     SELECT l.*
     FROM app.locations l
     JOIN r ON r.id = l.id
     WHERE l.id <> ${parentId} AND l.deleted_at IS NULL;
-  `.execute(db)
+  `
+}
+
+function isLocationChildOfQuery(parentId: UUID, givenId: UUID) {
+  return sql<{ isChild: boolean }>`
+    ${childLocationsCte(parentId)}
+    SELECT EXISTS (
+      SELECT 1 FROM r WHERE id = ${givenId} AND id <> ${parentId}
+    ) AS "isChild";
+  `
+}
+
+export async function getChildLocations(parentId: UUID) {
+  const db = getClient()
+
+  const { rows } = await getChildLocationsQuery(parentId).execute(db)
   return rows
 }
 
@@ -180,24 +200,23 @@ export async function getLeafLocationIds({
   return query.execute()
 }
 
-export async function isOfficeUnderJurisdiction({
+/**
+ * Recursive check to see if a location is descendant of a jurisdiction location.
+ * @returns is the location **under** the jurisdiction of another location.
+ */
+export async function isLocationUnderJurisdiction({
   jurisdictionLocationId,
-  officeLocationId
+  locationToSearchId
 }: {
   jurisdictionLocationId: UUID
-  officeLocationId: UUID
+  locationToSearchId: UUID
 }) {
   const db = getClient()
 
-  const officeId = await db
-    .selectFrom('locations')
-    .select('id')
-    .where('id', '=', officeLocationId)
-    // @TODO: ask whether any location goes
-    .where('locationType', '=', LocationType.Enum.CRVS_OFFICE)
-    .where('parentId', '=', jurisdictionLocationId)
-    .where('deletedAt', 'is', null)
-    .executeTakeFirst()
+  const result = await isLocationChildOfQuery(
+    jurisdictionLocationId,
+    locationToSearchId
+  ).execute(db)
 
-  return !!officeId
+  return !!result.rows[0].isChild
 }

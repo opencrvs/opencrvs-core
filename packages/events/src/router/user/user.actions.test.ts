@@ -11,13 +11,13 @@
 
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
-import { intersectionBy } from 'lodash'
 import {
   LocationType,
   SCOPES,
   generateUuid,
   TestUserRole,
-  ActionType
+  ActionType,
+  createPrng
 } from '@opencrvs/commons'
 import {
   createEvent,
@@ -77,6 +77,67 @@ test('Find user by id outside of jurisdiction with global scope', async () => {
   await expect(
     client.user.actions({
       userId: users[1].id
+    })
+  ).resolves.toMatchObject({
+    results: [],
+    total: 0
+  })
+})
+
+test('Finds user in nested location with my jurisdiction scope', async () => {
+  const { user: userOnParentLocation, seed } = await setupTestCase()
+  const parentLocationClient = createTestClient(userOnParentLocation, [
+    SCOPES.USER_READ_MY_JURISDICTION
+  ])
+
+  const rng = createPrng(44444)
+
+  const childLocationId = generateUuid(rng)
+  const grandchildLocationId = generateUuid(rng)
+
+  await seed.locations([
+    {
+      name: 'Child office',
+      parentId: userOnParentLocation.primaryOfficeId,
+      locationType: LocationType.Enum.ADMIN_STRUCTURE,
+      id: childLocationId,
+      validUntil: null
+    },
+    {
+      name: 'Grandchild office',
+      parentId: childLocationId,
+      locationType: LocationType.Enum.CRVS_OFFICE,
+      id: grandchildLocationId,
+      validUntil: null
+    }
+  ])
+
+  const userToSearch = seed.user({
+    name: [{ family: 'Smith', given: ['John'], use: 'en' }],
+    primaryOfficeId: grandchildLocationId,
+    role: TestUserRole.Enum.FIELD_AGENT
+  })
+
+  mswServer.use(
+    http.post(`http://localhost:3030/getUser`, async ({ request }) => {
+      const body = (await request.clone().json()) as { userId: string }
+      const userId = body.userId
+
+      if (userId === userToSearch.id) {
+        return HttpResponse.json(userToSearch)
+      }
+
+      if (userId === userOnParentLocation.id) {
+        return HttpResponse.json(userOnParentLocation)
+      }
+
+      throw new Error('should not happen')
+    })
+  )
+
+  await expect(
+    parentLocationClient.user.actions({
+      userId: userToSearch.id
     })
   ).resolves.toMatchObject({
     results: [],
