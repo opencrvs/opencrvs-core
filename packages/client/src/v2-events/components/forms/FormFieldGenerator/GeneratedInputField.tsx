@@ -111,7 +111,11 @@ import {
 interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
   /** non-native onChange. Updates Formik state by updating the value and its dependencies */
-  onFieldValueChange: (name: string, value: FieldValue | undefined) => void
+  onFieldValueChange: (
+    name: string,
+    value: FieldValue | undefined,
+    prevValues?: Record<string, FieldValue>
+  ) => Record<string, FieldValue>
   /**
    * onBlur is used to set the touched state of the field
    */
@@ -687,7 +691,6 @@ export const GeneratedInputField = React.memo(
         />
       )
     }
-
     if (isVerificationStatusType(field)) {
       return (
         <VerificationStatus.Input
@@ -695,13 +698,16 @@ export const GeneratedInputField = React.memo(
           id={field.config.id}
           value={field.value}
           onReset={() => {
-            if (fieldDefinition.parent?.$$field) {
-              onFieldValueChange(
-                makeFormFieldIdFormikCompatible(fieldDefinition.parent.$$field),
-                undefined
-              )
-            } else {
-              onFieldValueChange(fieldDefinition.id, undefined)
+            let prevValues = onFieldValueChange(fieldDefinition.id, undefined)
+
+            if (Array.isArray(fieldDefinition.parent)) {
+              for (const parentField of fieldDefinition.parent) {
+                prevValues = onFieldValueChange(
+                  makeFormFieldIdFormikCompatible(parentField.$$field),
+                  undefined,
+                  prevValues
+                )
+              }
             }
           }}
         />

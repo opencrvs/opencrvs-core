@@ -286,8 +286,12 @@ export function FormSectionComponent({
   )
 
   const onFieldValueChange = useCallback(
-    (formikFieldId: string, value: FieldValue | undefined) => {
-      const updatedValues = cloneDeep(values)
+    (
+      formikFieldId: string,
+      value: FieldValue | undefined,
+      prevValues?: Record<string, FieldValue>
+    ) => {
+      const updatedValues = cloneDeep(prevValues ?? values)
       const updatedErrors = cloneDeep(errorsWithDotSeparator)
 
       const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
@@ -321,12 +325,12 @@ export function FormSectionComponent({
 
       const updatedTouched = omit(touched, formikListenerFieldIds)
 
-      // @TODO: Formik does not type errors well. Actual error message differs from the type.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      void setErrors(updatedErrors as any)
+      void setErrors(updatedErrors)
       void setValues(updatedValues)
       void setTouched(updatedTouched)
       void setAllTouchedFields(updatedTouched)
+
+      return updatedValues
     },
     [
       values,
