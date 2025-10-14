@@ -17,6 +17,8 @@ import { userSerializer } from '../events/serializers/user/serializer'
 import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 
+/* eslint-disable max-lines */
+
 /** @knipignore */
 export type JSONSchema = {
   $id: string
