@@ -144,8 +144,8 @@ export function DuplicateComparison({
     eventConfiguration.declaration.pages
       .filter(
         (page) =>
-          isPageVisible(page, originalDeclaration) ||
-          isPageVisible(page, potentialDuplicateDeclaration)
+          isPageVisible(page, originalDeclaration, validatorContext) ||
+          isPageVisible(page, potentialDuplicateDeclaration, validatorContext)
       )
       .map((page) => ({
         title: intl.formatMessage(page.title),
