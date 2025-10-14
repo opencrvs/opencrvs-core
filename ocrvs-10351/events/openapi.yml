@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 8dcec877-22b0-48c1-86e9-0d4e228fd9de
+                transactionId: 08d3117a-f7bd-4872-ae3c-38d7db7a5189
                 type: birth
       responses:
         "200":
@@ -423,7 +423,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: e48abd81-2661-4e4f-b95e-254781422db5
+                transactionId: 0ce2a68e-35f9-4c23-9200-889357005437
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -3160,6 +3160,8 @@ components:
                   required:
                     - $$field
                   description: Reference to a field by its ID
+                postfix:
+                  $ref: "#/components/schemas/TranslationConfig"
               required:
                 - asOfDate
           required:

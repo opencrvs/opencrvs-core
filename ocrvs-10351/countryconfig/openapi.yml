@@ -1296,6 +1296,8 @@ components:
                   required:
                     - $$field
                   description: Reference to a field by its ID
+                postfix:
+                  $ref: "#/components/schemas/TranslationConfig"
               required:
                 - asOfDate
           required:
