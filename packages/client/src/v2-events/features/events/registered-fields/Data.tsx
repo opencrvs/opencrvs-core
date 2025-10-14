@@ -22,7 +22,8 @@ import {
   StaticDataEntry,
   EventConfig,
   getDeclarationFields,
-  FieldValue
+  FieldValue,
+  DataEntry
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -196,49 +197,47 @@ function DataInput({
  * If we are handling a reference field, we generate the <Output/> component for the reference field.
  */
 function getDataOutputEntry(
-  id: string,
-  dataFieldConfig: DataField,
-  declarationFields: FieldConfig[],
-  value: FieldValue
+  value: NonNullable<DataFieldValue>,
+  dataEntryConfig: DataEntry,
+  declarationFields: FieldConfig[]
 ) {
-  const dataEntryConfig = dataFieldConfig.configuration.data.find(
-    (d) => ('id' in d && d.id === id) || ('fieldId' in d && d.fieldId === id)
-  )
-
-  if (!dataEntryConfig) {
-    return null
-  }
-
-  // Handle static data entries
   if ('id' in dataEntryConfig) {
-    const { label } = dataEntryConfig
+    if (!value[dataEntryConfig.id]) {
+      return null
+    }
 
-    const valueDisplay = (
-      <Output field={{ type: FieldType.TEXT, id, label }} value={value} />
-    )
+    const { id, label } = dataEntryConfig
 
     return {
+      id,
       label,
-      valueDisplay,
-      id
+      valueDisplay: (
+        <Output
+          field={{ type: FieldType.TEXT, id, label }}
+          value={value[dataEntryConfig.id]}
+        />
+      )
     }
   }
 
-  // Handle reference fields
-  const referencedFieldConfig = declarationFields.find(
-    (f) => f.id === dataEntryConfig.fieldId
-  )
+  const { fieldId } = dataEntryConfig
+
+  if (!value[fieldId]) {
+    return null
+  }
+
+  const referencedFieldConfig = declarationFields.find((f) => f.id === fieldId)
 
   if (!referencedFieldConfig) {
     return null
   }
 
-  const valueDisplay = <Output field={referencedFieldConfig} value={value} />
-
   return {
+    id: fieldId,
     label: referencedFieldConfig.label,
-    valueDisplay,
-    id
+    valueDisplay: (
+      <Output field={referencedFieldConfig} value={value[fieldId]} />
+    )
   }
 }
 
@@ -261,8 +260,8 @@ function DataOutput({
   }
 
   const declarationFields = getDeclarationFields(eventConfig)
-  const entries = Object.entries(value)
-    .map(([id, val]) => getDataOutputEntry(id, field, declarationFields, val))
+  const entries = field.configuration.data
+    .map((d) => getDataOutputEntry(value, d, declarationFields))
     .filter((e) => e !== null)
 
   if (!entries.length) {
