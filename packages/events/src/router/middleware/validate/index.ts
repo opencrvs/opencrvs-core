@@ -162,7 +162,7 @@ function validateDeclarationUpdateAction({
 
   // 4. Validate declaration update against conditional rules, taking into account conditional pages.
   const allVisiblePageFields = declarationConfig.pages
-    .filter((page) => isPageVisible(page, cleanedDeclaration))
+    .filter((page) => isPageVisible(page, cleanedDeclaration, context))
     .flatMap((page) => page.fields)
 
   const declarationErrors = getFieldErrors(
@@ -212,7 +212,8 @@ function validateActionAnnotation({
 
   const visibleVerificationPageIds = getVisibleVerificationPageIds(
     pages,
-    annotation
+    annotation,
+    context
   )
 
   const formFields = pages.flatMap(({ fields }) =>

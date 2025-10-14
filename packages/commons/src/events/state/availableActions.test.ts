@@ -39,4 +39,29 @@ describe('getAvailableActions', () => {
       ])
     ).toMatchSnapshot()
   })
+
+  it(`returns the correct actions for "${EventStatus.Enum.REGISTERED}" status with a "registered:requested" flag`, () => {
+    expect(
+      getAvailableActions(EventStatus.Enum.REGISTERED, [
+        (EventStatus.Enum.REGISTERED + ':requested').toLowerCase()
+      ])
+    ).toMatchSnapshot()
+  })
+
+  it(`returns the correct actions for "${EventStatus.Enum.DECLARED}" status with a "declared:requested" flag`, () => {
+    expect(
+      getAvailableActions(EventStatus.Enum.DECLARED, [
+        (EventStatus.Enum.DECLARED + ':requested').toLowerCase()
+      ])
+    ).toMatchSnapshot()
+  })
+
+  it(`should return the correct actions for "${EventStatus.Enum.REGISTERED}" status with "registered:requested" ${InherentFlags.CORRECTION_REQUESTED} flag`, () => {
+    expect(
+      getAvailableActions(EventStatus.Enum.REGISTERED, [
+        InherentFlags.CORRECTION_REQUESTED,
+        (EventStatus.Enum.REGISTERED + ':requested').toLowerCase()
+      ])
+    ).toMatchSnapshot()
+  })
 })

@@ -150,12 +150,14 @@ export function isOnline() {
 
 export function isConditionMet(
   conditional: JSONSchema,
-  values: Record<string, unknown>
+  values: Record<string, unknown>,
+  context: ValidatorContext
 ) {
   return validate(conditional, {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
-    $online: isOnline()
+    $online: isOnline(),
+    $user: context.user
   })
 }
 
@@ -174,10 +176,11 @@ function getConditionalActionsForField(
 
 export function areConditionsMet(
   conditions: FieldConditional[],
-  values: Record<string, unknown>
+  values: Record<string, unknown>,
+  context: ValidatorContext
 ) {
   return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values)
+    isConditionMet(condition.conditional, values, context)
   )
 }
 

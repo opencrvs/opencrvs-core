@@ -169,12 +169,16 @@ export function getActionReviewFields(
   return getActionReview(configuration, actionType).fields
 }
 
-export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
+export function isPageVisible(
+  page: PageConfig,
+  formValues: ActionUpdate,
+  context: ValidatorContext
+) {
   if (!page.conditional) {
     return true
   }
 
-  return isConditionMet(page.conditional, formValues)
+  return isConditionMet(page.conditional, formValues, context)
 }
 
 /**
@@ -297,11 +301,12 @@ export function isVerificationPage(
 
 export function getVisibleVerificationPageIds(
   pages: PageConfig[],
-  annotation: ActionUpdate
+  annotation: ActionUpdate,
+  context: ValidatorContext
 ): string[] {
   return pages
     .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, annotation))
+    .filter((page) => isPageVisible(page, annotation, context))
     .map((page) => page.id)
 }
 

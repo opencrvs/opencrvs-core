@@ -374,7 +374,7 @@ describe('Declare action', () => {
   })
 })
 
-test('deduplication check is performed after declaration', async () => {
+test('deduplication and annotation check is performed after declaration', async () => {
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
       return HttpResponse.json([
@@ -398,6 +398,7 @@ test('deduplication check is performed after declaration', async () => {
       'applicant.dobUnknown': false
     }
   )
+
   const existingEventIndex = eventQueryDataGenerator({
     id: existingEventId,
     declaration
@@ -418,6 +419,17 @@ test('deduplication check is performed after declaration', async () => {
       declaration: existingEventIndex.declaration
     })
   )
+
+  const lastAction = declaredEvent.actions.at(-1)
+  if (!lastAction) {
+    throw new Error('No action found')
+  }
+
+  expect(lastAction.type).toBe(ActionType.DUPLICATE_DETECTED)
+  expect(lastAction).toHaveProperty('annotation')
+  // @ts-expect-error - type not narrowed for duplicate action
+  expect(lastAction.annotation).toBeDefined()
+
   expect(
     getCurrentEventState(declaredEvent, tennisClubMembershipEvent)
       .potentialDuplicates

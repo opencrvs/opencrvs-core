@@ -23,7 +23,11 @@ import * as Request from './index'
 
 const validatedDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE]
+  actions: [
+    { type: ActionType.CREATE },
+    { type: ActionType.DECLARE },
+    { type: ActionType.VALIDATE }
+  ]
 })
 
 const meta: Meta<typeof Request.Pages> = {

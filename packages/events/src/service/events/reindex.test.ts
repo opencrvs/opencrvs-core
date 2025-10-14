@@ -49,9 +49,11 @@ beforeEach(async () => {
   const { user, eventsDb } = await setupTestCase()
 
   event = generateEventDocument({
-    user,
     configuration: tennisClubMembershipEvent,
-    actions: [ActionType.CREATE, ActionType.DECLARE]
+    actions: [
+      { type: ActionType.CREATE, user },
+      { type: ActionType.DECLARE, user }
+    ]
   })
 
   const eventInDb = await eventsDb
