@@ -1,11 +1,8 @@
 import { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { UserAuditHistory } from './UserAuditHistory'
-import superjson from 'superjson'
 import { TestUserRole } from '@opencrvs/commons/client'
 
-import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { AppRouter } from '@events/router'
 import { TRPCProvider } from '../../v2-events/trpc'
 
 const meta: Meta<typeof UserAuditHistory> = {
