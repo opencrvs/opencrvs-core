@@ -11,7 +11,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
-import { cloneDeep, isEqual, set, omit, get, assign } from 'lodash'
+import { cloneDeep, isEqual, set, omit, get, assign, compact } from 'lodash'
 import { useIntl } from 'react-intl'
 import styled, { keyframes } from 'styled-components'
 import {
@@ -267,20 +267,19 @@ export function FormSectionComponent({
         listenerField.id
       )
 
-      for (const reference of referencesToOtherFields) {
-        const updatedValue = getUpdatedChildValueOnChange({
-          childField: listenerField,
-          fieldReference: reference,
-          fieldValues,
-          systemVariables
-        })
+      const firstNonFalsyValue = compact(
+        referencesToOtherFields.map((reference) =>
+          getUpdatedChildValueOnChange({
+            childField: listenerField,
+            fieldReference: reference,
+            fieldValues,
+            systemVariables
+          })
+        )
+      )[0]
 
-        if (updatedValue) {
-          set(fieldValues, listenerFieldFormikId, updatedValue)
-          set(fieldErrors, listenerFieldFormikId, { errors: [] })
-          break
-        }
-      }
+      set(fieldValues, listenerFieldFormikId, firstNonFalsyValue)
+      set(fieldErrors, listenerFieldFormikId, { errors: [] })
     },
     [fieldsWithDotSeparator, systemVariables]
   )
