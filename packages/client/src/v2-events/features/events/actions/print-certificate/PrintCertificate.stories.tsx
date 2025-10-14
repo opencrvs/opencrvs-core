@@ -82,11 +82,11 @@ const printActionWithSelections = generateActionDocument({
 const registeredEvent = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [
-    ActionType.CREATE,
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REGISTER,
-    ActionType.PRINT_CERTIFICATE
+    { type: ActionType.CREATE },
+    { type: ActionType.DECLARE },
+    { type: ActionType.VALIDATE },
+    { type: ActionType.REGISTER },
+    { type: ActionType.PRINT_CERTIFICATE }
   ]
 })
 

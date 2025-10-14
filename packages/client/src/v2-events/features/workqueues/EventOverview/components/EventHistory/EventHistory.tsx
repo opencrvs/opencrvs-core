@@ -22,6 +22,7 @@ import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
   ActionType,
+  EventConfig,
   EventDocument,
   getAcceptedActions,
   ValidatorContext
@@ -333,10 +334,12 @@ export function EventHistorySkeleton() {
  */
 export function EventHistory({
   fullEvent,
-  validatorContext
+  validatorContext,
+  eventConfiguration
 }: {
   fullEvent: EventDocument
   validatorContext: ValidatorContext
+  eventConfiguration: EventConfig
 }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
@@ -347,7 +350,11 @@ export function EventHistory({
 
   const history = getAcceptedActions(fullEvent)
 
-  const historyWithUpdatedActions = expandWithUpdateActions(history)
+  const historyWithUpdatedActions = expandWithUpdateActions(
+    fullEvent,
+    validatorContext,
+    eventConfiguration
+  )
 
   const visibleHistoryWithUpdatedActions = historyWithUpdatedActions.filter(
     ({ type }) => type !== ActionType.CREATE

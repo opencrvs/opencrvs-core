@@ -12,7 +12,6 @@
 import { logger } from '@opencrvs/commons'
 import '@opencrvs/commons/monitoring'
 import { env } from './environment'
-
 import { server } from './server'
 import { getAnonymousToken } from './service/auth'
 import { getInMemoryEventConfigurations } from './service/config/config'

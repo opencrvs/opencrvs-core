@@ -48,7 +48,7 @@ type Story = StoryObj<unknown>
 
 const createdEvent = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [{ type: ActionType.CREATE }]
 })
 
 const router = {

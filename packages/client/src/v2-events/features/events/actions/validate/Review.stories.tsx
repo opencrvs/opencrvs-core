@@ -84,7 +84,7 @@ export const ReviewForLocalRegistrarIncomplete: Story = {
 }
 const eventForlocalRegistrarComplete = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
 })
 
 export const ReviewForLocalRegistrarComplete: Story = {
@@ -103,7 +103,7 @@ export const ReviewForLocalRegistrarComplete: Story = {
 
 const eventForRegistrationAgentComplete = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
 })
 
 export const ReviewForRegistrationAgentComplete: Story = {
