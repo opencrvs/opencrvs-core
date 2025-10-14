@@ -23,6 +23,7 @@ import {
 import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
@@ -118,15 +119,14 @@ export const summaryMessages = messages
 export function EventSummary({
   event,
   eventConfiguration,
-  flags,
   hideSecuredFields = false
 }: {
   event: Record<string, FieldValue | null>
   eventConfiguration: EventConfig
-  flags: Flag[]
   hideSecuredFields?: boolean
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
+  const validationContext = useValidatorContext()
   const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)
   const securedFields = declarationFields
@@ -134,7 +134,10 @@ export function EventSummary({
     .map(({ id }) => id)
 
   const configuredFields = summary.fields.map((field) => {
-    if (field.conditionals && !areConditionsMet(field.conditionals, event)) {
+    if (
+      field.conditionals &&
+      !areConditionsMet(field.conditionals, event, validationContext)
+    ) {
       return null
     }
 
@@ -175,11 +178,6 @@ export function EventSummary({
     }
   })
 
-  const flattenedFlags = flags
-    .filter((flag) => !ActionFlag.safeParse(flag).success)
-    .filter((flag) => flag !== InherentFlags.INCOMPLETE)
-    .join(', ')
-
   return (
     <>
       <Summary id="summary">
@@ -197,13 +195,6 @@ export function EventSummary({
           data-testid="status"
           label={intl.formatMessage(messages.status.label)}
           value={intl.formatMessage(messages.status.value, event)}
-        />
-        <Summary.Row
-          key="flags"
-          data-testid="flags"
-          label={intl.formatMessage(messages.flags.label)}
-          placeholder={intl.formatMessage(messages.flags.placeholder)}
-          value={flattenedFlags}
         />
         <Summary.Row
           key="event"

@@ -295,8 +295,9 @@ function FormReview({
   isReviewCorrection?: boolean
 }) {
   const intl = useIntl()
+
   const visiblePages = formConfig.pages.filter((page) =>
-    isPageVisible(page, form)
+    isPageVisible(page, form, validatorContext)
   )
 
   return (

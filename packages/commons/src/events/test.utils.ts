@@ -323,7 +323,8 @@ function generateActionAnnotationInput(
 
   const visibleVerificationPageIds = getVisibleVerificationPageIds(
     findRecordActionPages(configuration, action),
-    annotation
+    annotation,
+    {}
   )
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(

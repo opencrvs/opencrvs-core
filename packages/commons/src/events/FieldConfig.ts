@@ -88,9 +88,11 @@ const requiredSchema = z
 const BaseField = z.object({
   id: FieldId,
   label: TranslationConfig,
-  parent: FieldReference.optional().describe(
-    'Reference to a parent field. If a field has a parent, it will be reset when the parent field is changed.'
-  ),
+  parent: FieldReference.or(z.array(FieldReference))
+    .optional()
+    .describe(
+      'Reference to a parent field. If a field has parent(s), it will be reset when any parent field is changed.'
+    ),
   required: requiredSchema,
   conditionals: z.array(FieldConditional).default([]).optional(),
   secured: z.boolean().default(false).optional(),
@@ -105,9 +107,11 @@ const BaseField = z.object({
     .describe(
       'Indicates if the field can be changed during a record correction.'
     ),
-  value: FieldReference.optional().describe(
-    'Reference to a parent field. If field has a value, the value will be copied when the parent field is changed.'
-  ),
+  value: FieldReference.or(z.array(FieldReference))
+    .optional()
+    .describe(
+      'Reference to a parent field. If field has a value, the value will be copied when the parent field is changed. If a list is provided, the first truthy value will be used'
+    ),
   analytics: z
     .boolean()
     .default(false)
