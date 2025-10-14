@@ -701,9 +701,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -937,9 +934,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -1092,9 +1086,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -1241,9 +1232,6 @@ components:
                       description: Custom required validation message
                   required:
                     - message
-              default: false
-            disabled:
-              type: boolean
               default: false
             conditionals:
               type: array
@@ -1398,9 +1386,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -1543,9 +1528,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -1686,9 +1668,6 @@ components:
                       description: Custom required validation message
                   required:
                     - message
-              default: false
-            disabled:
-              type: boolean
               default: false
             conditionals:
               type: array
@@ -1848,9 +1827,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -2007,9 +1983,6 @@ components:
                       description: Custom required validation message
                   required:
                     - message
-              default: false
-            disabled:
-              type: boolean
               default: false
             conditionals:
               type: array
@@ -2169,9 +2142,6 @@ components:
                       description: Custom required validation message
                   required:
                     - message
-              default: false
-            disabled:
-              type: boolean
               default: false
             conditionals:
               type: array
@@ -2336,9 +2306,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -2490,9 +2457,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -2627,9 +2591,6 @@ components:
                       description: Custom required validation message
                   required:
                     - message
-              default: false
-            disabled:
-              type: boolean
               default: false
             conditionals:
               type: array
@@ -2805,9 +2766,6 @@ components:
                       description: Custom required validation message
                   required:
                     - message
-              default: false
-            disabled:
-              type: boolean
               default: false
             conditionals:
               type: array
@@ -3033,9 +2991,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -3170,9 +3125,6 @@ components:
                       description: Custom required validation message
                   required:
                     - message
-              default: false
-            disabled:
-              type: boolean
               default: false
             conditionals:
               type: array
@@ -3309,9 +3261,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -3447,9 +3396,6 @@ components:
                       description: Custom required validation message
                   required:
                     - message
-              default: false
-            disabled:
-              type: boolean
               default: false
             conditionals:
               type: array
@@ -3637,9 +3583,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -3774,9 +3717,6 @@ components:
                       description: Custom required validation message
                   required:
                     - message
-              default: false
-            disabled:
-              type: boolean
               default: false
             conditionals:
               type: array
@@ -3934,9 +3874,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -4067,9 +4004,6 @@ components:
                       description: Custom required validation message
                   required:
                     - message
-              default: false
-            disabled:
-              type: boolean
               default: false
             conditionals:
               type: array
@@ -4220,9 +4154,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -4358,9 +4289,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -4495,9 +4423,6 @@ components:
                       description: Custom required validation message
                   required:
                     - message
-              default: false
-            disabled:
-              type: boolean
               default: false
             conditionals:
               type: array
@@ -4655,9 +4580,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -4799,9 +4721,6 @@ components:
                       description: Custom required validation message
                   required:
                     - message
-              default: false
-            disabled:
-              type: boolean
               default: false
             conditionals:
               type: array
@@ -4990,9 +4909,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -5154,9 +5070,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -5306,9 +5219,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -5452,9 +5362,6 @@ components:
                       description: Custom required validation message
                   required:
                     - message
-              default: false
-            disabled:
-              type: boolean
               default: false
             conditionals:
               type: array
@@ -5673,9 +5580,6 @@ components:
                   required:
                     - message
               default: false
-            disabled:
-              type: boolean
-              default: false
             conditionals:
               type: array
               items:
@@ -5820,9 +5724,6 @@ components:
                       description: Custom required validation message
                   required:
                     - message
-              default: false
-            disabled:
-              type: boolean
               default: false
             conditionals:
               type: array
@@ -5974,9 +5875,6 @@ components:
                       description: Custom required validation message
                   required:
                     - message
-              default: false
-            disabled:
-              type: boolean
               default: false
             conditionals:
               type: array
