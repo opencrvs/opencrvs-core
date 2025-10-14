@@ -11,7 +11,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
-import { cloneDeep, isEqual, set, groupBy, omit, get, merge } from 'lodash'
+import { cloneDeep, isEqual, set, omit, get, assign } from 'lodash'
 import { useIntl } from 'react-intl'
 import styled, { keyframes } from 'styled-components'
 import {
@@ -341,13 +341,13 @@ export function FormSectionComponent({
     ]
   )
 
-  const onFieldValuesChange = useCallback(
+  const onBatchFieldValueChange = useCallback(
     (newValues: Partial<EventState>) => {
       const updatedValues = cloneDeep(values)
       const updatedErrors = cloneDeep(errorsWithDotSeparator)
 
       // update the value of the field that was changed
-      merge(updatedValues, newValues)
+      assign(updatedValues, newValues)
 
       const totalFormikListenerFieldIds: string[] = []
       for (const formikFieldId of Object.keys(newValues)) {
@@ -366,7 +366,10 @@ export function FormSectionComponent({
         totalFormikListenerFieldIds.push(...formikListenerFieldIds)
       }
 
-      const updatedTouched = omit(touched, totalFormikListenerFieldIds)
+      const updatedTouched = omit(
+        touched,
+        Array.from(new Set(totalFormikListenerFieldIds))
+      )
 
       // @TODO: Formik does not type errors well. Actual error message differs from the type.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -509,9 +512,9 @@ export function FormSectionComponent({
                   }
                   validatorContext={validatorContext}
                   value={formikField.value}
+                  onBatchFieldValueChange={onBatchFieldValueChange}
                   onBlur={formikField.onBlur}
                   onFieldValueChange={onFieldValueChange}
-                  onFieldValuesChange={onFieldValuesChange}
                 />
               )}
             </Field>

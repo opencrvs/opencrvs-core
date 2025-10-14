@@ -116,7 +116,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
    * This is useful for cases where the parent component needs to know about
    * changes in the form state.
    */
-  onFieldValuesChange: (values: Partial<EventState>) => void
+  onBatchFieldValueChange: (values: Partial<EventState>) => void
   /**
    * onBlur is used to set the touched state of the field
    */
@@ -140,7 +140,7 @@ export const GeneratedInputField = React.memo(
     validatorContext,
     onBlur,
     onFieldValueChange,
-    onFieldValuesChange,
+    onBatchFieldValueChange,
     error,
     touched,
     value,
@@ -710,8 +710,7 @@ export const GeneratedInputField = React.memo(
                 },
                 {} as Partial<EventState>
               )
-              console.log(parentValues)
-              onFieldValuesChange(parentValues)
+              onBatchFieldValueChange(parentValues)
             }
           }}
         />
