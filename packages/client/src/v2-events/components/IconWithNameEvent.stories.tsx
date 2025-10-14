@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { InherentFlags } from '@opencrvs/commons/client'
+import { EventStatus, InherentFlags } from '@opencrvs/commons/client'
 import { IconWithNameEvent } from './IconWithNameEvent'
 
 const meta: Meta<typeof IconWithNameEvent> = {
@@ -22,7 +22,7 @@ type Story = StoryObj<typeof IconWithNameEvent>
 
 export const PotentialDuplicateInMobileView: Story = {
   args: {
-    status: 'DECLARED',
+    status: EventStatus.enum.DECLARED,
     name: 'John Doe',
     event: 'Birth Registration',
     flags: [InherentFlags.POTENTIAL_DUPLICATE]
