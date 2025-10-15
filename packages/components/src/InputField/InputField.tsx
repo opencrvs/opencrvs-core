@@ -86,7 +86,6 @@ export const InputField = (props: IInputFieldProps) => {
           {label && (
             <InputLabel
               id={`${id}_label`}
-              htmlFor={id}
               inputDescriptor={helperText}
               disabled={props.disabled}
               required={required}
