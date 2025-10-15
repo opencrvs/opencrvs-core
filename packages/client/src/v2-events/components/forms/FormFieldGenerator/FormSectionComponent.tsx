@@ -42,6 +42,7 @@ import {
   makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
+import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -78,7 +79,6 @@ type AllProps = {
    * If isCorrection is true, fields with configuration option 'uncorrectable' set to true will be disabled.
    */
   isCorrection?: boolean
-  systemVariables: SystemVariables
   parentId?: string
   validatorContext: ValidatorContext
 } & UsedFormikProps
@@ -192,13 +192,13 @@ export function FormSectionComponent({
   fieldsToShowValidationErrors,
   onAllFieldsValidated,
   isCorrection = false,
-  systemVariables,
   parentId,
   validatorContext
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not -
   useOnlineStatus()
   const intl = useIntl()
+  const systemVariables = useSystemVariables()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
 

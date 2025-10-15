@@ -107,21 +107,21 @@ function AnnotationActionComponent({ children, actionType }: Props) {
 
   const actionAnnotation = deepDropNulls(mergedDraft.action.annotation)
 
-  useEffect(() => {
-    // Use the annotation values from the zustand state, so that filled form state is not lost
-    // If user e.g. enters the 'screen lock' flow while filling form.
-    // Then use annotation values from drafts.
-    const initialAnnotation = deepMerge(annotation || {}, actionAnnotation)
+  // useEffect(() => {
+  //   // Use the annotation values from the zustand state, so that filled form state is not lost
+  //   // If user e.g. enters the 'screen lock' flow while filling form.
+  //   // Then use annotation values from drafts.
+  //   const initialAnnotation = deepMerge(annotation || {}, actionAnnotation)
+  //   console.log('setting initialAnnotation')
+  //   setAnnotation(initialAnnotation)
 
-    setAnnotation(initialAnnotation)
-
-    /*
-     * This is fine to only run once on mount and unmount as
-     * At the point of this code being run, there absolutely must be an event that has already been
-     * fetched of which data can be used to initialise the form
-     */
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  //   /*
+  //    * This is fine to only run once on mount and unmount as
+  //    * At the point of this code being run, there absolutely must be an event that has already been
+  //    * fetched of which data can be used to initialise the form
+  //    */
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
 
   return children
 }

@@ -17,11 +17,19 @@ import {
   isPageVisible,
   PageTypes,
   PageConfig,
-  ValidatorContext
+  ValidatorContext,
+  FieldConfig,
+  SystemVariables,
+  InteractiveFieldType,
+  isNonInteractiveFieldType
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import {
+  handleDefaultValue,
+  makeFormFieldIdFormikCompatible
+} from '@client/v2-events/components/forms/utils'
+import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
@@ -50,6 +58,26 @@ type DeclarationProps =
   | {
       declaration: EventState
     }
+
+function mapFieldsToValues(
+  fields: FieldConfig[],
+  systemVariables: SystemVariables
+) {
+  return fields
+    .filter(
+      (field): field is InteractiveFieldType =>
+        !isNonInteractiveFieldType(field)
+    )
+    .reduce((memo, field) => {
+      const fieldInitialValue = handleDefaultValue({
+        field,
+        systemVariables
+      })
+
+      return { ...memo, [field.id]: fieldInitialValue }
+    }, {})
+}
+
 /**
  *
  * Reusable component for rendering a form with pagination. Used by different action forms
@@ -78,6 +106,7 @@ export function Pages({
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
   const page = pageIdx === -1 ? visiblePages[0] : visiblePages[pageIdx]
   const [validateAllFields, setValidateAllFields] = useState(false)
+  const systemVariables = useSystemVariables()
 
   const { setAllTouchedFields, touchedFields: initialTouchedFields } =
     useEventFormData()
@@ -140,6 +169,14 @@ export function Pages({
     onSubmit
   }
 
+  const defaultValues = mapFieldsToValues(page.fields, systemVariables)
+  const initialValues = { ...defaultValues, ...declaration, ...form }
+
+  useEffect(() => {
+    setFormData(initialValues)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const fields = (
     <FormFieldGenerator
       eventConfig={eventConfig}
@@ -149,7 +186,7 @@ export function Pages({
       // We still merge the optional `declaration` prop into the initial form values so that
       // read-only declaration data is available for Data components or calculations.
       // Example: Print Certificate action.
-      initialValues={{ ...declaration, ...form }}
+      initialValues={initialValues}
       isCorrection={isCorrection}
       validateAllFields={validateAllFields}
       validatorContext={validatorContext}
