@@ -22,7 +22,7 @@ import {
   isNonInteractiveFieldType,
   joinValues,
   SystemVariables,
-  Location
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import {
@@ -56,7 +56,7 @@ function mapFieldsToValues(
     }, {})
 }
 
-interface FormFieldGeneratorProps {
+export interface FormFieldGeneratorProps {
   /** form id */
   id: string
   fieldsToShowValidationErrors?: FieldConfig[]
@@ -72,7 +72,7 @@ interface FormFieldGeneratorProps {
   onAllFieldsValidated?: (success: boolean) => void
   isCorrection?: boolean
   parentId?: string // `child____name` part of `child____name____firstname`
-  locations?: Location[]
+  validatorContext: ValidatorContext
 }
 
 export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
@@ -89,18 +89,18 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     onAllFieldsValidated,
     isCorrection = false,
     parentId,
-    locations
+    validatorContext
   }) => {
-    const { setAllTouchedFields, touchedFields: initialTouchedFields } =
-      useEventFormData()
+    const { setAllTouchedFields, touchedFields } = useEventFormData()
 
     const updateTouchFields = (
       touched: Record<string, boolean | undefined>
     ) => {
       const newlyTouched =
         Object.keys(touched).length > 0 &&
-        !isEqual(touched, initialTouchedFields) &&
-        Object.keys(touched).filter((key) => !(key in initialTouchedFields))
+        !isEqual(touched, touchedFields) &&
+        Object.keys(touched).filter((key) => !(key in touchedFields))
+
       if (newlyTouched && newlyTouched.length > 0) {
         const newlyTouchedFields = parentId
           ? newlyTouched.reduce(
@@ -117,7 +117,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
           : touched
 
         setAllTouchedFields({
-          ...initialTouchedFields,
+          ...touchedFields,
           ...newlyTouchedFields
         })
       }
@@ -137,13 +137,13 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     return (
       <Formik<EventState>
         enableReinitialize={true}
-        initialTouched={initialTouchedFields}
+        initialTouched={touchedFields}
         initialValues={formikCompatibleInitialValues}
         validate={(values) =>
           getValidationErrorsForForm(
             fields,
             makeFormikFieldIdsOpenCRVSCompatible(values),
-            locations ?? []
+            validatorContext
           )
         }
         validateOnMount={true}
@@ -184,8 +184,9 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
               systemVariables={systemVariables}
-              touched={{ ...formikProps.touched, ...initialTouchedFields }}
+              touched={{ ...formikProps.touched, ...touchedFields }}
               validateAllFields={validateAllFields}
+              validatorContext={validatorContext}
               values={formikProps.values}
               onAllFieldsValidated={onAllFieldsValidated}
               onChange={formikOnChange}

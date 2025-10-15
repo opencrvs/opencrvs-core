@@ -20,7 +20,9 @@ import {
   ActionStatus,
   getUUID,
   EventInput,
-  UUID
+  UUID,
+  AssignedAction,
+  getTokenPayload
 } from '@opencrvs/commons/client'
 
 import {
@@ -61,6 +63,10 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
   retryDelay: 3333,
   mutationFn: createEventCreationMutation(trpcOptionsProxy.event.create),
   onMutate: (newEvent) => {
+    const token = window.localStorage.getItem('opencrvs')
+    const tokenPayload = token ? getTokenPayload(token) : null
+    const loggedInUserId = tokenPayload?.sub ?? 'offline'
+    const loggedInUserRole = tokenPayload?.role ?? 'offline'
     const optimisticEvent = {
       id: newEvent.transactionId as UUID, // not actually an UUID, but as as it's temporary for the optimistic update, we can satisfy the type this way
       type: newEvent.type,
@@ -73,14 +79,27 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
           type: ActionType.CREATE,
           id: createTemporaryId(),
           createdAt: new Date().toISOString(),
-          createdBy: 'offline',
+          createdBy: loggedInUserId,
           createdByUserType: 'user',
-          createdByRole: 'offline',
+          createdByRole: loggedInUserId,
           createdAtLocation: '00000000-0000-0000-0000-000000000000' as UUID,
           declaration: {},
           status: ActionStatus.Accepted,
           transactionId: getUUID()
-        } satisfies CreatedAction
+        } satisfies CreatedAction,
+        {
+          type: ActionType.ASSIGN,
+          id: createTemporaryId(),
+          createdAt: new Date().toISOString(),
+          createdBy: loggedInUserId,
+          assignedTo: loggedInUserId,
+          createdByUserType: 'user',
+          createdByRole: loggedInUserRole,
+          createdAtLocation: '00000000-0000-0000-0000-000000000000' as UUID,
+          declaration: {},
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
+        } satisfies AssignedAction
       ]
     }
 
@@ -91,7 +110,8 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
     setEventData(response.id, response)
     setEventData(context.transactionId, response)
     await refetchAllSearchQueries()
-  }
+  },
+  meta: { actionType: ActionType.CREATE }
 })
 
 export function useCreateEvent() {

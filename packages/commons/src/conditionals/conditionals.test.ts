@@ -670,6 +670,7 @@ describe('"user" conditionals', () => {
   const userParams = {
     $user: {
       scope: ['record.register', 'record.registration-correct'],
+      role: 'LOCAL_REGISTRAR',
       exp: '1739881718',
       algorithm: 'RS256',
       userType: TokenUserType.enum.user,
@@ -695,6 +696,11 @@ describe('"user" conditionals', () => {
   it('validates "user.isOnline" conditional', () => {
     expect(validate(user.isOnline(), userParams)).toBe(true)
     expect(validate(user.isOnline(), offlineUserParams)).toBe(false)
+  })
+
+  it('validates "user.hasRole" conditional', () => {
+    expect(validate(user.hasRole('LOCAL_REGISTRAR'), userParams)).toBe(true)
+    expect(validate(user.hasRole('FAKE_ROLE'), offlineUserParams)).toBe(false)
   })
 })
 
@@ -1390,5 +1396,159 @@ describe('Subfield nesting', () => {
     expect(
       validate(field('applicant.http').get('success').isEqualTo(true), params)
     ).toBe(true)
+  })
+})
+
+describe('isGreaterThan and isLessThan conditionals', () => {
+  // --------- isGreaterThan with another field ----------
+  it('should fail validation when numberOfChildren is not greater than numberOfDependents', () => {
+    const params = {
+      $form: {
+        'family.numberOfChildren': 2,
+        'family.numberOfDependents': 3
+      },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $locations: [],
+      $online: false
+    }
+
+    expect(
+      validate(
+        field('family.numberOfChildren').isGreaterThan({
+          $$field: 'family.numberOfDependents'
+        }),
+        params
+      )
+    ).toBe(false)
+  })
+
+  it('should pass validation when numberOfChildren is greater than numberOfDependents', () => {
+    const params = {
+      $form: {
+        'family.numberOfChildren': 5,
+        'family.numberOfDependents': 3
+      },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $locations: [],
+      $online: false
+    }
+
+    expect(
+      validate(
+        field('family.numberOfChildren').isGreaterThan({
+          $$field: 'family.numberOfDependents'
+        }),
+        params
+      )
+    ).toBe(true)
+  })
+
+  // --------- isGreaterThan with a number ----------
+  it('should fail validation when salary is not greater than 10000', () => {
+    const params = {
+      $form: { 'employee.salary': 8000 },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $locations: [],
+      $online: false
+    }
+
+    expect(
+      validate(field('employee.salary').isGreaterThan(10000), params)
+    ).toBe(false)
+  })
+
+  it('should pass validation when salary is greater than 10000', () => {
+    const params = {
+      $form: { 'employee.salary': 15000 },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $locations: [],
+      $online: false
+    }
+
+    expect(
+      validate(field('employee.salary').isGreaterThan(10000), params)
+    ).toBe(true)
+  })
+
+  // --------- isLessThan with another field ----------
+  it('should fail validation when yearsMarried is not less than yearsSinceGraduation', () => {
+    const params = {
+      $form: {
+        'person.yearsMarried': 15,
+        'person.yearsSinceGraduation': 10
+      },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $locations: [],
+      $online: false
+    }
+
+    expect(
+      validate(
+        field('person.yearsMarried').isLessThan({
+          $$field: 'person.yearsSinceGraduation'
+        }),
+        params
+      )
+    ).toBe(false)
+  })
+
+  it('should pass validation when yearsMarried is less than yearsSinceGraduation', () => {
+    const params = {
+      $form: {
+        'person.yearsMarried': 5,
+        'person.yearsSinceGraduation': 10
+      },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $locations: [],
+      $online: false
+    }
+
+    expect(
+      validate(
+        field('person.yearsMarried').isLessThan({
+          $$field: 'person.yearsSinceGraduation'
+        }),
+        params
+      )
+    ).toBe(true)
+  })
+
+  // --------- isLessThan with a number ----------
+  it('should fail validation when vacationDays is not less than 30', () => {
+    const params = {
+      $form: { 'employee.vacationDays': 45 },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $locations: [],
+      $online: false
+    }
+
+    expect(
+      validate(field('employee.vacationDays').isLessThan(30), params)
+    ).toBe(false)
+  })
+
+  it('should pass validation when vacationDays is less than 30', () => {
+    const params = {
+      $form: { 'employee.vacationDays': 15 },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $locations: [],
+      $online: false
+    }
+
+    expect(
+      validate(field('employee.vacationDays').isLessThan(30), params)
+    ).toBe(true)
+  })
+
+  it('should fail validation when salary is equal to 10000', () => {
+    const params = {
+      $form: { 'employee.salary': 10000 },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $locations: [],
+      $online: false
+    }
+    expect(
+      validate(field('employee.salary').isGreaterThan(10000), params)
+    ).toBe(false)
   })
 })

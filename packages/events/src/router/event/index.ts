@@ -49,7 +49,7 @@ import {
   throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
-import { importEvent } from '@events/service/events/import'
+import { importEvent, bulkImportEvents } from '@events/service/events/import'
 import { findRecordsByQuery } from '@events/service/indexing/indexing'
 import { reindex } from '@events/service/events/reindex'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
@@ -64,6 +64,10 @@ extendZodWithOpenApi(z)
 
 export const eventRouter = router({
   config: router({
+    /**
+     * Event configurations are intentionally available to all user types.
+     * Some of the dynamic scopes require knowledge of available types.
+     */
     get: publicProcedure
       .meta({
         openapi: {
@@ -74,22 +78,6 @@ export const eventRouter = router({
           protect: true
         }
       })
-      .use(
-        requiresAnyOfScopes(
-          [
-            SCOPES.RECORD_READ,
-            SCOPES.RECORD_EXPORT_RECORDS,
-            SCOPES.CONFIG,
-            SCOPES.CONFIG_UPDATE_ALL
-          ],
-          [
-            'record.create',
-            'record.declare',
-            'record.notify',
-            'record.register'
-          ]
-        )
-      )
       .input(z.void())
       .output(z.array(EventConfig))
       .query(async (options) =>
@@ -167,7 +155,7 @@ export const eventRouter = router({
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
-      if (ctx.isDuplicateAction) {
+      if (ctx.existingAction) {
         return ctx.event
       }
 
@@ -358,6 +346,19 @@ export const eventRouter = router({
     .input(EventDocument)
     .output(EventDocument)
     .mutation(async ({ input, ctx }) => importEvent(input, ctx.token)),
+  bulkImport: systemProcedure
+    .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
+    .meta({
+      openapi: {
+        summary: 'Import multiple full event records',
+        method: 'POST',
+        path: '/events/bulk-import',
+        tags: ['events']
+      }
+    })
+    .input(z.array(EventDocument))
+    .output(z.void())
+    .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token)),
   reindex: systemProcedure
     .input(z.void())
     .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))

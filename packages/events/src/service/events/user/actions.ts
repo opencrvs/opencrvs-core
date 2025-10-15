@@ -9,22 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FullDocumentPath } from '../documents'
-import { z } from 'zod'
+import {
+  countActionsByUserId,
+  getActionsByUserId,
+  UserActionsQuery
+} from '@events/storage/postgres/events/actions'
 
-export const User = z.object({
-  id: z.string(),
-  name: z.array(
-    z.object({
-      use: z.string(),
-      given: z.array(z.string()),
-      family: z.string()
-    })
-  ),
-  role: z.string(),
-  avatar: FullDocumentPath.optional(),
-  signature: FullDocumentPath.optional(),
-  primaryOfficeId: z.string()
-})
+export async function getUserActions(query: UserActionsQuery) {
+  const actions = await getActionsByUserId(query)
+  const total = await countActionsByUserId(query)
 
-export type User = z.infer<typeof User>
+  return {
+    results: actions,
+    total
+  }
+}

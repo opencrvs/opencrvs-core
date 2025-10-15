@@ -12,10 +12,11 @@ import { redis } from '@auth/database'
 import { JWT_ISSUER } from '@auth/constants'
 import { env } from '@auth/environment'
 import * as crypto from 'crypto'
-import { IUserName, createToken } from '@auth/features/authenticate/service'
+import { createToken } from '@auth/features/authenticate/service'
 import {
   triggerUserEventNotification,
-  personNameFromV1ToV2
+  personNameFromV1ToV2,
+  IUserName
 } from '@opencrvs/commons'
 
 interface ICodeDetails {
@@ -90,6 +91,7 @@ export async function sendVerificationCode(
         ['service'],
         ['opencrvs:notification-user', 'opencrvs:countryconfig-user'],
         JWT_ISSUER,
+        undefined,
         true
       )}`
     }

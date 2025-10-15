@@ -16,7 +16,8 @@ import {
   EventConfig,
   isPageVisible,
   PageTypes,
-  PageConfig
+  PageConfig,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -34,6 +35,7 @@ interface PagesProps {
   formPages: PageConfig[]
   onPageChange: (nextPageId: string) => void
   onSubmit: () => void
+  validatorContext: ValidatorContext
   continueButtonText?: string
   eventConfig?: EventConfig
   validateBeforeNextPage?: boolean
@@ -65,10 +67,14 @@ export function Pages({
   declaration,
   validateBeforeNextPage = false,
   // When isCorrection is true, we should disabled fields with 'uncorrectable' set to true, or skip pages where all fields have 'uncorrectable' set to true
-  isCorrection = false
+  isCorrection = false,
+  validatorContext
 }: PagesProps & DeclarationProps) {
   const intl = useIntl()
-  const visiblePages = formPages.filter((page) => isPageVisible(page, form))
+  const visiblePages = formPages.filter((page) =>
+    isPageVisible(page, form, validatorContext)
+  )
+
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
   const page = pageIdx === -1 ? visiblePages[0] : visiblePages[pageIdx]
   const [validateAllFields, setValidateAllFields] = useState(false)
@@ -138,7 +144,7 @@ export function Pages({
     <FormFieldGenerator
       eventConfig={eventConfig}
       fields={page.fields}
-      id="locationForm"
+      id="pagesSection"
       // In some Action page forms, the form data itself is not the complete declaration.
       // We still merge the optional `declaration` prop into the initial form values so that
       // read-only declaration data is available for Data components or calculations.
@@ -146,6 +152,7 @@ export function Pages({
       initialValues={{ ...declaration, ...form }}
       isCorrection={isCorrection}
       validateAllFields={validateAllFields}
+      validatorContext={validatorContext}
       onAllFieldsValidated={(success) => {
         setValidateAllFields(false)
         if (success) {

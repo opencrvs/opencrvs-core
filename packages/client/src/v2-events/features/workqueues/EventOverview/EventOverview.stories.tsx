@@ -362,7 +362,7 @@ export const WithVariousUserRoles: Story = {
           createdBy: refData.user.id.fieldAgent,
           createdAtLocation: 'loc-002' as UUID,
           createdByUserType: 'user' as const,
-          createdByRole: 'SOCIAL_WORKER',
+          createdByRole: 'HOSPITAL_CLERK',
           assignedTo: '010101',
           declaration: {}
         },
@@ -427,7 +427,7 @@ export const WithVariousUserRoles: Story = {
           createdBy: testDataGenerator().user.id.fieldAgent,
           createdAtLocation: 'loc-003' as UUID,
           createdByUserType: 'user' as const,
-          createdByRole: 'LOCAL_LEADER',
+          createdByRole: 'COMMUNITY_LEADER',
           declaration: {}
         },
         {
@@ -629,7 +629,7 @@ const actionDefaults = {
   ),
   createdBy: refData.user.id.localRegistrar,
   createdByRole: TestUserRole.Enum.LOCAL_REGISTRAR,
-  createdAtLocation: refData.user.localRegistrar().primaryOffice.id as UUID
+  createdAtLocation: refData.user.localRegistrar().v2.primaryOfficeId
 } satisfies Partial<ActionDocument>
 
 const duplicateEvent = {

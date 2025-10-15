@@ -20,7 +20,8 @@ import {
   ActionType,
   EventState,
   generateTransactionId,
-  RequestedCorrectionAction
+  RequestedCorrectionAction,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import {
@@ -207,12 +208,24 @@ function RejectModal({
   )
 }
 
+// Content has 'height: 100%' on mobile, which breaks the page layout if there is anything on the page after the Content.
+// We don't want that.
+const StyledContent = styled(Content)`
+  height: auto;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-bottom: 28px;
+  }
+`
+
 export function ReviewCorrection({
   form,
-  correctionRequestAction
+  correctionRequestAction,
+  validatorContext
 }: {
   form: EventState
   correctionRequestAction: RequestedCorrectionAction
+  validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
   const { getAnnotation } = useActionAnnotation()
@@ -300,7 +313,8 @@ export function ReviewCorrection({
   )
 
   return (
-    <Content
+    <StyledContent
+      showTitleOnMobile={true}
       size={ContentSize.LARGE}
       title={intl.formatMessage(reviewCorrectionMessages.correctionRequest)}
     >
@@ -310,12 +324,13 @@ export function ReviewCorrection({
         event={event}
         form={form}
         requesting={!isActionAllowed(ActionType.APPROVE_CORRECTION)}
+        validatorContext={validatorContext}
       />
       <Row background="white" position="left">
         {rejectButton}
         {approveButton}
       </Row>
       {modal}
-    </Content>
+    </StyledContent>
   )
 }

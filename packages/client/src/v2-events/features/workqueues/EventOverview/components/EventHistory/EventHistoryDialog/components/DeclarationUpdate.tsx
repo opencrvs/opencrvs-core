@@ -10,15 +10,15 @@
  */
 import React from 'react'
 import {
-  ActionDocument,
   EventDocument,
   EventStatus,
-  getCurrentEventState,
-  getStatusFromActions
+  getStatusFromActions,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { DeclarationComparisonTable } from '@client/v2-events/features/events/actions/correct/request/Summary/DeclarationComparisonTable'
+import { EventHistoryActionDocument } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 
 /**
  *
@@ -26,10 +26,12 @@ import { DeclarationComparisonTable } from '@client/v2-events/features/events/ac
  */
 export function DeclarationUpdateComponent({
   action,
-  fullEvent
+  fullEvent,
+  validatorContext
 }: {
-  action: ActionDocument
+  action: EventHistoryActionDocument
   fullEvent: EventDocument
+  validatorContext: ValidatorContext
 }) {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
@@ -47,6 +49,7 @@ export function DeclarationUpdateComponent({
       eventConfig={eventConfiguration}
       fullEvent={fullEvent}
       id={'declaration-update'}
+      validatorContext={validatorContext}
     />
   )
 }

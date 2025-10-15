@@ -24,9 +24,7 @@ import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
-import { Leaderboards } from '@client/views/Performance/Leaderboards'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
-import { PerformanceStatistics } from '@client/views/Performance/Statistics'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
 import { Payment } from '@client/views/PrintCertificate/Payment'
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
@@ -99,7 +97,6 @@ function createRedirect(from: string, to: string) {
     }
   }
 }
-
 export const routesConfig = config.FEATURES.V2_EVENTS
   ? [
       {
@@ -135,37 +132,6 @@ export const routesConfig = config.FEATURES.V2_EVENTS
           // Search results,
           // Advanced search,
           {
-            path: routes.ALL_USER_EMAIL,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
-                <AllUserEmail />
-              </ProtectedRoute>
-            )
-          },
-          { path: routes.SETTINGS, element: <SettingsPage /> },
-          {
-            path: routes.TEAM_USER_LIST,
-            element: (
-              <ProtectedRoute
-                scopes={[
-                  SCOPES.ORGANISATION_READ_LOCATIONS,
-                  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-                  SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
-                ]}
-              >
-                <UserList />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.SYSTEM_LIST,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
-                <SystemList />
-              </ProtectedRoute>
-            )
-          },
-          {
             path: routes.VS_EXPORTS,
             element: (
               <ProtectedRoute
@@ -175,46 +141,15 @@ export const routesConfig = config.FEATURES.V2_EVENTS
               </ProtectedRoute>
             )
           },
-          { path: routes.USER_PROFILE, element: <UserAudit /> },
           {
             path: routes.PERFORMANCE_REGISTRATIONS_LIST,
             element: <RegistrationList />
           },
           {
-            path: routes.PERFORMANCE_STATISTICS,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-                <PerformanceStatistics />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.PERFORMANCE_LEADER_BOARDS,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-                <Leaderboards />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.PERFORMANCE_DASHBOARD,
+            path: routes.DASHBOARD,
             element: (
               <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
                 <PerformanceDashboard />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.ORGANISATIONS_INDEX,
-            element: (
-              <ProtectedRoute
-                scopes={[
-                  SCOPES.ORGANISATION_READ_LOCATIONS,
-                  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-                  SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
-                ]}
-              >
-                <AdministrativeLevels />
               </ProtectedRoute>
             )
           },
@@ -435,23 +370,7 @@ export const routesConfig = config.FEATURES.V2_EVENTS
             element: <RegistrationList />
           },
           {
-            path: routes.PERFORMANCE_STATISTICS,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-                <PerformanceStatistics />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.PERFORMANCE_LEADER_BOARDS,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-                <Leaderboards />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.PERFORMANCE_DASHBOARD,
+            path: routes.DASHBOARD,
             element: (
               <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
                 <PerformanceDashboard />

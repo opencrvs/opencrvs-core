@@ -31,6 +31,7 @@ function RadioGroupInput({
 }: FieldPropsWithoutReferenceValue<'RADIO_GROUP'> & {
   onChange: (val: string | undefined) => void
   value?: string
+  disabled?: boolean
 }) {
   const intl = useIntlWithFormData()
 

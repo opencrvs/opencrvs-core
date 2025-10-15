@@ -25,7 +25,8 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
   border-radius: 4px;
   border: 1.5px solid ${({ theme }) => theme.colors.grey600};
   background-color: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${({ theme, disabled }) =>
+    disabled ? theme.colors.disabled : theme.colors.copy};
 
   &:hover {
     box-shadow: 0 0 0px 4px ${({ theme }) => theme.colors.grey200};

@@ -12,13 +12,7 @@ import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { ListViewSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { Content } from '@opencrvs/components/lib/Content'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import {
-  constantsMessages,
-  userMessages as messages
-} from '@client/i18n/messages'
-import { Navigation } from '@client/components/interface/Navigation'
-import { Header } from '@client/components/Header/Header'
+import { userMessages as messages } from '@client/i18n/messages'
 import {
   Name,
   Role,
@@ -31,10 +25,16 @@ import {
 import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
 import { EmailAddress } from '@client/views/Settings/items/EmailAddress'
 
+const settingsTitle = {
+  id: 'home.header.settingsTitle',
+  defaultMessage: 'Settings',
+  description: 'settings title'
+}
+
 export function SettingsPage() {
   const intl = useIntl()
   return (
-    <WorkqueueLayout>
+    <WorkqueueLayout title={intl.formatMessage(settingsTitle)}>
       <Content
         showTitleOnMobile={true}
         title={intl.formatMessage(messages.settingsTitle)}

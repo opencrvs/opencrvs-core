@@ -21,10 +21,11 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
-  ActionDocument,
   ActionType,
+  EventConfig,
   EventDocument,
-  getAcceptedActions
+  getAcceptedActions,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -34,7 +35,11 @@ import { useEventOverviewContext } from '@client/v2-events/features/workqueues/E
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
-import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
+import {
+  expandWithUpdateActions,
+  EventHistoryActionDocument,
+  useActionForHistory
+} from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import {
   EventHistoryDialog,
@@ -68,7 +73,7 @@ const messages = defineMessages({
   role: {
     id: 'event.history.role',
     defaultMessage:
-      '{role, select, LOCAL_REGISTRAR {Local Registrar} SOCIAL_WORKER {Social Worker} FIELD_AGENT {Field Agent} POLICE_OFFICER {Police Officer} REGISTRATION_AGENT {Registration Agent} HEALTHCARE_WORKER {Healthcare Worker} LOCAL_LEADER {Local Leader} HOSPITAL_CLERK {Hospital Clerk} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} COMMUNITY_LEADER {Community Leader} HEALTH {Health integration} IMPORT_EXPORT {Import integration} NATIONAL_ID {National ID integration} RECORD_SEARCH {Record search integration} WEBHOOK {Webhook} other {Unknown}}',
+      '{role, select, LOCAL_REGISTRAR {Local Registrar} HOSPITAL_CLERK {Hospital Clerk} FIELD_AGENT {Field Agent} POLICE_OFFICER {Police Officer} REGISTRATION_AGENT {Registration Agent} HEALTHCARE_WORKER {Healthcare Worker} COMMUNITY_LEADER {Community Leader} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} HEALTH {Health integration} IMPORT_EXPORT {Import integration} NATIONAL_ID {National ID integration} RECORD_SEARCH {Record search integration} WEBHOOK {Webhook} other {Unknown}}',
     description: 'Role of the user in the event history'
   },
   system: {
@@ -142,10 +147,12 @@ interface ActionCreator {
 
 function useActionCreator() {
   const intl = useIntl()
-  const { getUser } = useEventOverviewContext()
+  const { findUser } = useEventOverviewContext()
   const { systems } = useSelector(getOfflineData)
 
-  const getActionCreator = (action: ActionDocument): ActionCreator => {
+  const getActionCreator = (
+    action: EventHistoryActionDocument
+  ): ActionCreator => {
     if (action.createdByUserType === 'system') {
       const system = systems.find((s) => s._id === action.createdBy)
       return {
@@ -159,20 +166,21 @@ function useActionCreator() {
         name: intl.formatMessage(messages.system)
       } as const
     }
-    const user = getUser(action.createdBy)
+    const user = findUser(action.createdBy)
     return {
       type: 'user',
-      name: getUsersFullName(user.name, intl.locale)
+      // @todo:
+      name: user ? getUsersFullName(user.name, intl.locale) : 'Missing user'
     } as const
   }
   return { getActionCreator }
 }
 
-function User({ action }: { action: ActionDocument }) {
+function User({ action }: { action: EventHistoryActionDocument }) {
   const intl = useIntl()
-  const { getUser } = useEventOverviewContext()
+  const { findUser } = useEventOverviewContext()
   const navigate = useNavigate()
-  const user = getUser(action.createdBy)
+  const user = findUser(action.createdBy)
   const { canReadUser } = usePermissions()
 
   const { getActionCreator } = useActionCreator()
@@ -183,10 +191,12 @@ function User({ action }: { action: ActionDocument }) {
     throw new Error('Expected action creator to be a user')
   }
 
-  const canViewUser = canReadUser({
-    id: user.id,
-    primaryOffice: { id: user.primaryOfficeId }
-  })
+  const canViewUser =
+    !!user &&
+    canReadUser({
+      id: user.id,
+      primaryOffice: { id: user.primaryOfficeId }
+    })
 
   return canViewUser ? (
     <Link
@@ -208,7 +218,7 @@ function User({ action }: { action: ActionDocument }) {
   )
 }
 
-function Integration({ action }: { action: ActionDocument }) {
+function Integration({ action }: { action: EventHistoryActionDocument }) {
   const { getActionCreator } = useActionCreator()
 
   const { type, name } = getActionCreator(action)
@@ -227,7 +237,7 @@ function Integration({ action }: { action: ActionDocument }) {
   )
 }
 
-function ActionCreator({ action }: { action: ActionDocument }) {
+function ActionCreator({ action }: { action: EventHistoryActionDocument }) {
   const intl = useIntl()
   if (action.createdByUserType === 'system') {
     return <Integration action={action} />
@@ -245,7 +255,7 @@ function ActionCreator({ action }: { action: ActionDocument }) {
   return <User action={action} />
 }
 
-function ActionRole({ action }: { action: ActionDocument }) {
+function ActionRole({ action }: { action: EventHistoryActionDocument }) {
   const intl = useIntl()
   const role = action.createdByRole
   const { getActionCreator } = useActionCreator()
@@ -255,27 +265,26 @@ function ActionRole({ action }: { action: ActionDocument }) {
     return null
   }
 
-  return (
-    <Text element="span" variant="reg14">
-      {intl.formatMessage(messages.role, { role })}
-    </Text>
-  )
+  return <>{intl.formatMessage(messages.role, { role })}</>
 }
 
-function ActionLocation({ action }: { action: ActionDocument }) {
-  const { getUser, getLocation } = useEventOverviewContext()
+function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
+  const { findUser, getLocation } = useEventOverviewContext()
   const { canAccessOffice } = usePermissions()
   const navigate = useNavigate()
   const { getActionCreator } = useActionCreator()
 
-  const user = getUser(action.createdBy)
+  const user = findUser(action.createdBy)
   const locationName = action.createdAtLocation
     ? getLocation(action.createdAtLocation)?.name
     : undefined
 
-  const hasAccessToOffice = canAccessOffice({
-    id: user.primaryOfficeId
-  })
+  const hasAccessToOffice =
+    !!user &&
+    canAccessOffice({
+      id: user.primaryOfficeId
+    })
+
   const { type } = getActionCreator(action)
 
   if (type === 'system') {
@@ -319,7 +328,15 @@ export function EventHistorySkeleton() {
 /**
  *  Renders the event history table. Used for audit trail.
  */
-export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
+export function EventHistory({
+  fullEvent,
+  validatorContext,
+  eventConfiguration
+}: {
+  fullEvent: EventDocument
+  validatorContext: ValidatorContext
+  eventConfiguration: EventConfig
+}) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
   const intl = useIntl()
@@ -327,33 +344,44 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const { getActionTypeForHistory } = useActionForHistory()
   const { getActionCreator } = useActionCreator()
 
-  const onHistoryRowClick = (item: ActionDocument, userName: string) => {
+  const history = getAcceptedActions(fullEvent)
+
+  const historyWithUpdatedActions = expandWithUpdateActions(
+    fullEvent,
+    validatorContext,
+    eventConfiguration
+  )
+
+  const visibleHistoryWithUpdatedActions = historyWithUpdatedActions.filter(
+    ({ type }) => type !== ActionType.CREATE
+  )
+
+  const onHistoryRowClick = (
+    action: EventHistoryActionDocument,
+    userName: string
+  ) => {
     void openModal<void>((close) => (
       <EventHistoryDialog
-        action={item}
+        action={action}
         close={close}
         fullEvent={fullEvent}
         userName={userName}
+        validatorContext={validatorContext}
       />
     ))
   }
 
-  const history = getAcceptedActions(fullEvent)
-
-  const visibleHistory = history.filter(
-    ({ type }) => type !== ActionType.CREATE
-  )
-
-  const historyRows = visibleHistory
+  const historyRows = visibleHistoryWithUpdatedActions
     .map((x) => {
       if (x.type === ActionType.REQUEST_CORRECTION) {
-        const immediateApprovedCorrection = visibleHistory.find(
-          (h) =>
-            h.type === ActionType.APPROVE_CORRECTION &&
-            (h.requestId === x.id || h.requestId === x.originalActionId) &&
-            h.annotation?.isImmediateCorrection &&
-            h.createdBy === x.createdBy
-        )
+        const immediateApprovedCorrection =
+          visibleHistoryWithUpdatedActions.find(
+            (h) =>
+              h.type === ActionType.APPROVE_CORRECTION &&
+              (h.requestId === x.id || h.requestId === x.originalActionId) &&
+              h.annotation?.isImmediateCorrection &&
+              h.createdBy === x.createdBy
+          )
         // Adding flag on immediately approved REQUEST_CORRECTION to show it
         // as 'Record corrected' in history table
         if (immediateApprovedCorrection) {
@@ -450,11 +478,13 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
           noResultText=""
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
         />
-        {visibleHistory.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
+        {visibleHistoryWithUpdatedActions.length >
+          DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
           <Pagination
             currentPage={currentPageNumber}
             totalPages={Math.ceil(
-              visibleHistory.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+              visibleHistoryWithUpdatedActions.length /
+                DEFAULT_HISTORY_RECORD_PAGE_SIZE
             )}
             onPageChange={(page) => setCurrentPageNumber(page)}
           />

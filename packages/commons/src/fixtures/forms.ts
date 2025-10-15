@@ -12,7 +12,8 @@ import {
   and,
   defineConditional,
   never,
-  not
+  not,
+  user
 } from '../conditionals/conditionals'
 import {
   defineActionForm,
@@ -148,7 +149,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
               }
             },
             {
-              value: 'REFUGEE_NUMBER',
+              value: 'REFUGEE-NUMBER',
               label: {
                 id: 'event.tennis-club-membership.action.form.section.idType.refugeeNumber.label',
                 defaultMessage: 'Refugee Number',
@@ -234,7 +235,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           type: FieldType.TEXT
         },
         {
-          id: 'collector.DRIVING_LICENSE.details',
+          id: 'collector.DRIVING-LICENSE.details',
           conditionals: [
             {
               type: ConditionalType.SHOW,
@@ -285,7 +286,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           type: FieldType.TEXT
         },
         {
-          id: 'collector.REFUGEE_NUMBER.details',
+          id: 'collector.REFUGEE-NUMBER.details',
           conditionals: [
             {
               type: ConditionalType.SHOW,
@@ -336,7 +337,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           type: FieldType.TEXT
         },
         {
-          id: 'collector.ALIEN_NUMBER.details',
+          id: 'collector.ALIEN-NUMBER.details',
           conditionals: [
             {
               type: ConditionalType.SHOW,
@@ -1115,6 +1116,24 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               }
             ]
           }
+        },
+        {
+          id: 'applicant.isRecommendedByFieldAgent',
+          type: FieldType.CHECKBOX,
+          analytics: true,
+          required: false,
+          label: {
+            defaultMessage:
+              'Field shown when field agent is submitting application.',
+            description: 'This is the label for the field',
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.isRecommendedByFieldAgent.label'
+          },
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional: user.hasRole('FIELD_AGENT')
+            }
+          ]
         }
       ]
     },

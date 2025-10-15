@@ -40,8 +40,12 @@ import {
   DateRangeField,
   SelectDateRangeField,
   TimeField,
+  AlphaPrintButton,
   HttpField,
-  ButtonField
+  ButtonField,
+  LinkButtonField,
+  VerificationStatus,
+  QueryParamReaderField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -57,7 +61,8 @@ import {
   DateRangeFieldValue,
   SelectDateRangeValue,
   TimeValue,
-  ButtonFieldValue
+  ButtonFieldValue,
+  VerificationStatusValue
 } from './FieldValue'
 
 import { FullDocumentPath } from '../documents'
@@ -70,7 +75,8 @@ import {
   AddressType,
   NameFieldValue,
   NameFieldUpdateValue,
-  HttpFieldUpdateValue
+  HttpFieldUpdateValue,
+  QueryParamReaderFieldUpdateValue
 } from './CompositeFieldValue'
 
 /**
@@ -124,6 +130,8 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.PHONE:
+    case FieldType.LINK_BUTTON:
+    case FieldType.VERIFICATION_STATUS:
     case FieldType.ID:
       schema = required ? NonEmptyTextValue : TextValue
       break
@@ -152,8 +160,14 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.BUTTON:
       schema = ButtonFieldValue
       break
+    case FieldType.ALPHA_PRINT_BUTTON:
+      schema = TextValue
+      break
     case FieldType.HTTP:
       schema = HttpFieldUpdateValue
+      break
+    case FieldType.QUERY_PARAM_READER:
+      schema = QueryParamReaderFieldUpdateValue
       break
   }
 
@@ -167,7 +181,7 @@ export function createValidationSchema(config: FieldConfig[]) {
   > = {}
 
   for (const field of config) {
-    shape[field.id] = mapFieldTypeToZod(field.type, field.required)
+    shape[field.id] = mapFieldTypeToZod(field.type, !!field.required)
   }
 
   return z.object(shape)
@@ -202,8 +216,12 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.NAME:
     case FieldType.PHONE:
     case FieldType.BUTTON:
+    case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.HTTP:
+    case FieldType.LINK_BUTTON:
+    case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
+    case FieldType.VERIFICATION_STATUS:
       return null
     case FieldType.ADDRESS:
       return {
@@ -433,11 +451,45 @@ export const isButtonFieldType = (field: {
   return field.config.type === FieldType.BUTTON
 }
 
+export const isPrintButtonFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: AlphaPrintButton } => {
+  return field.config.type === FieldType.ALPHA_PRINT_BUTTON
+}
+
 export const isHttpFieldType = (field: {
   config: FieldConfig
   value: FieldValue
 }): field is { value: undefined; config: HttpField } => {
   return field.config.type === FieldType.HTTP
+}
+
+export const isLinkButtonFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: LinkButtonField } => {
+  return field.config.type === FieldType.LINK_BUTTON
+}
+
+export const isVerificationStatusType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is {
+  value: VerificationStatusValue | undefined
+  config: VerificationStatus
+} => {
+  return field.config.type === FieldType.VERIFICATION_STATUS
+}
+
+export const isQueryParamReaderFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is {
+  value: undefined
+  config: QueryParamReaderField
+} => {
+  return field.config.type === FieldType.QUERY_PARAM_READER
 }
 
 export type NonInteractiveFieldType =
@@ -446,6 +498,10 @@ export type NonInteractiveFieldType =
   | Paragraph
   | BulletList
   | DataField
+  | AlphaPrintButton
+  | HttpField
+  | LinkButtonField
+  | QueryParamReaderField
 
 export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
 
@@ -458,6 +514,9 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.PARAGRAPH ||
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
-    field.type === FieldType.HTTP
+    field.type === FieldType.ALPHA_PRINT_BUTTON ||
+    field.type === FieldType.HTTP ||
+    field.type === FieldType.LINK_BUTTON ||
+    field.type === FieldType.QUERY_PARAM_READER
   )
 }

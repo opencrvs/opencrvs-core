@@ -183,7 +183,11 @@ export async function defaultRequestHandler(
   token: TokenWithBearer,
   event: EventDocument,
   configuration: EventConfig,
-  actionConfirmationResponseSchema?: z.ZodType
+  // @TODO: Could this be typed with the actual input schema, or could these actually be anything?
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  inputSchema: z.ZodObject<any>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  actionConfirmationResponseSchema?: z.ZodObject<any>
 ) {
   await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
 
@@ -200,18 +204,19 @@ export async function defaultRequestHandler(
     { eventId: input.eventId, actionId: requestedAction.id },
     token
   )
-  const { responseStatus, body } = await requestActionConfirmation(
-    input.type,
-    input.transactionId,
-    eventWithRequestedAction,
-    setBearerForToken(eventActionToken)
-  )
+  const { responseStatus, responseBody: confirmationResponse } =
+    await requestActionConfirmation(
+      input.type,
+      input.transactionId,
+      eventWithRequestedAction,
+      setBearerForToken(eventActionToken)
+    )
 
   // If we get an unexpected failure response, we just return HTTP 500 without saving the
   if (responseStatus === ActionConfirmationResponse.UnexpectedFailure) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
-      message: 'Unexpected failure from notification API'
+      message: 'Unexpected failure from country config action confirmation API'
     })
     // For Async flow, we just return the event with the requested action and ensure it is indexed
   } else if (responseStatus === ActionConfirmationResponse.RequiresProcessing) {
@@ -241,6 +246,20 @@ export async function defaultRequestHandler(
   if (responseStatus === ActionConfirmationResponse.Success) {
     status = ActionStatus.Accepted
 
+    try {
+      parsedBody = (actionConfirmationResponseSchema ?? z.object({}))
+        .merge(inputSchema.partial())
+        .parse(confirmationResponse ?? {})
+    } catch (error) {
+      logger.error(error)
+
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message:
+          'Invalid payload received from country config action confirmation API'
+      })
+    }
+
     logger.debug(
       {
         transactionId: input.transactionId,
@@ -250,16 +269,6 @@ export async function defaultRequestHandler(
       },
       `Action immediately accepted (status: "${responseStatus}")`
     )
-    if (actionConfirmationResponseSchema) {
-      try {
-        parsedBody = actionConfirmationResponseSchema.parse(body)
-      } catch {
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Invalid payload received from notification API'
-        })
-      }
-    }
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { declaration, annotation, ...strippedInput } = input
@@ -277,14 +286,17 @@ export async function defaultRequestHandler(
   return updatedEvent
 }
 
-const ActionConfirmationResponseSchema = z.object({
+/**
+ * These fields aren't required in the synchronous flow as the action is processed immediately and we still have access to them.
+ */
+const AsyncActionConfirmationResponseSchema = z.object({
   eventId: UUID,
   actionId: UUID,
   transactionId: z.string()
 })
 
-export type ActionConfirmationResponseSchema = z.infer<
-  typeof ActionConfirmationResponseSchema
+export type AsyncActionConfirmationResponseSchema = z.infer<
+  typeof AsyncActionConfirmationResponseSchema
 >
 
 /**
@@ -303,13 +315,11 @@ export function getDefaultActionProcedures(
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
-  const { actionConfirmationResponseSchema, inputSchema } = actionConfig
+  let asyncAcceptInputFields = AsyncActionConfirmationResponseSchema
 
-  let acceptInputFields = ActionConfirmationResponseSchema
-
-  if (actionConfirmationResponseSchema) {
-    acceptInputFields = acceptInputFields.merge(
-      actionConfirmationResponseSchema
+  if (actionConfig.actionConfirmationResponseSchema) {
+    asyncAcceptInputFields = asyncAcceptInputFields.merge(
+      actionConfig.actionConfirmationResponseSchema
     )
   }
 
@@ -324,7 +334,7 @@ export function getDefaultActionProcedures(
     request: systemProcedure
       .meta(meta)
       .use(requireScopesForRequestMiddleware)
-      .input(inputSchema)
+      .input(actionConfig.inputSchema)
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
@@ -332,15 +342,15 @@ export function getDefaultActionProcedures(
       .use(middleware.requireLocationForSystemUserAction)
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
-        const { token, user, isDuplicateAction, duplicates } = ctx
+        const { token, user, existingAction, duplicates } = ctx
         const { eventId } = input
         const event = await getEventById(eventId)
-        const configuration = await getEventConfigurationById({
+        const eventConfiguration = await getEventConfigurationById({
           token,
           eventType: event.type
         })
 
-        if (isDuplicateAction) {
+        if (existingAction) {
           return ctx.event
         }
 
@@ -353,13 +363,14 @@ export function getDefaultActionProcedures(
           user,
           token,
           event,
-          configuration,
-          actionConfirmationResponseSchema
+          eventConfiguration,
+          actionConfig.inputSchema,
+          actionConfig.actionConfirmationResponseSchema
         )
       }),
 
     accept: systemProcedure
-      .input(inputSchema.merge(acceptInputFields))
+      .input(actionConfig.inputSchema.merge(asyncAcceptInputFields))
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
@@ -428,7 +439,7 @@ export function getDefaultActionProcedures(
       }),
 
     reject: systemProcedure
-      .input(ActionConfirmationResponseSchema)
+      .input(AsyncActionConfirmationResponseSchema)
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ input, ctx }) => {
         const { eventId, actionId } = input

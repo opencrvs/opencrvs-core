@@ -32,6 +32,7 @@ import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { RejectionState, Review } from './Review'
 
 const mockDeclaration = {
@@ -65,13 +66,14 @@ const meta: Meta<typeof Review.Body> = {
     title: 'Member declaration for John Doe'
   },
   decorators: [
-    (Story) => (
+    (Story, context) => (
       <TRPCProvider>
         <React.Suspense>
-          <Story />
+          <Story {...context} />
         </React.Suspense>
       </TRPCProvider>
-    )
+    ),
+    withValidatorContext
   ]
 }
 
@@ -144,7 +146,7 @@ export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
       await fireEvent.click(cancelButton)
     })
   },
-  render: function Component() {
+  render: function Component(args) {
     const [modal, openModal] = useModal()
 
     async function handleDeclaration() {
@@ -182,6 +184,7 @@ export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
     return (
       <>
         <Review.Body
+          {...args}
           form={mockDeclaration}
           formConfig={TENNIS_CLUB_DECLARATION_FORM}
           title="My test action"
@@ -230,7 +233,7 @@ export const ReviewWithValidationErrors: Story = {
       } as AddressFieldValue
     }
   },
-  render: function Component() {
+  render: function Component(args) {
     const [modal, openModal] = useModal()
 
     async function handleRejection() {
@@ -240,6 +243,7 @@ export const ReviewWithValidationErrors: Story = {
     }
     return (
       <Review.Body
+        {...args}
         form={this.args?.form || {}}
         formConfig={TENNIS_CLUB_DECLARATION_FORM}
         title="My test action"
@@ -277,7 +281,7 @@ export const ReviewWithConditionallyHiddenFields: Story = {
       'are-you-feeling-all-right': true
     }
   },
-  render: function Component() {
+  render: function Component(args) {
     const [modal, openModal] = useModal()
 
     async function handleRejection() {
@@ -287,6 +291,7 @@ export const ReviewWithConditionallyHiddenFields: Story = {
     }
     return (
       <Review.Body
+        {...args}
         form={this.args?.form || {}}
         formConfig={defineDeclarationForm({
           label: {
@@ -358,8 +363,7 @@ export const ReviewWithConditionallyHiddenFields: Story = {
                     }
                   ]
                 },
-                // By default, checkboxes are hidden unless selected
-                // I.e. this should be hidden
+                // These fields should be shown, since there are no conditions
                 {
                   id: 'has-it-been-a-nice-day',
                   type: FieldType.CHECKBOX,
@@ -370,7 +374,6 @@ export const ReviewWithConditionallyHiddenFields: Story = {
                     id: 'has-it-been-a-nice-day.label'
                   }
                 },
-                // This field should be shown, since its selected
                 {
                   id: 'are-you-feeling-all-right',
                   type: FieldType.CHECKBOX,
@@ -452,7 +455,7 @@ export const RejectModalInteraction: StoryObj<typeof Review.Body> = {
       })
     })
   },
-  render: function Component() {
+  render: function Component(args) {
     const [modal, openModal] = useModal()
 
     async function handleDeclaration() {
@@ -490,6 +493,7 @@ export const RejectModalInteraction: StoryObj<typeof Review.Body> = {
     return (
       <>
         <Review.Body
+          {...args}
           form={mockDeclaration}
           formConfig={TENNIS_CLUB_DECLARATION_FORM}
           title="My test action"
@@ -511,7 +515,7 @@ export const RejectModalInteraction: StoryObj<typeof Review.Body> = {
 
 const declareEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
 })
 
 const eventDocumentWithoutSurname = {

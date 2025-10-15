@@ -714,7 +714,7 @@ const viewRecordMock = {
           },
           user: {
             id: '63b3f284452f2e40afa44092',
-            type: 'SOCIAL_WORKER',
+            type: 'HOSPITAL_CLERK',
             role: 'FIELD_AGENT',
             name: [
               {
@@ -1117,7 +1117,7 @@ const actualDeclarationMock = {
       system: null,
       user: {
         id: '63b3f284452f2e40afa44092',
-        type: 'SOCIAL_WORKER',
+        type: 'HOSPITAL_CLERK',
         role: 'FIELD_AGENT',
         name: [
           {

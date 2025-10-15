@@ -10,21 +10,21 @@
  */
 
 import { useSelector } from 'react-redux'
+import { cloneDeep } from 'lodash'
 import {
   ActionDocument,
   ActionType,
   CertificateTemplateConfig,
   EventConfig,
   EventDocument,
+  EventState,
   FieldType,
   getCurrentEventState,
-  getUUID,
   isMinioUrl,
   LanguageConfig,
   Location,
   PrintCertificateAction,
-  User,
-  UUID
+  UserOrSystem
 } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
@@ -33,36 +33,32 @@ import {
   svgToPdfTemplate
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
-import { getUserDetails } from '@client/profile/profileSelectors'
 import { getOfflineData } from '@client/offline/selectors'
 import { useEventConfiguration } from '../features/events/useEventConfiguration'
-import { useEvents } from '../features/events/useEvents/useEvents'
+import { hasStringFilename } from '../utils'
 
 async function replaceMinioUrlWithBase64(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  declaration: Record<string, any>,
+  declaration: EventState,
   config: EventConfig
 ) {
+  // Clone to avoid mutating the original declaration
+  const declarationClone = cloneDeep(declaration)
+
   const fileFieldIds = config.declaration.pages
     .flatMap((page) => page.fields)
     .filter((field) => field.type === FieldType.FILE)
     .map((field) => field.id)
 
   for (const fieldId of fileFieldIds) {
-    const fieldValue = declaration[fieldId]
-    if (
-      fieldValue &&
-      typeof fieldValue === 'object' &&
-      'filename' in fieldValue &&
-      isMinioUrl(fieldValue.filename)
-    ) {
-      declaration[fieldId].filename = await fetchImageAsBase64(
-        // this should be a presigned minio url
-        fieldValue.filename
-      )
+    const field = declarationClone[fieldId]
+
+    if (hasStringFilename(field) && isMinioUrl(field.filename)) {
+      // TypeScript now knows `field` has a `filename` property of type string
+      field.filename = await fetchImageAsBase64(field.filename)
     }
   }
-  return declaration
+
+  return declarationClone
 }
 
 export const usePrintableCertificate = ({
@@ -76,51 +72,17 @@ export const usePrintableCertificate = ({
   event: EventDocument
   config: EventConfig
   locations: Location[]
-  users: User[]
+  users: UserOrSystem[]
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
 }) => {
   const { eventConfiguration } = useEventConfiguration(event.type)
+  const { config: appConfig } = useSelector(getOfflineData)
   const { declaration, ...metadata } = getCurrentEventState(
     event,
     eventConfiguration
   )
-  const { getEvent } = useEvents()
-  const userDetails = useSelector(getUserDetails)
-  const { config: appConfig } = useSelector(getOfflineData)
-
-  const adminLevels = appConfig.ADMIN_STRUCTURE
-
-  const actions = getEvent.getFromCache(event.id).actions
-  if (!userDetails) {
-    throw new Error('User details are not available')
-  }
-
-  const userFromUsersList = users.find((user) => user.id === userDetails.id)
-  if (!userFromUsersList) {
-    throw new Error(`User with id ${userDetails.id} not found in users list`)
-  }
-
-  const actionsWithAnOptimisticPrintAction = actions.concat({
-    type: ActionType.PRINT_CERTIFICATE,
-    id: getUUID(),
-    transactionId: getUUID(),
-    createdByUserType: 'user',
-    createdAt: new Date().toISOString(),
-    createdBy: userFromUsersList.id,
-    createdByRole: userFromUsersList.role,
-    status: 'Accepted',
-    declaration: {},
-    annotation: null,
-    originalActionId: null,
-    createdBySignature: userFromUsersList.signature,
-    createdAtLocation: userDetails.primaryOffice.id as UUID,
-    content: {
-      templateId: certificateConfig?.id
-    }
-  } satisfies PrintCertificateAction)
-
-  const copiesPrintedForTemplate = actionsWithAnOptimisticPrintAction.filter(
+  const copiesPrintedForTemplate = event.actions.filter(
     (action) =>
       action.type === ActionType.PRINT_CERTIFICATE &&
       (action as PrintCertificateAction).content?.templateId ===
@@ -141,13 +103,15 @@ export const usePrintableCertificate = ({
     return { svgCode: null }
   }
 
+  const adminLevels = appConfig.ADMIN_STRUCTURE
+
   const certificateFonts = certificateConfig.fonts ?? {}
 
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
     $metadata: modifiedMetadata,
     $declaration: declaration,
-    $actions: actionsWithAnOptimisticPrintAction as ActionDocument[],
+    $actions: event.actions as ActionDocument[],
     review: true,
     locations,
     users,
@@ -183,7 +147,7 @@ export const usePrintableCertificate = ({
         copiesPrintedForTemplate
       },
       $declaration: declarationWithResolvedImages,
-      $actions: actionsWithAnOptimisticPrintAction as ActionDocument[],
+      $actions: event.actions as ActionDocument[],
       locations,
       review: false,
       users,

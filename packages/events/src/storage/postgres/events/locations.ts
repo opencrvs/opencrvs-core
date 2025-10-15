@@ -96,10 +96,20 @@ export async function getLocations({
   return query.execute()
 }
 
-export async function getChildLocations(parentId: string) {
+export async function getLocationById(id: UUID) {
   const db = getClient()
+  return db
+    .selectFrom('locations')
+    .select(['id', 'name', 'parentId', 'validUntil', 'locationType'])
+    .where('id', '=', id)
+    .where('deletedAt', 'is', null)
+    .$narrowType<{ deletedAt: null }>()
+    .executeTakeFirst()
+}
 
-  const { rows } = await sql<Locations>`
+/** @returns a recursive CTE that can be used to get all child locations of a given location */
+function childLocationsCte(parentId: UUID) {
+  return sql`
     WITH RECURSIVE r AS (
       SELECT id, parent_id
       FROM app.locations
@@ -109,11 +119,32 @@ export async function getChildLocations(parentId: string) {
       FROM app.locations l
       JOIN r ON l.parent_id = r.id
     )
+  `
+}
+
+function getChildLocationsQuery(parentId: UUID) {
+  return sql<Locations>`
+    ${childLocationsCte(parentId)}
     SELECT l.*
     FROM app.locations l
     JOIN r ON r.id = l.id
     WHERE l.id <> ${parentId} AND l.deleted_at IS NULL;
-  `.execute(db)
+  `
+}
+
+function isLocationChildOfQuery(parentId: UUID, givenId: UUID) {
+  return sql<{ isChild: boolean }>`
+    ${childLocationsCte(parentId)}
+    SELECT EXISTS (
+      SELECT 1 FROM r WHERE id = ${givenId} AND id <> ${parentId}
+    ) AS "isChild";
+  `
+}
+
+export async function getChildLocations(parentId: UUID) {
+  const db = getClient()
+
+  const { rows } = await getChildLocationsQuery(parentId).execute(db)
   return rows
 }
 
@@ -167,4 +198,25 @@ export async function getLeafLocationIds({
   }
 
   return query.execute()
+}
+
+/**
+ * Recursive check to see if a location is descendant of a jurisdiction location.
+ * @returns is the location **under** the jurisdiction of another location.
+ */
+export async function isLocationUnderJurisdiction({
+  jurisdictionLocationId,
+  locationToSearchId
+}: {
+  jurisdictionLocationId: UUID
+  locationToSearchId: UUID
+}) {
+  const db = getClient()
+
+  const result = await isLocationChildOfQuery(
+    jurisdictionLocationId,
+    locationToSearchId
+  ).execute(db)
+
+  return !!result.rows[0].isChild
 }

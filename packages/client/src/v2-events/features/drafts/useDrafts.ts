@@ -12,14 +12,20 @@
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { deepDropNulls, Draft, UUID } from '@opencrvs/commons/client'
+import {
+  ActionDocument,
+  deepDropNulls,
+  Draft,
+  UUID
+} from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import {
   clearPendingDraftCreationRequests,
   findLocalEventDocument,
   refetchDraftsList,
   refetchAllSearchQueries,
-  setDraftData
+  setDraftData,
+  updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   createEventActionMutationFn,
@@ -169,7 +175,6 @@ function useCreateDraft() {
 
 export function useDrafts() {
   const trpc = useTRPC()
-  const setDraft = localDraftStore((drafts) => drafts.setDraft)
   const getLocalDraftOrDefault = localDraftStore(
     (drafts) => drafts.getLocalDraftOrDefault
   )
@@ -177,7 +182,7 @@ export function useDrafts() {
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
 
-  function findAllRemoteDrafts(
+  function getAllRemoteDrafts(
     additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
   ): Draft[] {
     // Skip the queryFn defined by tRPC and use the one defined above
@@ -217,8 +222,8 @@ export function useDrafts() {
   }
 
   return {
-    setLocalDraft: setDraft,
-    getLocalDraftOrDefault: getLocalDraftOrDefault,
+    setLocalDraft: localDraftStore((drafts) => drafts.setDraft),
+    getLocalDraftOrDefault,
     submitLocalDraft: () => {
       if (!localDraft) {
         throw new Error('No draft to submit')
@@ -233,12 +238,12 @@ export function useDrafts() {
         status: localDraft.action.status
       })
     },
-    getAllRemoteDrafts: findAllRemoteDrafts,
+    getAllRemoteDrafts,
     getRemoteDraftByEventId: function useDraftList(
       eventId: string,
       additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
     ): Draft | undefined {
-      const eventDrafts = findAllRemoteDrafts(additionalOptions).filter(
+      const eventDrafts = getAllRemoteDrafts(additionalOptions).filter(
         (draft) => draft.eventId === eventId
       )
 

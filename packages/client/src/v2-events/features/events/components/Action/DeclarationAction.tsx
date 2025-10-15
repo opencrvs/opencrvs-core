@@ -11,16 +11,13 @@
 
 import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { useNavigate } from 'react-router-dom'
 import {
   Draft,
   createEmptyDraft,
   findActiveDraftForEvent,
   dangerouslyGetCurrentEventStateWithDrafts,
   getActionAnnotation,
-  DeclarationUpdateActionType,
   ActionType,
-  Action,
   deepMerge,
   getUUID,
   deepDropNulls,
@@ -39,6 +36,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useToastAndRedirect } from '@client/v2-events/features/events/useToastAndRedirect'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
 import { AvailableActionTypes, getPreviousDeclarationActionType } from './utils'
@@ -49,7 +47,8 @@ import { AvailableActionTypes, getPreviousDeclarationActionType } from './utils'
  * @param event Event document
  * @param configuration Event configuration
  *
- * Throws an error if the action is not allowed for the event or if the user does not have permission to perform the action.
+ * If the action is not allowed for the event, redirect the user to overview page.
+ * Or throws an error if the user does not have permission to perform the action.
  */
 function useActionGuard(
   actionType: AvailableActionTypes,
@@ -59,11 +58,34 @@ function useActionGuard(
   const eventState = getCurrentEventState(event, configuration)
   const availableActions = getAvailableActionsForEvent(eventState)
   const { isActionAllowed } = useUserAllowedActions(event.type)
-
+  const { redirectToEventOverviewPage } = useToastAndRedirect()
   // If the action is not available for the event, redirect to the overview page
   if (!availableActions.includes(actionType)) {
+    const isProd = import.meta.env.PROD
+
+    // Some Storybook tests expect the action guard to throw errors.
+    // In the actual app, we want explicit failures in development but silent handling in production.
+    // Storybook verifies behavior based on these development-mode failures.
+    const isStory = import.meta.env.STORYBOOK
+
+    if (isProd && !isStory) {
+      // In prod mode, show a toast explaining why the action is not available
+      // and then redirect to the overview page
+      return redirectToEventOverviewPage({
+        toastId: `${actionType}-no-available-for-${event.id}`,
+        message: {
+          id: 'event.action.notAvailableForEvent',
+          defaultMessage:
+            "The action you're trying to perform is not available for this event anymore.",
+          description:
+            'Shown when user tries to perform an action that is not available for the event'
+        },
+        eventId: event.id
+      })
+    }
+
     throw new Error(
-      `Action ${actionType} not available for the event ${event.id} with status ${getCurrentEventState(event, configuration).status} ${eventState.flags.length > 0 ? `(flags: ${eventState.flags.join(', ')})` : ''}`
+      `Action ${actionType} not available for the event ${event.id} with status ${eventState.status} ${eventState.flags.length > 0 ? `(flags: ${eventState.flags.join(', ')})` : ''}`
     )
   }
 
@@ -90,12 +112,10 @@ function DeclarationActionComponent({
   actionType: AvailableActionTypes
 }>) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
-
   const events = useEvents()
-  const navigate = useNavigate()
   const { setLocalDraft, getLocalDraftOrDefault, getRemoteDraftByEventId } =
     useDrafts()
-
+  const { redirectToEventOverviewPage } = useToastAndRedirect()
   const event = events.getEvent.findFromCache(eventId).data
 
   useEffect(() => {
@@ -104,9 +124,19 @@ function DeclarationActionComponent({
       console.warn(
         `Event with id ${eventId} not found in cache. Redirecting to overview.`
       )
-      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId: eventId }))
+      redirectToEventOverviewPage({
+        toastId: `${eventId}-not-found`,
+        message: {
+          id: 'event.not.downloaded',
+          defaultMessage:
+            'Please ensure the event is first assigned and downloaded to the browser.',
+          description:
+            'Shown when user tries to perform an action on event that is not available '
+        },
+        eventId
+      })
     }
-  }, [event, eventId, navigate])
+  }, [event, eventId, redirectToEventOverviewPage])
 
   if (!event) {
     return <div />

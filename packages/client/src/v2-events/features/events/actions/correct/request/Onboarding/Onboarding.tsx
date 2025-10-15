@@ -21,6 +21,7 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 const messages = defineMessages({
   title: {
@@ -34,7 +35,7 @@ export function Onboarding() {
   const { eventId, pageId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
-
+  const validatorContext = useValidatorContext()
   const events = useEvents()
   const annotation = useActionAnnotation((state) => state.getAnnotation())
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
@@ -96,6 +97,7 @@ export function Onboarding() {
         setFormData={(data) => setAnnotation(data)}
         showReviewButton={false}
         validateBeforeNextPage={true}
+        validatorContext={validatorContext}
         onPageChange={(nextPageId: string) => {
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({

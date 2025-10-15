@@ -260,19 +260,5 @@ export type AsyncRejectActionDocument = z.infer<
 export const Action = z.union([ActionDocument, AsyncRejectActionDocument])
 export type Action = ActionDocument | AsyncRejectActionDocument
 
-export const ResolvedUser = z.object({
-  id: z.string(),
-  role: z.string(),
-  name: z.array(
-    z.object({
-      use: z.string(),
-      given: z.array(z.string()),
-      family: z.string()
-    })
-  ),
-  primaryOfficeId: z.string()
-})
-
-export type ResolvedUser = z.infer<typeof ResolvedUser>
-
 export type CreatedAction = z.infer<typeof CreatedAction>
+export type AssignedAction = z.infer<typeof AssignedAction>

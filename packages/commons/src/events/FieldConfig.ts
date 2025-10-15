@@ -23,7 +23,8 @@ import {
   SignatureFieldValue,
   SelectDateRangeValue,
   TimeValue,
-  ButtonFieldValue
+  ButtonFieldValue,
+  VerificationStatusValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -36,7 +37,22 @@ import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 extendZodWithOpenApi(z)
 
-const FieldId = z.string().describe('Unique identifier for the field')
+const FieldId = z
+  .string()
+  .refine(
+    /*
+     * Disallow underscores '_' in field ids.
+     * Why? Theres two reasons:
+     *   1. We transform dots to underscores as separator in Formik field ids, so this avoids any issues with the Formik transformations.
+     *   2. On Kysely-SQL queries, we use the CamelCasePlugin. This plugin transforms snake_case to camelCase also on nested (jsonb) object keys.
+     *      This could be disabled via 'maintainNestedObjectKeys: true', but this would also affect SQL queries which use e.g. json_agg() or to_jsonb() to aggregate results.
+     */
+    (val) => !val.includes('_'),
+    (val) => ({
+      message: `id: '${val}' must not contain underscores '_'`
+    })
+  )
+  .describe('Unique identifier for the field')
 
 export const FieldReference = z
   .object({
@@ -58,6 +74,15 @@ export const ValidationConfig = z.object({
 })
 
 export type ValidationConfig = z.infer<typeof ValidationConfig>
+const requiredSchema = z
+  .union([
+    z.boolean(),
+    z.object({
+      message: TranslationConfig.describe('Custom required validation message')
+    })
+  ])
+  .default(false)
+  .optional()
 
 const BaseField = z.object({
   id: FieldId,
@@ -65,7 +90,7 @@ const BaseField = z.object({
   parent: FieldReference.optional().describe(
     'Reference to a parent field. If a field has a parent, it will be reset when the parent field is changed.'
   ),
-  required: z.boolean().default(false).optional(),
+  required: requiredSchema,
   conditionals: z.array(FieldConditional).default([]).optional(),
   secured: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),
@@ -151,7 +176,17 @@ export const ImageMimeType = z.enum([
   'image/svg+xml'
 ])
 
-export const MimeType = ImageMimeType
+export const DocumentMimeType = z.enum([
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.oasis.opendocument.text'
+])
+
+export const MimeType = z.enum([
+  ...ImageMimeType.options,
+  ...DocumentMimeType.options
+])
 export type MimeType = z.infer<typeof MimeType>
 
 const DEFAULT_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
@@ -355,7 +390,17 @@ export type BulletList = z.infer<typeof BulletList>
 const Select = BaseField.extend({
   type: z.literal(FieldType.SELECT),
   defaultValue: TextValue.optional(),
-  options: z.array(SelectOption).describe('A list of options')
+  options: z.array(SelectOption).describe('A list of options'),
+  noOptionsMessage: TranslationConfig.optional().describe(
+    `
+    A translation configuration object used to display a message when no options are available.
+    It must follow the shape: { id: string; defaultMessage: string; description?: string }.
+    The message is rendered via intl.formatMessage(noOptionsMessage, { input }),
+    where 'input' represents the text entered in the Select field.
+    You can reference this variable in your message, for example:
+    { ..., defaultMessage: "'{input}' is not listed among the health facilities." }
+  `
+  )
 }).describe('Select input')
 
 export const SelectDateRangeOption = z.object({
@@ -378,13 +423,13 @@ export type SelectDateRangeField = z.infer<typeof SelectDateRangeField>
 
 export const NameConfig = z.object({
   firstname: z
-    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .object({ required: requiredSchema, label: TranslationConfig.optional() })
     .optional(),
   middlename: z
-    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .object({ required: requiredSchema, label: TranslationConfig.optional() })
     .optional(),
   surname: z
-    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .object({ required: requiredSchema, label: TranslationConfig.optional() })
     .optional()
 })
 
@@ -531,7 +576,7 @@ const Address = BaseField.extend({
         .array(
           z.object({
             id: z.string(),
-            required: z.boolean(),
+            required: requiredSchema,
             label: TranslationConfig,
             type: z.literal(FieldType.TEXT),
             conditionals: z.array(FieldConditional).default([]).optional(),
@@ -585,6 +630,21 @@ const ButtonField = BaseField.extend({
 
 export type ButtonField = z.infer<typeof ButtonField>
 
+// This is an alpha version of the print button and it is not recommended for use and will change in the future
+const AlphaPrintButton = BaseField.extend({
+  type: z.literal(FieldType.ALPHA_PRINT_BUTTON),
+  configuration: z.object({
+    template: z
+      .string()
+      .describe('Template ID from countryconfig templates to use for printing'),
+    buttonLabel: TranslationConfig.optional().describe(
+      'Label for the print button'
+    )
+  })
+}).describe('Print button field for printing certificates')
+
+export type AlphaPrintButton = z.infer<typeof AlphaPrintButton>
+
 const HttpField = BaseField.extend({
   type: z.literal(FieldType.HTTP),
   defaultValue: HttpFieldValue.optional(),
@@ -594,15 +654,54 @@ const HttpField = BaseField.extend({
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
     headers: z.record(z.string()).optional(),
     body: z.record(z.string()).optional(),
-    params: z.record(z.string()).optional(),
+    params: z
+      .record(z.string(), z.union([z.string(), FieldReference]))
+      .optional(),
     timeout: z
       .number()
       .default(15000)
       .describe('Request timeout in milliseconds')
   })
-}).describe('HTTP request function triggered by a button click')
+}).describe('HTTP request function triggered by a button click or other event')
 
 export type HttpField = z.infer<typeof HttpField>
+
+const LinkButtonField = BaseField.extend({
+  type: z.literal(FieldType.LINK_BUTTON),
+  configuration: z.object({
+    url: z.string().describe('URL to open'),
+    text: TranslationConfig.describe('Text to display on the button')
+  })
+}).describe('Button that opens a link')
+
+export type LinkButtonField = z.infer<typeof LinkButtonField>
+
+const VerificationStatus = BaseField.extend({
+  type: z.literal(FieldType.VERIFICATION_STATUS),
+  defaultValue: VerificationStatusValue.optional(),
+  configuration: z.object({
+    status: TranslationConfig.describe('Text to display on the status pill.'),
+    description: TranslationConfig.describe(
+      'Explaining text on the banner in form.'
+    )
+  })
+})
+
+export type VerificationStatus = z.infer<typeof VerificationStatus>
+
+const QueryParamReaderField = BaseField.extend({
+  type: z.literal(FieldType.QUERY_PARAM_READER),
+  configuration: z.object({
+    formProjection: z
+      .record(z.string())
+      .optional()
+      .describe('Projection of the field value after parsing the query string')
+  })
+}).describe(
+  'A field that maps URL query params into form values and clears them afterward'
+)
+
+export type QueryParamReaderField = z.infer<typeof QueryParamReaderField>
 
 /** @knipignore */
 export type FieldConfig =
@@ -635,7 +734,11 @@ export type FieldConfig =
   | z.infer<typeof EmailField>
   | z.infer<typeof DataField>
   | z.infer<typeof ButtonField>
+  | z.infer<typeof AlphaPrintButton>
   | z.infer<typeof HttpField>
+  | z.infer<typeof LinkButtonField>
+  | z.infer<typeof VerificationStatus>
+  | z.infer<typeof QueryParamReaderField>
 
 /** @knipignore */
 /**
@@ -647,6 +750,7 @@ export type FieldConfigInput =
   | z.input<typeof TimeField>
   | z.input<typeof SelectDateRangeField>
   | z.input<typeof ButtonField>
+  | z.input<typeof AlphaPrintButton>
   | z.input<typeof NumberField>
   | z.input<typeof TextAreaField>
   | z.input<typeof DateField>
@@ -672,6 +776,9 @@ export type FieldConfigInput =
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
+  | z.input<typeof LinkButtonField>
+  | z.input<typeof VerificationStatus>
+  | z.input<typeof QueryParamReaderField>
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
  *  referenced quite extensively througout various other schemas. Leaving the
@@ -713,7 +820,11 @@ export const FieldConfig: z.ZodType<
     FileUploadWithOptions,
     DataField,
     ButtonField,
-    HttpField
+    AlphaPrintButton,
+    HttpField,
+    LinkButtonField,
+    VerificationStatus,
+    QueryParamReaderField
   ])
   .openapi({
     description: 'Form field configuration',

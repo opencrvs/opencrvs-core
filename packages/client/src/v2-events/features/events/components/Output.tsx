@@ -11,7 +11,6 @@
 
 import React from 'react'
 import styled from 'styled-components'
-import * as _ from 'lodash'
 import { isUndefined } from 'lodash'
 import {
   FieldConfig,
@@ -42,10 +41,10 @@ import {
   isPhoneFieldType,
   isSelectDateRangeFieldType,
   isLocationFieldType,
-  FileFieldWithOptionValue,
   EventState,
   FormConfig,
-  FieldType
+  isVerificationStatusType,
+  isSignatureFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -63,12 +62,14 @@ import {
   Number,
   Text,
   TimeField,
-  getRegisteredFieldByFieldConfig
+  getRegisteredFieldByFieldConfig,
+  VerificationStatus
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
+import { isEqualFieldValue } from '../actions/correct/utils'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -125,7 +126,7 @@ export function ValueOutput(
     return <Number.Output {...field} />
   }
 
-  if (isFileFieldType(field)) {
+  if (isFileFieldType(field) || isSignatureFieldType(field)) {
     return <File.Output {...field} />
   }
 
@@ -147,7 +148,7 @@ export function ValueOutput(
 
   if (isCheckboxFieldType(field)) {
     return (
-      <Checkbox.Output required={field.config.required} value={field.value} />
+      <Checkbox.Output required={!!field.config.required} value={field.value} />
     )
   }
 
@@ -185,6 +186,16 @@ export function ValueOutput(
 
   if (isFacilityFieldType(field)) {
     return <LocationSearch.Output value={field.value} />
+  }
+
+  if (isVerificationStatusType(field)) {
+    return (
+      <VerificationStatus.Output
+        configuration={field.config.configuration}
+        id={field.config.id}
+        value={field.value ?? 'pending'}
+      />
+    )
   }
 }
 
@@ -290,13 +301,13 @@ export function Output({
       return '-'
     }
 
-    return <ValueOutput config={field} value={''} />
+    return <ValueOutput config={field} value={undefined} />
   }
 
   const hasPreviousValue = previousValue !== undefined
 
   // Note, checking for previousValue !== value is not enough, as we have composite fields.
-  if (hasPreviousValue && !_.isEqual(previousValue, value)) {
+  if (hasPreviousValue && !isEqualFieldValue(previousValue, value)) {
     let valueOutput = <ValueOutput config={field} value={value} />
 
     if (isEmptyValue(field, value)) {

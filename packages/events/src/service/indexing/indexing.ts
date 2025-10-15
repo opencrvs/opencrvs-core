@@ -95,6 +95,8 @@ function mapFieldTypeToElasticsearch(
     case FieldType.PAGE_HEADER:
     case FieldType.EMAIL:
     case FieldType.TIME:
+    case FieldType.LINK_BUTTON:
+    case FieldType.QUERY_PARAM_READER:
       return { type: 'text' }
     case FieldType.EMAIL:
       return {
@@ -112,17 +114,25 @@ function mapFieldTypeToElasticsearch(
     case FieldType.OFFICE:
     case FieldType.DATA:
     case FieldType.BUTTON:
+    case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.ID:
     case FieldType.PHONE:
+    case FieldType.VERIFICATION_STATUS:
       return { type: 'keyword' }
     case FieldType.ADDRESS:
+      const streetLevelDetails = Object.fromEntries(
+        (field.configuration?.streetAddressForm ?? []).map((f) => [
+          f.id,
+          mapFieldTypeToElasticsearch(f)
+        ])
+      )
       const addressProperties = {
         country: { type: 'keyword' },
         addressType: { type: 'keyword' },
         administrativeArea: { type: 'keyword' },
         streetLevelDetails: {
           type: 'object',
-          properties: {}
+          properties: streetLevelDetails
         }
       } satisfies {
         [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
