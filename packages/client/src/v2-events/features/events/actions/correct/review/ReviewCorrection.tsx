@@ -209,6 +209,8 @@ function RejectModal({
 }
 
 const StyledContent = styled(Content)`
+  // Content has 'height: 100%' on mobile, which breaks the page layout if there is anything on the page after the Content.
+  // We don't want that.
   height: auto;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
