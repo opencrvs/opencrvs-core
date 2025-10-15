@@ -497,16 +497,21 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           </LabelContainer>
           <NavigatorContainer>
             <CircleButton
+              data-testid={`${id}-prev`}
               id={`${id}-prev`}
               onClick={() => onNavigateDate(subYears(date, 1))}
             >
               <ChevronLeft />
             </CircleButton>
-            <YearLabelContainer id={`${id}-year-label`}>
+            <YearLabelContainer
+              id={`${id}-year-label`}
+              data-testid={`${id}-year-label`}
+            >
               {format(date, 'yyyy')}
             </YearLabelContainer>
             <CircleButton
               id={`${id}-next`}
+              data-testid={`${id}-next`}
               onClick={() => {
                 const nextDate = addYears(date, 1)
                 const finalDateNavigateTo = isAfter(nextDate, todaysDate)
@@ -526,6 +531,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
             return (
               <MonthButton
                 id={`${id}-${month.toLowerCase()}`}
+                data-testid={`${id}-${month.toLowerCase()}`}
                 key={index}
                 disabled={
                   (minDate && isBefore(monthDate, minDate)) ||
