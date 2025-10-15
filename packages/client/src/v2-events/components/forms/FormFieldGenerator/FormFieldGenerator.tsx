@@ -17,20 +17,12 @@ import {
   EventConfig,
   EventState,
   FieldConfig,
-  FieldValue,
-  InteractiveFieldType,
-  isNonInteractiveFieldType,
   joinValues,
-  SystemVariables,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import {
-  FIELD_SEPARATOR,
-  handleDefaultValue
-} from '@client/v2-events/components/forms/utils'
+import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
-import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible

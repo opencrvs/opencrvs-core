@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useIntl } from 'react-intl'
 import {
   EventState,
@@ -17,16 +17,12 @@ import {
   isPageVisible,
   PageTypes,
   PageConfig,
-  ValidatorContext,
-  FieldConfig,
-  SystemVariables,
-  InteractiveFieldType,
-  isNonInteractiveFieldType
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import {
-  handleDefaultValue,
+  getDefaultValuesForFields,
   makeFormFieldIdFormikCompatible
 } from '@client/v2-events/components/forms/utils'
 import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
@@ -58,25 +54,6 @@ type DeclarationProps =
   | {
       declaration: EventState
     }
-
-function mapFieldsToValues(
-  fields: FieldConfig[],
-  systemVariables: SystemVariables
-) {
-  return fields
-    .filter(
-      (field): field is InteractiveFieldType =>
-        !isNonInteractiveFieldType(field)
-    )
-    .reduce((memo, field) => {
-      const fieldInitialValue = handleDefaultValue({
-        field,
-        systemVariables
-      })
-
-      return { ...memo, [field.id]: fieldInitialValue }
-    }, {})
-}
 
 /**
  *
@@ -169,7 +146,11 @@ export function Pages({
     onSubmit
   }
 
-  const defaultValues = mapFieldsToValues(page.fields, systemVariables)
+  const defaultValues = useMemo(
+    () => getDefaultValuesForFields(page.fields, systemVariables),
+    [page.fields, systemVariables]
+  )
+
   const initialValues = { ...defaultValues, ...declaration, ...form }
 
   useEffect(() => {

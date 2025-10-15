@@ -14,7 +14,8 @@ import {
   EventState,
   SystemVariables,
   isFieldConfigDefaultValue,
-  InteractiveFieldType
+  InteractiveFieldType,
+  isNonInteractiveFieldType
 } from '@opencrvs/commons/client'
 import { replacePlaceholders } from '@client/v2-events/utils'
 
@@ -52,6 +53,25 @@ export function handleDefaultValue({
   }
 
   return defaultValue
+}
+
+export function getDefaultValuesForFields(
+  fields: FieldConfig[],
+  systemVariables: SystemVariables
+) {
+  return fields
+    .filter(
+      (field): field is InteractiveFieldType =>
+        !isNonInteractiveFieldType(field)
+    )
+    .reduce((memo, field) => {
+      const fieldInitialValue = handleDefaultValue({
+        field,
+        systemVariables
+      })
+
+      return { ...memo, [field.id]: fieldInitialValue }
+    }, {})
 }
 
 export interface Stringifiable {

@@ -282,6 +282,7 @@ function DeclarationActionComponent({
       actionAnnotation
     )
 
+    // TODO CIHAN: can we remove this and the other one above?
     setAnnotation(initialAnnotation)
 
     /*
