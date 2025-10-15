@@ -626,6 +626,32 @@ describe('age asAge comparisons', () => {
       )
     ).toBe(false)
   })
+
+  it('validates comparisons where age is expected to be between a certain value range', () => {
+    expect(
+      validate(
+        field('applicant.age').asAge().isBetween(16, 25),
+        getFieldParams({
+          'applicant.age': {
+            age: 20,
+            asOfDate: '1990-01-01'
+          }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age').asAge().isBetween(16, 25),
+        getFieldParams({
+          'applicant.age': {
+            age: 30,
+            asOfDate: '1990-01-01'
+          }
+        })
+      )
+    ).toBe(false)
+  })
 })
 
 describe('leaf level validations', () => {
