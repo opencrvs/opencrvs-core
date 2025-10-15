@@ -70,7 +70,7 @@ test('Throws error when accessing oneself user without my audit scope', async ()
   ).rejects.toMatchObject(new TRPCError({ code: 'NOT_FOUND' }))
 })
 
-test('Throws error when accessing oneself user with scope for own audit', async () => {
+test('Throws error when accessing other user with scope for own audit', async () => {
   const { users } = await setupTestCase()
   const client = createTestClient(users[0], [SCOPES.USER_READ_ONLY_MY_AUDIT])
 
