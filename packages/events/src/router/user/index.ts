@@ -14,8 +14,9 @@ import { TRPCError } from '@trpc/server'
 import { UserOrSystem } from '@opencrvs/commons'
 import { router, publicProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
-import { getUserActions } from '@events/service/events/user-actions'
+import { getUserActions } from '@events/service/events/user/actions'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
+import { userCanReadOtherUser } from '../middleware'
 
 export const userRouter = router({
   get: publicProcedure
@@ -34,7 +35,10 @@ export const userRouter = router({
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))
     .query(async ({ input, ctx }) => getUsersById(input, ctx.token)),
-  actions: publicProcedure.input(UserActionsQuery).query(async ({ input }) => {
-    return getUserActions(input)
-  })
+  actions: publicProcedure
+    .input(UserActionsQuery)
+    .use(userCanReadOtherUser)
+    .query(async ({ input }) => {
+      return getUserActions(input)
+    })
 })
