@@ -448,7 +448,7 @@ export function FormSectionComponent({
           !isFieldEnabled(field, visibleFieldValues, validatorContext) ||
           (isCorrection && field.uncorrectable)
 
-        const visibleError = errors[field.id]?.[0]
+        const visibleError = errors[field.id]
         const error = visibleError ?? ''
 
         return (
