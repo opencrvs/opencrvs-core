@@ -70,7 +70,6 @@ jobs:
       author: ${{ steps.get_author.outputs.AUTHOR }}
       slugified_branch: ${{ steps.slugify_bname.outputs.stack }}
       e2e_branch: ${{ steps.get_e2e_branch.outputs.branch }}
-      runtime: ${{ steps.identify_runtime.outputs.runtime }}
     steps:
       - uses: actions/checkout@v5
 
@@ -175,18 +174,6 @@ jobs:
                 .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, '');
             }
             core.setOutput('stack', slugify('${{ env.BRANCH_NAME }}'));
-      - name: Identify deployment runtime
-        id: identify_runtime
-        run: |
-          if [[ ! -f .kube ]]; then
-            echo "Repository is not compatible with kubernetes"
-            runtime="docker"
-          elif (( stack_id % 10 < 7 )); then
-            runtime="k8s"
-          else
-            runtime="docker"
-          fi
-          echo "runtime=$runtime" >> $GITHUB_OUTPUT
 
   trigger-build:
     if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false) }}
@@ -307,7 +294,7 @@ jobs:
         id: print-links
         run: |
           E2E_RUN_LINK="https://github.com/opencrvs/e2e/actions/runs/${{ steps.dispatch_e2e.outputs.run_id }}"
-          DEPLOYMENT_LINK="https://${{ steps.generate_stack.outputs.stack }}.opencrvs.dev"
+          DEPLOYMENT_LINK="https://${{ steps.generate_stack.outputs.stack }}.e2e-k8s.opencrvs.dev"
 
           echo """
           # E2E Environment summary
