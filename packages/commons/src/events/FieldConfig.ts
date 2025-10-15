@@ -30,7 +30,9 @@ import {
   AddressFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  HttpFieldValue
+  HttpFieldValue,
+  IdReaderFieldValue,
+  QrReaderFieldValue
 } from './CompositeFieldValue'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { UUID } from '../uuid'
@@ -718,6 +720,7 @@ export type QueryParamReaderField = z.infer<typeof QueryParamReaderField>
 
 const QrReaderField = BaseField.extend({
   type: z.literal(FieldType.QR_READER),
+  defaultValue: QrReaderFieldValue.optional(),
   configuration: z
     .object({
       validator: z.custom<JSONSchema>(
@@ -731,6 +734,7 @@ export type QrReaderField = z.infer<typeof QrReaderField>
 
 const IdReaderField = BaseField.extend({
   type: z.literal(FieldType.ID_READER),
+  defaultValue: IdReaderFieldValue.optional(),
   methods: z.array(
     z
       .union([QrReaderField, LinkButtonField])

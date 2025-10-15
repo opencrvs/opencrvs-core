@@ -18,6 +18,8 @@ import {
 } from '@client/i18n/messages/views/qr-reader'
 
 interface QrReaderInputProps {
+  // TODO: imnplement configuration props
+  // eslint-disable-next-line react/no-unused-prop-types
   configuration: QrReaderField['configuration']
   onChange: (data: unknown) => void
 }
@@ -40,7 +42,7 @@ function QrReaderInput(props: QrReaderInputProps) {
           lightBalance: intl.formatMessage(tutorialMessages.lightBalance)
         }
       }}
-      validator={props.configuration?.validator}
+      // TODO: implement validation using props.configuration.validator
       onScan={(data) => props.onChange({ data })}
     />
   )

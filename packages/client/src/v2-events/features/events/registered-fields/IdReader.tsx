@@ -16,13 +16,13 @@ import { Box, Divider, Stack, Text } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
-export const MainContainer = styled(Box)`
+const MainContainer = styled(Box)`
   background: ${({ theme }) => theme.colors.background};
   border: none;
   flex: 1;
 `
 
-export const ReadersContainer = styled.div`
+const ReadersContainer = styled.div`
   display: flex;
   width: 100%;
 
