@@ -9,13 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Meta, StoryObj } from '@storybook/react'
+import { Decorator, Meta, StoryObj } from '@storybook/react'
 import { fn, expect, waitFor } from '@storybook/test'
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { http, HttpResponse } from 'msw'
 import { useNavigate } from 'react-router-dom'
 import { within, userEvent } from '@storybook/testing-library'
+import { noop } from 'lodash'
 import {
   and,
   ConditionalType,
@@ -29,10 +30,47 @@ import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
+interface HTMLMediaElementWithCaptureStream extends HTMLVideoElement {
+  captureStream(fps: number): MediaStream
+}
+
+async function makeStreamFromVideo(src: string): Promise<MediaStream> {
+  const v = document.createElement('video') as HTMLMediaElementWithCaptureStream
+  v.src = src
+  v.crossOrigin = 'anonymous'
+  v.muted = true
+  v.loop = true
+  v.playsInline = true
+  await v.play().catch(noop)
+  if (v.readyState < 2) {
+    await new Promise<void>((r) => (v.oncanplay = () => r()))
+  }
+  return v.captureStream(30)
+}
+
+function mockCamera(src: string): Decorator {
+  return (Story, ctx) => {
+    const original = navigator.mediaDevices.getUserMedia.bind(
+      navigator.mediaDevices
+    )
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(navigator as any).mediaDevices ??= {}
+    ;(navigator.mediaDevices as MediaDevices).getUserMedia = async () =>
+      makeStreamFromVideo(src)
+
+    ctx.cleanup?.(() => {
+      ;(navigator.mediaDevices as MediaDevices).getUserMedia = original
+    })
+
+    return <Story />
+  }
+}
+
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/IdReader/Interaction',
   args: { onChange: fn() },
   decorators: [
+    mockCamera('/assets/qr-sample.webm'),
     (Story, context) => (
       <TRPCProvider>
         <Story {...context} />
@@ -215,7 +253,7 @@ const fields = [
   }
 ] as const satisfies FieldConfig[]
 
-export const IdReaderInteraction: StoryObj<typeof FormFieldGenerator> = {
+export const AuthenticationFlow: StoryObj<typeof FormFieldGenerator> = {
   name: 'Authentication flow',
   parameters: {
     layout: 'centered',
@@ -310,6 +348,59 @@ export const IdReaderInteraction: StoryObj<typeof FormFieldGenerator> = {
       return () => document.removeEventListener('click', handler)
     }, [navigate])
 
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={fields}
+        id="my-form"
+        onChange={(data) => {
+          args.onChange(data)
+        }}
+      />
+    )
+  }
+}
+
+export const QrReaderFlow: StoryObj<typeof FormFieldGenerator> = {
+  name: 'QR Reader flow',
+  parameters: {
+    layout: 'centered'
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup({ document: canvasElement.ownerDocument })
+
+    await step('Renders ID Reader', async () => {
+      await canvas.findByText('Scan QR code')
+      await canvas.findByText('Authenticate online')
+    })
+
+    await step('No NID field populated', async () => {
+      await expect(canvas.queryByTestId('text__storybook____nid')).toHaveValue(
+        ''
+      )
+
+      // warm-up the QR Scanner engine - it takes a bit of time to load
+      await new Promise((r) => setTimeout(r, 100))
+    })
+
+    await step('Click on QR scan button', async () => {
+      const linkButton = await canvas.findByRole('button', {
+        name: 'Scan QR code'
+      })
+      await user.click(linkButton)
+    })
+
+    await step('Wait for QR scanner to load and inject mock QR', async () => {
+      await canvas.findByText('Ensure your camera is clean and functional.')
+    })
+
+    await step('NID field populated', async () => {
+      const nidField = await canvas.findByTestId('text__storybook____nid')
+      await waitFor(async () => expect(nidField).toHaveValue('1234567890'))
+    })
+  },
+  render: function Component(args) {
     return (
       <StyledFormFieldGenerator
         {...args}
