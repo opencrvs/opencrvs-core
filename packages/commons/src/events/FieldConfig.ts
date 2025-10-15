@@ -246,6 +246,7 @@ const AgeField = BaseField.extend({
   defaultValue: NumberFieldValue.optional(),
   configuration: z.object({
     asOfDate: FieldReference,
+    prefix: TranslationConfig.optional(),
     postfix: TranslationConfig.optional()
   })
 }).describe('An age input field which uses the current date as the asOfDate')

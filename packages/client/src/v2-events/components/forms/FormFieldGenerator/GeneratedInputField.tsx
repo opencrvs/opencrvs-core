@@ -266,6 +266,10 @@ export const GeneratedInputField = React.memo(
             field.config.configuration.postfix &&
             intl.formatMessage(field.config.configuration.postfix)
           }
+          prefix={
+            field.config.configuration.prefix &&
+            intl.formatMessage(field.config.configuration.prefix)
+          }
         >
           <AgeField.Input
             {...inputProps}
