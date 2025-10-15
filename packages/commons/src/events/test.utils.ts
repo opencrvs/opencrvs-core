@@ -185,6 +185,7 @@ function mapFieldTypeToMockValue(
     case FieldType.ID:
     case FieldType.OFFICE:
     case FieldType.LINK_BUTTON:
+    case FieldType.LOADER:
       return `${field.id}-${field.type}-${i}`
     case FieldType.VERIFICATION_STATUS:
       return 'verified'
