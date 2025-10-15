@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 98cb4162-e23f-451b-943e-65fb84d8980a
+                transactionId: b126dff5-54dc-4085-9217-14ff7eb8335f
                 type: birth
       responses:
         "200":
@@ -401,7 +401,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: f6c18c48-d730-4654-91a2-38b6f496296f
+                transactionId: ef9d71e8-ee01-4a6d-b2be-714805573713
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -7796,6 +7796,9 @@ components:
               type: string
               enum:
                 - QR_READER
+            defaultValue:
+              type: object
+              additionalProperties: {}
             configuration:
               type: object
               properties:
@@ -7935,6 +7938,9 @@ components:
               type: string
               enum:
                 - ID_READER
+            defaultValue:
+              type: object
+              additionalProperties: {}
             methods:
               type: array
               items:
@@ -8072,6 +8078,9 @@ components:
                         type: string
                         enum:
                           - QR_READER
+                      defaultValue:
+                        type: object
+                        additionalProperties: {}
                       configuration:
                         type: object
                         properties:
@@ -15503,8 +15512,10 @@ components:
                 nullable: true
                 additionalProperties:
                   type: string
-              - {}
-              - {}
+              - type: object
+                additionalProperties: {}
+              - type: object
+                additionalProperties: {}
       required:
         - id
         - type

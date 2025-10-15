@@ -5956,6 +5956,9 @@ components:
             type:
               type: string
               const: QR_READER
+            defaultValue:
+              type: object
+              additionalProperties: {}
             configuration:
               type: object
               properties:
@@ -6093,6 +6096,9 @@ components:
             type:
               type: string
               const: ID_READER
+            defaultValue:
+              type: object
+              additionalProperties: {}
             methods:
               type: array
               items:
@@ -6228,6 +6234,9 @@ components:
                       type:
                         type: string
                         const: QR_READER
+                      defaultValue:
+                        type: object
+                        additionalProperties: {}
                       configuration:
                         type: object
                         properties:
