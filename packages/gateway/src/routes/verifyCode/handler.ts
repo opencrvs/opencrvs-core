@@ -30,7 +30,7 @@ import {
 } from '@opencrvs/commons'
 import * as t from 'io-ts'
 import * as F from 'fp-ts'
-import { env } from '@events/environment'
+import { env } from '../../environment'
 
 const pipe = F.function.pipe
 const { chainW, tryCatch } = F.either
