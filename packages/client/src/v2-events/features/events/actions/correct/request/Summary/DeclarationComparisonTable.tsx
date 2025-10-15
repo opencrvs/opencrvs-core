@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { uniqBy } from 'lodash'
 import styled from 'styled-components'
 import { defineMessages, useIntl } from 'react-intl'
 import {
@@ -28,7 +27,8 @@ import { messages as correctionMessages } from '@client/i18n/messages/views/corr
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import {
-  getAnnotationComparison,
+  getAnnotationComparisonForField,
+  getReviewFormFields,
   hasFieldChanged
 } from '@client/v2-events/features/events/actions/correct/utils'
 import {
@@ -70,20 +70,6 @@ const messages = defineMessages({
   }
 })
 
-function getReviewForm(configuration: EventConfig) {
-  return configuration.actions
-    .filter((action) => 'review' in action)
-    .map((action) => action.review)
-}
-
-function getReviewFormFields(configuration: EventConfig) {
-  const reviewForms = getReviewForm(configuration)
-  return uniqBy(
-    reviewForms.flatMap((form) => form.fields),
-    (field) => field.id
-  )
-}
-
 /**
  * When action is not found or provided, we compare the full event
  * Needed when action is not provided as props e.g. - correction summary
@@ -111,7 +97,7 @@ function sliceEventAt(
  * @param action - action with the latest correction/update. Compares state before (exclusive) the action with the corrected one
  * @returns Display of differences between declaration before and after the correction/update.
  */
-export function DeclarationComparisonTableComponent({
+function DeclarationComparisonTableComponent({
   action,
   form,
   fullEvent: fullEventWithoutUpdatedAction,
@@ -119,8 +105,11 @@ export function DeclarationComparisonTableComponent({
   id,
   validatorContext
 }: DeclarationComparisonTableProps) {
-  const acceptedActions = getAcceptedActions(fullEventWithoutUpdatedAction)
-  const historyWithUpdatedActions = expandWithUpdateActions(acceptedActions)
+  const historyWithUpdatedActions = expandWithUpdateActions(
+    fullEventWithoutUpdatedAction,
+    validatorContext,
+    eventConfig
+  )
 
   const fullEvent = {
     ...fullEventWithoutUpdatedAction,
@@ -167,14 +156,16 @@ export function DeclarationComparisonTableComponent({
 
   // Collect all changed review fields once
   const changedAnnotationFields = reviewFormFields
-    .filter(
-      (f) =>
-        getAnnotationComparison(f, fullEvent, index, validatorContext)
-          .valueHasChanged
-    )
     .map((f) => {
-      const { currentAnnotations, previousAnnotations } =
-        getAnnotationComparison(f, fullEvent, index, validatorContext)
+      const comparison = getAnnotationComparisonForField(
+        f,
+        fullEvent,
+        index,
+        validatorContext
+      )
+
+      const { currentAnnotations, previousAnnotations, valueHasChanged } =
+        comparison
 
       const previous = (
         <Output
@@ -197,9 +188,11 @@ export function DeclarationComparisonTableComponent({
       return {
         fieldLabel: intl.formatMessage(f.label),
         latest,
-        previous
+        previous,
+        valueHasChanged
       }
     })
+    .filter((item) => item.valueHasChanged)
 
   return (
     <>

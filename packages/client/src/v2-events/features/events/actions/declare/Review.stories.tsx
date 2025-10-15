@@ -34,24 +34,32 @@ const generator = testDataGenerator()
 
 const eventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [{ type: ActionType.CREATE }]
 })
 
 const eventId = eventDocument.id
 
 const notifiedEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.NOTIFY]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.NOTIFY }]
 })
 
 const rejectedNotifiedEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.NOTIFY, ActionType.REJECT]
+  actions: [
+    { type: ActionType.CREATE },
+    { type: ActionType.NOTIFY },
+    { type: ActionType.REJECT }
+  ]
 })
 
 const rejectedDeclaerdEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.NOTIFY, ActionType.REJECT]
+  actions: [
+    { type: ActionType.CREATE },
+    { type: ActionType.NOTIFY },
+    { type: ActionType.REJECT }
+  ]
 })
 
 const meta: Meta<typeof ReviewIndex> = {
@@ -372,7 +380,7 @@ export const ReviewForFieldAgentIncomplete: Story = {
 
 const createdEvent = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [{ type: ActionType.CREATE }]
 })
 const declareDraft = generateEventDraftDocument({
   eventId: createdEvent.id,
