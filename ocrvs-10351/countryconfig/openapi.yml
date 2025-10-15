@@ -1296,6 +1296,8 @@ components:
                   required:
                     - $$field
                   description: Reference to a field by its ID
+                prefix:
+                  $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
               required:
