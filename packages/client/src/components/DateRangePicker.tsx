@@ -721,7 +721,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 label={intl.formatMessage(constantsMessages.from)}
                 selectedDate={startDate}
                 onSelectDate={setStartDate}
-                // If the user picked August 2025 as the end month, then the first month allowed for the “From” date should also be August 2025.
+                // If the user picked August 2025 as the end month, then the latest month allowed for the “From” date should also be August 2025.
                 // To include that same month in the picker, we set maxDate to the same day as the end date.
                 maxDate={endDate}
               />
