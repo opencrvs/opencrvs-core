@@ -33,7 +33,8 @@ import {
   getTokenPayload,
   canUserReadEvent,
   hasScope,
-  SCOPES
+  SCOPES,
+  hasAnyOfScopes
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
@@ -355,6 +356,22 @@ export const userCanReadOtherUser: MiddlewareFunction<
   { userId: string }
 > = async ({ next, ctx, input }) => {
   const { token, user: userReading } = ctx
+
+  // Throw early to avoid mistakes in the logic below.
+  // There are test cases for each but better safe than sorry.
+  const hasAnyScope = hasAnyOfScopes(
+    [
+      SCOPES.USER_READ,
+      SCOPES.USER_READ_MY_OFFICE,
+      SCOPES.USER_READ_MY_JURISDICTION,
+      SCOPES.USER_READ_ONLY_MY_AUDIT
+    ],
+    getScopes(token)
+  )
+
+  if (!hasAnyScope) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
 
   const otherUser = await getUserOrSystem(input.userId, token)
 
