@@ -537,17 +537,21 @@ export function createFieldConditionals(fieldId: string) {
         }
       })
     },
-    inArray: (values: string[]) =>
-      defineFormConditional({
+    inArray(values: string[]) {
+      return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: {
-            type: 'string',
-            enum: values
-          }
+          [fieldId]: wrapToPath(
+            {
+              type: 'string',
+              enum: values
+            },
+            this.$$subfield
+          )
         },
         required: [fieldId]
-      }),
+      })
+    },
     isValidEnglishName: () =>
       defineFormConditional({
         type: 'object',
@@ -562,51 +566,63 @@ export function createFieldConditionals(fieldId: string) {
           }
         }
       }),
-    isValidAdministrativeLeafLevel: () =>
-      defineFormConditional({
+    isValidAdministrativeLeafLevel() {
+      return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: {
-            type: 'object',
-            properties: {
-              administrativeArea: {
-                type: 'string',
-                isLeafLevelLocation: true
-              }
+          [fieldId]: wrapToPath(
+            {
+              type: 'object',
+              properties: {
+                administrativeArea: {
+                  type: 'string',
+                  isLeafLevelLocation: true
+                }
+              },
+              description:
+                'The provided administrative value should have a value corresponding to the required lowest administrative level'
             },
-            description:
-              'The provided administrative value should have a value corresponding to the required lowest administrative level'
-          }
+            this.$$subfield
+          )
         }
-      }),
+      })
+    },
     /**
      * Checks if the field value matches a given regular expression pattern.
      * @param pattern - The regular expression pattern to match the field value against.
      * @returns A JSONSchema conditional that validates the field value against the pattern.
      */
-    matches: (pattern: string) =>
-      defineFormConditional({
+    matches(pattern: string) {
+      return defineFormConditional({
+        type: 'object',
+        properties: wrapToPath(
+          {
+            [fieldId]: {
+              type: 'string',
+              pattern
+            }
+          },
+          this.$$subfield
+        ),
+        required: [fieldId]
+      })
+    },
+    isBetween(min: number, max: number) {
+      return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: {
-            type: 'string',
-            pattern
-          }
+          [fieldId]: wrapToPath(
+            {
+              type: 'number',
+              minimum: min,
+              maximum: max
+            },
+            this.$$subfield
+          )
         },
         required: [fieldId]
-      }),
-    isBetween: (min: number, max: number) =>
-      defineFormConditional({
-        type: 'object',
-        properties: {
-          [fieldId]: {
-            type: 'number',
-            minimum: min,
-            maximum: max
-          }
-        },
-        required: [fieldId]
-      }),
+      })
+    },
     getId: () => ({ fieldId }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     object: (options: Record<string, any>) =>
