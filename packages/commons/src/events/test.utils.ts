@@ -895,7 +895,7 @@ export function generateEventDocument({
   rng?: () => number
 }): EventDocument {
   return {
-    trackingId: generateTrackingId(rng),
+    trackingId: getUUID(),
     type: configuration.id,
     actions: actions.map((action) =>
       generateActionDocument({
