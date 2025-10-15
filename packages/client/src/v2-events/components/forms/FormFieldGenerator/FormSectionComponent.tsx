@@ -283,7 +283,7 @@ export function FormSectionComponent({
       })
 
       set(fieldValues, childFieldFormikId, updatedValue)
-      set(fieldErrors, childField.id, { errors: [] })
+      set(fieldErrors, childField.id, '')
     },
     [fieldsWithDotSeparator, systemVariables]
   )
