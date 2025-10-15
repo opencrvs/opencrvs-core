@@ -134,6 +134,95 @@ export const AdvancedSearchStory: Story = {
   }
 }
 
+async function adjustYearLabel(
+  canvas: ReturnType<typeof within>,
+  baseId: string,
+  targetYear: number
+) {
+  const labelId = `${baseId}-year-label`
+  const prevMonthButtonId = `${baseId}-prev`
+  const nextMonthButtonId = `${baseId}-next`
+
+  let yearLabel = await canvas.findByTestId(labelId)
+  let currentYear = Number(yearLabel.textContent)
+  let guard = 0
+
+  while (currentYear !== targetYear && guard < 10) {
+    if (currentYear < targetYear) {
+      const nextBtn = await canvas.findByTestId(nextMonthButtonId)
+      await userEvent.click(nextBtn)
+    } else {
+      const prevBtn = await canvas.findByTestId(prevMonthButtonId)
+      await userEvent.click(prevBtn)
+    }
+
+    yearLabel = await canvas.findByTestId(labelId)
+    currentYear = Number(yearLabel.textContent)
+    guard++
+  }
+
+  await expect(currentYear).toBe(targetYear)
+}
+
+export const AdvancedSearchDateRangePicker: Story = {
+  parameters: {
+    ...storyParams,
+    viewport: { defaultViewport: 'mobile' }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('Open tennis club membership tab', async () => {
+      await canvas.findByText(
+        'Tennis club membership application',
+        {},
+        { timeout: 3000 }
+      )
+    })
+
+    await step('Fill in required fields and enable search', async () => {
+      const accordion = await canvas.findByTestId(
+        'accordion-advancedSearch.form.registrationDetails'
+      )
+      await userEvent.click(
+        within(accordion).getByRole('button', { name: 'Show' })
+      )
+
+      const locationOption = await canvas.findAllByText('Exact date unknown')
+      await userEvent.click(locationOption[0])
+    })
+
+    const TARGET_YEAR = 2024
+    await step(`Adjust FROM year label to ${TARGET_YEAR}`, async () => {
+      await adjustYearLabel(canvas, 'start-date-small', TARGET_YEAR)
+    })
+
+    await step(
+      `Select Aug month from ${TARGET_YEAR} for FROM date`,
+      async () => {
+        const monthBtn = await canvas.findByTestId('start-date-small-aug')
+        await userEvent.click(monthBtn)
+      }
+    )
+
+    await step(`Adjust TO year label to ${TARGET_YEAR}`, async () => {
+      await adjustYearLabel(canvas, 'end-date-small', TARGET_YEAR)
+    })
+
+    await step(`Select Aug month from ${TARGET_YEAR} for TO date`, async () => {
+      const monthBtn = await canvas.findByTestId('end-date-small-aug')
+      await userEvent.click(monthBtn)
+    })
+
+    await step('Search button disabled with incomplete fields', async () => {
+      const searchButton = (
+        await canvas.findAllByRole('button', { name: 'Search' })
+      ).find((btn) => btn.id === 'search')
+
+      await expect(searchButton).toBeDisabled()
+    })
+  }
+}
+
 const serializedParams = serializeSearchParams({
   'applicant.name': {
     firstname: 'Nina',
@@ -291,6 +380,7 @@ const serializedParams2 = serializeSearchParams({
   'event.status': 'ALL',
   eventType: TENNIS_CLUB_MEMBERSHIP
 })
+
 export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
   parameters: {
     ...storyParams,
@@ -358,6 +448,7 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
     )
   }
 }
+
 export const AdvancedSearchPartialNameSearchSupport: Story = {
   parameters: {
     ...storyParams,
