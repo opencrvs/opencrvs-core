@@ -19,11 +19,13 @@ import {
   ConditionalType,
   field,
   FieldType,
-  never
+  never,
+  TestUserRole
 } from '@opencrvs/commons/client'
 import { Stack, Text } from '@opencrvs/components'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 const StyledImg = styled.img`
   width: 300px;
@@ -210,6 +212,9 @@ export const WithQrReader: StoryObj<Args> = {
           <FormFieldGenerator
             fields={fieldsWithQrReader}
             id="id-form"
+            validatorContext={getTestValidatorContext(
+              TestUserRole.Enum.LOCAL_REGISTRAR
+            )}
             onChange={onChange}
           />
         </Stack>
@@ -238,6 +243,9 @@ export const WithQrReaderAndLinkButton: StoryObj<Args> = {
           <FormFieldGenerator
             fields={fieldsWithQrReaderAndLinkButton}
             id="id-form"
+            validatorContext={getTestValidatorContext(
+              TestUserRole.Enum.LOCAL_REGISTRAR
+            )}
             onChange={onChange}
           />
         </Stack>
