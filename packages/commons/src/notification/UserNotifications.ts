@@ -13,8 +13,6 @@ import { joinUrl } from '../url'
 import { NameFieldValue } from '../events'
 import { z } from 'zod'
 
-export const Foo = z.enum(['user-created', 'user-updated'])
-
 export const TriggerEvent = {
   USER_CREATED: 'user-created',
   USER_UPDATED: 'user-updated',

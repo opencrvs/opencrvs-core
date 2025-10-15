@@ -13,16 +13,13 @@ import * as Joi from 'joi'
 import {
   CERT_PUBLIC_KEY_PATH,
   CONFIG_SMS_CODE_EXPIRY_SECONDS,
-  NOTIFICATION_URL,
   PRODUCTION,
   QA_ENV
 } from '@gateway/constants'
 import { redis } from '@gateway/utils/redis'
 import * as crypto from 'crypto'
-import { resolve } from 'url'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import fetch from '@gateway/fetch'
 import { unauthorized } from '@hapi/boom'
 import {
   IUserName,
