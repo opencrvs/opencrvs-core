@@ -24,9 +24,16 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import fetch from '@gateway/fetch'
 import { unauthorized } from '@hapi/boom'
-import { IUserName, logger } from '@opencrvs/commons'
+import {
+  IUserName,
+  logger,
+  personNameFromV1ToV2,
+  TriggerEvent,
+  triggerUserEventNotification
+} from '@opencrvs/commons'
 import * as t from 'io-ts'
 import * as F from 'fp-ts'
+import { env } from '@events/environment'
 
 const pipe = F.function.pipe
 const { chainW, tryCatch } = F.either
@@ -50,7 +57,9 @@ interface ISendVerifyCodeResponse {
 
 interface ISendVerifyCodePayload {
   userFullName: IUserName[]
-  notificationEvent: string
+  notificationEvent:
+    | typeof TriggerEvent.CHANGE_PHONE_NUMBER
+    | typeof TriggerEvent.CHANGE_EMAIL_ADDRESS
   phoneNumber?: string
   email?: string
 }
@@ -113,27 +122,32 @@ export function generateNonce() {
   return crypto.randomBytes(16).toString('base64').toString()
 }
 
+const VERIFICATION_EVENTS = [
+  TriggerEvent.TWO_FA,
+  TriggerEvent.CHANGE_PHONE_NUMBER,
+  TriggerEvent.CHANGE_EMAIL_ADDRESS
+] as const
+
 export async function sendVerificationCode(
   verificationCode: string,
   token: string,
-  notificationEvent: string,
+  notificationEvent: (typeof VERIFICATION_EVENTS)[number],
   userFullName: IUserName[],
   mobile?: string,
   email?: string
 ): Promise<void> {
-  const params = {
-    msisdn: mobile,
-    email,
-    code: verificationCode,
-    notificationEvent,
-    userFullName
-  }
-
-  await fetch(resolve(NOTIFICATION_URL, 'authenticationCode'), {
-    method: 'POST',
-    body: JSON.stringify(params),
-    headers: {
-      'Content-Type': 'application/json',
+  await triggerUserEventNotification({
+    event: notificationEvent,
+    payload: {
+      recipient: {
+        mobile,
+        email,
+        name: personNameFromV1ToV2(userFullName)
+      },
+      code: verificationCode
+    },
+    countryConfigUrl: env.COUNTRY_CONFIG_URL,
+    authHeader: {
       Authorization: `Bearer ${token}`
     }
   })
@@ -145,7 +159,7 @@ export async function generateAndSendVerificationCode(
   nonce: string,
   scope: string[],
   token: string,
-  notificationEvent: string,
+  notificationEvent: (typeof VERIFICATION_EVENTS)[number],
   userFullName: IUserName[],
   mobile?: string,
   email?: string

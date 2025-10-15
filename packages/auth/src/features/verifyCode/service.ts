@@ -16,7 +16,8 @@ import { createToken } from '@auth/features/authenticate/service'
 import {
   triggerUserEventNotification,
   personNameFromV1ToV2,
-  IUserName
+  IUserName,
+  TriggerEvent
 } from '@opencrvs/commons'
 
 interface ICodeDetails {
@@ -74,8 +75,8 @@ export async function sendVerificationCode(
   await triggerUserEventNotification({
     event:
       notificationEvent === NotificationEvent.TWO_FACTOR_AUTHENTICATION
-        ? '2fa'
-        : 'reset-password',
+        ? TriggerEvent.TWO_FA
+        : TriggerEvent.RESET_PASSWORD,
     payload: {
       code: verificationCode,
       recipient: {
