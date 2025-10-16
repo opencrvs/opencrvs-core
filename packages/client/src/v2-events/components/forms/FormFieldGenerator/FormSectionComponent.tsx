@@ -12,7 +12,6 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
 import { cloneDeep, isEqual, set, groupBy, omit, get } from 'lodash'
-import { useIntl } from 'react-intl'
 import styled, { keyframes } from 'styled-components'
 import {
   EventState,
@@ -21,7 +20,6 @@ import {
   FieldType,
   FieldValue,
   AddressType,
-  TranslationConfig,
   IndexMap,
   joinValues,
   isNonInteractiveFieldType,
@@ -32,7 +30,9 @@ import {
   omitHiddenFields,
   isFieldEnabled,
   ValidatorContext,
-  isFieldVisible
+  isFieldVisible,
+  AgeValue,
+  DateValue
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -55,7 +55,7 @@ type AllProps = {
   fields: FieldConfig[]
   className?: string
   readonlyMode?: boolean
-  errors: Record<string, { errors: { message: TranslationConfig }[] }>
+  errors: IndexMap<string>
   /**
    * Update the form values in the non-formik state.
    */
@@ -198,7 +198,6 @@ export function FormSectionComponent({
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not -
   useOnlineStatus()
-  const intl = useIntl()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
 
@@ -221,6 +220,12 @@ export function FormSectionComponent({
     }
     return fieldsWithDotSeparator
   }, [eventConfig, fieldsWithDotSeparator])
+
+  const ageFields = useMemo(
+    () =>
+      allFieldsWithDotSeparator.filter((field) => field.type === FieldType.AGE),
+    [allFieldsWithDotSeparator]
+  )
 
   // Create a reference map of parent fields and their their children for quick access.
   // This is used to reset the values of child fields when a parent field changes.
@@ -278,7 +283,7 @@ export function FormSectionComponent({
       })
 
       set(fieldValues, childFieldFormikId, updatedValue)
-      set(fieldErrors, childField.id, { errors: [] })
+      set(fieldErrors, childField.id, '')
     },
     [fieldsWithDotSeparator, systemVariables]
   )
@@ -303,6 +308,19 @@ export function FormSectionComponent({
         setValuesForListenerFields(child, updatedValues, updatedErrors)
       }
 
+      const dependentAgeFields = ageFields.filter(
+        (f) => f.configuration.asOfDate.$$field === ocrvsFieldId
+      )
+
+      for (const ageField of dependentAgeFields) {
+        const formikAgeFieldId = makeFormFieldIdFormikCompatible(ageField.id)
+        const maybeDate = updatedValues[formikFieldId]
+        set(updatedValues, formikAgeFieldId, {
+          ...(updatedValues[formikAgeFieldId] as AgeValue),
+          asOfDate: DateValue.safeParse(maybeDate).data
+        })
+      }
+
       // @TODO: we should not reference field id 'country' directly.
       if (formikFieldId === 'country') {
         const defaultCountry = window.config.COUNTRY || 'FAR'
@@ -321,9 +339,7 @@ export function FormSectionComponent({
 
       const updatedTouched = omit(touched, formikChildIds)
 
-      // @TODO: Formik does not type errors well. Actual error message differs from the type.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      void setErrors(updatedErrors as any)
+      void setErrors(updatedErrors)
       void setValues(updatedValues)
       void setTouched(updatedTouched)
       void setAllTouchedFields(updatedTouched)
@@ -335,6 +351,7 @@ export function FormSectionComponent({
       setTouched,
       touched,
       errorsWithDotSeparator,
+      ageFields,
       setErrors,
       setAllTouchedFields,
       setValuesForListenerFields
@@ -390,7 +407,7 @@ export function FormSectionComponent({
   const completeForm = { ...initialValues, ...form }
 
   const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
-    const fieldErrors = errors[field.id]?.errors
+    const fieldErrors = errors[field.id]
     const hasErrors = fieldErrors && fieldErrors.length > 0
     return isFieldVisible(field, completeForm, validatorContext) && hasErrors
   })
@@ -431,8 +448,8 @@ export function FormSectionComponent({
           !isFieldEnabled(field, visibleFieldValues, validatorContext) ||
           (isCorrection && field.uncorrectable)
 
-        const visibleError = errors[field.id]?.errors[0]?.message
-        const error = visibleError ? intl.formatMessage(visibleError) : ''
+        const visibleError = errors[field.id]
+        const error = visibleError ?? ''
 
         return (
           <FormItem

@@ -101,7 +101,7 @@ export function getFieldErrors(
       context
     })
 
-    return fieldErrors.errors.map((error) => ({
+    return fieldErrors.map((error) => ({
       message: error.message.defaultMessage,
       id: field.id,
       value: data[field.id as keyof typeof data]
@@ -264,7 +264,7 @@ function validateNotifyAction({
         context
       })
 
-      return fieldErrors.errors.map((error) => ({
+      return fieldErrors.map((error) => ({
         message: error.message.defaultMessage,
         id: field.id,
         value: annotation[field.id]
@@ -290,7 +290,7 @@ function validateNotifyAction({
         context
       })
 
-      return fieldErrors.errors.map((error) => ({
+      return fieldErrors.map((error) => ({
         message: error.message.defaultMessage,
         id: field.id,
         value: declaration[field.id]
