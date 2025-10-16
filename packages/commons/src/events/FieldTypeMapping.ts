@@ -45,7 +45,8 @@ import {
   ButtonField,
   LinkButtonField,
   VerificationStatus,
-  QueryParamReaderField
+  QueryParamReaderField,
+  AgeField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -62,7 +63,8 @@ import {
   SelectDateRangeValue,
   TimeValue,
   ButtonFieldValue,
-  VerificationStatusValue
+  VerificationStatusValue,
+  AgeValue
 } from './FieldValue'
 
 import { FullDocumentPath } from '../documents'
@@ -103,6 +105,9 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
   switch (type) {
     case FieldType.DATE:
       schema = DateValue
+      break
+    case FieldType.AGE:
+      schema = AgeValue
       break
     case FieldType.TIME:
       schema = TimeValue
@@ -208,6 +213,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.NUMBER:
     case FieldType.EMAIL:
     case FieldType.DATE:
+    case FieldType.AGE:
     case FieldType.TIME:
     case FieldType.CHECKBOX:
     case FieldType.DATE_RANGE:
@@ -254,6 +260,13 @@ export const isDateFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: DateField } => {
   return field.config.type === FieldType.DATE
+}
+
+export const isAgeFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: AgeValue | undefined; config: AgeField } => {
+  return field.config.type === FieldType.AGE
 }
 
 export const isTimeFieldType = (field: {

@@ -14,6 +14,7 @@ import {
   EventState,
   isPageVisible,
   FormConfig,
+  IndexMap,
   runStructuralValidations,
   ValidatorContext,
   runFieldValidations,
@@ -21,27 +22,19 @@ import {
   omitHiddenPaginatedFields
 } from '@opencrvs/commons/client'
 
-interface FieldErrors {
-  errors: {
-    message: MessageDescriptor
-  }[]
+interface FieldError {
+  message: MessageDescriptor
 }
 
-export interface Errors {
-  [fieldName: string]: FieldErrors
-}
+export type IntlErrors = IndexMap<FieldError[]>
 
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
   values: EventState,
   context: ValidatorContext
 ) {
-  return fields.reduce((errorsForAllFields: Errors, field) => {
-    if (
-      // eslint-disable-next-line
-      errorsForAllFields[field.id] &&
-      errorsForAllFields[field.id].errors.length > 0
-    ) {
+  return fields.reduce((errorsForAllFields: IntlErrors, field) => {
+    if ((errorsForAllFields[field.id] ?? []).length > 0) {
       return errorsForAllFields
     }
 
@@ -61,12 +54,8 @@ export function getStructuralValidationErrorsForForm(
   values: EventState,
   context: ValidatorContext
 ) {
-  return fields.reduce((errorsForAllFields: Errors, field) => {
-    if (
-      // eslint-disable-next-line
-      errorsForAllFields[field.id] &&
-      errorsForAllFields[field.id].errors.length > 0
-    ) {
+  return fields.reduce((errorsForAllFields: IntlErrors, field) => {
+    if ((errorsForAllFields[field.id] ?? []).length > 0) {
       return errorsForAllFields
     }
 
@@ -110,18 +99,20 @@ export function validationErrorsInActionFormExist({
   const hasValidationErrors = formConfig.pages
     .filter((page) => isPageVisible(page, form, context))
     .some((page) => {
-      const fieldErrors = getValidationErrorsForForm(
+      const formErrors = getValidationErrorsForForm(
         page.fields,
         formWithoutHiddenFields,
         context
       )
 
-      return Object.values(fieldErrors).some((field) => field.errors.length > 0)
+      return Object.values(formErrors).some(
+        (fieldErrors) => (fieldErrors ?? []).length > 0
+      )
     })
 
   const hasAnnotationValidationErrors = Object.values(
     getValidationErrorsForForm(reviewFields, visibleAnnotationFields, context)
-  ).some((field) => field.errors.length > 0)
+  ).some((fieldErrors) => (fieldErrors ?? []).length > 0)
 
   return hasValidationErrors || hasAnnotationValidationErrors
 }
