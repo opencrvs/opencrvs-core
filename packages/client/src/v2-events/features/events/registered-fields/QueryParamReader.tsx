@@ -28,7 +28,10 @@ function prepareFieldValueFromFormProjection(
 ) {
   const result: Record<string, string> = {}
   for (const [key, entry] of Object.entries(formProjection)) {
-    result[entry] = params.get(key) || ''
+    const value = params.get(key)
+    if (value) {
+      result[entry] = value
+    }
   }
   return result
 }
@@ -55,14 +58,16 @@ function QueryParamReaderInput({
       ? prepareFieldValueFromFormProjection(params, formProjection)
       : Object.fromEntries(params)
 
-    void Promise.resolve().then(() =>
-      onChangeRef.current({
-        ...fieldValue,
-        // to ensure formik sees it as a new value even if the params are the same
-        [Symbol('updated')]: true
-      })
-    )
-    setSearchParams(new URLSearchParams(), { replace: true })
+    void Promise.resolve().then(() => {
+      if (Object.keys(fieldValue).length) {
+        onChangeRef.current({
+          ...fieldValue,
+          // to ensure formik sees it as a new value even if the params are the same
+          [Symbol('updated')]: true
+        })
+        setSearchParams(new URLSearchParams(), { replace: true })
+      }
+    })
   }, [formProjection, onChangeRef, searchString, setSearchParams])
   return null
 }

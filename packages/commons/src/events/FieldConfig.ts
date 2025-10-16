@@ -710,7 +710,9 @@ const QueryParamReaderField = BaseField.extend({
     formProjection: z
       .record(z.string())
       .optional()
-      .describe('Projection of the field value after parsing the query string')
+      .describe(
+        'Projection of the field value after parsing the query string, the property will be ignored if the item is not present in querystring'
+      )
   })
 }).describe(
   'A field that maps URL query params into form values and clears them afterward'
