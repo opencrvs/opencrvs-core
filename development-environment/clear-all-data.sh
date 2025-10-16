@@ -61,7 +61,11 @@ CREATE SCHEMA analytics AUTHORIZATION postgres;
 GRANT USAGE ON SCHEMA analytics TO events_analytics;
 EOF
 
-echo "Schemas 'app' and 'analytics' dropped and recreated."
+echo "Recreating analytics schema via country-config repo..."
+cd $COUNTRY_CONFIG_PATH
+yarn setup-analytics
+
+echo "Schemas 'app' reset and 'analytics' recreated."
 
 ##################
 # Run migrations #
