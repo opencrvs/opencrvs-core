@@ -129,6 +129,7 @@ describe('event.actions.notify', () => {
     }
 
     await expect(
+      // @ts-expect-error - test case
       client.event.actions.notify.request(payload)
     ).rejects.toMatchSnapshot()
   })
