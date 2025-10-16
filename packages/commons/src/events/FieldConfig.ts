@@ -241,6 +241,18 @@ const DateField = BaseField.extend({
 
 export type DateField = z.infer<typeof DateField>
 
+const AgeField = BaseField.extend({
+  type: z.literal(FieldType.AGE),
+  defaultValue: NumberFieldValue.optional(),
+  configuration: z.object({
+    asOfDate: FieldReference,
+    prefix: TranslationConfig.optional(),
+    postfix: TranslationConfig.optional()
+  })
+}).describe('An age input field which uses the current date as the asOfDate')
+
+export type AgeField = z.infer<typeof AgeField>
+
 const TimeField = BaseField.extend({
   type: z.literal(FieldType.TIME),
   defaultValue: TimeValue.optional(),
@@ -710,6 +722,7 @@ export type FieldConfig =
   | z.infer<typeof NumberField>
   | z.infer<typeof TextAreaField>
   | z.infer<typeof DateField>
+  | z.infer<typeof AgeField>
   | z.infer<typeof TimeField>
   | z.infer<typeof DateRangeField>
   | z.infer<typeof SelectDateRangeField>
@@ -754,6 +767,7 @@ export type FieldConfigInput =
   | z.input<typeof NumberField>
   | z.input<typeof TextAreaField>
   | z.input<typeof DateField>
+  | z.input<typeof AgeField>
   | z.input<typeof DateRangeField>
   | z.input<typeof Paragraph>
   | z.input<typeof RadioGroup>
@@ -795,6 +809,7 @@ export const FieldConfig: z.ZodType<
     TextField,
     NumberField,
     TextAreaField,
+    AgeField,
     DateField,
     TimeField,
     DateRangeField,

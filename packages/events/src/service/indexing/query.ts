@@ -21,7 +21,7 @@ import {
   SearchScopeAccessLevels,
   timePeriodToDateRange
 } from '@opencrvs/commons/events'
-import { getOrThrow } from '@opencrvs/commons'
+import { getOrThrow, UUID } from '@opencrvs/commons'
 import { getChildLocations } from '../locations/locations'
 import {
   encodeFieldId,
@@ -219,7 +219,7 @@ async function buildClause(
         if (value.type === 'exact') {
           must.push({ term: { [key]: value.term } })
         } else {
-          const childLocations = await getChildLocations(value.location)
+          const childLocations = await getChildLocations(value.location as UUID)
           const locationIds = [
             value.location,
             ...childLocations.map((location) => location.id)

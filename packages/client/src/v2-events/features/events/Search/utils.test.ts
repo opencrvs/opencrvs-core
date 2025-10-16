@@ -29,39 +29,23 @@ describe('getAdvancedSearchFieldErrors', () => {
     const sections = resolveAdvancedSearchConfig(tennisClubMembershipEvent)
     const errors = getAdvancedSearchFieldErrors(sections, mockFormValues, {})
     expect(errors).toEqual({
-      'applicant.name': {
-        errors: []
-      },
-      'recommender.name': {
-        errors: []
-      },
-      'applicant.email': {
-        errors: []
-      },
-      'applicant.dob': {
-        errors: [
-          {
-            message: {
-              defaultMessage: 'Invalid date field',
-              description: 'Error message when date field is invalid',
-              id: 'error.invalidDate'
-            }
+      'applicant.name': [],
+      'recommender.name': [],
+      'applicant.email': [],
+      'applicant.dob': [
+        {
+          message: {
+            defaultMessage: 'Invalid date field',
+            description: 'Error message when date field is invalid',
+            id: 'error.invalidDate'
           }
-        ]
-      },
-      'event.legalStatuses.REGISTERED.acceptedAt': {
-        errors: []
-      },
-      'event.legalStatuses.REGISTERED.createdAtLocation': {
-        errors: []
-      },
-      'event.status': {
-        errors: []
-      },
-      'event.updatedAt': {
-        errors: []
-      }
-    })
+        }
+      ],
+      'event.legalStatuses.REGISTERED.acceptedAt': [],
+      'event.legalStatuses.REGISTERED.createdAtLocation': [],
+      'event.status': [],
+      'event.updatedAt': []
+    } satisfies ReturnType<typeof getAdvancedSearchFieldErrors>)
   })
 })
 
