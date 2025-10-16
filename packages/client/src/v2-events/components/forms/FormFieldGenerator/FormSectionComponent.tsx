@@ -36,13 +36,13 @@ import {
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
-  handleDefaultValue,
   makeDatesFormatted,
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
 import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
+import { handleDefaultValue } from '@client/v2-events/hooks/useDefaultValues'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible

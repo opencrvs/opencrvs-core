@@ -26,6 +26,7 @@ import {
   makeFormFieldIdFormikCompatible
 } from '@client/v2-events/components/forms/utils'
 import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
+import { useDefaultValues } from '@client/v2-events/hooks/useDefaultValues'
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
@@ -83,7 +84,7 @@ export function Pages({
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
   const page = pageIdx === -1 ? visiblePages[0] : visiblePages[pageIdx]
   const [validateAllFields, setValidateAllFields] = useState(false)
-  const systemVariables = useSystemVariables()
+  const defaultValues = useDefaultValues(page.fields)
 
   const { setAllTouchedFields, touchedFields: initialTouchedFields } =
     useEventFormData()
@@ -145,11 +146,6 @@ export function Pages({
     onPreviousPage,
     onSubmit
   }
-
-  const defaultValues = useMemo(
-    () => getDefaultValuesForFields(page.fields, systemVariables),
-    [page.fields, systemVariables]
-  )
 
   const initialValues = { ...defaultValues, ...declaration, ...form }
 

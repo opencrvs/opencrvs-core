@@ -8,16 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  FieldConfig,
-  FieldType,
-  EventState,
-  SystemVariables,
-  isFieldConfigDefaultValue,
-  InteractiveFieldType,
-  isNonInteractiveFieldType
-} from '@opencrvs/commons/client'
-import { replacePlaceholders } from '@client/v2-events/utils'
+import { FieldConfig, FieldType, EventState } from '@opencrvs/commons/client'
 
 /*
  * Formik has a feature that automatically nests all form keys that have a dot in them.
@@ -33,45 +24,6 @@ export function makeFormFieldIdFormikCompatible(fieldId: string) {
 
 export function makeFormikFieldIdOpenCRVSCompatible(fieldId: string): string {
   return fieldId.replaceAll(FIELD_SEPARATOR, DOT_SEPARATOR)
-}
-
-export function handleDefaultValue({
-  field,
-  systemVariables
-}: {
-  field: InteractiveFieldType
-  systemVariables: SystemVariables
-}) {
-  const defaultValue = field.defaultValue
-
-  if (isFieldConfigDefaultValue(field.defaultValue)) {
-    return replacePlaceholders({
-      fieldType: field.type,
-      defaultValue,
-      systemVariables
-    })
-  }
-
-  return defaultValue
-}
-
-export function getDefaultValuesForFields(
-  fields: FieldConfig[],
-  systemVariables: SystemVariables
-) {
-  return fields
-    .filter(
-      (field): field is InteractiveFieldType =>
-        !isNonInteractiveFieldType(field)
-    )
-    .reduce((memo, field) => {
-      const fieldInitialValue = handleDefaultValue({
-        field,
-        systemVariables
-      })
-
-      return { ...memo, [field.id]: fieldInitialValue }
-    }, {})
 }
 
 export interface Stringifiable {
