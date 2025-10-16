@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 893a0312-8abc-4a60-9b9b-d4c4bfae582c
+                transactionId: 120065b6-1f59-4fb3-9c71-05329041108b
                 type: birth
       responses:
         "200":
@@ -401,7 +401,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 0c3c49e3-6f13-4367-bfb5-deefb2d3732d
+                transactionId: cd78186e-d099-4973-91bd-86d9760b7e1c
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -8388,7 +8388,9 @@ components:
                   type: object
                   additionalProperties:
                     type: string
-                  description: Projection of the field value after parsing the query string
+                  description: Projection of the field value after parsing the query string, the
+                    property will be ignored if the item is not present in
+                    querystring
           required:
             - id
             - label

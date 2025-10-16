@@ -6539,7 +6539,9 @@ components:
                   type: object
                   additionalProperties:
                     type: string
-                  description: Projection of the field value after parsing the query string
+                  description: Projection of the field value after parsing the query string, the
+                    property will be ignored if the item is not present in
+                    querystring
           required:
             - id
             - label
