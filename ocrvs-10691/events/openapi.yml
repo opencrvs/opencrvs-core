@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 84aebc20-09ab-4a1c-a858-d1a8362899bf
+                transactionId: 539bc5f0-477d-40e8-aea3-a070b0390de5
                 type: birth
       responses:
         "200":
@@ -130,6 +130,17 @@ paths:
                         description: Date in the format YYYY-MM-DD
                       - type: string
                         pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+                      - type: object
+                        nullable: true
+                        properties:
+                          age:
+                            type: number
+                          asOfDate:
+                            type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                        required:
+                          - age
                       - type: object
                         properties:
                           country:
@@ -266,6 +277,17 @@ paths:
                       - type: string
                         pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                       - type: object
+                        nullable: true
+                        properties:
+                          age:
+                            type: number
+                          asOfDate:
+                            type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                        required:
+                          - age
+                      - type: object
                         properties:
                           country:
                             type: string
@@ -401,7 +423,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: f46111b2-f294-4577-9d94-c92b707e2b65
+                transactionId: b118537b-e46f-4557-aef1-c0c6dc2b2e94
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -470,6 +492,17 @@ paths:
                         description: Date in the format YYYY-MM-DD
                       - type: string
                         pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+                      - type: object
+                        nullable: true
+                        properties:
+                          age:
+                            type: number
+                          asOfDate:
+                            type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                        required:
+                          - age
                       - type: object
                         properties:
                           country:
@@ -599,6 +632,17 @@ paths:
                         description: Date in the format YYYY-MM-DD
                       - type: string
                         pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+                      - type: object
+                        nullable: true
+                        properties:
+                          age:
+                            type: number
+                          asOfDate:
+                            type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                        required:
+                          - age
                       - type: object
                         properties:
                           country:
@@ -799,6 +843,17 @@ paths:
                       - type: string
                         pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                       - type: object
+                        nullable: true
+                        properties:
+                          age:
+                            type: number
+                          asOfDate:
+                            type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                        required:
+                          - age
+                      - type: object
                         properties:
                           country:
                             type: string
@@ -927,6 +982,17 @@ paths:
                         description: Date in the format YYYY-MM-DD
                       - type: string
                         pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+                      - type: object
+                        nullable: true
+                        properties:
+                          age:
+                            type: number
+                          asOfDate:
+                            type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                        required:
+                          - age
                       - type: object
                         properties:
                           country:
@@ -1130,6 +1196,17 @@ paths:
                       - type: string
                         pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                       - type: object
+                        nullable: true
+                        properties:
+                          age:
+                            type: number
+                          asOfDate:
+                            type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                        required:
+                          - age
+                      - type: object
                         properties:
                           country:
                             type: string
@@ -1258,6 +1335,17 @@ paths:
                         description: Date in the format YYYY-MM-DD
                       - type: string
                         pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+                      - type: object
+                        nullable: true
+                        properties:
+                          age:
+                            type: number
+                          asOfDate:
+                            type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                        required:
+                          - age
                       - type: object
                         properties:
                           country:
@@ -2960,6 +3048,130 @@ components:
             - label
             - type
           description: Multiline text input
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a10
+            secured:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a11
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
+            analytics:
+              type: boolean
+              default: false
+              description: Meta field for analytics to allow filtering non-analytics fields
+                away
+            type:
+              type: string
+              enum:
+                - AGE
+            defaultValue:
+              type: number
+            configuration:
+              type: object
+              properties:
+                asOfDate:
+                  type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  required:
+                    - $$field
+                  description: Reference to a field by its ID
+                prefix:
+                  $ref: "#/components/schemas/TranslationConfig"
+                postfix:
+                  $ref: "#/components/schemas/TranslationConfig"
+              required:
+                - asOfDate
+          required:
+            - id
+            - label
+            - type
+            - configuration
+          description: An age input field which uses the current date as the asOfDate
         - type: object
           properties:
             id:
@@ -7640,6 +7852,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -7768,6 +7991,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -7949,6 +8183,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -8077,6 +8322,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -8255,6 +8511,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -8383,6 +8650,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -8571,6 +8849,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -8699,6 +8988,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -8896,6 +9196,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -9024,6 +9335,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -9202,6 +9524,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -9330,6 +9663,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -9516,6 +9860,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -9644,6 +9999,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -9832,6 +10198,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -9960,6 +10337,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -10138,6 +10526,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -10266,6 +10665,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -10446,6 +10856,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -10574,6 +10995,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -10752,6 +11184,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -10880,6 +11323,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -11061,6 +11515,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -11189,6 +11654,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -11367,6 +11843,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -11495,6 +11982,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -11676,6 +12174,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -11804,6 +12313,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -11995,6 +12515,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -12123,6 +12654,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -12301,6 +12843,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -12429,6 +12982,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -12613,6 +13177,17 @@ components:
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
+              - type: object
                 properties:
                   country:
                     type: string
@@ -12741,6 +13316,17 @@ components:
                 description: Date in the format YYYY-MM-DD
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - type: object
+                nullable: true
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: object
                 properties:
                   country:
@@ -13393,6 +13979,16 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: object
+                properties:
+                  age:
+                    type: number
+                  asOfDate:
+                    type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                required:
+                  - age
               - type: string
                 pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - type: object
