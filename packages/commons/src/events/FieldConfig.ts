@@ -603,7 +603,7 @@ const Address = BaseField.extend({
 
 export const StaticDataEntry = z
   .object({
-    id: z.string().describe('ID for the data entry.'),
+    id: z.string().describe('ID for the data entry'),
     label: TranslationConfig,
     value: TranslationConfig.or(z.string())
   })
@@ -612,7 +612,12 @@ export const StaticDataEntry = z
 export type StaticDataEntry = z.infer<typeof StaticDataEntry>
 
 export const DataEntry = z
-  .union([StaticDataEntry, z.object({ fieldId: z.string() })])
+  .union([
+    StaticDataEntry,
+    z
+      .object({ fieldId: z.string() })
+      .describe('Reference to a field in the declaration')
+  ])
   .describe(
     'Data entry can be either a static data entry, or a reference to another field in the current form or the declaration.'
   )

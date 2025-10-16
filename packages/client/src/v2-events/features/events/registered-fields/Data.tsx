@@ -22,7 +22,6 @@ import {
   StaticDataEntry,
   EventConfig,
   getDeclarationFields,
-  FieldValue,
   DataEntry
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
