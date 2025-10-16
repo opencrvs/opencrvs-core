@@ -169,18 +169,18 @@ function DeclarationComparisonTableComponent({
 
       const previous = (
         <Output
+          eventConfig={eventConfig}
           field={f}
           formConfig={declarationConfig}
           previousForm={previousAnnotations}
-          showPreviouslyMissingValuesAsChanged={false}
           value={previousAnnotations[f.id]}
         />
       )
 
       const latest = (
         <Output
+          eventConfig={eventConfig}
           field={f}
-          showPreviouslyMissingValuesAsChanged={false}
           value={currentAnnotations[f.id]}
         />
       )
@@ -213,10 +213,10 @@ function DeclarationComparisonTableComponent({
             const previous = (
               <Output
                 displayEmptyAsDash
+                eventConfig={eventConfig}
                 field={f}
                 formConfig={declarationConfig}
                 previousForm={previousDeclaration}
-                showPreviouslyMissingValuesAsChanged={false}
                 value={previousDeclaration[f.id]}
               />
             )
@@ -224,8 +224,8 @@ function DeclarationComparisonTableComponent({
             const latest = (
               <Output
                 displayEmptyAsDash
+                eventConfig={eventConfig}
                 field={f}
-                showPreviouslyMissingValuesAsChanged={false}
                 value={latestDeclaration[f.id]}
               />
             )

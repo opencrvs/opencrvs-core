@@ -157,8 +157,8 @@ export function EventSummary({
         secured: config.secured ?? false,
         value: (
           <Output
+            eventConfig={eventConfiguration}
             field={config}
-            showPreviouslyMissingValuesAsChanged={false}
             value={value}
           />
         )

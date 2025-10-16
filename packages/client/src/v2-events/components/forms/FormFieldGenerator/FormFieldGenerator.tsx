@@ -187,7 +187,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               resetForm={formikProps.resetForm}
               setAllTouchedFields={setAllTouchedFields}
               setErrors={formikProps.setErrors}
-              setFieldValue={formikProps.setFieldValue}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
               systemVariables={systemVariables}

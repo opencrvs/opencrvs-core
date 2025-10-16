@@ -96,17 +96,6 @@ export async function getLocations({
   return query.execute()
 }
 
-export async function getLocationById(id: UUID) {
-  const db = getClient()
-  return db
-    .selectFrom('locations')
-    .select(['id', 'name', 'parentId', 'validUntil', 'locationType'])
-    .where('id', '=', id)
-    .where('deletedAt', 'is', null)
-    .$narrowType<{ deletedAt: null }>()
-    .executeTakeFirst()
-}
-
 /** @returns a recursive CTE that can be used to get all child locations of a given location */
 function childLocationsCte(parentId: UUID) {
   return sql`

@@ -113,13 +113,14 @@ function mapFieldTypeToElasticsearch(
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
-    case FieldType.DATA:
     case FieldType.BUTTON:
     case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.ID:
     case FieldType.PHONE:
     case FieldType.VERIFICATION_STATUS:
       return { type: 'keyword' }
+    case FieldType.DATA:
+      return { type: 'object' }
     case FieldType.ADDRESS:
       const streetLevelDetails = Object.fromEntries(
         (field.configuration?.streetAddressForm ?? []).map((f) => [
