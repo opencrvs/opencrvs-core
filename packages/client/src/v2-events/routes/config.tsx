@@ -13,7 +13,7 @@ import React, { useEffect } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
 import { useSelector } from 'react-redux'
-import { ActionType, LocationType, SCOPES } from '@opencrvs/commons/client'
+import { ActionType, SCOPES } from '@opencrvs/commons/client'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
@@ -62,23 +62,6 @@ function PrefetchQueries() {
   useEffect(() => {
     void queryClient.prefetchQuery({
       queryKey: trpcOptionsProxy.locations.list.queryKey()
-    })
-
-    // Prefetch active health facility locations
-    void queryClient.prefetchQuery({
-      queryKey: trpcOptionsProxy.locations.list.queryKey({
-        isActive: true,
-        locationType: LocationType.Enum.HEALTH_FACILITY
-      })
-    })
-
-    // Prefetch locations for residential address locations
-    void queryClient.prefetchQuery({
-      queryKey: trpcOptionsProxy.locations.list.queryKey({
-        isActive: undefined,
-        locationType: undefined,
-        locationIds: undefined
-      })
     })
 
     function prefetch() {
