@@ -624,6 +624,15 @@ export function createFieldConditionals(fieldId: string) {
       })
     },
     getId: () => ({ fieldId }),
+    /**
+     * @deprecated
+     * use field(fieldId).get(nestedProperty) instead
+     * with 'and' combinator e.g.
+     * and(
+     *   field('child.name').get('firstname').isEqualTo('John'),
+     *   field('child.name').get('surname').isEqualTo('Doe')
+     * )
+     */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     object: (options: Record<string, any>) =>
       defineFormConditional({
