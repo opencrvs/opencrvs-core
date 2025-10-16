@@ -68,12 +68,14 @@ export const compositeFieldTypes = [
   FieldType.DATE_RANGE,
   FieldType.ADDRESS,
   FieldType.FILE_WITH_OPTIONS,
-  FieldType.FILE
+  FieldType.FILE,
+  FieldType.DATA
 ]
 
 export const FieldTypesToHideInReview = [
   FieldType.BULLET_LIST,
   FieldType.DIVIDER,
   FieldType.PAGE_HEADER,
-  FieldType.PARAGRAPH
+  FieldType.PARAGRAPH,
+  FieldType.DATA
 ]
