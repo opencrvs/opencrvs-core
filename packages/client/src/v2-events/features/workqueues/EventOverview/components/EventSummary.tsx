@@ -119,12 +119,10 @@ export const summaryMessages = messages
 export function EventSummary({
   event,
   eventConfiguration,
-  flags,
   hideSecuredFields = false
 }: {
   event: Record<string, FieldValue | null>
   eventConfiguration: EventConfig
-  flags: Flag[]
   hideSecuredFields?: boolean
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
@@ -180,11 +178,6 @@ export function EventSummary({
     }
   })
 
-  const flattenedFlags = flags
-    .filter((flag) => !ActionFlag.safeParse(flag).success)
-    .filter((flag) => flag !== InherentFlags.INCOMPLETE)
-    .join(', ')
-
   return (
     <>
       <Summary id="summary">
@@ -202,13 +195,6 @@ export function EventSummary({
           data-testid="status"
           label={intl.formatMessage(messages.status.label)}
           value={intl.formatMessage(messages.status.value, event)}
-        />
-        <Summary.Row
-          key="flags"
-          data-testid="flags"
-          label={intl.formatMessage(messages.flags.label)}
-          placeholder={intl.formatMessage(messages.flags.placeholder)}
-          value={flattenedFlags}
         />
         <Summary.Row
           key="event"

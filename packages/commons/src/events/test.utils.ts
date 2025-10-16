@@ -9,7 +9,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { merge, omitBy, isString, omit } from 'lodash'
+import { merge, omitBy, isString, omit, isEmpty } from 'lodash'
 import { addDays } from 'date-fns'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID, UUID } from '../uuid'
@@ -161,7 +161,7 @@ export function generateRandomSignature(rng: () => number): string {
 /**
  * Quick-and-dirty mock data generator for event actions.
  */
-export function mapFieldTypeToMockValue(
+function mapFieldTypeToMockValue(
   field: FieldConfig,
   i: number,
   rng: () => number
@@ -213,6 +213,11 @@ export function mapFieldTypeToMockValue(
       }
     case FieldType.DATE:
       return '2021-01-01'
+    case FieldType.AGE:
+      return {
+        age: 19,
+        asOfDate: '2021-01-01'
+      }
     case FieldType.TIME:
       return '09:33'
     case FieldType.ALPHA_PRINT_BUTTON:
@@ -263,6 +268,10 @@ export function generateActionDeclarationInput(
   overrides?: Partial<EventState>
 ): EventState {
   const parsed = DeclarationUpdateActions.safeParse(action)
+
+  if (isEmpty(overrides) && typeof overrides === 'object') {
+    return {}
+  }
   if (parsed.success) {
     const fields = getDeclarationFields(configuration)
 
@@ -871,24 +880,24 @@ export function generateActionDocument<T extends ActionType>({
 export function generateEventDocument({
   configuration,
   actions,
-  rng = () => 0.1,
-  user,
-  declarationOverrides
+  rng = () => 0.1
 }: {
   configuration: EventConfig
-  actions: ActionType[]
+  actions: {
+    type: ActionType
+    /**
+     * Overrides for default event state per action
+     */
+    declarationOverrides?: Partial<EventState>
+    user?: Partial<{
+      signature: string
+      primaryOfficeId: UUID
+      role: TestUserRole
+      id: string
+      assignedTo: string
+    }>
+  }[]
   rng?: () => number
-  user?: Partial<{
-    signature: string
-    primaryOfficeId: UUID
-    role: TestUserRole
-    id: string
-    assignedTo: string
-  }>
-  /**
-   * Overrides for default event state
-   */
-  declarationOverrides?: Partial<EventState>
 }): EventDocument {
   return {
     trackingId: getUUID(),
@@ -896,14 +905,15 @@ export function generateEventDocument({
     actions: actions.map((action) =>
       generateActionDocument({
         configuration,
-        action,
+        action: action.type,
         rng,
         defaults: {
-          createdBy: user?.id,
-          createdAtLocation: user?.primaryOfficeId,
-          assignedTo: user?.assignedTo
+          createdBy: action.user?.id,
+          createdAtLocation: action.user?.primaryOfficeId,
+          assignedTo: action.user?.assignedTo,
+          createdByRole: action.user?.role
         },
-        declarationOverrides
+        declarationOverrides: action.declarationOverrides
       })
     ),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
@@ -1052,7 +1062,7 @@ export const generateTranslationConfig = (
 ): TranslationConfig => ({
   defaultMessage: message,
   description: 'Description for ${message}',
-  id: message
+  id: message.trim().replace(/\s+/g, '_').toLowerCase()
 })
 
 export const BearerTokenByUserType = {

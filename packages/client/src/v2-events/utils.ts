@@ -72,10 +72,6 @@ export const getUserIdsFromActions = (
   return uniq(userIds)
 }
 
-export const getAllUniqueFields = (eventConfig: EventConfig) => {
-  return uniqBy(getDeclarationFields(eventConfig), (field) => field.id)
-}
-
 export function flattenEventIndex(event: EventIndex) {
   const { declaration, trackingId, status, ...rest } = event
   return {

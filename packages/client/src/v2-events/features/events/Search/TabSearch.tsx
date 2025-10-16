@@ -175,7 +175,7 @@ export function TabSearch({
 
   const errors = Object.values(
     getAdvancedSearchFieldErrors(sections, formValues, validatorContext)
-  ).flatMap((errObj) => errObj.errors)
+  ).flatMap((fieldErrors) => fieldErrors)
 
   const nonEmptyValues = filterEmptyValues(formValues)
 

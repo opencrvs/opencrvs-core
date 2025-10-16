@@ -59,13 +59,15 @@ import {
   isLinkButtonFieldType,
   isVerificationStatusType,
   isQueryParamReaderFieldType,
-  ValidatorContext
+  ValidatorContext,
+  isAgeFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
 import {
   BulletList,
   Checkbox,
+  AgeField,
   DateField,
   RadioGroup,
   LocationSearch,
@@ -251,6 +253,29 @@ export const GeneratedInputField = React.memo(
             onChange={(val: string) =>
               onFieldValueChange(fieldDefinition.id, val)
             }
+          />
+        </InputField>
+      )
+    }
+
+    if (isAgeFieldType(field)) {
+      return (
+        <InputField
+          {...inputFieldProps}
+          postfix={
+            field.config.configuration.postfix &&
+            intl.formatMessage(field.config.configuration.postfix)
+          }
+          prefix={
+            field.config.configuration.prefix &&
+            intl.formatMessage(field.config.configuration.prefix)
+          }
+        >
+          <AgeField.Input
+            {...inputProps}
+            asOfDateRef={field.config.configuration.asOfDate.$$field}
+            value={field.value?.age}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
         </InputField>
       )

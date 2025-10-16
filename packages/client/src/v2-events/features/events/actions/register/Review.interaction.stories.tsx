@@ -40,7 +40,11 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 const validatedEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE]
+  actions: [
+    { type: ActionType.CREATE },
+    { type: ActionType.DECLARE },
+    { type: ActionType.VALIDATE }
+  ]
 })
 
 const declarationTrpcMsw = createDeclarationTrpcMsw(

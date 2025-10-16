@@ -48,10 +48,6 @@ import { ActionMenu } from './components/ActionMenu'
 import { EventOverviewProvider } from './EventOverviewContext'
 
 /**
- * File is based on packages/client/src/views/RecordAudit/RecordAudit.tsx
- */
-
-/**
  * Renders the event overview page, including the event summary and history.
  */
 function EventOverviewFull({
@@ -95,8 +91,7 @@ function EventOverviewFull({
       // drafts should not affect the status of the event
       // so the status and flags are taken from the eventIndex
       'event.status': status,
-      'event.assignedTo': assignedTo,
-      flags: eventIndex.flags
+      'event.assignedTo': assignedTo
     }
 
   const { getEventTitle } = useEventTitle()
@@ -120,9 +115,12 @@ function EventOverviewFull({
       <EventSummary
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
-        flags={flags}
       />
-      <EventHistory fullEvent={event} validatorContext={validatorContext} />
+      <EventHistory
+        eventConfiguration={eventConfiguration}
+        fullEvent={event}
+        validatorContext={validatorContext}
+      />
     </Content>
   )
 }
@@ -194,7 +192,6 @@ function EventOverviewProtected({
         hideSecuredFields
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
-        flags={flags}
       />
       <EventHistorySkeleton />
     </Content>
