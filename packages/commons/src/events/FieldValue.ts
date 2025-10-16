@@ -83,8 +83,6 @@ export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
 export const NumberFieldValue = z.number()
 export type NumberFieldValue = z.infer<typeof NumberFieldValue>
-export const DataFieldValue = z.undefined()
-export type DataFieldValue = z.infer<typeof DataFieldValue>
 
 export const SignatureFieldValue = z.string()
 export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
@@ -99,7 +97,9 @@ export const VerificationStatusValue = z.enum([
 ])
 export type VerificationStatusValue = z.infer<typeof VerificationStatusValue>
 
-export const FieldValue = z.union([
+// We need to create a separate union of all field types excluding the DataFieldValue,
+// because otherwise the DataFieldValue would need to refer to itself.
+const FieldValuesWithoutDataField = z.union([
   /**
    * Street level is our first dynamic record. In the future we might extend it to include any dynamic (sub)field.
    */
@@ -115,7 +115,6 @@ export const FieldValue = z.union([
   NumberFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  DataFieldValue,
   NameFieldValue,
   NameFieldUpdateValue,
   ButtonFieldValue,
@@ -124,6 +123,13 @@ export const FieldValue = z.union([
   QueryParamReaderFieldValue
 ])
 
+// As data field value can refer to other field values, it can contain any other field value types
+export const DataFieldValue = z
+  .record(z.string(), FieldValuesWithoutDataField)
+  .nullish()
+export type DataFieldValue = z.infer<typeof DataFieldValue>
+
+export const FieldValue = z.union([FieldValuesWithoutDataField, DataFieldValue])
 export type FieldValue = z.infer<typeof FieldValue>
 
 export const FieldUpdateValue = z.union([

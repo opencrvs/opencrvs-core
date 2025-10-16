@@ -88,13 +88,7 @@ type AllProps = {
  */
 type UsedFormikProps = Pick<
   FormikProps<EventState>,
-  | 'values'
-  | 'setTouched'
-  | 'setValues'
-  | 'touched'
-  | 'resetForm'
-  | 'setFieldValue'
-  | 'setErrors'
+  'values' | 'setTouched' | 'setValues' | 'touched' | 'resetForm' | 'setErrors'
 >
 
 const fadeIn = keyframes`

@@ -124,12 +124,6 @@ const ALL_ADDRESS_FIELDS = [
   STREET_LEVEL_DETAILS_FIELD
 ]
 
-const ALL_ADDRESS_INPUT_FIELDS = [
-  COUNTRY_FIELD
-] satisfies Array<FieldConfigWithoutAddress>
-
-type AddressFieldIdentifier = (typeof ALL_ADDRESS_FIELDS)[number]['id']
-
 function isDomesticAddress() {
   return and(
     not(createFieldCondition('country').isUndefined()),
@@ -429,11 +423,7 @@ function AddressOutput({
     <>
       {fieldsToShow.map((field, index) => (
         <React.Fragment key={field.field.id}>
-          <Output
-            field={field.field}
-            showPreviouslyMissingValuesAsChanged={false}
-            value={field.value}
-          />
+          <Output field={field.field} value={field.value} />
           {index < fieldsToShow.length - 1 && (lineSeparator || <br />)}
         </React.Fragment>
       ))}
