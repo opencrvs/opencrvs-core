@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useIntl } from 'react-intl'
 import {
   EventState,
@@ -21,11 +21,7 @@ import {
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import {
-  getDefaultValuesForFields,
-  makeFormFieldIdFormikCompatible
-} from '@client/v2-events/components/forms/utils'
-import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useDefaultValues } from '@client/v2-events/hooks/useDefaultValues'
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
