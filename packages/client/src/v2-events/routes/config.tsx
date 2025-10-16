@@ -64,23 +64,6 @@ function PrefetchQueries() {
       queryKey: trpcOptionsProxy.locations.list.queryKey()
     })
 
-    // Prefetch active health facility locations
-    void queryClient.prefetchQuery({
-      queryKey: trpcOptionsProxy.locations.list.queryKey({
-        isActive: true,
-        locationType: LocationType.Enum.HEALTH_FACILITY
-      })
-    })
-
-    // Prefetch locations for residential address locations
-    void queryClient.prefetchQuery({
-      queryKey: trpcOptionsProxy.locations.list.queryKey({
-        isActive: undefined,
-        locationType: undefined,
-        locationIds: undefined
-      })
-    })
-
     function prefetch() {
       void workqueues.prefetch()
     }
