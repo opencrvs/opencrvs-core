@@ -122,7 +122,7 @@ export interface IApplicationConfigAnonymous {
   APPLICATION_NAME: string
   COUNTRY_LOGO: ICountryLogo
   LOGIN_BACKGROUND: ILoginBackground
-  PHONE_NUMBER_PATTERN: RegExp
+  PHONE_NUMBER_PATTERN: RegExp | string
 }
 
 export interface IApplicationConfig {
@@ -152,7 +152,7 @@ export interface IApplicationConfig {
   }
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
-  PHONE_NUMBER_PATTERN: RegExp
+  PHONE_NUMBER_PATTERN: RegExp | string
   NID_NUMBER_PATTERN: RegExp
   LOGIN_BACKGROUND: ILoginBackground
   USER_NOTIFICATION_DELIVERY_METHOD: string

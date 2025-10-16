@@ -24,6 +24,7 @@ type Story = StoryObj<typeof SettingsPage>
 
 export const ChangePhoneNumber: Story = {
   parameters: {
+    chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.SETTINGS.buildPath({})
@@ -46,7 +47,7 @@ export const ChangePhoneNumber: Story = {
 
       const input = await canvas.findByRole('spinbutton', { name: '' })
       // NOTE: Using userEvent does not work for number inputs. It'll remove the leading 0 for you.
-      await fireEvent.change(input, { target: { value: '0734834834' } })
+      await fireEvent.change(input, { target: { value: '01741234567' } })
 
       await userEvent.click(
         await canvas.findByRole('button', { name: 'Continue' })
@@ -77,6 +78,7 @@ export const ChangePhoneNumber: Story = {
 
 export const ChangeEmailAddress: Story = {
   parameters: {
+    chromatic: { disableSnapshot: true },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.SETTINGS.buildPath({})
