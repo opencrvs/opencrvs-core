@@ -4084,7 +4084,7 @@ components:
                         properties:
                           id:
                             type: string
-                            description: ID for the data entry.
+                            description: ID for the data entry
                           label:
                             $ref: "#/components/schemas/TranslationConfig"
                           value:
@@ -4102,6 +4102,7 @@ components:
                             type: string
                         required:
                           - fieldId
+                        description: Reference to a field in the declaration
                     description: Data entry can be either a static data entry, or a reference to
                       another field in the current form or the declaration.
               required:

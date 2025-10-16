@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 23cd35d0-cc3e-45b2-9a4c-afdd28dec9d1
+                transactionId: 61fe27d3-3d0e-40d7-a667-a47c9308c5d2
                 type: birth
       responses:
         "200":
@@ -725,7 +725,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 4491fd12-dcee-4c4c-a1df-0127b7eb3f52
+                transactionId: 52daf1be-4e8f-4936-a15c-d7c9873f5417
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -7067,7 +7067,7 @@ components:
                         properties:
                           id:
                             type: string
-                            description: ID for the data entry.
+                            description: ID for the data entry
                           label:
                             $ref: "#/components/schemas/TranslationConfig"
                           value:
@@ -7085,6 +7085,7 @@ components:
                             type: string
                         required:
                           - fieldId
+                        description: Reference to a field in the declaration
                     description: Data entry can be either a static data entry, or a reference to
                       another field in the current form or the declaration.
               required:
