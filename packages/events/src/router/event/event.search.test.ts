@@ -287,6 +287,8 @@ test('Returns events based on the updatedAt column', async () => {
     updatedAt: new Date().toISOString()
   }
 
+  await client.event.bulkImport([oldDocumentWithoutAcceptedDeclaration])
+
   const newlyCreatedEvent = await client.event.create(generator.event.create())
   const newlyCreatedEvent2 = await client.event.create(generator.event.create())
   await client.event.actions.declare.request(
