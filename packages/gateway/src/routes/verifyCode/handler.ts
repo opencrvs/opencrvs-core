@@ -32,6 +32,10 @@ import * as t from 'io-ts'
 import * as F from 'fp-ts'
 import { env } from '../../environment'
 
+type VerifyUserChangeTrigger =
+  | typeof TriggerEvent.CHANGE_PHONE_NUMBER
+  | typeof TriggerEvent.CHANGE_EMAIL_ADDRESS
+
 const pipe = F.function.pipe
 const { chainW, tryCatch } = F.either
 
@@ -54,9 +58,7 @@ interface ISendVerifyCodeResponse {
 
 interface ISendVerifyCodePayload {
   userFullName: IUserName[]
-  notificationEvent:
-    | typeof TriggerEvent.CHANGE_PHONE_NUMBER
-    | typeof TriggerEvent.CHANGE_EMAIL_ADDRESS
+  notificationEvent: VerifyUserChangeTrigger
   phoneNumber?: string
   email?: string
 }
@@ -119,16 +121,10 @@ export function generateNonce() {
   return crypto.randomBytes(16).toString('base64').toString()
 }
 
-const VERIFICATION_EVENTS = [
-  TriggerEvent.TWO_FA,
-  TriggerEvent.CHANGE_PHONE_NUMBER,
-  TriggerEvent.CHANGE_EMAIL_ADDRESS
-] as const
-
 export async function sendVerificationCode(
   verificationCode: string,
   token: string,
-  notificationEvent: (typeof VERIFICATION_EVENTS)[number],
+  notificationEvent: VerifyUserChangeTrigger,
   userFullName: IUserName[],
   mobile?: string,
   email?: string
@@ -156,7 +152,7 @@ export async function generateAndSendVerificationCode(
   nonce: string,
   scope: string[],
   token: string,
-  notificationEvent: (typeof VERIFICATION_EVENTS)[number],
+  notificationEvent: VerifyUserChangeTrigger,
   userFullName: IUserName[],
   mobile?: string,
   email?: string
