@@ -423,11 +423,7 @@ function AddressOutput({
     <>
       {fieldsToShow.map((field, index) => (
         <React.Fragment key={field.field.id}>
-          <Output
-            field={field.field}
-            showPreviouslyMissingValuesAsChanged={false}
-            value={field.value}
-          />
+          <Output field={field.field} value={field.value} />
           {index < fieldsToShow.length - 1 && (lineSeparator || <br />)}
         </React.Fragment>
       ))}
