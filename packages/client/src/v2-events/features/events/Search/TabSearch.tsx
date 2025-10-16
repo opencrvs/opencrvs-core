@@ -8,11 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useEffect, useMemo, useState, useRef } from 'react'
 import styled from 'styled-components'
 import { useIntl, defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useRef, useState } from 'react'
 import { Accordion } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -33,6 +32,8 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { filterEmptyValues } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { getDefaultValuesForFields } from '@client/v2-events/components/forms/utils'
+import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
 import {
   getAdvancedSearchFieldErrors,
   resolveAdvancedSearchConfig,
@@ -80,6 +81,12 @@ function SearchSectionForm({
   validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
+  const systemVariables = useSystemVariables()
+
+  const defaultValues = useMemo(
+    () => getDefaultValuesForFields(section.fields, systemVariables),
+    [section.fields, systemVariables]
+  )
 
   return (
     <Accordion
@@ -93,7 +100,7 @@ function SearchSectionForm({
       <FormFieldGenerator
         fields={section.fields}
         id={section.title.id}
-        initialValues={fieldValues}
+        initialValues={{ ...defaultValues, ...fieldValues }}
         validatorContext={validatorContext}
         onChange={(updatedValues) => {
           Object.entries(updatedValues).forEach(([fieldId, value]) =>
