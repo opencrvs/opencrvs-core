@@ -47,15 +47,21 @@ fi
 # Clear PostgreSQL #
 ####################
 
-echo "Resetting schema 'app' in database 'events'..."
+echo "Resetting schemas 'app' and 'analytics' in database 'events'..."
 
 docker exec -i postgres psql -U postgres -d events <<EOF
+-- Reset app schema
 DROP SCHEMA IF EXISTS app CASCADE;
 CREATE SCHEMA app AUTHORIZATION events_migrator;
 GRANT USAGE ON SCHEMA app TO events_app;
+
+-- Reset analytics schema
+DROP SCHEMA IF EXISTS analytics CASCADE;
+CREATE SCHEMA analytics AUTHORIZATION postgres;
+GRANT USAGE ON SCHEMA analytics TO events_analytics;
 EOF
 
-echo "Schema 'app' dropped and recreated."
+echo "Schemas 'app' and 'analytics' dropped and recreated."
 
 ##################
 # Run migrations #
