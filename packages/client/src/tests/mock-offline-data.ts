@@ -509,7 +509,7 @@ export const mockOfflineData = {
       isoCode: 'ZMW',
       languagesAndCountry: ['en-ZM']
     },
-    PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/,
+    PHONE_NUMBER_PATTERN: '^0(7|9)[0-9]{8}$',
     BIRTH_REGISTRATION_TARGET: 45,
     DEATH_REGISTRATION_TARGET: 45,
     NID_NUMBER_PATTERN: /^[0-9]{9}$/,
@@ -529,7 +529,7 @@ export const mockOfflineData = {
       backgroundImage: '',
       imageFit: 'FILL'
     },
-    PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/
+    PHONE_NUMBER_PATTERN: '^0(7|9)[0-9]{8}$'
   },
   systems
 }
