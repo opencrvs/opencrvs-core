@@ -2644,5 +2644,47 @@ export const handlers = {
         }
       })
     })
+  ],
+  userSettings: [
+    graphql.query('getUserByMobile', () => {
+      return HttpResponse.json({
+        data: {
+          getUserByMobile: null
+        }
+      })
+    }),
+    graphql.query('getUserByEmail', () => {
+      return HttpResponse.json({
+        data: {
+          getUserByEmail: null
+        }
+      })
+    }),
+    graphql.mutation('changePhone', (input) => {
+      const isValidCode = input.variables.verifyCode === '000000'
+
+      return HttpResponse.json({
+        data: {
+          changePhone: isValidCode ? 'true' : null
+        }
+      })
+    }),
+    graphql.mutation('changeEmail', (input) => {
+      return HttpResponse.json({
+        data: {
+          changeEmail: 'true'
+        }
+      })
+    }),
+    http.post('http://localhost:7070/sendVerifyCode', () => {
+      const generator = testDataGenerator()
+      return HttpResponse.json({
+        userId: generator.user.registrationAgent().v2.id,
+        nonce: 'UxN/IFJ3jGCjQBySQ+JP+A==',
+        status: 'Success',
+        mobile: '+260734237472',
+        email: 'kalushabwalya1.7@gmail.com'
+      })
+    })
   ]
 }
