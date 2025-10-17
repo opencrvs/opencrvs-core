@@ -36,12 +36,13 @@ import {
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
-  handleDefaultValue,
   makeDatesFormatted,
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
+import { handleDefaultValue } from '@client/v2-events/hooks/useDefaultValues'
+import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -78,7 +79,6 @@ type AllProps = {
    * If isCorrection is true, fields with configuration option 'uncorrectable' set to true will be disabled.
    */
   isCorrection?: boolean
-  systemVariables: SystemVariables
   parentId?: string
   validatorContext: ValidatorContext
 } & UsedFormikProps
@@ -186,7 +186,6 @@ export function FormSectionComponent({
   fieldsToShowValidationErrors,
   onAllFieldsValidated,
   isCorrection = false,
-  systemVariables,
   parentId,
   validatorContext
 }: AllProps) {
@@ -194,6 +193,8 @@ export function FormSectionComponent({
   useOnlineStatus()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
+
+  const systemVariables = useSystemVariables()
 
   const fieldsWithFormikSeparator = fieldsWithDotSeparator.map((field) => ({
     ...field,
