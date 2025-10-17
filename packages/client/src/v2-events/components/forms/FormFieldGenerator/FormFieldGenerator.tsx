@@ -11,7 +11,7 @@
 
 import React, { useEffect } from 'react'
 
-import { Formik } from 'formik'
+import { Formik, FormikTouched } from 'formik'
 import { isEqual, noop } from 'lodash'
 import { useIntl } from 'react-intl'
 import {
@@ -97,7 +97,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     const intl = useIntl()
 
     const updateTouchFields = (
-      touched: Record<string, boolean | undefined>
+      touched: FormikTouched<Record<string, boolean | undefined>>
     ) => {
       const newlyTouched =
         Object.keys(touched).length > 0 &&

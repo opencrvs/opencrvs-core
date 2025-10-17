@@ -185,6 +185,7 @@ function mapFieldTypeToMockValue(
     case FieldType.ID:
     case FieldType.OFFICE:
     case FieldType.LINK_BUTTON:
+    case FieldType.LOADER:
       return `${field.id}-${field.type}-${i}`
     case FieldType.VERIFICATION_STATUS:
       return 'verified'
@@ -245,6 +246,10 @@ function mapFieldTypeToMockValue(
     case FieldType.FILE_WITH_OPTIONS:
     case FieldType.DATA:
       return undefined
+    case FieldType.QR_READER:
+      return Object.create(null)
+    case FieldType.ID_READER:
+      return Object.create(null)
   }
 }
 

@@ -11,7 +11,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import QRScanner from 'qr-scanner'
 import styled from 'styled-components'
-import { ErrorHandler, Validator } from '../../../IDReader/types'
+import { ErrorHandler, Validator } from '../../types'
 import { throttle } from 'lodash'
 
 interface ScannerProps {

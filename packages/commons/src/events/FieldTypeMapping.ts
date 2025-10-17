@@ -46,6 +46,9 @@ import {
   LinkButtonField,
   VerificationStatus,
   QueryParamReaderField,
+  QrReaderField,
+  IdReaderField,
+  LoaderField,
   AgeField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
@@ -78,7 +81,9 @@ import {
   NameFieldValue,
   NameFieldUpdateValue,
   HttpFieldUpdateValue,
-  QueryParamReaderFieldUpdateValue
+  QueryParamReaderFieldUpdateValue,
+  QrReaderFieldValue,
+  IdReaderFieldValue
 } from './CompositeFieldValue'
 
 /**
@@ -138,6 +143,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.LINK_BUTTON:
     case FieldType.VERIFICATION_STATUS:
     case FieldType.ID:
+    case FieldType.LOADER:
       schema = required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
@@ -173,6 +179,12 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       break
     case FieldType.QUERY_PARAM_READER:
       schema = QueryParamReaderFieldUpdateValue
+      break
+    case FieldType.QR_READER:
+      schema = QrReaderFieldValue
+      break
+    case FieldType.ID_READER:
+      schema = IdReaderFieldValue
       break
   }
 
@@ -228,6 +240,9 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
     case FieldType.VERIFICATION_STATUS:
+    case FieldType.QR_READER:
+    case FieldType.ID_READER:
+    case FieldType.LOADER:
       return null
     case FieldType.ADDRESS:
       return {
@@ -505,6 +520,27 @@ export const isQueryParamReaderFieldType = (field: {
   return field.config.type === FieldType.QUERY_PARAM_READER
 }
 
+export const isQrReaderFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: QrReaderField } => {
+  return field.config.type === FieldType.QR_READER
+}
+
+export const isIdReaderFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: IdReaderField } => {
+  return field.config.type === FieldType.ID_READER
+}
+
+export const isLoaderFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: LoaderField } => {
+  return field.config.type === FieldType.LOADER
+}
+
 export type NonInteractiveFieldType =
   | Divider
   | PageHeader
@@ -515,6 +551,7 @@ export type NonInteractiveFieldType =
   | HttpField
   | LinkButtonField
   | QueryParamReaderField
+  | LoaderField
 
 export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
 
@@ -530,6 +567,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.ALPHA_PRINT_BUTTON ||
     field.type === FieldType.HTTP ||
     field.type === FieldType.LINK_BUTTON ||
-    field.type === FieldType.QUERY_PARAM_READER
+    field.type === FieldType.QUERY_PARAM_READER ||
+    field.type === FieldType.LOADER
   )
 }

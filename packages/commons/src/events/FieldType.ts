@@ -46,7 +46,10 @@ export const FieldType = {
   HTTP: 'HTTP',
   LINK_BUTTON: 'LINK_BUTTON',
   VERIFICATION_STATUS: 'VERIFICATION_STATUS',
-  QUERY_PARAM_READER: 'QUERY_PARAM_READER'
+  QUERY_PARAM_READER: 'QUERY_PARAM_READER',
+  QR_READER: 'QR_READER',
+  ID_READER: 'ID_READER',
+  LOADER: 'LOADER'
 } as const
 
 /**
@@ -69,6 +72,7 @@ export const compositeFieldTypes = [
   FieldType.ADDRESS,
   FieldType.FILE_WITH_OPTIONS,
   FieldType.FILE,
+  FieldType.ID_READER,
   FieldType.DATA
 ]
 
@@ -77,5 +81,9 @@ export const FieldTypesToHideInReview = [
   FieldType.DIVIDER,
   FieldType.PAGE_HEADER,
   FieldType.PARAGRAPH,
+  FieldType.ID_READER,
+  FieldType.LOADER,
+  FieldType.HTTP,
+  FieldType.QUERY_PARAM_READER,
   FieldType.DATA
 ]

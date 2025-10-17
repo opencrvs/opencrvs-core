@@ -15,7 +15,7 @@ import { Icon, Button as UiButton } from '@opencrvs/components'
 import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
 import { TranslationConfig } from '@opencrvs/commons/client'
 
-function throwIfUnsupportedIcon(icon: string) {
+export function throwIfUnsupportedIcon(icon: string) {
   if (icon in SupportedIcons) {
     return icon as keyof typeof SupportedIcons
   }
