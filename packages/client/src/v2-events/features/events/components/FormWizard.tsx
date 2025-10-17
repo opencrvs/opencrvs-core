@@ -15,6 +15,7 @@ import { Content } from '@opencrvs/components/src/Content'
 import { Frame } from '@opencrvs/components/src/Frame'
 import { Icon } from '@opencrvs/components/src/Icon'
 import { Stack } from '@opencrvs/components/src/Stack'
+import { EventState } from '@opencrvs/commons/client'
 
 export const messages = defineMessages({
   back: {
@@ -32,7 +33,7 @@ export const messages = defineMessages({
 export type FormWizardProps = PropsWithChildren<{
   currentPage: number
   /** Callback when the user clicks the "Continue" button */
-  onNextPage: () => void
+  onNextPage: (values?: EventState) => void
   onPreviousPage?: () => void
 
   /** Callback when the user submits the form wizard */
@@ -75,7 +76,7 @@ export const FormWizard = ({
               role="button"
               size="large"
               type="primary"
-              onClick={onNextPage}
+              onClick={() => onNextPage()}
             >
               {continueButtonText}
             </Button>

@@ -45,11 +45,9 @@ export const VerificationWizard = ({
   onNextPage,
   onPreviousPage,
   showReviewButton,
-  pageConfig,
-  onVerifyAction
+  pageConfig
 }: FormWizardProps & {
   pageConfig: VerificationPageConfig
-  onVerifyAction: (val: boolean) => void
 }) => {
   const intl = useIntl()
   const [cancelModal, openCancelModal] = useModal()
@@ -71,9 +69,8 @@ export const VerificationWizard = ({
             key="confirm"
             type="primary"
             onClick={() => {
-              onVerifyAction(false)
               close()
-              return onNextPage()
+              return onNextPage({ [pageConfig.id]: false })
             }}
           >
             {intl.formatMessage(messages.confirm)}
@@ -112,10 +109,7 @@ export const VerificationWizard = ({
               role="button"
               size="large"
               type="positive"
-              onClick={() => {
-                onVerifyAction(true)
-                onNextPage()
-              }}
+              onClick={() => onNextPage({ [pageConfig.id]: true })}
             >
               <Check color="white" />
               {intl.formatMessage(pageConfig.actions.verify.label)}

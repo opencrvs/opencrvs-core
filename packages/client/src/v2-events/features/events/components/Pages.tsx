@@ -105,16 +105,16 @@ export function Pages({
 
   const systemVariables = useSystemVariables()
 
-  function onNextPage() {
+  function onNextPage(values?: EventState) {
     // Ensure that defaultValues end up in the zustand state
     // This solution is not ideal, as the current way default values work is:
     //   1. They are updated in to the formik state as 'initialValues' in <FormFieldGenerator/>
-    //   2. They are updated in to the zustand state here
+    //   2. They are updated in to the zustand state on next page switch here
     //
     // I tried to improve this by updating the default values directly into the zustand state on form initialisation, but it caused other issues.
     // I decided to leave it this way for now, since it works, but we should overhaul the default values logic at some point.
     const defaultValues = mapFieldsToValues(page.fields, systemVariables)
-    setFormData({ ...defaultValues, ...form })
+    setFormData({ ...defaultValues, ...form, ...values })
 
     // Before switching to the next page, we need to mark all fields in the current page as touched
     // so that when we get back to the page, we show validation errors for all fields in the page.
@@ -179,16 +179,7 @@ export function Pages({
 
   if (page.type === PageTypes.enum.VERIFICATION) {
     return (
-      <VerificationWizard
-        {...wizardProps}
-        pageConfig={page}
-        onVerifyAction={(val: boolean) => {
-          setFormData({
-            ...form,
-            [page.id]: val
-          })
-        }}
-      >
+      <VerificationWizard {...wizardProps} pageConfig={page}>
         {fields}
       </VerificationWizard>
     )
