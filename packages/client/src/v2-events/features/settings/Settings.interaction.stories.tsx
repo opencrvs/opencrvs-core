@@ -10,7 +10,6 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import { userEvent, within, expect, fireEvent } from '@storybook/test'
-import { TestUserRole } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { SettingsPage } from './Settings'
 
@@ -99,7 +98,10 @@ export const ChangeEmailAddress: Story = {
         await canvas.findByRole('button', { name: 'Continue' })
       ).toBeDisabled()
 
-      const input = await canvas.findByRole('textbox', { name: '' })
+      const modal = within(await canvas.findByRole('dialog'))
+      const input = await modal.findByRole('textbox', {
+        name: ''
+      })
 
       await userEvent.type(input, 'opencrvs@opencrvs.org')
 
