@@ -6126,7 +6126,8 @@ components:
               const: QR_READER
             defaultValue:
               type: object
-              additionalProperties: {}
+              properties:
+                data: {}
             configuration:
               type: object
               properties:
@@ -6266,7 +6267,8 @@ components:
               const: ID_READER
             defaultValue:
               type: object
-              additionalProperties: {}
+              properties:
+                data: {}
             methods:
               type: array
               items:
@@ -6404,7 +6406,8 @@ components:
                         const: QR_READER
                       defaultValue:
                         type: object
-                        additionalProperties: {}
+                        properties:
+                          data: {}
                       configuration:
                         type: object
                         properties:
@@ -8069,9 +8072,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -8372,9 +8377,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -8728,9 +8735,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -9031,9 +9040,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -9383,9 +9394,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -9686,9 +9699,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -10048,9 +10063,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -10351,9 +10368,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -10722,9 +10741,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -11025,9 +11046,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -11377,9 +11400,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -11680,9 +11705,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -12040,9 +12067,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -12343,9 +12372,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -12705,9 +12736,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -13008,9 +13041,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -13360,9 +13395,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -13663,9 +13700,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -14017,9 +14056,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -14320,9 +14361,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -14672,9 +14715,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -14975,9 +15020,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -15330,9 +15377,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -15633,9 +15682,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -15985,9 +16036,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -16288,9 +16341,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -16643,9 +16698,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -16946,9 +17003,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -17311,9 +17370,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -17614,9 +17675,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -17966,9 +18029,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -18269,9 +18334,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -18628,9 +18695,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -18931,9 +19000,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object

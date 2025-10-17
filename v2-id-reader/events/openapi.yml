@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 22e95bab-2841-4dc0-a259-f85da4c75892
+                transactionId: cb57781c-c25d-4cb3-8b2b-609b23b69a96
                 type: birth
       responses:
         "200":
@@ -377,9 +377,11 @@ paths:
                               additionalProperties:
                                 type: string
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                       - anyOf:
                           - anyOf:
                               - type: object
@@ -669,9 +671,11 @@ paths:
                               additionalProperties:
                                 type: string
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                       - anyOf:
                           - anyOf:
                               - type: object
@@ -733,7 +737,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 487efaf2-a010-4fd4-8ea0-ace4e5855abf
+                transactionId: b77abc71-c57e-4222-be99-b8516f376b2c
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1037,9 +1041,11 @@ paths:
                               additionalProperties:
                                 type: string
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                       - anyOf:
                           - anyOf:
                               - type: object
@@ -1329,9 +1335,11 @@ paths:
                               additionalProperties:
                                 type: string
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                       - anyOf:
                           - anyOf:
                               - type: object
@@ -1691,9 +1699,11 @@ paths:
                               additionalProperties:
                                 type: string
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                       - anyOf:
                           - anyOf:
                               - type: object
@@ -1983,9 +1993,11 @@ paths:
                               additionalProperties:
                                 type: string
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                       - anyOf:
                           - anyOf:
                               - type: object
@@ -2348,9 +2360,11 @@ paths:
                               additionalProperties:
                                 type: string
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                       - anyOf:
                           - anyOf:
                               - type: object
@@ -2640,9 +2654,11 @@ paths:
                               additionalProperties:
                                 type: string
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                             - type: object
-                              additionalProperties: {}
+                              properties:
+                                data: {}
                       - anyOf:
                           - anyOf:
                               - type: object
@@ -9152,7 +9168,8 @@ components:
                 - QR_READER
             defaultValue:
               type: object
-              additionalProperties: {}
+              properties:
+                data: {}
             configuration:
               type: object
               properties:
@@ -9294,7 +9311,8 @@ components:
                 - ID_READER
             defaultValue:
               type: object
-              additionalProperties: {}
+              properties:
+                data: {}
             methods:
               type: array
               items:
@@ -9434,7 +9452,8 @@ components:
                           - QR_READER
                       defaultValue:
                         type: object
-                        additionalProperties: {}
+                        properties:
+                          data: {}
                       configuration:
                         type: object
                         properties:
@@ -11222,9 +11241,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -11513,9 +11534,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -11855,9 +11878,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -12146,9 +12171,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -12485,9 +12512,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -12776,9 +12805,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -13125,9 +13156,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -13416,9 +13449,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -13774,9 +13809,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -14065,9 +14102,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -14404,9 +14443,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -14695,9 +14736,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -15042,9 +15085,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -15333,9 +15378,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -15682,9 +15729,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -15973,9 +16022,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -16312,9 +16363,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -16603,9 +16656,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -16944,9 +16999,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -17235,9 +17292,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -17574,9 +17633,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -17865,9 +17926,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -18207,9 +18270,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -18498,9 +18563,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -18837,9 +18904,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -19128,9 +19197,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -19470,9 +19541,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -19761,9 +19834,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -20113,9 +20188,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -20404,9 +20481,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -20743,9 +20822,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -21034,9 +21115,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -21379,9 +21462,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -21670,9 +21755,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
               - anyOf:
                   - anyOf:
                       - type: object
@@ -22388,9 +22475,11 @@ components:
                     additionalProperties:
                       type: string
                   - type: object
-                    additionalProperties: {}
+                    properties:
+                      data: {}
                   - type: object
-                    additionalProperties: {}
+                    properties:
+                      data: {}
               - type: object
                 nullable: true
                 additionalProperties:
@@ -22539,9 +22628,11 @@ components:
                       additionalProperties:
                         type: string
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
                     - type: object
-                      additionalProperties: {}
+                      properties:
+                        data: {}
       required:
         - id
         - type
