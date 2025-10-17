@@ -345,7 +345,6 @@ function UserAuditHistoryComponent(props: Props) {
 
   const { intl, practitionerId, theme } = props
   const { timeStart, timeEnd, currentPageNumber } = state
-  const recordCount = DEFAULT_LIST_SIZE
 
   return (
     <RecentActionsHolder id="user-audit-list">
@@ -368,7 +367,7 @@ function UserAuditHistoryComponent(props: Props) {
               query={GET_USER_AUDIT_LOG}
               variables={{
                 practitionerId: practitionerId,
-                count: recordCount,
+                count: DEFAULT_LIST_SIZE,
                 skip: DEFAULT_LIST_SIZE * (currentPageNumber - 1),
                 timeStart: timeStart,
                 timeEnd: timeEnd

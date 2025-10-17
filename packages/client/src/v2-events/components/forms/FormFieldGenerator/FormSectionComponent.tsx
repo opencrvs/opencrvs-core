@@ -21,7 +21,6 @@ import {
   FieldType,
   FieldValue,
   AddressType,
-  TranslationConfig,
   IndexMap,
   joinValues,
   isNonInteractiveFieldType,
@@ -32,7 +31,9 @@ import {
   omitHiddenFields,
   isFieldEnabled,
   ValidatorContext,
-  isFieldVisible
+  isFieldVisible,
+  AgeValue,
+  DateValue
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -55,7 +56,7 @@ type AllProps = {
   fields: FieldConfig[]
   className?: string
   readonlyMode?: boolean
-  errors: Record<string, { errors: { message: TranslationConfig }[] }>
+  errors: IndexMap<string>
   /**
    * Update the form values in the non-formik state.
    */
@@ -88,13 +89,7 @@ type AllProps = {
  */
 type UsedFormikProps = Pick<
   FormikProps<EventState>,
-  | 'values'
-  | 'setTouched'
-  | 'setValues'
-  | 'touched'
-  | 'resetForm'
-  | 'setFieldValue'
-  | 'setErrors'
+  'values' | 'setTouched' | 'setValues' | 'touched' | 'resetForm' | 'setErrors'
 >
 
 const fadeIn = keyframes`
@@ -209,7 +204,6 @@ export function FormSectionComponent({
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not -
   useOnlineStatus()
-  const intl = useIntl()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
 
@@ -218,8 +212,17 @@ export function FormSectionComponent({
     id: makeFormFieldIdFormikCompatible(field.id)
   }))
 
+  const allFieldsWithDotSeparator = eventConfig
+    ? getAllUniqueFields(eventConfig)
+    : fieldsWithDotSeparator
   const listenerFieldsByParentId = getParentsOfListenerFields(
-    eventConfig ? getAllUniqueFields(eventConfig) : fieldsWithDotSeparator
+    allFieldsWithDotSeparator
+  )
+
+  const ageFields = useMemo(
+    () =>
+      allFieldsWithDotSeparator.filter((field) => field.type === FieldType.AGE),
+    [allFieldsWithDotSeparator]
   )
 
   const errors = makeFormFieldIdsFormikCompatible(errorsWithDotSeparator)
@@ -279,7 +282,7 @@ export function FormSectionComponent({
       )[0]
 
       set(fieldValues, listenerFieldFormikId, firstNonFalsyValue)
-      set(fieldErrors, listenerFieldFormikId, { errors: [] })
+      set(fieldErrors, listenerFieldFormikId, '')
     },
     [fieldsWithDotSeparator, systemVariables]
   )
@@ -302,6 +305,19 @@ export function FormSectionComponent({
         setValueForListenerField(listenerField, updatedValues, updatedErrors)
       }
 
+      const dependentAgeFields = ageFields.filter(
+        (f) => f.configuration.asOfDate.$$field === ocrvsFieldId
+      )
+
+      for (const ageField of dependentAgeFields) {
+        const formikAgeFieldId = makeFormFieldIdFormikCompatible(ageField.id)
+        const maybeDate = updatedValues[formikFieldId]
+        set(updatedValues, formikAgeFieldId, {
+          ...(updatedValues[formikAgeFieldId] as AgeValue),
+          asOfDate: DateValue.safeParse(maybeDate).data
+        })
+      }
+
       // @TODO: we should not reference field id 'country' directly.
       if (formikFieldId === 'country') {
         const defaultCountry = window.config.COUNTRY || 'FAR'
@@ -320,9 +336,7 @@ export function FormSectionComponent({
 
       const updatedTouched = omit(touched, formikListenerFieldIds)
 
-      // @TODO: Formik does not type errors well. Actual error message differs from the type.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      void setErrors(updatedErrors as any)
+      void setErrors(updatedErrors)
       void setValues(updatedValues)
       void setTouched(updatedTouched)
       void setAllTouchedFields(updatedTouched)
@@ -334,6 +348,7 @@ export function FormSectionComponent({
       setTouched,
       touched,
       errorsWithDotSeparator,
+      ageFields,
       setErrors,
       setAllTouchedFields,
       setValueForListenerField
@@ -359,6 +374,19 @@ export function FormSectionComponent({
           setValueForListenerField(listenerField, updatedValues, updatedErrors)
         }
 
+        const dependentAgeFields = ageFields.filter(
+          (f) => f.configuration.asOfDate.$$field === ocrvsFieldId
+        )
+
+        for (const ageField of dependentAgeFields) {
+          const formikAgeFieldId = makeFormFieldIdFormikCompatible(ageField.id)
+          const maybeDate = updatedValues[formikFieldId]
+          set(updatedValues, formikAgeFieldId, {
+            ...(updatedValues[formikAgeFieldId] as AgeValue),
+            asOfDate: DateValue.safeParse(maybeDate).data
+          })
+        }
+
         const formikListenerFieldIds = listenerFields.map((child) =>
           makeFormFieldIdFormikCompatible(child.id)
         )
@@ -378,6 +406,7 @@ export function FormSectionComponent({
       void setAllTouchedFields(updatedTouched)
     },
     [
+      ageFields,
       values,
       setValues,
       listenerFieldsByParentId,
@@ -439,7 +468,7 @@ export function FormSectionComponent({
   const completeForm = { ...initialValues, ...form }
 
   const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
-    const fieldErrors = errors[field.id]?.errors
+    const fieldErrors = errors[field.id]
     const hasErrors = fieldErrors && fieldErrors.length > 0
     return isFieldVisible(field, completeForm, validatorContext) && hasErrors
   })
@@ -480,8 +509,8 @@ export function FormSectionComponent({
           !isFieldEnabled(field, visibleFieldValues, validatorContext) ||
           (isCorrection && field.uncorrectable)
 
-        const visibleError = errors[field.id]?.errors[0]?.message
-        const error = visibleError ? intl.formatMessage(visibleError) : ''
+        const visibleError = errors[field.id]
+        const error = visibleError ?? ''
 
         return (
           <FormItem

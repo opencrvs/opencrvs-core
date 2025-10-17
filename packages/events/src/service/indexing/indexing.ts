@@ -14,6 +14,7 @@ import { z } from 'zod'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
+  AgeValue,
   AddressFieldValue,
   EventConfig,
   EventDocument,
@@ -110,13 +111,14 @@ function mapFieldTypeToElasticsearch(
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
-    case FieldType.DATA:
     case FieldType.BUTTON:
     case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.ID:
     case FieldType.PHONE:
     case FieldType.VERIFICATION_STATUS:
       return { type: 'keyword' }
+    case FieldType.DATA:
+      return { type: 'object' }
     case FieldType.ADDRESS:
       const streetLevelDetails = Object.fromEntries(
         (field.configuration?.streetAddressForm ?? []).map((f) => [
@@ -138,6 +140,16 @@ function mapFieldTypeToElasticsearch(
       return {
         type: 'object',
         properties: addressProperties
+      }
+    case FieldType.AGE:
+      return {
+        type: 'object',
+        properties: {
+          age: { type: 'double' },
+          asOfDate: { type: 'date' }
+        } satisfies {
+          [K in keyof AgeValue]: estypes.MappingProperty
+        }
       }
     case FieldType.SIGNATURE:
     case FieldType.FILE:

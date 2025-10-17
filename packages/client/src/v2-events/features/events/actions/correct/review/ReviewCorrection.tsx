@@ -208,6 +208,16 @@ function RejectModal({
   )
 }
 
+// Content has 'height: 100%' on mobile, which breaks the page layout if there is anything on the page after the Content.
+// We don't want that.
+const StyledContent = styled(Content)`
+  height: auto;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-bottom: 28px;
+  }
+`
+
 export function ReviewCorrection({
   form,
   correctionRequestAction,
@@ -303,7 +313,8 @@ export function ReviewCorrection({
   )
 
   return (
-    <Content
+    <StyledContent
+      showTitleOnMobile={true}
       size={ContentSize.LARGE}
       title={intl.formatMessage(reviewCorrectionMessages.correctionRequest)}
     >
@@ -320,6 +331,6 @@ export function ReviewCorrection({
         {approveButton}
       </Row>
       {modal}
-    </Content>
+    </StyledContent>
   )
 }

@@ -21,6 +21,7 @@ export const FieldType = {
   TEXTAREA: 'TEXTAREA',
   EMAIL: 'EMAIL',
   DATE: 'DATE',
+  AGE: 'AGE',
   DATE_RANGE: 'DATE_RANGE', // // Internal use, only for search functionality
   SELECT_DATE_RANGE: 'SELECT_DATE_RANGE', // Internal use, only for search functionality
   TIME: 'TIME',
@@ -71,7 +72,8 @@ export const compositeFieldTypes = [
   FieldType.ADDRESS,
   FieldType.FILE_WITH_OPTIONS,
   FieldType.FILE,
-  FieldType.ID_READER
+  FieldType.ID_READER,
+  FieldType.DATA
 ]
 
 export const FieldTypesToHideInReview = [
@@ -82,5 +84,6 @@ export const FieldTypesToHideInReview = [
   FieldType.ID_READER,
   FieldType.LOADER,
   FieldType.HTTP,
-  FieldType.QUERY_PARAM_READER
+  FieldType.QUERY_PARAM_READER,
+  FieldType.DATA
 ]

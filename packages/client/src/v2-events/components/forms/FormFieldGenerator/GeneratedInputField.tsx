@@ -62,13 +62,15 @@ import {
   ValidatorContext,
   isIdReaderFieldType,
   isQrReaderFieldType,
-  isLoaderFieldType
+  isLoaderFieldType,
+  isAgeFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
 import {
   BulletList,
   Checkbox,
+  AgeField,
   DateField,
   RadioGroup,
   LocationSearch,
@@ -266,6 +268,29 @@ export const GeneratedInputField = React.memo(
             onChange={(val: string) =>
               onFieldValueChange(fieldDefinition.id, val)
             }
+          />
+        </InputField>
+      )
+    }
+
+    if (isAgeFieldType(field)) {
+      return (
+        <InputField
+          {...inputFieldProps}
+          postfix={
+            field.config.configuration.postfix &&
+            intl.formatMessage(field.config.configuration.postfix)
+          }
+          prefix={
+            field.config.configuration.prefix &&
+            intl.formatMessage(field.config.configuration.prefix)
+          }
+        >
+          <AgeField.Input
+            {...inputProps}
+            asOfDateRef={field.config.configuration.asOfDate.$$field}
+            value={field.value?.age}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
         </InputField>
       )
@@ -635,6 +660,7 @@ export const GeneratedInputField = React.memo(
           {...field.config}
           declarationFields={getDeclarationFields(eventConfig)}
           formData={form}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )
     }
@@ -702,14 +728,13 @@ export const GeneratedInputField = React.memo(
           value={field.value}
           onReset={() => {
             if (Array.isArray(fieldDefinition.parent)) {
-              const parentValues = fieldDefinition.parent.reduce(
-                (acc, parentField) => {
-                  acc[makeFormFieldIdFormikCompatible(parentField.$$field)] =
-                    undefined
-                  return acc
-                },
-                {} as Partial<EventState>
-              )
+              const parentValues = Object.fromEntries(
+                fieldDefinition.parent.map((parentField) => [
+                  makeFormFieldIdFormikCompatible(parentField.$$field),
+                  undefined
+                ])
+              ) as Partial<EventState>
+
               onBatchFieldValueChange(parentValues)
             }
           }}

@@ -19,10 +19,11 @@ import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
-import { FieldUpdateValue } from '../events/FieldValue'
+import { AgeValue, FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
+import { ageToDate } from '../events/utils'
 
 const ajv = new Ajv({
   $data: true,
@@ -120,6 +121,20 @@ ajv.addKeyword({
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
+  if ('$form' in data) {
+    data.$form = Object.fromEntries(
+      Object.entries(data.$form).map(([key, value]) => {
+        const maybeAgeValue = AgeValue.safeParse(value)
+        if (maybeAgeValue.success) {
+          return [
+            key,
+            { age: maybeAgeValue.data.age, dob: ageToDate(maybeAgeValue.data) }
+          ]
+        }
+        return [key, value]
+      })
+    )
+  }
   const result = validator(data) as boolean
 
   return result
@@ -415,9 +430,7 @@ export function runStructuralValidations({
     !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
-    return {
-      errors: []
-    }
+    return []
   }
 
   const fieldValidationResult = validateFieldInput({
@@ -425,9 +438,7 @@ export function runStructuralValidations({
     value: values[field.id]
   })
 
-  return {
-    errors: fieldValidationResult
-  }
+  return fieldValidationResult
 }
 
 export function runFieldValidations({
@@ -443,9 +454,7 @@ export function runFieldValidations({
     !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
-    return {
-      errors: []
-    }
+    return []
   }
 
   const conditionalParameters = {
@@ -473,10 +482,8 @@ export function runFieldValidations({
     conditionalParameters
   })
 
-  return {
-    // Assumes that custom validation errors are based on the field type, and extend the validation.
-    errors: [...fieldValidationResult, ...customValidationResults]
-  }
+  // Assumes that custom validation errors are based on the field type, and extend the validation.
+  return [...fieldValidationResult, ...customValidationResults]
 }
 
 export function getValidatorsForField(

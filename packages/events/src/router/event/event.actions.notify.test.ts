@@ -129,7 +129,6 @@ describe('event.actions.notify', () => {
     }
 
     await expect(
-      // @ts-expect-error -- Intentionally passing incorrect type
       client.event.actions.notify.request(payload)
     ).rejects.toMatchSnapshot()
   })
