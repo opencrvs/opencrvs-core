@@ -69,7 +69,7 @@ const messages = {
 
 function getQrFieldValue(fields: IdReaderField['methods'], values: EventState) {
   const qrField = fields.find((f) =>
-    isQrReaderFieldType({ config: f, value: undefined })
+    isQrReaderFieldType({ config: f, value: values[f.id] })
   )
   if (!qrField) {
     return { data: null }
@@ -98,6 +98,16 @@ function IdReaderInput({
             id={id}
             validatorContext={validatorContext}
             onChange={(values) => {
+              /**
+               * Extracts the actual value from nested field definitions (passed as `methods`)
+               * to prevent redundant nesting in the resulting form data.
+               *
+               * This ensures that the parent form receives only the relevant value,
+               * without needing awareness of the nested field structure.
+               *
+               * Currently, this logic applies only to QR Reader fields —
+               * hence, we specifically search for and extract values from QR Reader field types.
+               */
               onChange(getQrFieldValue(methods, values))
             }}
           />
