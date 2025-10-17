@@ -38,7 +38,7 @@ import {
 } from './utils'
 import { FormSectionComponent } from './FormSectionComponent'
 
-function mapFieldsToValues(
+export function mapFieldsToValues(
   fields: FieldConfig[],
   systemVariables: SystemVariables
 ) {
@@ -152,6 +152,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               )
             ).map(([fieldId, errors]) => [
               fieldId,
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
               errors?.[0]?.message && intl.formatMessage(errors[0].message)
             ])
           )

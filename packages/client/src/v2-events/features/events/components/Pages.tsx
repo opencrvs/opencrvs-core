@@ -22,6 +22,8 @@ import {
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { mapFieldsToValues } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
+import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
@@ -101,7 +103,19 @@ export function Pages({
     return nextPage ? onPageChange(nextPage.id) : onSubmit()
   }
 
+  const systemVariables = useSystemVariables()
+
   function onNextPage() {
+    // Ensure that defaultValues end up in the zustand state
+    // This solution is not ideal, as the current way default values work is:
+    //   1. They are updated in to the formik state as 'initialValues' in <FormFieldGenerator/>
+    //   2. They are updated in to the zustand state here
+    //
+    // I tried to improve this by updating the default values directly into the zustand state on form initialisation, but it caused other issues.
+    // I decided to leave it this way for now, since it works, but we should overhaul the default values logic at some point.
+    const defaultValues = mapFieldsToValues(page.fields, systemVariables)
+    setFormData({ ...defaultValues, ...form })
+
     // Before switching to the next page, we need to mark all fields in the current page as touched
     // so that when we get back to the page, we show validation errors for all fields in the page.
     setAllTouchedFields(
