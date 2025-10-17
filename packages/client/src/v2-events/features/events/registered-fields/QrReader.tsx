@@ -11,7 +11,7 @@
 import { useIntl } from 'react-intl'
 import React from 'react'
 import { QrReader as QrReaderUI } from '@opencrvs/components/lib/IdReader/readers/QrReader/QrReader'
-import { QrReaderField } from '@opencrvs/commons/client'
+import { QrReaderField, QrReaderFieldValue } from '@opencrvs/commons/client'
 import {
   tutorialMessages,
   messages as qrReaderMessages
@@ -21,7 +21,7 @@ interface QrReaderInputProps {
   // TODO: imnplement configuration props
   // eslint-disable-next-line react/no-unused-prop-types
   configuration: QrReaderField['configuration']
-  onChange: (data: unknown) => void
+  onChange: (data: QrReaderFieldValue) => void
 }
 
 function QrReaderInput(props: QrReaderInputProps) {
@@ -43,7 +43,11 @@ function QrReaderInput(props: QrReaderInputProps) {
         }
       }}
       // TODO: implement validation using props.configuration.validator
-      onScan={(data) => props.onChange({ data })}
+      // In future we might come up with a configurable resolver approach
+      // or any alternative transformation method that would process the input
+      // data to a predictable type-strict structure and then we can get rid
+      // of this type assertion
+      onScan={(data) => props.onChange({ data } as QrReaderFieldValue)}
     />
   )
 }

@@ -39,7 +39,6 @@ function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
       key.replace(/\./g, INTERNAL_SEPARATOR)
     if (Array.isArray(value)) {
       value.forEach((val, id) => {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (typeof val === 'object' && val !== null) {
           Object.assign(
             result,

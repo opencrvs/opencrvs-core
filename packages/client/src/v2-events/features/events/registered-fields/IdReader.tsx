@@ -11,10 +11,16 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { IdReaderField, IdReaderFieldValue } from '@opencrvs/commons/client'
 import { Box, Divider, Stack, Text } from '@opencrvs/components'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  EventState,
+  IdReaderField,
+  IdReaderFieldValue,
+  QrReaderFieldValue,
+  isQrReaderFieldType
+} from '@opencrvs/commons/client'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 
 const MainContainer = styled(Box)`
   background: ${({ theme }) => theme.colors.background};
@@ -61,6 +67,16 @@ const messages = {
   }
 }
 
+function getQrFieldValue(fields: IdReaderField['methods'], values: EventState) {
+  const qrField = fields.find((f) =>
+    isQrReaderFieldType({ config: f, value: undefined })
+  )
+  if (!qrField) {
+    return { data: null }
+  }
+  return values[qrField.id] as QrReaderFieldValue
+}
+
 function IdReaderInput({
   id,
   methods,
@@ -81,7 +97,9 @@ function IdReaderInput({
             fields={methods}
             id={id}
             validatorContext={validatorContext}
-            onChange={(values) => onChange(Object.values(values)[0])}
+            onChange={(values) => {
+              onChange(getQrFieldValue(methods, values))
+            }}
           />
         </ReadersContainer>
         <Divider>
