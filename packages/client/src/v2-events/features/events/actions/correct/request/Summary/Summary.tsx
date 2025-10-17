@@ -152,7 +152,11 @@ export function Summary() {
       events.actions.correction.request.mutate(mutationPayload)
     }
 
-    navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+    if (workqueue) {
+      navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
+    } else {
+      navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+    }
   }, [
     form,
     fields,
@@ -165,7 +169,8 @@ export function Summary() {
     navigate,
     userMayCorrect,
     validatorContext,
-    eventConfiguration
+    eventConfiguration,
+    workqueue
   ])
 
   return (
@@ -201,9 +206,12 @@ export function Summary() {
               id="back-to-review"
               onClick={() =>
                 navigate(
-                  ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-                    eventId
-                  })
+                  ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
+                    {
+                      eventId
+                    },
+                    { workqueue }
+                  )
                 )
               }
             >
