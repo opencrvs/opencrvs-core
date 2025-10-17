@@ -356,57 +356,33 @@ export function FormSectionComponent({
   )
 
   const onBatchFieldValueChange = useCallback(
-    (newValues: Partial<EventState>) => {
+    (newValues: Array<{ name: string; value: FieldValue | undefined }>) => {
       const updatedValues = cloneDeep(values)
       const updatedErrors = cloneDeep(errorsWithDotSeparator)
+      const updatedTouched = cloneDeep(touched)
 
-      // update the value of the field that was changed
-      assign(updatedValues, newValues)
+      for (const { name: formikFieldId, value } of newValues) {
+        set(updatedValues, formikFieldId, value)
 
-      const totalFormikListenerFieldIds: string[] = []
-      for (const formikFieldId of Object.keys(newValues)) {
         const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
         const listenerFields = listenerFieldsByParentId[ocrvsFieldId] ?? []
         const interactiveListenerFields = listenerFields.filter(
           (c): c is InteractiveFieldType => !isNonInteractiveFieldType(c)
         )
+
         for (const listenerField of interactiveListenerFields) {
           setValueForListenerField(listenerField, updatedValues, updatedErrors)
+          updatedTouched[makeFormFieldIdFormikCompatible(listenerField.id)] =
+            undefined
         }
-
-        const dependentAgeFields = ageFields.filter(
-          (f) => f.configuration.asOfDate.$$field === ocrvsFieldId
-        )
-
-        for (const ageField of dependentAgeFields) {
-          const formikAgeFieldId = makeFormFieldIdFormikCompatible(ageField.id)
-          const maybeDate = updatedValues[formikFieldId]
-          set(updatedValues, formikAgeFieldId, {
-            ...(updatedValues[formikAgeFieldId] as AgeValue),
-            asOfDate: DateValue.safeParse(maybeDate).data
-          })
-        }
-
-        const formikListenerFieldIds = listenerFields.map((child) =>
-          makeFormFieldIdFormikCompatible(child.id)
-        )
-        totalFormikListenerFieldIds.push(...formikListenerFieldIds)
       }
 
-      const updatedTouched = omit(
-        touched,
-        Array.from(new Set(totalFormikListenerFieldIds))
-      )
-
-      // @TODO: Formik does not type errors well. Actual error message differs from the type.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      void setErrors(updatedErrors as any)
+      void setErrors(updatedErrors)
       void setValues(updatedValues)
       void setTouched(updatedTouched)
       void setAllTouchedFields(updatedTouched)
     },
     [
-      ageFields,
       values,
       setValues,
       listenerFieldsByParentId,

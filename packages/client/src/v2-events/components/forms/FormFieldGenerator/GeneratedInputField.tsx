@@ -118,7 +118,9 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
    * This is useful for cases where the parent component needs to know about
    * changes in the form state.
    */
-  onBatchFieldValueChange: (values: Partial<EventState>) => void
+  onBatchFieldValueChange: (
+    values: Array<{ name: string; value: FieldValue | undefined }>
+  ) => void
   /**
    * onBlur is used to set the touched state of the field
    */
@@ -728,14 +730,12 @@ export const GeneratedInputField = React.memo(
           value={field.value}
           onReset={() => {
             if (Array.isArray(fieldDefinition.parent)) {
-              const parentValues = Object.fromEntries(
-                fieldDefinition.parent.map((parentField) => [
-                  makeFormFieldIdFormikCompatible(parentField.$$field),
-                  undefined
-                ])
-              ) as Partial<EventState>
-
-              onBatchFieldValueChange(parentValues)
+              onBatchFieldValueChange(
+                fieldDefinition.parent.map((parentField) => ({
+                  name: makeFormFieldIdFormikCompatible(parentField.$$field),
+                  value: undefined
+                }))
+              )
             }
           }}
         />
