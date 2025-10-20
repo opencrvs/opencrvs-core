@@ -371,12 +371,6 @@ const HeaderComponent = (props: IFullProps) => {
                     : constantsMessages.declarationTitle
     )
 
-  console.log('activeMenuItem')
-  console.log(activeMenuItem)
-  console.log(ACTIVE_MENU_ITEM)
-  console.log(messages.teamTitle)
-  console.log(intl.formatMessage(messages.teamTitle))
-
   let rightMenu = [
     {
       element: <HistoryNavigator />
