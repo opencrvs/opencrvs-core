@@ -44,14 +44,14 @@ import { AnnotationAction } from '@client/v2-events/features/events/components/A
 import { QuickSearchIndex } from '@client/v2-events/features/events/Search/QuickSearchIndex'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { SettingsPage } from '@client/v2-events/features/settings/Settings'
+import { TeamPage } from '@client/v2-events/features/team/Team'
+import { OrganisationPage } from '@client/v2-events/features/organisation/Organisation'
 import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { SearchLayout } from '../layouts/search'
 import { useWorkqueues } from '../hooks/useWorkqueue'
 import { ReviewDuplicateIndex } from '../features/events/actions/dedup/ReviewDuplicate'
 import { ProtectedRoute } from '../../components/ProtectedRoute'
-import { UserList } from '../../views/SysAdmin/Team/user/UserList'
 import { UserAudit } from '../../views/UserAudit/UserAudit'
-import { AdministrativeLevels } from '../../views/Organisation/AdministrativeLevels'
 import { SystemList } from '../../views/SysAdmin/Config/Systems/Systems'
 import AllUserEmail from '../../views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { ROUTES } from './routes'
@@ -265,9 +265,7 @@ export const routesConfig = {
             SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
           ]}
         >
-          <WorkqueueLayout>
-            <UserList hideNavigation={true} />
-          </WorkqueueLayout>
+          <TeamPage />
         </ProtectedRoute>
       )
     },
@@ -289,9 +287,7 @@ export const routesConfig = {
             SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
           ]}
         >
-          <WorkqueueLayout>
-            <AdministrativeLevels hideNavigation={true} />
-          </WorkqueueLayout>
+          <OrganisationPage />
         </ProtectedRoute>
       )
     },
