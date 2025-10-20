@@ -11,8 +11,9 @@
 
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { TranslationConfig } from '@opencrvs/commons/client'
-import { Button } from '@opencrvs/components'
+import { LinkButtonField, TranslationConfig } from '@opencrvs/commons/client'
+import { Button, Icon } from '@opencrvs/components'
+import { throwIfUnsupportedIcon } from './Button'
 
 function setRedirectURI(url: string) {
   const parsed = new URL(url)
@@ -28,16 +29,29 @@ function LinkButtonInput({
   configuration
 }: {
   id: string
-  configuration: {
-    url: string
-    text: TranslationConfig
-  }
+  configuration: LinkButtonField['configuration']
   disabled?: boolean
 }) {
   const intl = useIntl()
   const url = setRedirectURI(configuration.url)
+
   return (
-    <Button disabled={disabled} element="a" href={url} id={id} type="secondary">
+    <Button
+      fullWidth
+      disabled={disabled}
+      element="a"
+      href={url}
+      id={id}
+      size="large"
+      type="secondary"
+    >
+      {configuration.icon && (
+        <Icon
+          color="currentColor"
+          name={throwIfUnsupportedIcon(configuration.icon)}
+          size="large"
+        />
+      )}
       {intl.formatMessage(configuration.text)}
     </Button>
   )

@@ -12,6 +12,7 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 
+import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -23,6 +24,7 @@ import { useAuthentication } from '@client/utils/userUtils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { ROUTES } from '@client/v2-events/routes'
 import { useAllowedActionConfigurations } from './useAllowedActionConfigurations'
 
 export function ActionMenu({
@@ -33,7 +35,7 @@ export function ActionMenu({
   onAction?: () => void
 }) {
   const intl = useIntl()
-
+  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.OVERVIEW)
   const { getUser } = useUsers()
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
@@ -101,7 +103,7 @@ export function ActionMenu({
                 key={action.type}
                 disabled={'disabled' in action ? action.disabled : false}
                 onClick={async () => {
-                  await action.onClick()
+                  await action.onClick(workqueue)
                   onAction?.()
                 }}
               >

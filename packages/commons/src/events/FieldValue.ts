@@ -21,7 +21,9 @@ import {
   StreetLevelDetailsValue,
   StreetLevelDetailsUpdateValue,
   QueryParamReaderFieldValue,
-  QueryParamReaderFieldUpdateValue
+  QueryParamReaderFieldUpdateValue,
+  QrReaderFieldValue,
+  IdReaderFieldValue
 } from './CompositeFieldValue'
 /**
  * FieldValues defined in this file are primitive field values.
@@ -120,7 +122,9 @@ const FieldValuesWithoutDataField = z.union([
   ButtonFieldValue,
   HttpFieldValue,
   VerificationStatusValue,
-  QueryParamReaderFieldValue
+  QueryParamReaderFieldValue,
+  QrReaderFieldValue,
+  IdReaderFieldValue
 ])
 
 // As data field value can refer to other field values, it can contain any other field value types
@@ -189,5 +193,7 @@ export type FieldUpdateValueSchema =
   | typeof HttpFieldUpdateValue
   | typeof QueryParamReaderFieldUpdateValue
   | typeof ButtonFieldValue
+  | typeof QrReaderFieldValue
+  | typeof IdReaderFieldValue
   | z.ZodString
   | z.ZodBoolean
