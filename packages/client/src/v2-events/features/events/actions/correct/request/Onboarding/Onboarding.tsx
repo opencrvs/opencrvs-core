@@ -11,7 +11,10 @@
 import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { buttonMessages } from '@client/i18n/messages'
@@ -33,6 +36,9 @@ const messages = defineMessages({
 
 export function Onboarding() {
   const { eventId, pageId } = useTypedParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
+  )
+  const [{ workqueue }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
   const validatorContext = useValidatorContext()
@@ -68,12 +74,15 @@ export function Onboarding() {
   React.useEffect(() => {
     if (!currentPageId) {
       navigate(
-        ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-          eventId: event.id
-        })
+        ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
+          {
+            eventId: event.id
+          },
+          { workqueue }
+        )
       )
     }
-  }, [currentPageId, navigate, event.id])
+  }, [currentPageId, navigate, event.id, workqueue])
 
   if (!currentPageId) {
     return null
@@ -100,15 +109,21 @@ export function Onboarding() {
         validatorContext={validatorContext}
         onPageChange={(nextPageId: string) => {
           return navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
-              eventId,
-              pageId: nextPageId
-            })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
+              {
+                eventId,
+                pageId: nextPageId
+              },
+              { workqueue }
+            )
           )
         }}
         onSubmit={() => {
           return navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
+              { eventId },
+              { workqueue }
+            )
           )
         }}
       />
