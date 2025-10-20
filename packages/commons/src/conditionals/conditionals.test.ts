@@ -1008,6 +1008,36 @@ describe('"field" conditionals', () => {
       )
     ).toBe(true)
   })
+
+  it('validates "field.isFalsy" conditional with null in parent when using `.get`', () => {
+    const falsyFormParams = {
+      $form: {
+        'deep.nonvalue': null,
+        'deep.value': {
+          some: {
+            value: null
+          }
+        }
+      },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $locations: [],
+      $online: false
+    }
+
+    expect(
+      validate(field('deep.nonvalue').get('foo.bar').isFalsy(), falsyFormParams)
+    ).toBe(true)
+
+    expect(
+      validate(field('deep.value').get('some.value').isFalsy(), falsyFormParams)
+    ).toBe(true)
+
+    expect(
+      validate(field('deep.value').get('some').isFalsy(), falsyFormParams)
+    ).toBe(false)
+
+    expect(validate(field('deep.value').isFalsy(), falsyFormParams)).toBe(false)
+  })
 })
 
 describe('"user" conditionals', () => {
