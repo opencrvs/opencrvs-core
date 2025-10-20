@@ -1009,7 +1009,7 @@ describe('"field" conditionals', () => {
     ).toBe(true)
   })
 
-  it('validates "field.isFalsy" conditional with null and .get', () => {
+  it('validates "field.isFalsy" conditional with null in parent when using `.get`', () => {
     const falsyFormParams = {
       $form: {
         'deep.nonvalue': null,
