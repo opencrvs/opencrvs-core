@@ -51,7 +51,9 @@ const defaultFields: FieldConfig[] = [
       defaultMessage: 'Query param reader',
       description: 'This is the label for the query param reader field'
     },
-    configuration: {}
+    configuration: {
+      pickParams: ['auth_token', 'client_session']
+    }
   },
   {
     id: 'applicant.http-fetch',
@@ -115,22 +117,8 @@ const testQueryParamReader = {
     defaultMessage: 'Query param reader',
     description: 'This is the label for the query param reader field'
   },
-  configuration: {}
-}
-
-const testQueryParamReaderWithFormProjection = {
-  id: 'test.query-param-reader',
-  type: FieldType.QUERY_PARAM_READER,
-  label: {
-    id: 'event.query-param-reader.label',
-    defaultMessage: 'Query param reader',
-    description: 'This is the label for the query param reader field'
-  },
   configuration: {
-    formProjection: {
-      auth_token: 'token',
-      client_session: 'session'
-    }
+    pickParams: ['auth_token', 'client_session']
   }
 }
 
@@ -223,13 +211,6 @@ const forwardedParams: FieldConfig[] = [
   sessionTextField
 ]
 
-const forwardedParamsWithFormProjection: FieldConfig[] = [
-  testQueryParamReaderWithFormProjection,
-  testHttpFetchAfterFormProjection,
-  tokenTextField,
-  sessionTextField
-]
-
 function Form(args: Args) {
   return (
     <FormFieldGenerator
@@ -275,33 +256,6 @@ export const WithForwardedParams: StoryObj<Args> = {
       router: {
         path: '/',
         element: <Form fields={forwardedParams} onChange={fn()} />
-      },
-      initialPath: '/?auth_token=123&client_session=abc'
-    },
-    msw: {
-      handlers: {
-        userInfoApi: [
-          http.get('/api/test', ({ request }) =>
-            HttpResponse.json(
-              Object.fromEntries(new URL(request.url).searchParams)
-            )
-          )
-        ]
-      }
-    }
-  }
-}
-
-export const WithForwardedParamsThroughFormProjection: StoryObj<Args> = {
-  name: 'With Forwarded Params Through Form Projection',
-  parameters: {
-    layout: 'centered',
-    reactRouter: {
-      router: {
-        path: '/',
-        element: (
-          <Form fields={forwardedParamsWithFormProjection} onChange={fn()} />
-        )
       },
       initialPath: '/?auth_token=123&client_session=abc'
     },
