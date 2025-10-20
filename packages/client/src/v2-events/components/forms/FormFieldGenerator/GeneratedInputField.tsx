@@ -731,14 +731,13 @@ export const GeneratedInputField = React.memo(
           value={field.value}
           onReset={() => {
             if (Array.isArray(fieldDefinition.parent)) {
-              onBatchFieldValueChange(
-                fieldDefinition.parent
-                  .map((parentField) => ({
-                    name: makeFormFieldIdFormikCompatible(parentField.$$field),
-                    value: undefined
-                  }))
-                  .concat({ name: fieldDefinition.id, value: undefined })
-              )
+              onBatchFieldValueChange([
+                ...fieldDefinition.parent.map((parentField) => ({
+                  name: makeFormFieldIdFormikCompatible(parentField.$$field),
+                  value: undefined
+                })),
+                { name: fieldDefinition.id, value: null }
+              ])
             } else if (fieldDefinition.parent) {
               onBatchFieldValueChange([
                 {
@@ -747,7 +746,7 @@ export const GeneratedInputField = React.memo(
                   ),
                   value: undefined
                 },
-                { name: fieldDefinition.id, value: undefined }
+                { name: fieldDefinition.id, value: null }
               ])
             }
           }}
