@@ -183,6 +183,37 @@ export function EventSummary({
   const flattenedFlags = flags
     .filter((flag) => !ActionFlag.safeParse(flag).success)
     .filter((flag) => flag !== InherentFlags.INCOMPLETE)
+    .map((flag) => {
+      const flagMessages = {
+        [InherentFlags.CORRECTION_REQUESTED]: {
+          id: 'flags.builtin.correction-requested.label',
+          defaultMessage: 'Correction requested',
+          description: 'Flag label for correction requested'
+        },
+        [InherentFlags.POTENTIAL_DUPLICATE]: {
+          id: 'flags.builtin.potential-duplicate.label',
+          defaultMessage: 'Potential duplicate',
+          description: 'Flag label for potential duplicate'
+        },
+        [InherentFlags.REJECTED]: {
+          id: 'flags.builtin.rejected.label',
+          defaultMessage: 'Rejected',
+          description: 'Flag label for rejected'
+        },
+        [InherentFlags.INCOMPLETE]: {
+          id: 'flags.builtin.incomplete.label',
+          defaultMessage: 'Incomplete',
+          description: 'Flag label for incomplete'
+        },
+        [InherentFlags.PENDING_CERTIFICATION]: {
+          id: 'flags.builtin.pending-certification.label',
+          defaultMessage: 'Pending certification',
+          description: 'Flag label for pending certification'
+        }
+      }
+
+      return intl.formatMessage(flagMessages[flag as InherentFlags])
+    })
     .join(', ')
 
   return (
