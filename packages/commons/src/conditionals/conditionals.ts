@@ -163,6 +163,21 @@ function wrapToPath(condition: Record<string, unknown>, path: string[]) {
   }, condition)
 }
 
+function wrapToPathOptional(
+  condition: Record<string, unknown>,
+  path: string[]
+) {
+  if (path.length === 0) {
+    return condition
+  }
+  return path.reduceRight((conditionNow, part) => {
+    return {
+      type: 'object',
+      properties: { [part]: conditionNow }
+    }
+  }, condition)
+}
+
 /**
  *
  * Generate conditional rules for user.
@@ -493,30 +508,35 @@ export function createFieldConditionals(fieldId: string) {
      *
      */
     isFalsy() {
+      // if we're targeting a nested leaf, be lenient about the parent shape
+      const hasSubpath = this.$$subfield.length > 0
+
+      const falsyLeaf = {
+        anyOf: [
+          { const: 'undefined' },
+          { const: false },
+          { const: null },
+          { const: '' }
+        ]
+      }
+
       return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: wrapToPath(
-            {
-              anyOf: [
-                { const: 'undefined' },
-                { const: false },
-                { const: null },
-                { const: '' }
-              ]
-            },
-            this.$$subfield
-          )
+          [fieldId]: hasSubpath
+            ? {
+                // either the whole parent is null (treat as undefined),
+                // or the nested leaf is falsy
+                anyOf: [
+                  { const: null },
+                  wrapToPathOptional(falsyLeaf, this.$$subfield)
+                ]
+              }
+            : falsyLeaf
         },
         anyOf: [
-          {
-            required: [fieldId]
-          },
-          {
-            not: {
-              required: [fieldId]
-            }
-          }
+          { required: [fieldId] }, // present
+          { not: { required: [fieldId] } } // or absent
         ]
       })
     },
