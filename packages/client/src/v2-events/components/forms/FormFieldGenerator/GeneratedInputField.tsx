@@ -739,8 +739,16 @@ export const GeneratedInputField = React.memo(
                   }))
                   .concat({ name: fieldDefinition.id, value: undefined })
               )
-            } else {
-              onFieldValueChange(fieldDefinition.id, undefined)
+            } else if (fieldDefinition.parent) {
+              onBatchFieldValueChange([
+                {
+                  name: makeFormFieldIdFormikCompatible(
+                    fieldDefinition.parent.$$field
+                  ),
+                  value: undefined
+                },
+                { name: fieldDefinition.id, value: undefined }
+              ])
             }
           }}
         />
