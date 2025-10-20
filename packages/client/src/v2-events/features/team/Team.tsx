@@ -12,6 +12,7 @@ import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
 import { UserList } from '@client/views/SysAdmin/Team/user/UserList'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 const teamTitle = {
   id: 'home.header.teamTitle',
@@ -19,7 +20,7 @@ const teamTitle = {
   description: 'settings title'
 }
 
-export function TeamPage() {
+function TeamPageComponent() {
   const intl = useIntl()
   return (
     <WorkqueueLayout title={intl.formatMessage(teamTitle)}>
@@ -27,3 +28,5 @@ export function TeamPage() {
     </WorkqueueLayout>
   )
 }
+
+export const TeamPage = withSuspense(TeamPageComponent)
