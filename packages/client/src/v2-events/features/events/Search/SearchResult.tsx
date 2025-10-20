@@ -344,9 +344,12 @@ export const SearchResultComponent = ({
             type={type}
             onClick={() => {
               return navigate(
-                ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-                  eventId: event.id
-                })
+                ROUTES.V2.EVENTS.OVERVIEW.buildPath(
+                  {
+                    eventId: event.id
+                  },
+                  { workqueue: slug }
+                )
               )
             }}
           />
