@@ -534,10 +534,7 @@ export function createFieldConditionals(fieldId: string) {
               }
             : falsyLeaf
         },
-        anyOf: [
-          { required: [fieldId] }, // present
-          { not: { required: [fieldId] } } // or absent
-        ]
+        anyOf: [{ required: [fieldId] }, { not: { required: [fieldId] } }]
       })
     },
     isUndefined() {
