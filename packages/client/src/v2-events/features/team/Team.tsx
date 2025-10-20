@@ -10,7 +10,6 @@
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
-import { Content } from '@opencrvs/components/lib/Content'
 import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
 import { UserList } from '@client/views/SysAdmin/Team/user/UserList'
 
@@ -24,9 +23,7 @@ export function TeamPage() {
   const intl = useIntl()
   return (
     <WorkqueueLayout title={intl.formatMessage(teamTitle)}>
-      <Content showTitleOnMobile={true} title={intl.formatMessage(teamTitle)}>
-        <UserList hideNavigation={true} />
-      </Content>
+      <UserList hideNavigation={true} />
     </WorkqueueLayout>
   )
 }

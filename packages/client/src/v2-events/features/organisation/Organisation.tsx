@@ -10,7 +10,6 @@
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
-import { Content } from '@opencrvs/components/lib/Content'
 import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 
@@ -24,12 +23,7 @@ export function OrganisationPage() {
   const intl = useIntl()
   return (
     <WorkqueueLayout title={intl.formatMessage(organisationsTitle)}>
-      <Content
-        showTitleOnMobile={true}
-        title={intl.formatMessage(organisationsTitle)}
-      >
-        <AdministrativeLevels hideNavigation={true} />
-      </Content>
+      <AdministrativeLevels hideNavigation={true} />
     </WorkqueueLayout>
   )
 }
