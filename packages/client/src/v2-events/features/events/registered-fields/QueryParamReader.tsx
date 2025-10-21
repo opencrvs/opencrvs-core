@@ -57,7 +57,11 @@ function QueryParamReaderInput({
     const fieldValue = prepareFieldValueFromPickedParams(params, pickParams)
     void Promise.resolve().then(() => {
       if (Object.keys(fieldValue).length) {
-        onChangeRef.current(fieldValue)
+        onChangeRef.current({
+          ...fieldValue,
+          // to ensure formik sees it as a new value even if the params are the same
+          [Symbol('updated')]: true
+        })
         setSearchParams(removeParams(params, pickParams), { replace: true })
       }
     })
