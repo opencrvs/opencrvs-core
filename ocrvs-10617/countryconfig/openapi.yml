@@ -245,6 +245,53 @@ components:
                             required:
                               - value
                               - label
+                        searchFields:
+                          type: array
+                          items:
+                            type: string
+                          description: "
+
+                            \    Defines multiple
+                            database fields that should be searched when this
+                            form field has a value.
+
+                            \    All specified
+                            fields will be combined using OR logic.
+
+                            \   \ 
+
+                            \    Example: A single
+                            \"Name\" form field can search across multiple name
+                            fields:
+
+                            \    {
+
+                            \      fieldId:
+                            'applicant-name',
+
+                            \      type: 'text',
+
+                            \      searchFields:
+                            ['mother.name.firstname', 'father.name.firstname',
+                            'child.name.firstname']
+
+                            \    }
+
+                            \   \ 
+
+                            \    When user enters
+                            \"Bob\", it creates:
+
+                            \    (mother.name.first\
+                            name=\"Bob\" OR father.name.firstname=\"Bob\" OR
+                            child.name.firstname=\"Bob\")
+
+                            \   \ 
+
+                            \    If not specified,
+                            the fieldId itself is used as the search field.
+
+                            \    "
                         searchCriteriaLabelPrefix:
                           $ref: "#/components/schemas/TranslationConfig"
                           description: "
@@ -398,6 +445,53 @@ components:
                             required:
                               - value
                               - label
+                        searchFields:
+                          type: array
+                          items:
+                            type: string
+                          description: "
+
+                            \    Defines multiple
+                            database fields that should be searched when this
+                            form field has a value.
+
+                            \    All specified
+                            fields will be combined using OR logic.
+
+                            \   \ 
+
+                            \    Example: A single
+                            \"Name\" form field can search across multiple name
+                            fields:
+
+                            \    {
+
+                            \      fieldId:
+                            'applicant-name',
+
+                            \      type: 'text',
+
+                            \      searchFields:
+                            ['mother.name.firstname', 'father.name.firstname',
+                            'child.name.firstname']
+
+                            \    }
+
+                            \   \ 
+
+                            \    When user enters
+                            \"Bob\", it creates:
+
+                            \    (mother.name.first\
+                            name=\"Bob\" OR father.name.firstname=\"Bob\" OR
+                            child.name.firstname=\"Bob\")
+
+                            \   \ 
+
+                            \    If not specified,
+                            the fieldId itself is used as the search field.
+
+                            \    "
                         searchCriteriaLabelPrefix:
                           $ref: "#/components/schemas/TranslationConfig"
                           description: "

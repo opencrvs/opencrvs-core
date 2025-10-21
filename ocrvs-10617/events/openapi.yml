@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 6808589c-7a8f-4454-b2b8-23d9b8ba4d4f
+                transactionId: 4280c757-d96b-4567-bef0-de65c7f0975a
                 type: birth
       responses:
         "200":
@@ -737,7 +737,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: c40d9964-2408-492d-a78f-9e98d13c3e86
+                transactionId: 23b138df-a44f-4286-821c-7b29893b7ba7
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -3240,6 +3240,48 @@ components:
                             required:
                               - value
                               - label
+                        searchFields:
+                          type: array
+                          items:
+                            type: string
+                          description: "
+
+                            \    Defines multiple database fields that should be
+                            searched when this form field has a value.
+
+                            \    All specified fields will be combined using OR
+                            logic.
+
+                            \   \ 
+
+                            \    Example: A single \"Name\" form field can
+                            search across multiple name fields:
+
+                            \    {
+
+                            \      fieldId: 'applicant-name',
+
+                            \      type: 'text',
+
+                            \      searchFields: ['mother.name.firstname',
+                            'father.name.firstname', 'child.name.firstname']
+
+                            \    }
+
+                            \   \ 
+
+                            \    When user enters \"Bob\", it creates:
+
+                            \    (mother.name.firstname=\"Bob\" OR
+                            father.name.firstname=\"Bob\" OR
+                            child.name.firstname=\"Bob\")
+
+                            \   \ 
+
+                            \    If not specified, the fieldId itself is used as
+                            the search field.
+
+                            \    "
                         searchCriteriaLabelPrefix:
                           description: "
 
@@ -3380,6 +3422,48 @@ components:
                             required:
                               - value
                               - label
+                        searchFields:
+                          type: array
+                          items:
+                            type: string
+                          description: "
+
+                            \    Defines multiple database fields that should be
+                            searched when this form field has a value.
+
+                            \    All specified fields will be combined using OR
+                            logic.
+
+                            \   \ 
+
+                            \    Example: A single \"Name\" form field can
+                            search across multiple name fields:
+
+                            \    {
+
+                            \      fieldId: 'applicant-name',
+
+                            \      type: 'text',
+
+                            \      searchFields: ['mother.name.firstname',
+                            'father.name.firstname', 'child.name.firstname']
+
+                            \    }
+
+                            \   \ 
+
+                            \    When user enters \"Bob\", it creates:
+
+                            \    (mother.name.firstname=\"Bob\" OR
+                            father.name.firstname=\"Bob\" OR
+                            child.name.firstname=\"Bob\")
+
+                            \   \ 
+
+                            \    If not specified, the fieldId itself is used as
+                            the search field.
+
+                            \    "
                         searchCriteriaLabelPrefix:
                           description: "
 
