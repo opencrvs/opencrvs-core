@@ -14,6 +14,8 @@ import { AgeValue, DateValue, EventState } from '@opencrvs/commons/client'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { Number as NumberField, NumberInputProps } from './Number'
 
+const validAgeRegex = /^[1-9][0-9]{0,2}$/
+
 interface AgeInputProps extends Omit<NumberInputProps, 'min' | 'onChange'> {
   asOfDateRef: string
   onChange(val: AgeValue | undefined): void
@@ -44,10 +46,7 @@ function AgeInput({ asOfDateRef, ...props }: AgeInputProps) {
         )
       }
       onKeyDownCapture={(e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (
-          ['.', 'e'].includes(e.key) ||
-          (e.key === '0' && !e.currentTarget.value)
-        ) {
+        if (!validAgeRegex.test(e.currentTarget.value + e.key)) {
           e.preventDefault()
         }
       }}
