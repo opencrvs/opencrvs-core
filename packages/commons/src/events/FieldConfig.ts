@@ -30,11 +30,14 @@ import {
   AddressFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  HttpFieldValue
+  HttpFieldValue,
+  IdReaderFieldValue,
+  QrReaderFieldValue
 } from './CompositeFieldValue'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
+import { JSONSchema } from '../client'
 extendZodWithOpenApi(z)
 
 const FieldId = z
@@ -87,9 +90,11 @@ const requiredSchema = z
 const BaseField = z.object({
   id: FieldId,
   label: TranslationConfig,
-  parent: FieldReference.optional().describe(
-    'Reference to a parent field. If a field has a parent, it will be reset when the parent field is changed.'
-  ),
+  parent: FieldReference.or(z.array(FieldReference))
+    .optional()
+    .describe(
+      'Reference to a parent field. If a field has parent(s), it will be reset when any parent field is changed.'
+    ),
   required: requiredSchema,
   conditionals: z.array(FieldConditional).default([]).optional(),
   secured: z.boolean().default(false).optional(),
@@ -104,9 +109,11 @@ const BaseField = z.object({
     .describe(
       'Indicates if the field can be changed during a record correction.'
     ),
-  value: FieldReference.optional().describe(
-    'Reference to a parent field. If field has a value, the value will be copied when the parent field is changed.'
-  ),
+  value: FieldReference.or(z.array(FieldReference))
+    .optional()
+    .describe(
+      'Reference to a parent field. If field has a value, the value will be copied when the parent field is changed. If a list is provided, the first truthy value will be used'
+    ),
   analytics: z
     .boolean()
     .default(false)
@@ -672,6 +679,10 @@ const HttpField = BaseField.extend({
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
     headers: z.record(z.string()).optional(),
     body: z.record(z.string()).optional(),
+    errorValue: z
+      .any()
+      .optional()
+      .describe('Value to set if the request fails'),
     params: z
       .record(z.string(), z.union([z.string(), FieldReference]))
       .optional(),
@@ -688,7 +699,11 @@ const LinkButtonField = BaseField.extend({
   type: z.literal(FieldType.LINK_BUTTON),
   configuration: z.object({
     url: z.string().describe('URL to open'),
-    text: TranslationConfig.describe('Text to display on the button')
+    text: TranslationConfig.describe('Text to display on the button'),
+    icon: z
+      .string()
+      .optional()
+      .describe('Icon for the button. You can find icons from OpenCRVS UI-Kit.')
   })
 }).describe('Button that opens a link')
 
@@ -713,13 +728,52 @@ const QueryParamReaderField = BaseField.extend({
     formProjection: z
       .record(z.string())
       .optional()
-      .describe('Projection of the field value after parsing the query string')
+      .describe(
+        'Projection of the field value after parsing the query string, the property will be ignored if the item is not present in querystring'
+      )
   })
 }).describe(
   'A field that maps URL query params into form values and clears them afterward'
 )
 
 export type QueryParamReaderField = z.infer<typeof QueryParamReaderField>
+
+const QrReaderField = BaseField.extend({
+  type: z.literal(FieldType.QR_READER),
+  defaultValue: QrReaderFieldValue.optional(),
+  configuration: z
+    .object({
+      validator: z.custom<JSONSchema>(
+        (val) => typeof val === 'object' && val !== null
+      )
+    })
+    .optional()
+})
+
+export type QrReaderField = z.infer<typeof QrReaderField>
+
+const IdReaderField = BaseField.extend({
+  type: z.literal(FieldType.ID_READER),
+  defaultValue: IdReaderFieldValue.optional(),
+  methods: z.array(
+    z
+      .union([QrReaderField, LinkButtonField])
+      .describe('Methods for reading an ID')
+  )
+})
+
+export type IdReaderField = z.infer<typeof IdReaderField>
+
+const LoaderField = BaseField.extend({
+  type: z.literal(FieldType.LOADER),
+  configuration: z.object({
+    text: TranslationConfig.describe('Display text above the loading spinner')
+  })
+}).describe(
+  'A non-interactive field that indicates an in progress operation in form'
+)
+
+export type LoaderField = z.infer<typeof LoaderField>
 
 /** @knipignore */
 export type FieldConfig =
@@ -758,6 +812,9 @@ export type FieldConfig =
   | z.infer<typeof LinkButtonField>
   | z.infer<typeof VerificationStatus>
   | z.infer<typeof QueryParamReaderField>
+  | z.infer<typeof QrReaderField>
+  | z.infer<typeof IdReaderField>
+  | z.infer<typeof LoaderField>
 
 /** @knipignore */
 /**
@@ -799,6 +856,9 @@ export type FieldConfigInput =
   | z.input<typeof LinkButtonField>
   | z.input<typeof VerificationStatus>
   | z.input<typeof QueryParamReaderField>
+  | z.input<typeof QrReaderField>
+  | z.input<typeof IdReaderField>
+  | z.input<typeof LoaderField>
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
  *  referenced quite extensively througout various other schemas. Leaving the
@@ -845,7 +905,10 @@ export const FieldConfig: z.ZodType<
     HttpField,
     LinkButtonField,
     VerificationStatus,
-    QueryParamReaderField
+    QrReaderField,
+    IdReaderField,
+    QueryParamReaderField,
+    LoaderField
   ])
   .openapi({
     description: 'Form field configuration',

@@ -91,7 +91,8 @@ function EventOverviewFull({
       // drafts should not affect the status of the event
       // so the status and flags are taken from the eventIndex
       'event.status': status,
-      'event.assignedTo': assignedTo
+      'event.assignedTo': assignedTo,
+      flags: eventIndex.flags
     }
 
   const { getEventTitle } = useEventTitle()
@@ -115,6 +116,7 @@ function EventOverviewFull({
       <EventSummary
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
+        flags={flags}
       />
       <EventHistory
         eventConfiguration={eventConfiguration}
@@ -192,6 +194,7 @@ function EventOverviewProtected({
         hideSecuredFields
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
+        flags={flags}
       />
       <EventHistorySkeleton />
     </Content>

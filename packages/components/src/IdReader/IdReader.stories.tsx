@@ -9,28 +9,28 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { IDReader } from '.'
+import { IdReader } from '.'
 import React from 'react'
-import { QRReader } from './readers/QRReader/QRReader'
+import { QrReader } from './readers/QrReader/QrReader'
 import { Stack } from '../Stack'
 import { Text } from '../Text'
-import { ScannableQRReader } from './types'
+import { ScannableQrReader } from './types'
 
-const meta: Meta<typeof IDReader> = {
+const meta: Meta<typeof IdReader> = {
   title: 'Controls/IDReader',
-  component: IDReader
+  component: IdReader
 }
 
 export default meta
 
-type Story = StoryObj<typeof IDReader>
+type Story = StoryObj<typeof IdReader>
 
-const IDReaderComponent = (qrReaderProps: Partial<ScannableQRReader>) => (
-  <IDReader
+const IDReaderComponent = (qrReaderProps: Partial<ScannableQrReader>) => (
+  <IdReader
     dividerLabel="Or"
     manualInputInstructionLabel="Complete fields below"
   >
-    <QRReader
+    <QrReader
       {...qrReaderProps}
       labels={{
         button: 'Scan ID QR code',
@@ -50,7 +50,7 @@ const IDReaderComponent = (qrReaderProps: Partial<ScannableQRReader>) => (
         console.error(`Error: ${type} - ${error.message}`)
       }
     />
-  </IDReader>
+  </IdReader>
 )
 
 export const IDReaderWithAlertFeedback: Story = {

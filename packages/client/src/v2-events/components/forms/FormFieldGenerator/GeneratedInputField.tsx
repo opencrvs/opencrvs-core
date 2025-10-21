@@ -60,6 +60,9 @@ import {
   isVerificationStatusType,
   isQueryParamReaderFieldType,
   ValidatorContext,
+  isIdReaderFieldType,
+  isQrReaderFieldType,
+  isLoaderFieldType,
   isAgeFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
@@ -93,8 +96,14 @@ import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileIn
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
+import { IdReader } from '@client/v2-events/features/events/registered-fields/IdReader'
+import { QrReader } from '@client/v2-events/features/events/registered-fields/QrReader'
 import { QueryParamReader } from '@client/v2-events/features/events/registered-fields/QueryParamReader'
-import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
+import { Loader } from '@client/v2-events/features/events/registered-fields/Loader'
+import {
+  makeFormFieldIdFormikCompatible,
+  makeFormikFieldIdOpenCRVSCompatible
+} from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
 import {
   makeFormikFieldIdsOpenCRVSCompatible,
@@ -105,6 +114,13 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
   /** non-native onChange. Updates Formik state by updating the value and its dependencies */
   onFieldValueChange: (name: string, value: FieldValue | undefined) => void
+  /** Optional callback that is called whenever any field value changes.
+   * This is useful for cases where the parent component needs to know about
+   * changes in the form state.
+   */
+  onBatchFieldValueChange: (
+    values: Array<{ name: string; value: FieldValue | undefined }>
+  ) => void
   /**
    * onBlur is used to set the touched state of the field
    */
@@ -128,6 +144,7 @@ export const GeneratedInputField = React.memo(
     validatorContext,
     onBlur,
     onFieldValueChange,
+    onBatchFieldValueChange,
     error,
     touched,
     value,
@@ -712,7 +729,16 @@ export const GeneratedInputField = React.memo(
           configuration={field.config.configuration}
           id={field.config.id}
           value={field.value}
-          onReset={() => onFieldValueChange(fieldDefinition.id, undefined)}
+          onReset={() => {
+            if (Array.isArray(fieldDefinition.parent)) {
+              onBatchFieldValueChange(
+                fieldDefinition.parent.map((parentField) => ({
+                  name: makeFormFieldIdFormikCompatible(parentField.$$field),
+                  value: undefined
+                }))
+              )
+            }
+          }}
         />
       )
     }
@@ -722,6 +748,34 @@ export const GeneratedInputField = React.memo(
         <QueryParamReader.Input
           configuration={field.config.configuration}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isIdReaderFieldType(field)) {
+      return (
+        <IdReader.Input
+          id={field.config.id}
+          methods={field.config.methods}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isQrReaderFieldType(field)) {
+      return (
+        <QrReader.Input
+          configuration={field.config.configuration}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isLoaderFieldType(field)) {
+      return (
+        <Loader.Input
+          configuration={field.config.configuration}
+          id={field.config.id}
         />
       )
     }

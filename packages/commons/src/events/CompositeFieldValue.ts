@@ -116,3 +116,12 @@ export type QueryParamReaderFieldValue = z.infer<
 >
 
 export const QueryParamReaderFieldUpdateValue = z.record(z.string(), z.string())
+
+const ReadDataValue = z.object({
+  data: z.any()
+})
+export const QrReaderFieldValue = ReadDataValue
+export type QrReaderFieldValue = z.infer<typeof QrReaderFieldValue>
+
+export const IdReaderFieldValue = ReadDataValue
+export type IdReaderFieldValue = z.infer<typeof IdReaderFieldValue>
