@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 4280c757-d96b-4567-bef0-de65c7f0975a
+                transactionId: f4d3cea1-a092-49de-a394-d8338f196a03
                 type: birth
       responses:
         "200":
@@ -737,7 +737,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 23b138df-a44f-4286-821c-7b29893b7ba7
+                transactionId: 853315bf-2a19-4103-a154-68fa5c5a59e2
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -3261,7 +3261,11 @@ components:
 
                             \      fieldId: 'applicant-name',
 
-                            \      type: 'text',
+                            \      type: 'NAME',
+
+                            \      label: { defaultMessage: 'Parent Name',
+                            description: 'Search parent names', id:
+                            'search.parentName' },
 
                             \      searchFields: ['mother.name.firstname',
                             'father.name.firstname', 'child.name.firstname']
@@ -3282,6 +3286,93 @@ components:
                             the search field.
 
                             \    "
+                        type:
+                          type: string
+                          enum:
+                            - NAME
+                            - PHONE
+                            - ID
+                            - ADDRESS
+                            - TEXT
+                            - NUMBER
+                            - TEXTAREA
+                            - EMAIL
+                            - DATE
+                            - AGE
+                            - DATE_RANGE
+                            - SELECT_DATE_RANGE
+                            - TIME
+                            - PARAGRAPH
+                            - PAGE_HEADER
+                            - RADIO_GROUP
+                            - FILE
+                            - FILE_WITH_OPTIONS
+                            - BULLET_LIST
+                            - CHECKBOX
+                            - SELECT
+                            - COUNTRY
+                            - LOCATION
+                            - DIVIDER
+                            - ADMINISTRATIVE_AREA
+                            - FACILITY
+                            - OFFICE
+                            - SIGNATURE
+                            - DATA
+                            - BUTTON
+                            - ALPHA_PRINT_BUTTON
+                            - HTTP
+                            - LINK_BUTTON
+                            - VERIFICATION_STATUS
+                            - QUERY_PARAM_READER
+                            - QR_READER
+                            - ID_READER
+                            - LOADER
+                          description: "
+
+                            \    Explicitly specify the field type for search
+                            fields with searchFields.
+
+                            \    When searchFields is used, this allows you to
+                            control the UI field type.
+
+                            \   \ 
+
+                            \    Example: FieldType.NAME for name fields,
+                            FieldType.TEXT for text fields, FieldType.DATE for
+                            date fields, etc.
+
+                            \    If not specified, defaults to FieldType.TEXT.
+
+                            \    "
+                        label:
+                          description: "
+
+                            \    Explicitly specify the label for search fields
+                            with searchFields.
+
+                            \    When searchFields is used, this allows you to
+                            provide a custom label instead of auto-generating
+                            from fieldId.
+
+                            \   \ 
+
+                            \    Example:
+
+                            \    {
+
+                            \      fieldId: 'parent-name',
+
+                            \      label: { defaultMessage: 'Parent Name',
+                            description: 'Search parent names', id:
+                            'search.parentName' },
+
+                            \      searchFields: ['mother.name', 'father.name']
+
+                            \    }
+
+                            \    "
+                          allOf:
+                            - $ref: "#/components/schemas/TranslationConfig"
                         searchCriteriaLabelPrefix:
                           description: "
 
@@ -3443,7 +3534,11 @@ components:
 
                             \      fieldId: 'applicant-name',
 
-                            \      type: 'text',
+                            \      type: 'NAME',
+
+                            \      label: { defaultMessage: 'Parent Name',
+                            description: 'Search parent names', id:
+                            'search.parentName' },
 
                             \      searchFields: ['mother.name.firstname',
                             'father.name.firstname', 'child.name.firstname']
@@ -3464,6 +3559,93 @@ components:
                             the search field.
 
                             \    "
+                        type:
+                          type: string
+                          enum:
+                            - NAME
+                            - PHONE
+                            - ID
+                            - ADDRESS
+                            - TEXT
+                            - NUMBER
+                            - TEXTAREA
+                            - EMAIL
+                            - DATE
+                            - AGE
+                            - DATE_RANGE
+                            - SELECT_DATE_RANGE
+                            - TIME
+                            - PARAGRAPH
+                            - PAGE_HEADER
+                            - RADIO_GROUP
+                            - FILE
+                            - FILE_WITH_OPTIONS
+                            - BULLET_LIST
+                            - CHECKBOX
+                            - SELECT
+                            - COUNTRY
+                            - LOCATION
+                            - DIVIDER
+                            - ADMINISTRATIVE_AREA
+                            - FACILITY
+                            - OFFICE
+                            - SIGNATURE
+                            - DATA
+                            - BUTTON
+                            - ALPHA_PRINT_BUTTON
+                            - HTTP
+                            - LINK_BUTTON
+                            - VERIFICATION_STATUS
+                            - QUERY_PARAM_READER
+                            - QR_READER
+                            - ID_READER
+                            - LOADER
+                          description: "
+
+                            \    Explicitly specify the field type for search
+                            fields with searchFields.
+
+                            \    When searchFields is used, this allows you to
+                            control the UI field type.
+
+                            \   \ 
+
+                            \    Example: FieldType.NAME for name fields,
+                            FieldType.TEXT for text fields, FieldType.DATE for
+                            date fields, etc.
+
+                            \    If not specified, defaults to FieldType.TEXT.
+
+                            \    "
+                        label:
+                          description: "
+
+                            \    Explicitly specify the label for search fields
+                            with searchFields.
+
+                            \    When searchFields is used, this allows you to
+                            provide a custom label instead of auto-generating
+                            from fieldId.
+
+                            \   \ 
+
+                            \    Example:
+
+                            \    {
+
+                            \      fieldId: 'parent-name',
+
+                            \      label: { defaultMessage: 'Parent Name',
+                            description: 'Search parent names', id:
+                            'search.parentName' },
+
+                            \      searchFields: ['mother.name', 'father.name']
+
+                            \    }
+
+                            \    "
+                          allOf:
+                            - $ref: "#/components/schemas/TranslationConfig"
                         searchCriteriaLabelPrefix:
                           description: "
 
