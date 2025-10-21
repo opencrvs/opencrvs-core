@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { MessageDescriptor, MessageFormatElement, useIntl } from 'react-intl'
+import {
+  IntlShape,
+  MessageDescriptor,
+  MessageFormatElement,
+  useIntl
+} from 'react-intl'
 import IntlMessageFormat, { PrimitiveType } from 'intl-messageformat'
 import {
   isArgumentElement,
@@ -18,6 +23,8 @@ import {
   parse
 } from '@formatjs/icu-messageformat-parser'
 import { useMemo } from 'react'
+import format from 'date-fns/format'
+import { defineMessage } from 'react-intl'
 import { EventState } from '@opencrvs/commons/client'
 import { useEventFormData } from '../features/events/useEventFormData'
 import { useActionAnnotation } from '../features/events/useActionAnnotation'
@@ -216,4 +223,14 @@ export function useIntlWithFormData() {
     ...intl,
     formatMessage
   }
+}
+
+const dateFormat = defineMessage({
+  defaultMessage: 'd MMMM y',
+  id: 'configuration.dateFormat',
+  description: 'Default format for date values'
+})
+
+export function formatDate(intl: IntlShape, date: string) {
+  return format(new Date(date), intl.formatMessage(dateFormat))
 }

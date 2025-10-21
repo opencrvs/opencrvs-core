@@ -8,10 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import format from 'date-fns/format'
 import * as React from 'react'
-import { defineMessages, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import {
   DateField as DateFieldType,
   DatetimeValue,
@@ -21,15 +19,8 @@ import {
   DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
 } from '@opencrvs/components/lib/DateField'
+import { formatDate } from '@client/v2-events/messages/utils'
 import { StringifierContext } from './RegisteredField'
-
-const messages = defineMessages({
-  dateFormat: {
-    defaultMessage: 'd MMMM y',
-    id: 'configuration.dateFormat',
-    description: 'Default format for date values'
-  }
-})
 
 const EMPTY_DATE = '--'
 
@@ -79,10 +70,7 @@ function DateOutput({ value }: { value?: string }) {
   const parsed = DateValue.safeParse(value)
 
   if (parsed.success) {
-    return format(
-      new Date(parsed.data),
-      intl.formatMessage(messages.dateFormat)
-    )
+    return formatDate(intl, parsed.data)
   }
 
   return String(value ?? '')
@@ -96,10 +84,7 @@ function stringify(
   const parsed = DateValue.or(DatetimeValue).safeParse(value)
 
   if (parsed.success) {
-    return format(
-      new Date(parsed.data),
-      context.intl.formatMessage(messages.dateFormat)
-    )
+    return formatDate(context.intl, parsed.data)
   }
 
   return String(value ?? '')

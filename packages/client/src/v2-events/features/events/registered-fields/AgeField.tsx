@@ -10,8 +10,11 @@
  */
 import * as React from 'react'
 import { useFormikContext } from 'formik'
+import styled from 'styled-components'
+import { defineMessage, useIntl } from 'react-intl'
 import { AgeValue, DateValue, EventState } from '@opencrvs/commons/client'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { formatDate } from '@client/v2-events/messages/utils'
 import { Number, NumberInputProps } from './Number'
 
 interface AgeInputProps extends Omit<NumberInputProps, 'min' | 'onChange'> {
@@ -40,7 +43,37 @@ function AgeInput({ asOfDateRef, ...props }: AgeInputProps) {
   )
 }
 
+const AsOfLabel = styled.span`
+  ${({ theme }) => theme.fonts.reg14};
+  font-style: italic;
+`
+
+const asOfMessage = defineMessage({
+  defaultMessage: 'as of',
+  id: 'field.age.asOf',
+  description: 'Label for age as of date'
+})
+
+function AgeOutput({ value }: { value?: AgeValue }) {
+  const intl = useIntl()
+  const age = value?.age ?? ''
+  if (!value?.asOfDate) {
+    return age
+  }
+
+  return (
+    <>
+      <span>{age}</span>{' '}
+      <AsOfLabel>
+        {'('}
+        {intl.formatMessage(asOfMessage)} {formatDate(intl, value?.asOfDate)}
+        {')'}
+      </AsOfLabel>
+    </>
+  )
+}
+
 export const AgeField = {
   Input: AgeInput,
-  Output: ({ value }: { value?: AgeValue }) => value?.age ?? ''
+  Output: AgeOutput
 }
