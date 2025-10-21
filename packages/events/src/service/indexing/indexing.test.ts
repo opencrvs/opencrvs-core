@@ -305,10 +305,92 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     })
   })
 
+  test('builds nested AND/OR query', async () => {
+    const nestedPayload: QueryType = {
+      type: 'and',
+      clauses: [
+        {
+          type: 'or',
+          clauses: [
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              data: {
+                'applicant.name': { type: 'exact', term: 'Bob' }
+              }
+            },
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              data: {
+                'applicant.email': { type: 'exact', term: 'bob@example.com' }
+              }
+            }
+          ]
+        },
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.dob': { type: 'exact', term: '1985-01-01' }
+          }
+        }
+      ]
+    }
+    const result = await buildElasticQueryFromSearchPayload(nestedPayload, [
+      tennisClubMembershipEvent
+    ])
+    expect(result).toEqual({
+      bool: {
+        must: [
+          {
+            bool: {
+              should: [
+                {
+                  bool: {
+                    must: [
+                      { term: { type: TENNIS_CLUB_MEMBERSHIP } },
+                      {
+                        match: {
+                          'declaration.applicant____name.__fullname': 'Bob'
+                        }
+                      }
+                    ],
+                    should: undefined
+                  }
+                },
+                {
+                  bool: {
+                    must: [
+                      { term: { type: TENNIS_CLUB_MEMBERSHIP } },
+                      {
+                        match: {
+                          'declaration.applicant____email': 'bob@example.com'
+                        }
+                      }
+                    ],
+                    should: undefined
+                  }
+                }
+              ],
+              minimum_should_match: 1
+            }
+          },
+          {
+            bool: {
+              must: [
+                { term: { type: TENNIS_CLUB_MEMBERSHIP } },
+                { match: { 'declaration.applicant____dob': '1985-01-01' } }
+              ],
+              should: undefined
+            }
+          }
+        ],
+        should: undefined
+      }
+    })
+  })
+
   test('returns match_all for invalid input', async () => {
     const result = await buildElasticQueryFromSearchPayload(
       {
-        // @ts-expect-error testing invalid input
         type: 'invalid',
         clauses: [
           {
@@ -319,6 +401,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
           }
         ]
       },
+      // @ts-expect-error testing invalid input
       tennisClubMembershipEvent
     )
     expect(result).toEqual({

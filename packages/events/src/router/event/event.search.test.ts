@@ -1807,3 +1807,110 @@ test('System integration without record search scope is not allowed to search an
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
+
+test('Returns events using nested AND/OR query combinations', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    'search[event=tennis-club-membership,access=all]',
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
+  ])
+
+  const record1 = {
+    'applicant.id': '111',
+    'applicant.name': {
+      firstname: 'Bob',
+      surname: 'Smith'
+    },
+    'applicant.dob': '1985-01-01',
+    'applicant.email': 'bob.smith@example.com'
+  }
+
+  const record2 = {
+    'applicant.id': '222',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
+    'applicant.dob': '1985-01-01',
+    'applicant.email': 'bob@example.com'
+  }
+
+  const record3 = {
+    'applicant.id': '333',
+    'applicant.name': {
+      firstname: 'Bob',
+      surname: 'Johnson'
+    },
+    'applicant.dob': '1990-01-01',
+    'applicant.email': 'different@example.com'
+  }
+
+  const record4 = {
+    'applicant.id': '444',
+    'applicant.name': {
+      firstname: 'Alice',
+      surname: 'Smith'
+    },
+    'applicant.dob': '1985-01-01',
+    'applicant.email': 'alice@example.com'
+  }
+
+  const event1 = await client.event.create(generator.event.create())
+  const event2 = await client.event.create(generator.event.create())
+  const event3 = await client.event.create(generator.event.create())
+  const event4 = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event1.id, { declaration: record1 })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event2.id, { declaration: record2 })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event3.id, { declaration: record3 })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event4.id, { declaration: record4 })
+  )
+
+  // Test nested query: { applicant.name: "Bob" OR applicant.email: "bob@example.com" } AND { applicant.dob: "1985-01-01" }
+  const { results: fetchedEvents } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          type: 'or',
+          clauses: [
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              data: {
+                'applicant.name': { type: 'exact', term: 'Bob' }
+              }
+            },
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              data: {
+                'applicant.email': { type: 'exact', term: 'bob@example.com' }
+              }
+            }
+          ]
+        },
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.dob': { type: 'exact', term: '1985-01-01' }
+          }
+        }
+      ]
+    }
+  })
+
+  expect(fetchedEvents.length).toBeGreaterThanOrEqual(2)
+
+  const matchingIds = fetchedEvents.map((event) =>
+    getMixedPath(event.declaration, 'applicant.id')
+  )
+  expect(matchingIds).toContain('111')
+  expect(matchingIds).toContain('222')
+})
