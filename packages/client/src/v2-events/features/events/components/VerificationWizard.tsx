@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { VerificationPageConfig } from '@opencrvs/commons/client'
+import { EventState, VerificationPageConfig } from '@opencrvs/commons/client'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
 import {
   ResponsiveModal,
@@ -48,6 +48,7 @@ export const VerificationWizard = ({
   pageConfig
 }: FormWizardProps & {
   pageConfig: VerificationPageConfig
+  onNextPage: (values: EventState) => void
 }) => {
   const intl = useIntl()
   const [cancelModal, openCancelModal] = useModal()
