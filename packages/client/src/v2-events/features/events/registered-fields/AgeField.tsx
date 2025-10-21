@@ -12,7 +12,7 @@ import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { AgeValue, DateValue, EventState } from '@opencrvs/commons/client'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { Number, NumberInputProps } from './Number'
+import { Number as NumberField, NumberInputProps } from './Number'
 
 interface AgeInputProps extends Omit<NumberInputProps, 'min' | 'onChange'> {
   asOfDateRef: string
@@ -27,15 +27,37 @@ function AgeInput({ asOfDateRef, ...props }: AgeInputProps) {
   ).data
 
   return (
-    <Number.Input
+    <NumberField.Input
       {...props}
       data-testid={`age__${props.id}`}
       min={0}
+      value={props.value}
+      onBlur={(e) => {
+        props.onChange(
+          e.target.value ? { age: Number(e.target.value), asOfDate } : undefined
+        )
+        props.onBlur?.(e)
+      }}
       onChange={(newAge) =>
         props.onChange(
           newAge === undefined ? undefined : { age: newAge, asOfDate }
         )
       }
+      onKeyDownCapture={(e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (
+          ['.', 'e'].includes(e.key) ||
+          (e.key === '0' && !e.currentTarget.value)
+        ) {
+          e.preventDefault()
+        }
+      }}
+      onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => {
+        const text = e.clipboardData.getData('text')
+        const numeric = Number(text)
+        e.currentTarget.value = String(numeric)
+        e.preventDefault()
+        props.onChange(numeric ? { age: numeric, asOfDate } : undefined)
+      }}
     />
   )
 }
