@@ -113,6 +113,8 @@ export function Pages({
     //
     // I tried to improve this by updating the default values directly into the zustand state on form initialisation, but it caused other issues.
     // I decided to leave it this way for now, since it works, but we should overhaul the default values logic at some point.
+    //
+    // Why doesn't this use deepMerge() instead of spread? If there are any defined or 'undefined' values in the 'form' at this point, they should completely replace the default values.
     setFormData({ ...defaultValues, ...form, ...values })
 
     // Before switching to the next page, we need to mark all fields in the current page as touched
