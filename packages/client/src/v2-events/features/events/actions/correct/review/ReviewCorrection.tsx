@@ -252,12 +252,15 @@ export function ReviewCorrection({
             requestId: correctionRequestAction.id,
             annotation
           })
-          return navigate(
-            ROUTES.V2.EVENTS.OVERVIEW.buildPath(
-              { eventId },
-              { workqueue: searchParams.workqueue }
+          if (searchParams.workqueue) {
+            return navigate(
+              ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
+                slug: searchParams.workqueue
+              })
             )
-          )
+          } else {
+            return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+          }
         }}
       />
     ))
@@ -275,12 +278,20 @@ export function ReviewCorrection({
             annotation,
             content: { reason }
           })
-          return navigate(
-            ROUTES.V2.EVENTS.OVERVIEW.buildPath(
-              { eventId },
-              { workqueue: searchParams.workqueue }
+          if (searchParams.workqueue) {
+            return navigate(
+              ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
+                slug: searchParams.workqueue
+              })
             )
-          )
+          } else {
+            return navigate(
+              ROUTES.V2.EVENTS.OVERVIEW.buildPath(
+                { eventId },
+                { workqueue: searchParams.workqueue }
+              )
+            )
+          }
         }}
       />
     ))
