@@ -547,9 +547,9 @@ export function getValidatorsForField(
 
 export function areCertificateConditionsMet(
   conditions: FieldConditional[],
-  values: Record<string, unknown>
+  values: ConditionalParameters
 ) {
   return conditions.every((condition) => {
-    return ajv.validate(condition.conditional, values)
+    return validate(condition.conditional, values)
   })
 }
