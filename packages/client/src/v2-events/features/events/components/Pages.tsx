@@ -104,6 +104,7 @@ export function Pages({
 
   const defaultValues = useDefaultValues(page.fields)
 
+  // values is used on the verification page wizard to set the verification page result
   function onNextPage(values?: EventState) {
     // Ensure that defaultValues end up in the zustand state
     // This solution is not ideal, as the current way default values work is:
