@@ -65,9 +65,7 @@ function AgeOutput({ value }: { value?: AgeValue }) {
     <>
       <span>{age}</span>{' '}
       <AsOfLabel>
-        {'('}
-        {intl.formatMessage(asOfMessage)} {formatDate(intl, value.asOfDate)}
-        {')'}
+        {`(${intl.formatMessage(asOfMessage)} ${formatDate(intl, value.asOfDate)})`}
       </AsOfLabel>
     </>
   )
