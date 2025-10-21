@@ -11,7 +11,9 @@
 import React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
 import { http, HttpResponse } from 'msw'
-import { fn } from '@storybook/test'
+import { fn, expect, within } from '@storybook/test'
+import { waitFor } from '@storybook/testing-library'
+import { useLocation, useSearchParams } from 'react-router-dom'
 import {
   ConditionalType,
   field,
@@ -245,6 +247,19 @@ export const Default: StoryObj<Args> = {
         ]
       }
     }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('firstname and surname are populated from api', async () => {
+      await waitFor(async () => {
+        await expect(
+          canvas.queryByTestId('text__applicant____firstname')
+        ).toHaveValue('John')
+        await expect(
+          canvas.queryByTestId('text__applicant____familyName')
+        ).toHaveValue('Doe')
+      })
+    })
   }
 }
 
@@ -270,5 +285,76 @@ export const WithForwardedParams: StoryObj<Args> = {
         ]
       }
     }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('token and session are populated from api', async () => {
+      await waitFor(async () => {
+        await expect(canvas.queryByTestId('text__test____token')).toHaveValue(
+          '123'
+        )
+        await expect(canvas.queryByTestId('text__test____session')).toHaveValue(
+          'abc'
+        )
+      })
+    })
+  }
+}
+
+function DebugLocation() {
+  const [searchParams] = useSearchParams()
+  return (
+    <span data-testid="current-params" style={{ display: 'none' }}>
+      {searchParams.toString()}
+    </span>
+  )
+}
+
+export const WithExtraUnpickedParameters: StoryObj<Args> = {
+  name: 'With Extra Unpicked Parameters',
+  parameters: {
+    chromatic: {
+      disableSnapshot: true
+    },
+    layout: 'centered',
+    reactRouter: {
+      router: {
+        path: '/',
+        element: (
+          <>
+            <DebugLocation />
+            <Form fields={defaultFields} onChange={fn()} />
+          </>
+        )
+      },
+      initialPath:
+        '/?auth_token=123&client_session=abc&from=page1&ref=ad_campaign'
+    },
+    msw: {
+      handlers: {
+        userInfoApi: [
+          http.get('/api/user-info', () =>
+            HttpResponse.json({ firstName: 'John', familyName: 'Doe' })
+          )
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step, parameters }) => {
+    const canvas = within(canvasElement)
+    await step('firstname and surname are populated from api', async () => {
+      await waitFor(async () => {
+        await expect(
+          canvas.queryByTestId('text__applicant____firstname')
+        ).toHaveValue('John')
+        await expect(
+          canvas.queryByTestId('text__applicant____familyName')
+        ).toHaveValue('Doe')
+      })
+    })
+    await step('unpicked query params remain in the URL', async () => {
+      const params = await canvas.findByTestId('current-params')
+      await expect(params).toHaveTextContent('from=page1&ref=ad_campaign')
+    })
   }
 }
