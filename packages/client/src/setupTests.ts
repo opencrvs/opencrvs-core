@@ -81,7 +81,6 @@ const config = {
     }
   ],
   FEATURES: {
-    V2_EVENTS: false,
     DEATH_REGISTRATION: true,
     MARRIAGE_REGISTRATION: true,
     EXTERNAL_VALIDATION_WORKQUEUE: false,
