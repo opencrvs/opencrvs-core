@@ -371,7 +371,12 @@ describe('Nested Query Generation with searchFields', () => {
           eventType: 'birth'
         },
         {
-          data: { 'mapped.database.field': 'test-value' }
+          type: 'or',
+          clauses: [
+            {
+              data: { 'mapped.database.field': 'test-value' }
+            }
+          ]
         }
       ]
     })

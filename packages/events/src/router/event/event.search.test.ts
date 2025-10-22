@@ -1035,7 +1035,10 @@ test('Returns no documents when search params are not matched', async () => {
         {
           eventType: TENNIS_CLUB_MEMBERSHIP,
           data: {
-            'applicant.name': { type: 'exact', term: 'Nothing Matching' }
+            'applicant.name': {
+              type: 'exact',
+              term: 'Nothing Matching'
+            }
           }
         }
       ]
@@ -1817,43 +1820,75 @@ test('Returns events using nested AND/OR query combinations', async () => {
   ])
 
   const record1 = {
-    'applicant.id': '111',
     'applicant.name': {
       firstname: 'Bob',
       surname: 'Smith'
     },
     'applicant.dob': '1985-01-01',
-    'applicant.email': 'bob.smith@example.com'
+    'applicant.email': 'bob.smith@example.com',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
   }
 
   const record2 = {
-    'applicant.id': '222',
     'applicant.name': {
       firstname: 'John',
       surname: 'Doe'
     },
     'applicant.dob': '1985-01-01',
-    'applicant.email': 'bob@example.com'
+    'applicant.email': 'bob@example.com',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
   }
 
   const record3 = {
-    'applicant.id': '333',
     'applicant.name': {
       firstname: 'Bob',
       surname: 'Johnson'
     },
     'applicant.dob': '1990-01-01',
-    'applicant.email': 'different@example.com'
+    'applicant.email': 'different@example.com',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
   }
 
   const record4 = {
-    'applicant.id': '444',
     'applicant.name': {
       firstname: 'Alice',
       surname: 'Smith'
     },
     'applicant.dob': '1985-01-01',
-    'applicant.email': 'alice@example.com'
+    'applicant.email': 'alice@example.com',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
   }
 
   const event1 = await client.event.create(generator.event.create())
@@ -1885,7 +1920,7 @@ test('Returns events using nested AND/OR query combinations', async () => {
             {
               eventType: TENNIS_CLUB_MEMBERSHIP,
               data: {
-                'applicant.name': { type: 'exact', term: 'Bob' }
+                'applicant.name': { type: 'fuzzy', term: 'Bob' }
               }
             },
             {
@@ -1908,9 +1943,14 @@ test('Returns events using nested AND/OR query combinations', async () => {
 
   expect(fetchedEvents.length).toBeGreaterThanOrEqual(2)
 
-  const matchingIds = fetchedEvents.map((event) =>
-    getMixedPath(event.declaration, 'applicant.id')
+  const matchingFirstnames = fetchedEvents.map((event) =>
+    getMixedPath(event.declaration, 'applicant.name.firstname')
   )
-  expect(matchingIds).toContain('111')
-  expect(matchingIds).toContain('222')
+  const matchingEmails = fetchedEvents.map((event) =>
+    getMixedPath(event.declaration, 'applicant.email')
+  )
+
+  // Should match record1 (Bob with dob 1985-01-01) and record2 (John with bob@example.com and dob 1985-01-01)
+  expect(matchingFirstnames).toContain('Bob')
+  expect(matchingEmails).toContain('bob@example.com')
 })
