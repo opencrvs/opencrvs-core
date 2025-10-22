@@ -26,7 +26,6 @@ export default meta
 type Story = StoryObj<typeof VerificationWizard>
 
 const onNextPageSpy = fn()
-const onVerifyActionSpy = fn()
 
 export const VerificationWizardModal: Story = {
   parameters: {
@@ -75,7 +74,6 @@ export const VerificationWizardModal: Story = {
         onNextPage={onNextPageSpy}
         onPreviousPage={noop}
         onSubmit={noop}
-        onVerifyAction={onVerifyActionSpy}
       />
     )
   },
@@ -105,7 +103,7 @@ export const VerificationWizardModal: Story = {
           await canvas.findByRole('button', { name: 'Verify' })
         )
 
-        await expect(onVerifyActionSpy).toHaveBeenCalled()
+        await expect(onNextPageSpy).toHaveBeenCalledWith({ verification: true })
       }
     )
   }

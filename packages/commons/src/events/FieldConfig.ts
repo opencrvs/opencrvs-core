@@ -725,12 +725,9 @@ export type VerificationStatus = z.infer<typeof VerificationStatus>
 const QueryParamReaderField = BaseField.extend({
   type: z.literal(FieldType.QUERY_PARAM_READER),
   configuration: z.object({
-    formProjection: z
-      .record(z.string())
-      .optional()
-      .describe(
-        'Projection of the field value after parsing the query string, the property will be ignored if the item is not present in querystring'
-      )
+    pickParams: z
+      .array(z.string())
+      .describe('List of query parameters to read from the URL')
   })
 }).describe(
   'A field that maps URL query params into form values and clears them afterward'
