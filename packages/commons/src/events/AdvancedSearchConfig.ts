@@ -18,7 +18,9 @@ const MatchType = z.enum(['fuzzy', 'exact', 'range', 'within'])
 
 const BaseField = z.object({
   config: z.object({
-    type: MatchType.describe('Determines the type of field')
+    type: MatchType.describe(
+      'Determines the search type of field. How to match value.'
+    )
   }),
   options: z.array(SelectOption).optional(),
   searchCriteriaLabelPrefix: TranslationConfig.optional().describe(
@@ -64,7 +66,7 @@ const BaseField = z.object({
     .default([])
     .optional()
     .describe(
-      `In advanced search, we sometimes need to override the default field validations.`
+      `Option for overriding the field validations specifically for advanced search form.`
     )
 })
 
@@ -132,7 +134,9 @@ export type SearchField = z.infer<typeof SearchField>
 
 export const AdvancedSearchConfig = z.object({
   title: TranslationConfig.describe('Advanced search tab title'),
-  fields: z.array(SearchField).describe('Advanced search fields.')
+  fields: z
+    .array(SearchField)
+    .describe('Advanced search fields within the tab.')
 })
 
 export type AdvancedSearchConfig = z.infer<typeof AdvancedSearchConfig>
