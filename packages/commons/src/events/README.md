@@ -51,7 +51,7 @@ By default, forms can contain multiple pages. Each page consists of fields. Fiel
 
 ### Validation, Writing data
 
-[How data is validated in the backend](../../../events/src/router/middleware/index)
+[How data is validated in the backend](../../../events/src/router/middleware/index.ts)
 
 How field values are represented
 [FieldValue](./FieldValue.ts)
