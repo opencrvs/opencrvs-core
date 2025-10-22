@@ -40,7 +40,7 @@ export type ITimeFieldProps = IProps &
   Omit<ITextInputProps, 'onChange' | 'value'> &
   Omit<ISelectProps, 'onChange' | 'value'>
 
-function getFormattedValue(
+function get24HourNormalisedFormat(
   time: { hh: string; mm: string },
   use12HourFormat: boolean,
   amPm?: string | null
@@ -155,7 +155,7 @@ function TimeInput12(props: ITimeFieldProps) {
 
   React.useEffect(() => {
     if (isValidHours(state.hh, true) && isValidMinutes(state.mm)) {
-      onChange(getFormattedValue(state, true, amPm))
+      onChange(get24HourNormalisedFormat(state, true, amPm))
     }
   }, [state, amPm, onChange])
 
@@ -293,7 +293,7 @@ function TimeInput24(props: ITimeFieldProps) {
 
   React.useEffect(() => {
     if (isValidHours(state.hh, false) && isValidMinutes(state.mm)) {
-      onChange(getFormattedValue(state, false))
+      onChange(get24HourNormalisedFormat(state, false))
     }
   }, [state, onChange])
 
