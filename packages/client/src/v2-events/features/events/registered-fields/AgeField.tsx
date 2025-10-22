@@ -24,9 +24,11 @@ function AgeInput(props: AgeInputProps) {
       data-testid={`age__${props.id}`}
       min={0}
       onChange={(newAge) =>
-        newAge === undefined
-          ? undefined
-          : { age: newAge, asOfDateRef: props.asOfDateRef }
+        props.onChange(
+          newAge === undefined
+            ? undefined
+            : { age: newAge, asOfDateRef: props.asOfDateRef }
+        )
       }
     />
   )
