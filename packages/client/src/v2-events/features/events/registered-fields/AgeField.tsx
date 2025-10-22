@@ -9,38 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { useFormikContext } from 'formik'
-import { AgeValue, DateValue, EventState } from '@opencrvs/commons/client'
-import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { Number, NumberInputProps } from './Number'
 
 interface AgeInputProps extends Omit<NumberInputProps, 'min' | 'onChange'> {
   asOfDateRef: string
-  onChange(val: AgeValue | undefined): void
+  onChange(val: number | undefined): void
 }
 
 function AgeInput({ asOfDateRef, ...props }: AgeInputProps) {
-  const { values } = useFormikContext<EventState>()
-
-  const asOfDate = DateValue.safeParse(
-    values[makeFormFieldIdFormikCompatible(asOfDateRef)]
-  ).data
-
   return (
     <Number.Input
       {...props}
       data-testid={`age__${props.id}`}
       min={0}
-      onChange={(newAge) =>
-        props.onChange(
-          newAge === undefined ? undefined : { age: newAge, asOfDate }
-        )
-      }
+      onChange={props.onChange}
     />
   )
 }
 
 export const AgeField = {
   Input: AgeInput,
-  Output: ({ value }: { value?: AgeValue }) => value?.age ?? ''
+  Output: ({ value }: { value?: number }) => value?.toString() ?? ''
 }

@@ -31,9 +31,7 @@ import {
   omitHiddenFields,
   isFieldEnabled,
   ValidatorContext,
-  isFieldVisible,
-  AgeValue,
-  DateValue
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -220,12 +218,6 @@ export function FormSectionComponent({
     allFieldsWithDotSeparator
   )
 
-  const ageFields = useMemo(
-    () =>
-      allFieldsWithDotSeparator.filter((field) => field.type === FieldType.AGE),
-    [allFieldsWithDotSeparator]
-  )
-
   const errors = makeFormFieldIdsFormikCompatible(errorsWithDotSeparator)
   const form = makeFormikFieldIdsOpenCRVSCompatible(
     makeDatesFormatted(fieldsWithDotSeparator, values)
@@ -306,19 +298,6 @@ export function FormSectionComponent({
         setValueForListenerField(listenerField, updatedValues, updatedErrors)
       }
 
-      const dependentAgeFields = ageFields.filter(
-        (f) => f.configuration.asOfDate.$$field === ocrvsFieldId
-      )
-
-      for (const ageField of dependentAgeFields) {
-        const formikAgeFieldId = makeFormFieldIdFormikCompatible(ageField.id)
-        const maybeDate = updatedValues[formikFieldId]
-        set(updatedValues, formikAgeFieldId, {
-          ...(updatedValues[formikAgeFieldId] as AgeValue),
-          asOfDate: DateValue.safeParse(maybeDate).data
-        })
-      }
-
       // @TODO: we should not reference field id 'country' directly.
       if (formikFieldId === 'country') {
         const defaultCountry = window.config.COUNTRY || 'FAR'
@@ -349,7 +328,6 @@ export function FormSectionComponent({
       setTouched,
       touched,
       errorsWithDotSeparator,
-      ageFields,
       setErrors,
       setAllTouchedFields,
       setValueForListenerField

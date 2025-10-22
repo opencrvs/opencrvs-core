@@ -56,7 +56,6 @@ import { DateValue, SelectDateRangeValue } from './FieldValue'
 import { subDays, subYears, format } from 'date-fns'
 import { ConditionalType } from './Conditional'
 
-// TODO CIHAN: fix type to AgeValue
 export function ageToDate(age: number, asOfDate: DateValue) {
   const date = new Date(asOfDate)
   return DateValue.parse(format(subYears(date, age), 'yyyy-MM-dd'))

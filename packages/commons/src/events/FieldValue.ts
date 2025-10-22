@@ -45,17 +45,7 @@ export const DateValue = z
   .string()
   .date()
   .describe('Date in the format YYYY-MM-DD')
-
 export type DateValue = z.infer<typeof DateValue>
-
-export const AgeValue = z.object({
-  age: z.number(),
-  asOfDate: DateValue.optional()
-})
-
-export const AgeUpdateValue = AgeValue.optional().nullable()
-
-export type AgeValue = z.infer<typeof AgeValue>
 
 export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
 
@@ -110,7 +100,6 @@ const FieldValuesWithoutDataField = z.union([
   StreetLevelDetailsValue,
   TextValue,
   DateValue,
-  AgeValue,
   TimeValue,
   AddressFieldValue,
   DateRangeFieldValue,
@@ -146,7 +135,6 @@ export const FieldUpdateValue = z.union([
   TextValue,
   DateValue,
   TimeValue,
-  AgeUpdateValue,
   AddressFieldUpdateValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
@@ -182,7 +170,6 @@ export type FieldValueSchema =
  * */
 export type FieldUpdateValueSchema =
   | typeof DateRangeFieldValue
-  | typeof AgeValue
   | typeof SelectDateRangeValue
   | typeof FileFieldValue
   | typeof FileFieldWithOptionValue
