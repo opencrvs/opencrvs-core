@@ -29,7 +29,6 @@ import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
 import { ageToDate } from '../events/utils'
-import { FieldType } from '../events/FieldType'
 
 const ajv = new Ajv({
   $data: true,
@@ -132,11 +131,18 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
         const maybeAgeValue = AgeValue.safeParse(value)
         if (maybeAgeValue.success) {
           const age = maybeAgeValue.data.age
+          const maybeAsOfDate = DateValue.safeParse(
+            data.$form[maybeAgeValue.data.asOfDateRef]
+          )
+
           return [
             key,
             {
               age,
-              dob: ageToDate(age, data.$ageFieldReferenceDate || data.$now)
+              dob: ageToDate(
+                age,
+                maybeAsOfDate.success ? maybeAsOfDate.data : data.$now
+              )
             }
           ]
         }
@@ -450,25 +456,6 @@ export function runStructuralValidations({
   return fieldValidationResult
 }
 
-/**
- * Returns the reference date for an AGE field if applicable, undefined otherwise.
- * The reference date is retrieved from another field specified via the field's configuration.
- *
- * @param field - The FieldConfig for the field.
- * @param values - The form state containing all field values.
- * @returns The reference date string in YYYY-MM-DD format, or undefined if not applicable.
- */
-function getAgeFieldReferenceDate(field: FieldConfig, values: EventState) {
-  if (field.type !== FieldType.AGE) {
-    return undefined
-  }
-
-  const referenceFieldId = field.configuration.asOfDate.$$field
-  const referenceFieldValue = values[referenceFieldId]
-  const maybeDateValue = DateValue.safeParse(referenceFieldValue)
-  return maybeDateValue.success ? maybeDateValue.data : undefined
-}
-
 export function runFieldValidations({
   field,
   values,
@@ -497,8 +484,7 @@ export function runFieldValidations({
      */
     $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? [],
     $online: isOnline(),
-    $user: context.user,
-    $ageFieldReferenceDate: getAgeFieldReferenceDate(field, values)
+    $user: context.user
   }
 
   const fieldValidationResult = validateFieldInput({
