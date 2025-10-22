@@ -17,7 +17,6 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-
 import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled from 'styled-components'
@@ -33,15 +32,6 @@ const Actions = styled.div`
     margin-bottom: 16px;
   }
 `
-
-interface State {
-  phone: string
-  email: string
-  touched: boolean
-  error: boolean
-  errorMessage: string
-  notificationMethod: string
-}
 
 const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
   const [phone, setPhone] = useState('')
