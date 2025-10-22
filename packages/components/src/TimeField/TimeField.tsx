@@ -105,18 +105,28 @@ function TimeInput12(props: ITimeFieldProps) {
     function getInitialState(time: string): IState {
       const [hh, mm] = time.split(':')
 
-      setAmPm(parseInt(hh, 10) >= 12 ? 'PM' : 'AM')
+      const hours24 = parseInt(hh, 10)
 
-      return { hh: hh || '', mm: mm || '' }
+      setAmPm(hours24 >= 12 ? 'PM' : 'AM')
+
+      let hours12 = hours24
+      if (hours24 === 0) {
+        hours12 = 12
+      } else if (hours24 > 12) {
+        hours12 = hours24 - 12
+      }
+
+      return { hh: hours12.toString().padStart(2, '0') || '', mm: mm || '' }
     }
 
     const isValidTime = (time: string) => {
       const cleanTime = time.replace(/\s?(AM|PM)$/i, '')
+
       const parts = cleanTime.split(':')
 
       if (parts.length !== 2) return false
 
-      return isValidHours(parts[0], true) && isValidMinutes(parts[1])
+      return isValidHours(parts[0], false) && isValidMinutes(parts[1])
     }
 
     if (props.value && isValidTime(props.value)) {
