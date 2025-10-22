@@ -11,51 +11,44 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { AgeValue, DateValue, EventState } from '@opencrvs/commons/client'
+import {
+  TextInput as TextInputComponent,
+  ITextInputProps as TextInputProps
+} from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { Number as NumberField, NumberInputProps } from './Number'
 
-const validAgeRegex = /^[1-9][0-9]{0,2}$/
-
-interface AgeInputProps extends Omit<NumberInputProps, 'min' | 'onChange'> {
+interface AgeInputProps extends Omit<TextInputProps, 'min' | 'onChange'> {
   asOfDateRef: string
   onChange(val: AgeValue | undefined): void
+  value: number | undefined
 }
 
-function AgeInput({ asOfDateRef, ...props }: AgeInputProps) {
+function AgeInput({ asOfDateRef, value, ...props }: AgeInputProps) {
   const { values } = useFormikContext<EventState>()
 
   const asOfDate = DateValue.safeParse(
     values[makeFormFieldIdFormikCompatible(asOfDateRef)]
   ).data
 
+  const [inputValue, setInputValue] = React.useState(
+    value && isNaN(value) ? undefined : value
+  )
+
   return (
-    <NumberField.Input
+    <TextInputComponent
       {...props}
       data-testid={`age__${props.id}`}
-      min={0}
-      value={props.value}
+      value={inputValue}
       onBlur={(e) => {
-        props.onChange(
-          e.target.value ? { age: Number(e.target.value), asOfDate } : undefined
-        )
+        props.onChange(inputValue ? { age: inputValue, asOfDate } : undefined)
         props.onBlur?.(e)
       }}
-      onChange={(newAge) =>
-        props.onChange(
-          newAge === undefined ? undefined : { age: newAge, asOfDate }
-        )
-      }
-      onKeyDownCapture={(e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (!validAgeRegex.test(e.currentTarget.value + e.key)) {
-          e.preventDefault()
-        }
-      }}
-      onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => {
-        const text = e.clipboardData.getData('text')
-        const numeric = Number(text)
-        e.currentTarget.value = String(numeric)
-        e.preventDefault()
-        props.onChange(numeric ? { age: numeric, asOfDate } : undefined)
+      onChange={(e) => {
+        const parsedValue = parseInt(e.target.value, 10)
+
+        isNaN(parsedValue)
+          ? setInputValue(undefined)
+          : setInputValue(parsedValue)
       }}
     />
   )
