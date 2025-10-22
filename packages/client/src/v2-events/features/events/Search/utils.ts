@@ -221,7 +221,7 @@ export function toAdvancedSearchQueryType(
     const searchField = searchFieldMap[formFieldId]
     const searchFields = searchField.config.searchFields
 
-    if (searchFields && searchFields.length > 1) {
+    if (searchFields && searchFields.length > 0) {
       const orClauses: QueryExpression[] = searchFields.map((dbFieldId) => ({
         data: { [dbFieldId]: fieldValue }
       }))
@@ -231,7 +231,7 @@ export function toAdvancedSearchQueryType(
         clauses: orClauses
       } as QueryType)
     } else {
-      const targetFieldId = searchFields?.[0] || formFieldId
+      const targetFieldId = formFieldId
       clauses.push({
         data: { [targetFieldId]: fieldValue }
       })

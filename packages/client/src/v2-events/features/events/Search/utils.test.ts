@@ -11,6 +11,7 @@
 
 import {
   EventStatus,
+  QueryInputType,
   SearchField,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
@@ -267,7 +268,7 @@ describe('Nested Query Generation with searchFields', () => {
     ]
 
     const result = toAdvancedSearchQueryType(
-      searchParams as any,
+      searchParams as unknown as QueryInputType,
       searchFieldConfigs,
       'birth'
     )
@@ -321,7 +322,7 @@ describe('Nested Query Generation with searchFields', () => {
     ]
 
     const result = toAdvancedSearchQueryType(
-      searchParams as any,
+      searchParams as unknown as QueryInputType,
       searchFieldConfigs,
       'birth'
     )
@@ -358,7 +359,7 @@ describe('Nested Query Generation with searchFields', () => {
     ]
 
     const result = toAdvancedSearchQueryType(
-      searchParams as any,
+      searchParams as unknown as QueryInputType,
       searchFieldConfigs,
       'birth'
     )
@@ -399,7 +400,7 @@ describe('Nested Query Generation with searchFields', () => {
     ]
 
     const result = toAdvancedSearchQueryType(
-      searchParams as any,
+      searchParams as unknown as QueryInputType,
       searchFieldConfigs,
       'birth'
     )
@@ -474,7 +475,7 @@ describe('Nested Query Generation with searchFields', () => {
     ]
 
     const result = toAdvancedSearchQueryType(
-      searchParams as any,
+      searchParams as unknown as QueryInputType,
       searchFieldConfigs,
       'birth'
     )

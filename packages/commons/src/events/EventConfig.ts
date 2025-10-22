@@ -89,9 +89,9 @@ export const EventConfig = z
           !(
             fieldIds.includes(field.fieldId) ||
             (EventFieldId.options as string[]).includes(field.fieldId) ||
-            field.config.searchFields?.every((sf: string) =>
-              fieldIds.includes(sf)
-            )
+            (field.config.searchFields &&
+              field.config.searchFields.length > 0 &&
+              field.config.searchFields.every((sf) => fieldIds.includes(sf)))
           )
       )
     )
