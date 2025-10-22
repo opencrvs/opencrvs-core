@@ -28,7 +28,7 @@ export const OrganisationPageStory: Story = {
     userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.path + V1_LEGACY_ROUTES.ORGANISATIONS_INDEX
+      initialPath: V1_LEGACY_ROUTES.ORGANISATIONS_INDEX
     }
   }
 }
