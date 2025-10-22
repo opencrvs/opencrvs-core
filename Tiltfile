@@ -5,10 +5,14 @@
 
 core_images_tag = "local"
 countryconfig_image_name="opencrvs/ocrvs-countryconfig"
-countryconfig_image_tag="v1.9.0-beta-6"
+countryconfig_image_tag="develop"
 
+load('ext://git_resource', 'git_checkout')
 if not os.path.exists('../infrastructure'):
-    local("git clone git@github.com:opencrvs/infrastructure.git ../infrastructure")
+    # FIXME: Replace ocrvs-10672 to develop after testing
+    git_checkout('git@github.com:opencrvs/infrastructure.git#ocrvs-10672', '../infrastructure')
+if not os.path.exists('../infrastructure/tilt/opencrvs.tilt'):
+  fail('Something went wrong while cloning infrastructure repository!')
 load('../infrastructure/tilt/opencrvs.tilt', 'setup_opencrvs')
 
 ############################################################
