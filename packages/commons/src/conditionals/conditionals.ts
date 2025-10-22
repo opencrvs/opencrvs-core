@@ -53,6 +53,7 @@ export function defineFormConditional(schema: Record<string, unknown>) {
 type CommonConditionalParameters = {
   $now: string
   $online: boolean
+  $ageFieldReferenceDate?: string | null
 }
 
 export type UserConditionalParameters = CommonConditionalParameters & {
@@ -64,7 +65,7 @@ export type EventConditionalParameters = CommonConditionalParameters & {
 }
 
 export type FormConditionalParameters = CommonConditionalParameters & {
-  $form: EventState
+  $form: EventState | Record<string, unknown>
   $locations?: Array<{ id: UUID }>
 }
 

@@ -19,11 +19,17 @@ import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
-import { AgeValue, FieldUpdateValue, FieldValue } from '../events/FieldValue'
+import {
+  AgeValue,
+  DateValue,
+  FieldUpdateValue,
+  FieldValue
+} from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
 import { ageToDate } from '../events/utils'
+import { FieldType } from '../events/FieldType'
 
 const ajv = new Ajv({
   $data: true,
@@ -128,7 +134,13 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
         if (maybeAgeValue.success) {
           return [
             key,
-            { age: maybeAgeValue.data.age, dob: ageToDate(maybeAgeValue.data) }
+            {
+              age: maybeAgeValue.data.age,
+              dob: ageToDate(
+                maybeAgeValue.data.age,
+                data.$ageFieldReferenceDate || data.$now
+              )
+            }
           ]
         }
         return [key, value]
@@ -441,6 +453,25 @@ export function runStructuralValidations({
   return fieldValidationResult
 }
 
+/**
+ * Returns the reference date for an AGE field if applicable, undefined otherwise.
+ * The reference date is retrieved from another field specified via the field's configuration.
+ *
+ * @param field - The FieldConfig for the field.
+ * @param values - The form state containing all field values.
+ * @returns The reference date string in YYYY-MM-DD format, or undefined if not applicable.
+ */
+function getAgeFieldReferenceDate(field: FieldConfig, values: EventState) {
+  if (field.type !== FieldType.AGE || !field.configuration?.asOfDate) {
+    return undefined
+  }
+
+  const referenceFieldId = field.configuration.asOfDate.$$field
+  const referenceFieldValue = values[referenceFieldId]
+  const maybeDateValue = DateValue.safeParse(referenceFieldValue)
+  return maybeDateValue.success ? maybeDateValue.data : undefined
+}
+
 export function runFieldValidations({
   field,
   values,
@@ -469,7 +500,8 @@ export function runFieldValidations({
      */
     $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? [],
     $online: isOnline(),
-    $user: context.user
+    $user: context.user,
+    $ageFieldReferenceDate: getAgeFieldReferenceDate(field, values)
   }
 
   const fieldValidationResult = validateFieldInput({
