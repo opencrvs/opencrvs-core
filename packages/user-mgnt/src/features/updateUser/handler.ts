@@ -154,7 +154,7 @@ export default async function updateUser(
     }
 
     // update user in user-mgnt data store
-    await User.updateOne({ _id: existingUser._id }, existingUser)
+    await User.update({ _id: existingUser._id }, existingUser)
   } catch (err) {
     logger.error(err)
     await rollbackUpdateUser(
