@@ -215,10 +215,7 @@ function mapFieldTypeToMockValue(
     case FieldType.DATE:
       return '2021-01-01'
     case FieldType.AGE:
-      return {
-        age: 19,
-        asOfDate: '2021-01-01'
-      }
+      return 19
     case FieldType.TIME:
       return '09:33'
     case FieldType.ALPHA_PRINT_BUTTON:
