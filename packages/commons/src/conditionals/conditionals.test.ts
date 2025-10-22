@@ -544,6 +544,60 @@ describe('age asAge comparisons', () => {
       )
     ).toBe(false)
   })
+
+  it('validates comparisons where dob from age field is expected to be before dob from another age field', () => {
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isBefore()
+          .date(field('referrer.age').asDob()),
+        {
+          ...getFieldParams({
+            // dob is 1973-01-01
+            'applicant.age': {
+              age: 17,
+              asOfDateRef: 'reference.dob.one'
+            },
+            // dob is 1970-01-01
+            'referrer.age': {
+              age: 20,
+              asOfDateRef: 'reference.dob.two'
+            },
+            'reference.dob.one': '1990-01-01',
+            'reference.dob.two': '1995-01-01'
+          }),
+          $now: '1990-01-01'
+        }
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isBefore()
+          .date(field('referrer.age').asDob()),
+        {
+          ...getFieldParams({
+            // dob is 1973-01-01
+            'applicant.age': {
+              age: 17,
+              asOfDateRef: 'reference.dob.one'
+            },
+            // dob is 1970-01-01
+            'referrer.age': {
+              age: 25,
+              asOfDateRef: 'reference.dob.two'
+            },
+            'reference.dob.one': '1990-01-01',
+            'reference.dob.two': '1995-01-01'
+          }),
+          $now: '1990-01-01'
+        }
+      )
+    ).toBe(false)
+  })
 })
 
 describe('leaf level validations', () => {
