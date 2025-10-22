@@ -11,31 +11,46 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { AgeValue, DateValue, EventState } from '@opencrvs/commons/client'
+import {
+  TextInput as TextInputComponent,
+  ITextInputProps as TextInputProps
+} from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { Number, NumberInputProps } from './Number'
 
-interface AgeInputProps extends Omit<NumberInputProps, 'min' | 'onChange'> {
+interface AgeInputProps extends Omit<TextInputProps, 'min' | 'onChange'> {
   asOfDateRef: string
   onChange(val: AgeValue | undefined): void
+  value: number | undefined
 }
 
-function AgeInput({ asOfDateRef, ...props }: AgeInputProps) {
+function AgeInput({ asOfDateRef, value, ...props }: AgeInputProps) {
   const { values } = useFormikContext<EventState>()
 
   const asOfDate = DateValue.safeParse(
     values[makeFormFieldIdFormikCompatible(asOfDateRef)]
   ).data
 
+  const [inputValue, setInputValue] = React.useState(
+    value && isNaN(value) ? undefined : value
+  )
+
   return (
-    <Number.Input
+    <TextInputComponent
       {...props}
       data-testid={`age__${props.id}`}
-      min={0}
-      onChange={(newAge) =>
-        props.onChange(
-          newAge === undefined ? undefined : { age: newAge, asOfDate }
-        )
-      }
+      maxLength={3}
+      value={inputValue}
+      onBlur={(e) => {
+        props.onChange(inputValue ? { age: inputValue, asOfDate } : undefined)
+        props.onBlur?.(e)
+      }}
+      onChange={(e) => {
+        const parsedValue = parseInt(e.target.value, 10)
+
+        isNaN(parsedValue)
+          ? setInputValue(undefined)
+          : setInputValue(parsedValue)
+      }}
     />
   )
 }
