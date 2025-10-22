@@ -6709,13 +6709,13 @@ components:
             configuration:
               type: object
               properties:
-                formProjection:
-                  type: object
-                  additionalProperties:
+                pickParams:
+                  type: array
+                  items:
                     type: string
-                  description: Projection of the field value after parsing the query string, the
-                    property will be ignored if the item is not present in
-                    querystring
+                  description: List of query parameters to read from the URL
+              required:
+                - pickParams
           required:
             - id
             - label

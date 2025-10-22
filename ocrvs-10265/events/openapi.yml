@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: a150e920-9109-4ef0-b6d2-29f12f0ad078
+                transactionId: f0d19d39-f5c7-4e04-94df-f8c79cd9bd7e
                 type: birth
       responses:
         "200":
@@ -737,7 +737,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: c6445d86-4845-4dd4-8a1c-fe93822baf94
+                transactionId: b31b1e91-5dda-429c-9f20-af4a20d685f0
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9760,13 +9760,13 @@ components:
             configuration:
               type: object
               properties:
-                formProjection:
-                  type: object
-                  additionalProperties:
+                pickParams:
+                  type: array
+                  items:
                     type: string
-                  description: Projection of the field value after parsing the query string, the
-                    property will be ignored if the item is not present in
-                    querystring
+                  description: List of query parameters to read from the URL
+              required:
+                - pickParams
           required:
             - id
             - label
