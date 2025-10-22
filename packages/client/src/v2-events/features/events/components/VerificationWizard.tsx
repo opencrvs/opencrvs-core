@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { VerificationPageConfig } from '@opencrvs/commons/client'
+import { EventState, VerificationPageConfig } from '@opencrvs/commons/client'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
 import {
   ResponsiveModal,
@@ -45,11 +45,10 @@ export const VerificationWizard = ({
   onNextPage,
   onPreviousPage,
   showReviewButton,
-  pageConfig,
-  onVerifyAction
+  pageConfig
 }: FormWizardProps & {
   pageConfig: VerificationPageConfig
-  onVerifyAction: (val: boolean) => void
+  onNextPage: (values: EventState) => void
 }) => {
   const intl = useIntl()
   const [cancelModal, openCancelModal] = useModal()
@@ -71,9 +70,8 @@ export const VerificationWizard = ({
             key="confirm"
             type="primary"
             onClick={() => {
-              onVerifyAction(false)
               close()
-              return onNextPage()
+              return onNextPage({ [pageConfig.id]: false })
             }}
           >
             {intl.formatMessage(messages.confirm)}
@@ -112,10 +110,7 @@ export const VerificationWizard = ({
               role="button"
               size="large"
               type="positive"
-              onClick={() => {
-                onVerifyAction(true)
-                onNextPage()
-              }}
+              onClick={() => onNextPage({ [pageConfig.id]: true })}
             >
               <Check color="white" />
               {intl.formatMessage(pageConfig.actions.verify.label)}
