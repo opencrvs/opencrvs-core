@@ -33,10 +33,7 @@ export const TeamPageStory: Story = {
     userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
-      initialPath:
-        ROUTES.V2.path +
-        V1_LEGACY_ROUTES.TEAM_USER_LIST +
-        `?locationId=${locationId}`
+      initialPath: V1_LEGACY_ROUTES.TEAM_USER_LIST + `?locationId=${locationId}`
     }
   }
 }
