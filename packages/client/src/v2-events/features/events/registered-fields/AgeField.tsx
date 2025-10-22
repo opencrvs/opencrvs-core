@@ -38,6 +38,7 @@ function AgeInput({ asOfDateRef, value, ...props }: AgeInputProps) {
     <TextInputComponent
       {...props}
       data-testid={`age__${props.id}`}
+      maxLength={3}
       value={inputValue}
       onBlur={(e) => {
         props.onChange(inputValue ? { age: inputValue, asOfDate } : undefined)
