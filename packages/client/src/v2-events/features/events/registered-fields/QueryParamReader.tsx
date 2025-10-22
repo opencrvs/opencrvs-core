@@ -30,10 +30,11 @@ function prepareFieldValueFromPickedParams(
 }
 
 function removeParams(params: URLSearchParams, pickParams: string[]) {
+  const updated = new URLSearchParams(params)
   for (const key of pickParams) {
-    params.delete(key)
+    updated.delete(key)
   }
-  return params
+  return updated
 }
 
 function QueryParamReaderInput({

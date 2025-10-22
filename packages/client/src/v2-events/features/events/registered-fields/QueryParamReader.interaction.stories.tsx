@@ -147,29 +147,6 @@ const testHttpFetch = {
   }
 }
 
-const testHttpFetchAfterFormProjection = {
-  id: 'test.http-fetch',
-  type: FieldType.HTTP,
-  label: {
-    defaultMessage: 'Fetch test information',
-    description: 'Fetch test information',
-    id: 'test.http-fetch.label'
-  },
-  configuration: {
-    trigger: field('test.query-param-reader'),
-    url: '/api/test',
-    timeout: 5000,
-    method: 'GET' as const,
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    params: {
-      token: field('test.query-param-reader').get('token'),
-      session: field('test.query-param-reader').get('session')
-    }
-  }
-}
-
 const tokenTextField = {
   id: 'test.token',
   type: FieldType.TEXT,
@@ -340,7 +317,7 @@ export const WithExtraUnpickedParameters: StoryObj<Args> = {
       }
     }
   },
-  play: async ({ canvasElement, step, parameters }) => {
+  play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
     await step('firstname and surname are populated from api', async () => {
       await waitFor(async () => {
