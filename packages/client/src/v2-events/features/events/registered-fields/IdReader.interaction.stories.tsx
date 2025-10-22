@@ -97,7 +97,9 @@ const fields = [
       description:
         'This is the label for the query param reader field - usually this is hidden'
     },
-    configuration: {}
+    configuration: {
+      pickParams: ['nid-reverse']
+    }
   },
   {
     id: 'storybook.verify-nid-http-fetch',
