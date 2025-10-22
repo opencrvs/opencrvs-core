@@ -44,11 +44,20 @@ function getFormattedValue(
   time: { hh: string; mm: string },
   use12HourFormat: boolean,
   amPm?: string | null
-) {
-  const formattedHours = time.hh.padStart(2, '0')
-  return use12HourFormat
-    ? `${formattedHours}:${time.mm.padStart(2, '0')} ${amPm}`
-    : `${formattedHours}:${time.mm.padStart(2, '0')}`
+): string {
+  let hours = parseInt(time.hh, 10)
+
+  // Convert 12-hour format to 24-hour format
+  if (use12HourFormat && amPm) {
+    if (amPm === 'AM' && hours === 12) {
+      hours = 0
+    } else if (amPm === 'PM' && hours !== 12) {
+      hours += 12
+    }
+  }
+
+  const formattedHours = hours.toString().padStart(2, '0')
+  return `${formattedHours}:${time.mm.padStart(2, '0')}`
 }
 
 function isValidMinutes(minutes: string) {
@@ -94,9 +103,9 @@ function TimeInput12(props: ITimeFieldProps) {
 
   React.useEffect(() => {
     function getInitialState(time: string): IState {
-      const [hh, mm, meridiem] = time.split(/[:\s]/)
+      const [hh, mm] = time.split(':')
 
-      setAmPm(meridiem)
+      setAmPm(parseInt(hh, 10) >= 12 ? 'PM' : 'AM')
 
       return { hh: hh || '', mm: mm || '' }
     }
