@@ -20078,15 +20078,13 @@ components:
             configuration:
               type: object
               properties:
-                formProjection:
-                  description: Projection of the field value after parsing the query string, the
-                    property will be ignored if the item is not present in
-                    querystring
-                  type: object
-                  propertyNames:
+                pickParams:
+                  description: List of query parameters to read from the URL
+                  type: array
+                  items:
                     type: string
-                  additionalProperties:
-                    type: string
+              required:
+                - pickParams
               additionalProperties: false
           required:
             - id
