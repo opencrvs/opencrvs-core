@@ -19,7 +19,7 @@ import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
-import { AgeValue, FieldUpdateValue } from '../events/FieldValue'
+import { AgeValue, FieldUpdateValue, FieldValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
@@ -150,7 +150,7 @@ export function isOnline() {
 
 export function isConditionMet(
   conditional: JSONSchema,
-  values: Record<string, unknown>,
+  values: Record<string, FieldValue>,
   context: ValidatorContext
 ) {
   return validate(conditional, {
@@ -176,7 +176,7 @@ function getConditionalActionsForField(
 
 export function areConditionsMet(
   conditions: FieldConditional[],
-  values: Record<string, unknown>,
+  values: Record<string, FieldValue>,
   context: ValidatorContext
 ) {
   return conditions.every((condition) =>
