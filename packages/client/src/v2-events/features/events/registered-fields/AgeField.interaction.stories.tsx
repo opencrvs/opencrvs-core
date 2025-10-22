@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fn } from '@storybook/test'
+import { expect, fireEvent, fn } from '@storybook/test'
 import { userEvent, waitFor, within } from '@storybook/testing-library'
 import React, { Suspense } from 'react'
 import styled from 'styled-components'
@@ -66,6 +66,8 @@ const fields = [
   } satisfies AgeField
 ]
 
+export const Foo = {}
+
 export const AgeFieldInteractionLeadingZero: StoryObj<
   typeof FormFieldGenerator
 > = {
@@ -89,9 +91,9 @@ export const AgeFieldInteractionLeadingZero: StoryObj<
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 
-    const ageInput = await canvas.findByTestId('number__storybook____age')
+    const ageInput = await canvas.findByTestId('age__storybook____age')
     await userEvent.clear(ageInput)
-    await userEvent.type(ageInput, '0020')
+    await fireEvent.change(ageInput, { target: { value: '0020' } })
     ageInput.blur()
     await expect(ageInput).toHaveValue(20)
     await userEvent.click(ageInput)
@@ -120,7 +122,7 @@ export const AgeFieldInteractionDecimal: StoryObj<typeof FormFieldGenerator> = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 
-    const ageInput = await canvas.findByTestId('number__storybook____age')
+    const ageInput = await canvas.findByTestId('age__storybook____age')
     await userEvent.clear(ageInput)
     await userEvent.type(ageInput, '12.6')
     ageInput.blur()
@@ -153,7 +155,7 @@ export const AgeFieldInteractionExponential: StoryObj<
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 
-    const ageInput = await canvas.findByTestId('number__storybook____age')
+    const ageInput = await canvas.findByTestId('age__storybook____age')
     await userEvent.clear(ageInput)
     await userEvent.type(ageInput, '1e2')
     ageInput.blur()
@@ -182,7 +184,7 @@ export const AgeFieldInteractionSmaller: StoryObj<typeof FormFieldGenerator> = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 
-    const ageInput = await canvas.findByTestId('number__storybook____age')
+    const ageInput = await canvas.findByTestId('age__storybook____age')
     await userEvent.clear(ageInput)
     await userEvent.type(ageInput, '10')
     ageInput.blur()
@@ -216,7 +218,7 @@ export const AgeFieldInteractionGreater: StoryObj<typeof FormFieldGenerator> = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 
-    const ageInput = await canvas.findByTestId('number__storybook____age')
+    const ageInput = await canvas.findByTestId('age__storybook____age')
     await userEvent.clear(ageInput)
     await userEvent.type(ageInput, '150')
     ageInput.blur()
@@ -250,7 +252,7 @@ export const AgeFieldInteractionEmpty: StoryObj<typeof FormFieldGenerator> = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 
-    const ageInput = await canvas.findByTestId('number__storybook____age')
+    const ageInput = await canvas.findByTestId('age__storybook____age')
     await userEvent.clear(ageInput)
     await userEvent.click(ageInput)
     ageInput.blur()
@@ -279,7 +281,7 @@ export const AgeFieldInteractionDigits: StoryObj<typeof FormFieldGenerator> = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 
-    const ageInput = await canvas.findByTestId('number__storybook____age')
+    const ageInput = await canvas.findByTestId('age__storybook____age')
     await userEvent.clear(ageInput)
     await userEvent.type(ageInput, '12345')
     ageInput.blur()
