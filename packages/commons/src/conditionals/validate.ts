@@ -459,7 +459,7 @@ export function runStructuralValidations({
  * @returns The reference date string in YYYY-MM-DD format, or undefined if not applicable.
  */
 function getAgeFieldReferenceDate(field: FieldConfig, values: EventState) {
-  if (field.type !== FieldType.AGE || !field.configuration?.asOfDate) {
+  if (field.type !== FieldType.AGE) {
     return undefined
   }
 
