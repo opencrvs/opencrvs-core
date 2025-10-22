@@ -25,7 +25,7 @@ const meta: Meta<typeof FormFieldGenerator> = {
   decorators: [
     (Story, context) => (
       <TRPCProvider>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div>{'Loading...'}</div>}>
           <Story {...context} />
         </Suspense>
       </TRPCProvider>
