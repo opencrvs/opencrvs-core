@@ -12,11 +12,10 @@ import * as React from 'react'
 import { Number, NumberInputProps } from './Number'
 
 interface AgeInputProps extends Omit<NumberInputProps, 'min' | 'onChange'> {
-  asOfDateRef: string
   onChange(val: number | undefined): void
 }
 
-function AgeInput({ asOfDateRef, ...props }: AgeInputProps) {
+function AgeInput(props: AgeInputProps) {
   return (
     <Number.Input
       {...props}
