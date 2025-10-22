@@ -66,8 +66,6 @@ const fields = [
   } satisfies AgeField
 ]
 
-export const Foo = {}
-
 export const AgeFieldInteractionLeadingZero: StoryObj<
   typeof FormFieldGenerator
 > = {
@@ -95,7 +93,7 @@ export const AgeFieldInteractionLeadingZero: StoryObj<
     await userEvent.clear(ageInput)
     await fireEvent.change(ageInput, { target: { value: '0020' } })
     ageInput.blur()
-    await expect(ageInput).toHaveValue(20)
+    await expect(ageInput).toHaveValue('20')
     await userEvent.click(ageInput)
     ageInput.blur()
   }
@@ -126,7 +124,7 @@ export const AgeFieldInteractionDecimal: StoryObj<typeof FormFieldGenerator> = {
     await userEvent.clear(ageInput)
     await userEvent.type(ageInput, '12.6')
     ageInput.blur()
-    await expect(ageInput).toHaveValue(126)
+    await expect(ageInput).toHaveValue('126')
     await userEvent.click(ageInput)
     ageInput.blur()
   }
@@ -159,7 +157,7 @@ export const AgeFieldInteractionExponential: StoryObj<
     await userEvent.clear(ageInput)
     await userEvent.type(ageInput, '1e2')
     ageInput.blur()
-    await expect(ageInput).toHaveValue(12)
+    await expect(ageInput).toHaveValue('12')
   }
 }
 
@@ -188,7 +186,7 @@ export const AgeFieldInteractionSmaller: StoryObj<typeof FormFieldGenerator> = {
     await userEvent.clear(ageInput)
     await userEvent.type(ageInput, '10')
     ageInput.blur()
-    await expect(ageInput).toHaveValue(10)
+    await expect(ageInput).toHaveValue('10')
     await userEvent.click(ageInput)
     ageInput.blur()
     await expect(
@@ -222,7 +220,7 @@ export const AgeFieldInteractionGreater: StoryObj<typeof FormFieldGenerator> = {
     await userEvent.clear(ageInput)
     await userEvent.type(ageInput, '150')
     ageInput.blur()
-    await expect(ageInput).toHaveValue(150)
+    await expect(ageInput).toHaveValue('150')
     await userEvent.click(ageInput)
     ageInput.blur()
     await expect(
@@ -285,6 +283,6 @@ export const AgeFieldInteractionDigits: StoryObj<typeof FormFieldGenerator> = {
     await userEvent.clear(ageInput)
     await userEvent.type(ageInput, '12345')
     ageInput.blur()
-    await expect(ageInput).toHaveValue(123)
+    await expect(ageInput).toHaveValue('123')
   }
 }
