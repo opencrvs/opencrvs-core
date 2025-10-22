@@ -144,7 +144,10 @@ function HttpInput({
     }
 
     // 2) trigger on following mounts if the value tracked changes
-    if (!isEqual(parentValue, prevParentRef.current)) {
+    if (
+      !isEqual(parentValue, prevParentRef.current) &&
+      parentValue !== undefined
+    ) {
       prevParentRef.current = parentValue
       mutation.mutate()
     }
