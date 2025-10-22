@@ -192,7 +192,6 @@ function mapFieldTypeToMockValue(
     case FieldType.NAME:
       return generateRandomName(rng)
     case FieldType.NUMBER:
-    case FieldType.AGE:
       return 19
     case FieldType.BUTTON:
       return 1
@@ -215,6 +214,11 @@ function mapFieldTypeToMockValue(
       }
     case FieldType.DATE:
       return '2021-01-01'
+    case FieldType.AGE:
+      return {
+        age: 19,
+        asOfDateRef: 'applicant.dob'
+      }
     case FieldType.TIME:
       return '09:33'
     case FieldType.ALPHA_PRINT_BUTTON:

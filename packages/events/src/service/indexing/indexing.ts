@@ -14,6 +14,7 @@ import { z } from 'zod'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
+  AgeValue,
   AddressFieldValue,
   EventConfig,
   EventDocument,
@@ -84,7 +85,6 @@ function mapFieldTypeToElasticsearch(
 ): estypes.MappingProperty {
   switch (field.type) {
     case FieldType.NUMBER:
-    case FieldType.AGE:
       return { type: 'double' }
     case FieldType.DATE:
       return { type: 'date' }
@@ -140,6 +140,16 @@ function mapFieldTypeToElasticsearch(
       return {
         type: 'object',
         properties: addressProperties
+      }
+    case FieldType.AGE:
+      return {
+        type: 'object',
+        properties: {
+          age: { type: 'double' },
+          asOfDateRef: { type: 'keyword' }
+        } satisfies {
+          [K in keyof AgeValue]: estypes.MappingProperty
+        }
       }
     case FieldType.SIGNATURE:
     case FieldType.FILE:

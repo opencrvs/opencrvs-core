@@ -66,7 +66,8 @@ import {
   SelectDateRangeValue,
   TimeValue,
   ButtonFieldValue,
-  VerificationStatusValue
+  VerificationStatusValue,
+  AgeValue
 } from './FieldValue'
 
 import { FullDocumentPath } from '../documents'
@@ -110,6 +111,9 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.DATE:
       schema = DateValue
       break
+    case FieldType.AGE:
+      schema = AgeValue
+      break
     case FieldType.TIME:
       schema = TimeValue
       break
@@ -143,7 +147,6 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       schema = required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
-    case FieldType.AGE:
       schema = NumberFieldValue
       break
     case FieldType.CHECKBOX:
@@ -277,7 +280,7 @@ export const isDateFieldType = (field: {
 export const isAgeFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: number | undefined; config: AgeField } => {
+}): field is { value: AgeValue | undefined; config: AgeField } => {
   return field.config.type === FieldType.AGE
 }
 

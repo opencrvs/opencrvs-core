@@ -19,7 +19,12 @@ import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
-import { DateValue, FieldUpdateValue, FieldValue } from '../events/FieldValue'
+import {
+  DateValue,
+  FieldUpdateValue,
+  FieldValue,
+  AgeValue
+} from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
@@ -119,17 +124,14 @@ ajv.addKeyword({
   }
 })
 
-export function validate(
-  schema: JSONSchema,
-  data: ConditionalParameters,
-  isAgeField = false
-) {
+export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
   if ('$form' in data) {
     data.$form = Object.fromEntries(
       Object.entries(data.$form).map(([key, value]) => {
-        if (isAgeField) {
-          const age = value as number
+        const maybeAgeValue = AgeValue.safeParse(value)
+        if (maybeAgeValue.success) {
+          const age = maybeAgeValue.data.age
           return [
             key,
             {
@@ -386,16 +388,14 @@ export type CustomZodToIntlErrorMap = {
  */
 function runCustomFieldValidations({
   field,
-  conditionalParameters,
-  isAgeField
+  conditionalParameters
 }: {
   field: FieldConfig
   conditionalParameters: ConditionalParameters
-  isAgeField: boolean
 }) {
   return (field.validation ?? [])
     .filter((validation) => {
-      return !validate(validation.validator, conditionalParameters, isAgeField)
+      return !validate(validation.validator, conditionalParameters)
     })
     .map((validation) => ({ message: validation.message }))
 }
@@ -508,8 +508,7 @@ export function runFieldValidations({
 
   const customValidationResults = runCustomFieldValidations({
     field,
-    conditionalParameters,
-    isAgeField: field.type === FieldType.AGE
+    conditionalParameters
   })
 
   // Assumes that custom validation errors are based on the field type, and extend the validation.

@@ -290,7 +290,8 @@ export const GeneratedInputField = React.memo(
         >
           <AgeField.Input
             {...inputProps}
-            value={field.value}
+            asOfDateRef={field.config.configuration.asOfDate.$$field}
+            value={field.value?.age}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
         </InputField>

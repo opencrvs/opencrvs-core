@@ -322,12 +322,11 @@ describe('age asDob comparisons', () => {
         {
           ...getFieldParams({
             // dob is 1970-01-01
-            'applicant.age': 20
+            'applicant.age': { age: 20, asOfDateRef: 'some.field' }
           }),
           $now: '1990-01-01',
           $ageFieldReferenceDate: '1990-01-01'
-        },
-        true
+        }
       )
     ).toBe(true)
 
@@ -341,12 +340,11 @@ describe('age asDob comparisons', () => {
         {
           ...getFieldParams({
             // dob is 1973-01-01
-            'applicant.age': 17
+            'applicant.age': { age: 17, asOfDateRef: 'some.field' }
           }),
           $now: '1990-01-01',
           $ageFieldReferenceDate: '1990-01-01'
-        },
-        true
+        }
       )
     ).toBe(false)
   })
@@ -362,12 +360,11 @@ describe('age asDob comparisons', () => {
         {
           ...getFieldParams({
             // dob is 1973-01-01
-            'applicant.age': 17
+            'applicant.age': { age: 17, asOfDateRef: 'some.field' }
           }),
           $now: '1990-01-01',
           $ageFieldReferenceDate: '1990-01-01'
-        },
-        true
+        }
       )
     ).toBe(true)
 
@@ -381,77 +378,60 @@ describe('age asDob comparisons', () => {
         {
           ...getFieldParams({
             // dob is 1971-01-01
-            'applicant.age': 19
+            'applicant.age': { age: 19, asOfDateRef: 'some.field' }
           }),
           $now: '1990-01-01',
           $ageFieldReferenceDate: '1990-01-01'
-        },
-        true
+        }
       )
     ).toBe(false)
   })
 
   it('validates comparisons where dob from age field is expected to be after a certain date', () => {
     expect(
-      validate(
-        field('applicant.age').asDob().isAfter().date('1970-01-01'),
-        {
-          ...getFieldParams({
-            // dob is 1973-01-01
-            'applicant.age': 17
-          }),
-          $now: '1990-01-01',
-          $ageFieldReferenceDate: '1990-01-01'
-        },
-        true
-      )
+      validate(field('applicant.age').asDob().isAfter().date('1970-01-01'), {
+        ...getFieldParams({
+          // dob is 1973-01-01
+          'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01',
+        $ageFieldReferenceDate: '1990-01-01'
+      })
     ).toBe(true)
 
     expect(
-      validate(
-        field('applicant.age').asDob().isAfter().date('1970-01-01'),
-        {
-          ...getFieldParams({
-            // dob is 1963-01-01
-            'applicant.age': 27
-          }),
-          $now: '1990-01-01',
-          $ageFieldReferenceDate: '1990-01-01'
-        },
-        true
-      )
+      validate(field('applicant.age').asDob().isAfter().date('1970-01-01'), {
+        ...getFieldParams({
+          // dob is 1963-01-01
+          'applicant.age': { age: 27, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01',
+        $ageFieldReferenceDate: '1990-01-01'
+      })
     ).toBe(false)
   })
 
   it('validates comparisons where dob from age field is expected to be before a certain date', () => {
     expect(
-      validate(
-        field('applicant.age').asDob().isBefore().date('1980-01-01'),
-        {
-          ...getFieldParams({
-            // dob is 1973-01-01
-            'applicant.age': 17
-          }),
-          $now: '1990-01-01',
-          $ageFieldReferenceDate: '1990-01-01'
-        },
-        true
-      )
+      validate(field('applicant.age').asDob().isBefore().date('1980-01-01'), {
+        ...getFieldParams({
+          // dob is 1973-01-01
+          'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01',
+        $ageFieldReferenceDate: '1990-01-01'
+      })
     ).toBe(true)
 
     expect(
-      validate(
-        field('applicant.age').asDob().isBefore().date('1970-01-01'),
-        {
-          ...getFieldParams({
-            // dob is 1973-01-01
-            'applicant.age': 17
-          }),
-          $now: '1990-01-01',
-          $ageFieldReferenceDate: '1990-01-01'
-        },
-        true
-      )
+      validate(field('applicant.age').asDob().isBefore().date('1970-01-01'), {
+        ...getFieldParams({
+          // dob is 1973-01-01
+          'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01',
+        $ageFieldReferenceDate: '1990-01-01'
+      })
     ).toBe(false)
   })
 })
@@ -462,9 +442,8 @@ describe('age asAge comparisons', () => {
       validate(
         field('applicant.age').asAge().isEqualTo(20),
         getFieldParams({
-          'applicant.age': 20
-        }),
-        true
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' }
+        })
       )
     ).toBe(true)
 
@@ -472,9 +451,8 @@ describe('age asAge comparisons', () => {
       validate(
         field('applicant.age').asAge().isEqualTo(20),
         getFieldParams({
-          'applicant.age': 22
-        }),
-        true
+          'applicant.age': { age: 22, asOfDateRef: 'some.field' }
+        })
       )
     ).toBe(false)
   })
@@ -484,10 +462,9 @@ describe('age asAge comparisons', () => {
       validate(
         field('applicant.age').asAge().isEqualTo(field('referrer.age').asAge()),
         getFieldParams({
-          'applicant.age': 20,
-          'referrer.age': 20
-        }),
-        true
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' },
+          'referrer.age': { age: 20, asOfDateRef: 'some.field' }
+        })
       )
     ).toBe(true)
 
@@ -495,10 +472,9 @@ describe('age asAge comparisons', () => {
       validate(
         field('applicant.age').asAge().isEqualTo(field('referrer.age').asAge()),
         getFieldParams({
-          'applicant.age': 20,
-          'referrer.age': 25
-        }),
-        true
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' },
+          'referrer.age': { age: 25, asOfDateRef: 'some.field' }
+        })
       )
     ).toBe(false)
   })
@@ -508,9 +484,8 @@ describe('age asAge comparisons', () => {
       validate(
         field('applicant.age').asAge().isLessThan(25),
         getFieldParams({
-          'applicant.age': 20
-        }),
-        true
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' }
+        })
       )
     ).toBe(true)
 
@@ -518,9 +493,8 @@ describe('age asAge comparisons', () => {
       validate(
         field('applicant.age').asAge().isLessThan(25),
         getFieldParams({
-          'applicant.age': 30
-        }),
-        true
+          'applicant.age': { age: 30, asOfDateRef: 'some.field' }
+        })
       )
     ).toBe(false)
   })
@@ -532,10 +506,9 @@ describe('age asAge comparisons', () => {
           .asAge()
           .isLessThan(field('referrer.age').asAge()),
         getFieldParams({
-          'applicant.age': 20,
-          'referrer.age': 22
-        }),
-        true
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' },
+          'referrer.age': { age: 22, asOfDateRef: 'some.field' }
+        })
       )
     ).toBe(true)
 
@@ -545,10 +518,9 @@ describe('age asAge comparisons', () => {
           .asAge()
           .isLessThan(field('referrer.age').asAge()),
         getFieldParams({
-          'applicant.age': 20,
-          'referrer.age': 18
-        }),
-        true
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' },
+          'referrer.age': { age: 18, asOfDateRef: 'some.field' }
+        })
       )
     ).toBe(false)
   })
@@ -558,9 +530,8 @@ describe('age asAge comparisons', () => {
       validate(
         field('applicant.age').asAge().isBetween(16, 25),
         getFieldParams({
-          'applicant.age': 20
-        }),
-        true
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' }
+        })
       )
     ).toBe(true)
 
@@ -568,9 +539,8 @@ describe('age asAge comparisons', () => {
       validate(
         field('applicant.age').asAge().isBetween(16, 25),
         getFieldParams({
-          'applicant.age': 30
-        }),
-        true
+          'applicant.age': { age: 30, asOfDateRef: 'some.field' }
+        })
       )
     ).toBe(false)
   })

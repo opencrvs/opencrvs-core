@@ -9,10 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
+import { AgeValue } from '@opencrvs/commons/client'
 import { Number, NumberInputProps } from './Number'
 
 interface AgeInputProps extends Omit<NumberInputProps, 'min' | 'onChange'> {
-  onChange(val: number | undefined): void
+  onChange(val: AgeValue | undefined): void
+  asOfDateRef: string
 }
 
 function AgeInput(props: AgeInputProps) {
@@ -21,12 +23,16 @@ function AgeInput(props: AgeInputProps) {
       {...props}
       data-testid={`age__${props.id}`}
       min={0}
-      onChange={props.onChange}
+      onChange={(newAge) =>
+        newAge === undefined
+          ? undefined
+          : { age: newAge, asOfDateRef: props.asOfDateRef }
+      }
     />
   )
 }
 
 export const AgeField = {
   Input: AgeInput,
-  Output: ({ value }: { value?: number }) => value?.toString() ?? ''
+  Output: ({ value }: { value?: AgeValue }) => value?.age ?? ''
 }
