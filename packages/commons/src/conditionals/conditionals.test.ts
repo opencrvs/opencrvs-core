@@ -324,8 +324,7 @@ describe('age asDob comparisons', () => {
             // dob is 1970-01-01
             'applicant.age': { age: 20, asOfDateRef: 'some.field' }
           }),
-          $now: '1990-01-01',
-          $ageFieldReferenceDate: '1990-01-01'
+          $now: '1990-01-01'
         }
       )
     ).toBe(true)
@@ -342,8 +341,7 @@ describe('age asDob comparisons', () => {
             // dob is 1973-01-01
             'applicant.age': { age: 17, asOfDateRef: 'some.field' }
           }),
-          $now: '1990-01-01',
-          $ageFieldReferenceDate: '1990-01-01'
+          $now: '1990-01-01'
         }
       )
     ).toBe(false)
@@ -362,8 +360,7 @@ describe('age asDob comparisons', () => {
             // dob is 1973-01-01
             'applicant.age': { age: 17, asOfDateRef: 'some.field' }
           }),
-          $now: '1990-01-01',
-          $ageFieldReferenceDate: '1990-01-01'
+          $now: '1990-01-01'
         }
       )
     ).toBe(true)
@@ -380,8 +377,7 @@ describe('age asDob comparisons', () => {
             // dob is 1971-01-01
             'applicant.age': { age: 19, asOfDateRef: 'some.field' }
           }),
-          $now: '1990-01-01',
-          $ageFieldReferenceDate: '1990-01-01'
+          $now: '1990-01-01'
         }
       )
     ).toBe(false)
@@ -394,8 +390,7 @@ describe('age asDob comparisons', () => {
           // dob is 1973-01-01
           'applicant.age': { age: 17, asOfDateRef: 'some.field' }
         }),
-        $now: '1990-01-01',
-        $ageFieldReferenceDate: '1990-01-01'
+        $now: '1990-01-01'
       })
     ).toBe(true)
 
@@ -405,8 +400,7 @@ describe('age asDob comparisons', () => {
           // dob is 1963-01-01
           'applicant.age': { age: 27, asOfDateRef: 'some.field' }
         }),
-        $now: '1990-01-01',
-        $ageFieldReferenceDate: '1990-01-01'
+        $now: '1990-01-01'
       })
     ).toBe(false)
   })
@@ -418,8 +412,7 @@ describe('age asDob comparisons', () => {
           // dob is 1973-01-01
           'applicant.age': { age: 17, asOfDateRef: 'some.field' }
         }),
-        $now: '1990-01-01',
-        $ageFieldReferenceDate: '1990-01-01'
+        $now: '1990-01-01'
       })
     ).toBe(true)
 
@@ -429,9 +422,62 @@ describe('age asDob comparisons', () => {
           // dob is 1973-01-01
           'applicant.age': { age: 17, asOfDateRef: 'some.field' }
         }),
-        $now: '1990-01-01',
-        $ageFieldReferenceDate: '1990-01-01'
+        $now: '1990-01-01'
       })
+    ).toBe(false)
+  })
+
+  it('validates comparisons where dob from age field is expected to be before dob from another age field', () => {
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isBefore()
+          .date(field('referrer.age').asDob()),
+        {
+          ...getFieldParams({
+            // dob is 1973-01-01
+            'applicant.age': {
+              age: 17,
+              asOfDateRef: 'reference.dob.one'
+            },
+            // dob is 1970-01-01
+            'referrer.age': {
+              age: 20,
+              asOfDateRef: 'reference.dob.two'
+            },
+            'reference.dob.one': '1990-01-01',
+            'reference.dob.two': '1995-01-01'
+          }),
+          $now: '1990-01-01'
+        }
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isBefore()
+          .date(field('referrer.age').asDob()),
+        {
+          ...getFieldParams({
+            // dob is 1973-01-01
+            'applicant.age': {
+              age: 17,
+              asOfDateRef: 'reference.dob.one'
+            },
+            // dob is 1970-01-01
+            'referrer.age': {
+              age: 25,
+              asOfDateRef: 'reference.dob.two'
+            },
+            'reference.dob.one': '1990-01-01',
+            'reference.dob.two': '1995-01-01'
+          }),
+          $now: '1990-01-01'
+        }
+      )
     ).toBe(false)
   })
 })
@@ -541,60 +587,6 @@ describe('age asAge comparisons', () => {
         getFieldParams({
           'applicant.age': { age: 30, asOfDateRef: 'some.field' }
         })
-      )
-    ).toBe(false)
-  })
-
-  it('validates comparisons where dob from age field is expected to be before dob from another age field', () => {
-    expect(
-      validate(
-        field('applicant.age')
-          .asDob()
-          .isBefore()
-          .date(field('referrer.age').asDob()),
-        {
-          ...getFieldParams({
-            // dob is 1973-01-01
-            'applicant.age': {
-              age: 17,
-              asOfDateRef: 'reference.dob.one'
-            },
-            // dob is 1970-01-01
-            'referrer.age': {
-              age: 20,
-              asOfDateRef: 'reference.dob.two'
-            },
-            'reference.dob.one': '1990-01-01',
-            'reference.dob.two': '1995-01-01'
-          }),
-          $now: '1990-01-01'
-        }
-      )
-    ).toBe(true)
-
-    expect(
-      validate(
-        field('applicant.age')
-          .asDob()
-          .isBefore()
-          .date(field('referrer.age').asDob()),
-        {
-          ...getFieldParams({
-            // dob is 1973-01-01
-            'applicant.age': {
-              age: 17,
-              asOfDateRef: 'reference.dob.one'
-            },
-            // dob is 1970-01-01
-            'referrer.age': {
-              age: 25,
-              asOfDateRef: 'reference.dob.two'
-            },
-            'reference.dob.one': '1990-01-01',
-            'reference.dob.two': '1995-01-01'
-          }),
-          $now: '1990-01-01'
-        }
       )
     ).toBe(false)
   })
