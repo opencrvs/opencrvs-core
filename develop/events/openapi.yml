@@ -195,8 +195,100 @@ paths:
                                             - range
                                             - within
                                           description: Determines the search type of field. How to match value.
+                                        searchFields:
+                                          type: array
+                                          items:
+                                            type: string
+                                          description: "
+
+                                            \      Defines multiple form fields
+                                            that should be searched when this
+                                            field has a value.
+
+                                            \      All specified fields will be
+                                            combined using OR logic.
+
+
+                                            \      Example: { searchFields:
+                                            ['mother.name', 'father.name',
+                                            'informant.name'] }
+
+                                            \      Will search all fields and
+                                            return a record if any of the fields
+                                            match the search value.    \ 
+
+                                            \      "
                                       required:
                                         - type
+                                    type:
+                                      type: string
+                                      enum:
+                                        - NAME
+                                        - PHONE
+                                        - ID
+                                        - ADDRESS
+                                        - TEXT
+                                        - NUMBER
+                                        - TEXTAREA
+                                        - EMAIL
+                                        - DATE
+                                        - AGE
+                                        - DATE_RANGE
+                                        - SELECT_DATE_RANGE
+                                        - TIME
+                                        - PARAGRAPH
+                                        - PAGE_HEADER
+                                        - RADIO_GROUP
+                                        - FILE
+                                        - FILE_WITH_OPTIONS
+                                        - BULLET_LIST
+                                        - CHECKBOX
+                                        - SELECT
+                                        - COUNTRY
+                                        - LOCATION
+                                        - DIVIDER
+                                        - ADMINISTRATIVE_AREA
+                                        - FACILITY
+                                        - OFFICE
+                                        - SIGNATURE
+                                        - DATA
+                                        - BUTTON
+                                        - ALPHA_PRINT_BUTTON
+                                        - HTTP
+                                        - LINK_BUTTON
+                                        - VERIFICATION_STATUS
+                                        - QUERY_PARAM_READER
+                                        - QR_READER
+                                        - ID_READER
+                                        - LOADER
+                                      description: "
+
+                                        \      Explicitly specify the field type
+                                        for searchFields.
+
+                                        \      This is required when
+                                        searchFields is defined, to show the
+                                        correct control in the UI.
+
+                                        \       \ 
+
+                                        \      Example: FieldType.NAME for name
+                                        fields, FieldType.TEXT for text fields,
+                                        FieldType.DATE for date fields, etc.
+
+                                        \      "
+                                    label:
+                                      description: "
+
+                                        \      Explicitly specify the label for
+                                        searchFields.
+
+                                        \      This is required when
+                                        searchFields is defined.           \ 
+
+                                        \      "
+                                      allOf:
+                                        - $ref: "#/components/schemas/TranslationConfig"
                                     options:
                                       type: array
                                       items:
@@ -354,8 +446,100 @@ paths:
                                           type: string
                                           enum: *a2
                                           description: Determines the search type of field. How to match value.
+                                        searchFields:
+                                          type: array
+                                          items:
+                                            type: string
+                                          description: "
+
+                                            \      Defines multiple form fields
+                                            that should be searched when this
+                                            field has a value.
+
+                                            \      All specified fields will be
+                                            combined using OR logic.
+
+
+                                            \      Example: { searchFields:
+                                            ['mother.name', 'father.name',
+                                            'informant.name'] }
+
+                                            \      Will search all fields and
+                                            return a record if any of the fields
+                                            match the search value.    \ 
+
+                                            \      "
                                       required:
                                         - type
+                                    type:
+                                      type: string
+                                      enum:
+                                        - NAME
+                                        - PHONE
+                                        - ID
+                                        - ADDRESS
+                                        - TEXT
+                                        - NUMBER
+                                        - TEXTAREA
+                                        - EMAIL
+                                        - DATE
+                                        - AGE
+                                        - DATE_RANGE
+                                        - SELECT_DATE_RANGE
+                                        - TIME
+                                        - PARAGRAPH
+                                        - PAGE_HEADER
+                                        - RADIO_GROUP
+                                        - FILE
+                                        - FILE_WITH_OPTIONS
+                                        - BULLET_LIST
+                                        - CHECKBOX
+                                        - SELECT
+                                        - COUNTRY
+                                        - LOCATION
+                                        - DIVIDER
+                                        - ADMINISTRATIVE_AREA
+                                        - FACILITY
+                                        - OFFICE
+                                        - SIGNATURE
+                                        - DATA
+                                        - BUTTON
+                                        - ALPHA_PRINT_BUTTON
+                                        - HTTP
+                                        - LINK_BUTTON
+                                        - VERIFICATION_STATUS
+                                        - QUERY_PARAM_READER
+                                        - QR_READER
+                                        - ID_READER
+                                        - LOADER
+                                      description: "
+
+                                        \      Explicitly specify the field type
+                                        for searchFields.
+
+                                        \      This is required when
+                                        searchFields is defined, to show the
+                                        correct control in the UI.
+
+                                        \       \ 
+
+                                        \      Example: FieldType.NAME for name
+                                        fields, FieldType.TEXT for text fields,
+                                        FieldType.DATE for date fields, etc.
+
+                                        \      "
+                                    label:
+                                      description: "
+
+                                        \      Explicitly specify the label for
+                                        searchFields.
+
+                                        \      This is required when
+                                        searchFields is defined.           \ 
+
+                                        \      "
+                                      allOf:
+                                        - $ref: "#/components/schemas/TranslationConfig"
                                     options:
                                       type: array
                                       items:
@@ -566,7 +750,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: cfc2bf3a-4aef-4ff4-a5fc-8e88dbea7914
+                transactionId: 1716d84b-d636-414c-a1bd-695e5da4e7b7
                 type: birth
       responses:
         "200":
@@ -1240,7 +1424,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 852868dc-6809-448a-bfc2-ab3fe6bce535
+                transactionId: 8cc07abd-88cb-49e1-ac9d-6b1503690a5b
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -3747,8 +3931,97 @@ components:
                               type: string
                               enum: *a2
                               description: Determines the search type of field. How to match value.
+                            searchFields:
+                              type: array
+                              items:
+                                type: string
+                              description: "
+
+                                \      Defines multiple form fields that should
+                                be searched when this field has a value.
+
+                                \      All specified fields will be combined
+                                using OR logic.
+
+
+                                \      Example: { searchFields: ['mother.name',
+                                'father.name', 'informant.name'] }
+
+                                \      Will search all fields and return a
+                                record if any of the fields match the search
+                                value.    \ 
+
+                                \      "
                           required:
                             - type
+                        type:
+                          type: string
+                          enum:
+                            - NAME
+                            - PHONE
+                            - ID
+                            - ADDRESS
+                            - TEXT
+                            - NUMBER
+                            - TEXTAREA
+                            - EMAIL
+                            - DATE
+                            - AGE
+                            - DATE_RANGE
+                            - SELECT_DATE_RANGE
+                            - TIME
+                            - PARAGRAPH
+                            - PAGE_HEADER
+                            - RADIO_GROUP
+                            - FILE
+                            - FILE_WITH_OPTIONS
+                            - BULLET_LIST
+                            - CHECKBOX
+                            - SELECT
+                            - COUNTRY
+                            - LOCATION
+                            - DIVIDER
+                            - ADMINISTRATIVE_AREA
+                            - FACILITY
+                            - OFFICE
+                            - SIGNATURE
+                            - DATA
+                            - BUTTON
+                            - ALPHA_PRINT_BUTTON
+                            - HTTP
+                            - LINK_BUTTON
+                            - VERIFICATION_STATUS
+                            - QUERY_PARAM_READER
+                            - QR_READER
+                            - ID_READER
+                            - LOADER
+                          description: "
+
+                            \      Explicitly specify the field type for
+                            searchFields.
+
+                            \      This is required when searchFields is
+                            defined, to show the correct control in the UI.
+
+                            \       \ 
+
+                            \      Example: FieldType.NAME for name fields,
+                            FieldType.TEXT for text fields, FieldType.DATE for
+                            date fields, etc.
+
+                            \      "
+                        label:
+                          description: "
+
+                            \      Explicitly specify the label for
+                            searchFields.
+
+                            \      This is required when searchFields is
+                            defined.           \ 
+
+                            \      "
+                          allOf:
+                            - $ref: "#/components/schemas/TranslationConfig"
                         options:
                           type: array
                           items:
@@ -3887,8 +4160,97 @@ components:
                               type: string
                               enum: *a2
                               description: Determines the search type of field. How to match value.
+                            searchFields:
+                              type: array
+                              items:
+                                type: string
+                              description: "
+
+                                \      Defines multiple form fields that should
+                                be searched when this field has a value.
+
+                                \      All specified fields will be combined
+                                using OR logic.
+
+
+                                \      Example: { searchFields: ['mother.name',
+                                'father.name', 'informant.name'] }
+
+                                \      Will search all fields and return a
+                                record if any of the fields match the search
+                                value.    \ 
+
+                                \      "
                           required:
                             - type
+                        type:
+                          type: string
+                          enum:
+                            - NAME
+                            - PHONE
+                            - ID
+                            - ADDRESS
+                            - TEXT
+                            - NUMBER
+                            - TEXTAREA
+                            - EMAIL
+                            - DATE
+                            - AGE
+                            - DATE_RANGE
+                            - SELECT_DATE_RANGE
+                            - TIME
+                            - PARAGRAPH
+                            - PAGE_HEADER
+                            - RADIO_GROUP
+                            - FILE
+                            - FILE_WITH_OPTIONS
+                            - BULLET_LIST
+                            - CHECKBOX
+                            - SELECT
+                            - COUNTRY
+                            - LOCATION
+                            - DIVIDER
+                            - ADMINISTRATIVE_AREA
+                            - FACILITY
+                            - OFFICE
+                            - SIGNATURE
+                            - DATA
+                            - BUTTON
+                            - ALPHA_PRINT_BUTTON
+                            - HTTP
+                            - LINK_BUTTON
+                            - VERIFICATION_STATUS
+                            - QUERY_PARAM_READER
+                            - QR_READER
+                            - ID_READER
+                            - LOADER
+                          description: "
+
+                            \      Explicitly specify the field type for
+                            searchFields.
+
+                            \      This is required when searchFields is
+                            defined, to show the correct control in the UI.
+
+                            \       \ 
+
+                            \      Example: FieldType.NAME for name fields,
+                            FieldType.TEXT for text fields, FieldType.DATE for
+                            date fields, etc.
+
+                            \      "
+                        label:
+                          description: "
+
+                            \      Explicitly specify the label for
+                            searchFields.
+
+                            \      This is required when searchFields is
+                            defined.           \ 
+
+                            \      "
+                          allOf:
+                            - $ref: "#/components/schemas/TranslationConfig"
                         options:
                           type: array
                           items:
@@ -22628,7 +22990,9 @@ components:
         clauses:
           type: array
           items:
-            $ref: "#/components/schemas/QueryExpression"
+            anyOf:
+              - $ref: "#/components/schemas/QueryExpression"
+              - $ref: "#/components/schemas/QueryType"
           minItems: 1
           default:
             - eventType: tennis-club-membership
