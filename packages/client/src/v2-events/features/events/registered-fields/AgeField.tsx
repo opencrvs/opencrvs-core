@@ -9,13 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { useFormikContext } from 'formik'
-import { AgeValue, DateValue, EventState } from '@opencrvs/commons/client'
+import { AgeValue } from '@opencrvs/commons/client'
 import {
   TextInput as TextInputComponent,
   ITextInputProps as TextInputProps
 } from '@opencrvs/components'
-import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 
 interface AgeInputProps extends Omit<TextInputProps, 'min' | 'onChange'> {
   asOfDateRef: string
@@ -23,13 +21,9 @@ interface AgeInputProps extends Omit<TextInputProps, 'min' | 'onChange'> {
   value: number | undefined
 }
 
+const AGE_MAX_CHARACTERS = 3
+
 function AgeInput({ asOfDateRef, value, ...props }: AgeInputProps) {
-  const { values } = useFormikContext<EventState>()
-
-  const asOfDate = DateValue.safeParse(
-    values[makeFormFieldIdFormikCompatible(asOfDateRef)]
-  ).data
-
   const [inputValue, setInputValue] = React.useState(
     value && isNaN(value) ? undefined : value
   )
@@ -38,10 +32,12 @@ function AgeInput({ asOfDateRef, value, ...props }: AgeInputProps) {
     <TextInputComponent
       {...props}
       data-testid={`age__${props.id}`}
-      maxLength={3}
+      maxLength={AGE_MAX_CHARACTERS}
       value={inputValue}
       onBlur={(e) => {
-        props.onChange(inputValue ? { age: inputValue, asOfDate } : undefined)
+        props.onChange(
+          inputValue ? { age: inputValue, asOfDateRef } : undefined
+        )
         props.onBlur?.(e)
       }}
       onChange={(e) => {
@@ -57,5 +53,7 @@ function AgeInput({ asOfDateRef, value, ...props }: AgeInputProps) {
 
 export const AgeField = {
   Input: AgeInput,
-  Output: ({ value }: { value?: AgeValue }) => value?.age ?? ''
+  Output: ({ value }: { value?: AgeValue }) => value?.age ?? '',
+  stringify: (value?: AgeValue) =>
+    value === undefined ? '' : value.age.toString()
 }

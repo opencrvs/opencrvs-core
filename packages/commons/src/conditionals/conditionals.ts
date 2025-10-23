@@ -50,22 +50,21 @@ export function defineFormConditional(schema: Record<string, unknown>) {
   return defineConditional(schemaWithForm)
 }
 
-export type UserConditionalParameters = {
+type CommonConditionalParameters = {
   $now: string
   $online: boolean
+}
+
+export type UserConditionalParameters = CommonConditionalParameters & {
   $user: TokenPayload
 }
-export type EventConditionalParameters = {
-  $now: string
-  $online: boolean
+
+export type EventConditionalParameters = CommonConditionalParameters & {
   $event: EventDocument
 }
-// @TODO: Reconcile which types should be used. The same values are used within form and config. In form values can be undefined, for example.
-export type FormConditionalParameters = {
-  $now: string
-  $online: boolean
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  $form: EventState | Record<string, any>
+
+export type FormConditionalParameters = CommonConditionalParameters & {
+  $form: EventState | Record<string, unknown>
   $locations?: Array<{ id: UUID }>
 }
 
