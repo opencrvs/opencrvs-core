@@ -38,7 +38,7 @@
     "packages/components/.storybook/preview.jsx",
     "packages/components/.storybook/manager-head.html",
     "grafana",
-    "packages/client/storybook-static",
+    "packages/client/public/assets/qr-sample.webm",
     "packages/client/.storybook/preview-head.html",
     "packages/scheduler/start.sh",
     "packages/scheduler/crontab",

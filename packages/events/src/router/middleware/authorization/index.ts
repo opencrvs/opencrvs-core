@@ -13,6 +13,7 @@ import { TRPCError } from '@trpc/server'
 import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import z from 'zod'
+import { findLast } from 'lodash'
 import {
   ActionDocument,
   ActionInputWithType,
@@ -30,11 +31,16 @@ import {
   ConfigurableScopes,
   getAuthorizedEventsFromScopes,
   getTokenPayload,
-  canUserReadEvent
+  canUserReadEvent,
+  hasScope,
+  SCOPES,
+  hasAnyOfScopes
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
+import { getUserOrSystem } from '../../../service/users/api'
+import { isLocationUnderJurisdiction } from '../../../storage/postgres/events/locations'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -190,7 +196,7 @@ export const requireAssignment: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
   TrpcContext,
-  TrpcContext & { isDuplicateAction?: boolean; event: EventDocument },
+  TrpcContext & { existingAction?: ActionDocument; event: EventDocument },
   ActionInputWithType | DeleteActionInput | EventIdParam
 > = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
@@ -220,20 +226,18 @@ export const requireAssignment: MiddlewareFunction<
   }
 
   // Check for duplicate only when we know the user is assigned to the event. Otherwise we will effectively leak the event (allow reading it) to users who are not assigned to it.
-  if (
-    'transactionId' in input &&
-    event.actions.some(
+  if ('transactionId' in input) {
+    const existingAction = findLast(
+      event.actions,
       (action) =>
         action.transactionId === input.transactionId &&
         action.type === input.type
     )
-  ) {
     return next({
-      ctx: { ...ctx, isDuplicateAction: true, event },
+      ctx: { ...ctx, existingAction, event },
       input
     })
   }
-
   return next()
 }
 
@@ -342,4 +346,81 @@ export const userCanReadEvent: MiddlewareFunction<
 
   // Throw not found to avoid leaking the existence of the event
   throw new EventNotFoundError(input)
+}
+
+export const userCanReadOtherUser: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext & { userId: string },
+  { userId: string }
+> = async ({ next, ctx, input }) => {
+  const { token, user: userReading } = ctx
+
+  // Throw early to avoid mistakes in the logic below.
+  // There are test cases for each but better safe than sorry.
+  const hasAnyScope = hasAnyOfScopes(
+    [
+      SCOPES.USER_READ,
+      SCOPES.USER_READ_MY_OFFICE,
+      SCOPES.USER_READ_MY_JURISDICTION,
+      SCOPES.USER_READ_ONLY_MY_AUDIT
+    ],
+    getScopes(token)
+  )
+
+  if (!hasAnyScope) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+
+  const otherUser = await getUserOrSystem(input.userId, token)
+
+  // Don't reveal the existence of the user
+  if (!otherUser) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+
+  // Not supported for system users
+  if (otherUser.type === TokenUserType.Enum.system) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+
+  if (!userReading.primaryOfficeId) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+
+  if (hasScope(token, SCOPES.USER_READ)) {
+    return next()
+  }
+
+  if (
+    inScope(token, [
+      SCOPES.USER_READ_MY_OFFICE,
+      SCOPES.USER_READ_MY_JURISDICTION
+    ]) &&
+    userReading.primaryOfficeId === otherUser.primaryOfficeId
+  ) {
+    return next()
+  }
+
+  const isUnderJurisdiction = await isLocationUnderJurisdiction({
+    jurisdictionLocationId: userReading.primaryOfficeId,
+    locationToSearchId: otherUser.primaryOfficeId
+  })
+
+  if (
+    hasScope(token, SCOPES.USER_READ_MY_JURISDICTION) &&
+    isUnderJurisdiction
+  ) {
+    return next()
+  }
+
+  if (
+    hasScope(token, SCOPES.USER_READ_ONLY_MY_AUDIT) &&
+    userReading.id === otherUser.id
+  ) {
+    return next()
+  }
+
+  throw new TRPCError({ code: 'NOT_FOUND' })
 }

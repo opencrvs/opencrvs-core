@@ -11,6 +11,7 @@
 
 import { hashKey, MutationKey, useMutationState } from '@tanstack/react-query'
 import * as z from 'zod'
+import { TRPCClientError } from '@trpc/client'
 import {
   applyDeclarationToEventIndex,
   getCurrentEventState
@@ -30,6 +31,12 @@ function assignmentMutation(mutationKey: MutationKey) {
     hashKey(trpcOptionsProxy.event.actions.assignment.unassign.mutationKey())
   ].includes(hashKey(mutationKey))
 }
+function hasConflict(error: unknown) {
+  if (error instanceof TRPCClientError) {
+    return error.data.code === 'CONFLICT'
+  }
+  return false
+}
 
 export function useOutbox() {
   const trpc = useTRPC()
@@ -39,6 +46,7 @@ export function useOutbox() {
     filters: {
       predicate: (mutation) =>
         mutation.state.status !== 'success' &&
+        !hasConflict(mutation.state.error) &&
         !assignmentMutation(mutation.options.mutationKey as MutationKey)
     },
     select: (mutation) => mutation

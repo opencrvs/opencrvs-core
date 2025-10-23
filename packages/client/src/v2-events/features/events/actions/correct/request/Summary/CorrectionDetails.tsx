@@ -121,7 +121,7 @@ function buildCorrectionDetails(
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
   const details: CorrectionDetail[] = correctionFormPages
-    .filter((page) => isPageVisible(page, annotation))
+    .filter((page) => isPageVisible(page, annotation, validatorContext))
     .flatMap((page) => {
       if (page.type === PageTypes.enum.VERIFICATION) {
         const value = !!annotation[page.id]
@@ -146,13 +146,7 @@ function buildCorrectionDetails(
         .map((field) => ({
           label: field.label,
           id: field.id,
-          valueDisplay: (
-            <Output
-              field={field}
-              showPreviouslyMissingValuesAsChanged={false}
-              value={annotation[field.id]}
-            />
-          ),
+          valueDisplay: <Output field={field} value={annotation[field.id]} />,
           pageId: page.id
         }))
     })

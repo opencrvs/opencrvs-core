@@ -52,9 +52,17 @@ import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
-import { SelectDateRangeValue } from './FieldValue'
-import { subDays } from 'date-fns'
+import { AgeValue, DateValue, SelectDateRangeValue } from './FieldValue'
+import { subDays, subYears, format } from 'date-fns'
 import { ConditionalType } from './Conditional'
+
+export function ageToDate(age: AgeValue) {
+  if (!age.asOfDate) {
+    return
+  }
+  const asOfDate = new Date(age.asOfDate)
+  return DateValue.parse(format(subYears(asOfDate, age.age), 'yyyy-MM-dd'))
+}
 
 function isDeclarationActionConfig(
   action: ActionConfig
@@ -161,12 +169,16 @@ export function getActionReviewFields(
   return getActionReview(configuration, actionType).fields
 }
 
-export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
+export function isPageVisible(
+  page: PageConfig,
+  formValues: ActionUpdate,
+  context: ValidatorContext
+) {
   if (!page.conditional) {
     return true
   }
 
-  return isConditionMet(page.conditional, formValues)
+  return isConditionMet(page.conditional, formValues, context)
 }
 
 /**
@@ -289,11 +301,12 @@ export function isVerificationPage(
 
 export function getVisibleVerificationPageIds(
   pages: PageConfig[],
-  annotation: ActionUpdate
+  annotation: ActionUpdate,
+  context: ValidatorContext
 ): string[] {
   return pages
     .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, annotation))
+    .filter((page) => isPageVisible(page, annotation, context))
     .map((page) => page.id)
 }
 

@@ -22,7 +22,12 @@ export function Hamburger() {
 
   return (
     <>
-      <Button size="medium" type="icon" onClick={toggleMenu}>
+      <Button
+        aria-label="Toggle menu"
+        size="medium"
+        type="icon"
+        onClick={toggleMenu}
+      >
         <Icon color="primary" name="List" size="medium" />
       </Button>
       <ExpandingMenu

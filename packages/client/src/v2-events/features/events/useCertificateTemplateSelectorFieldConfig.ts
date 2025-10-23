@@ -12,12 +12,14 @@
 import formatISO from 'date-fns/formatISO'
 import {
   areCertificateConditionsMet,
+  ConditionalParameters,
   EventDocument,
   EventState,
   FieldConfig,
   FieldType
 } from '@opencrvs/commons/client'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
+import { useOnlineStatus } from '../../../utils'
 
 export const CERT_TEMPLATE_ID = 'certificateTemplateId'
 export const useCertificateTemplateSelectorFieldConfig = (
@@ -27,11 +29,13 @@ export const useCertificateTemplateSelectorFieldConfig = (
 ): FieldConfig => {
   const { certificateTemplates } = useAppConfig()
 
+  const isOnline = useOnlineStatus()
   const declarationWithEventMetadata = {
     $form: declaration,
     $event: event,
-    $now: formatISO(new Date(), { representation: 'date' })
-  }
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $online: isOnline
+  } satisfies ConditionalParameters
 
   // Filter out certificates that are not for the event type and are not v2 templates
   const validTemplates = certificateTemplates.filter(

@@ -376,6 +376,7 @@ const fields = [
       subtitle: generateTranslationConfig('Membership Overview'),
       data: [
         {
+          id: 'status',
           value: 'Active',
           label: generateTranslationConfig('Status')
         },

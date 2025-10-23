@@ -11,7 +11,9 @@
 import React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
 import { http, HttpResponse } from 'msw'
-import { fn } from '@storybook/test'
+import { fn, expect, within } from '@storybook/test'
+import { waitFor } from '@storybook/testing-library'
+import { useSearchParams } from 'react-router-dom'
 import {
   ConditionalType,
   field,
@@ -20,7 +22,7 @@ import {
   never
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { FormFieldGenerator } from '../FormFieldGenerator'
+import { FormFieldGenerator } from '../../../components/forms/FormFieldGenerator'
 import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 interface Args {
@@ -51,7 +53,9 @@ const defaultFields: FieldConfig[] = [
       defaultMessage: 'Query param reader',
       description: 'This is the label for the query param reader field'
     },
-    configuration: {}
+    configuration: {
+      pickParams: ['auth_token', 'client_session']
+    }
   },
   {
     id: 'applicant.http-fetch',
@@ -115,22 +119,8 @@ const testQueryParamReader = {
     defaultMessage: 'Query param reader',
     description: 'This is the label for the query param reader field'
   },
-  configuration: {}
-}
-
-const testQueryParamReaderWithFormProjection = {
-  id: 'test.query-param-reader',
-  type: FieldType.QUERY_PARAM_READER,
-  label: {
-    id: 'event.query-param-reader.label',
-    defaultMessage: 'Query param reader',
-    description: 'This is the label for the query param reader field'
-  },
   configuration: {
-    formProjection: {
-      auth_token: 'token',
-      client_session: 'session'
-    }
+    pickParams: ['auth_token', 'client_session']
   }
 }
 
@@ -153,29 +143,6 @@ const testHttpFetch = {
     params: {
       token: field('test.query-param-reader').get('auth_token'),
       session: field('test.query-param-reader').get('client_session')
-    }
-  }
-}
-
-const testHttpFetchAfterFormProjection = {
-  id: 'test.http-fetch',
-  type: FieldType.HTTP,
-  label: {
-    defaultMessage: 'Fetch test information',
-    description: 'Fetch test information',
-    id: 'test.http-fetch.label'
-  },
-  configuration: {
-    trigger: field('test.query-param-reader'),
-    url: '/api/test',
-    timeout: 5000,
-    method: 'GET' as const,
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    params: {
-      token: field('test.query-param-reader').get('token'),
-      session: field('test.query-param-reader').get('session')
     }
   }
 }
@@ -223,13 +190,6 @@ const forwardedParams: FieldConfig[] = [
   sessionTextField
 ]
 
-const forwardedParamsWithFormProjection: FieldConfig[] = [
-  testQueryParamReaderWithFormProjection,
-  testHttpFetchAfterFormProjection,
-  tokenTextField,
-  sessionTextField
-]
-
 function Form(args: Args) {
   return (
     <FormFieldGenerator
@@ -264,6 +224,19 @@ export const Default: StoryObj<Args> = {
         ]
       }
     }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('firstname and surname are populated from api', async () => {
+      await waitFor(async () => {
+        await expect(
+          canvas.queryByTestId('text__applicant____firstname')
+        ).toHaveValue('John')
+        await expect(
+          canvas.queryByTestId('text__applicant____familyName')
+        ).toHaveValue('Doe')
+      })
+    })
   }
 }
 
@@ -289,32 +262,76 @@ export const WithForwardedParams: StoryObj<Args> = {
         ]
       }
     }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('token and session are populated from api', async () => {
+      await waitFor(async () => {
+        await expect(canvas.queryByTestId('text__test____token')).toHaveValue(
+          '123'
+        )
+        await expect(canvas.queryByTestId('text__test____session')).toHaveValue(
+          'abc'
+        )
+      })
+    })
   }
 }
 
-export const WithForwardedParamsThroughFormProjection: StoryObj<Args> = {
-  name: 'With Forwarded Params Through Form Projection',
+function DebugLocation() {
+  const [searchParams] = useSearchParams()
+  return (
+    <span data-testid="current-params" style={{ display: 'none' }}>
+      {searchParams.toString()}
+    </span>
+  )
+}
+
+export const WithExtraUnpickedParameters: StoryObj<Args> = {
+  name: 'With Extra Unpicked Parameters',
   parameters: {
+    chromatic: {
+      disableSnapshot: true
+    },
     layout: 'centered',
     reactRouter: {
       router: {
         path: '/',
         element: (
-          <Form fields={forwardedParamsWithFormProjection} onChange={fn()} />
+          <>
+            <DebugLocation />
+            <Form fields={defaultFields} onChange={fn()} />
+          </>
         )
       },
-      initialPath: '/?auth_token=123&client_session=abc'
+      initialPath:
+        '/?auth_token=123&client_session=abc&from=page1&ref=ad_campaign'
     },
     msw: {
       handlers: {
         userInfoApi: [
-          http.get('/api/test', ({ request }) =>
-            HttpResponse.json(
-              Object.fromEntries(new URL(request.url).searchParams)
-            )
+          http.get('/api/user-info', () =>
+            HttpResponse.json({ firstName: 'John', familyName: 'Doe' })
           )
         ]
       }
     }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('firstname and surname are populated from api', async () => {
+      await waitFor(async () => {
+        await expect(
+          canvas.queryByTestId('text__applicant____firstname')
+        ).toHaveValue('John')
+        await expect(
+          canvas.queryByTestId('text__applicant____familyName')
+        ).toHaveValue('Doe')
+      })
+    })
+    await step('unpicked query params remain in the URL', async () => {
+      const params = await canvas.findByTestId('current-params')
+      await expect(params).toHaveTextContent('from=page1&ref=ad_campaign')
+    })
   }
 }

@@ -11,11 +11,8 @@
 import { omit } from 'lodash'
 import { EventDocument, getUUID, TokenWithBearer } from '@opencrvs/commons'
 import { upsertEventWithActions } from '@events/storage/postgres/events/import'
-import {
-  getEventConfigurationById,
-  getInMemoryEventConfigurations
-} from '../config/config'
-import { indexEvent, indexEventsInBulk } from '../indexing/indexing'
+import { getInMemoryEventConfigurations } from '../config/config'
+import { indexEventsInBulk } from '../indexing/indexing'
 
 function mapEventActions(actions: EventDocument['actions']) {
   return actions.map(({ type, ...action }) => ({
@@ -36,31 +33,6 @@ function mapEventActions(actions: EventDocument['actions']) {
     originalActionId: action.originalActionId ?? null,
     createdBySignature: action.createdBySignature ?? null
   }))
-}
-
-export async function importEvent(
-  eventDocument: EventDocument,
-  token: TokenWithBearer
-) {
-  const transactionId = getUUID()
-  const { actions, ...event } = eventDocument
-
-  const eventType = event.type
-  const eventActions = mapEventActions(actions)
-
-  const createdEvent = await upsertEventWithActions(
-    { ...omit(event, 'type'), eventType, transactionId },
-    eventActions
-  )
-
-  const config = await getEventConfigurationById({
-    eventType: event.type,
-    token
-  })
-
-  await indexEvent(createdEvent, config)
-
-  return createdEvent
 }
 
 export async function bulkImportEvents(

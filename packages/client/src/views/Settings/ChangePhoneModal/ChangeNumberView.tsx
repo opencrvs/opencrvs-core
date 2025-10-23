@@ -22,12 +22,12 @@ import { convertToMSISDN } from '@client/forms/utils'
 import { GET_USER_BY_MOBILE } from '@client/views/Settings/queries'
 import { useDispatch, useSelector } from 'react-redux'
 import { sendVerifyCode } from '@client/profile/profileActions'
-import { NotificationEvent } from '@client/profile/serviceApi'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { getLanguage } from '@client/i18n/selectors'
 import { useLazyQuery } from '@apollo/client'
 import { GetUserByMobileQuery } from '@client/utils/gateway'
+import { TriggerEvent } from '@opencrvs/commons/client'
 
 interface IProps {
   show: boolean
@@ -81,7 +81,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     const mobileNumberExist = userData?.getUserByMobile
 
     if (!mobileNumberExist) {
-      const notificationEvent = NotificationEvent.CHANGE_PHONE_NUMBER
+      const notificationEvent = TriggerEvent.CHANGE_PHONE_NUMBER
 
       dispatch(
         sendVerifyCode(

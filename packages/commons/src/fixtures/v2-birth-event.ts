@@ -17,7 +17,7 @@ import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { BIRTH_EVENT } from '../events/Constants'
 import { ActionType } from '../events/ActionType'
-import { TranslationConfig } from 'src/events/TranslationConfig'
+import { TranslationConfig } from '../events/TranslationConfig'
 import { createFieldConditionals } from '../conditionals/conditionals'
 
 function generateTranslationConfig(message: string): TranslationConfig {

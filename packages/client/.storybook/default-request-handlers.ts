@@ -1212,11 +1212,23 @@ export const handlers = {
   ],
   user: [
     graphql.query('getUserAuditLog', (input) => {
+      const start = input.variables.skip || 0
+      const end = start + (input.variables.count || 10)
+      const total = 11
       return HttpResponse.json({
         data: {
           getUserAuditLog: {
-            total: 7,
+            total,
             results: [
+              {
+                time: '2025-10-03T10:46:49.362Z',
+                userAgent: 'undefined',
+                practitionerId: input.variables.userId,
+                ipAddress: '127.0.0.1',
+                action: 'LOGGED_OUT',
+                isV2: null,
+                __typename: 'UserAuditLogItem'
+              },
               {
                 time: '2025-10-03T10:44:55.012Z',
                 userAgent: 'undefined',
@@ -1293,6 +1305,48 @@ export const handlers = {
                 __typename: 'UserAuditLogItemWithComposition'
               },
               {
+                time: '2025-10-03T09:24:25.604Z',
+                userAgent: '',
+                practitionerId: input.variables.userId,
+                ipAddress: '',
+                action: 'VIEWED',
+                isV2: true,
+                data: {
+                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+                  trackingId: 'MOX89J',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:23:45.604Z',
+                userAgent: '',
+                practitionerId: input.variables.userId,
+                ipAddress: '',
+                action: 'VIEWED',
+                isV2: true,
+                data: {
+                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+                  trackingId: 'MOX89J',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:23:25.604Z',
+                userAgent: '',
+                practitionerId: input.variables.userId,
+                ipAddress: '',
+                action: 'VIEWED',
+                isV2: true,
+                data: {
+                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+                  trackingId: 'MOX89J',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
                 time: '2025-10-03T09:22:10.128Z',
                 userAgent: 'undefined',
                 practitionerId: input.variables.userId,
@@ -1301,7 +1355,7 @@ export const handlers = {
                 isV2: null,
                 __typename: 'UserAuditLogItem'
               }
-            ],
+            ].slice(start, Math.min(end, total)),
             __typename: 'UserAuditLogResultSet'
           }
         }
@@ -2588,6 +2642,48 @@ export const handlers = {
             __typename: 'SearchUserResult'
           }
         }
+      })
+    })
+  ],
+  userSettings: [
+    graphql.query('getUserByMobile', () => {
+      return HttpResponse.json({
+        data: {
+          getUserByMobile: null
+        }
+      })
+    }),
+    graphql.query('getUserByEmail', () => {
+      return HttpResponse.json({
+        data: {
+          getUserByEmail: null
+        }
+      })
+    }),
+    graphql.mutation('changePhone', (input) => {
+      const isValidCode = input.variables.verifyCode === '000000'
+
+      return HttpResponse.json({
+        data: {
+          changePhone: isValidCode ? 'true' : null
+        }
+      })
+    }),
+    graphql.mutation('changeEmail', (input) => {
+      return HttpResponse.json({
+        data: {
+          changeEmail: 'true'
+        }
+      })
+    }),
+    http.post('http://localhost:7070/sendVerifyCode', () => {
+      const generator = testDataGenerator()
+      return HttpResponse.json({
+        userId: generator.user.registrationAgent().v2.id,
+        nonce: 'UxN/IFJ3jGCjQBySQ+JP+A==',
+        status: 'Success',
+        mobile: '+260734237472',
+        email: 'kalushabwalya1.7@gmail.com'
       })
     })
   ]

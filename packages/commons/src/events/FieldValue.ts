@@ -21,7 +21,9 @@ import {
   StreetLevelDetailsValue,
   StreetLevelDetailsUpdateValue,
   QueryParamReaderFieldValue,
-  QueryParamReaderFieldUpdateValue
+  QueryParamReaderFieldUpdateValue,
+  QrReaderFieldValue,
+  IdReaderFieldValue
 } from './CompositeFieldValue'
 /**
  * FieldValues defined in this file are primitive field values.
@@ -43,6 +45,15 @@ export const DateValue = z
   .string()
   .date()
   .describe('Date in the format YYYY-MM-DD')
+
+export const AgeValue = z.object({
+  age: z.number(),
+  asOfDate: DateValue.optional()
+})
+
+export const AgeUpdateValue = AgeValue.optional().nullable()
+
+export type AgeValue = z.infer<typeof AgeValue>
 
 export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
 
@@ -74,8 +85,6 @@ export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
 export const NumberFieldValue = z.number()
 export type NumberFieldValue = z.infer<typeof NumberFieldValue>
-export const DataFieldValue = z.undefined()
-export type DataFieldValue = z.infer<typeof DataFieldValue>
 
 export const SignatureFieldValue = z.string()
 export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
@@ -90,13 +99,16 @@ export const VerificationStatusValue = z.enum([
 ])
 export type VerificationStatusValue = z.infer<typeof VerificationStatusValue>
 
-export const FieldValue = z.union([
+// We need to create a separate union of all field types excluding the DataFieldValue,
+// because otherwise the DataFieldValue would need to refer to itself.
+const FieldValuesWithoutDataField = z.union([
   /**
    * Street level is our first dynamic record. In the future we might extend it to include any dynamic (sub)field.
    */
   StreetLevelDetailsValue,
   TextValue,
   DateValue,
+  AgeValue,
   TimeValue,
   AddressFieldValue,
   DateRangeFieldValue,
@@ -105,15 +117,23 @@ export const FieldValue = z.union([
   NumberFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  DataFieldValue,
   NameFieldValue,
   NameFieldUpdateValue,
   ButtonFieldValue,
   HttpFieldValue,
   VerificationStatusValue,
-  QueryParamReaderFieldValue
+  QueryParamReaderFieldValue,
+  QrReaderFieldValue,
+  IdReaderFieldValue
 ])
 
+// As data field value can refer to other field values, it can contain any other field value types
+export const DataFieldValue = z
+  .record(z.string(), FieldValuesWithoutDataField)
+  .nullish()
+export type DataFieldValue = z.infer<typeof DataFieldValue>
+
+export const FieldValue = z.union([FieldValuesWithoutDataField, DataFieldValue])
 export type FieldValue = z.infer<typeof FieldValue>
 
 export const FieldUpdateValue = z.union([
@@ -124,6 +144,7 @@ export const FieldUpdateValue = z.union([
   TextValue,
   DateValue,
   TimeValue,
+  AgeUpdateValue,
   AddressFieldUpdateValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
@@ -159,6 +180,7 @@ export type FieldValueSchema =
  * */
 export type FieldUpdateValueSchema =
   | typeof DateRangeFieldValue
+  | typeof AgeValue
   | typeof SelectDateRangeValue
   | typeof FileFieldValue
   | typeof FileFieldWithOptionValue
@@ -171,5 +193,7 @@ export type FieldUpdateValueSchema =
   | typeof HttpFieldUpdateValue
   | typeof QueryParamReaderFieldUpdateValue
   | typeof ButtonFieldValue
+  | typeof QrReaderFieldValue
+  | typeof IdReaderFieldValue
   | z.ZodString
   | z.ZodBoolean

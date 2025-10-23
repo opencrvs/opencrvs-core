@@ -22,7 +22,7 @@ export default meta
 export const Organisation: StoryObj<typeof UserList> = {
   parameters: {
     reactRouter: {
-      initialPath: '/v2/organisation',
+      initialPath: '/organisation',
       router: routesConfig
     }
   }
@@ -34,7 +34,7 @@ export const Team: StoryObj<typeof UserList> = {
   parameters: {
     userRole: TestUserRole.enum.REGISTRATION_AGENT,
     reactRouter: {
-      initialPath: `/v2/team/users?locationId=${generator.user.registrationAgent().v2.primaryOfficeId}`,
+      initialPath: `/team/users?locationId=${generator.user.registrationAgent().v2.primaryOfficeId}`,
       router: routesConfig
     }
   }
@@ -46,7 +46,7 @@ export const SystemList: StoryObj<typeof UserList> = {
   parameters: {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
-      initialPath: '/v2/config/integration',
+      initialPath: '/config/integration',
       router: routesConfig
     }
   }
@@ -56,7 +56,7 @@ export const EmailAllUsers: StoryObj<typeof UserList> = {
   parameters: {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     reactRouter: {
-      initialPath: '/v2/communications/emailAllUsers',
+      initialPath: '/communications/emailAllUsers',
       router: routesConfig
     }
   }

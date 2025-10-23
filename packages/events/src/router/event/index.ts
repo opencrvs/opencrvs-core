@@ -49,7 +49,7 @@ import {
   throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
-import { importEvent, bulkImportEvents } from '@events/service/events/import'
+import { bulkImportEvents } from '@events/service/events/import'
 import { findRecordsByQuery } from '@events/service/indexing/indexing'
 import { reindex } from '@events/service/events/reindex'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
@@ -155,7 +155,7 @@ export const eventRouter = router({
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
-      if (ctx.isDuplicateAction) {
+      if (ctx.existingAction) {
         return ctx.event
       }
 
@@ -333,19 +333,6 @@ export const eventRouter = router({
         ctx.user.primaryOfficeId
       )
     }),
-  import: systemProcedure
-    .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
-    .meta({
-      openapi: {
-        summary: 'Import full event record',
-        method: 'POST',
-        path: '/events/import',
-        tags: ['events']
-      }
-    })
-    .input(EventDocument)
-    .output(EventDocument)
-    .mutation(async ({ input, ctx }) => importEvent(input, ctx.token)),
   bulkImport: systemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
     .meta({

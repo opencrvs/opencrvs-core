@@ -33,9 +33,11 @@ import { TimeField } from './TimeField'
 import { AlphaPrintButton } from './AlphaPrintButton'
 import { LinkButton } from './LinkButton'
 import { VerificationStatus } from './VerificationStatus'
+import { QueryParamReader } from './QueryParamReader'
 
 export * from './Address'
 export * from './AdministrativeArea'
+export * from './AgeField'
 export * from './BulletList'
 export * from './Button'
 export * from './Checkbox'
@@ -109,6 +111,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return LinkButton
     case FieldType.VERIFICATION_STATUS:
       return VerificationStatus
+    case FieldType.QUERY_PARAM_READER:
+      return QueryParamReader
     default:
       return undefined
   }

@@ -8,20 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import React from 'react'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { DashboardEmbedView } from '@client/views/Performance/Dashboard'
+import * as React from 'react'
 import { useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/dashboard'
+import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
+import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 
-export const Leaderboards = () => {
+const organisationsTitle = {
+  id: 'navigation.organisation',
+  defaultMessage: 'Settings',
+  description: 'settings title'
+}
+
+export function OrganisationPage() {
   const intl = useIntl()
   return (
-    <DashboardEmbedView
-      title={intl.formatMessage(messages.leaderboardTitle)}
-      url={window.config.LEADERBOARDS_DASHBOARD_URL}
-      icon={<Icon name="Medal" size="medium" />}
-    />
+    <WorkqueueLayout title={intl.formatMessage(organisationsTitle)}>
+      <AdministrativeLevels hideNavigation={true} />
+    </WorkqueueLayout>
   )
 }

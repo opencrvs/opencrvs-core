@@ -465,7 +465,8 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     mutate: (params: ActionMutationInput) =>
       mutation.mutate(getMutationPayload(params)),
     mutateAsync: async (params: ActionMutationInput) =>
-      mutation.mutateAsync(getMutationPayload(params))
+      mutation.mutateAsync(getMutationPayload(params)),
+    isPending: mutation.isPending
   }
 }
 

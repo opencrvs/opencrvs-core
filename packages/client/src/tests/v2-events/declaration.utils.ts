@@ -102,7 +102,7 @@ export function wrapHandlersWithSpies<
 
 const eventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [{ type: ActionType.CREATE }]
 })
 const eventId = eventDocument.id
 const draft = generateEventDraftDocument({
@@ -137,7 +137,7 @@ export const createDeclarationTrpcMsw = (
         handler: () =>
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
-            actions: [ActionType.CREATE]
+            actions: [{ type: ActionType.CREATE }]
           })
       },
       {
@@ -146,7 +146,7 @@ export const createDeclarationTrpcMsw = (
         handler: () =>
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
-            actions: [ActionType.CREATE, ActionType.NOTIFY]
+            actions: [{ type: ActionType.CREATE }, { type: ActionType.NOTIFY }]
           })
       },
       {
@@ -155,7 +155,7 @@ export const createDeclarationTrpcMsw = (
         handler: () =>
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
-            actions: [ActionType.CREATE, ActionType.DECLARE]
+            actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
           })
       },
       {
@@ -165,9 +165,9 @@ export const createDeclarationTrpcMsw = (
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
             actions: [
-              ActionType.CREATE,
-              ActionType.DECLARE,
-              ActionType.VALIDATE
+              { type: ActionType.CREATE },
+              { type: ActionType.DECLARE },
+              { type: ActionType.VALIDATE }
             ]
           })
       },
@@ -178,10 +178,10 @@ export const createDeclarationTrpcMsw = (
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
             actions: [
-              ActionType.CREATE,
-              ActionType.DECLARE,
-              ActionType.VALIDATE,
-              ActionType.REGISTER
+              { type: ActionType.CREATE },
+              { type: ActionType.DECLARE },
+              { type: ActionType.VALIDATE },
+              { type: ActionType.REGISTER }
             ]
           })
       },
@@ -192,10 +192,10 @@ export const createDeclarationTrpcMsw = (
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
             actions: [
-              ActionType.CREATE,
-              ActionType.DECLARE,
-              ActionType.VALIDATE,
-              ActionType.ARCHIVE
+              { type: ActionType.CREATE },
+              { type: ActionType.DECLARE },
+              { type: ActionType.VALIDATE },
+              { type: ActionType.ARCHIVE }
             ]
           })
       },
@@ -206,10 +206,10 @@ export const createDeclarationTrpcMsw = (
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
             actions: [
-              ActionType.CREATE,
-              ActionType.DECLARE,
-              ActionType.VALIDATE,
-              ActionType.MARK_AS_DUPLICATE
+              { type: ActionType.CREATE },
+              { type: ActionType.DECLARE },
+              { type: ActionType.VALIDATE },
+              { type: ActionType.MARK_AS_DUPLICATE }
             ]
           })
       },
@@ -220,10 +220,10 @@ export const createDeclarationTrpcMsw = (
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
             actions: [
-              ActionType.CREATE,
-              ActionType.DECLARE,
-              ActionType.VALIDATE,
-              ActionType.REJECT
+              { type: ActionType.CREATE },
+              { type: ActionType.DECLARE },
+              { type: ActionType.VALIDATE },
+              { type: ActionType.REJECT }
             ]
           })
       }

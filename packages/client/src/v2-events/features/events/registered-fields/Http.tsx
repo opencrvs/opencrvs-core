@@ -115,11 +115,12 @@ function HttpInput({
       onChange({ loading: false, error: null, data })
     },
     onError: (error: HttpError) => {
+      const data = configuration.errorValue ?? null
       if (error.name === 'AbortError') {
         onChange({
           loading: false,
           error: { statusCode: 408, message: 'The request timed out.' },
-          data: null
+          data
         })
       } else {
         onChange({
@@ -128,7 +129,7 @@ function HttpInput({
             statusCode: error.statusCode,
             message: error.message
           },
-          data: null
+          data
         })
       }
     }
@@ -143,7 +144,10 @@ function HttpInput({
     }
 
     // 2) trigger on following mounts if the value tracked changes
-    if (!isEqual(parentValue, prevParentRef.current)) {
+    if (
+      !isEqual(parentValue, prevParentRef.current) &&
+      parentValue !== undefined
+    ) {
       prevParentRef.current = parentValue
       mutation.mutate()
     }
