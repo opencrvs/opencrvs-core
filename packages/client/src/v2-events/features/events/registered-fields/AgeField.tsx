@@ -53,5 +53,7 @@ function AgeInput({ asOfDateRef, value, ...props }: AgeInputProps) {
 
 export const AgeField = {
   Input: AgeInput,
-  Output: ({ value }: { value?: AgeValue }) => value?.age ?? ''
+  Output: ({ value }: { value?: AgeValue }) => value?.age ?? '',
+  stringify: (value?: AgeValue) =>
+    value === undefined ? '' : value.age.toString()
 }
