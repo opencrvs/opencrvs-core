@@ -221,11 +221,11 @@ const LiteralScopes = z.union([
   DeclareScopes,
   ValidateScopes,
   RegisterScope,
-  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+  z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
   CorrectionScopes,
   SearchScopes,
   AuditScopes,
-  SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
+  z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
   PerformanceScopes,
   OrganisationScopes,
   UserScopes,
@@ -485,7 +485,7 @@ export const ActionScopes = z.union([
   DeclareScopes,
   ValidateScopes,
   RegisterScope,
-  CertifyScopes,
+  z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
   CorrectionScopes
 ])
 
