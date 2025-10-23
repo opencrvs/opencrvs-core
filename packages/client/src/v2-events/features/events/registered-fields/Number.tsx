@@ -17,7 +17,7 @@ import {
 } from '@opencrvs/components'
 import { NumberField } from '@opencrvs/commons/client'
 
-export interface NumberInputProps
+interface NumberInputProps
   extends Omit<TextInputProps, 'type' | 'maxLength' | 'onChange'> {
   onChange(val: number | undefined): void
   value: number | undefined
