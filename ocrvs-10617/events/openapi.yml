@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 646812bb-38ba-4e2e-b330-dcacf3a913ad
+                transactionId: 111b8c3e-5b28-46a7-bc1d-3f8835c72060
                 type: birth
       responses:
         "200":
@@ -737,7 +737,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: fb350475-707e-4ae8-8888-0ba0df6eb1af
+                transactionId: 4a8a2f71-a881-436f-8ebe-b6df8801f94a
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -3243,76 +3243,76 @@ components:
                                 value.    \ 
 
                                 \      "
-                            searchFieldType:
-                              type: string
-                              enum:
-                                - NAME
-                                - PHONE
-                                - ID
-                                - ADDRESS
-                                - TEXT
-                                - NUMBER
-                                - TEXTAREA
-                                - EMAIL
-                                - DATE
-                                - AGE
-                                - DATE_RANGE
-                                - SELECT_DATE_RANGE
-                                - TIME
-                                - PARAGRAPH
-                                - PAGE_HEADER
-                                - RADIO_GROUP
-                                - FILE
-                                - FILE_WITH_OPTIONS
-                                - BULLET_LIST
-                                - CHECKBOX
-                                - SELECT
-                                - COUNTRY
-                                - LOCATION
-                                - DIVIDER
-                                - ADMINISTRATIVE_AREA
-                                - FACILITY
-                                - OFFICE
-                                - SIGNATURE
-                                - DATA
-                                - BUTTON
-                                - ALPHA_PRINT_BUTTON
-                                - HTTP
-                                - LINK_BUTTON
-                                - VERIFICATION_STATUS
-                                - QUERY_PARAM_READER
-                                - QR_READER
-                                - ID_READER
-                                - LOADER
-                              description: "
-
-                                \      Explicitly specify the field type for
-                                searchFields.
-
-                                \      This is required when searchFields is
-                                defined, to show the correct control in the UI.
-
-                                \       \ 
-
-                                \      Example: FieldType.NAME for name fields,
-                                FieldType.TEXT for text fields, FieldType.DATE
-                                for date fields, etc.
-
-                                \      "
-                            label:
-                              description: "
-
-                                \      Explicitly specify the label for
-                                searchFields.
-
-                                \      This is required when searchFields is
-                                defined.           \ 
-
-                                \      "
-                              allOf:
-                                - $ref: "#/components/schemas/TranslationConfig"
                           required:
                             - type
+                        type:
+                          type: string
+                          enum:
+                            - NAME
+                            - PHONE
+                            - ID
+                            - ADDRESS
+                            - TEXT
+                            - NUMBER
+                            - TEXTAREA
+                            - EMAIL
+                            - DATE
+                            - AGE
+                            - DATE_RANGE
+                            - SELECT_DATE_RANGE
+                            - TIME
+                            - PARAGRAPH
+                            - PAGE_HEADER
+                            - RADIO_GROUP
+                            - FILE
+                            - FILE_WITH_OPTIONS
+                            - BULLET_LIST
+                            - CHECKBOX
+                            - SELECT
+                            - COUNTRY
+                            - LOCATION
+                            - DIVIDER
+                            - ADMINISTRATIVE_AREA
+                            - FACILITY
+                            - OFFICE
+                            - SIGNATURE
+                            - DATA
+                            - BUTTON
+                            - ALPHA_PRINT_BUTTON
+                            - HTTP
+                            - LINK_BUTTON
+                            - VERIFICATION_STATUS
+                            - QUERY_PARAM_READER
+                            - QR_READER
+                            - ID_READER
+                            - LOADER
+                          description: "
+
+                            \      Explicitly specify the field type for
+                            searchFields.
+
+                            \      This is required when searchFields is
+                            defined, to show the correct control in the UI.
+
+                            \       \ 
+
+                            \      Example: FieldType.NAME for name fields,
+                            FieldType.TEXT for text fields, FieldType.DATE for
+                            date fields, etc.
+
+                            \      "
+                        label:
+                          description: "
+
+                            \      Explicitly specify the label for
+                            searchFields.
+
+                            \      This is required when searchFields is
+                            defined.           \ 
+
+                            \      "
+                          allOf:
+                            - $ref: "#/components/schemas/TranslationConfig"
                         options:
                           type: array
                           items:
@@ -3472,76 +3472,76 @@ components:
                                 value.    \ 
 
                                 \      "
-                            searchFieldType:
-                              type: string
-                              enum:
-                                - NAME
-                                - PHONE
-                                - ID
-                                - ADDRESS
-                                - TEXT
-                                - NUMBER
-                                - TEXTAREA
-                                - EMAIL
-                                - DATE
-                                - AGE
-                                - DATE_RANGE
-                                - SELECT_DATE_RANGE
-                                - TIME
-                                - PARAGRAPH
-                                - PAGE_HEADER
-                                - RADIO_GROUP
-                                - FILE
-                                - FILE_WITH_OPTIONS
-                                - BULLET_LIST
-                                - CHECKBOX
-                                - SELECT
-                                - COUNTRY
-                                - LOCATION
-                                - DIVIDER
-                                - ADMINISTRATIVE_AREA
-                                - FACILITY
-                                - OFFICE
-                                - SIGNATURE
-                                - DATA
-                                - BUTTON
-                                - ALPHA_PRINT_BUTTON
-                                - HTTP
-                                - LINK_BUTTON
-                                - VERIFICATION_STATUS
-                                - QUERY_PARAM_READER
-                                - QR_READER
-                                - ID_READER
-                                - LOADER
-                              description: "
-
-                                \      Explicitly specify the field type for
-                                searchFields.
-
-                                \      This is required when searchFields is
-                                defined, to show the correct control in the UI.
-
-                                \       \ 
-
-                                \      Example: FieldType.NAME for name fields,
-                                FieldType.TEXT for text fields, FieldType.DATE
-                                for date fields, etc.
-
-                                \      "
-                            label:
-                              description: "
-
-                                \      Explicitly specify the label for
-                                searchFields.
-
-                                \      This is required when searchFields is
-                                defined.           \ 
-
-                                \      "
-                              allOf:
-                                - $ref: "#/components/schemas/TranslationConfig"
                           required:
                             - type
+                        type:
+                          type: string
+                          enum:
+                            - NAME
+                            - PHONE
+                            - ID
+                            - ADDRESS
+                            - TEXT
+                            - NUMBER
+                            - TEXTAREA
+                            - EMAIL
+                            - DATE
+                            - AGE
+                            - DATE_RANGE
+                            - SELECT_DATE_RANGE
+                            - TIME
+                            - PARAGRAPH
+                            - PAGE_HEADER
+                            - RADIO_GROUP
+                            - FILE
+                            - FILE_WITH_OPTIONS
+                            - BULLET_LIST
+                            - CHECKBOX
+                            - SELECT
+                            - COUNTRY
+                            - LOCATION
+                            - DIVIDER
+                            - ADMINISTRATIVE_AREA
+                            - FACILITY
+                            - OFFICE
+                            - SIGNATURE
+                            - DATA
+                            - BUTTON
+                            - ALPHA_PRINT_BUTTON
+                            - HTTP
+                            - LINK_BUTTON
+                            - VERIFICATION_STATUS
+                            - QUERY_PARAM_READER
+                            - QR_READER
+                            - ID_READER
+                            - LOADER
+                          description: "
+
+                            \      Explicitly specify the field type for
+                            searchFields.
+
+                            \      This is required when searchFields is
+                            defined, to show the correct control in the UI.
+
+                            \       \ 
+
+                            \      Example: FieldType.NAME for name fields,
+                            FieldType.TEXT for text fields, FieldType.DATE for
+                            date fields, etc.
+
+                            \      "
+                        label:
+                          description: "
+
+                            \      Explicitly specify the label for
+                            searchFields.
+
+                            \      This is required when searchFields is
+                            defined.           \ 
+
+                            \      "
+                          allOf:
+                            - $ref: "#/components/schemas/TranslationConfig"
                         options:
                           type: array
                           items:
