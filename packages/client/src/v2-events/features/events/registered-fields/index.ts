@@ -22,6 +22,7 @@ import { LocationSearch } from './LocationSearch'
 import { Name } from './Name'
 import { Number } from './Number'
 import { PageHeader } from './PageHeader'
+import { AgeField } from './AgeField'
 import { Paragraph } from './Paragraph'
 import { RadioGroup } from './RadioGroup'
 import { RegisteredFieldModule } from './RegisteredField'
@@ -113,6 +114,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return VerificationStatus
     case FieldType.QUERY_PARAM_READER:
       return QueryParamReader
+    case FieldType.AGE:
+      return AgeField
     default:
       return undefined
   }

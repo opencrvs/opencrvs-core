@@ -9,38 +9,51 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { useFormikContext } from 'formik'
-import { AgeValue, DateValue, EventState } from '@opencrvs/commons/client'
-import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { Number, NumberInputProps } from './Number'
+import { AgeValue } from '@opencrvs/commons/client'
+import {
+  TextInput as TextInputComponent,
+  ITextInputProps as TextInputProps
+} from '@opencrvs/components'
 
-interface AgeInputProps extends Omit<NumberInputProps, 'min' | 'onChange'> {
+interface AgeInputProps extends Omit<TextInputProps, 'min' | 'onChange'> {
   asOfDateRef: string
   onChange(val: AgeValue | undefined): void
+  value: number | undefined
 }
 
-function AgeInput({ asOfDateRef, ...props }: AgeInputProps) {
-  const { values } = useFormikContext<EventState>()
+const AGE_MAX_CHARACTERS = 3
 
-  const asOfDate = DateValue.safeParse(
-    values[makeFormFieldIdFormikCompatible(asOfDateRef)]
-  ).data
+function AgeInput({ asOfDateRef, value, ...props }: AgeInputProps) {
+  const [inputValue, setInputValue] = React.useState(
+    value && isNaN(value) ? undefined : value
+  )
 
   return (
-    <Number.Input
+    <TextInputComponent
       {...props}
       data-testid={`age__${props.id}`}
-      min={0}
-      onChange={(newAge) =>
+      maxLength={AGE_MAX_CHARACTERS}
+      value={inputValue}
+      onBlur={(e) => {
         props.onChange(
-          newAge === undefined ? undefined : { age: newAge, asOfDate }
+          inputValue ? { age: inputValue, asOfDateRef } : undefined
         )
-      }
+        props.onBlur?.(e)
+      }}
+      onChange={(e) => {
+        const parsedValue = parseInt(e.target.value, 10)
+
+        isNaN(parsedValue)
+          ? setInputValue(undefined)
+          : setInputValue(parsedValue)
+      }}
     />
   )
 }
 
 export const AgeField = {
   Input: AgeInput,
-  Output: ({ value }: { value?: AgeValue }) => value?.age ?? ''
+  Output: ({ value }: { value?: AgeValue }) => value?.age ?? '',
+  stringify: (value?: AgeValue) =>
+    value === undefined ? '' : value.age.toString()
 }

@@ -151,7 +151,7 @@ export function EventSummary({
   flags,
   hideSecuredFields = false
 }: {
-  event: Record<string, FieldValue | null>
+  event: Record<string, FieldValue>
   eventConfiguration: EventConfig
   flags: Flag[]
   hideSecuredFields?: boolean
