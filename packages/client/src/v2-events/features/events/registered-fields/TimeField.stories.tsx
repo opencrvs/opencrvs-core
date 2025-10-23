@@ -68,7 +68,8 @@ const OutputDisplay = styled.div`
   font-size: 14px;
 `
 
-type FormData = Record<string, string | undefined>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FormData = Record<string, any>
 
 // Original TimeInput story with 24-hour format
 export const TimeInput: StoryObj<typeof FormFieldGenerator> = {
@@ -147,8 +148,7 @@ export const TimeInput24HourWithInitialValue: StoryObj<
     })
   },
   render: function Component(args) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [formData, setFormData] = React.useState<Record<string, any>>({
+    const [formData, setFormData] = React.useState<FormData>({
       'storybook.time': '14:30'
     })
 
@@ -204,8 +204,7 @@ export const TimeInput12HourDisplay: StoryObj<typeof FormFieldGenerator> = {
     })
   },
   render: function Component(args) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [formData, setFormData] = React.useState<Record<string, any>>({})
+    const [formData, setFormData] = React.useState<FormData>({})
 
     return (
       <Container>
@@ -272,8 +271,7 @@ export const TimeInput12HourDisplayWith24HourInitialValue: StoryObj<
     })
   },
   render: function Component(args) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [formData, setFormData] = React.useState<Record<string, any>>({
+    const [formData, setFormData] = React.useState<FormData>({
       'storybook.time': '14:30'
     })
 
@@ -352,8 +350,7 @@ export const TimeFieldEdgeCases: StoryObj<typeof FormFieldGenerator> = {
     })
   },
   render: function Component(args) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [formData, setFormData] = React.useState<Record<string, any>>({})
+    const [formData, setFormData] = React.useState<FormData>({})
 
     return (
       <Container>
