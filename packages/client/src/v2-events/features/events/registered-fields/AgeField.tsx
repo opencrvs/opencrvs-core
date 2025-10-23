@@ -10,26 +10,41 @@
  */
 import * as React from 'react'
 import { AgeValue } from '@opencrvs/commons/client'
-import { Number, NumberInputProps } from './Number'
+import {
+  TextInput as TextInputComponent,
+  ITextInputProps as TextInputProps
+} from '@opencrvs/components'
 
-interface AgeInputProps extends Omit<NumberInputProps, 'min' | 'onChange'> {
-  onChange(val: AgeValue | undefined): void
+interface AgeInputProps extends Omit<TextInputProps, 'min' | 'onChange'> {
   asOfDateRef: string
+  onChange(val: AgeValue | undefined): void
+  value: number | undefined
 }
 
-function AgeInput(props: AgeInputProps) {
+function AgeInput({ asOfDateRef, value, ...props }: AgeInputProps) {
+  const [inputValue, setInputValue] = React.useState(
+    value && isNaN(value) ? undefined : value
+  )
+
   return (
-    <Number.Input
+    <TextInputComponent
       {...props}
       data-testid={`age__${props.id}`}
-      min={0}
-      onChange={(newAge) =>
+      maxLength={3}
+      value={inputValue}
+      onBlur={(e) => {
         props.onChange(
-          newAge === undefined
-            ? undefined
-            : { age: newAge, asOfDateRef: props.asOfDateRef }
+          inputValue ? { age: inputValue, asOfDateRef } : undefined
         )
-      }
+        props.onBlur?.(e)
+      }}
+      onChange={(e) => {
+        const parsedValue = parseInt(e.target.value, 10)
+
+        isNaN(parsedValue)
+          ? setInputValue(undefined)
+          : setInputValue(parsedValue)
+      }}
     />
   )
 }
