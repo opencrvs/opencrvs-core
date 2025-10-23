@@ -136,7 +136,6 @@ export const DEFAULT_ROLES_DEFINITION = [
     },
     scopes: [
       SCOPES.SYSADMIN,
-      SCOPES.NATLSYSADMIN,
       SCOPES.USER_CREATE,
       SCOPES.USER_READ,
       SCOPES.USER_UPDATE,
@@ -144,7 +143,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
-      // 'organisation.read-users' ?
     ]
   },
   {

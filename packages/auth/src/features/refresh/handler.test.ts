@@ -97,7 +97,6 @@ describe('authenticate handler receives a request', () => {
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
       expect(body.scope).toEqual([
         SCOPES.SYSADMIN,
-        SCOPES.NATLSYSADMIN,
         SCOPES.USER_CREATE,
         SCOPES.USER_READ,
         SCOPES.USER_UPDATE,
@@ -119,7 +118,7 @@ describe('authenticate handler receives a request', () => {
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         id: '1',
         role: 'NATIONAL_SYSTEM_ADMIN',
-        scope: ['natlsysadmin'],
+        scope: [],
         username: '+345345343'
       })
 

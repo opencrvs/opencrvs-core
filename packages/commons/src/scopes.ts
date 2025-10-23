@@ -14,12 +14,9 @@ import { SearchScopeAccessLevels } from './events'
 
 export const SCOPES = {
   // TODO v1.8 legacy scopes
-  NATLSYSADMIN: 'natlsysadmin',
   BYPASSRATELIMIT: 'bypassratelimit',
 
-  DECLARE: 'declare',
   REGISTER: 'register',
-  VALIDATE: 'validate',
 
   DEMO: 'demo',
   CERTIFY: 'certify',
@@ -131,11 +128,8 @@ export const SCOPES = {
 
 // Legacy scopes
 const LegacyScopes = z.union([
-  z.literal(SCOPES.NATLSYSADMIN),
   z.literal(SCOPES.BYPASSRATELIMIT),
-  z.literal(SCOPES.DECLARE),
   z.literal(SCOPES.REGISTER),
-  z.literal(SCOPES.VALIDATE),
   z.literal(SCOPES.DEMO),
   z.literal(SCOPES.CERTIFY),
   z.literal(SCOPES.PERFORMANCE),
