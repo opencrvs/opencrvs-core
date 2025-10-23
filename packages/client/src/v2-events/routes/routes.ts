@@ -22,7 +22,7 @@ import { uuid } from './utils'
 
 export const ROUTES = {
   V2: route(
-    config.FEATURES.V2_EVENTS ? '' : 'v2',
+    '',
     {},
     {
       EVENTS: route(

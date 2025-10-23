@@ -19,43 +19,18 @@ import {
   EventState,
   FieldConfig,
   FieldValue,
-  InteractiveFieldType,
-  isNonInteractiveFieldType,
   joinValues,
-  SystemVariables,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import {
-  FIELD_SEPARATOR,
-  handleDefaultValue
-} from '@client/v2-events/components/forms/utils'
+import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
-import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
+import { useDefaultValues } from '@client/v2-events/hooks/useDefaultValues'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
 } from './utils'
 import { FormSectionComponent } from './FormSectionComponent'
-
-function mapFieldsToValues(
-  fields: FieldConfig[],
-  systemVariables: SystemVariables
-) {
-  return fields
-    .filter(
-      (field): field is InteractiveFieldType =>
-        !isNonInteractiveFieldType(field)
-    )
-    .reduce((memo, field) => {
-      const fieldInitialValue = handleDefaultValue({
-        field,
-        systemVariables
-      })
-
-      return { ...memo, [field.id]: fieldInitialValue }
-    }, {})
-}
 
 export interface FormFieldGeneratorProps {
   /** form id */
@@ -93,8 +68,8 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     validatorContext
   }) => {
     const { setAllTouchedFields, touchedFields } = useEventFormData()
-
     const intl = useIntl()
+    const defaultValues = useDefaultValues(fields)
 
     const updateTouchFields = (
       touched: FormikTouched<Record<string, boolean | undefined>>
@@ -129,11 +104,9 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     const formikOnChange = (values: EventState) =>
       onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
 
-    const systemVariables = useSystemVariables()
-
     const formikCompatibleInitialValues =
       makeFormFieldIdsFormikCompatible<FieldValue>({
-        ...mapFieldsToValues(fields, systemVariables),
+        ...defaultValues,
         ...initialValues
       })
 
@@ -189,7 +162,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               setErrors={formikProps.setErrors}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
-              systemVariables={systemVariables}
               touched={{ ...formikProps.touched, ...touchedFields }}
               validateAllFields={validateAllFields}
               validatorContext={validatorContext}
