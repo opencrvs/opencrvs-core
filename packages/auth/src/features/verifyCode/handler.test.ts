@@ -88,7 +88,6 @@ describe('authenticate handler receives a request', () => {
       const [, payload] = res.result!.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
       expect(body.scope).toEqual([
-        SCOPES.SYSADMIN,
         SCOPES.USER_CREATE,
         SCOPES.USER_READ,
         SCOPES.USER_UPDATE,

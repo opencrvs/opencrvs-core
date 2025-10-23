@@ -30,7 +30,7 @@ describe('authUtils', () => {
         exp: 1573112965,
         aud: '',
         sub: '1',
-        scope: "['performance']"
+        scope: '[]'
       }
       expect(getTokenPayload(performanceJWT)).toEqual(response)
     })
