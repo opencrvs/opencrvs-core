@@ -493,8 +493,8 @@ function getFieldConfigsWithSearchOverrides(eventConfig: EventConfig) {
 function generateSearchFieldConfig(searchField: SearchField): FieldConfig {
   const baseFieldConfig: FieldConfig = {
     id: searchField.fieldId,
-    type: searchField.config.searchFieldType,
-    label: searchField.config.label,
+    type: searchField.type,
+    label: searchField.label,
     conditionals: [],
     validation: []
   } as FieldConfig

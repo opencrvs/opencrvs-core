@@ -249,9 +249,9 @@ describe('Nested Query Generation with searchFields', () => {
       {
         fieldId: 'person-name',
         fieldType: 'field',
+        type: 'NAME',
         config: {
           type: 'fuzzy',
-          searchFieldType: 'NAME',
           searchFields: [
             'child.name.firstname',
             'child.name.surname',

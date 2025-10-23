@@ -33,25 +33,25 @@ const BaseField = z.object({
       Example: { searchFields: ['mother.name', 'father.name', 'informant.name'] }
       Will search all fields and return a record if any of the fields match the search value.     
       `
-      ),
-    searchFieldType: z
-      .nativeEnum(FieldType)
-      .optional()
-      .describe(
-        `
+      )
+  }),
+  type: z
+    .nativeEnum(FieldType)
+    .optional()
+    .describe(
+      `
       Explicitly specify the field type for searchFields.
       This is required when searchFields is defined, to show the correct control in the UI.
         
       Example: FieldType.NAME for name fields, FieldType.TEXT for text fields, FieldType.DATE for date fields, etc.
       `
-      ),
-    label: TranslationConfig.optional().describe(
-      `
+    ),
+  label: TranslationConfig.optional().describe(
+    `
       Explicitly specify the label for searchFields.
       This is required when searchFields is defined.            
       `
-    )
-  }),
+  ),
   options: z.array(SelectOption).optional(),
   searchCriteriaLabelPrefix: TranslationConfig.optional().describe(
     `
@@ -159,14 +159,14 @@ export const SearchField = z
   .discriminatedUnion('fieldType', [FieldConfigSchema, EventFieldConfigSchema])
   .superRefine((data, ctx) => {
     if (data.config.searchFields && data.config.searchFields.length > 0) {
-      if (!data.config.label) {
+      if (!data.label) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'label is required when config.searchFields is defined.',
           path: ['label']
         })
       }
-      if (!data.config.searchFieldType) {
+      if (!data.type) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'type is required when config.searchFields is defined.',
