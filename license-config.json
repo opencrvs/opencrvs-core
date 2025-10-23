@@ -40,6 +40,7 @@
     "grafana",
     "packages/client/public/assets/qr-sample.webm",
     "packages/client/.storybook/preview-head.html",
+    "packages/client/storybook-static",
     "packages/scheduler/start.sh",
     "packages/scheduler/crontab",
     "packages/scheduler/jobs/*",
@@ -52,6 +53,7 @@
     "packages/commons/src/events/EventUpdateFlow.mermaid",
     "packages/events/src/storage/postgres/events/schema/**/*.ts",
     "packages/events/.kanelrc.js",
+    "packages/dashboards/data/metabase/*",
     "packages/events/src/tests/extract-dump.sh",
     ".kube"
   ],

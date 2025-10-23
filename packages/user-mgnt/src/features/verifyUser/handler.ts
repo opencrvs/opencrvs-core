@@ -54,7 +54,9 @@ export default async function verifyUserHandler(
   if (mobile) {
     user = await User.findOne({ mobile })
   } else {
-    user = await User.findOne({ emailForNotification: email })
+    user = await User.findOne({
+      emailForNotification: { $regex: `^${email}$`, $options: 'i' }
+    })
   }
 
   if (!user) {
