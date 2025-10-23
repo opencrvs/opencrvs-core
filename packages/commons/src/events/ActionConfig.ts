@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { EnableConditional, ShowConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
@@ -19,61 +18,52 @@ import { extendZodWithOpenApi } from 'zod-openapi'
 
 extendZodWithOpenApi(z)
 
-/**
- * By default, when conditionals are not defined, action is visible and enabled to the user.
- */
-const ActionConditional = z.discriminatedUnion('type', [
-  /** If conditional is defined, the action is shown to the user only if the condition is met */
-  ShowConditional,
-  /** If conditional is defined, the action is enabled only if the condition is met */
-  EnableConditional
-])
-
 export const DeclarationReviewConfig = z
   .object({
     title: TranslationConfig.describe('Title of the review page'),
     fields: z
       .array(FieldConfig)
-      .describe('Fields to be rendered on the review page for annotations.')
+      .describe('Fields displayed on the review page for annotations.')
   })
-  .describe('Configuration for **declaration** review page.')
+  .describe(
+    'Configuration of the declaration review page for collecting event-related metadata.'
+  )
 
 export type ReviewPageConfig = z.infer<typeof DeclarationReviewConfig>
 
 export const ActionConfigBase = z.object({
-  label: TranslationConfig,
-  conditionals: z.array(ActionConditional).optional().default([]),
-  draft: z.boolean().optional()
+  label: TranslationConfig.describe('Human readable description of the action')
+})
+
+export const DeclarationActionBase = ActionConfigBase.extend({
+  review: DeclarationReviewConfig,
+  deduplication: DeduplicationConfig.optional()
 })
 
 const ReadActionConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.READ),
-    review: DeclarationReviewConfig
+    review: DeclarationReviewConfig.describe(
+      'Configuration of the review page for read-only view.'
+    )
   })
 )
 
-const DeclareConfig = ActionConfigBase.merge(
+const DeclareConfig = DeclarationActionBase.merge(
   z.object({
-    type: z.literal(ActionType.DECLARE),
-    review: DeclarationReviewConfig,
-    deduplication: DeduplicationConfig.optional()
+    type: z.literal(ActionType.DECLARE)
   })
 )
 
-const ValidateConfig = ActionConfigBase.merge(
+const ValidateConfig = DeclarationActionBase.merge(
   z.object({
-    type: z.literal(ActionType.VALIDATE),
-    review: DeclarationReviewConfig,
-    deduplication: DeduplicationConfig.optional()
+    type: z.literal(ActionType.VALIDATE)
   })
 )
 
-const RegisterConfig = ActionConfigBase.merge(
+const RegisterConfig = DeclarationActionBase.merge(
   z.object({
-    type: z.literal(ActionType.REGISTER),
-    review: DeclarationReviewConfig,
-    deduplication: DeduplicationConfig.optional()
+    type: z.literal(ActionType.REGISTER)
   })
 )
 
@@ -175,6 +165,9 @@ export const ActionConfig = z
     RejectCorrectionConfig.openapi({ ref: 'RejectCorrectionActionConfig' }),
     ApproveCorrectionConfig.openapi({ ref: 'ApproveCorrectionActionConfig' })
   ])
+  .describe(
+    'Configuration of an action available for an event. Data collected depends on the action type and is accessible through the annotation property in ActionDocument.'
+  )
   .openapi({ ref: 'ActionConfig' }) as unknown as z.ZodDiscriminatedUnion<
   'type',
   AllActionConfigFields[]

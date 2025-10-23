@@ -17,12 +17,28 @@ extendZodWithOpenApi(z)
 
 export const EventDocument = z
   .object({
-    id: UUID,
-    type: z.string(),
-    createdAt: z.string().datetime(),
-    updatedAt: z.string().datetime(),
-    actions: z.array(Action),
-    trackingId: z.string()
+    id: UUID.describe('Unique identifier of the event.'),
+    type: z
+      .string()
+      .describe('Type of the event (e.g. birth, death, marriage).'),
+    createdAt: z
+      .string()
+      .datetime()
+      .describe('Timestamp indicating when the event was created.'),
+    updatedAt: z
+      .string()
+      .datetime()
+      .describe(
+        'Timestamp of the last update, excluding changes from actions.'
+      ),
+    actions: z
+      .array(Action)
+      .describe('Ordered list of actions associated with the event.'),
+    trackingId: z
+      .string()
+      .describe(
+        'System-generated tracking identifier used to look up the event.'
+      )
   })
   .openapi({ ref: 'EventDocument' })
 

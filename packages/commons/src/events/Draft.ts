@@ -20,15 +20,19 @@ import { UUID } from '../uuid'
  * Stored with details of the event, creator and creation time.
  * Drafts are deleted when the action is committed.
  */
-export const Draft = z.object({
-  id: UUID,
-  eventId: UUID,
-  transactionId: z.string(),
-  createdAt: z.string().datetime(),
-  action: ActionBase.extend({
-    type: ActionTypes.exclude([ActionTypes.Enum.DELETE])
-  }).omit({ id: true, createdAtLocation: true })
-})
+export const Draft = z
+  .object({
+    id: UUID,
+    eventId: UUID,
+    transactionId: z.string(),
+    createdAt: z.string().datetime(),
+    action: ActionBase.extend({
+      type: ActionTypes.exclude([ActionTypes.Enum.DELETE])
+    }).omit({ id: true, createdAtLocation: true })
+  })
+  .describe(
+    'A temporary storage for an action. Stored with details of the event, creator and creation time.'
+  )
 
 export const DraftInput = BaseActionInput.extend({
   type: ActionTypes.exclude([ActionTypes.Enum.DELETE]),

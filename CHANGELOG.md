@@ -36,6 +36,8 @@
 
   - Renamed `COUNTRY_CONFIG_URL` → `COUNTRY_CONFIG_URL_EXTERNAL` in the auth service to make its purpose clearer and more explicit.
 
+- Tiltfile: Improved Kubernetes support for development environment [#10672](https://github.com/opencrvs/opencrvs-core/issues/10672)
+
 ### Bug fixes
 
 - Fix informant details not populating in API [#10311](https://github.com/opencrvs/opencrvs-core/issues/10311)
