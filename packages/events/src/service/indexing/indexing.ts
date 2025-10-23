@@ -146,7 +146,7 @@ function mapFieldTypeToElasticsearch(
         type: 'object',
         properties: {
           age: { type: 'double' },
-          asOfDate: { type: 'date' }
+          asOfDateRef: { type: 'keyword' }
         } satisfies {
           [K in keyof AgeValue]: estypes.MappingProperty
         }
