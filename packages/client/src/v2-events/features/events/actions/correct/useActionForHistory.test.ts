@@ -9,9 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import addDays from 'date-fns/addDays'
 import {
+  ActionDocument,
+  ActionStatus,
+  ActionType,
   ActionTypes,
+  createPrng,
+  generateActionDocument,
   generateEventDocument,
+  generateRandomDatetime,
+  generateRandomSignature,
+  generateTrackingId,
+  generateUuid,
   tennisClubMembershipEvent,
   TestUserRole
 } from '@opencrvs/commons/client'
@@ -97,5 +107,104 @@ describe('useActionForHistory', () => {
     ).find((a) => a.type === DECLARATION_ACTION_UPDATE)
 
     expect(updateActionForEventCreatedByRegAgent).toBeUndefined()
+  })
+
+  const rng = createPrng(3123)
+  const validateActionUuid = generateUuid(rng)
+
+  const actionDefaults = {
+    createdAt: generateRandomDatetime(
+      createPrng(82),
+      new Date('2024-03-01'),
+      new Date('2024-04-01')
+    ),
+    createdBy: generator.user.id.localRegistrar,
+    createdByRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    createdAtLocation: generator.user.localRegistrar().v2.primaryOfficeId
+  } satisfies Partial<ActionDocument>
+
+  it('should add synthetic UPDATE action when only annotation changes', () => {
+    const annotationUpdateOnValidateEvent = {
+      id: generateUuid(rng),
+      type: 'tennis-club-membership',
+      actions: [
+        generateActionDocument({
+          action: ActionType.CREATE,
+          configuration: tennisClubMembershipEvent,
+          defaults: {
+            ...actionDefaults,
+            createdAt: actionDefaults.createdAt
+          }
+        }),
+        generateActionDocument({
+          action: ActionType.DECLARE,
+          configuration: tennisClubMembershipEvent,
+          defaults: {
+            ...actionDefaults,
+            createdAt: addDays(
+              new Date(actionDefaults.createdAt),
+              1
+            ).toISOString(),
+            annotation: {
+              'review.signature': generateRandomSignature(rng)
+            }
+          }
+        }),
+        generateActionDocument({
+          action: ActionType.VALIDATE,
+          configuration: tennisClubMembershipEvent,
+          declarationOverrides: {},
+          defaults: {
+            ...actionDefaults,
+            createdAt: addDays(
+              new Date(actionDefaults.createdAt),
+              2
+            ).toISOString(),
+            id: validateActionUuid,
+            status: ActionStatus.Requested,
+            annotation: {
+              'review.signature': generateRandomSignature(rng)
+            }
+          }
+        }),
+        generateActionDocument({
+          action: ActionType.VALIDATE,
+          configuration: tennisClubMembershipEvent,
+          declarationOverrides: {},
+          defaults: {
+            ...actionDefaults,
+            createdAt: addDays(
+              new Date(actionDefaults.createdAt),
+              2
+            ).toISOString(),
+            status: ActionStatus.Accepted,
+            originalActionId: validateActionUuid
+          }
+        }),
+        generateActionDocument({
+          configuration: tennisClubMembershipEvent,
+          action: ActionType.ASSIGN,
+          defaults: {
+            ...actionDefaults,
+            createdAt: addDays(
+              new Date(actionDefaults.createdAt),
+              3
+            ).toISOString(),
+            assignedTo: generator.user.id.localRegistrar
+          }
+        })
+      ],
+      trackingId: generateTrackingId(rng),
+      updatedAt: actionDefaults.createdAt,
+      createdAt: actionDefaults.createdAt
+    }
+
+    const updateAction = expandWithUpdateActions(
+      annotationUpdateOnValidateEvent,
+      getTestValidatorContext(),
+      tennisClubMembershipEvent
+    ).find((a) => a.type === DECLARATION_ACTION_UPDATE)
+
+    expect(updateAction).not.toBeUndefined()
   })
 })

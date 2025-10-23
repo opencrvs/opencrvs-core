@@ -965,7 +965,7 @@ export function generateEventDraftDocument({
   }
 }
 
-export function getRandomDatetime(
+export function generateRandomDatetime(
   rng: () => number,
   start: Date,
   end: Date
@@ -977,7 +977,7 @@ export function getRandomDatetime(
 }
 
 export function getRandomDate(rng: () => number, start: string, end: string) {
-  const datetime = getRandomDatetime(rng, new Date(start), new Date(end))
+  const datetime = generateRandomDatetime(rng, new Date(start), new Date(end))
 
   return datetime.split('T')[0] // Return only the date part in YYYY-MM-DD format
 }
@@ -1033,7 +1033,7 @@ export const eventQueryDataGenerator = (
 ): EventIndex => {
   const rng = createPrng(seed)
 
-  const createdAt = getRandomDatetime(
+  const createdAt = generateRandomDatetime(
     rng,
     new Date('2024-01-01'),
     new Date('2024-12-31')
