@@ -21,6 +21,8 @@ interface AgeInputProps extends Omit<TextInputProps, 'min' | 'onChange'> {
   value: number | undefined
 }
 
+const AGE_MAX_CHARACTERS = 3
+
 function AgeInput({ asOfDateRef, value, ...props }: AgeInputProps) {
   const [inputValue, setInputValue] = React.useState(
     value && isNaN(value) ? undefined : value
@@ -30,7 +32,7 @@ function AgeInput({ asOfDateRef, value, ...props }: AgeInputProps) {
     <TextInputComponent
       {...props}
       data-testid={`age__${props.id}`}
-      maxLength={3}
+      maxLength={AGE_MAX_CHARACTERS}
       value={inputValue}
       onBlur={(e) => {
         props.onChange(
