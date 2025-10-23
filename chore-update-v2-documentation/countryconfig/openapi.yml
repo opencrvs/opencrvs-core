@@ -7570,13 +7570,13 @@ components:
             configuration:
               type: object
               properties:
-                formProjection:
-                  type: object
-                  additionalProperties:
+                pickParams:
+                  type: array
+                  items:
                     type: string
-                  description: Projection of the field value after parsing the query string, the
-                    property will be ignored if the item is not present in
-                    querystring
+                  description: List of query parameters to read from the URL
+              required:
+                - pickParams
           required:
             - id
             - label
@@ -8426,12 +8426,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -8528,12 +8527,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -8736,12 +8734,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -8835,12 +8832,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -9105,12 +9101,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -9204,12 +9199,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -9412,12 +9406,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -9511,12 +9504,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -9777,12 +9769,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -9876,12 +9867,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -10084,12 +10074,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -10183,12 +10172,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -10459,12 +10447,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -10558,12 +10545,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -10766,12 +10752,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -10865,12 +10850,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -11150,12 +11134,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -11249,12 +11232,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -11457,12 +11439,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -11556,12 +11537,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -11822,12 +11802,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -11921,12 +11900,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -12129,12 +12107,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -12228,12 +12205,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -12502,12 +12478,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -12601,12 +12576,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -12809,12 +12783,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -12908,12 +12881,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -13184,12 +13156,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -13283,12 +13254,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -13491,12 +13461,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -13590,12 +13559,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -13856,12 +13824,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -13955,12 +13922,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -14163,12 +14129,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -14262,12 +14227,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -14532,12 +14496,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -14631,12 +14594,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -14839,12 +14801,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -14938,12 +14899,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -15204,12 +15164,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -15303,12 +15262,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -15511,12 +15469,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -15610,12 +15567,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -15880,12 +15836,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -15979,12 +15934,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -16187,12 +16141,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -16286,12 +16239,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -16552,12 +16504,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -16651,12 +16602,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -16859,12 +16809,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -16958,12 +16907,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -17227,12 +17175,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -17326,12 +17273,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -17534,12 +17480,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -17633,12 +17578,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -17912,12 +17856,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -18011,12 +17954,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -18219,12 +18161,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -18318,12 +18259,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -18584,12 +18524,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -18683,12 +18622,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -18891,12 +18829,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -18990,12 +18927,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -19263,12 +19199,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -19362,12 +19297,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
@@ -19570,12 +19504,11 @@ components:
                 properties:
                   age:
                     type: number
-                  asOfDate:
+                  asOfDateRef:
                     type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
                 required:
                   - age
+                  - asOfDateRef
               - type: object
                 properties:
                   country:
@@ -19669,12 +19602,11 @@ components:
                       properties:
                         age:
                           type: number
-                        asOfDate:
+                        asOfDateRef:
                           type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
                       required:
                         - age
+                        - asOfDateRef
                     - type: string
                       pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                     - type: object
