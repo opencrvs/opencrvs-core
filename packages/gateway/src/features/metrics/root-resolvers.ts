@@ -301,7 +301,8 @@ export const resolvers: GQLResolver = {
             ActionTypes.enum.DELETE,
             ActionTypes.enum.CREATE,
             ActionTypes.Enum.DUPLICATE_DETECTED,
-            ActionTypes.Enum.NOTIFY
+            ActionTypes.Enum.NOTIFY,
+            ActionTypes.Enum.UPDATE
           ]).options
         },
         { ...authHeader }
