@@ -891,7 +891,7 @@ export function generateEventDocument({
 }: {
   configuration: EventConfig
   actions: {
-    type: Exclude<ActionType, 'UPDATE'>[]
+    type: Exclude<ActionType, 'UPDATE'>
     /**
      * Overrides for default event state per action
      */
