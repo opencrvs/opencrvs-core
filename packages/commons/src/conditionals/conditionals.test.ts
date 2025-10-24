@@ -1709,6 +1709,43 @@ describe('Subfield nesting', () => {
       validate(field('applicant.http').get('success').isEqualTo(true), params)
     ).toBe(true)
   })
+
+  it('is supported by other conditionals', () => {
+    expect(
+      validate(
+        or(
+          field('applicant.name').get('firstname').isValidEnglishName(),
+          field('applicant.name').get('middlename').isValidEnglishName(),
+          field('applicant.name').get('surname').isValidEnglishName()
+        ),
+        {
+          $form: {
+            'applicant.name': { firstname: '', middlename: '', surname: '' }
+          },
+          $now: formatISO(new Date(), { representation: 'date' }),
+          $locations: [],
+          $online: false
+        }
+      )
+    ).toBe(false)
+    expect(
+      validate(
+        or(
+          field('applicant.name').get('firstname').isValidEnglishName(),
+          field('applicant.name').get('middlename').isValidEnglishName(),
+          field('applicant.name').get('surname').isValidEnglishName()
+        ),
+        {
+          $form: {
+            'applicant.name': { firstname: '', middlename: 'Riku', surname: '' }
+          },
+          $now: formatISO(new Date(), { representation: 'date' }),
+          $locations: [],
+          $online: false
+        }
+      )
+    ).toBe(true)
+  })
 })
 
 describe('isGreaterThan and isLessThan conditionals', () => {
