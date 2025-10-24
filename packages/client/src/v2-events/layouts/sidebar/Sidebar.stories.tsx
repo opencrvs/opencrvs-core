@@ -24,24 +24,24 @@ type Story = StoryObj<typeof Sidebar>
 
 export const LocalRegistrar: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR
   }
 }
 
 export const FieldAgent: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT
+    userRole: TestUserRole.enum.FIELD_AGENT
   }
 }
 
 export const RegistrationAgent: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.REGISTRATION_AGENT
+    userRole: TestUserRole.enum.REGISTRATION_AGENT
   }
 }
 
 export const LocalSystemAdmin: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN
+    userRole: TestUserRole.enum.LOCAL_SYSTEM_ADMIN
   }
 }

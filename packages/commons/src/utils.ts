@@ -10,7 +10,7 @@
  */
 
 import { NameFieldValue } from './events/CompositeFieldValue'
-import * as z from 'zod'
+import { z } from 'zod'
 
 export function getOrThrow<T>(x: T, message: string) {
   if (x === undefined || x === null) {

@@ -34,7 +34,7 @@ export const CertificateConfig = z.object({
     delayed: z.number()
   }),
   svgUrl: z.string(),
-  fonts: z.record(FontFamily).optional(),
+  fonts: z.record(z.string(), FontFamily).optional(),
   conditionals: z.array(ShowConditional).optional()
 })
 

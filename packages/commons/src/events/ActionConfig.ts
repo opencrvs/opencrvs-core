@@ -14,9 +14,6 @@ import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
 import { ActionFormConfig } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
-import { extendZodWithOpenApi } from 'zod-openapi'
-
-extendZodWithOpenApi(z)
 
 export const DeclarationReviewConfig = z
   .object({
@@ -40,72 +37,72 @@ export const DeclarationActionBase = ActionConfigBase.extend({
   deduplication: DeduplicationConfig.optional()
 })
 
-const ReadActionConfig = ActionConfigBase.merge(
+const ReadActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.READ),
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page for read-only view.'
     )
-  })
+  }).shape
 )
 
-const DeclareConfig = DeclarationActionBase.merge(
+const DeclareConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.DECLARE)
-  })
+  }).shape
 )
 
-const ValidateConfig = DeclarationActionBase.merge(
+const ValidateConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.VALIDATE)
-  })
+  }).shape
 )
 
-const RegisterConfig = DeclarationActionBase.merge(
+const RegisterConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.REGISTER)
-  })
+  }).shape
 )
 
-const RejectDeclarationConfig = ActionConfigBase.merge(
+const RejectDeclarationConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REJECT)
   })
 )
 
-const ArchiveConfig = ActionConfigBase.merge(
+const ArchiveConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.ARCHIVE)
   })
 )
 
-const DeleteConfig = ActionConfigBase.merge(
+const DeleteConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.DELETE)
   })
 )
 
-const PrintCertificateActionConfig = ActionConfigBase.merge(
+const PrintCertificateActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.PRINT_CERTIFICATE),
     printForm: ActionFormConfig
-  })
+  }).shape
 )
 
-const RequestCorrectionConfig = ActionConfigBase.merge(
+const RequestCorrectionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REQUEST_CORRECTION),
     correctionForm: ActionFormConfig
-  })
+  }).shape
 )
 
-const RejectCorrectionConfig = ActionConfigBase.merge(
+const RejectCorrectionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REJECT_CORRECTION)
-  })
+  }).shape
 )
 
-const ApproveCorrectionConfig = ActionConfigBase.merge(
+const ApproveCorrectionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.APPROVE_CORRECTION)
   })
@@ -151,27 +148,25 @@ export const ActionConfig = z
      * OpenAPI references are defined here so our generated OpenAPI spec knows to reuse the models
      * and treat them as "models" instead of duplicating the data structure in each endpoint.
      */
-    ReadActionConfig.openapi({ ref: 'ReadActionConfig' }),
-    DeclareConfig.openapi({ ref: 'DeclareActionConfig' }),
-    ValidateConfig.openapi({ ref: 'ValidateActionConfig' }),
-    RejectDeclarationConfig.openapi({ ref: 'RejectDeclarationActionConfig' }),
-    ArchiveConfig.openapi({ ref: 'ArchiveActionConfig' }),
-    RegisterConfig.openapi({ ref: 'RegisterActionConfig' }),
-    DeleteConfig.openapi({ ref: 'DeleteActionConfig' }),
-    PrintCertificateActionConfig.openapi({
-      ref: 'PrintCertificateActionConfig'
+    ReadActionConfig.meta({ id: 'ReadActionConfig' }),
+    DeclareConfig.meta({ id: 'DeclareActionConfig' }),
+    ValidateConfig.meta({ id: 'ValidateActionConfig' }),
+    RejectDeclarationConfig.meta({ id: 'RejectDeclarationActionConfig' }),
+    ArchiveConfig.meta({ id: 'ArchiveActionConfig' }),
+    RegisterConfig.meta({ id: 'RegisterActionConfig' }),
+    DeleteConfig.meta({ id: 'DeleteActionConfig' }),
+    PrintCertificateActionConfig.meta({
+      id: 'PrintCertificateActionConfig'
     }),
-    RequestCorrectionConfig.openapi({ ref: 'RequestCorrectionActionConfig' }),
-    RejectCorrectionConfig.openapi({ ref: 'RejectCorrectionActionConfig' }),
-    ApproveCorrectionConfig.openapi({ ref: 'ApproveCorrectionActionConfig' })
+    RequestCorrectionConfig.meta({ id: 'RequestCorrectionActionConfig' }),
+    RejectCorrectionConfig.meta({ id: 'RejectCorrectionActionConfig' }),
+    ApproveCorrectionConfig.meta({ id: 'ApproveCorrectionActionConfig' })
   ])
   .describe(
     'Configuration of an action available for an event. Data collected depends on the action type and is accessible through the annotation property in ActionDocument.'
   )
-  .openapi({ ref: 'ActionConfig' }) as unknown as z.ZodDiscriminatedUnion<
-  'type',
-  AllActionConfigFields[]
->
+  .meta({ id: 'ActionConfig' })
+//REMOVED_AS as unknown as z.ZodDiscriminatedUnion<'type', AllActionConfigFields[]>
 
 export type ActionConfig = InferredActionConfig
 

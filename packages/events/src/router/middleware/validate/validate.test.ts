@@ -22,7 +22,7 @@ export const testContext = {
   user: {
     sub: 'user_12345',
     scope: ['declare'],
-    role: TestUserRole.Enum.LOCAL_REGISTRAR,
+    role: TestUserRole.enum.LOCAL_REGISTRAR,
     exp: '1678890000',
     algorithm: 'RS256',
     userType: TokenUserType.enum.user
@@ -151,7 +151,7 @@ describe('getFieldErrors()', () => {
           conditionals: [
             {
               type: ConditionalType.SHOW,
-              conditional: user.hasRole(TestUserRole.Enum.FIELD_AGENT)
+              conditional: user.hasRole(TestUserRole.enum.FIELD_AGENT)
             }
           ]
         }
@@ -178,7 +178,7 @@ describe('getFieldErrors()', () => {
           conditionals: [
             {
               type: ConditionalType.SHOW,
-              conditional: user.hasRole(TestUserRole.Enum.LOCAL_REGISTRAR)
+              conditional: user.hasRole(TestUserRole.enum.LOCAL_REGISTRAR)
             }
           ]
         }
@@ -205,7 +205,7 @@ describe('getFieldErrors()', () => {
           conditionals: [
             {
               type: ConditionalType.SHOW,
-              conditional: user.hasRole(TestUserRole.Enum.LOCAL_REGISTRAR)
+              conditional: user.hasRole(TestUserRole.enum.LOCAL_REGISTRAR)
             }
           ]
         }

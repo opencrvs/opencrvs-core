@@ -353,7 +353,7 @@ export const userDetails: UserDetails = {
     { use: 'bn', firstNames: '', familyName: '' }
   ],
   role: {
-    id: TestUserRole.Enum.FIELD_AGENT,
+    id: TestUserRole.enum.FIELD_AGENT,
     label: {
       defaultMessage: 'Field Agent',
       description: 'Name for user role Field Agent',
@@ -1780,7 +1780,7 @@ export function fetchUserMock(officeId: string): FetchUserQuery {
       practitionerId: '4651d1cc-6072-4e34-bf20-b583f421a9f1',
       creationDate: '1701241360173',
       role: {
-        id: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN,
+        id: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
         label: {
           id: 'userRoles.localSystemAdmin',
           defaultMessage: 'Local System Admin',

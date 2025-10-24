@@ -10,7 +10,7 @@
  */
 
 import { hashKey, MutationKey, useMutationState } from '@tanstack/react-query'
-import * as z from 'zod'
+import { z } from 'zod'
 import { TRPCClientError } from '@trpc/client'
 import {
   applyDeclarationToEventIndex,

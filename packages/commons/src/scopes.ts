@@ -518,6 +518,7 @@ export const scopes: Scope[] = Object.values(SCOPES)
 export type ParsedScopes = NonNullable<
   ReturnType<typeof parseConfigurableScope>
 >
+
 export type RawScopes = z.infer<typeof LiteralScopes> | (string & {})
 
 // for backwards compatibility

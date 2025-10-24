@@ -52,7 +52,7 @@ export const ActionFlag = z
     ),
     'Flag must be in the format ActionType:ActionStatus (lowerCase)'
   )
-export const Flag = ActionFlag.or(z.nativeEnum(InherentFlags))
+export const Flag = ActionFlag.or(z.enum(InherentFlags))
 
 export type ActionFlag = z.infer<typeof ActionFlag>
 export type Flag = z.infer<typeof Flag>

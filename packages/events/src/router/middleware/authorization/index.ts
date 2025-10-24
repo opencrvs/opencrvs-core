@@ -12,7 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
-import z from 'zod'
+import { z } from 'zod'
 import { findLast } from 'lodash'
 import {
   ActionDocument,
@@ -210,7 +210,7 @@ export const requireAssignment: MiddlewareFunction<
   )
 
   // System users can not perform action on assigned events
-  if (user.type === TokenUserType.Enum.system && assignedTo) {
+  if (user.type === TokenUserType.enum.system && assignedTo) {
     throw new TRPCError({
       code: 'CONFLICT',
       cause: 'System user can not perform action on assigned event'
@@ -218,7 +218,7 @@ export const requireAssignment: MiddlewareFunction<
   }
 
   // Normal users require assignment
-  if (user.type === TokenUserType.Enum.user && user.id !== assignedTo) {
+  if (user.type === TokenUserType.enum.user && user.id !== assignedTo) {
     throw new TRPCError({
       code: 'CONFLICT',
       message: 'You are not assigned to this event'
@@ -341,7 +341,18 @@ export const userCanReadEvent: MiddlewareFunction<
   )
 
   if (canRead) {
-    return next({ ctx: { ...ctx, event } })
+    return next({
+      ctx: {
+        ...ctx,
+        user: {
+          id: ctx.user.id,
+          type: 'system',
+          primaryOfficeId: ctx.user.primaryOfficeId,
+          role: ctx.user.role
+        },
+        event
+      }
+    })
   }
 
   // Throw not found to avoid leaking the existence of the event
@@ -366,6 +377,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
       SCOPES.USER_READ_MY_JURISDICTION,
       SCOPES.USER_READ_ONLY_MY_AUDIT
     ],
+
     getScopes(token)
   )
 
@@ -381,7 +393,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
   }
 
   // Not supported for system users
-  if (otherUser.type === TokenUserType.Enum.system) {
+  if (otherUser.type === TokenUserType.enum.system) {
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 

@@ -101,6 +101,7 @@ export type WorkqueueConfig = z.infer<typeof WorkqueueConfig>
 export type WorkqueueConfigWithoutQuery = z.infer<
   typeof WorkqueueConfigWithoutQuery
 >
+
 export type WorkqueueConfigInput = z.input<typeof WorkqueueConfigInput>
 
 export function defineWorkqueue(workqueueInput: WorkqueueConfigInput) {

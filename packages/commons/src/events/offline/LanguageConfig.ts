@@ -19,7 +19,7 @@ export const LanguageConfig = z.object({
   /**
    * client.csv contents
    */
-  messages: z.record(z.string())
+  messages: z.record(z.string(), z.string())
 })
 
 export type LanguageConfig = z.infer<typeof LanguageConfig>

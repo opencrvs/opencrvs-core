@@ -109,14 +109,14 @@ async function resolveUserDetails(
   try {
     if (userId === REINDEX_USER_ID) {
       return SystemContext.parse({
-        type: TokenUserType.Enum.system,
+        type: TokenUserType.enum.system,
         id: userId,
         primaryOfficeId: undefined,
         role: SystemRole.enum.REINDEX
       })
     }
 
-    if (userType === TokenUserType.Enum.system) {
+    if (userType === TokenUserType.enum.system) {
       const { type } = await getSystem(userId, token)
 
       return SystemContext.parse({
@@ -134,11 +134,11 @@ async function resolveUserDetails(
 
     if (username === SEEDER_SUPER_ADMIN) {
       logger.warn(
-        `User ${username} is used for seeding. Treating it as a ${TokenUserType.Enum.system} user type.`
+        `User ${username} is used for seeding. Treating it as a ${TokenUserType.enum.system} user type.`
       )
 
       return SuperAdminContext.parse({
-        type: TokenUserType.Enum.system,
+        type: TokenUserType.enum.system,
         id: userId,
         primaryOfficeId: undefined,
         role

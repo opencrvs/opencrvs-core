@@ -16,6 +16,6 @@ export const EventInput = z
     transactionId: z.string(),
     type: z.string()
   })
-  .openapi({ default: { transactionId: uuidv4(), type: 'birth' } })
+  .meta({ default: { transactionId: uuidv4(), type: 'birth' } })
 
 export type EventInput = z.infer<typeof EventInput>

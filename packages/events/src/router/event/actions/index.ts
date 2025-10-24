@@ -469,7 +469,7 @@ export function getDefaultActionProcedures(
           originalActionId: actionId,
           type: actionType,
           createdBy: ctx.user.id,
-          createdByUserType: TokenUserType.Enum.user,
+          createdByUserType: TokenUserType.enum.user,
           createdByRole: ctx.user.role,
           createdAtLocation: ctx.user.primaryOfficeId ?? undefined,
           token: ctx.token,

@@ -13,7 +13,7 @@ import {
   getTaskFromSavedBundle
 } from '@opencrvs/commons/types'
 import * as Hapi from '@hapi/hapi'
-import * as z from 'zod'
+import { z } from 'zod'
 import { validateRequest } from '@workflow/utils/index'
 import { getValidRecordById } from '@workflow/records/index'
 import { getToken } from '@workflow/utils/auth-utils'

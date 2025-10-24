@@ -10,8 +10,6 @@
  */
 
 import { z } from 'zod'
-import { extendZodWithOpenApi } from 'zod-openapi'
-extendZodWithOpenApi(z)
 
 export const MINIO_REGEX =
   /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|png|jpeg|svg)(\?.*)?$/i
@@ -39,7 +37,7 @@ export type FullDocumentUrl = z.infer<typeof FullDocumentUrl>
 export const FullDocumentPath = z
   .string()
   .transform((val) => (val.startsWith('/') ? val : `/${val}`))
-  .openapi({ effectType: 'input', type: 'string' })
+  .meta({ effectType: 'input', type: 'string' })
   .describe(
     'A full absolute path with bucket name, starting from the root of the S3 server, /bucket-name/document-id.jpg'
   )

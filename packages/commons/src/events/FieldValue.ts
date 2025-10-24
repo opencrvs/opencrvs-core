@@ -79,7 +79,7 @@ export const DateRangeFieldValue = z
 export type DateRangeFieldValue = z.infer<typeof DateRangeFieldValue>
 export type SelectDateRangeValue = z.infer<typeof SelectDateRangeValue>
 
-export const EmailValue = z.string().email()
+export const EmailValue = z.email()
 
 export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
@@ -195,5 +195,7 @@ export type FieldUpdateValueSchema =
   | typeof ButtonFieldValue
   | typeof QrReaderFieldValue
   | typeof IdReaderFieldValue
+  | typeof DateValue
+  | typeof EmailValue
   | z.ZodString
   | z.ZodBoolean

@@ -139,7 +139,7 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
           'storybook.failed': 'failed'
         }}
         validatorContext={getTestValidatorContext(
-          TestUserRole.Enum.LOCAL_REGISTRAR
+          TestUserRole.enum.LOCAL_REGISTRAR
         )}
         onChange={noop}
       />

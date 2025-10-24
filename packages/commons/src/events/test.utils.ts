@@ -379,8 +379,7 @@ export function eventPayloadGenerator(
         omitFields = []
       }: {
         eventId: UUID
-        actionType: Draft['action']['type']
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        actionType: Draft['action']['type'] // eslint-disable-next-line @typescript-eslint/no-explicit-any
         annotation?: Record<string, any>
         omitFields?: string[] // list of declaration fields to exclude
       },
@@ -415,7 +414,7 @@ export function eventPayloadGenerator(
           },
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
-          createdByUserType: TokenUserType.Enum.user,
+          createdByUserType: TokenUserType.enum.user,
           createdByRole: '@todo'
         }
       }
@@ -791,8 +790,8 @@ export function generateActionDocument<T extends ActionType>({
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
     createdBy: generateUuid(rng),
-    createdByUserType: TokenUserType.Enum.user,
-    createdByRole: TestUserRole.Enum.FIELD_AGENT,
+    createdByUserType: TokenUserType.enum.user,
+    createdByRole: TestUserRole.enum.FIELD_AGENT,
     id: getUUID(),
     createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     declaration: generateActionDeclarationInput(
@@ -892,8 +891,7 @@ export function generateEventDocument({
     type: ActionType
     /**
      * Overrides for default event state per action
-     */
-    declarationOverrides?: Partial<EventState>
+     */ declarationOverrides?: Partial<EventState>
     user?: Partial<{
       signature: string
       primaryOfficeId: UUID
@@ -1101,6 +1099,7 @@ export const generateWorkqueues = (
           conditionals: []
         }
       ],
+
       icon: 'Draft'
     }
   ])

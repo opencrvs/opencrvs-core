@@ -85,7 +85,7 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
             keepAssignment: true
           })
 
-          if (eventIndex.status === EventStatus.Values.DECLARED) {
+          if (eventIndex.status === EventStatus.enum.DECLARED) {
             navigate(ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId }))
           } else {
             navigate(ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId }))

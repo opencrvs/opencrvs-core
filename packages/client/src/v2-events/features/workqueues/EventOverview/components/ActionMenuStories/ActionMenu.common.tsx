@@ -280,8 +280,8 @@ export const enum AssertType {
   DISABLED = 'DISABLED'
 }
 
-export const getHiddenActions = () =>
-  Object.values(ActionTypes.Values).reduce(
+export const getHiddenActions = (): Record<string, AssertType> =>
+  Object.values(ActionTypes.enum).reduce(
     (acc, action) => {
       acc[action] = AssertType.HIDDEN
       return acc

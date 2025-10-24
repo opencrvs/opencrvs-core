@@ -51,6 +51,7 @@ export const workqueueRouter = router({
         string,
         SearchScopeAccessLevels
       >
+
       return getEventCount(
         input,
         await getInMemoryEventConfigurations(ctx.token),

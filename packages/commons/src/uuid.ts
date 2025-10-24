@@ -11,7 +11,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
 
-export const UUID = z.string().uuid().brand('UUID')
+export const UUID = z.uuid().brand('UUID')
 export type UUID = z.infer<typeof UUID>
 
 export function getUUID() {

@@ -11,7 +11,7 @@
 
 import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
-import { ErrorMapCtx, z, ZodIssueOptionalMessage } from 'zod'
+import { z } from 'zod'
 import { formatISO, isAfter, isBefore } from 'date-fns'
 
 import { ConditionalParameters, JSONSchema } from './conditionals'
@@ -165,7 +165,7 @@ export function isOnline() {
 
 export function isConditionMet(
   conditional: JSONSchema,
-  values: Record<string, FieldValue>,
+  values: Record<string, FieldUpdateValue>,
   context: ValidatorContext
 ) {
   return validate(conditional, {
@@ -312,27 +312,28 @@ function createIntlError(message: TranslationConfig) {
  * Form error message definitions for Zod validation errors.
  * Overrides zod internal type error messages (string) to match the OpenCRVS error messages (TranslationConfig).
  */
+// In modern Zod, the `issue` parameter is always `z.core.$ZodIssue`.
 function zodToIntlErrorMap(
-  issue: ZodIssueOptionalMessage,
-  _ctx: ErrorMapCtx,
+  issue: z.core.$ZodIssue,
+  value: unknown,
   field: FieldConfig
 ) {
   const requiredMessage: TranslationConfig =
     field.required && typeof field.required === 'object'
       ? field.required.message
       : errorMessages.requiredField
-  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+
   switch (issue.code) {
-    case 'invalid_string': {
-      if (_ctx.data === '') {
+    case 'too_small': {
+      if (value === '') {
         return createIntlError(requiredMessage)
       }
 
-      if (issue.validation === 'date') {
+      if (issue.origin === 'date') {
         return createIntlError(errorMessages.invalidDate)
       }
 
-      if (issue.validation === 'email') {
+      if (issue.origin === 'email') {
         return createIntlError(errorMessages.invalidEmail)
       }
 
@@ -340,34 +341,47 @@ function zodToIntlErrorMap(
     }
 
     case 'invalid_type': {
-      if (
-        issue.expected !== issue.received &&
-        (issue.received === 'undefined' || issue.received === 'null')
-      ) {
+      if (issue.input === 'undefined' || issue.input === 'null') {
         return createIntlError(requiredMessage)
       }
 
       break
     }
-    case 'too_small': {
-      if (issue.message === undefined) {
-        return createIntlError(requiredMessage)
-      }
 
-      break
-    }
     case 'invalid_union': {
-      for (const { issues } of issue.unionErrors) {
-        for (const e of issues) {
-          if (
-            zodToIntlErrorMap(e, _ctx, field).message.message.id !==
-            'error.required'
-          ) {
+      for (const unionError of issue.errors) {
+        for (const e of unionError) {
+          const intlErr = zodToIntlErrorMap(e, value, field)
+          if (intlErr.message.message.id !== 'error.required') {
             return createIntlError(errorMessages.invalidInput)
           }
         }
       }
       return createIntlError(requiredMessage)
+    }
+    case 'custom': {
+      throw new Error('Not implemented yet: "custom" case')
+    }
+    case 'unrecognized_keys': {
+      throw new Error('Not implemented yet: "unrecognized_keys" case')
+    }
+    case 'invalid_value': {
+      throw new Error('Not implemented yet: "invalid_value" case')
+    }
+    case 'invalid_key': {
+      throw new Error('Not implemented yet: "invalid_key" case')
+    }
+    case 'invalid_format': {
+      throw new Error('Not implemented yet: "invalid_format" case')
+    }
+    case 'too_big': {
+      throw new Error('Not implemented yet: "too_big" case')
+    }
+    case 'not_multiple_of': {
+      throw new Error('Not implemented yet: "not_multiple_of" case')
+    }
+    case 'invalid_element': {
+      throw new Error('Not implemented yet: "invalid_element" case')
     }
   }
 
@@ -422,7 +436,7 @@ export function validateFieldInput({
 
   const rawError = zodType.safeParse(value, {
     // @ts-expect-error
-    errorMap: (issue, _ctx) => zodToIntlErrorMap(issue, _ctx, field)
+    error: (issue) => zodToIntlErrorMap(issue, value, field)
   })
 
   // We have overridden the standard error messages

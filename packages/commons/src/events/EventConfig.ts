@@ -15,10 +15,9 @@ import { TranslationConfig } from './TranslationConfig'
 import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
 import { findAllFields, getDeclarationFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
-import { extendZodWithOpenApi } from 'zod-openapi'
+
 import { FieldType } from './FieldType'
 import { FieldReference } from './FieldConfig'
-extendZodWithOpenApi(z)
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -127,8 +126,8 @@ export const EventConfig = z
       }
     }
   })
-  .openapi({
-    ref: 'EventConfig'
+  .meta({
+    id: 'EventConfig'
   })
   .describe('Configuration defining an event type.')
 

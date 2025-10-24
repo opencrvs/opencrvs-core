@@ -18,7 +18,7 @@ import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
 import { isRejected } from '@opencrvs/commons/types'
 import { validateRequest } from '@workflow/utils/index'
-import * as z from 'zod'
+import { z } from 'zod'
 import { SCOPES } from '@opencrvs/commons/authentication'
 
 export const registerRoute = createRoute({

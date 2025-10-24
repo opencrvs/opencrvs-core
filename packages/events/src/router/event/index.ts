@@ -10,7 +10,6 @@
  */
 
 import { z } from 'zod'
-import { extendZodWithOpenApi } from 'zod-openapi'
 import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -59,8 +58,6 @@ import { UserContext } from '../../context'
 import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
-
-extendZodWithOpenApi(z)
 
 export const eventRouter = router({
   config: router({
@@ -113,7 +110,8 @@ export const eventRouter = router({
     }),
   get: publicProcedure
     .input(UUID)
-    .use(middleware.userCanReadEvent)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .use(async (opts) => middleware.userCanReadEvent(opts as any))
     .query(async ({ ctx }) => {
       const event = ctx.event
 

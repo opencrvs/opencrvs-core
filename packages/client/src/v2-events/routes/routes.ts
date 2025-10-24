@@ -11,7 +11,7 @@
 
 import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
 import { zod } from 'react-router-typesafe-routes/zod'
-import * as z from 'zod'
+import { z } from 'zod'
 import { config } from '@client/config'
 import {
   requestRoutes as correctionRequestRoutes,

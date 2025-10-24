@@ -9,8 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { extendZodWithOpenApi } from 'zod-openapi'
-extendZodWithOpenApi(z)
 
 export type TranslationConfig = {
   id: string
@@ -29,12 +27,7 @@ export type MessageDescriptorZod = {
  * packages/commons/build/dist/common/events/EventConfig.d.ts
  * Doing this makes it go from 60705 to 40250
  */
-type ExplicitTypeToReduceDeclarationSize = z.ZodObject<
-  MessageDescriptorZod,
-  'strip',
-  z.ZodTypeAny,
-  TranslationConfig
->
+type ExplicitTypeToReduceDeclarationSize = z.ZodObject<MessageDescriptorZod>
 
 export const TranslationConfig: ExplicitTypeToReduceDeclarationSize = z
   .object({
@@ -50,7 +43,7 @@ export const TranslationConfig: ExplicitTypeToReduceDeclarationSize = z
         'Describe the translation for a translator to be able to identify it.'
       )
   })
-  .openapi({
+  .meta({
     description: 'Translation configuration',
-    ref: 'TranslationConfig'
+    id: 'TranslationConfig'
   })

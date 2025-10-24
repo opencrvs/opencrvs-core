@@ -30,7 +30,7 @@ const locationId = V2_DEFAULT_MOCK_LOCATIONS.find(
 export const TeamPageStory: Story = {
   name: 'Team Page',
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: V1_LEGACY_ROUTES.TEAM_USER_LIST + `?locationId=${locationId}`
