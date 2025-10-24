@@ -24,9 +24,9 @@ import {
   generateRandomSignature,
   generateTrackingId
 } from '@opencrvs/commons/client'
+import { DECLARATION_ACTION_UPDATE } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { getTestValidatorContext } from '../../../../../../../../.storybook/decorators'
 import { expandWithUpdateActions } from '../../../../../events/actions/correct/useActionForHistory'
-import { DECLARATION_ACTION_UPDATE } from '../../../../../events/registered-fields'
 import { testDataGenerator } from '../../../../../../../tests/test-data-generators'
 import { EventHistoryDialog } from './EventHistoryDialog'
 
