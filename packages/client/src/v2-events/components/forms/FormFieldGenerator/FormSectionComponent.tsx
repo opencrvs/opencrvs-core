@@ -9,10 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
-import { cloneDeep, isEqual, set, omit, get, assign, compact } from 'lodash'
-import { useIntl } from 'react-intl'
+import { cloneDeep, isEqual, set, omit, get, compact } from 'lodash'
 import styled, { keyframes } from 'styled-components'
 import {
   EventState,
@@ -253,31 +252,41 @@ export function FormSectionComponent({
         listenerField.id
       )
 
-      const referenceOrReferencesToOtherFields = fieldsWithDotSeparator.find(
+      const listenerFieldConfig = allFieldsWithDotSeparator.find(
         (f) => f.id === listenerFieldOcrvsId
-      )?.value
-      const referencesToOtherFields = ([] as FieldReference[]).concat(
-        referenceOrReferencesToOtherFields ?? []
       )
+
+      const referencesToOtherFields = ([] as FieldReference[]).concat(
+        listenerFieldConfig?.value ?? []
+      )
+
       const listenerFieldFormikId = makeFormFieldIdFormikCompatible(
         listenerField.id
       )
 
       const firstNonFalsyValue = compact(
         referencesToOtherFields.map((reference) =>
-          getUpdatedChildValueOnChange({
-            childField: listenerField,
-            fieldReference: reference,
-            fieldValues,
-            systemVariables
-          })
+          resolveFieldReferenceValue(reference, fieldValues)
         )
       )[0]
 
-      set(fieldValues, listenerFieldFormikId, firstNonFalsyValue)
+      if (firstNonFalsyValue) {
+        set(fieldValues, listenerFieldFormikId, firstNonFalsyValue)
+        set(fieldErrors, listenerFieldFormikId, '')
+        return
+      }
+
+      const defaultValue = handleDefaultValue({
+        field: listenerField,
+        systemVariables
+      })
+
+      set(fieldValues, listenerFieldFormikId, defaultValue)
       set(fieldErrors, listenerFieldFormikId, '')
+
+      return
     },
-    [fieldsWithDotSeparator, systemVariables]
+    [allFieldsWithDotSeparator, systemVariables]
   )
 
   const onFieldValueChange = useCallback(
