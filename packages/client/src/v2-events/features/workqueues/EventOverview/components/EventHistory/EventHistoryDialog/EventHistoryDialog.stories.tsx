@@ -1182,6 +1182,11 @@ const notDuplicateUpdateEvent = generateEventDocument({
         role: TestUserRole.enum.LOCAL_REGISTRAR,
         id: generator.user.id.localRegistrar
       },
+      createdAt: generateRandomDatetime(
+        createPrng(92),
+        new Date('2024-03-01'),
+        new Date('2024-04-01')
+      ),
       declarationOverrides: {
         'applicant.dob': '1999-11-11',
         'applicant.name': {

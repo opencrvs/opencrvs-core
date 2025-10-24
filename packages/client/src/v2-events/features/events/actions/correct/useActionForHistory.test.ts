@@ -132,8 +132,7 @@ describe('useActionForHistory', () => {
           action: ActionType.CREATE,
           configuration: tennisClubMembershipEvent,
           defaults: {
-            ...actionDefaults,
-            createdAt: actionDefaults.createdAt
+            ...actionDefaults
           }
         }),
         generateActionDocument({

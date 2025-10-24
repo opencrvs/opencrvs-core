@@ -142,7 +142,10 @@ const annotationUpdateOnRegisterEvent = {
   actions: [
     generateActionDocument({
       action: ActionType.CREATE,
-      configuration: tennisClubMembershipEvent
+      configuration: tennisClubMembershipEvent,
+      defaults: {
+        ...actionDefaults
+      }
     }),
     generateActionDocument({
       action: ActionType.DECLARE,
