@@ -18,8 +18,6 @@ import {
   NameFieldUpdateValue,
   HttpFieldUpdateValue,
   HttpFieldValue,
-  StreetLevelDetailsValue,
-  StreetLevelDetailsUpdateValue,
   QueryParamReaderFieldValue,
   QueryParamReaderFieldUpdateValue,
   QrReaderFieldValue,
@@ -102,15 +100,11 @@ export type VerificationStatusValue = z.infer<typeof VerificationStatusValue>
 // We need to create a separate union of all field types excluding the DataFieldValue,
 // because otherwise the DataFieldValue would need to refer to itself.
 const FieldValuesWithoutDataField = z.union([
-  /**
-   * Street level is our first dynamic record. In the future we might extend it to include any dynamic (sub)field.
-   */
-  StreetLevelDetailsValue,
+  AddressFieldValue,
   TextValue,
   DateValue,
   AgeValue,
   TimeValue,
-  AddressFieldValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
   CheckboxFieldValue,
@@ -129,7 +123,9 @@ const FieldValuesWithoutDataField = z.union([
 
 // As data field value can refer to other field values, it can contain any other field value types
 export const DataFieldValue = z
-  .record(z.string(), FieldValuesWithoutDataField)
+  .object({
+    data: z.record(z.string(), FieldValuesWithoutDataField)
+  })
   .nullish()
 export type DataFieldValue = z.infer<typeof DataFieldValue>
 
@@ -137,10 +133,6 @@ export const FieldValue = z.union([FieldValuesWithoutDataField, DataFieldValue])
 export type FieldValue = z.infer<typeof FieldValue>
 
 export const FieldUpdateValue = z.union([
-  /**
-   * Street level is our first dynamic record. In the future we might extend it to include any dynamic (sub)field.
-   */
-  StreetLevelDetailsUpdateValue,
   TextValue,
   DateValue,
   TimeValue,

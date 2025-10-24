@@ -27,7 +27,7 @@ import {
   VerificationStatusValue
 } from './FieldValue'
 import {
-  AddressFieldValue,
+  DomesticAddressFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
   HttpFieldValue,
@@ -599,7 +599,7 @@ const Office = BaseField.extend({
 
 export type Office = z.infer<typeof Office>
 
-export const DefaultAddressFieldValue = AddressFieldValue.extend({
+export const DefaultAddressFieldValue = DomesticAddressFieldValue.extend({
   administrativeArea: z.union([UUID, SerializedUserField]).optional()
 })
 

@@ -55,29 +55,43 @@ export const StreetLevelDetailsValue = z
   .record(z.string(), z.string())
   .optional()
 
-export const AddressFieldValue = z.object({
+export const BaseAddressFieldValue = z.object({
   country: z.string(),
-  addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL]),
-  administrativeArea: z
-    .string()
-    .uuid()
-    .optional() /* Leaf level admin structure */,
   streetLevelDetails: StreetLevelDetailsValue
 })
 
-export const StreetLevelDetailsUpdateValue = z
-  .record(z.string(), z.string())
-  .nullish()
+export type BaseAddressFieldValue = z.infer<typeof BaseAddressFieldValue>
 
-export const AddressFieldUpdateValue = z.object({
-  country: z.string(),
-  addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL]),
+export const DomesticAddressFieldValue = BaseAddressFieldValue.extend({
+  addressType: z.literal(AddressType.DOMESTIC),
+  administrativeArea: z.string().uuid() /* Leaf level admin structure */
+})
+
+export type DomesticAddressFieldValue = z.infer<
+  typeof DomesticAddressFieldValue
+>
+
+const InternationalAddressFieldValue = BaseAddressFieldValue.extend({
+  addressType: z.literal(AddressType.INTERNATIONAL)
+})
+
+export const AddressFieldValue = z.discriminatedUnion('addressType', [
+  DomesticAddressFieldValue,
+  InternationalAddressFieldValue
+])
+
+const DomesticAddressUpdatedFieldValue = BaseAddressFieldValue.extend({
+  addressType: z.literal(AddressType.DOMESTIC),
   administrativeArea: z
     .string()
     .uuid()
-    .nullish() /* Leaf level admin structure */,
-  streetLevelDetails: StreetLevelDetailsUpdateValue
+    .nullish() /* Leaf level admin structure */
 })
+
+export const AddressFieldUpdateValue = z.discriminatedUnion('addressType', [
+  DomesticAddressUpdatedFieldValue,
+  InternationalAddressFieldValue
+])
 
 export type AddressFieldValue = z.infer<typeof AddressFieldValue>
 
@@ -109,13 +123,18 @@ export const HttpFieldUpdateValue = z
   .or(z.undefined())
 
 export const QueryParamReaderFieldValue = z
-  .record(z.string(), z.string())
+  .object({
+    params: z.record(z.string(), z.string())
+  })
   .nullish()
+
 export type QueryParamReaderFieldValue = z.infer<
   typeof QueryParamReaderFieldValue
 >
 
-export const QueryParamReaderFieldUpdateValue = z.record(z.string(), z.string())
+export const QueryParamReaderFieldUpdateValue = z.object({
+  params: (z.string(), z.string())
+})
 
 const ReadDataValue = z.object({
   data: z.any()
