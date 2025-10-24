@@ -21,7 +21,8 @@ import {
   FieldType,
   generateTranslationConfig,
   ConditionalType,
-  field
+  field,
+  ActionUpdate
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { ReviewDuplicateIndex } from './ReviewDuplicate'
@@ -99,17 +100,19 @@ const declarationObj = {
   'applicant.address': {
     country: 'FAR',
     addressType: 'DOMESTIC',
-    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-    district: '27160bbd-32d1-4625-812f-860226bfb92a',
-    urbanOrRural: 'URBAN',
-    town: 'Example Town',
-    residentialArea: 'Example Residential Area',
-    street: 'Example Street',
-    number: '55',
-    zipCode: '123456'
+    streetLevelDetails: {
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '27160bbd-32d1-4625-812f-860226bfb92a',
+      urbanOrRural: 'URBAN',
+      town: 'Example Town',
+      residentialArea: 'Example Residential Area',
+      street: 'Example Street',
+      number: '55',
+      zipCode: '123456'
+    }
   },
   'recommender.none': true
-}
+} satisfies ActionUpdate
 
 const actions = [
   generateActionDocument({

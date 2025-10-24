@@ -28,7 +28,7 @@ export function handleDefaultValue({
 }) {
   const defaultValue = field.defaultValue
 
-  if (isFieldConfigDefaultValue(field.defaultValue)) {
+  if (isFieldConfigDefaultValue(defaultValue)) {
     return replacePlaceholders({
       fieldType: field.type,
       defaultValue,

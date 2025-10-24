@@ -30,7 +30,8 @@ import {
   AdministrativeArea,
   DefaultAddressFieldValue,
   LocationType,
-  ValidatorContext
+  ValidatorContext,
+  DomesticAddressFieldValue
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -241,11 +242,14 @@ function AddressInput(props: Props) {
     (location) => location.locationType === 'ADMIN_STRUCTURE'
   )
 
-  const administrativeArea = value?.administrativeArea
+  let administrativeArea
+  if (value?.addressType === AddressType.DOMESTIC) {
+    administrativeArea = value.administrativeArea
+  }
 
   const resolveAdministrativeArea = (
     adminArea:
-      | AddressFieldValue['administrativeArea']
+      | DomesticAddressFieldValue['administrativeArea']
       | DefaultAddressFieldValue['administrativeArea']
   ) => {
     if (!adminArea) {
@@ -270,7 +274,7 @@ function AddressInput(props: Props) {
   const resolvedAdministrativeArea =
     resolveAdministrativeArea(administrativeArea)
 
-  if (value) {
+  if (value && value.addressType === AddressType.DOMESTIC) {
     value.administrativeArea = resolvedAdministrativeArea
   }
 
@@ -365,7 +369,11 @@ function AddressOutput({
     return ''
   }
 
-  const administrativeArea = value.administrativeArea
+  let administrativeArea
+
+  if (value.addressType === AddressType.DOMESTIC) {
+    administrativeArea = value.administrativeArea
+  }
   const adminStructureLocations = locations.filter(
     (location) => location.locationType === LocationType.enum.ADMIN_STRUCTURE
   )
@@ -447,7 +455,12 @@ function toCertificateVariables(
   const { intl, locations, adminLevels } = context
   const stringifier = getFormDataStringifier(intl, locations)
   const stringifiedResult = stringifier(ALL_ADDRESS_FIELDS, value as EventState)
-  const { administrativeArea, streetLevelDetails } = value
+  const { streetLevelDetails } = value
+
+  let administrativeArea
+  if (value.addressType === AddressType.DOMESTIC) {
+    administrativeArea = value.administrativeArea
+  }
 
   if (value.addressType === AddressType.INTERNATIONAL) {
     return { ...stringifiedResult, streetLevelDetails }
