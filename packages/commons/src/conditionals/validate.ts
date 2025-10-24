@@ -495,6 +495,14 @@ export function getValidatorsForField(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const jsonSchema = validator as any
 
+      /*
+       * In this case it was possible the validator is a or(...) and(...) or similar combinator value
+       * From these it's a little tricky to extract the field specific validation
+       */
+      if (!jsonSchema.properties) {
+        return null
+      }
+
       const $form = jsonSchema.properties.$form
 
       /*
