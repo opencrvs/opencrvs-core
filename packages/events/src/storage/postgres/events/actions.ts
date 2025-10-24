@@ -19,8 +19,13 @@ export const UserActionsQuery = z.object({
   count: z.number().optional().default(10),
   timeStart: z.string().optional(),
   timeEnd: z.string().optional(),
-  // Delete action is not persisted.
-  actionTypes: ActionTypes.exclude([ActionTypes.enum.DELETE]).array().optional()
+  // Delete and Update actions are not persisted.
+  actionTypes: ActionTypes.exclude([
+    ActionTypes.enum.DELETE,
+    ActionTypes.enum.UPDATE
+  ])
+    .array()
+    .optional()
 })
 
 export type UserActionsQuery = z.infer<typeof UserActionsQuery>
