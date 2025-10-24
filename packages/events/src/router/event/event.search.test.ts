@@ -15,6 +15,8 @@ import { TRPCError } from '@trpc/server'
 import {
   ActionStatus,
   ActionType,
+  ActionUpdate,
+  AddressFieldUpdateValue,
   AddressType,
   createPrng,
   EventStatus,
@@ -59,10 +61,13 @@ test('User without any search scopes should not see any events', async () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        administrativeArea: '123e4567-e89b-12d3-a456-426614174000',
+        streetLevelDetails: {
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          urbanOrRural: 'RURAL' as const,
+          village: 'Small village'
+        }
       }
     }
   })
@@ -105,12 +110,14 @@ test('Returns empty list when no events match search criteria', async () => {
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const event = await client.event.create(generator.event.create())
 
@@ -460,12 +467,14 @@ test.skip('Returns events that match the name field criteria of applicant', asyn
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const record2 = {
     'applicant.name': {
@@ -477,12 +486,14 @@ test.skip('Returns events that match the name field criteria of applicant', asyn
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const record3 = {
     'applicant.name': {
@@ -494,12 +505,14 @@ test.skip('Returns events that match the name field criteria of applicant', asyn
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const event1 = await client.event.create(generator.event.create())
   const event2 = await client.event.create(generator.event.create())
@@ -559,12 +572,14 @@ test('Should not match partially when searching with emails against name field',
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const event = await client.event.create(generator.event.create())
 
@@ -608,12 +623,14 @@ test('Returns events that match date of birth of applicant', async () => {
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const record2 = {
     'applicant.name': {
@@ -625,12 +642,14 @@ test('Returns events that match date of birth of applicant', async () => {
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const event1 = await client.event.create(generator.event.create())
   const event2 = await client.event.create(generator.event.create())
@@ -687,12 +706,14 @@ test('Does not return events when searching with a similar but different date of
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const record2 = {
     'applicant.name': {
@@ -704,12 +725,14 @@ test('Does not return events when searching with a similar but different date of
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const event1 = await client.event.create(generator.event.create())
   const event2 = await client.event.create(generator.event.create())
@@ -762,10 +785,12 @@ test('Returns single document after creation', async () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        streetLevelDetails: {
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          urbanOrRural: 'RURAL' as const,
+          village: 'Small village'
+        }
       }
     }
   })
@@ -813,10 +838,12 @@ test('Returns multiple documents after creation', async () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        streetLevelDetails: {
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          urbanOrRural: 'RURAL' as const,
+          village: 'Small village'
+        }
       }
     }
   })
@@ -835,10 +862,12 @@ test('Returns multiple documents after creation', async () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        streetLevelDetails: {
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          urbanOrRural: 'RURAL' as const,
+          village: 'Small village'
+        }
       }
     }
   })
@@ -852,15 +881,16 @@ test('Returns multiple documents after creation', async () => {
         firstname: 'Different',
         surname: 'Lastname'
       },
-
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        streetLevelDetails: {
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          urbanOrRural: 'RURAL' as const,
+          village: 'Small village'
+        }
       }
     }
   })
@@ -928,10 +958,12 @@ test('Returns correctly based on registration location even when a parent locati
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        streetLevelDetails: {
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          urbanOrRural: 'RURAL' as const,
+          village: 'Small village'
+        }
       }
     }
   })
@@ -975,10 +1007,12 @@ test('Returns no documents when search params are not matched', async () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        streetLevelDetails: {
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          urbanOrRural: 'RURAL' as const,
+          village: 'Small village'
+        }
       }
     }
   })
@@ -997,10 +1031,12 @@ test('Returns no documents when search params are not matched', async () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        streetLevelDetails: {
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          urbanOrRural: 'RURAL' as const,
+          village: 'Small village'
+        }
       }
     }
   })
@@ -1018,10 +1054,12 @@ test('Returns no documents when search params are not matched', async () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        streetLevelDetails: {
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          urbanOrRural: 'RURAL' as const,
+          village: 'Small village'
+        }
       }
     }
   })
@@ -1069,10 +1107,12 @@ test('Throws error when search params are not matching proper schema', async () 
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        streetLevelDetails: {
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          urbanOrRural: 'RURAL' as const,
+          village: 'Small village'
+        }
       }
     }
   })
@@ -1108,11 +1148,13 @@ test('Returns events assigned to a specific user', async () => {
   const WindmillVillage = {
     country: 'FAR',
     addressType: AddressType.DOMESTIC,
-    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-    district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-    urbanOrRural: 'RURAL' as const,
-    village: 'Windmill village, Kingdom of Goa'
-  }
+    streetLevelDetails: {
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Windmill village, Kingdom of Goa'
+    }
+  } satisfies AddressFieldUpdateValue
 
   const record1 = {
     'applicant.name': {
@@ -1652,10 +1694,12 @@ test('Returns paginated results when limit and size parameters are provided', as
         'applicant.address': {
           country: 'FAR',
           addressType: AddressType.DOMESTIC,
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          streetLevelDetails: {
+            province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+            district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+            urbanOrRural: 'RURAL' as const,
+            village: 'Small village'
+          }
         }
       }
     })
@@ -1830,12 +1874,14 @@ test('Returns events using nested AND/OR query combinations', async () => {
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const record2 = {
     'applicant.name': {
@@ -1848,12 +1894,14 @@ test('Returns events using nested AND/OR query combinations', async () => {
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const record3 = {
     'applicant.name': {
@@ -1866,12 +1914,14 @@ test('Returns events using nested AND/OR query combinations', async () => {
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const record4 = {
     'applicant.name': {
@@ -1884,12 +1934,14 @@ test('Returns events using nested AND/OR query combinations', async () => {
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const event1 = await client.event.create(generator.event.create())
   const event2 = await client.event.create(generator.event.create())

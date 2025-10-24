@@ -21,7 +21,9 @@ import {
   UUID,
   getCurrentEventState,
   getUUID,
-  TENNIS_CLUB_MEMBERSHIP
+  TENNIS_CLUB_MEMBERSHIP,
+  ActionUpdate,
+  EventState
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -115,10 +117,12 @@ describe('Declare action', () => {
         'applicant.address': {
           country: 'FAR',
           addressType: AddressType.DOMESTIC,
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          streetLevelDetails: {
+            province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+            district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+            urbanOrRural: 'RURAL' as const,
+            village: 'Small village'
+          }
         }
       }
     })
@@ -141,13 +145,16 @@ describe('Declare action', () => {
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
-        addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        addressType: 'DOMESTIC',
+        administrativeArea: getUUID(),
+        streetLevelDetails: {
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          urbanOrRural: 'RURAL' as const,
+          village: 'Small village'
+        }
       }
-    }
+    } satisfies ActionUpdate
 
     const data = generator.event.actions.declare(eventId, {
       declaration: form
@@ -180,12 +187,14 @@ describe('Declare action', () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        streetLevelDetails: {
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          urbanOrRural: 'RURAL' as const,
+          village: 'Small village'
+        }
       }
-    }
+    } satisfies ActionUpdate
 
     const data = generator.event.actions.declare(eventId, {
       declaration: form
@@ -212,12 +221,14 @@ describe('Declare action', () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        streetLevelDetails: {
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          urbanOrRural: 'RURAL' as const,
+          village: 'Small village'
+        }
       }
-    }
+    } satisfies ActionUpdate
 
     const data = generator.event.actions.declare(eventId, {
       declaration: form
@@ -250,12 +261,14 @@ describe('Declare action', () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        streetLevelDetails: {
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          urbanOrRural: 'RURAL' as const,
+          village: 'Small village'
+        }
       }
-    }
+    } satisfies ActionUpdate
 
     const payload = generator.event.actions.declare(eventId, {
       declaration: form
@@ -397,7 +410,7 @@ test('deduplication and annotation check is performed after declaration', async 
     {
       'applicant.dobUnknown': false
     }
-  )
+  ) as Partial<EventState>
 
   const existingEventIndex = eventQueryDataGenerator({
     id: existingEventId,

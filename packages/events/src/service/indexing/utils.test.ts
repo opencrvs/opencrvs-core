@@ -62,10 +62,13 @@ describe('EventIndex utils', () => {
         'applicant.dob': '1990-01-01',
         'applicant.address': {
           addressType: 'DOMESTIC',
-          district: 'District',
-          country: 'Country',
-          province: 'Province',
-          urbanOrRural: 'URBAN'
+          country: 'GB',
+          streetLevelDetails: {
+            district: 'District',
+            country: 'Country',
+            province: 'Province',
+            urbanOrRural: 'URBAN'
+          }
         }
       }
     })

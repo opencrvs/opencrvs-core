@@ -15,6 +15,7 @@ import { HttpResponse, http } from 'msw'
 import {
   ActionStatus,
   ActionType,
+  ActionUpdate,
   AddressType,
   createPrng,
   EventIndex,
@@ -131,10 +132,12 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        streetLevelDetails: {
+          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+          urbanOrRural: 'RURAL' as const,
+          village: 'Small village'
+        }
       }
     }
   })
@@ -153,12 +156,14 @@ const declaration = {
   'applicant.address': {
     country: 'FAR',
     addressType: AddressType.DOMESTIC,
-    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-    district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-    urbanOrRural: 'RURAL' as const,
-    village: 'Small village'
+    streetLevelDetails: {
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
   }
-}
+} satisfies ActionUpdate
 
 test('Skips required field validation when they are conditionally hidden', async () => {
   const { user, generator } = await setupTestCase()
@@ -204,12 +209,14 @@ test('Prevents adding birth date in future', async () => {
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const payload = generator.event.actions.register(event.id, {
     declaration: form
