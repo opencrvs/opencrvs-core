@@ -884,10 +884,28 @@ export function generateActionDocument<
   }
 }
 
+export function generateRandomDatetime(
+  rng: () => number,
+  start: Date,
+  end: Date
+): string {
+  const range = end.getTime() - start.getTime()
+  const offset = Math.floor(rng() * range)
+  const randomDate = new Date(start.getTime() + offset)
+  return randomDate.toISOString()
+}
+
+export function getRandomDate(rng: () => number, start: string, end: string) {
+  const datetime = generateRandomDatetime(rng, new Date(start), new Date(end))
+
+  return datetime.split('T')[0] // Return only the date part in YYYY-MM-DD format
+}
+
 export function generateEventDocument({
   configuration,
   actions,
-  rng = () => 0.1
+  rng = () => 0.1,
+  defaults = {}
 }: {
   configuration: EventConfig
   actions: {
@@ -905,20 +923,30 @@ export function generateEventDocument({
     }>
   }[]
   rng?: () => number
+  defaults?: Partial<EventDocument>
 }): EventDocument {
   return {
     trackingId: getUUID(),
     type: configuration.id,
-    actions: actions.map((action) =>
+    actions: actions.map((action, i) =>
       generateActionDocument({
         configuration,
         action: action.type,
-        rng,
         defaults: {
           createdBy: action.user?.id,
           createdAtLocation: action.user?.primaryOfficeId,
           assignedTo: action.user?.assignedTo,
-          createdByRole: action.user?.role
+          createdByRole: action.user?.role,
+          createdAt: addDays(
+            new Date(
+              generateRandomDatetime(
+                rng,
+                new Date(2025, 0, 1),
+                new Date(2025, 11, 31)
+              )
+            ),
+            i
+          ).toISOString()
         },
         declarationOverrides: action.declarationOverrides
       })
@@ -929,7 +957,8 @@ export function generateEventDocument({
     id: getUUID(),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
-    updatedAt: new Date(Date.now() - 1000).toISOString()
+    updatedAt: new Date(Date.now() - 1000).toISOString(),
+    ...defaults
   }
 }
 
@@ -965,23 +994,6 @@ export function generateEventDraftDocument({
     createdAt: new Date().toISOString(),
     eventId
   }
-}
-
-export function getRandomDatetime(
-  rng: () => number,
-  start: Date,
-  end: Date
-): string {
-  const range = end.getTime() - start.getTime()
-  const offset = Math.floor(rng() * range)
-  const randomDate = new Date(start.getTime() + offset)
-  return randomDate.toISOString()
-}
-
-export function getRandomDate(rng: () => number, start: string, end: string) {
-  const datetime = getRandomDatetime(rng, new Date(start), new Date(end))
-
-  return datetime.split('T')[0] // Return only the date part in YYYY-MM-DD format
 }
 
 function generateRandomApplicant(rng: () => number): EventState {
@@ -1035,7 +1047,7 @@ export const eventQueryDataGenerator = (
 ): EventIndex => {
   const rng = createPrng(seed)
 
-  const createdAt = getRandomDatetime(
+  const createdAt = generateRandomDatetime(
     rng,
     new Date('2024-01-01'),
     new Date('2024-12-31')
