@@ -23,7 +23,6 @@ import {
   IndexMap,
   joinValues,
   isNonInteractiveFieldType,
-  SystemVariables,
   InteractiveFieldType,
   FieldReference,
   getAllUniqueFields,
@@ -125,30 +124,6 @@ function resolveFieldReferenceValue(
   return $$subfield && $$subfield.length > 0
     ? get(fieldValues[referenceKeyInFormikFormat], $$subfield)
     : fieldValues[referenceKeyInFormikFormat]
-}
-
-function getUpdatedChildValueOnChange({
-  childField,
-  fieldReference,
-  fieldValues,
-  systemVariables
-}: {
-  childField: InteractiveFieldType
-  fieldReference: FieldReference | undefined
-  fieldValues: Record<string, FieldValue>
-  systemVariables: SystemVariables
-}) {
-  if (!fieldReference) {
-    // If there is no reference, we reset the value to the default value.
-    return (
-      handleDefaultValue({
-        field: childField,
-        systemVariables
-      }) ?? null
-    )
-  }
-
-  return resolveFieldReferenceValue(fieldReference, fieldValues)
 }
 
 /**
