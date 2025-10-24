@@ -165,7 +165,7 @@ export function isOnline() {
 
 export function isConditionMet(
   conditional: JSONSchema,
-  values: Record<string, FieldValue>,
+  values: EventState | ActionUpdate,
   context: ValidatorContext
 ) {
   return validate(conditional, {
@@ -230,7 +230,7 @@ function isFieldConditionMet(
 
 export function isFieldVisible(
   field: FieldConfig,
-  form: ActionUpdate | EventState,
+  form: Partial<ActionUpdate | EventState>,
   context: ValidatorContext
 ) {
   return isFieldConditionMet(field, form, ConditionalType.SHOW, context)
