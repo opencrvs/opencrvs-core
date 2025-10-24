@@ -64,7 +64,10 @@ export type BaseAddressFieldValue = z.infer<typeof BaseAddressFieldValue>
 
 export const DomesticAddressFieldValue = BaseAddressFieldValue.extend({
   addressType: z.literal(AddressType.DOMESTIC),
-  administrativeArea: z.string().uuid() /* Leaf level admin structure */
+  administrativeArea: z
+    .string()
+    .uuid()
+    .optional() /* Leaf level admin structure */
 })
 
 export type DomesticAddressFieldValue = z.infer<
