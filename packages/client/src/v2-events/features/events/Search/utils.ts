@@ -179,20 +179,28 @@ type Condition =
  * Represents advanced search behavior where **all conditions must match**.
  * Used to build ElasticSearch queries with `must` clauses (logical AND).
  */
-const ADVANCED_SEARCH_KEY = 'and' as const
+const AND_SEARCH_KEY = 'and' as const
 /**
  * Represents quick search behavior where **any condition may match**.
  * Used to build ElasticSearch queries with `should` clauses (logical OR).
  */
-const QUICK_SEARCH_KEY = 'or' as const
+const OR_SEARCH_KEY = 'or' as const
 
 export function toAdvancedSearchQueryType(
   searchParams: QueryInputType,
-  eventType?: string,
-  type = ADVANCED_SEARCH_KEY
+  searchFieldConfigs: SearchField[],
+  eventType?: string
 ): QueryType {
   const metadata: Record<string, unknown> = {}
   const declaration: Record<string, unknown> = {}
+
+  const searchFieldMap = searchFieldConfigs.reduce(
+    (acc, field) => {
+      acc[field.fieldId] = field
+      return acc
+    },
+    {} as Record<string, SearchField>
+  )
 
   Object.entries(searchParams).forEach(([key, value]) => {
     if (key.startsWith(METADATA_FIELD_PREFIX)) {
@@ -202,9 +210,46 @@ export function toAdvancedSearchQueryType(
     }
   })
 
+  const clauses: (QueryExpression | QueryType)[] = []
+
+  clauses.push({
+    ...metadata,
+    eventType
+  })
+
+  Object.entries(declaration).forEach(([formFieldId, fieldValue]) => {
+    const searchField = searchFieldMap[formFieldId]
+    const searchFields = searchField.config.searchFields
+
+    if (searchFields && searchFields.length > 0) {
+      const orClauses: QueryExpression[] = searchFields.map((dbFieldId) => ({
+        data: { [dbFieldId]: fieldValue }
+      }))
+
+      clauses.push({
+        type: OR_SEARCH_KEY,
+        clauses: orClauses
+      } as QueryType)
+    } else {
+      const targetFieldId = formFieldId
+      clauses.push({
+        data: { [targetFieldId]: fieldValue }
+      })
+    }
+  })
+
   return {
-    type,
-    clauses: [{ ...metadata, eventType, data: declaration }]
+    type: AND_SEARCH_KEY,
+    clauses:
+      clauses.length > 0
+        ? clauses
+        : [
+            {
+              ...metadata,
+              eventType,
+              data: {}
+            }
+          ]
   }
 }
 
@@ -445,6 +490,18 @@ function getFieldConfigsWithSearchOverrides(eventConfig: EventConfig) {
   })
 }
 
+function generateSearchFieldConfig(searchField: SearchField): FieldConfig {
+  const baseFieldConfig: FieldConfig = {
+    id: searchField.fieldId,
+    type: searchField.type,
+    label: searchField.label,
+    conditionals: [],
+    validation: []
+  } as FieldConfig
+
+  return applySearchFieldOverridesToFieldConfig(baseFieldConfig, searchField)
+}
+
 export function resolveAdvancedSearchConfig(
   eventConfig: EventConfig
 ): AdvancedSearchConfigWithFieldsResolved[] {
@@ -461,6 +518,11 @@ export function resolveAdvancedSearchConfig(
       fields: section.fields.map((field) => {
         if (isEventFieldId(field.fieldId)) {
           return defaultSearchFieldGenerator[field.fieldId](field)
+        } else if (
+          field.config.searchFields &&
+          field.config.searchFields.length > 0
+        ) {
+          return generateSearchFieldConfig(field)
         } else {
           return applySearchFieldOverridesToFieldConfig(
             declarationFieldsMap[field.fieldId],
@@ -487,9 +549,16 @@ export function getSearchParamsFieldConfigs(
     getFieldConfigsWithSearchOverrides(eventConfig)
   const metadataFieldConfigs = getMetadataFieldConfigs(allSearchFields)
 
+  const searchOnlyFieldConfigs = allSearchFields
+    .filter(
+      (field) =>
+        field.config.searchFields && field.config.searchFields.length > 0
+    )
+    .map(generateSearchFieldConfig)
   const searchFieldConfigs = [
     ...metadataFieldConfigs,
-    ...declarationFieldConfigs
+    ...declarationFieldConfigs,
+    ...searchOnlyFieldConfigs
   ].filter((field) => {
     return Object.keys(searchParams).some((key) => key === field.id)
   })
@@ -630,7 +699,7 @@ function buildQueryFromQuickSearchFields(
   clauses = addMetadataFieldsInQuickSearchQuery(clauses, terms)
 
   return {
-    type: QUICK_SEARCH_KEY,
+    type: OR_SEARCH_KEY,
     clauses
   } as QueryType
 }

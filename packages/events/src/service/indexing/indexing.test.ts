@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -145,11 +146,18 @@ describe('test buildElasticQueryFromSearchPayload', () => {
       bool: {
         must: [
           {
-            term: {
-              type: TENNIS_CLUB_MEMBERSHIP
+            bool: {
+              must: [
+                {
+                  term: {
+                    type: TENNIS_CLUB_MEMBERSHIP
+                  }
+                },
+                { term: { status: 'REGISTERED' } }
+              ],
+              should: undefined
             }
-          },
-          { term: { status: 'REGISTERED' } }
+          }
         ],
         should: undefined
       }
@@ -164,9 +172,19 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     expect(result).toEqual({
       bool: {
         must: [
-          { term: { 'legalStatuses.REGISTERED.acceptedAt': '2024-01-01' } },
-          { term: { type: TENNIS_CLUB_MEMBERSHIP } }
-        ]
+          {
+            bool: {
+              must: [
+                {
+                  term: { 'legalStatuses.REGISTERED.acceptedAt': '2024-01-01' }
+                },
+                { term: { type: TENNIS_CLUB_MEMBERSHIP } }
+              ],
+              should: undefined
+            }
+          }
+        ],
+        should: undefined
       }
     })
   })
@@ -180,16 +198,24 @@ describe('test buildElasticQueryFromSearchPayload', () => {
       bool: {
         must: [
           {
-            range: {
-              'legalStatuses.REGISTERED.acceptedAt': {
-                gte: '2024-01-01',
-                lte: '2024-12-31',
-                time_zone: 'Asia/Dhaka'
-              }
+            bool: {
+              must: [
+                {
+                  range: {
+                    'legalStatuses.REGISTERED.acceptedAt': {
+                      gte: '2024-01-01',
+                      lte: '2024-12-31',
+                      time_zone: 'Asia/Dhaka'
+                    }
+                  }
+                },
+                { term: { type: TENNIS_CLUB_MEMBERSHIP } }
+              ],
+              should: undefined
             }
-          },
-          { term: { type: TENNIS_CLUB_MEMBERSHIP } }
-        ]
+          }
+        ],
+        should: undefined
       }
     })
   })
@@ -203,12 +229,20 @@ describe('test buildElasticQueryFromSearchPayload', () => {
       bool: {
         must: [
           {
-            term: {
-              'legalStatuses.REGISTERED.createdAtLocation': RANDOM_UUID
+            bool: {
+              must: [
+                {
+                  term: {
+                    'legalStatuses.REGISTERED.createdAtLocation': RANDOM_UUID
+                  }
+                },
+                { term: { type: TENNIS_CLUB_MEMBERSHIP } }
+              ],
+              should: undefined
             }
-          },
-          { term: { type: TENNIS_CLUB_MEMBERSHIP } }
-        ]
+          }
+        ],
+        should: undefined
       }
     })
   })
@@ -220,7 +254,15 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     )
     expect(result).toEqual({
       bool: {
-        must: [{ terms: { status: ['REGISTERED', 'VALIDATED'] } }]
+        must: [
+          {
+            bool: {
+              must: [{ terms: { status: ['REGISTERED', 'VALIDATED'] } }],
+              should: undefined
+            }
+          }
+        ],
+        should: undefined
       }
     })
   })
@@ -231,35 +273,47 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     ])
     expect(result).toMatchObject({
       bool: {
-        must: expect.arrayContaining([
-          { term: { type: 'tennis-club-membership' } },
-          { term: { status: 'ARCHIVED' } },
-          { term: { trackingId: 'ABC123' } },
-          {
-            range: {
-              createdAt: {
-                gte: '2024-01-01',
-                lte: '2024-12-31',
-                time_zone: 'Asia/Dhaka'
-              }
-            }
-          },
-          { term: { updatedAt: '2024-06-01' } },
-          { term: { createdAtLocation: RANDOM_UUID } },
+        must: [
           {
             bool: {
-              minimum_should_match: 1,
-              should: [
+              must: expect.arrayContaining([
+                { term: { type: 'tennis-club-membership' } },
+                { term: { status: 'ARCHIVED' } },
+                { term: { trackingId: 'ABC123' } },
                 {
-                  term: {
-                    updatedAtLocation: RANDOM_UUID
+                  range: {
+                    createdAt: {
+                      gte: '2024-01-01',
+                      lte: '2024-12-31',
+                      time_zone: 'Asia/Dhaka'
+                    }
+                  }
+                },
+                { term: { updatedAt: '2024-06-01' } },
+                { term: { createdAtLocation: RANDOM_UUID } },
+                {
+                  bool: {
+                    minimum_should_match: 1,
+                    should: [
+                      {
+                        term: {
+                          updatedAtLocation: RANDOM_UUID
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  match: {
+                    'declaration.applicant____name.__fullname': 'John Doe'
                   }
                 }
-              ]
+              ]),
+              should: undefined
             }
-          },
-          { match: { 'declaration.applicant____name.__fullname': 'John Doe' } }
-        ])
+          }
+        ],
+        should: undefined
       }
     })
   })
@@ -283,13 +337,15 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     ])
     expect(result).toEqual({
       bool: {
+        minimum_should_match: 1,
         should: [
           {
             bool: {
               must: [
                 { term: { type: 'foo' } },
                 { term: { status: 'REGISTERED' } }
-              ]
+              ],
+              should: undefined
             }
           },
           {
@@ -297,7 +353,8 @@ describe('test buildElasticQueryFromSearchPayload', () => {
               must: [
                 { term: { type: 'bar' } },
                 { term: { status: 'VALIDATED' } }
-              ]
+              ],
+              should: undefined
             }
           }
         ]
@@ -305,10 +362,92 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     })
   })
 
+  test('builds nested AND/OR query', async () => {
+    const nestedPayload: QueryType = {
+      type: 'and',
+      clauses: [
+        {
+          type: 'or',
+          clauses: [
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              data: {
+                'applicant.name': { type: 'exact', term: 'Bob' }
+              }
+            },
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              data: {
+                'applicant.email': { type: 'exact', term: 'bob@example.com' }
+              }
+            }
+          ]
+        },
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.dob': { type: 'exact', term: '1985-01-01' }
+          }
+        }
+      ]
+    }
+    const result = await buildElasticQueryFromSearchPayload(nestedPayload, [
+      tennisClubMembershipEvent
+    ])
+    expect(result).toEqual({
+      bool: {
+        must: [
+          {
+            bool: {
+              should: [
+                {
+                  bool: {
+                    must: [
+                      { term: { type: TENNIS_CLUB_MEMBERSHIP } },
+                      {
+                        match: {
+                          'declaration.applicant____name.__fullname': 'Bob'
+                        }
+                      }
+                    ],
+                    should: undefined
+                  }
+                },
+                {
+                  bool: {
+                    must: [
+                      { term: { type: TENNIS_CLUB_MEMBERSHIP } },
+                      {
+                        match: {
+                          'declaration.applicant____email': 'bob@example.com'
+                        }
+                      }
+                    ],
+                    should: undefined
+                  }
+                }
+              ],
+              minimum_should_match: 1
+            }
+          },
+          {
+            bool: {
+              must: [
+                { term: { type: TENNIS_CLUB_MEMBERSHIP } },
+                { match: { 'declaration.applicant____dob': '1985-01-01' } }
+              ],
+              should: undefined
+            }
+          }
+        ],
+        should: undefined
+      }
+    })
+  })
+
   test('returns match_all for invalid input', async () => {
     const result = await buildElasticQueryFromSearchPayload(
       {
-        // @ts-expect-error testing invalid input
         type: 'invalid',
         clauses: [
           {
@@ -319,7 +458,8 @@ describe('test buildElasticQueryFromSearchPayload', () => {
           }
         ]
       },
-      tennisClubMembershipEvent
+
+      [tennisClubMembershipEvent]
     )
     expect(result).toEqual({
       bool: { must_not: { match_all: {} } }
@@ -509,27 +649,40 @@ test('builds Address field query', async () => {
   expect(result).toEqual({
     bool: {
       must: [
-        { term: { type: 'tennis-club-membership' } },
         {
           bool: {
             must: [
-              { term: { 'declaration.applicant____address.country': 'FAR' } },
+              { term: { type: 'tennis-club-membership' } },
               {
-                term: {
-                  'declaration.applicant____address.administrativeArea':
-                    '7a150651-15f3-49ac-8746-e907340736b0'
-                }
-              },
-              {
-                match: {
-                  'declaration.applicant____address.streetLevelDetails.town':
-                    "Joynogor government officer's apartment complex"
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        'declaration.applicant____address.country': 'FAR'
+                      }
+                    },
+                    {
+                      term: {
+                        'declaration.applicant____address.administrativeArea':
+                          '7a150651-15f3-49ac-8746-e907340736b0'
+                      }
+                    },
+                    {
+                      match: {
+                        'declaration.applicant____address.streetLevelDetails.town':
+                          "Joynogor government officer's apartment complex"
+                      }
+                    }
+                  ],
+                  should: undefined
                 }
               }
-            ]
+            ],
+            should: undefined
           }
         }
-      ]
+      ],
+      should: undefined
     }
   })
 })
