@@ -136,7 +136,7 @@ export type QueryParamReaderFieldValue = z.infer<
 >
 
 export const QueryParamReaderFieldUpdateValue = z.object({
-  params: (z.string(), z.string())
+  params: z.record(z.string(), z.string())
 })
 
 const ReadDataValue = z.object({
