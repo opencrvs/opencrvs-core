@@ -9125,7 +9125,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -9463,7 +9465,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -9863,7 +9867,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -10201,7 +10207,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -10597,7 +10605,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -10935,7 +10945,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -11341,7 +11353,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -11679,7 +11693,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -12094,7 +12110,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -12432,7 +12450,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -12828,7 +12848,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -13166,7 +13188,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -13570,7 +13594,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -13908,7 +13934,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -14314,7 +14342,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -14652,7 +14682,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -15048,7 +15080,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -15386,7 +15420,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -15786,7 +15822,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -16124,7 +16162,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -16520,7 +16560,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -16858,7 +16900,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -17258,7 +17302,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -17596,7 +17642,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -17992,7 +18040,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -18330,7 +18380,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -18729,7 +18781,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -19067,7 +19121,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -19476,7 +19532,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -19814,7 +19872,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -20210,7 +20270,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -20548,7 +20610,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
@@ -20951,7 +21015,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Declaration data defined by the ActionConfig. Supports partial
@@ -21289,7 +21355,9 @@ components:
               - type: object
                 properties:
                   params:
-                    type: string
+                    type: object
+                    additionalProperties:
+                      type: string
                 required:
                   - params
           description: Action-specific metadata used to annotate the event.
