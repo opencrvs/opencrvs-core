@@ -511,8 +511,19 @@ export function getValidatorsForField(
       const jsonSchema = validator as any
 
       /*
-       * In this case it was possible the validator is a or(...) and(...) or similar combinator value
-       * From these it's a little tricky to extract the field specific validation
+       * It’s possible the validator is an or(...) / and(...) / similar combinator.
+       * From these it's tricky to extract field-specific validation:
+       *
+       * Currently we assume a plain object validator:
+       *   { firstname: aValidator, middlename: bValidator, lastname: cValidator }
+       * so "lastname" → cValidator directly.
+       *
+       * But with something like:
+       *   (firstname: aValidator) OR (middlename: bValidator) OR (lastname: cValidator)
+       * or even more nested logical combinations, there’s no clear properties structure
+       * (similar to JSON Schema `anyOf` not exposing `properties`).
+       *
+       * Handling all those cases is left unimplemented for now due to complexity/time.
        */
       if (!jsonSchema.properties) {
         return null
