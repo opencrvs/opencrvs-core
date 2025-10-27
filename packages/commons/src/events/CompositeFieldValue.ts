@@ -95,6 +95,7 @@ export const AddressFieldUpdateValue = z.discriminatedUnion('addressType', [
   DomesticAddressUpdatedFieldValue,
   InternationalAddressFieldValue
 ])
+export type AddressFieldUpdateValue = z.infer<typeof AddressFieldUpdateValue>
 
 export type AddressFieldValue = z.infer<typeof AddressFieldValue>
 
