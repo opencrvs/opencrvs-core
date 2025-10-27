@@ -26,8 +26,9 @@ function init() {
       // Set custom APM Server URL (default: http://localhost:8200)
       serverUrl: process.env.APN_SERVICE_URL || 'http://localhost:8200',
       // Docker swarm provides this environment variale
+      // FIXME: containerId is not used by APM in k8s
       containerId: process.env.HOSTNAME,
-
+      hostname: process.env.APN_NODE_NAME || require('os').hostname(),
       environment:
         process.env.APN_ENVIRONMENT || process.env.NODE_ENV || 'development'
     })

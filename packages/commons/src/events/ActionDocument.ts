@@ -22,13 +22,21 @@ extendZodWithOpenApi(z)
 /**
  * ActionUpdate is a record of a specific action that updated data fields.
  */
-export const ActionUpdate = z.record(z.string(), FieldUpdateValue)
+export const ActionUpdate = z
+  .record(z.string(), FieldUpdateValue)
+  .describe(
+    'Record of field-level changes made by an action. Supports partial updates and nullable values.'
+  )
 export type ActionUpdate = z.infer<typeof ActionUpdate>
+
 /**
  * EventState is an aggregate of all the actions that have been applied to event data.
  */
-
-export const EventState = z.record(z.string(), FieldValue)
+export const EventState = z
+  .record(z.string(), FieldValue)
+  .describe(
+    'Aggregate representation of event data after all actions have been applied, with all updates consolidated and null values removed.'
+  )
 export type EventState = z.infer<typeof EventState>
 
 export const ActionStatus = {
@@ -40,33 +48,48 @@ export const ActionStatus = {
 export type ActionStatus = keyof typeof ActionStatus
 
 export const ActionBase = z.object({
-  id: UUID,
-  transactionId: z.string(),
-  createdByUserType: TokenUserType,
-  createdAt: z.string().datetime(),
-  createdBy: z.string(),
-  createdByRole: z.string(),
+  id: UUID.describe('Unique identifier of the action.'),
+  transactionId: z.string().describe('Unique identifier of the transaction.'),
+  createdByUserType: TokenUserType.describe(
+    'Indicates whether the action was created by a human-user or by a system-user.'
+  ),
+  createdAt: z
+    .string()
+    .datetime()
+    .describe('Timestamp indicating when the action was created.'),
+  createdBy: z
+    .string()
+    .describe('Identifier of the user who created the action.'),
+  createdByRole: z
+    .string()
+    .describe('Role of the user who created the action.'),
   createdBySignature: z
     .string()
     .nullish()
-    .describe('Reference to signature of the user who created the action'),
-  createdAtLocation: CreatedAtLocation,
-  declaration: ActionUpdate,
-  annotation: ActionUpdate.optional().nullable(),
-  status: z.enum([
-    ActionStatus.Requested,
-    ActionStatus.Accepted,
-    ActionStatus.Rejected
-  ]),
-  // If the action is an asynchronous confirmation for another action, we will save the original action id here.
+    .describe('Reference to the signature of the user who created the action.'),
+  createdAtLocation: CreatedAtLocation.describe(
+    'Reference to the location of the user who created the action.'
+  ),
+  declaration: ActionUpdate.describe(
+    'Declaration data defined by the ActionConfig. Supports partial updates.'
+  ),
+  annotation: ActionUpdate.optional()
+    .nullable()
+    .describe('Action-specific metadata used to annotate the event.'),
+  status: z
+    .enum([
+      ActionStatus.Requested,
+      ActionStatus.Accepted,
+      ActionStatus.Rejected
+    ])
+    .describe(
+      'Current status of the action. Actions may be validated asynchronously by third-party integrations.'
+    ),
   originalActionId: UUID.optional()
     .nullable()
     .describe(
-      'Reference to the original action that was asynchronously rejected or accepted by 3rd party integration.'
+      'Reference to the original action asynchronously accepted or rejected by a third-party integration.'
     )
-  // 'content' field reserved for additional data
-  // Each action can define its own content specifc to the action
-  // See PrintCertificateAction
 })
 
 export type ActionBase = z.infer<typeof ActionBase>
@@ -74,7 +97,9 @@ export type ActionBase = z.infer<typeof ActionBase>
 const AssignedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.ASSIGN),
-    assignedTo: z.string() // TODO move into 'content' property
+    assignedTo: z
+      .string()
+      .describe('Identifier of the user to whom the action is assigned.') // TODO move into 'content' property
   })
 )
 
@@ -87,7 +112,12 @@ const UnassignedAction = ActionBase.merge(
 export const RegisterAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REGISTER),
-    registrationNumber: z.string().optional() // TODO move into 'content' property
+    registrationNumber: z
+      .string()
+      .optional()
+      .describe(
+        'Registration number of the event. Always present for accepted registrations.'
+      ) // TODO move into 'content' property
   })
 )
 
@@ -109,7 +139,9 @@ export const ReasonContent = z.object({
   reason: z
     .string()
     .min(1, { message: 'Message cannot be empty' })
-    .describe('Message describing reason for rejection or archiving')
+    .describe(
+      'Message describing the reason for rejecting or archiving the event.'
+    )
 })
 
 const RejectAction = ActionBase.merge(

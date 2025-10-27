@@ -46,14 +46,14 @@ export const DateValue = z
   .date()
   .describe('Date in the format YYYY-MM-DD')
 
+export type DateValue = z.infer<typeof DateValue>
+
 export const AgeValue = z.object({
   age: z.number(),
-  asOfDate: DateValue.optional()
+  asOfDateRef: z.string()
 })
-
-export const AgeUpdateValue = AgeValue.optional().nullable()
-
 export type AgeValue = z.infer<typeof AgeValue>
+export const AgeUpdateValue = AgeValue.optional().nullable()
 
 export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
 

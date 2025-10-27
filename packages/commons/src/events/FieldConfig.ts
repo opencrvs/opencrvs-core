@@ -87,47 +87,68 @@ const requiredSchema = z
   .default(false)
   .optional()
 
-const BaseField = z.object({
-  id: FieldId,
-  label: TranslationConfig,
-  parent: FieldReference.or(z.array(FieldReference))
-    .optional()
-    .describe(
-      'Reference to a parent field. If a field has parent(s), it will be reset when any parent field is changed.'
+const BaseField = z
+  .object({
+    id: FieldId.describe('Unique identifier of the field.'),
+    label: TranslationConfig.describe('Human-readable label of the field.'),
+    parent: FieldReference.or(z.array(FieldReference))
+      .optional()
+      .describe(
+        'Reference to the parent field or fields. When a parent field changes, this field is reset.'
+      ),
+    required: requiredSchema.describe(
+      'Indicates whether the field is mandatory.'
     ),
-  required: requiredSchema,
-  conditionals: z.array(FieldConditional).default([]).optional(),
-  secured: z.boolean().default(false).optional(),
-  placeholder: TranslationConfig.optional(),
-  validation: z.array(ValidationConfig).default([]).optional(),
-  helperText: TranslationConfig.optional(),
-  hideLabel: z.boolean().default(false).optional(),
-  uncorrectable: z
-    .boolean()
-    .default(false)
-    .optional()
-    .describe(
-      'Indicates if the field can be changed during a record correction.'
-    ),
-  value: FieldReference.or(z.array(FieldReference))
-    .optional()
-    .describe(
-      'Reference to a parent field. If field has a value, the value will be copied when the parent field is changed. If a list is provided, the first truthy value will be used'
-    ),
-  analytics: z
-    .boolean()
-    .default(false)
-    .optional()
-    .describe(
-      'Meta field for analytics to allow filtering non-analytics fields away'
-    )
-})
+    conditionals: z
+      .array(FieldConditional)
+      .default([])
+      .optional()
+      .describe(
+        'Conditions determining when the field is shown or enabled. By default, the field is always shown and enabled.'
+      ),
+    secured: z
+      .boolean()
+      .default(false)
+      .optional()
+      .describe(
+        'Indicates whether the field is secured. Secured fields are not indexed for search and are only visible when explicitly assigned.'
+      ),
+    placeholder: TranslationConfig.optional(),
+    validation: z
+      .array(ValidationConfig)
+      .default([])
+      .optional()
+      .describe('Additional validation rules applied to the field.'),
+    helperText: TranslationConfig.optional(),
+    hideLabel: z.boolean().default(false).optional(),
+    uncorrectable: z
+      .boolean()
+      .default(false)
+      .optional()
+      .describe(
+        'Indicates whether the field can be modified during record correction.'
+      ),
+    value: FieldReference.or(z.array(FieldReference))
+      .optional()
+      .describe(
+        'Reference to the source field or fields. When a value is defined, it is copied from the parent field when changed. If multiple references are provided, the first truthy value is used.'
+      ),
+    analytics: z
+      .boolean()
+      .default(false)
+      .optional()
+      .describe(
+        'Indicates whether the field is included in analytics. When enabled, its value becomes available in the analytics dashboard.'
+      )
+  })
+  .describe('Common properties shared across all field types.')
 
 export type BaseField = z.infer<typeof BaseField>
 
 const Divider = BaseField.extend({
   type: z.literal(FieldType.DIVIDER)
 })
+
 export type Divider = z.infer<typeof Divider>
 
 export const TextField = BaseField.extend({

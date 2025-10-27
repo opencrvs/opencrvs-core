@@ -152,8 +152,7 @@ const modiedV2BirthEvent = defineConfig({
       correctionForm: {
         label: generateTranslationConfig('Correct record'),
         pages: []
-      },
-      conditionals: []
+      }
     }
   ],
   declaration: defineDeclarationForm({

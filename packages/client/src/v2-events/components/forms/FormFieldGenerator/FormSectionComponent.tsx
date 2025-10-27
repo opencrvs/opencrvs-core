@@ -9,10 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
-import { cloneDeep, isEqual, set, omit, get, assign, compact } from 'lodash'
-import { useIntl } from 'react-intl'
+import { cloneDeep, isEqual, set, omit, get, compact } from 'lodash'
 import styled, { keyframes } from 'styled-components'
 import {
   EventState,
@@ -24,16 +23,13 @@ import {
   IndexMap,
   joinValues,
   isNonInteractiveFieldType,
-  SystemVariables,
   InteractiveFieldType,
   FieldReference,
   getAllUniqueFields,
   omitHiddenFields,
   isFieldEnabled,
   ValidatorContext,
-  isFieldVisible,
-  AgeValue,
-  DateValue
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -130,30 +126,6 @@ function resolveFieldReferenceValue(
     : fieldValues[referenceKeyInFormikFormat]
 }
 
-function getUpdatedChildValueOnChange({
-  childField,
-  fieldReference,
-  fieldValues,
-  systemVariables
-}: {
-  childField: InteractiveFieldType
-  fieldReference: FieldReference | undefined
-  fieldValues: Record<string, FieldValue>
-  systemVariables: SystemVariables
-}) {
-  if (!fieldReference) {
-    // If there is no reference, we reset the value to the default value.
-    return (
-      handleDefaultValue({
-        field: childField,
-        systemVariables
-      }) ?? null
-    )
-  }
-
-  return resolveFieldReferenceValue(fieldReference, fieldValues)
-}
-
 /**
  * Create a reference map of visible parent fields and their their children for quick access.
  * This is used to reset the values of child fields when a parent field changes.
@@ -220,12 +192,6 @@ export function FormSectionComponent({
     allFieldsWithDotSeparator
   )
 
-  const ageFields = useMemo(
-    () =>
-      allFieldsWithDotSeparator.filter((field) => field.type === FieldType.AGE),
-    [allFieldsWithDotSeparator]
-  )
-
   const errors = makeFormFieldIdsFormikCompatible(errorsWithDotSeparator)
   const form = makeFormikFieldIdsOpenCRVSCompatible(
     makeDatesFormatted(fieldsWithDotSeparator, values)
@@ -261,31 +227,41 @@ export function FormSectionComponent({
         listenerField.id
       )
 
-      const referenceOrReferencesToOtherFields = fieldsWithDotSeparator.find(
+      const listenerFieldConfig = allFieldsWithDotSeparator.find(
         (f) => f.id === listenerFieldOcrvsId
-      )?.value
-      const referencesToOtherFields = ([] as FieldReference[]).concat(
-        referenceOrReferencesToOtherFields ?? []
       )
+
+      const referencesToOtherFields = ([] as FieldReference[]).concat(
+        listenerFieldConfig?.value ?? []
+      )
+
       const listenerFieldFormikId = makeFormFieldIdFormikCompatible(
         listenerField.id
       )
 
       const firstNonFalsyValue = compact(
         referencesToOtherFields.map((reference) =>
-          getUpdatedChildValueOnChange({
-            childField: listenerField,
-            fieldReference: reference,
-            fieldValues,
-            systemVariables
-          })
+          resolveFieldReferenceValue(reference, fieldValues)
         )
       )[0]
 
-      set(fieldValues, listenerFieldFormikId, firstNonFalsyValue)
+      if (firstNonFalsyValue) {
+        set(fieldValues, listenerFieldFormikId, firstNonFalsyValue)
+        set(fieldErrors, listenerFieldFormikId, '')
+        return
+      }
+
+      const defaultValue = handleDefaultValue({
+        field: listenerField,
+        systemVariables
+      })
+
+      set(fieldValues, listenerFieldFormikId, defaultValue)
       set(fieldErrors, listenerFieldFormikId, '')
+
+      return
     },
-    [fieldsWithDotSeparator, systemVariables]
+    [allFieldsWithDotSeparator, systemVariables]
   )
 
   const onFieldValueChange = useCallback(
@@ -304,19 +280,6 @@ export function FormSectionComponent({
 
       for (const listenerField of interactiveListenerFields) {
         setValueForListenerField(listenerField, updatedValues, updatedErrors)
-      }
-
-      const dependentAgeFields = ageFields.filter(
-        (f) => f.configuration.asOfDate.$$field === ocrvsFieldId
-      )
-
-      for (const ageField of dependentAgeFields) {
-        const formikAgeFieldId = makeFormFieldIdFormikCompatible(ageField.id)
-        const maybeDate = updatedValues[formikFieldId]
-        set(updatedValues, formikAgeFieldId, {
-          ...(updatedValues[formikAgeFieldId] as AgeValue),
-          asOfDate: DateValue.safeParse(maybeDate).data
-        })
       }
 
       // @TODO: we should not reference field id 'country' directly.
@@ -349,7 +312,6 @@ export function FormSectionComponent({
       setTouched,
       touched,
       errorsWithDotSeparator,
-      ageFields,
       setErrors,
       setAllTouchedFields,
       setValueForListenerField

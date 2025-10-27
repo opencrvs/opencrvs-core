@@ -21,16 +21,12 @@ jest.mock('../../minio/client', () => {
 
 describe('verify svg uploader handler', () => {
   let server: Awaited<ReturnType<typeof createServer>>
-  const token = jwt.sign(
-    { scope: ['declare'] },
-    readFileSync('./test/cert.key'),
-    {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:documents-user',
-      subject: '123123123'
-    }
-  )
+  const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:documents-user',
+    subject: '123123123'
+  })
   beforeEach(async () => {
     server = await createServer()
   })
