@@ -11,18 +11,11 @@
 import { omit } from 'lodash'
 import { EventDocument, getUUID, TokenWithBearer } from '@opencrvs/commons'
 import { upsertEventWithActions } from '@events/storage/postgres/events/import'
-import { getEventConfigurationById } from '../config/config'
-import { indexEvent } from '../indexing/indexing'
+import { getInMemoryEventConfigurations } from '../config/config'
+import { indexEventsInBulk } from '../indexing/indexing'
 
-export async function importEvent(
-  eventDocument: EventDocument,
-  token: TokenWithBearer
-) {
-  const transactionId = getUUID()
-  const { actions, ...event } = eventDocument
-
-  const eventType = event.type
-  const eventActions = actions.map(({ type, ...action }) => ({
+function mapEventActions(actions: EventDocument['actions']) {
+  return actions.map(({ type, ...action }) => ({
     ...omit(action, 'type'),
     actionType: type,
 
@@ -40,17 +33,32 @@ export async function importEvent(
     originalActionId: action.originalActionId ?? null,
     createdBySignature: action.createdBySignature ?? null
   }))
+}
 
-  const createdEvent = await upsertEventWithActions(
-    { ...omit(event, 'type'), eventType, transactionId },
-    eventActions
-  )
+export async function bulkImportEvents(
+  events: EventDocument[],
+  token: TokenWithBearer
+) {
+  const toIndex = []
 
-  const config = await getEventConfigurationById({
-    eventType: event.type,
-    token
-  })
-  await indexEvent(createdEvent, config)
+  const eventConfigs = await getInMemoryEventConfigurations(token)
 
-  return createdEvent
+  for (const eventDocument of events) {
+    const transactionId = getUUID()
+    const { actions, ...event } = eventDocument
+
+    const eventType = event.type
+    const eventActions = mapEventActions(actions)
+
+    const createdEvent = await upsertEventWithActions(
+      { ...omit(event, 'type'), eventType, transactionId },
+      eventActions
+    )
+
+    toIndex.push(createdEvent)
+  }
+
+  if (toIndex.length > 0) {
+    await indexEventsInBulk(toIndex, eventConfigs)
+  }
 }

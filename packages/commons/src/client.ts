@@ -17,8 +17,7 @@ export * from './utils'
 export * from './conditionals/validate'
 export { DEFAULT_ROLES_DEFINITION } from './authentication'
 export * from './fixtures'
-export * from './users/systemRole'
+export * from './users/User'
 export * from './authentication'
 export * from './url'
-
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+export { TriggerEvent } from './notification'

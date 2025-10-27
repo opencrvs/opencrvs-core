@@ -11,57 +11,44 @@
 
 import {
   EventStatus,
+  QueryInputType,
+  SearchField,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import {
-  getAdvancedSearchFieldErrors,
   getMetadataFieldConfigs,
   buildSearchQuery,
   serializeSearchParams,
   deserializeSearchParams,
   buildQuickSearchQuery,
-  resolveAdvancedSearchConfig
+  resolveAdvancedSearchConfig,
+  getAdvancedSearchFieldErrors,
+  toAdvancedSearchQueryType
 } from './utils'
 
 describe('getAdvancedSearchFieldErrors', () => {
   it('should return no errors for empty values', () => {
     const mockFormValues = { 'applicant.dob': '3' }
     const sections = resolveAdvancedSearchConfig(tennisClubMembershipEvent)
-    const errors = getAdvancedSearchFieldErrors(sections, mockFormValues)
+    const errors = getAdvancedSearchFieldErrors(sections, mockFormValues, {})
     expect(errors).toEqual({
-      'applicant.name': {
-        errors: []
-      },
-      'recommender.name': {
-        errors: []
-      },
-      'applicant.email': {
-        errors: []
-      },
-      'applicant.dob': {
-        errors: [
-          {
-            message: {
-              defaultMessage: 'Invalid date field',
-              description: 'Error message when date field is invalid',
-              id: 'error.invalidDate'
-            }
+      'applicant.name': [],
+      'recommender.name': [],
+      'applicant.email': [],
+      'applicant.dob': [
+        {
+          message: {
+            defaultMessage: 'Invalid date field',
+            description: 'Error message when date field is invalid',
+            id: 'error.invalidDate'
           }
-        ]
-      },
-      'event.legalStatuses.REGISTERED.acceptedAt': {
-        errors: []
-      },
-      'event.legalStatuses.REGISTERED.createdAtLocation': {
-        errors: []
-      },
-      'event.status': {
-        errors: []
-      },
-      'event.updatedAt': {
-        errors: []
-      }
-    })
+        }
+      ],
+      'event.legalStatuses.REGISTERED.acceptedAt': [],
+      'event.legalStatuses.REGISTERED.createdAtLocation': [],
+      'event.status': [],
+      'event.updatedAt': []
+    } satisfies ReturnType<typeof getAdvancedSearchFieldErrors>)
   })
 })
 
@@ -246,6 +233,301 @@ describe('buildQuickSearchQuery', () => {
             term: 'abc@gmail.com',
             type: 'exact'
           }
+        }
+      ]
+    })
+  })
+})
+
+describe('Nested Query Generation with searchFields', () => {
+  it('creates OR clauses for fields with multiple searchFields', () => {
+    const searchParams = {
+      'person-name': 'Bob',
+      'child.dob': '1985-01-01'
+    }
+    const searchFieldConfigs: SearchField[] = [
+      {
+        fieldId: 'person-name',
+        fieldType: 'field',
+        type: 'NAME',
+        config: {
+          type: 'fuzzy',
+          searchFields: [
+            'child.name.firstname',
+            'child.name.surname',
+            'mother.name.firstname',
+            'father.name.firstname'
+          ]
+        }
+      },
+      {
+        fieldId: 'child.dob',
+        fieldType: 'field',
+        config: { type: 'exact' }
+      }
+    ]
+
+    const result = toAdvancedSearchQueryType(
+      searchParams as unknown as QueryInputType,
+      searchFieldConfigs,
+      'birth'
+    )
+
+    expect(result).toEqual({
+      type: 'and',
+      clauses: [
+        {
+          eventType: 'birth'
+        },
+        {
+          type: 'or',
+          clauses: [
+            {
+              data: { 'child.name.firstname': 'Bob' }
+            },
+            {
+              data: { 'child.name.surname': 'Bob' }
+            },
+            {
+              data: { 'mother.name.firstname': 'Bob' }
+            },
+            {
+              data: { 'father.name.firstname': 'Bob' }
+            }
+          ]
+        },
+        {
+          data: { 'child.dob': '1985-01-01' }
+        }
+      ]
+    })
+  })
+
+  it('creates individual clauses for fields without searchFields', () => {
+    const searchParams = {
+      'child.name.firstname': 'Alice',
+      'child.dob': '1990-01-01'
+    }
+    const searchFieldConfigs: SearchField[] = [
+      {
+        fieldId: 'child.name.firstname',
+        fieldType: 'field',
+        config: { type: 'fuzzy' }
+      },
+      {
+        fieldId: 'child.dob',
+        fieldType: 'field',
+        config: { type: 'exact' }
+      }
+    ]
+
+    const result = toAdvancedSearchQueryType(
+      searchParams as unknown as QueryInputType,
+      searchFieldConfigs,
+      'birth'
+    )
+
+    expect(result).toEqual({
+      type: 'and',
+      clauses: [
+        {
+          eventType: 'birth'
+        },
+        {
+          data: { 'child.name.firstname': 'Alice' }
+        },
+        {
+          data: { 'child.dob': '1990-01-01' }
+        }
+      ]
+    })
+  })
+
+  it('handles single searchField as individual clause', () => {
+    const searchParams = {
+      'custom-field': 'test-value'
+    }
+    const searchFieldConfigs: SearchField[] = [
+      {
+        fieldId: 'custom-field',
+        fieldType: 'field',
+        config: {
+          type: 'exact',
+          searchFields: ['mapped.database.field'] // Single field
+        }
+      }
+    ]
+
+    const result = toAdvancedSearchQueryType(
+      searchParams as unknown as QueryInputType,
+      searchFieldConfigs,
+      'birth'
+    )
+
+    expect(result).toEqual({
+      type: 'and',
+      clauses: [
+        {
+          eventType: 'birth'
+        },
+        {
+          type: 'or',
+          clauses: [
+            {
+              data: { 'mapped.database.field': 'test-value' }
+            }
+          ]
+        }
+      ]
+    })
+  })
+
+  it('handles metadata fields correctly', () => {
+    const searchParams = {
+      'event.trackingId': 'ABC123',
+      'person-name': 'Bob'
+    }
+
+    const searchFieldConfigs: SearchField[] = [
+      {
+        fieldId: 'event.trackingId',
+        fieldType: 'event',
+        config: { type: 'exact' }
+      },
+      {
+        fieldId: 'person-name',
+        fieldType: 'field',
+        config: {
+          type: 'fuzzy',
+          searchFields: ['child.name.firstname', 'mother.name.firstname']
+        }
+      }
+    ]
+
+    const result = toAdvancedSearchQueryType(
+      searchParams as unknown as QueryInputType,
+      searchFieldConfigs,
+      'birth'
+    )
+
+    expect(result).toEqual({
+      type: 'and',
+      clauses: [
+        {
+          trackingId: 'ABC123',
+          eventType: 'birth'
+        },
+        {
+          type: 'or',
+          clauses: [
+            {
+              data: { 'child.name.firstname': 'Bob' }
+            },
+            {
+              data: { 'mother.name.firstname': 'Bob' }
+            }
+          ]
+        }
+      ]
+    })
+  })
+
+  it('handles complex multi-field scenario', () => {
+    const searchParams = {
+      'applicant-name': 'John',
+      'contact-info': 'john@example.com',
+      'event.status': 'REGISTERED',
+      'birth.date': '1980-01-01'
+    }
+
+    const searchFieldConfigs: SearchField[] = [
+      {
+        fieldId: 'applicant-name',
+        fieldType: 'field',
+        config: {
+          type: 'fuzzy',
+          searchFields: [
+            'child.name.firstname',
+            'child.name.surname',
+            'informant.name.firstname',
+            'informant.name.surname'
+          ]
+        }
+      },
+      {
+        fieldId: 'contact-info',
+        fieldType: 'field',
+        config: {
+          type: 'exact',
+          searchFields: [
+            'child.email',
+            'informant.email',
+            'child.phone',
+            'informant.phone'
+          ]
+        }
+      },
+      {
+        fieldId: 'event.status',
+        fieldType: 'event',
+        config: { type: 'exact' }
+      },
+      {
+        fieldId: 'birth.date',
+        fieldType: 'field',
+        config: { type: 'exact' }
+      }
+    ]
+
+    const result = toAdvancedSearchQueryType(
+      searchParams as unknown as QueryInputType,
+      searchFieldConfigs,
+      'birth'
+    )
+
+    expect(result).toEqual({
+      type: 'and',
+      clauses: [
+        {
+          status: 'REGISTERED',
+          eventType: 'birth'
+        },
+        {
+          type: 'or',
+          clauses: [
+            {
+              data: { 'child.name.firstname': 'John' }
+            },
+            {
+              data: { 'child.name.surname': 'John' }
+            },
+            {
+              data: { 'informant.name.firstname': 'John' }
+            },
+            {
+              data: { 'informant.name.surname': 'John' }
+            }
+          ]
+        },
+        {
+          type: 'or',
+          clauses: [
+            {
+              data: { 'child.email': 'john@example.com' }
+            },
+            {
+              data: { 'informant.email': 'john@example.com' }
+            },
+            {
+              data: { 'child.phone': 'john@example.com' }
+            },
+            {
+              data: { 'informant.phone': 'john@example.com' }
+            }
+          ]
+        },
+        {
+          data: { 'birth.date': '1980-01-01' }
         }
       ]
     })

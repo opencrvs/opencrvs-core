@@ -24,13 +24,15 @@ import {
   TranslationConfig,
   EventState,
   NameFieldValue,
-  isFieldVisible,
   isDateRangeFieldType,
-  isNameFieldType
+  isNameFieldType,
+  isFieldVisible,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import {
   getAdvancedSearchFieldErrors,
   resolveAdvancedSearchConfig,
@@ -65,7 +67,8 @@ const messages = defineMessages(messagesToDefine)
 function SearchSectionForm({
   section,
   handleFieldChange,
-  fieldValues
+  fieldValues,
+  validatorContext
 }: {
   section: {
     title: TranslationConfig
@@ -74,6 +77,7 @@ function SearchSectionForm({
   }
   handleFieldChange: (fieldId: string, value: FieldValue) => void
   fieldValues?: EventState
+  validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
 
@@ -90,6 +94,7 @@ function SearchSectionForm({
         fields={section.fields}
         id={section.title.id}
         initialValues={fieldValues}
+        validatorContext={validatorContext}
         onChange={(updatedValues) => {
           Object.entries(updatedValues).forEach(([fieldId, value]) =>
             handleFieldChange(fieldId, value)
@@ -137,6 +142,7 @@ export function TabSearch({
 }) {
   const intl = useIntl()
   const navigate = useNavigate()
+  const validatorContext = useValidatorContext()
 
   const [formValues, setFormValues] = useState<EventState>(fieldValues)
 
@@ -168,8 +174,8 @@ export function TabSearch({
     }))
 
   const errors = Object.values(
-    getAdvancedSearchFieldErrors(sections, formValues)
-  ).flatMap((errObj) => errObj.errors)
+    getAdvancedSearchFieldErrors(sections, formValues, validatorContext)
+  ).flatMap((fieldErrors) => fieldErrors)
 
   const nonEmptyValues = filterEmptyValues(formValues)
 
@@ -179,7 +185,7 @@ export function TabSearch({
     const updatedValues = Object.entries(nonEmptyValues).reduce(
       (result, [fieldId, value]) => {
         const field = fields.find((f) => f.id === fieldId)
-        if (!field || !isFieldVisible(field, formValues)) {
+        if (!field || !isFieldVisible(field, formValues, validatorContext)) {
           return result
         }
         if (field.type === FieldType.NAME && typeof value === 'object') {
@@ -219,7 +225,7 @@ export function TabSearch({
         if (!field) {
           return count
         }
-        if (!isFieldVisible(field, formValues)) {
+        if (!isFieldVisible(field, formValues, validatorContext)) {
           return count
         }
         return count + countFilledFieldsForInputType(field, val)
@@ -239,6 +245,7 @@ export function TabSearch({
           fieldValues={fieldValues}
           handleFieldChange={handleFieldChange}
           section={section}
+          validatorContext={validatorContext}
         />
       ))}
       <SearchButton

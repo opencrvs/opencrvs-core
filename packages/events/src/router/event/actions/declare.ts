@@ -43,9 +43,18 @@ export function declareActionProcedures() {
       .use(middleware.validateAction)
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
-        const { token, user, isDuplicateAction } = ctx
+        const { token, user, existingAction } = ctx
 
-        if (isDuplicateAction) {
+        // If an action exists but is not in the REQUESTED state,
+        // then we consider the action to have been fully handled already.
+        // For future reference, it would also make sense to have the pending state
+        // of the country config HTTP request be persisted in the database
+        // so that even if you ran the request twice consecutively, it would not
+        // trigger two country config requests in parallel.
+        if (
+          existingAction &&
+          existingAction.status !== ActionStatus.Requested
+        ) {
           return ctx.event
         }
 
@@ -65,7 +74,8 @@ export function declareActionProcedures() {
           user,
           token,
           event,
-          config
+          config,
+          DeclareActionInput
         )
 
         const dedupConfig = config.actions.find(
@@ -91,6 +101,7 @@ export function declareActionProcedures() {
               transactionId: input.transactionId,
               eventId: input.eventId,
               declaration: input.declaration,
+              annotation: input.annotation,
               content: {
                 duplicates: duplicates.map(({ event: { id, trackingId } }) => ({
                   id,

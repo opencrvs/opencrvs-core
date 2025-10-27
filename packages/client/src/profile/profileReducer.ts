@@ -19,7 +19,6 @@ import {
 } from '@client/utils/userUtils'
 import {
   getTokenPayload,
-  ITokenPayload,
   storeToken,
   getToken,
   isTokenStillValid,
@@ -30,6 +29,7 @@ import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { serviceApi } from '@client/profile/serviceApi'
 import { IStoreState } from '@client/store'
+import { ITokenPayload } from '@opencrvs/commons/client'
 
 export type ProfileState = {
   authenticated: boolean

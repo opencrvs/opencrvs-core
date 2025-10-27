@@ -9,7 +9,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { merge, omitBy, isString, omit } from 'lodash'
+import { merge, omitBy, isString, omit, isEmpty } from 'lodash'
 import { addDays } from 'date-fns'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID, UUID } from '../uuid'
@@ -19,7 +19,6 @@ import {
   ActionStatus,
   EventState,
   PrintCertificateAction,
-  ActionUpdate,
   DuplicateDetectedAction
 } from './ActionDocument'
 import {
@@ -84,7 +83,9 @@ export const TestUserRole = z.enum([
   'LOCAL_REGISTRAR',
   'LOCAL_SYSTEM_ADMIN',
   'NATIONAL_REGISTRAR',
-  'REGISTRATION_AGENT'
+  'REGISTRATION_AGENT',
+  'NATIONAL_SYSTEM_ADMIN',
+  'SOCIAL_WORKER'
 ])
 
 export type TestUserRole = z.infer<typeof TestUserRole>
@@ -132,10 +133,35 @@ export function generateRandomName(rng: () => number) {
   }
 }
 
+export function generateUuid(rng: () => number = () => 0.1) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.floor(rng() * 16)
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+
+    return v.toString(16)
+  }) as UUID
+}
+
+export function generateTrackingId(rng: () => number): string {
+  const uuid = generateUuid(rng).replace(/-/g, '')
+  const trackingId = uuid.slice(0, 6).toUpperCase()
+  return trackingId
+}
+
+export function generateRegistrationNumber(rng: () => number): string {
+  const uuid = generateUuid(rng).replace(/-/g, '')
+  const registrationNumber = uuid.slice(0, 12).toUpperCase()
+  return registrationNumber
+}
+
+export function generateRandomSignature(rng: () => number): string {
+  return `/random-bucket/${generateUuid(rng)}.png`
+}
+
 /**
  * Quick-and-dirty mock data generator for event actions.
  */
-export function mapFieldTypeToMockValue(
+function mapFieldTypeToMockValue(
   field: FieldConfig,
   i: number,
   rng: () => number
@@ -155,9 +181,14 @@ export function mapFieldTypeToMockValue(
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.PHONE:
+    case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
     case FieldType.OFFICE:
+    case FieldType.LINK_BUTTON:
+    case FieldType.LOADER:
       return `${field.id}-${field.type}-${i}`
+    case FieldType.VERIFICATION_STATUS:
+      return 'verified'
     case FieldType.NAME:
       return generateRandomName(rng)
     case FieldType.NUMBER:
@@ -170,7 +201,9 @@ export function mapFieldTypeToMockValue(
       return {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+        // @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
+        // @TODO:  Find a way to give out context aware mock values in the future.
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
         streetLevelDetails: {
           town: 'Example Town',
           residentialArea: 'Example Residential Area',
@@ -181,8 +214,15 @@ export function mapFieldTypeToMockValue(
       }
     case FieldType.DATE:
       return '2021-01-01'
+    case FieldType.AGE:
+      return {
+        age: 19,
+        asOfDateRef: 'applicant.dob'
+      }
     case FieldType.TIME:
       return '09:33'
+    case FieldType.ALPHA_PRINT_BUTTON:
+      return undefined
     case FieldType.DATE_RANGE:
       return {
         start: '2021-01-01',
@@ -207,10 +247,17 @@ export function mapFieldTypeToMockValue(
     case FieldType.FILE_WITH_OPTIONS:
     case FieldType.DATA:
       return undefined
+    case FieldType.QR_READER:
+      return Object.create(null)
+    case FieldType.ID_READER:
+      return Object.create(null)
   }
 }
 
-function fieldConfigsToActionPayload(fields: FieldConfig[], rng: () => number) {
+function fieldConfigsToActionPayload(
+  fields: FieldConfig[],
+  rng: () => number
+): EventState {
   return fields.reduce(
     (acc, field, i) => ({
       ...acc,
@@ -227,6 +274,10 @@ export function generateActionDeclarationInput(
   overrides?: Partial<EventState>
 ): EventState {
   const parsed = DeclarationUpdateActions.safeParse(action)
+
+  if (isEmpty(overrides) && typeof overrides === 'object') {
+    return {}
+  }
   if (parsed.success) {
     const fields = getDeclarationFields(configuration)
 
@@ -236,10 +287,14 @@ export function generateActionDeclarationInput(
 
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
-    return omitHiddenPaginatedFields(declarationConfig, {
-      ...declaration,
-      ...overrides
-    })
+    return omitHiddenPaginatedFields(
+      declarationConfig,
+      {
+        ...declaration,
+        ...overrides
+      },
+      {} // Intentionally empty. Allow generating fields with custom conditionals.
+    )
   }
 
   // eslint-disable-next-line no-console
@@ -262,7 +317,7 @@ export function generateActionDuplicateDeclarationInput(
   })
 }
 
-export function generateActionAnnotationInput(
+function generateActionAnnotationInput(
   configuration: EventConfig,
   action: ActionType,
   rng: () => number
@@ -279,7 +334,8 @@ export function generateActionAnnotationInput(
 
   const visibleVerificationPageIds = getVisibleVerificationPageIds(
     findRecordActionPages(configuration, action),
-    annotation
+    annotation,
+    {}
   )
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
@@ -290,7 +346,11 @@ export function generateActionAnnotationInput(
     {}
   )
 
-  const fieldBasedPayload = omitHiddenFields(annotationFields, annotation)
+  const fieldBasedPayload = omitHiddenFields(
+    annotationFields,
+    annotation,
+    {} // Intentionally empty. Allow generating fields with custom conditionals.
+  )
 
   return {
     ...fieldBasedPayload,
@@ -714,45 +774,35 @@ export function eventPayloadGenerator(
   }
 }
 
-export function generateActionDocument({
+export function generateActionDocument<T extends ActionType>({
   configuration,
   action,
   rng = () => 0.1,
-  defaults = {},
-  user = {},
-  annotation,
+  defaults,
   declarationOverrides
 }: {
   configuration: EventConfig
-  action: ActionType
+  action: T
   rng?: () => number
-  defaults?: Partial<ActionDocument>
-  user?: Partial<{
-    signature: string
-    primaryOfficeId: UUID
-    role: TestUserRole
-    id: string
-  }>
-  annotation?: ActionUpdate
+  defaults?: Partial<Extract<ActionDocument, { type: T }>>
   declarationOverrides?: Partial<EventState>
 }): ActionDocument {
   const actionBase = {
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
-    createdBy: user.id ?? getUUID(),
+    createdBy: generateUuid(rng),
     createdByUserType: TokenUserType.Enum.user,
     createdByRole: TestUserRole.Enum.FIELD_AGENT,
     id: getUUID(),
-    createdAtLocation:
-      user.primaryOfficeId ?? ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID),
+    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     declaration: generateActionDeclarationInput(
       configuration,
       action,
       rng,
       declarationOverrides
     ),
-    annotation: annotation ?? {},
+    annotation: {},
     status: ActionStatus.Accepted,
     transactionId: getUUID(),
     ...defaults
@@ -769,8 +819,16 @@ export function generateActionDocument({
       return { ...actionBase, type: action }
     case ActionType.UNASSIGN:
       return { ...actionBase, type: action }
-    case ActionType.ASSIGN:
-      return { ...actionBase, assignedTo: getUUID(), type: action }
+    case ActionType.ASSIGN: {
+      const assignActionDefaults = defaults as
+        | Partial<Extract<ActionDocument, { type: 'ASSIGN' }>>
+        | undefined
+      return {
+        ...actionBase,
+        assignedTo: assignActionDefaults?.assignedTo ?? getUUID(),
+        type: action
+      }
+    }
     case ActionType.VALIDATE:
       return { ...actionBase, type: action }
     case ActionType.ARCHIVE:
@@ -781,12 +839,16 @@ export function generateActionDocument({
       return { ...actionBase, type: action }
     case ActionType.NOTIFY:
       return { ...actionBase, type: action }
-    case ActionType.PRINT_CERTIFICATE:
+    case ActionType.PRINT_CERTIFICATE: {
+      const printActionDefaults = defaults as
+        | Partial<PrintCertificateAction>
+        | undefined
       return {
         ...actionBase,
         type: action,
-        content: (defaults as Partial<PrintCertificateAction>).content
+        content: printActionDefaults?.content
       }
+    }
     case ActionType.REQUEST_CORRECTION:
       return { ...actionBase, type: action }
     case ActionType.APPROVE_CORRECTION:
@@ -803,16 +865,18 @@ export function generateActionDocument({
         ...actionBase,
         type: action
       }
-    case ActionType.DUPLICATE_DETECTED:
+    case ActionType.DUPLICATE_DETECTED: {
+      const duplicateActionDefaults = defaults as
+        | Partial<DuplicateDetectedAction>
+        | undefined
       return {
         ...actionBase,
         type: action,
         content: {
-          duplicates:
-            (defaults as Partial<DuplicateDetectedAction>).content
-              ?.duplicates ?? []
+          duplicates: duplicateActionDefaults?.content?.duplicates ?? []
         }
       }
+    }
     case ActionType.DELETE:
     default:
       throw new Error(`Unsupported action type: ${action}`)
@@ -822,23 +886,24 @@ export function generateActionDocument({
 export function generateEventDocument({
   configuration,
   actions,
-  rng = () => 0.1,
-  user,
-  declarationOverrides
+  rng = () => 0.1
 }: {
   configuration: EventConfig
-  actions: ActionType[]
+  actions: {
+    type: ActionType
+    /**
+     * Overrides for default event state per action
+     */
+    declarationOverrides?: Partial<EventState>
+    user?: Partial<{
+      signature: string
+      primaryOfficeId: UUID
+      role: TestUserRole
+      id: string
+      assignedTo: string
+    }>
+  }[]
   rng?: () => number
-  user?: Partial<{
-    signature: string
-    primaryOfficeId: UUID
-    role: TestUserRole
-    id: string
-  }>
-  /**
-   * Overrides for default event state
-   */
-  declarationOverrides?: Partial<EventState>
 }): EventDocument {
   return {
     trackingId: getUUID(),
@@ -846,10 +911,15 @@ export function generateEventDocument({
     actions: actions.map((action) =>
       generateActionDocument({
         configuration,
-        action,
+        action: action.type,
         rng,
-        user,
-        declarationOverrides
+        defaults: {
+          createdBy: action.user?.id,
+          createdAtLocation: action.user?.primaryOfficeId,
+          assignedTo: action.user?.assignedTo,
+          createdByRole: action.user?.role
+        },
+        declarationOverrides: action.declarationOverrides
       })
     ),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
@@ -948,31 +1018,6 @@ export function createPrng(seed: number) {
   }
 }
 
-export function generateUuid(rng: () => number = () => 0.1) {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = Math.floor(rng() * 16)
-    const v = c === 'x' ? r : (r & 0x3) | 0x8
-
-    return v.toString(16)
-  }) as UUID
-}
-
-export function generateTrackingId(rng: () => number): string {
-  const uuid = generateUuid(rng).replace(/-/g, '')
-  const trackingId = uuid.slice(0, 6).toUpperCase()
-  return trackingId
-}
-
-export function generateRegistrationNumber(rng: () => number): string {
-  const uuid = generateUuid(rng).replace(/-/g, '')
-  const registrationNumber = uuid.slice(0, 12).toUpperCase()
-  return registrationNumber
-}
-
-export function generateRandomSignature(rng: () => number): string {
-  return `/random-bucket/${generateUuid(rng)}.png`
-}
-
 /**
  * @param overrides - Partial EventIndex object to override the default values.
  * @param seed - Seed value for the pseudo-random number generator.
@@ -1023,7 +1068,7 @@ export const generateTranslationConfig = (
 ): TranslationConfig => ({
   defaultMessage: message,
   description: 'Description for ${message}',
-  id: message
+  id: message.trim().replace(/\s+/g, '_').toLowerCase()
 })
 
 export const BearerTokenByUserType = {

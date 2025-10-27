@@ -11,7 +11,7 @@
 
 import { sql } from 'kysely'
 import { chunk } from 'lodash'
-import { logger, UUID } from '@opencrvs/commons'
+import { Location, LocationType, logger, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { Locations, NewLocations } from './schema/app/Locations'
 
@@ -59,35 +59,81 @@ export async function setLocations(locations: NewLocations[]) {
   return addLocations(locations)
 }
 
-export async function getLocations() {
+export async function getLocations({
+  locationType,
+  locationIds,
+  isActive
+}: {
+  locationType?: LocationType
+  locationIds?: UUID[]
+  isActive?: boolean
+} = {}) {
   const db = getClient()
 
-  return db
+  let query = db
     .selectFrom('locations')
-    .selectAll()
+    .select(['id', 'name', 'parentId', 'validUntil', 'locationType'])
     .where('deletedAt', 'is', null)
-    .$narrowType<{ deletedAt: null }>()
-    .execute()
+    .$narrowType<{
+      deletedAt: null
+      validUntil: Location['validUntil']
+    }>()
+
+  if (locationType) {
+    query = query.where('locationType', '=', locationType)
+  }
+
+  if (locationIds && locationIds.length > 0) {
+    query = query.where('id', 'in', locationIds)
+  }
+
+  if (isActive) {
+    query = query.where((eb) =>
+      eb.or([eb('validUntil', 'is', null), eb('validUntil', '>', 'now()')])
+    )
+  }
+
+  return query.execute()
 }
 
-export async function getChildLocations(id: string) {
-  const db = getClient()
-
-  const { rows } = await sql<Locations>`
+/** @returns a recursive CTE that can be used to get all child locations of a given location */
+function childLocationsCte(parentId: UUID) {
+  return sql`
     WITH RECURSIVE r AS (
       SELECT id, parent_id
       FROM app.locations
-      WHERE id = ${id} AND deleted_at IS NULL
+      WHERE id = ${parentId} AND deleted_at IS NULL
       UNION ALL
       SELECT l.id, l.parent_id
       FROM app.locations l
       JOIN r ON l.parent_id = r.id
     )
+  `
+}
+
+function getChildLocationsQuery(parentId: UUID) {
+  return sql<Locations>`
+    ${childLocationsCte(parentId)}
     SELECT l.*
     FROM app.locations l
     JOIN r ON r.id = l.id
-    WHERE l.id <> ${id} AND l.deleted_at IS NULL;
-  `.execute(db)
+    WHERE l.id <> ${parentId} AND l.deleted_at IS NULL;
+  `
+}
+
+function isLocationChildOfQuery(parentId: UUID, givenId: UUID) {
+  return sql<{ isChild: boolean }>`
+    ${childLocationsCte(parentId)}
+    SELECT EXISTS (
+      SELECT 1 FROM r WHERE id = ${givenId} AND id <> ${parentId}
+    ) AS "isChild";
+  `
+}
+
+export async function getChildLocations(parentId: UUID) {
+  const db = getClient()
+
+  const { rows } = await getChildLocationsQuery(parentId).execute(db)
   return rows
 }
 
@@ -103,4 +149,63 @@ export async function isLeafLocation(id: UUID) {
     .executeTakeFirst()
 
   return !result
+}
+
+/**
+ * Get the leaf location IDs from a list of locations.
+ *
+ * A leaf location is defined as a location that does not have any children in the provided list.
+ * e.g. if a location is a parent of another location in the list, it is not considered a leaf. ADMIN_STRUCTURE might have CRVS_OFFICE children, but can be a leaf if we only consider ADMIN_STRUCTURE locations.
+ *
+ * @param locationTypes - The types of locations to include.
+ * @returns The list of leaf location IDs.
+ */
+export async function getLeafLocationIds({
+  locationTypes
+}: { locationTypes?: LocationType[] } = {}) {
+  const db = getClient()
+
+  const query = db
+    .selectFrom('locations as l')
+    .select(['l.id'])
+    .where(({ not, exists, selectFrom }) =>
+      not(
+        exists(
+          selectFrom('locations as c')
+            .select('c.id')
+            .whereRef('c.parentId', '=', 'l.id')
+            .$if(!!locationTypes && !!locationTypes.length, (qb) =>
+              // @ts-expect-error -- query builder cannot infer the type from the condition above.
+              qb.where('c.locationType', 'in', locationTypes)
+            )
+        )
+      )
+    )
+
+  if (locationTypes && locationTypes.length > 0) {
+    query.where('locationType', 'in', locationTypes)
+  }
+
+  return query.execute()
+}
+
+/**
+ * Recursive check to see if a location is descendant of a jurisdiction location.
+ * @returns is the location **under** the jurisdiction of another location.
+ */
+export async function isLocationUnderJurisdiction({
+  jurisdictionLocationId,
+  locationToSearchId
+}: {
+  jurisdictionLocationId: UUID
+  locationToSearchId: UUID
+}) {
+  const db = getClient()
+
+  const result = await isLocationChildOfQuery(
+    jurisdictionLocationId,
+    locationToSearchId
+  ).execute(db)
+
+  return !!result.rows[0].isChild
 }

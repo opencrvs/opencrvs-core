@@ -17,7 +17,8 @@ import {
   getAcceptedActions,
   getUUID,
   SCOPES,
-  TENNIS_CLUB_MEMBERSHIP
+  TENNIS_CLUB_MEMBERSHIP,
+  createPrng
 } from '@opencrvs/commons'
 import {
   createSystemTestClient,
@@ -128,7 +129,6 @@ describe('event.actions.notify', () => {
     }
 
     await expect(
-      // @ts-expect-error -- Intentionally passing incorrect type
       client.event.actions.notify.request(payload)
     ).rejects.toMatchSnapshot()
   })
@@ -210,15 +210,16 @@ describe('event.actions.notify', () => {
 
       const parentId = generateUuid(rng)
 
-      const locationPayload = generator.locations.set([
-        { id: parentId },
-        { parentId: parentId },
-        { parentId: parentId }
-      ])
+      const locationRng = createPrng(843)
+
+      const locationPayload = generator.locations.set(
+        [{ id: parentId }, { parentId: parentId }, { parentId: parentId }],
+        locationRng
+      )
 
       await dataSeedingClient.locations.set(locationPayload)
 
-      const locations = await dataSeedingClient.locations.get()
+      const locations = await dataSeedingClient.locations.list()
 
       const client = createSystemTestClient('test-system', [
         `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,

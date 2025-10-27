@@ -14,9 +14,11 @@ import {
   eventPayloadGenerator,
   UUID,
   TestUserRole,
-  EventConfig
+  EventConfig,
+  Location,
+  LocationType,
+  generateUuid
 } from '@opencrvs/commons'
-import { Location } from '@events/service/locations/locations'
 import { addLocations } from '@events/storage/postgres/events/locations'
 
 interface Name {
@@ -30,12 +32,14 @@ export interface CreatedUser {
   primaryOfficeId: UUID
   role: string
   name: Array<Name>
+  fullHonorificName?: string
 }
 
 interface CreateUser {
   primaryOfficeId: UUID
   role?: string
   name?: Array<Name>
+  fullHonorificName?: string
 }
 
 /**
@@ -47,31 +51,32 @@ export function payloadGenerator(
 ) {
   const user = {
     create: (input: CreateUser) => ({
-      role: input.role ?? ('REGISTRATION_AGENT' as TestUserRole),
+      role: input.role ?? TestUserRole.Enum.REGISTRATION_AGENT,
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
-      primaryOfficeId: input.primaryOfficeId
+      primaryOfficeId: input.primaryOfficeId,
+      fullHonorificName: input.fullHonorificName
     })
   }
 
   const locations = {
     /** Create test data by providing count or desired locations */
-    set: (input: Array<Partial<Location>> | number) => {
+    set: (input: Array<Partial<Location>> | number, prng: () => number) => {
       if (typeof input === 'number') {
         return Array.from({ length: input }).map((_, i) => ({
-          id: getUUID(),
+          id: generateUuid(prng),
           name: `Location name ${i}`,
           parentId: null,
           validUntil: null,
-          locationType: 'ADMIN_STRUCTURE'
+          locationType: LocationType.Enum.ADMIN_STRUCTURE
         })) as Location[]
       }
 
       return input.map((location, i) => ({
-        id: location.id ?? getUUID(),
+        id: location.id ?? generateUuid(prng),
         name: location.name ?? `Location name ${i}`,
         parentId: location.parentId ?? null,
         validUntil: null,
-        locationType: 'ADMIN_STRUCTURE'
+        locationType: LocationType.Enum.ADMIN_STRUCTURE
       })) as Location[]
     }
   }
@@ -88,6 +93,7 @@ export function seeder() {
     return {
       primaryOfficeId: user.primaryOfficeId,
       name: user.name,
+      fullHonorificName: user.fullHonorificName,
       role: user.role as TestUserRole,
       id: getUUID()
     }
@@ -96,9 +102,7 @@ export function seeder() {
     addLocations(
       locations.map((location) => ({
         ...location,
-        validUntil: location.validUntil
-          ? location.validUntil.toISOString()
-          : null
+        validUntil: location.validUntil ? location.validUntil : null
       }))
     )
 

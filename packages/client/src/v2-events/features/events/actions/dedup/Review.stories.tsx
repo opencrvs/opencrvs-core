@@ -9,9 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
-import { AppRouter } from '@events/router'
 import { userEvent, within, expect } from '@storybook/test'
 import {
   ActionType,
@@ -36,14 +33,6 @@ const meta: Meta<typeof ReviewDuplicateIndex> = {
 export default meta
 
 type Story = StoryObj<typeof ReviewDuplicateIndex>
-const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [
-    httpLink({
-      url: '/api/events'
-    })
-  ],
-  transformer: { input: superjson, output: superjson }
-})
 
 const prng = createPrng(123123)
 const duplicates = [
@@ -52,6 +41,7 @@ const duplicates = [
     trackingId: generateTrackingId(prng)
   }
 ]
+
 const overriddenEventConfig = {
   ...tennisClubMembershipEvent,
   declaration: defineDeclarationForm({
@@ -95,6 +85,32 @@ const overriddenEventConfig = {
     })
   })
 }
+
+const declarationObj = {
+  'applicant.name': {
+    firstname: 'Riku',
+    surname: 'Rouvila'
+  },
+  'applicant.dob': '2025-01-23',
+  'recommender.name': {
+    firstname: 'Euan',
+    surname: 'Millar'
+  },
+  'applicant.address': {
+    country: 'FAR',
+    addressType: 'DOMESTIC',
+    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+    district: '27160bbd-32d1-4625-812f-860226bfb92a',
+    urbanOrRural: 'URBAN',
+    town: 'Example Town',
+    residentialArea: 'Example Residential Area',
+    street: 'Example Street',
+    number: '55',
+    zipCode: '123456'
+  },
+  'recommender.none': true
+}
+
 const actions = [
   generateActionDocument({
     configuration: overriddenEventConfig,
@@ -104,40 +120,17 @@ const actions = [
     configuration: overriddenEventConfig,
     action: ActionType.DECLARE,
     defaults: {
-      declaration: {
-        'applicant.name': {
-          firstname: 'Riku',
-          surname: 'Rouvila'
-        },
-        'applicant.dob': '2025-01-23',
-        'recommender.name': {
-          firstname: 'Euan',
-          surname: 'Millar'
-        },
-        'applicant.address': {
-          country: 'FAR',
-          addressType: 'DOMESTIC',
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'URBAN',
-          town: 'Example Town',
-          residentialArea: 'Example Residential Area',
-          street: 'Example Street',
-          number: '55',
-          zipCode: '123456'
-        },
-        'recommender.none': true
+      declaration: declarationObj,
+      annotation: {
+        'review.comment': 'asdasdasdasdasdasd'
       }
-    },
-
-    annotation: {
-      'review.comment': 'asdasdasdasdasdasd'
     }
   }),
   generateActionDocument({
     configuration: overriddenEventConfig,
     action: ActionType.DUPLICATE_DETECTED,
     defaults: {
+      declaration: declarationObj, // Same as DECLARE action details
       content: {
         duplicates
       }
@@ -151,7 +144,6 @@ const mockOriginalEvent = {
   actions,
   createdAt: new Date(Date.now()).toISOString(),
   id: generateUuid(prng),
-
   updatedAt: new Date(Date.now()).toISOString()
 }
 

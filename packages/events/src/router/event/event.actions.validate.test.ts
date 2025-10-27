@@ -264,10 +264,9 @@ test('validation prevents including hidden fields', async () => {
       ...generateActionDeclarationInput(
         tennisClubMembershipEvent,
         ActionType.VALIDATE,
-        () => 0.1,
-        { locations: [] }
+        () => 0.1
       ),
-      'recommender.firstname': 'this should not be here'
+      'recommender.name': { firstname: 'John', surname: 'Doe' }
     }
   })
 
@@ -473,7 +472,7 @@ test('deduplication check is skipped if the event has been marked as not duplica
   })
 })
 
-test('deduplication check is not skipped if the event has been marked as not duplicate but data has changed', async () => {
+test('deduplication and annotation check is not skipped if the event has been marked as not duplicate but data has changed', async () => {
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
       return HttpResponse.json([
@@ -536,6 +535,16 @@ test('deduplication check is not skipped if the event has been marked as not dup
       }
     })
   )
+
+  const lastWriteAction = stillDeclaredEvent.actions.at(-2)
+  if (!lastWriteAction) {
+    throw new Error('No action found')
+  }
+
+  expect(lastWriteAction.type).toBe(ActionType.DUPLICATE_DETECTED)
+  expect(lastWriteAction).toHaveProperty('annotation')
+  // @ts-expect-error - type not narrowed for duplicate action
+  expect(lastWriteAction.annotation).toBeDefined()
 
   expect(
     getCurrentEventState(stillDeclaredEvent, tennisClubMembershipEvent)

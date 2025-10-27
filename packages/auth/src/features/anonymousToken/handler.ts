@@ -30,6 +30,7 @@ export default async function anonymousTokenHandler(
       'opencrvs:countryconfig-user'
     ],
     'opencrvs:auth-service',
+    undefined,
     true
   )
   return { token }

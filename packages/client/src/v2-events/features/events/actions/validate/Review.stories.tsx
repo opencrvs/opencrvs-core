@@ -18,7 +18,6 @@ import {
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import * as Validate from './index'
 
@@ -51,11 +50,10 @@ const actions = [
           firstname: 'Euan',
           surname: 'Millar'
         }
+      },
+      annotation: {
+        'review.comment': 'asdasdasdasdasdasd'
       }
-    },
-
-    annotation: {
-      'review.comment': 'asdasdasdasdasdasd'
     }
   })
 ]
@@ -86,7 +84,7 @@ export const ReviewForLocalRegistrarIncomplete: Story = {
 }
 const eventForlocalRegistrarComplete = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
 })
 
 export const ReviewForLocalRegistrarComplete: Story = {
@@ -105,7 +103,7 @@ export const ReviewForLocalRegistrarComplete: Story = {
 
 const eventForRegistrationAgentComplete = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
 })
 
 export const ReviewForRegistrationAgentComplete: Story = {

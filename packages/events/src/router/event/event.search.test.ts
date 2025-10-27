@@ -16,12 +16,15 @@ import {
   ActionStatus,
   ActionType,
   AddressType,
+  createPrng,
   EventStatus,
   generateActionDocument,
   getCurrentEventState,
   getMixedPath,
   getUUID,
   InherentFlags,
+  Location,
+  LocationType,
   SCOPES,
   TENNIS_CLUB_MEMBERSHIP,
   TEST_SYSTEM_IANA_TIMEZONE
@@ -36,7 +39,7 @@ import {
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
-import { Location } from '@events/service/locations/locations'
+
 test('User without any search scopes should not see any events', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
@@ -248,9 +251,10 @@ test('Returns events based on the updatedAt column', async () => {
   const oldEventCreateAction = generateActionDocument({
     configuration: tennisClubMembershipEvent,
     action: ActionType.CREATE,
-    user,
     defaults: {
-      createdAt: oldEventCreatedAt
+      createdAt: oldEventCreatedAt,
+      createdBy: user.id,
+      createdAtLocation: user.primaryOfficeId
     }
   })
 
@@ -261,9 +265,10 @@ test('Returns events based on the updatedAt column', async () => {
     generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action,
-      user,
       defaults: {
-        status: ActionStatus.Requested
+        status: ActionStatus.Requested,
+        createdBy: user.id,
+        createdAtLocation: user.primaryOfficeId
       }
     })
   )
@@ -282,7 +287,7 @@ test('Returns events based on the updatedAt column', async () => {
     updatedAt: new Date().toISOString()
   }
 
-  await client.event.import(oldDocumentWithoutAcceptedDeclaration)
+  await client.event.bulkImport([oldDocumentWithoutAcceptedDeclaration])
 
   const newlyCreatedEvent = await client.event.create(generator.event.create())
   const newlyCreatedEvent2 = await client.event.create(generator.event.create())
@@ -886,8 +891,9 @@ test('Returns multiple documents after creation', async () => {
 test('Returns correctly based on registration location even when a parent location level is used for searching', async () => {
   const { user, generator, seed, locations } = await setupTestCase()
 
+  const locationRng = createPrng(842)
   const parentLocation = {
-    ...generator.locations.set(1)[0],
+    ...generator.locations.set(1, locationRng)[0],
     name: 'Parent location'
   }
 
@@ -898,7 +904,7 @@ test('Returns correctly based on registration location even when a parent locati
       id: user.primaryOfficeId,
       name: 'Child location',
       parentId: parentLocation.id,
-      locationType: 'ADMIN_STRUCTURE'
+      locationType: LocationType.enum.ADMIN_STRUCTURE
     }
   ]
 
@@ -1029,7 +1035,10 @@ test('Returns no documents when search params are not matched', async () => {
         {
           eventType: TENNIS_CLUB_MEMBERSHIP,
           data: {
-            'applicant.name': { type: 'exact', term: 'Nothing Matching' }
+            'applicant.name': {
+              type: 'exact',
+              term: 'Nothing Matching'
+            }
           }
         }
       ]
@@ -1800,4 +1809,148 @@ test('System integration without record search scope is not allowed to search an
       offset: 0
     })
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test('Returns events using nested AND/OR query combinations', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    'search[event=tennis-club-membership,access=all]',
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
+  ])
+
+  const record1 = {
+    'applicant.name': {
+      firstname: 'Bob',
+      surname: 'Smith'
+    },
+    'applicant.dob': '1985-01-01',
+    'applicant.email': 'bob.smith@example.com',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
+  }
+
+  const record2 = {
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
+    'applicant.dob': '1985-01-01',
+    'applicant.email': 'bob@example.com',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
+  }
+
+  const record3 = {
+    'applicant.name': {
+      firstname: 'Bob',
+      surname: 'Johnson'
+    },
+    'applicant.dob': '1990-01-01',
+    'applicant.email': 'different@example.com',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
+  }
+
+  const record4 = {
+    'applicant.name': {
+      firstname: 'Alice',
+      surname: 'Smith'
+    },
+    'applicant.dob': '1985-01-01',
+    'applicant.email': 'alice@example.com',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
+  }
+
+  const event1 = await client.event.create(generator.event.create())
+  const event2 = await client.event.create(generator.event.create())
+  const event3 = await client.event.create(generator.event.create())
+  const event4 = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event1.id, { declaration: record1 })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event2.id, { declaration: record2 })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event3.id, { declaration: record3 })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event4.id, { declaration: record4 })
+  )
+
+  // Test nested query: { applicant.name: "Bob" OR applicant.email: "bob@example.com" } AND { applicant.dob: "1985-01-01" }
+  const { results: fetchedEvents } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          type: 'or',
+          clauses: [
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              data: {
+                'applicant.name': { type: 'fuzzy', term: 'Bob' }
+              }
+            },
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              data: {
+                'applicant.email': { type: 'exact', term: 'bob@example.com' }
+              }
+            }
+          ]
+        },
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.dob': { type: 'exact', term: '1985-01-01' }
+          }
+        }
+      ]
+    }
+  })
+
+  expect(fetchedEvents.length).toBeGreaterThanOrEqual(2)
+
+  const matchingFirstnames = fetchedEvents.map((event) =>
+    getMixedPath(event.declaration, 'applicant.name.firstname')
+  )
+  const matchingEmails = fetchedEvents.map((event) =>
+    getMixedPath(event.declaration, 'applicant.email')
+  )
+
+  // Should match record1 (Bob with dob 1985-01-01) and record2 (John with bob@example.com and dob 1985-01-01)
+  expect(matchingFirstnames).toContain('Bob')
+  expect(matchingEmails).toContain('bob@example.com')
 })

@@ -14,6 +14,7 @@ import { z } from 'zod'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
+  AgeValue,
   AddressFieldValue,
   EventConfig,
   EventDocument,
@@ -110,19 +111,28 @@ function mapFieldTypeToElasticsearch(
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
-    case FieldType.DATA:
     case FieldType.BUTTON:
+    case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.ID:
     case FieldType.PHONE:
+    case FieldType.VERIFICATION_STATUS:
       return { type: 'keyword' }
+    case FieldType.DATA:
+      return { type: 'object' }
     case FieldType.ADDRESS:
+      const streetLevelDetails = Object.fromEntries(
+        (field.configuration?.streetAddressForm ?? []).map((f) => [
+          f.id,
+          mapFieldTypeToElasticsearch(f)
+        ])
+      )
       const addressProperties = {
         country: { type: 'keyword' },
         addressType: { type: 'keyword' },
         administrativeArea: { type: 'keyword' },
         streetLevelDetails: {
           type: 'object',
-          properties: {}
+          properties: streetLevelDetails
         }
       } satisfies {
         [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
@@ -130,6 +140,16 @@ function mapFieldTypeToElasticsearch(
       return {
         type: 'object',
         properties: addressProperties
+      }
+    case FieldType.AGE:
+      return {
+        type: 'object',
+        properties: {
+          age: { type: 'double' },
+          asOfDateRef: { type: 'keyword' }
+        } satisfies {
+          [K in keyof AgeValue]: estypes.MappingProperty
+        }
       }
     case FieldType.SIGNATURE:
     case FieldType.FILE:
@@ -161,7 +181,12 @@ function mapFieldTypeToElasticsearch(
         }
       }
     case FieldType.SEARCH:
+    case FieldType.ID_READER:
+    case FieldType.QR_READER:
     case FieldType.HTTP:
+    case FieldType.LINK_BUTTON:
+    case FieldType.QUERY_PARAM_READER:
+    case FieldType.LOADER:
       /**
        * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
        * The field still lands in `_source`.

@@ -9,10 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
-import { cloneDeep, isEqual, set, groupBy, omit, get } from 'lodash'
-import { useIntl } from 'react-intl'
+import { cloneDeep, isEqual, set, omit, get, compact } from 'lodash'
 import styled, { keyframes } from 'styled-components'
 import {
   EventState,
@@ -20,26 +19,27 @@ import {
   FieldConfig,
   FieldType,
   FieldValue,
-  isFieldEnabled,
-  isFieldVisible,
   AddressType,
-  TranslationConfig,
   IndexMap,
   joinValues,
   isNonInteractiveFieldType,
-  SystemVariables,
   InteractiveFieldType,
   FieldReference,
-  getAllUniqueFields
+  getAllUniqueFields,
+  omitHiddenFields,
+  isFieldEnabled,
+  ValidatorContext,
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
-  handleDefaultValue,
   makeDatesFormatted,
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
+import { handleDefaultValue } from '@client/v2-events/hooks/useDefaultValues'
+import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -53,7 +53,7 @@ type AllProps = {
   fields: FieldConfig[]
   className?: string
   readonlyMode?: boolean
-  errors: Record<string, { errors: { message: TranslationConfig }[] }>
+  errors: IndexMap<string>
   /**
    * Update the form values in the non-formik state.
    */
@@ -76,8 +76,8 @@ type AllProps = {
    * If isCorrection is true, fields with configuration option 'uncorrectable' set to true will be disabled.
    */
   isCorrection?: boolean
-  systemVariables: SystemVariables
   parentId?: string
+  validatorContext: ValidatorContext
 } & UsedFormikProps
 
 /**
@@ -85,13 +85,7 @@ type AllProps = {
  */
 type UsedFormikProps = Pick<
   FormikProps<EventState>,
-  | 'values'
-  | 'setTouched'
-  | 'setValues'
-  | 'touched'
-  | 'resetForm'
-  | 'setFieldValue'
-  | 'setErrors'
+  'values' | 'setTouched' | 'setValues' | 'touched' | 'resetForm' | 'setErrors'
 >
 
 const fadeIn = keyframes`
@@ -107,23 +101,6 @@ const FormItem = styled.div<{
     ignoreBottomMargin ? '0px' : '22px'};
 `
 
-/**
- * Given a parent field id, retrieve all of the child configs.
- * Used to reset the values of child fields when a parent field changes.
- */
-function retrieveChildFields(
-  parentId: string,
-  fieldParentMap: IndexMap<FieldConfig[]>
-) {
-  const childFields = fieldParentMap[parentId]
-
-  if (!childFields) {
-    return []
-  }
-
-  return childFields
-}
-
 function focusElementByHash() {
   const hash = window.location.hash.slice(1)
   if (!hash) {
@@ -138,34 +115,38 @@ function focusElementByHash() {
   window.scrollTo(0, document.documentElement.scrollTop - 100)
 }
 
-function getUpdatedChildValueOnChange({
-  childField,
-  fieldReference,
-  fieldValues,
-  systemVariables
-}: {
-  childField: InteractiveFieldType
-  fieldReference: FieldReference | undefined
-  fieldValues: Record<string, FieldValue>
-  systemVariables: SystemVariables
-}) {
-  if (!fieldReference) {
-    // If there is no reference, we reset the value to the default value.
-    return (
-      handleDefaultValue({
-        field: childField,
-        systemVariables
-      }) ?? null
-    )
+function resolveFieldReferenceValue(
+  { $$field, $$subfield }: FieldReference,
+  fieldValues: EventState
+): FieldValue | undefined {
+  const referenceKeyInFormikFormat = makeFormFieldIdFormikCompatible($$field)
+
+  return $$subfield && $$subfield.length > 0
+    ? get(fieldValues[referenceKeyInFormikFormat], $$subfield)
+    : fieldValues[referenceKeyInFormikFormat]
+}
+
+/**
+ * Create a reference map of visible parent fields and their their children for quick access.
+ * This is used to reset the values of child fields when a parent field changes.
+ *
+ * @returns `Record<parentFieldId, FieldConfig[]>` mapping parent field IDs to their child fields
+ */
+function getParentsOfListenerFields(fields: FieldConfig[]) {
+  // Create a reference map of visible parent fields and their their children for quick access.
+  // This is used to reset the values of child fields when a parent field changes.
+  const fieldsByParentId: IndexMap<FieldConfig[]> = {}
+
+  for (const field of fields) {
+    const parents = ([] as FieldReference[]).concat(field.parent ?? [])
+
+    for (const parent of parents) {
+      const listenersParentId = parent.$$field
+      ;(fieldsByParentId[listenersParentId] ||= []).push(field)
+    }
   }
 
-  const referenceKeyInFormikFormat = makeFormFieldIdFormikCompatible(
-    fieldReference.$$field
-  )
-
-  return fieldReference.$$subfield && fieldReference.$$subfield.length > 0
-    ? get(fieldValues[referenceKeyInFormikFormat], fieldReference.$$subfield)
-    : fieldValues[referenceKeyInFormikFormat]
+  return fieldsByParentId
 }
 
 // @TODO: Clarify and unify the naming of the props. What is from formik and what is from the state.
@@ -189,37 +170,26 @@ export function FormSectionComponent({
   fieldsToShowValidationErrors,
   onAllFieldsValidated,
   isCorrection = false,
-  systemVariables,
-  parentId
+  parentId,
+  validatorContext
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not -
   useOnlineStatus()
-  const intl = useIntl()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
+
+  const systemVariables = useSystemVariables()
 
   const fieldsWithFormikSeparator = fieldsWithDotSeparator.map((field) => ({
     ...field,
     id: makeFormFieldIdFormikCompatible(field.id)
   }))
 
-  // fieldsWithDotSeparator may fallback to pageFieldsWithDotIds when eventConfig
-  // isn’t loaded yet. This guarantees we always have a usable set of fields.
-  // Once eventConfig is available, we derive all fields (with dot-separated IDs)
-  // so parent → child relationships can be resolved consistently across pages.
-  const allFieldsWithDotSeparator: FieldConfig[] = useMemo(() => {
-    if (eventConfig) {
-      const allConfigFields = getAllUniqueFields(eventConfig)
-      return allConfigFields
-    }
-    return fieldsWithDotSeparator
-  }, [eventConfig, fieldsWithDotSeparator])
-
-  // Create a reference map of parent fields and their their children for quick access.
-  // This is used to reset the values of child fields when a parent field changes.
-  const fieldsByParentId: IndexMap<FieldConfig[]> = useMemo(
-    () => groupBy(allFieldsWithDotSeparator, (field) => field.parent?.$$field),
-    [allFieldsWithDotSeparator]
+  const allFieldsWithDotSeparator = eventConfig
+    ? getAllUniqueFields(eventConfig)
+    : fieldsWithDotSeparator
+  const listenerFieldsByParentId = getParentsOfListenerFields(
+    allFieldsWithDotSeparator
   )
 
   const errors = makeFormFieldIdsFormikCompatible(errorsWithDotSeparator)
@@ -246,35 +216,52 @@ export function FormSectionComponent({
   )
 
   /** Sets the value for fields that listen to another field via `parent` and `value` properties */
-  const setValuesForListenerFields = useCallback(
+  const setValueForListenerField = useCallback(
     (
-      childField: InteractiveFieldType,
+      listenerField: InteractiveFieldType,
       fieldValues: Record<string, FieldValue>,
       fieldErrors: AllProps['errors']
     ) => {
       // this can be any field. Even though we call this only when parent triggers the change.
-
-      const childFieldOcrvsId = makeFormikFieldIdOpenCRVSCompatible(
-        childField.id
+      const listenerFieldOcrvsId = makeFormikFieldIdOpenCRVSCompatible(
+        listenerField.id
       )
 
-      const referenceToAnotherField = fieldsWithDotSeparator.find(
-        (f) => f.id === childFieldOcrvsId
-      )?.value as FieldReference | undefined
+      const listenerFieldConfig = allFieldsWithDotSeparator.find(
+        (f) => f.id === listenerFieldOcrvsId
+      )
 
-      const childFieldFormikId = makeFormFieldIdFormikCompatible(childField.id)
+      const referencesToOtherFields = ([] as FieldReference[]).concat(
+        listenerFieldConfig?.value ?? []
+      )
 
-      const updatedValue = getUpdatedChildValueOnChange({
-        childField,
-        fieldReference: referenceToAnotherField,
-        fieldValues,
+      const listenerFieldFormikId = makeFormFieldIdFormikCompatible(
+        listenerField.id
+      )
+
+      const firstNonFalsyValue = compact(
+        referencesToOtherFields.map((reference) =>
+          resolveFieldReferenceValue(reference, fieldValues)
+        )
+      )[0]
+
+      if (firstNonFalsyValue) {
+        set(fieldValues, listenerFieldFormikId, firstNonFalsyValue)
+        set(fieldErrors, listenerFieldFormikId, '')
+        return
+      }
+
+      const defaultValue = handleDefaultValue({
+        field: listenerField,
         systemVariables
       })
 
-      set(fieldValues, childFieldFormikId, updatedValue)
-      set(fieldErrors, childField.id, { errors: [] })
+      set(fieldValues, listenerFieldFormikId, defaultValue)
+      set(fieldErrors, listenerFieldFormikId, '')
+
+      return
     },
-    [fieldsWithDotSeparator, systemVariables]
+    [allFieldsWithDotSeparator, systemVariables]
   )
 
   const onFieldValueChange = useCallback(
@@ -283,18 +270,16 @@ export function FormSectionComponent({
       const updatedErrors = cloneDeep(errorsWithDotSeparator)
 
       const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
-
-      const children = retrieveChildFields(ocrvsFieldId, fieldsByParentId)
-
-      const interactiveChildren = children.filter(
+      const listenerFields = listenerFieldsByParentId[ocrvsFieldId] ?? []
+      const interactiveListenerFields = listenerFields.filter(
         (c): c is InteractiveFieldType => !isNonInteractiveFieldType(c)
       )
 
       // update the value of the field that was changed
       set(updatedValues, formikFieldId, value)
 
-      for (const child of interactiveChildren) {
-        setValuesForListenerFields(child, updatedValues, updatedErrors)
+      for (const listenerField of interactiveListenerFields) {
+        setValueForListenerField(listenerField, updatedValues, updatedErrors)
       }
 
       // @TODO: we should not reference field id 'country' directly.
@@ -309,15 +294,13 @@ export function FormSectionComponent({
         )
       }
 
-      const formikChildIds = children.map((child) =>
+      const formikListenerFieldIds = listenerFields.map((child) =>
         makeFormFieldIdFormikCompatible(child.id)
       )
 
-      const updatedTouched = omit(touched, formikChildIds)
+      const updatedTouched = omit(touched, formikListenerFieldIds)
 
-      // @TODO: Formik does not type errors well. Actual error message differs from the type.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      void setErrors(updatedErrors as any)
+      void setErrors(updatedErrors)
       void setValues(updatedValues)
       void setTouched(updatedTouched)
       void setAllTouchedFields(updatedTouched)
@@ -325,13 +308,53 @@ export function FormSectionComponent({
     [
       values,
       setValues,
-      fieldsByParentId,
+      listenerFieldsByParentId,
       setTouched,
       touched,
       errorsWithDotSeparator,
       setErrors,
       setAllTouchedFields,
-      setValuesForListenerFields
+      setValueForListenerField
+    ]
+  )
+
+  const onBatchFieldValueChange = useCallback(
+    (newValues: Array<{ name: string; value: FieldValue | undefined }>) => {
+      const updatedValues = cloneDeep(values)
+      const updatedErrors = cloneDeep(errorsWithDotSeparator)
+      const updatedTouched = cloneDeep(touched)
+
+      for (const { name: formikFieldId, value } of newValues) {
+        set(updatedValues, formikFieldId, value)
+
+        const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
+        const listenerFields = listenerFieldsByParentId[ocrvsFieldId] ?? []
+        const interactiveListenerFields = listenerFields.filter(
+          (c): c is InteractiveFieldType => !isNonInteractiveFieldType(c)
+        )
+
+        for (const listenerField of interactiveListenerFields) {
+          setValueForListenerField(listenerField, updatedValues, updatedErrors)
+          updatedTouched[makeFormFieldIdFormikCompatible(listenerField.id)] =
+            undefined
+        }
+      }
+
+      void setErrors(updatedErrors)
+      void setValues(updatedValues)
+      void setTouched(updatedTouched)
+      void setAllTouchedFields(updatedTouched)
+    },
+    [
+      values,
+      setValues,
+      listenerFieldsByParentId,
+      setTouched,
+      touched,
+      errorsWithDotSeparator,
+      setErrors,
+      setAllTouchedFields,
+      setValueForListenerField
     ]
   )
 
@@ -347,7 +370,6 @@ export function FormSectionComponent({
 
   useEffect(() => {
     const userChangedForm = !isEqual(values, prevValuesRef.current)
-
     const sectionChanged = prevIdRef.current !== id
 
     // Formik does not allow controlling the form state 'easily'.
@@ -382,13 +404,12 @@ export function FormSectionComponent({
   ])
 
   // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
-  // Address is the only deep value.
   const completeForm = { ...initialValues, ...form }
 
   const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
-    const fieldErrors = errors[field.id]?.errors
+    const fieldErrors = errors[field.id]
     const hasErrors = fieldErrors && fieldErrors.length > 0
-    return isFieldVisible(field, completeForm) && hasErrors
+    return isFieldVisible(field, completeForm, validatorContext) && hasErrors
   })
 
   useEffect(() => {
@@ -400,19 +421,35 @@ export function FormSectionComponent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validateAllFields])
 
+  /*
+   * For the conditional check data, we want to only include values from visible fields so values of hidden fields don’t affect them.
+   *
+   * You might wonder why values of hidden fields aren’t filtered out completely earlier.
+   * That’s intentional — we persist their values so if the fields become visible again, the previous values are restored instead of resetting.
+   */
+  const declarationFields = eventConfig?.declaration.pages.flatMap(
+    (p) => p.fields
+  )
+  const allFields = [...(declarationFields ?? []), ...fieldsWithDotSeparator]
+  const visibleFieldValues = omitHiddenFields(
+    allFields,
+    completeForm,
+    validatorContext
+  )
+
   return (
     <section className={className}>
       {fieldsWithFormikSeparator.map((field) => {
-        if (!isFieldVisible(field, completeForm)) {
+        if (!isFieldVisible(field, visibleFieldValues, validatorContext)) {
           return null
         }
 
         const isDisabled =
-          !isFieldEnabled(field, completeForm) ||
+          !isFieldEnabled(field, visibleFieldValues, validatorContext) ||
           (isCorrection && field.uncorrectable)
 
-        const visibleError = errors[field.id]?.errors[0]?.message
-        const error = visibleError ? intl.formatMessage(visibleError) : ''
+        const visibleError = errors[field.id]
+        const error = visibleError ?? ''
 
         return (
           <FormItem
@@ -440,7 +477,9 @@ export function FormSectionComponent({
                         ] || touched[parentId]
                       : touched[field.id]) ?? false
                   }
+                  validatorContext={validatorContext}
                   value={formikField.value}
+                  onBatchFieldValueChange={onBatchFieldValueChange}
                   onBlur={formikField.onBlur}
                   onFieldValueChange={onFieldValueChange}
                 />

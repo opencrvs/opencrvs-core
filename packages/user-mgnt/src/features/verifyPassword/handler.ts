@@ -11,7 +11,8 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
-import User, { IUserModel, IUserName } from '@user-mgnt/model/user'
+import User, { IUserModel } from '@user-mgnt/model/user'
+import { IUserName } from '@opencrvs/commons'
 import { generateHash, generateOldHash } from '@user-mgnt/utils/hash'
 
 interface IVerifyPayload {

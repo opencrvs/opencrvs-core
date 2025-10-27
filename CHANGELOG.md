@@ -1,12 +1,38 @@
 # Changelog
 
+## 1.9.1
+
+### Breaking changes
+
+- **Removed support for following scopes**
+  - `NATLSYSADMIN`
+  - `DECLARE`
+  - `VALIDATE`
+  - `CERTIFY`
+  - `PERFORMANCE`
+  - `SYSADMIN`
+  - `TEAMS`
+  - `CONFIG`
+  - `RECORD_EXPORT_RECORDS`
+  - `RECORD_DECLARATION_PRINT`
+  - `RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS`
+  - `RECORD_REGISTRATION_PRINT`
+  - `RECORD_PRINT_CERTIFIED_COPIES`
+  - `RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES`
+  - `PROFILE_UPDATE`
+
 ## 1.9.0 Release candidate
 
 ### New features
 
 - **Redis password support with authorization and authentication** [#9338](https://github.com/opencrvs/opencrvs-core/pull/9338). By default password is disabled for local development environment and enabled on server environments.
+- **Switch back to default redis image** [#10173](https://github.com/opencrvs/opencrvs-core/issues/10173)
 - **Certificate Template Conditionals**: Certificate template conditionals allow dynamic template selection based on print history using the template conditional helpers.. [#7585](https://github.com/opencrvs/opencrvs-core/issues/7585)
 - Expose number of copies printed for a certificate template so it can be printed on the certificate. [#7586](https://github.com/opencrvs/opencrvs-core/issues/7586)
+- Add Import/Export system client and `record.export` scope to enable data migrations [#10415](https://github.com/opencrvs/opencrvs-core/issues/10415)
+- Add an Alpha version of configurable "Print" button that will be refactored in a later release - this button can be used to print certificates during declaration/correction flow. [#10039](https://github.com/opencrvs/opencrvs-core/issues/10039)
+- Add bulk import endpoint [#10590](https://github.com/opencrvs/opencrvs-core/pull/10590)
+- Add multi-field search with a single component [#10617](https://github.com/opencrvs/opencrvs-core/issues/10617)
 
 ### Improvements
 
@@ -31,6 +57,8 @@
 - **Updated environment variable**
 
   - Renamed `COUNTRY_CONFIG_URL` → `COUNTRY_CONFIG_URL_EXTERNAL` in the auth service to make its purpose clearer and more explicit.
+
+- Tiltfile: Improved Kubernetes support for development environment [#10672](https://github.com/opencrvs/opencrvs-core/issues/10672)
 
 ### Bug fixes
 

@@ -39,16 +39,13 @@ import {
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useAuthentication } from '@client/utils/userUtils'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 import { ActionMenu } from './components/ActionMenu'
 import { EventOverviewProvider } from './EventOverviewContext'
-
-/**
- * File is based on packages/client/src/views/RecordAudit/RecordAudit.tsx
- */
 
 /**
  * Renders the event overview page, including the event summary and history.
@@ -62,6 +59,7 @@ function EventOverviewFull({
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const validatorContext = useValidatorContext()
   const { status } = eventIndex
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(eventIndex.id, {
@@ -120,7 +118,11 @@ function EventOverviewFull({
         eventConfiguration={eventConfiguration}
         flags={flags}
       />
-      <EventHistory fullEvent={event} />
+      <EventHistory
+        eventConfiguration={eventConfiguration}
+        fullEvent={event}
+        validatorContext={validatorContext}
+      />
     </Content>
   )
 }
@@ -216,7 +218,6 @@ function EventOverviewContainer() {
   // Suspense query is not used here because we want to refetch when an event action is performed
   const getEventQuery = searchEventById.useQuery(params.eventId)
   const eventIndex = getEventQuery.data?.results[0]
-
   const fullEvent = getEvent.findFromCache(params.eventId).data
 
   if (!eventIndex) {

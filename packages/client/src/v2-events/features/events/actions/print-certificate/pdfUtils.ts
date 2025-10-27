@@ -19,11 +19,9 @@ import type {
   TFontFamilyTypes
 } from 'pdfmake/interfaces'
 import pdfMake from 'pdfmake/build/pdfmake'
-import { Location } from '@events/service/locations/locations'
-import { isEqual } from 'lodash'
+import { isEqual, isNil } from 'lodash'
 import {
   EventState,
-  User,
   LanguageConfig,
   EventConfig,
   getMixedPath,
@@ -31,7 +29,9 @@ import {
   EventStatus,
   DEFAULT_DATE_OF_EVENT_PROPERTY,
   ActionDocument,
-  ActionStatus
+  ActionStatus,
+  Location,
+  UserOrSystem
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -52,19 +52,21 @@ type CertificateConfiguration = Partial<{
   fonts: Record<string, FontFamilyTypes>
 }>
 
-function findUserById(userId: string, users: User[]) {
+function findUserById(userId: string, users: UserOrSystem[]) {
   const user = users.find((u) => u.id === userId)
 
   if (!user) {
     return {
       name: '',
-      signature: ''
+      signature: '',
+      fullHonorificName: ''
     }
   }
 
   return {
     name: getUsersFullName(user.name, 'en'),
-    signature: user.signature ?? ''
+    signature: user.signature ?? '',
+    fullHonorificName: user.fullHonorificName ?? ''
   }
 }
 
@@ -83,7 +85,7 @@ export const stringifyEventMetadata = ({
   >
   intl: IntlShape
   locations: Location[]
-  users: User[]
+  users: UserOrSystem[]
   adminLevels: AdminStructureItem[]
 }) => {
   return {
@@ -231,7 +233,7 @@ export function compileSvg({
   $actions: ActionDocument[]
   $declaration: EventState
   locations: Location[]
-  users: User[]
+  users: UserOrSystem[]
   /**
    * Indicates whether certificate is reviewed or actually printed
    * in V1 "preview" was used. In V2, "review" is used to remain consistent with action terminology (review of print action rather than preview of certificate).
@@ -336,7 +338,7 @@ export function compileSvg({
         return getMixedPath(resolvedMetadata, propertyPath)
       }
 
-      if (isEqual(resolvedDeclaration, obj)) {
+      if (isEqual($declaration, obj)) {
         return getMixedPath(resolvedDeclaration, propertyPath)
       }
 
@@ -421,13 +423,12 @@ export function compileSvg({
       this: any,
       ...args: [...(string | undefined)[], Handlebars.HelperOptions]
     ) {
-      // If even one of the parts is undefined, then return empty string
+      // If even one of the parts is undefined or null, then return empty string
       const idParts = args.slice(0, -1)
-      if (idParts.some((part) => part === undefined)) {
+      if (idParts.some((part) => isNil(part))) {
         return ''
       }
 
-      // NOTE: If you are having isues with casing mismatch, please ensure that you are using lookup helper rather than $lookup. Former returns actual values, latter stringified ones.
       const id = idParts.map((part) => part?.toString()).join('.')
 
       return intl.formatMessage({
@@ -562,7 +563,7 @@ export function compileSvg({
   const template = Handlebars.compile(templateString)
 
   const data = {
-    $declaration: resolvedDeclaration,
+    $declaration,
     $metadata,
     $review: review,
     $references: {

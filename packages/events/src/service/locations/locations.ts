@@ -9,22 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-import { UUID } from '@opencrvs/commons'
+import { Location, LocationType, UUID } from '@opencrvs/commons'
 import * as locationsRepo from '@events/storage/postgres/events/locations'
 import * as config from '@events/service/config/config'
-
-export const Location = z.object({
-  id: UUID,
-  name: z.string(),
-  parentId: UUID.nullable(),
-  validUntil: z.date().nullable(),
-  locationType: z
-    .enum(['HEALTH_FACILITY', 'CRVS_OFFICE', 'ADMIN_STRUCTURE'])
-    .nullable()
-})
-
-export type Location = z.infer<typeof Location>
 
 /**
  * Sets incoming locations in the database for events. Should be only run as part of the initial seeding.
@@ -36,8 +23,8 @@ export async function setLocations(locations: Location[]) {
     locations.map(({ id, name, parentId, validUntil, locationType }) => ({
       id,
       name,
-      parentId: parentId,
-      validUntil: validUntil ? validUntil.toISOString() : null,
+      parentId,
+      validUntil: validUntil ? new Date(validUntil).toISOString() : null,
       locationType
     }))
   )
@@ -53,19 +40,22 @@ export async function syncLocations() {
   return setLocations(locations)
 }
 
-export const getLocations = async () => {
-  const locations = await locationsRepo.getLocations()
+/**
+ * NOTE: Be cautious when calling this function as it fetches all locations from the database.
+ * Do you really need all of them? Consider using more specific functions if possible. Act as if there could be hundreds of thousands of locations.
+ *
+ */
+export async function getLocations(params?: {
+  locationType?: LocationType
+  locationIds?: UUID[]
+  isActive?: boolean
+}) {
+  const locations = await locationsRepo.getLocations(params)
 
-  return locations.map(({ id, name, parentId, validUntil, locationType }) => ({
-    id,
-    name,
-    parentId,
-    validUntil: validUntil ? new Date(validUntil) : null,
-    locationType
-  }))
+  return locations
 }
 
-export const getChildLocations = async (parentIdToSearch: string) => {
+export const getChildLocations = async (parentIdToSearch: UUID) => {
   const locations = await locationsRepo.getChildLocations(parentIdToSearch)
 
   return locations.map(({ id, name, parentId, validUntil, locationType }) => ({

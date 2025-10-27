@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Location } from '@events/service/locations/locations'
 import { IntlShape } from 'react-intl'
-import { FieldConfigInput, User } from '@opencrvs/commons/client'
+import { FieldConfigInput, Location, User } from '@opencrvs/commons/client'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 
 export interface RegisteredFieldModule<T extends FieldConfigInput> {

@@ -11,25 +11,34 @@
 
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
-import { User } from '@opencrvs/commons'
+import { UserOrSystem } from '@opencrvs/commons'
 import { router, publicProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
+import { getUserActions } from '@events/service/events/user/actions'
+import { UserActionsQuery } from '@events/storage/postgres/events/actions'
+import { userCanReadOtherUser } from '../middleware'
 
 export const userRouter = router({
   get: publicProcedure
     .input(z.string())
-    .output(User)
-    .query(async (options) => {
-      const [user] = await getUsersById([options.input], options.ctx.token)
+    .output(UserOrSystem)
+    .query(async ({ input, ctx }) => {
+      const users = await getUsersById([input], ctx.token)
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (!user) {
+      if (users.length === 0) {
         throw new TRPCError({ code: 'NOT_FOUND' })
       }
 
-      return user
+      return users[0]
     }),
   list: publicProcedure
     .input(z.array(z.string()))
-    .query(async (options) => getUsersById(options.input, options.ctx.token))
+    .output(z.array(UserOrSystem))
+    .query(async ({ input, ctx }) => getUsersById(input, ctx.token)),
+  actions: publicProcedure
+    .input(UserActionsQuery)
+    .use(userCanReadOtherUser)
+    .query(async ({ input }) => {
+      return getUserActions(input)
+    })
 })

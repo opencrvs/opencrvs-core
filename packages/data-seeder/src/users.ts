@@ -169,6 +169,21 @@ async function getUsers(token: string) {
       isConfigUpdateAllScopeAvailable = true
   }
 
+  const seen = new Set<string>()
+  const duplicates: string[] = []
+
+  for (const role of allRoles) {
+    if (seen.has(role.id)) {
+      duplicates.push(role.id)
+    } else {
+      seen.add(role.id)
+    }
+  }
+
+  if (duplicates.length > 0) {
+    raise(`Duplicate role ids found: ${duplicates.join(', ')}`)
+  }
+
   if (!isConfigUpdateAllScopeAvailable) {
     raise(`At least one user with ${configScope} scope must be created`)
   }

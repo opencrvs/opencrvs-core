@@ -10,23 +10,33 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import {
-  Action,
   applyDeclarationToEventIndex,
   EventConfig,
   EventDocument,
   EventState,
-  getCurrentEventState,
+  getAcceptedActions,
   getDeclaration,
-  isFieldDisplayedOnReview
+  isFieldDisplayedOnReview,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { Table } from '@opencrvs/components/lib/Table'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from '@client/v2-events/features/events/components/Output'
-import { hasFieldChanged } from '../../utils'
+import {
+  getAnnotationComparisonForField,
+  getReviewFormFields,
+  hasFieldChanged
+} from '@client/v2-events/features/events/actions/correct/utils'
+import {
+  expandWithUpdateActions,
+  EventHistoryActionDocument,
+  EventHistoryDocument,
+  getCurrentEventStateSafe
+} from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 
 const TableHeader = styled.th`
   text-transform: uppercase;
@@ -36,85 +46,189 @@ const TableHeader = styled.th`
 interface BaseDeclarationComparisonTableProps {
   fullEvent: EventDocument
   eventConfig: EventConfig
+  validatorContext: ValidatorContext
   id: string
 }
 
 type DeclarationComparisonTableProps =
   | (BaseDeclarationComparisonTableProps & {
       /** When action is provided, the comparison is done between the state before the action and the state after it. */
-      action: Action
+      action: EventHistoryActionDocument
       form?: EventState
     })
   | (BaseDeclarationComparisonTableProps & {
       /** When form is provided, form is applied on top of the latest state and compared to the previous one. */
       form: EventState
-      action?: Action
+      action?: EventHistoryActionDocument
     })
+
+const messages = defineMessages({
+  reviewForm: {
+    defaultMessage: 'Review form',
+    description: 'Review form label for update action',
+    id: 'review.form.title'
+  }
+})
+
+/**
+ * When action is not found or provided, we compare the full event
+ * Needed when action is not provided as props e.g. - correction summary
+ */
+function sliceEventAt(
+  fullEvent: EventHistoryDocument,
+  actionId: string,
+  includeCurrent = false
+): EventHistoryDocument {
+  const index = fullEvent.actions.findIndex((a) => a.id === actionId)
+
+  if (index === -1) {
+    return fullEvent
+  }
+
+  const sliceEnd = includeCurrent ? index + 1 : index
+  return {
+    ...fullEvent,
+    actions: fullEvent.actions.slice(0, sliceEnd)
+  }
+}
 
 /**
  *
  * @param action - action with the latest correction/update. Compares state before (exclusive) the action with the corrected one
  * @returns Display of differences between declaration before and after the correction/update.
  */
-export function DeclarationComparisonTableComponent({
+function DeclarationComparisonTableComponent({
   action,
   form,
-  fullEvent,
+  fullEvent: fullEventWithoutUpdatedAction,
   eventConfig,
-  id
+  id,
+  validatorContext
 }: DeclarationComparisonTableProps) {
+  const historyWithUpdatedActions = expandWithUpdateActions(
+    fullEventWithoutUpdatedAction,
+    validatorContext,
+    eventConfig
+  )
+
+  const fullEvent = {
+    ...fullEventWithoutUpdatedAction,
+    actions: historyWithUpdatedActions
+  }
+
   const index = fullEvent.actions.findIndex((a) => a.id === action?.id)
-  // When action is not found or provided, we compare the full event
-  const eventBeforeUpdate =
-    index === -1
-      ? fullEvent
-      : {
-          ...fullEvent,
-          actions: fullEvent.actions.slice(0, index)
-        }
 
   const declarationConfig = getDeclaration(eventConfig)
+  const reviewFormFields = getReviewFormFields(eventConfig)
 
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
-  const currentState = getCurrentEventState(fullEvent, eventConfiguration)
+  const eventBeforeUpdate = action
+    ? sliceEventAt(fullEvent, action.id, false)
+    : fullEvent
+
+  const currentEvent = action
+    ? sliceEventAt(fullEvent, action.id, true)
+    : fullEvent
+
+  const currentState = getCurrentEventStateSafe(
+    currentEvent,
+    eventConfiguration
+  )
+
+  // `action.declaration` is extracted to be merged by applyDeclarationToEventIndex to get latest EventIndex
+  const formWithOnlyChangedValues = form ?? action?.declaration
 
   // When form is provided, we apply it on top of the current state to get the latest declaration
-  const latestDeclaration = form
-    ? applyDeclarationToEventIndex(currentState, form, eventConfiguration)
-        .declaration
+  const latestDeclaration = formWithOnlyChangedValues
+    ? applyDeclarationToEventIndex(
+        currentState,
+        formWithOnlyChangedValues,
+        eventConfiguration
+      ).declaration
     : currentState.declaration
 
-  const previousDeclaration = getCurrentEventState(
+  const previousDeclaration = getCurrentEventStateSafe(
     eventBeforeUpdate,
     eventConfiguration
   ).declaration
+
+  // Collect all changed review fields once
+  const changedAnnotationFields = reviewFormFields
+    .map((f) => {
+      const comparison = getAnnotationComparisonForField(
+        f,
+        fullEvent,
+        index,
+        validatorContext
+      )
+
+      const { currentAnnotations, previousAnnotations, valueHasChanged } =
+        comparison
+
+      const previous = (
+        <Output
+          eventConfig={eventConfig}
+          field={f}
+          formConfig={declarationConfig}
+          previousForm={previousAnnotations}
+          value={previousAnnotations[f.id]}
+        />
+      )
+
+      const latest = (
+        <Output
+          eventConfig={eventConfig}
+          field={f}
+          value={currentAnnotations[f.id]}
+        />
+      )
+
+      return {
+        fieldLabel: intl.formatMessage(f.label),
+        latest,
+        previous,
+        valueHasChanged
+      }
+    })
+    .filter((item) => item.valueHasChanged)
 
   return (
     <>
       {declarationConfig.pages.map((page) => {
         const changedFields = page.fields
-          .filter((field) => isFieldDisplayedOnReview(field, latestDeclaration))
+          .filter((field) =>
+            isFieldDisplayedOnReview(field, latestDeclaration, validatorContext)
+          )
           .filter((f) =>
-            hasFieldChanged(f, latestDeclaration, previousDeclaration)
+            hasFieldChanged(
+              f,
+              latestDeclaration,
+              previousDeclaration,
+              validatorContext
+            )
           )
           .map((f) => {
-            const previous = Output({
-              field: f,
-              value: previousDeclaration[f.id],
-              showPreviouslyMissingValuesAsChanged: false,
-              previousForm: previousDeclaration,
-              formConfig: declarationConfig,
-              displayEmptyAsDash: true
-            })
+            const previous = (
+              <Output
+                displayEmptyAsDash
+                eventConfig={eventConfig}
+                field={f}
+                formConfig={declarationConfig}
+                previousForm={previousDeclaration}
+                value={previousDeclaration[f.id]}
+              />
+            )
 
-            const latest = Output({
-              field: f,
-              value: latestDeclaration[f.id],
-              showPreviouslyMissingValuesAsChanged: false,
-              displayEmptyAsDash: true
-            })
+            const latest = (
+              <Output
+                displayEmptyAsDash
+                eventConfig={eventConfig}
+                field={f}
+                value={latestDeclaration[f.id]}
+              />
+            )
 
             return {
               fieldLabel: intl.formatMessage(f.label),
@@ -167,6 +281,47 @@ export function DeclarationComparisonTableComponent({
           />
         )
       })}
+      {changedAnnotationFields.length > 0 && (
+        <Table
+          key={`${id}-review-fields`}
+          columns={[
+            {
+              label: (
+                <TableHeader>
+                  {intl.formatMessage(messages.reviewForm)}
+                </TableHeader>
+              ),
+              width: 34,
+              key: 'fieldLabel'
+            },
+            {
+              label: (
+                <TableHeader>
+                  {intl.formatMessage(
+                    correctionMessages.correctionSummaryOriginal
+                  )}
+                </TableHeader>
+              ),
+              width: 33,
+              key: 'previous'
+            },
+            {
+              label: (
+                <TableHeader>
+                  {intl.formatMessage(
+                    correctionMessages.correctionSummaryCorrection
+                  )}
+                </TableHeader>
+              ),
+              width: 33,
+              key: 'latest'
+            }
+          ]}
+          content={changedAnnotationFields}
+          hideTableBottomBorder={true}
+          id={`${id}-review-fields`}
+        />
+      )}
     </>
   )
 }

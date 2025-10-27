@@ -40,7 +40,7 @@ type Story = StoryObj<typeof Review>
 
 const createdEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [{ type: ActionType.CREATE }]
 })
 
 export const PreventAccessForCreated: Story = {
@@ -77,7 +77,7 @@ export const PreventAccessForCreated: Story = {
 
 const notifiedEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.NOTIFY]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.NOTIFY }]
 })
 
 export const PreventAccessForNotified: Story = {
@@ -114,7 +114,11 @@ export const PreventAccessForNotified: Story = {
 
 const validatedEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE]
+  actions: [
+    { type: ActionType.CREATE },
+    { type: ActionType.DECLARE },
+    { type: ActionType.VALIDATE }
+  ]
 })
 
 export const PreventAccessForValidated: Story = {
@@ -152,10 +156,10 @@ export const PreventAccessForValidated: Story = {
 const registeredEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [
-    ActionType.CREATE,
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REGISTER
+    { type: ActionType.CREATE },
+    { type: ActionType.DECLARE },
+    { type: ActionType.VALIDATE },
+    { type: ActionType.REGISTER }
   ]
 })
 
@@ -194,10 +198,10 @@ export const PreventAccessForRegistered: Story = {
 const rejectedValidatedEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [
-    ActionType.CREATE,
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REJECT
+    { type: ActionType.CREATE },
+    { type: ActionType.DECLARE },
+    { type: ActionType.VALIDATE },
+    { type: ActionType.REJECT }
   ]
 })
 
@@ -236,7 +240,7 @@ export const AllowAccessForRejectedValidated: Story = {
 
 const declaredEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
 })
 
 export const AllowAccessForDeclared: Story = {
@@ -271,7 +275,11 @@ export const AllowAccessForDeclared: Story = {
 
 const rejectedDeclaredEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.REJECT]
+  actions: [
+    { type: ActionType.CREATE },
+    { type: ActionType.DECLARE },
+    { type: ActionType.REJECT }
+  ]
 })
 
 export const PreventAccessForRejectedDeclared: Story = {

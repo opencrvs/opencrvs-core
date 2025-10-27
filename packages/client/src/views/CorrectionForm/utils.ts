@@ -752,7 +752,7 @@ export function isViewOnly(field: IFormField) {
 }
 
 export const getNestedFieldValue = (
-  section: IFormSection,
+  _: IFormSection,
   nestSectionData: IFormData,
   nestedField: IFormField,
   intl: IntlShape,

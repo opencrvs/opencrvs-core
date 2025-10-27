@@ -11,7 +11,6 @@
 
 import React from 'react'
 import styled from 'styled-components'
-import * as _ from 'lodash'
 import { isUndefined } from 'lodash'
 import {
   FieldConfig,
@@ -42,10 +41,13 @@ import {
   isPhoneFieldType,
   isSelectDateRangeFieldType,
   isLocationFieldType,
-  FileFieldWithOptionValue,
   EventState,
   FormConfig,
-  FieldType
+  isVerificationStatusType,
+  isSignatureFieldType,
+  isDataFieldType,
+  EventConfig,
+  isAgeFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -62,12 +64,17 @@ import {
   Paragraph,
   Number,
   Text,
-  TimeField
+  TimeField,
+  getRegisteredFieldByFieldConfig,
+  VerificationStatus,
+  AgeField
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
+import { isEqualFieldValue } from '../actions/correct/utils'
+import { Data } from '../registered-fields/Data'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -83,13 +90,19 @@ const DeletedEmpty = styled(Deleted)`
  *
  *  @returns sensible default value for the field type given the field configuration.
  */
-export function ValueOutput(
-  field: {
-    config: FieldConfig
-    value: FieldValue
-  },
+export function ValueOutput({
+  config,
+  value,
+  searchMode,
+  eventConfig
+}: {
+  config: FieldConfig
+  value: FieldValue
   searchMode?: {} | boolean
-) {
+  eventConfig?: EventConfig
+}) {
+  const field = { config, value }
+
   if (
     isEmailFieldType(field) ||
     isIdFieldType(field) ||
@@ -97,19 +110,23 @@ export function ValueOutput(
     isTextFieldType(field) ||
     isTextAreaFieldType(field)
   ) {
-    return Text.Output({ value: field.value })
+    return <Text.Output value={field.value} />
   }
 
   if (isDateFieldType(field)) {
-    return DateField.Output({ value: field.value })
+    return <DateField.Output value={field.value} />
+  }
+
+  if (isAgeFieldType(field)) {
+    return <AgeField.Output value={field.value} />
   }
 
   if (isTimeFieldType(field)) {
-    return TimeField.Output({ value: field.value })
+    return <TimeField.Output value={field.value} />
   }
 
   if (isDateRangeFieldType(field)) {
-    return DateRangeField.Output({ value: field.value })
+    return <DateRangeField.Output value={field.value} />
   }
 
   if (isPageHeaderFieldType(field)) {
@@ -121,15 +138,15 @@ export function ValueOutput(
   }
 
   if (isNumberFieldType(field)) {
-    return Number.Output(field)
+    return <Number.Output {...field} />
   }
 
-  if (isFileFieldType(field)) {
-    return File.Output(field)
+  if (isFileFieldType(field) || isSignatureFieldType(field)) {
+    return <File.Output {...field} />
   }
 
   if (isFileFieldWithOptionType(field)) {
-    return FileWithOption.Output(field)
+    return <FileWithOption.Output {...field} />
   }
 
   if (isBulletListFieldType(field)) {
@@ -137,28 +154,23 @@ export function ValueOutput(
   }
 
   if (isSelectFieldType(field) || isSelectDateRangeFieldType(field)) {
-    return Select.Output({
-      options: field.config.options,
-      value: field.value
-    })
+    return <Select.Output options={field.config.options} value={field.value} />
   }
 
   if (isCountryFieldType(field)) {
-    return SelectCountry.Output({ value: field.value })
+    return <SelectCountry.Output value={field.value} />
   }
 
   if (isCheckboxFieldType(field)) {
-    return Checkbox.Output({
-      required: field.config.required,
-      value: field.value
-    })
+    return (
+      <Checkbox.Output required={!!field.config.required} value={field.value} />
+    )
   }
 
   if (isAddressFieldType(field)) {
     return (
       <Address.Output
         configuration={field.config}
-        fields={searchMode === true ? ['country'] : undefined}
         lineSeparator={searchMode === true ? ', ' : undefined}
         value={field.value}
       />
@@ -166,22 +178,21 @@ export function ValueOutput(
   }
 
   if (isRadioGroupFieldType(field)) {
-    return RadioGroup.Output({
-      options: field.config.options,
-      value: field.value
-    })
+    return (
+      <RadioGroup.Output options={field.config.options} value={field.value} />
+    )
   }
 
   if (isNameFieldType(field)) {
-    return Name.Output({ value: field.value, configuration: field.config })
+    return <Name.Output configuration={field.config} value={field.value} />
   }
 
   if (isAdministrativeAreaFieldType(field)) {
-    return AdministrativeArea.Output({ value: field.value })
+    return <AdministrativeArea.Output value={field.value} />
   }
 
   if (isOfficeFieldType(field) || isLocationFieldType(field)) {
-    return LocationSearch.Output({ value: field.value })
+    return <LocationSearch.Output value={field.value} />
   }
 
   if (isDividerFieldType(field)) {
@@ -189,7 +200,28 @@ export function ValueOutput(
   }
 
   if (isFacilityFieldType(field)) {
-    return LocationSearch.Output({ value: field.value })
+    return <LocationSearch.Output value={field.value} />
+  }
+
+  if (isVerificationStatusType(field)) {
+    return (
+      <VerificationStatus.Output
+        configuration={field.config.configuration}
+        id={field.config.id}
+        value={field.value ?? 'pending'}
+      />
+    )
+  }
+
+  // For FieldType.DATA, the eventConfig is required
+  if (isDataFieldType(field) && eventConfig) {
+    return (
+      <Data.Output
+        eventConfig={eventConfig}
+        field={field.config}
+        value={field.value}
+      />
+    )
   }
 }
 
@@ -228,13 +260,26 @@ function findPreviousValueWithSameLabel(
   return { value: undefined, field: undefined }
 }
 
+export function isEmptyValue(field: FieldConfig, value: unknown) {
+  const module = getRegisteredFieldByFieldConfig(field)
+  if (
+    module &&
+    'isEmptyValue' in module &&
+    typeof module.isEmptyValue === 'function'
+  ) {
+    return Boolean(value) ? module.isEmptyValue(value) : true
+  }
+  return !Boolean(value)
+}
+
 export function Output({
   field,
   value,
   previousValue,
-  showPreviouslyMissingValuesAsChanged = true,
+  showPreviouslyMissingValuesAsChanged = false,
   previousForm,
   formConfig,
+  eventConfig,
   displayEmptyAsDash = false
 }: {
   field: FieldConfig
@@ -242,6 +287,7 @@ export function Output({
   previousValue?: FieldValue
   showPreviouslyMissingValuesAsChanged?: boolean
   previousForm?: EventState
+  eventConfig?: EventConfig
   formConfig?: FormConfig
   displayEmptyAsDash?: boolean
 }) {
@@ -271,48 +317,48 @@ export function Output({
 
   if (!hasValue) {
     if (previousValue) {
-      return ValueOutput({
-        config: previousValueField ?? field,
-        value: previousValue
-      })
+      return (
+        <ValueOutput
+          config={previousValueField ?? field}
+          eventConfig={eventConfig}
+          value={previousValue}
+        />
+      )
     }
 
     if (displayEmptyAsDash) {
       return '-'
     }
 
-    return ValueOutput({ config: field, value: '' })
+    return (
+      <ValueOutput config={field} eventConfig={eventConfig} value={undefined} />
+    )
   }
 
   const hasPreviousValue = previousValue !== undefined
 
   // Note, checking for previousValue !== value is not enough, as we have composite fields.
-  if (hasPreviousValue && !_.isEqual(previousValue, value)) {
-    const valueOutput = ValueOutput({
-      config: field,
-      value
-    })
+  if (hasPreviousValue && !isEqualFieldValue(previousValue, value)) {
+    let valueOutput = (
+      <ValueOutput config={field} eventConfig={eventConfig} value={value} />
+    )
 
-    if (valueOutput === null) {
+    if (isEmptyValue(field, value)) {
       if (displayEmptyAsDash) {
-        return '-'
+        valueOutput = <>{'-'}</>
       }
 
-      return null
+      valueOutput = <>{null}</>
     }
-
-    const previousValueOutput = ValueOutput({
-      config: previousValueField ?? field,
-      value: previousValue
-    })
 
     return (
       <>
-        {previousValueOutput !== null && (
+        {!isEmptyValue(field, previousValue) && (
           <>
             <Deleted>
               <ValueOutput
                 config={previousValueField ?? field}
+                eventConfig={eventConfig}
                 value={previousValue}
               />
             </Deleted>
@@ -325,24 +371,26 @@ export function Output({
   }
 
   if (!hasPreviousValue && showPreviouslyMissingValuesAsChanged) {
-    const deleted = ValueOutput({
-      config: { ...field, required: true },
-      value: undefined
-    })
-
+    const deleted = (
+      <ValueOutput
+        config={{ ...field, required: true }}
+        eventConfig={eventConfig}
+        value={undefined}
+      />
+    )
     return (
       <>
-        {deleted ? (
-          <Deleted>{deleted}</Deleted>
-        ) : (
+        {isEmptyValue(field, previousValue) ? (
           // For a deleted 'dash', we dont want to overline the dash
           <DeletedEmpty>{'-'}</DeletedEmpty>
+        ) : (
+          <Deleted>{deleted}</Deleted>
         )}
         <br />
-        <ValueOutput config={field} value={value} />
+        <ValueOutput config={field} eventConfig={eventConfig} value={value} />
       </>
     )
   }
 
-  return ValueOutput({ config: field, value })
+  return <ValueOutput config={field} eventConfig={eventConfig} value={value} />
 }

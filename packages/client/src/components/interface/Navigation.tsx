@@ -16,11 +16,7 @@ import {
 } from '@client/declarations'
 import { buttonMessages } from '@client/i18n/messages'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import {
-  formatUrl,
-  generateGoToHomeTabUrl,
-  generatePerformanceHomeUrl
-} from '@client/navigation'
+import { formatUrl, generateGoToHomeTabUrl } from '@client/navigation'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -64,6 +60,9 @@ import {
 } from '@client/components/WithRouterProps'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'query-string'
+import { useHasAccessToNavigationItem } from './useHasAccessToNavigationItem'
+import { SCOPES } from '@opencrvs/commons/client'
+import { usePermissions } from '@client/hooks/useAuthorization'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -184,6 +183,8 @@ const NavigationView = (props: IFullProps) => {
   const [isCommunationExpanded, setIsCommunationExpanded] =
     React.useState(false)
 
+  const { hasScope } = usePermissions()
+
   const { data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
     data,
@@ -197,15 +198,6 @@ const NavigationView = (props: IFullProps) => {
       return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
     }
   )
-  const showRegDashboard =
-    !IS_PROD_ENVIRONMENT ||
-    (IS_PROD_ENVIRONMENT && window.config.REGISTRATIONS_DASHBOARD_URL)
-  const showLeaderboard =
-    !IS_PROD_ENVIRONMENT ||
-    (IS_PROD_ENVIRONMENT && window.config.LEADERBOARDS_DASHBOARD_URL)
-  const showStatistics =
-    !IS_PROD_ENVIRONMENT ||
-    (IS_PROD_ENVIRONMENT && window.config.STATISTICS_DASHBOARD_URL)
 
   React.useEffect(() => {
     if (!userDetails || !loadWorkqueueStatuses) {
@@ -255,11 +247,7 @@ const NavigationView = (props: IFullProps) => {
     ).length
   }
 
-  const { routes: scopedRoutes } = useNavigation()
-  const hasAccess = (name: string): boolean =>
-    scopedRoutes.some(
-      (x) => x.name === name || x.tabs.some((t) => t.name === name)
-    )
+  const { hasAccess } = useHasAccessToNavigationItem()
 
   return (
     <LeftNavigation
@@ -602,89 +590,35 @@ const NavigationView = (props: IFullProps) => {
           )}
         </NavigationGroup>
       )}
-      {hasAccess(TAB_GROUPS.performance) && (
+      {hasScope(SCOPES.PERFORMANCE_READ_DASHBOARDS) && (
         <NavigationGroup>
           {
             <>
-              {showRegDashboard && hasAccess(WORKQUEUE_TABS.dashboard) && (
-                <NavigationItem
-                  icon={() => <Icon name="ChartLine" size="small" />}
-                  label={intl.formatMessage(navigationMessages['dashboard'])}
-                  onClick={() =>
-                    router.navigate(routes.PERFORMANCE_DASHBOARD, {
-                      state: { isNavigatedInsideApp: true }
-                    })
-                  }
-                  id={`navigation_${WORKQUEUE_TABS.dashboard}`}
-                  isSelected={
-                    enableMenuSelection && activeMenuItem === 'dashboard'
-                  }
-                />
-              )}
-              {showStatistics && hasAccess(WORKQUEUE_TABS.statistics) && (
-                <NavigationItem
-                  icon={() => <Icon name="Activity" size="small" />}
-                  label={intl.formatMessage(navigationMessages['statistics'])}
-                  onClick={() =>
-                    router.navigate(routes.PERFORMANCE_STATISTICS, {
-                      state: { isNavigatedInsideApp: true }
-                    })
-                  }
-                  id={`navigation_${WORKQUEUE_TABS.statistics}`}
-                  isSelected={
-                    enableMenuSelection && activeMenuItem === 'statistics'
-                  }
-                />
-              )}
-              {showLeaderboard && hasAccess(WORKQUEUE_TABS.leaderboards) && (
-                <NavigationItem
-                  icon={() => <Icon name="Medal" size="small" />}
-                  label={intl.formatMessage(navigationMessages['leaderboards'])}
-                  onClick={() =>
-                    router.navigate(routes.PERFORMANCE_LEADER_BOARDS, {
-                      state: { isNavigatedInsideApp: true }
-                    })
-                  }
-                  id={`navigation_${WORKQUEUE_TABS.leaderboards}`}
-                  isSelected={
-                    enableMenuSelection && activeMenuItem === 'leaderboards'
-                  }
-                />
-              )}
-              {userDetails && hasAccess(WORKQUEUE_TABS.performance) && (
-                <NavigationItem
-                  icon={() => <Icon name="ChartBar" size="small" />}
-                  label={intl.formatMessage(navigationMessages['performance'])}
-                  onClick={() => {
-                    props.router.navigate(
-                      generatePerformanceHomeUrl({
-                        locationId: userDetails.primaryOffice.id
-                      })
-                    )
-                  }}
-                  id={`navigation_${WORKQUEUE_TABS.performance}`}
-                  isSelected={
-                    enableMenuSelection &&
-                    activeMenuItem === WORKQUEUE_TABS.performance
-                  }
-                />
-              )}
+              {(window.config.DASHBOARDS || []).map((config) => {
+                return (
+                  <NavigationItem
+                    key={config.id}
+                    icon={() => <Icon name="ChartLine" size="small" />}
+                    label={intl.formatMessage(config.title)}
+                    onClick={() =>
+                      router.navigate(
+                        formatUrl(routes.DASHBOARD, {
+                          id: config.id
+                        }),
+                        {
+                          state: { isNavigatedInsideApp: true }
+                        }
+                      )
+                    }
+                    id={`navigation_dashboard_${config.id}`}
+                    isSelected={
+                      enableMenuSelection && activeMenuItem === 'dashboard'
+                    }
+                  />
+                )
+              })}
             </>
           }
-          {hasAccess(WORKQUEUE_TABS.vsexports) && (
-            <NavigationItem
-              icon={() => <Icon name="Export" size="small" />}
-              id={`navigation_${WORKQUEUE_TABS.vsexports}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.vsexports]
-              )}
-              onClick={() => router.navigate(routes.VS_EXPORTS)}
-              isSelected={
-                enableMenuSelection &&
-                activeMenuItem === WORKQUEUE_TABS.vsexports
-              }
-            />
-          )}
         </NavigationGroup>
       )}
 
@@ -764,33 +698,29 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
     advancedSearchParams: getAdvancedSearchParamsState(state),
     activeMenuItem: window.location.href.includes(WORKQUEUE_TABS.performance)
       ? WORKQUEUE_TABS.performance
-      : window.location.href.endsWith(WORKQUEUE_TABS.vsexports)
-        ? WORKQUEUE_TABS.vsexports
-        : window.location.href.includes(WORKQUEUE_TABS.organisation)
-          ? WORKQUEUE_TABS.organisation
-          : window.location.href.includes(WORKQUEUE_TABS.team)
-            ? WORKQUEUE_TABS.team
-            : window.location.href.endsWith(WORKQUEUE_TABS.application)
-              ? WORKQUEUE_TABS.application
-              : window.location.href.endsWith(WORKQUEUE_TABS.settings)
-                ? WORKQUEUE_TABS.settings
-                : window.location.href.endsWith(WORKQUEUE_TABS.certificate)
-                  ? WORKQUEUE_TABS.certificate
-                  : window.location.href.endsWith(WORKQUEUE_TABS.systems)
-                    ? WORKQUEUE_TABS.systems
+      : window.location.href.includes(WORKQUEUE_TABS.organisation)
+        ? WORKQUEUE_TABS.organisation
+        : window.location.href.includes(WORKQUEUE_TABS.team)
+          ? WORKQUEUE_TABS.team
+          : window.location.href.endsWith(WORKQUEUE_TABS.application)
+            ? WORKQUEUE_TABS.application
+            : window.location.href.endsWith(WORKQUEUE_TABS.settings)
+              ? WORKQUEUE_TABS.settings
+              : window.location.href.endsWith(WORKQUEUE_TABS.certificate)
+                ? WORKQUEUE_TABS.certificate
+                : window.location.href.endsWith(WORKQUEUE_TABS.systems)
+                  ? WORKQUEUE_TABS.systems
+                  : window.location.href.endsWith(
+                        WORKQUEUE_TABS.informantNotification
+                      )
+                    ? WORKQUEUE_TABS.informantNotification
                     : window.location.href.endsWith(
-                          WORKQUEUE_TABS.informantNotification
+                          WORKQUEUE_TABS.emailAllUsers
                         )
-                      ? WORKQUEUE_TABS.informantNotification
-                      : window.location.href.endsWith(
-                            WORKQUEUE_TABS.emailAllUsers
-                          )
-                        ? WORKQUEUE_TABS.emailAllUsers
-                        : window.location.href.endsWith(
-                              WORKQUEUE_TABS.userRoles
-                            )
-                          ? WORKQUEUE_TABS.userRoles
-                          : ''
+                      ? WORKQUEUE_TABS.emailAllUsers
+                      : window.location.href.endsWith(WORKQUEUE_TABS.userRoles)
+                        ? WORKQUEUE_TABS.userRoles
+                        : ''
   }
 }
 

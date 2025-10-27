@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
+import { TestUserRole } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { SettingsPage } from './Settings'
 
@@ -20,8 +21,39 @@ export default meta
 
 type Story = StoryObj<typeof SettingsPage>
 
-export const Default: Story = {
+export const LocalRegistrar: Story = {
   parameters: {
+    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.buildPath({})
+    }
+  }
+}
+
+export const FieldAgent: Story = {
+  parameters: {
+    userRole: TestUserRole.Enum.FIELD_AGENT,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.buildPath({})
+    }
+  }
+}
+
+export const RegistrationAgent: Story = {
+  parameters: {
+    userRole: TestUserRole.Enum.REGISTRATION_AGENT,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.buildPath({})
+    }
+  }
+}
+
+export const LocalSystemAdmin: Story = {
+  parameters: {
+    userRole: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.SETTINGS.buildPath({})

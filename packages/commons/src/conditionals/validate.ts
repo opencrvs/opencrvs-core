@@ -11,17 +11,24 @@
 
 import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
-import { ConditionalParameters, JSONSchema } from './conditionals'
-import { formatISO, isAfter, isBefore } from 'date-fns'
 import { ErrorMapCtx, z, ZodIssueOptionalMessage } from 'zod'
+import { formatISO, isAfter, isBefore } from 'date-fns'
+
+import { ConditionalParameters, JSONSchema } from './conditionals'
 import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
-import { FieldUpdateValue } from '../events/FieldValue'
+import {
+  DateValue,
+  FieldUpdateValue,
+  FieldValue,
+  AgeValue
+} from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-
-import { Location } from '../events/locations'
+import { ITokenPayload } from '../authentication'
+import { UUID } from '../uuid'
+import { ageToDate } from '../events/utils'
 
 const ajv = new Ajv({
   $data: true,
@@ -31,9 +38,11 @@ const ajv = new Ajv({
 
 const DataContext = z.object({
   rootData: z.object({
-    $locations: z.array(Location)
+    $leafAdminStructureLocationIds: z.array(z.object({ id: UUID }))
   })
 })
+
+type DataContext = z.infer<typeof DataContext>
 
 // https://ajv.js.org/packages/ajv-formats.html
 addFormats(ajv)
@@ -105,30 +114,42 @@ ajv.addKeyword({
   schemaType: 'boolean',
   $data: true,
   errors: true,
-  validate(
-    schema: {},
-    data: string,
-    _: unknown,
-    dataContext?: { rootData: unknown }
-  ) {
-    const context = DataContext.safeParse(dataContext)
+  // @ts-ignore -- Force type. We will move this away from AJV next. Parsing the array will take seconds and is only called by core.
+  validate(schema: {}, data: string, _: unknown, dataContext?: DataContext) {
+    const locationIdInput = data
+    const locations = dataContext?.rootData.$leafAdminStructureLocationIds ?? []
 
-    if (!context.success) {
-      throw new Error('Validation context must contain $locations')
-    }
-
-    const locationToValidate = data
-
-    const locations = context.data.rootData.$locations
-
-    return !locations.some(
-      (location) => location.parentId === locationToValidate
-    )
+    return locations.some((location) => location.id === locationIdInput)
   }
 })
 
-export function validate(schema: JSONSchema, data: ConditionalParameters) {
+export function validateValue(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
+  if ('$form' in data) {
+    data.$form = Object.fromEntries(
+      Object.entries(data.$form).map(([key, value]) => {
+        const maybeAgeValue = AgeValue.safeParse(value)
+        if (maybeAgeValue.success) {
+          const age = maybeAgeValue.data.age
+          const maybeAsOfDate = DateValue.safeParse(
+            data.$form[maybeAgeValue.data.asOfDateRef]
+          )
+
+          return [
+            key,
+            {
+              age,
+              dob: ageToDate(
+                age,
+                maybeAsOfDate.success ? maybeAsOfDate.data : data.$now
+              )
+            }
+          ]
+        }
+        return [key, value]
+      })
+    )
+  }
   const result = validator(data) as boolean
   return result
 }
@@ -138,7 +159,7 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
  * It is used for instance when an input component wants to validate something internally as per user
  * configured rules (e.g. Search field).
  */
-export function validateValue(schema: JSONSchema, data: unknown) {
+export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
   const result = validator(data) as boolean
   return result
@@ -154,12 +175,14 @@ export function isOnline() {
 
 export function isConditionMet(
   conditional: JSONSchema,
-  values: Record<string, unknown>
+  values: Record<string, FieldValue>,
+  context: ValidatorContext
 ) {
   return validate(conditional, {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
-    $online: isOnline()
+    $online: isOnline(),
+    $user: context.user
   })
 }
 
@@ -170,6 +193,7 @@ function getConditionalActionsForField(
   if (!field.conditionals) {
     return []
   }
+
   return field.conditionals
     .filter((conditional) => validate(conditional.conditional, values))
     .map((conditional) => conditional.type)
@@ -177,17 +201,24 @@ function getConditionalActionsForField(
 
 export function areConditionsMet(
   conditions: FieldConditional[],
-  values: Record<string, unknown>
+  values: Record<string, FieldValue>,
+  context: ValidatorContext
 ) {
   return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values)
+    isConditionMet(condition.conditional, values, context)
   )
+}
+
+export type ValidatorContext = {
+  user?: ITokenPayload
+  leafAdminStructureLocationIds?: Array<{ id: UUID }>
 }
 
 function isFieldConditionMet(
   field: FieldConfig,
   form: ActionUpdate | EventState,
-  conditionalType: ConditionalType
+  conditionalType: ConditionalType,
+  context: ValidatorContext
 ) {
   const hasRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === conditionalType
@@ -199,10 +230,9 @@ function isFieldConditionMet(
 
   const validConditionals = getConditionalActionsForField(field, {
     $form: form,
-    $now: formatISO(new Date(), {
-      representation: 'date'
-    }),
-    $online: isOnline()
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $online: isOnline(),
+    $user: context.user
   })
 
   return validConditionals.includes(conditionalType)
@@ -210,21 +240,10 @@ function isFieldConditionMet(
 
 export function isFieldVisible(
   field: FieldConfig,
-  form: ActionUpdate | EventState
+  form: ActionUpdate | EventState,
+  context: ValidatorContext
 ) {
-  return isFieldConditionMet(field, form, ConditionalType.SHOW)
-}
-
-export function getOnlyVisibleFormValues(
-  field: FieldConfig[],
-  form: EventState
-) {
-  return field.reduce((acc, f) => {
-    if (isFieldVisible(f, form) && form[f.id] !== undefined) {
-      acc[f.id] = form[f.id]
-    }
-    return acc
-  }, {} as EventState)
+  return isFieldConditionMet(field, form, ConditionalType.SHOW, context)
 }
 
 function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
@@ -234,19 +253,21 @@ function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
 
 export function isFieldEnabled(
   field: FieldConfig,
-  form: ActionUpdate | EventState
+  form: ActionUpdate | EventState,
+  context: ValidatorContext
 ) {
-  return isFieldConditionMet(field, form, ConditionalType.ENABLE)
+  return isFieldConditionMet(field, form, ConditionalType.ENABLE, context)
 }
 
 // Fields are displayed on review if both the 'ConditionalType.SHOW' and 'ConditionalType.DISPLAY_ON_REVIEW' conditions are met
 export function isFieldDisplayedOnReview(
   field: FieldConfig,
-  form: ActionUpdate | EventState
+  form: ActionUpdate | EventState,
+  context: ValidatorContext
 ) {
   return (
-    isFieldVisible(field, form) &&
-    isFieldConditionMet(field, form, ConditionalType.DISPLAY_ON_REVIEW)
+    isFieldVisible(field, form, context) &&
+    isFieldConditionMet(field, form, ConditionalType.DISPLAY_ON_REVIEW, context)
   )
 }
 
@@ -301,12 +322,20 @@ function createIntlError(message: TranslationConfig) {
  * Form error message definitions for Zod validation errors.
  * Overrides zod internal type error messages (string) to match the OpenCRVS error messages (TranslationConfig).
  */
-function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
+function zodToIntlErrorMap(
+  issue: ZodIssueOptionalMessage,
+  _ctx: ErrorMapCtx,
+  field: FieldConfig
+) {
+  const requiredMessage: TranslationConfig =
+    field.required && typeof field.required === 'object'
+      ? field.required.message
+      : errorMessages.requiredField
   // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
   switch (issue.code) {
     case 'invalid_string': {
       if (_ctx.data === '') {
-        return createIntlError(errorMessages.requiredField)
+        return createIntlError(requiredMessage)
       }
 
       if (issue.validation === 'date') {
@@ -325,14 +354,14 @@ function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
         issue.expected !== issue.received &&
         (issue.received === 'undefined' || issue.received === 'null')
       ) {
-        return createIntlError(errorMessages.requiredField)
+        return createIntlError(requiredMessage)
       }
 
       break
     }
     case 'too_small': {
       if (issue.message === undefined) {
-        return createIntlError(errorMessages.requiredField)
+        return createIntlError(requiredMessage)
       }
 
       break
@@ -341,13 +370,14 @@ function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
       for (const { issues } of issue.unionErrors) {
         for (const e of issues) {
           if (
-            zodToIntlErrorMap(e, _ctx).message.message.id !== 'error.required'
+            zodToIntlErrorMap(e, _ctx, field).message.message.id !==
+            'error.required'
           ) {
             return createIntlError(errorMessages.invalidInput)
           }
         }
       }
-      return createIntlError(errorMessages.requiredField)
+      return createIntlError(requiredMessage)
     }
   }
 
@@ -398,9 +428,12 @@ export function validateFieldInput({
   field: FieldConfig
   value: FieldUpdateValue
 }) {
-  const zodType = mapFieldTypeToZod(field.type, field.required)
-  // @ts-expect-error
-  const rawError = zodType.safeParse(value, { errorMap: zodToIntlErrorMap })
+  const zodType = mapFieldTypeToZod(field.type, !!field.required)
+
+  const rawError = zodType.safeParse(value, {
+    // @ts-expect-error
+    errorMap: (issue, _ctx) => zodToIntlErrorMap(issue, _ctx, field)
+  })
 
   // We have overridden the standard error messages
   return (rawError.error?.issues.map((issue) => issue.message) ??
@@ -411,18 +444,18 @@ export function validateFieldInput({
 
 export function runStructuralValidations({
   field,
-  values
+  values,
+  context
 }: {
   field: FieldConfig
   values: ActionUpdate
+  context: ValidatorContext
 }) {
   if (
-    !isFieldVisible(field, values) ||
+    !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
-    return {
-      errors: []
-    }
+    return []
   }
 
   const fieldValidationResult = validateFieldInput({
@@ -430,9 +463,7 @@ export function runStructuralValidations({
     value: values[field.id]
   })
 
-  return {
-    errors: fieldValidationResult
-  }
+  return fieldValidationResult
 }
 
 export function runFieldValidations({
@@ -442,22 +473,28 @@ export function runFieldValidations({
 }: {
   field: FieldConfig
   values: ActionUpdate
-  context?: { locations: Array<Location> }
+  context: ValidatorContext
 }) {
   if (
-    !isFieldVisible(field, values) ||
+    !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
-    return {
-      errors: []
-    }
+    return []
   }
 
   const conditionalParameters = {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
-    $locations: context?.locations ?? [],
-    $online: isOnline()
+    /**
+     * In real use cases, there can be hundreds of thousands of locations.
+     * Make sure that the context contains only the locations that are needed for validation.
+     * E.g. if the user is a leaf admin, only the leaf locations under their admin structure are needed.
+     *
+     * Loading few megabytes of locations to memory just for validation is not efficient and will choke the application.
+     */
+    $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? [],
+    $online: isOnline(),
+    $user: context.user
   }
 
   const fieldValidationResult = validateFieldInput({
@@ -470,10 +507,8 @@ export function runFieldValidations({
     conditionalParameters
   })
 
-  return {
-    // Assumes that custom validation errors are based on the field type, and extend the validation.
-    errors: [...fieldValidationResult, ...customValidationResults]
-  }
+  // Assumes that custom validation errors are based on the field type, and extend the validation.
+  return [...fieldValidationResult, ...customValidationResults]
 }
 
 export function getValidatorsForField(
@@ -537,9 +572,9 @@ export function getValidatorsForField(
 
 export function areCertificateConditionsMet(
   conditions: FieldConditional[],
-  values: Record<string, unknown>
+  values: ConditionalParameters
 ) {
   return conditions.every((condition) => {
-    return ajv.validate(condition.conditional, values)
+    return validate(condition.conditional, values)
   })
 }

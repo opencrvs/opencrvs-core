@@ -34,24 +34,32 @@ const generator = testDataGenerator()
 
 const eventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [{ type: ActionType.CREATE }]
 })
 
 const eventId = eventDocument.id
 
 const notifiedEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.NOTIFY]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.NOTIFY }]
 })
 
 const rejectedNotifiedEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.NOTIFY, ActionType.REJECT]
+  actions: [
+    { type: ActionType.CREATE },
+    { type: ActionType.NOTIFY },
+    { type: ActionType.REJECT }
+  ]
 })
 
 const rejectedDeclaerdEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.NOTIFY, ActionType.REJECT]
+  actions: [
+    { type: ActionType.CREATE },
+    { type: ActionType.NOTIFY },
+    { type: ActionType.REJECT }
+  ]
 })
 
 const meta: Meta<typeof ReviewIndex> = {
@@ -85,20 +93,7 @@ const draft = generateEventDraftDocument({
   actionType: ActionType.REGISTER
 })
 
-const mockUser = {
-  id: '67bda93bfc07dee78ae558cf',
-  name: [
-    {
-      use: 'en',
-      given: ['Kalusha'],
-      family: 'Bwalya'
-    }
-  ],
-  role: 'SOCIAL_WORKER',
-  signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined,
-  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-}
+const mockUser = generator.user.fieldAgent().v2
 
 export const ReviewForLocalRegistrarComplete: Story = {
   parameters: {
@@ -127,7 +122,7 @@ export const ReviewForLocalRegistrarComplete: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
@@ -165,7 +160,7 @@ export const ReviewForLocalRegistrarIncomplete: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
@@ -222,7 +217,7 @@ export const ReviewForRegistrationAgentComplete: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.registrationAgent()
+                getUser: generator.user.registrationAgent().v1
               }
             })
           }),
@@ -271,7 +266,7 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.registrationAgent()
+                getUser: generator.user.registrationAgent().v1
               }
             })
           }),
@@ -321,7 +316,7 @@ export const ReviewForFieldAgentComplete: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.fieldAgent()
+                getUser: generator.user.fieldAgent().v1
               }
             })
           }),
@@ -367,7 +362,7 @@ export const ReviewForFieldAgentIncomplete: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.fieldAgent()
+                getUser: generator.user.fieldAgent().v1
               }
             })
           }),
@@ -385,7 +380,7 @@ export const ReviewForFieldAgentIncomplete: Story = {
 
 const createdEvent = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [{ type: ActionType.CREATE }]
 })
 const declareDraft = generateEventDraftDocument({
   eventId: createdEvent.id,
@@ -457,7 +452,7 @@ export const Notified: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
@@ -495,7 +490,7 @@ export const RejectedNotified: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
@@ -533,7 +528,7 @@ export const RejectedDeclared: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),

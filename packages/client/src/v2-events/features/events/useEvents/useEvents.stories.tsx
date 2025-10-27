@@ -48,7 +48,7 @@ type Story = StoryObj<unknown>
 
 const createdEvent = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [{ type: ActionType.CREATE }]
 })
 
 const router = {
@@ -62,10 +62,6 @@ const router = {
          * Explicitly trigger the download of the event
          */
         const event = getEvent.findFromCache(createdEvent.id)
-
-        React.useEffect(() => {
-          void event.refetch()
-        }, [event, event.refetch])
 
         /*
          * Explicitly call the hook to trigger draft fetching
@@ -165,7 +161,7 @@ export const GetEventHook: Story = {
   ],
   parameters: {
     reactRouter: {
-      router: router,
+      router,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
         eventId: createdEvent.id
       })
@@ -219,8 +215,11 @@ export const GetEventHook: Story = {
 
     await step('Caches the files', async () => {
       const cache = await getCache(CACHE_NAME)
+
       await waitFor(async () => {
-        await expect(cache.matchAll()).resolves.toHaveLength(1)
+        await expect(
+          (await cache.keys()).filter((r) => r.url.endsWith('.png'))
+        ).toHaveLength(1)
       })
     })
   }

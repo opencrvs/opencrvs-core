@@ -11,7 +11,10 @@
 import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { buttonMessages } from '@client/i18n/messages'
@@ -21,6 +24,7 @@ import { useActionAnnotation } from '@client/v2-events/features/events/useAction
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 const messages = defineMessages({
   title: {
@@ -34,7 +38,10 @@ export function Onboarding() {
   const { eventId, pageId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
-
+  const [{ workqueue }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
+  )
+  const validatorContext = useValidatorContext()
   const events = useEvents()
   const annotation = useActionAnnotation((state) => state.getAnnotation())
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
@@ -67,12 +74,15 @@ export function Onboarding() {
   React.useEffect(() => {
     if (!currentPageId) {
       navigate(
-        ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-          eventId: event.id
-        })
+        ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
+          {
+            eventId: event.id
+          },
+          { workqueue }
+        )
       )
     }
-  }, [currentPageId, navigate, event.id])
+  }, [currentPageId, navigate, event.id, workqueue])
 
   if (!currentPageId) {
     return null
@@ -96,17 +106,24 @@ export function Onboarding() {
         setFormData={(data) => setAnnotation(data)}
         showReviewButton={false}
         validateBeforeNextPage={true}
+        validatorContext={validatorContext}
         onPageChange={(nextPageId: string) => {
           return navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
-              eventId,
-              pageId: nextPageId
-            })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
+              {
+                eventId,
+                pageId: nextPageId
+              },
+              { workqueue }
+            )
           )
         }}
         onSubmit={() => {
           return navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
+              { eventId },
+              { workqueue }
+            )
           )
         }}
       />

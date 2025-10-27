@@ -19,10 +19,9 @@ import {
 import {
   FieldConfig,
   generateTransactionId,
-  isFieldVisible,
   getDeclarationFields,
+  isFieldVisible,
   getCurrentEventState,
-  EventDocument,
   ActionType
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -41,7 +40,8 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
-import { hasFieldChanged } from '../../utils'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { hasDeclarationFieldChanged } from '../../utils'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
@@ -76,20 +76,21 @@ export function Summary() {
   const { eventId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
-
   const [{ workqueue }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
+
+  const validatorContext = useValidatorContext()
   const [showPrompt, setShowPrompt] = React.useState(false)
-  const togglePrompt = () => setShowPrompt(!showPrompt)
   const eventFormNavigation = useEventFormNavigation()
   const navigate = useNavigate()
   const intl = useIntl()
 
   const events = useEvents()
-  const event: EventDocument = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const togglePrompt = () => setShowPrompt(!showPrompt)
 
   const previousFormValues = eventIndex.declaration
   const getFormValues = useEventFormData((state) => state.getFormValues)
@@ -110,13 +111,23 @@ export function Summary() {
           return false
         }
 
-        return hasFieldChanged(field, form, previousFormValues)
+        return hasDeclarationFieldChanged(
+          field,
+          form,
+          previousFormValues,
+          eventConfiguration,
+          validatorContext
+        )
       })
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
-      const wasVisible = isFieldVisible(field, previousFormValues)
-      const isHidden = !isFieldVisible(field, form)
+      const wasVisible = isFieldVisible(
+        field,
+        previousFormValues,
+        validatorContext
+      )
+      const isHidden = !isFieldVisible(field, form, validatorContext)
       return wasVisible && isHidden
     })
 
@@ -130,7 +141,9 @@ export function Summary() {
       },
       transactionId: generateTransactionId(),
       annotation,
-      event
+      event,
+      context: validatorContext,
+      fullEvent: event
     }
 
     if (userMayCorrect) {
@@ -139,7 +152,11 @@ export function Summary() {
       events.actions.correction.request.mutate(mutationPayload)
     }
 
-    navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+    if (workqueue) {
+      navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
+    } else {
+      navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+    }
   }, [
     form,
     fields,
@@ -150,7 +167,10 @@ export function Summary() {
     annotation,
     previousFormValues,
     navigate,
-    userMayCorrect
+    userMayCorrect,
+    validatorContext,
+    eventConfiguration,
+    workqueue
   ])
 
   return (
@@ -186,9 +206,12 @@ export function Summary() {
               id="back-to-review"
               onClick={() =>
                 navigate(
-                  ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-                    eventId
-                  })
+                  ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
+                    {
+                      eventId
+                    },
+                    { workqueue }
+                  )
                 )
               }
             >
@@ -202,6 +225,7 @@ export function Summary() {
             event={event}
             form={form}
             requesting={!userMayCorrect}
+            validatorContext={validatorContext}
             workqueue={workqueue}
           />
         </Content>

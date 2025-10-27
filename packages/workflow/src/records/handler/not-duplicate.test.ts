@@ -42,15 +42,11 @@ describe('not-duplicate record endpoint', () => {
   })
 
   it('returns OK after deduplicating a birth declaration', async () => {
-    const token = jwt.sign(
-      { scope: ['declare'] },
-      readFileSync('./test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
+    const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:workflow-user'
+    })
 
     // Hearth response
     mswServer.use(

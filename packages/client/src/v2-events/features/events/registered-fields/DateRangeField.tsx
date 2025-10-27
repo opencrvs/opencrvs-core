@@ -185,7 +185,7 @@ function DateRangeInput({
       <DateFieldComponent
         {...props}
         data-testid={`${props.id}`}
-        disabled={dateRange.isDateRangeActive}
+        disabled={dateRange.isDateRangeActive || props.disabled}
         value={dateRange.exact}
         onBlur={(e) => {
           const segmentType = String(e.target.id.split('-').pop())
@@ -211,6 +211,7 @@ function DateRangeInput({
       <DateRangeBody>
         {dateRange.isDateRangeActive && (
           <Checkbox
+            disabled={props.disabled}
             id={props.id + '-date_range_checkbox'}
             label={dateRangeLabel || ''}
             name={props.id + 'date_range_toggle'}
@@ -221,6 +222,7 @@ function DateRangeInput({
         )}
 
         <NoShrinkLink
+          disabled={props.disabled}
           id={props.id + '-date_range_button'}
           onClick={handleLinkOnClick}
         >

@@ -85,6 +85,11 @@ async function fetchHttpFieldValue(
     throw err
   }
 
+  const contentType = res.headers.get('Content-Type') || ''
+
+  if (contentType.startsWith('text/')) {
+    return res.text()
+  }
   return res.json()
 }
 
@@ -108,11 +113,12 @@ function HttpInput({ parentValue, configuration, onChange }: Props) {
       onChange({ loading: false, error: null, data })
     },
     onError: (error: HttpError) => {
+      const data = configuration.errorValue ?? null
       if (error.name === 'AbortError') {
         onChange({
           loading: false,
           error: { statusCode: 408, message: 'The request timed out.' },
-          data: null
+          data
         })
       } else {
         onChange({
@@ -121,7 +127,7 @@ function HttpInput({ parentValue, configuration, onChange }: Props) {
             statusCode: error.statusCode,
             message: error.message
           },
-          data: null
+          data
         })
       }
     }
@@ -136,7 +142,10 @@ function HttpInput({ parentValue, configuration, onChange }: Props) {
     }
 
     // 2) trigger on following mounts if the value tracked changes
-    if (!isEqual(parentValue, prevParentRef.current)) {
+    if (
+      !isEqual(parentValue, prevParentRef.current) &&
+      parentValue !== undefined
+    ) {
       prevParentRef.current = parentValue
       mutation.mutate()
     }
@@ -148,5 +157,5 @@ function HttpInput({ parentValue, configuration, onChange }: Props) {
 export const Http = {
   Input: HttpInput,
   Output: null,
-  stringify: () => `[http response or error redacted]`
+  toCertificateVariables: (value: HttpFieldValue) => value
 }

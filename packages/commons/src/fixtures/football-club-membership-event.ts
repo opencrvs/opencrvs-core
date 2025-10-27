@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineConditional } from '../conditionals/conditionals'
 import { defineConfig } from '../events/defineConfig'
 import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
@@ -342,46 +341,7 @@ export const footballClubMembershipEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
       },
-      printForm: PRINT_CERTIFICATE_FORM,
-      conditionals: [
-        {
-          type: 'SHOW',
-          conditional: defineConditional({
-            type: 'object',
-            properties: {
-              $event: {
-                type: 'object',
-                properties: {
-                  actions: {
-                    type: 'array',
-                    contains: {
-                      type: 'object',
-                      properties: {
-                        type: {
-                          const: 'REGISTER'
-                        },
-                        draft: {
-                          type: 'boolean'
-                        }
-                      },
-                      required: ['type'],
-                      not: {
-                        properties: {
-                          draft: {
-                            const: true
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                required: ['actions']
-              }
-            },
-            required: ['$event']
-          })
-        }
-      ]
+      printForm: PRINT_CERTIFICATE_FORM
     },
     {
       type: ActionType.ARCHIVE,

@@ -22,6 +22,7 @@ import { LocationSearch } from './LocationSearch'
 import { Name } from './Name'
 import { Number } from './Number'
 import { PageHeader } from './PageHeader'
+import { AgeField } from './AgeField'
 import { Paragraph } from './Paragraph'
 import { RadioGroup } from './RadioGroup'
 import { RegisteredFieldModule } from './RegisteredField'
@@ -31,9 +32,14 @@ import { SelectDateRangeField } from './SelectDateRangeField'
 import { Text } from './Text'
 import { TimeField } from './TimeField'
 import { Search } from './Search'
+import { AlphaPrintButton } from './AlphaPrintButton'
+import { LinkButton } from './LinkButton'
+import { VerificationStatus } from './VerificationStatus'
+import { QueryParamReader } from './QueryParamReader'
 
 export * from './Address'
 export * from './AdministrativeArea'
+export * from './AgeField'
 export * from './BulletList'
 export * from './Button'
 export * from './Checkbox'
@@ -51,6 +57,9 @@ export * from './SelectCountry'
 export * from './SelectDateRangeField'
 export * from './Text'
 export * from './TimeField'
+export * from './AlphaPrintButton'
+export * from './LinkButton'
+export * from './VerificationStatus'
 
 export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
   type: T
@@ -70,6 +79,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return DateField
     case FieldType.TIME:
       return TimeField
+    case FieldType.ALPHA_PRINT_BUTTON:
+      return AlphaPrintButton
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
@@ -100,6 +111,14 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return Search
     case FieldType.HTTP:
       return Http
+    case FieldType.LINK_BUTTON:
+      return LinkButton
+    case FieldType.VERIFICATION_STATUS:
+      return VerificationStatus
+    case FieldType.QUERY_PARAM_READER:
+      return QueryParamReader
+    case FieldType.AGE:
+      return AgeField
     default:
       return undefined
   }

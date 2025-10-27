@@ -71,7 +71,7 @@ jobs:
       slugified_branch: ${{ steps.slugify_bname.outputs.stack }}
       e2e_branch: ${{ steps.get_e2e_branch.outputs.branch }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
       - name: Get input data (when manually triggered)
         env:
@@ -265,7 +265,8 @@ jobs:
                 'countryconfig-image-tag': '${{ env.FARAJALAND_COMMIT_HASH }}',
                 stack: '${{  steps.generate_stack.outputs.stack  }}',
                 'keep-e2e': '${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}',
-                'branch': '${{ needs.generate_stack_name_and_branch.outputs.e2e_branch }}'
+                'branch': '${{ needs.generate_stack_name_and_branch.outputs.e2e_branch }}',
+                'runtime': '${{ needs.generate_stack_name_and_branch.outputs.runtime }}'
               }
             });
 
@@ -293,7 +294,7 @@ jobs:
         id: print-links
         run: |
           E2E_RUN_LINK="https://github.com/opencrvs/e2e/actions/runs/${{ steps.dispatch_e2e.outputs.run_id }}"
-          DEPLOYMENT_LINK="https://${{ steps.generate_stack.outputs.stack }}.opencrvs.dev"
+          DEPLOYMENT_LINK="https://${{ steps.generate_stack.outputs.stack }}.e2e-k8s.opencrvs.dev"
 
           echo """
           # E2E Environment summary

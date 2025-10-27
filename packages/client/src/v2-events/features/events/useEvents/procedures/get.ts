@@ -11,7 +11,8 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import { EventDocument } from '@opencrvs/commons/client'
+import { useIntl } from 'react-intl'
+import { EventDocument, UUID } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { cacheFiles } from '@client/v2-events/features/files/cache'
 import {
@@ -21,6 +22,9 @@ import {
   trpcClient
 } from '@client/v2-events/trpc'
 import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+import { throwStructuredError } from '@client/v2-events/routes/TRPCErrorBoundary'
+import { ROUTES } from '@client/v2-events/routes'
+import { buttonMessages } from '@client/i18n/messages'
 import { updateLocalEventIndex } from '../api'
 import { setQueryDefaults } from './utils'
 
@@ -72,12 +76,18 @@ function viewEvent(id: string) {
   const trpc = useTRPC()
   const eventConfig = useEventConfigurations()
   const options = trpc.event.get.queryOptions(id)
-
   return useSuspenseQuery({
     // In this case we can use the queryFn as this is a ad-hoc query
     ...options,
     queryKey: [['view-event', id]],
-    queryFn: async () => trpcClient.event.get.query(id),
+    queryFn: async () => {
+      const eventDocument = await trpcClient.event.get.query(id)
+      await Promise.all([
+        cacheFiles(eventDocument),
+        cacheUsersFromEventDocument(eventDocument)
+      ])
+      return eventDocument
+    },
     meta: {
       eventConfig
     },
@@ -130,7 +140,8 @@ export function useGetEvent() {
      * This downloads the event document from the server without caching it
      */
     viewEvent,
-    getFromCache: (id: string) => {
+    getFromCache: (id: UUID) => {
+      const intl = useIntl()
       const eventConfig = useEventConfigurations()
       // Skip the queryFn defined by tRPC and use our own default defined above
       const { queryFn, ...queryOptions } = trpc.event.get.queryOptions(id)
@@ -145,9 +156,13 @@ export function useGetEvent() {
       }
 
       if (!downloaded) {
-        throw new Error(
-          `Event with id ${id} not found in cache. Please ensure the event is first assigned and downloaded to the browser.`
-        )
+        throwStructuredError({
+          message: `Event with id ${id} not found in cache. Please ensure the event is first assigned and downloaded to the browser.`,
+          redirection: {
+            label: intl.formatMessage(buttonMessages.refresh),
+            path: ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId: id })
+          }
+        })
       }
 
       return useSuspenseQuery({

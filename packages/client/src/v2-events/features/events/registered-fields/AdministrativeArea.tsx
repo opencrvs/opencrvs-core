@@ -10,12 +10,15 @@
  */
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Location } from '@events/service/locations/locations'
-import { FieldPropsWithoutReferenceValue } from '@opencrvs/commons/client'
+import {
+  Location,
+  FieldPropsWithoutReferenceValue
+} from '@opencrvs/commons/client'
 import { getAdminStructureLocations } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Select } from './Select'
 import { LocationSearch } from './LocationSearch'
 
@@ -43,6 +46,7 @@ function AdministrativeAreaInput({
   onChange: (val: string | undefined) => void
   partOf: string | null
   value?: string
+  disabled?: boolean
 }) {
   const options = useAdminLocations(partOf ?? '0')
 
@@ -76,9 +80,14 @@ function stringify(value: string, context: { locations: Location[] }) {
   return name ?? EMPTY_TOKEN
 }
 
+function isAdministrativeAreaEmpty(value: Stringifiable) {
+  return !value.toString()
+}
+
 export const AdministrativeArea = {
-  Input: AdministrativeAreaInput,
+  Input: withSuspense(AdministrativeAreaInput),
   Output: AdministrativeAreaOutput,
   stringify,
-  toCertificateVariables: LocationSearch.toCertificateVariables
+  toCertificateVariables: LocationSearch.toCertificateVariables,
+  isEmptyValue: isAdministrativeAreaEmpty
 }

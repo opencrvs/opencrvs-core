@@ -91,9 +91,8 @@ const declarationActionValues = [
   ActionTypes.enum.DECLARE,
   ActionTypes.enum.VALIDATE,
   ActionTypes.enum.REGISTER,
-  // @TODO: Check whether NOTIFY should be included here or not.
-  // It is not a declaration action strictly speaking, but it can change declaration data.
-  ActionTypes.enum.NOTIFY
+  ActionTypes.enum.NOTIFY,
+  ActionTypes.enum.DUPLICATE_DETECTED
 ] as const
 
 /** Actions which change event data (declaration) before registration / during declaration. */
@@ -114,7 +113,7 @@ export type DeclarationUpdateActionType = z.infer<
   typeof DeclarationUpdateActions
 >
 
-/** Actions which update annotation or status of an event. */
+/** Actions which only update annotation or status of an event. */
 export const annotationActions = ActionTypes.exclude(declarationActionValues)
 export type AnnotationActionType = z.infer<typeof annotationActions>
 

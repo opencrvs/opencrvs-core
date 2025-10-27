@@ -10,7 +10,7 @@
  */
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useIntl } from 'react-intl'
 import {
   ActionType,
@@ -27,7 +27,8 @@ import {
   Draft,
   isActionInScope,
   configurableEventScopeAllowed,
-  canUserReadEvent
+  canUserReadEvent,
+  ITokenPayload
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -41,7 +42,6 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { getScope } from '@client/profile/profileSelectors'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { ITokenPayload } from '@client/utils/authUtils'
 import { useModal } from '@client/hooks/useModal'
 import { AssignModal } from '@client/v2-events/components/AssignModal'
 import { useOnlineStatus } from '@client/utils'
@@ -167,8 +167,10 @@ interface ActionConfig {
   hidden?: boolean
 }
 
+export type ActionMenuActionType = WorkqueueActionType | ClientSpecificAction
+
 interface ActionMenuItem extends ActionConfig {
-  type: WorkqueueActionType | ClientSpecificAction
+  type: ActionMenuActionType
 }
 
 /**
@@ -207,13 +209,20 @@ function useViewableActionConfigurations(
     locations.find((l) => l.id === assignedOffice)?.name || ''
   const { archiveModal, onArchive } = useArchiveModal()
 
+  const { modal: deleteModal, deleteDeclaration } = useEventFormNavigation()
+  const onDelete = useCallback(
+    async (workqueue?: string) => {
+      await deleteDeclaration(event.id, workqueue)
+    },
+    [event, deleteDeclaration]
+  )
+
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
    * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
    */
   const { refetch: refetchEvent } = events.getEvent.findFromCache(event.id)
 
-  const { mutate: deleteEvent } = events.deleteEvent.useMutation()
   const { eventConfiguration } = useEventConfiguration(event.type)
 
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
@@ -269,11 +278,12 @@ function useViewableActionConfigurations(
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
   return {
-    modals: [assignModal, archiveModal],
+    modals: [assignModal, archiveModal, deleteModal],
     config: {
       [ActionType.READ]: {
         label: actionLabels[ActionType.READ],
         icon: 'Eye' as const,
+        disabled: !isOnline,
         onClick: () => navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId }))
       },
       [ActionType.ASSIGN]: {
@@ -406,21 +416,15 @@ function useViewableActionConfigurations(
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
         icon: 'Trash' as const,
-        onClick: (workqueue?: string) => {
-          deleteEvent({
-            eventId: event.id
-          })
-          // What if there is a workqueue?
-          if (!workqueue) {
-            navigate(ROUTES.V2.buildPath({}))
-          }
+        onClick: async (workqueue?: string) => {
+          await onDelete(workqueue)
         },
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REQUEST_CORRECTION]: {
         label: actionLabels[ActionType.REQUEST_CORRECTION],
         icon: 'NotePencil' as const,
-        onClick: () => {
+        onClick: (workqueue?: string) => {
           const correctionPages = eventConfiguration.actions.find(
             (action) => action.type === ActionType.REQUEST_CORRECTION
           )?.correctionForm.pages
@@ -434,17 +438,23 @@ function useViewableActionConfigurations(
           // If no pages are configured, skip directly to review page
           if (correctionPages.length === 0) {
             navigate(
-              ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
+              ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
+                { eventId },
+                { workqueue }
+              )
             )
             return
           }
 
           // If pages are configured, navigate to first page
           navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
-              eventId,
-              pageId: correctionPages[0].id
-            })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
+              {
+                eventId,
+                pageId: correctionPages[0].id
+              },
+              { workqueue }
+            )
           )
         },
         disabled: !isDownloadedAndAssignedToUser || eventIsWaitingForCorrection,
@@ -453,29 +463,36 @@ function useViewableActionConfigurations(
       [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
         label: actionLabels[ClientSpecificAction.REVIEW_CORRECTION_REQUEST],
         icon: 'NotePencil' as const,
-        onClick: () => {
+        onClick: (workqueue?: string) => {
           clearEphemeralFormState()
           navigate(
-            ROUTES.V2.EVENTS.REVIEW_CORRECTION.REVIEW.buildPath({
-              eventId
-            })
+            ROUTES.V2.EVENTS.REVIEW_CORRECTION.REVIEW.buildPath(
+              {
+                eventId
+              },
+              { workqueue }
+            )
           )
         },
         disabled: !isDownloadedAndAssignedToUser,
         hidden: !eventIsWaitingForCorrection
       }
-    } satisfies Record<WorkqueueActionType & ClientSpecificAction, ActionConfig>
+    } satisfies Record<ActionMenuActionType, ActionConfig>
   }
 }
 
 export function useUserAllowedActions(eventType: string) {
-  const scopes = useSelector(getScope) ?? []
+  const scopes = useSelector(getScope)
 
   const actions = Object.values(ActionType)
   const clientSpecificActions = Object.values(ClientSpecificAction)
 
-  const allowedActions = [...actions, ...clientSpecificActions].filter(
-    (action) => isActionInScope(scopes, action, eventType)
+  const allowedActions = useMemo(
+    () =>
+      [...actions, ...clientSpecificActions].filter((action) =>
+        isActionInScope(scopes ?? [], action, eventType)
+      ),
+    [scopes, eventType, actions, clientSpecificActions]
   )
 
   return {
@@ -526,7 +543,7 @@ export function useAllowedActionConfigurations(
     // deduplicate after adding the draft
     .filter((action, index, self) => self.indexOf(action) === index)
     .filter(
-      (action): action is WorkqueueActionType | ClientSpecificAction =>
+      (action): action is ActionMenuActionType =>
         ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
         workqueueActions.safeParse(action).success
     )

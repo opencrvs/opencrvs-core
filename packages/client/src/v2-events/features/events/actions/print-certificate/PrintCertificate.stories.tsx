@@ -19,10 +19,7 @@ import {
   generateEventDocument,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import {
-  tennisClubMembershipEventIndex,
-  tennisClubMembershipEventDocument
-} from '@client/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -85,11 +82,11 @@ const printActionWithSelections = generateActionDocument({
 const registeredEvent = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [
-    ActionType.CREATE,
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REGISTER,
-    ActionType.PRINT_CERTIFICATE
+    { type: ActionType.CREATE },
+    { type: ActionType.DECLARE },
+    { type: ActionType.VALIDATE },
+    { type: ActionType.REGISTER },
+    { type: ActionType.PRINT_CERTIFICATE }
   ]
 })
 

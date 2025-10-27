@@ -25,14 +25,19 @@ import {
   isPageVisible,
   PageConfig,
   PageTypes,
+  RequestedCorrectionAction,
   TranslationConfig,
-  User
+  User,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment, Link } from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { Output } from '@client/v2-events/features/events/components/Output'
+import {
+  isEmptyValue,
+  Output
+} from '@client/v2-events/features/events/components/Output'
 import { ROUTES } from '@client/v2-events/routes'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
@@ -112,10 +117,11 @@ function buildCorrectionDetails(
   intl: IntlShape,
   users: User[],
   locations: ReturnType<typeof getLocations>,
+  validatorContext: ValidatorContext,
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
   const details: CorrectionDetail[] = correctionFormPages
-    .filter((page) => isPageVisible(page, annotation))
+    .filter((page) => isPageVisible(page, annotation, validatorContext))
     .flatMap((page) => {
       if (page.type === PageTypes.enum.VERIFICATION) {
         const value = !!annotation[page.id]
@@ -123,27 +129,26 @@ function buildCorrectionDetails(
           {
             id: page.id,
             label: page.title,
-            valueDisplay: value
-              ? intl.formatMessage(correctionMessages.verifyIdentity)
-              : intl.formatMessage(correctionMessages.cancelVerifyIdentity),
+            valueDisplay: value ? (
+              <>{intl.formatMessage(correctionMessages.verifyIdentity)}</>
+            ) : (
+              <>{intl.formatMessage(correctionMessages.cancelVerifyIdentity)}</>
+            ),
             pageId: page.id
           }
         ]
       }
-
       return page.fields
-        .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
+        .filter((f) =>
+          isFieldVisible(f, { ...form, ...annotation }, validatorContext)
+        )
+        .filter((f) => !isEmptyValue(f, { ...form, ...annotation }[f.id]))
         .map((field) => ({
           label: field.label,
           id: field.id,
-          valueDisplay: Output({
-            field,
-            value: annotation[field.id],
-            showPreviouslyMissingValuesAsChanged: false
-          }),
+          valueDisplay: <Output field={field} value={annotation[field.id]} />,
           pageId: page.id
         }))
-        .filter((f) => f.valueDisplay)
     })
 
   if (correctionRequestAction) {
@@ -188,15 +193,17 @@ export function CorrectionDetails({
   requesting,
   editable = false,
   workqueue,
-  correctionRequestAction
+  correctionRequestAction,
+  validatorContext
 }: {
   event: EventDocument
   form: EventState
   annotation: EventState
   requesting: boolean
-  correctionRequestAction?: Action
+  correctionRequestAction?: RequestedCorrectionAction
   editable?: boolean
   workqueue?: string
+  validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(event.type)
@@ -218,6 +225,7 @@ export function CorrectionDetails({
     intl,
     users,
     locations,
+    validatorContext,
     correctionRequestAction
   )
 
@@ -290,6 +298,7 @@ export function CorrectionDetails({
         form={form}
         fullEvent={event}
         id={'corrections-table'}
+        validatorContext={validatorContext}
       />
     </>
   )

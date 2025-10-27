@@ -35,7 +35,7 @@ const generator = testDataGenerator()
 
 const declareEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
 })
 
 const eventId = declareEventDocument.id
@@ -112,9 +112,9 @@ export const RemovingExistingFileSendsNull: Story = {
             return generateEventDocument({
               configuration: tennisClubMembershipEvent,
               actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
+                { type: ActionType.CREATE },
+                { type: ActionType.DECLARE },
+                { type: ActionType.VALIDATE }
               ]
             })
           })
@@ -180,11 +180,13 @@ const actions = [
   generateActionDocument({
     configuration: tennisClubMembershipEvent,
     action: ActionType.DECLARE,
-    annotation: {
-      'review.signature': {
-        type: 'image/png',
-        originalFilename: 'signature.png',
-        path: '/ocrvs/signature.png'
+    defaults: {
+      annotation: {
+        'review.signature': {
+          type: 'image/png',
+          originalFilename: 'signature.png',
+          path: '/ocrvs/signature.png'
+        }
       }
     }
   })
@@ -227,9 +229,9 @@ export const RemovingExistingSignatureSendsNull: Story = {
             return generateEventDocument({
               configuration: tennisClubMembershipEvent,
               actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
+                { type: ActionType.CREATE },
+                { type: ActionType.DECLARE },
+                { type: ActionType.VALIDATE }
               ]
             })
           })
@@ -376,9 +378,9 @@ export const RemovingMultipleFilesDeletesAll: Story = {
             return generateEventDocument({
               configuration: multiFileConfig,
               actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
+                { type: ActionType.CREATE },
+                { type: ActionType.DECLARE },
+                { type: ActionType.VALIDATE }
               ]
             })
           })
@@ -432,8 +434,19 @@ export const RemovingMultipleFilesDeletesAll: Story = {
       )
       await canvas.findByText('No supporting documents')
 
-      // Check for regression
-      await expect(canvas.queryByText('multi file')).not.toBeInTheDocument()
+      await expect(
+        canvas
+          .getByTestId('row-value-documents.singleFile')
+          .querySelector('del')
+      ).toHaveTextContent('single file')
+
+      await expect(
+        canvas.getByTestId('row-value-documents.multiFile').querySelector('del')
+      ).toHaveTextContent('multi file option 1')
+
+      await expect(
+        canvas.getByTestId('row-value-documents.multiFile').querySelector('del')
+      ).toHaveTextContent('multi file option 2')
 
       const sendForApprovalButton = await canvas.findByRole('button', {
         name: 'Send for approval'

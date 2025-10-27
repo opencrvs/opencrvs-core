@@ -21,13 +21,11 @@ import {
   generateEventDraftDocument,
   generateWorkqueues,
   getCurrentEventState,
-  tennisClubMembershipEvent,
-  UUID
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
 import { ReadonlyViewIndex } from './ReadOnlyView'
 
 const generator = testDataGenerator()
@@ -52,20 +50,15 @@ const rng = createPrng(122)
 const eventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [
-    ActionType.CREATE,
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REGISTER
+    { type: ActionType.CREATE },
+    { type: ActionType.DECLARE },
+    { type: ActionType.VALIDATE },
+    { type: ActionType.REGISTER }
   ],
   rng
 })
 
 const eventId = eventDocument.id
-const draft = generateEventDraftDocument({
-  eventId,
-  actionType: ActionType.DECLARE,
-  rng
-})
 const modifiedDraft = generateEventDraftDocument({
   eventId: eventDocument.id,
   actionType: ActionType.REGISTER,
@@ -160,32 +153,14 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
           tRPCMsw.user.list.query(() => {
-            return [
-              {
-                id: generator.user.id.localRegistrar,
-                name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
-                role: 'LOCAL_REGISTRAR',
-                signature: undefined,
-                avatar: undefined,
-                primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-              }
-            ]
+            return [generator.user.localRegistrar().v2]
           }),
-          tRPCMsw.user.get.query((id) => {
-            return {
-              id: generator.user.id.localRegistrar,
-              name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
-              role: 'LOCAL_REGISTRAR',
-              signature: undefined,
-              avatar: undefined,
-              primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-            }
-          })
+          tRPCMsw.user.get.query((id) => generator.user.localRegistrar().v2)
         ]
       }
     }
@@ -219,38 +194,14 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
           tRPCMsw.user.list.query(() => {
-            return [
-              {
-                id: '67bda93bfc07dee78ae558cf',
-                name: [
-                  {
-                    use: 'en',
-                    given: ['Kalusha'],
-                    family: 'Bwalya'
-                  }
-                ],
-                role: 'SOCIAL_WORKER',
-                signature: undefined,
-                avatar: undefined,
-                primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-              }
-            ]
+            return [generator.user.fieldAgent().v2]
           }),
-          tRPCMsw.user.get.query(() => {
-            return {
-              id: generator.user.id.localRegistrar,
-              name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
-              role: 'LOCAL_REGISTRAR',
-              signature: undefined,
-              avatar: undefined,
-              primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
-            }
-          })
+          tRPCMsw.user.get.query(() => generator.user.localRegistrar().v2)
         ]
       }
     }

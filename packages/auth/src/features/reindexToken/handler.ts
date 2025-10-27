@@ -24,8 +24,9 @@ export default async function reindexingTokenHandler(
   const token = await createToken(
     REINDEX_USER_ID,
     ['record.reindex'],
-    ['opencrvs:events-user'],
+    ['opencrvs:gateway-user', 'opencrvs:events-user'],
     'opencrvs:auth-service',
+    undefined,
     true,
     TokenUserType.enum.system
   )

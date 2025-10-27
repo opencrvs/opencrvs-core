@@ -65,5 +65,6 @@ echo "Running migrations"
 echo
 
 yarn --cwd="$DIR/packages/migration" start
-
+echo
+yarn reindex
 echo

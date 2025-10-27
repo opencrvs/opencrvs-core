@@ -9,21 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useSelector } from 'react-redux'
 import { IntlShape, useIntl } from 'react-intl'
-import { Location } from '@events/service/locations/locations'
+import { useSelector } from 'react-redux'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
 import {
   FieldPropsWithoutReferenceValue,
+  Location,
+  LocationType,
   joinValues
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
-import { getListOfLocations } from '@client/utils/validate'
-import { generateLocations } from '@client/utils/locationUtils'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 interface SearchLocation {
   id: string
@@ -31,22 +31,38 @@ interface SearchLocation {
   displayLabel: string
 }
 
+const resourceTypeMap: Record<
+  'locations' | 'facilities' | 'offices',
+  LocationType
+> = {
+  locations: 'ADMIN_STRUCTURE',
+  facilities: 'HEALTH_FACILITY',
+  offices: 'CRVS_OFFICE'
+}
+
 function useAdministrativeAreas(
   searchableResource: ('locations' | 'facilities' | 'offices')[]
 ) {
-  const offlineCountryConfig = useSelector(getOfflineData)
-  const intl = useIntl()
-  const locationList = generateLocations(
-    searchableResource.reduce((locations, resource) => {
-      return {
-        ...locations,
-        ...getListOfLocations(offlineCountryConfig, resource)
-      }
-    }, {}),
-    intl
-  )
+  const { getLocations } = useLocations()
+  const [allLocations] = getLocations.useSuspenseQuery({})
 
-  return locationList
+  return React.useMemo(() => {
+    const resourceLocations = allLocations.filter(
+      ({ locationType }) =>
+        locationType &&
+        searchableResource.some(
+          (r) =>
+            resourceTypeMap[r satisfies keyof typeof resourceTypeMap] ===
+            locationType
+        )
+    )
+
+    return resourceLocations.map((location) => ({
+      id: location.id,
+      searchableText: location.name.toLowerCase(),
+      displayLabel: location.name
+    }))
+  }, [searchableResource, allLocations])
 }
 
 function LocationSearchInput({
@@ -60,6 +76,7 @@ function LocationSearchInput({
   searchableResource: ('locations' | 'facilities' | 'offices')[]
   value?: string
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
+  disabled?: boolean
 }) {
   const locationList = useAdministrativeAreas(searchableResource)
   const selectedLocation = locationList.find(
@@ -153,11 +170,21 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
     .filter(Boolean)
     .reverse()
 
+  const location = locations.find(({ id }) => id === value.toString())
+
+  if (location?.locationType === LocationType.Enum.ADMIN_STRUCTURE) {
+    return joinValues([...resolvedAdminLevels, country], ', ')
+  }
   return joinValues([name, ...resolvedAdminLevels, country], ', ')
 }
 
+function isLocationEmpty(value: Stringifiable) {
+  return !value.toString()
+}
+
 export const LocationSearch = {
-  Input: LocationSearchInput,
+  Input: withSuspense(LocationSearchInput),
   Output: LocationSearchOutput,
-  toCertificateVariables: toCertificateVariables
+  toCertificateVariables,
+  isEmptyValue: isLocationEmpty
 }

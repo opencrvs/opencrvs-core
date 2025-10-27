@@ -42,7 +42,7 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { reviewMessages } from '../messages'
 
 function getTranslations(hasErrors: boolean) {
@@ -62,13 +62,12 @@ export function Review() {
   )
   const events = useEvents()
   const drafts = useDrafts()
+  const validatorContext = useValidatorContext()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { closeActionView: closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
 
   const registerMutation = events.actions.register
 
@@ -92,15 +91,12 @@ export function Review() {
   const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form,
+    context: validatorContext,
     annotation,
-    reviewFields: reviewConfig.fields,
-    locations: adminStructureLocations
+    reviewFields: reviewConfig.fields
   })
 
   const messages = getTranslations(incomplete)
@@ -218,10 +214,10 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
-        locations={adminStructureLocations}
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
+        validatorContext={validatorContext}
         onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       >

@@ -13,6 +13,7 @@ import { Nominal } from './nominal'
 import { z } from 'zod'
 
 import { RawScopes, Scope, SCOPES } from './scopes'
+import { UUID } from './uuid'
 export * from './scopes'
 
 export const DEFAULT_ROLES_DEFINITION = [
@@ -44,8 +45,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.registrationAgent'
     },
     scopes: [
-      SCOPES.PERFORMANCE,
-      SCOPES.CERTIFY,
       `record.create[event=birth|death|tennis-club-membership]`,
       'record.declare[event=birth|death|tennis-club-membership]',
       SCOPES.RECORD_DECLARE_BIRTH,
@@ -56,11 +55,7 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.RECORD_DECLARATION_ARCHIVE,
       SCOPES.RECORD_DECLARATION_REINSTATE,
       SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-      SCOPES.RECORD_REGISTRATION_PRINT,
-      SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
-      SCOPES.RECORD_EXPORT_RECORDS,
       SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
-      SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.ORGANISATION_READ_LOCATIONS,
@@ -78,8 +73,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.localRegistrar'
     },
     scopes: [
-      SCOPES.PERFORMANCE,
-      SCOPES.CERTIFY,
       `record.create[event=birth|death|tennis-club-membership]`,
       'record.declare[event=birth|death|tennis-club-membership]',
       SCOPES.RECORD_DECLARE_BIRTH,
@@ -92,11 +85,7 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.RECORD_DECLARATION_REINSTATE,
       SCOPES.RECORD_REGISTER,
       SCOPES.RECORD_REGISTRATION_CORRECT,
-      SCOPES.RECORD_REGISTRATION_PRINT,
-      SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
-      SCOPES.RECORD_EXPORT_RECORDS,
       SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
-      SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.ORGANISATION_READ_LOCATIONS,
@@ -115,7 +104,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.localSystemAdmin'
     },
     scopes: [
-      SCOPES.SYSADMIN,
       SCOPES.USER_READ_MY_OFFICE,
       SCOPES.USER_CREATE_MY_JURISDICTION,
       SCOPES.USER_UPDATE_MY_JURISDICTION,
@@ -134,8 +122,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.nationalSystemAdmin'
     },
     scopes: [
-      SCOPES.SYSADMIN,
-      SCOPES.NATLSYSADMIN,
       SCOPES.USER_CREATE,
       SCOPES.USER_READ,
       SCOPES.USER_UPDATE,
@@ -143,7 +129,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
-      // 'organisation.read-users' ?
     ]
   },
   {
@@ -154,7 +139,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.performanceManager'
     },
     scopes: [
-      SCOPES.PERFORMANCE,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
@@ -179,7 +163,10 @@ export interface ITokenPayload {
   exp: string
   algorithm: string
   scope: Scope[]
+  role: string
   userType: TokenUserType
+  eventId?: UUID
+  actionId?: UUID
 }
 
 /**

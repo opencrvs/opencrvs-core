@@ -18,10 +18,7 @@ import {
 import {
   ActionType,
   getDeclaration,
-  getCurrentEventState,
-  ActionDocument,
-  getAcceptedActions,
-  isMetaAction
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
@@ -34,8 +31,8 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { hasFieldChanged } from '../utils'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { hasDeclarationFieldChanged } from '../utils'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
@@ -45,8 +42,7 @@ export function Review() {
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const validatorContext = useValidatorContext()
 
   const event = events.getEvent.getFromCache(eventId)
 
@@ -64,7 +60,13 @@ export function Review() {
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)
   const changedFields = formFields.filter((f) =>
-    hasFieldChanged(f, form, previousFormValues)
+    hasDeclarationFieldChanged(
+      f,
+      form,
+      previousFormValues,
+      configuration,
+      validatorContext
+    )
   )
   const anyValuesHaveChanged = changedFields.length > 0
 
@@ -80,14 +82,10 @@ export function Review() {
     )
   }
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
-
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form,
-    locations: adminStructureLocations
+    context: validatorContext
   })
 
   return (
@@ -96,12 +94,12 @@ export function Review() {
         form={form}
         formConfig={formConfig}
         isCorrection={true}
-        locations={adminStructureLocations}
         previousFormValues={previousFormValues}
         title={intlWithData.formatMessage(
           actionConfig.label,
           previousFormValues
         )}
+        validatorContext={validatorContext}
         onEdit={({ pageId, fieldId }) => {
           navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(

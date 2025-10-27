@@ -16,14 +16,18 @@ import {
   deepMerge,
   EventDocument,
   FieldType,
+  PageTypes,
+  getPrintCertificatePages,
   getCurrentEventState,
   isFieldVisible,
-  PageTypes,
-  getPrintCertificatePages
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment } from '@opencrvs/components'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { Output } from '@client/v2-events/features/events/components/Output'
+import {
+  isEmptyValue,
+  Output
+} from '@client/v2-events/features/events/components/Output'
 import { useCertificateTemplateSelectorFieldConfig } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
@@ -35,18 +39,21 @@ const verifiedMessage = {
 
 export function PrintCertificate({
   event,
-  action
+  action,
+  validatorContext
 }: {
   event: EventDocument
   action: PrintCertificateAction
+  validatorContext: ValidatorContext
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const formPages = getPrintCertificatePages(eventConfiguration)
   const intl = useIntl()
+
+  const { certificateTemplates } = useAppConfig()
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const annotation = deepMerge(eventIndex.declaration, action.annotation ?? {})
   const templateId = action.content?.templateId
-  const { certificateTemplates } = useAppConfig()
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
     event.type,
     eventIndex.declaration,
@@ -62,36 +69,39 @@ export function PrintCertificate({
     value: templateLabel ? intl.formatMessage(templateLabel) : ''
   }
 
-  // A very similar kind of listing of "annotation" fields will be done on the correction summary and modal.
-  // When we merge phase-3 branch here, we could try refactoring this to be a shared frontend module/function.
   const content = formPages.flatMap((page) => {
     const fields = page.fields
-      .filter((f) => isFieldVisible(f, annotation))
+      .filter((f) => isFieldVisible(f, annotation, validatorContext))
+      .filter((f) => !isEmptyValue(f, annotation[f.id]))
       .map((field) => {
-        const valueDisplay = Output({
-          field,
-          value: annotation[field.id],
-          showPreviouslyMissingValuesAsChanged: false
-        })
+        const valueDisplay = (
+          <Output
+            eventConfig={eventConfiguration}
+            field={field}
+            value={annotation[field.id]}
+          />
+        )
 
         return {
           label: intl.formatMessage(field.label),
           value: valueDisplay
         }
       })
-      .filter((f) => f.value)
 
     if (page.type === PageTypes.enum.VERIFICATION) {
-      const value = Output({
-        field: {
-          id: page.id,
-          label: page.title,
-          type: FieldType.CHECKBOX,
-          defaultValue: false
-        },
-        value: annotation[page.id],
-        showPreviouslyMissingValuesAsChanged: false
-      })
+      const value = (
+        <Output
+          eventConfig={eventConfiguration}
+          field={{
+            id: page.id,
+            label: page.title,
+            type: FieldType.CHECKBOX,
+            defaultValue: false,
+            required: true
+          }}
+          value={annotation[page.id]}
+        />
+      )
 
       return [{ label: intl.formatMessage(verifiedMessage), value }, ...fields]
     }

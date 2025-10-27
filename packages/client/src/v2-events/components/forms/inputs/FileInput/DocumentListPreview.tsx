@@ -66,6 +66,7 @@ interface Props {
   dropdownOptions?: SelectOption[]
   onDelete?: (path: FullDocumentPath) => void
   inReviewSection?: boolean
+  disabled?: boolean
 }
 
 export const DocumentListPreview = ({
@@ -75,7 +76,8 @@ export const DocumentListPreview = ({
   onSelect,
   dropdownOptions,
   onDelete,
-  inReviewSection
+  inReviewSection,
+  disabled
 }: Props) => {
   const intl = useIntl()
 
@@ -102,6 +104,7 @@ export const DocumentListPreview = ({
               <Icon color="grey600" name="Paperclip" size="large" />
               <Link
                 key={key}
+                disabled={disabled}
                 id={`document_${(document.option as string).replace(
                   /\s/g,
                   ''
@@ -122,6 +125,7 @@ export const DocumentListPreview = ({
             {onDelete && (
               <Button
                 aria-label="Delete attachment"
+                disabled={disabled}
                 id="preview_delete"
                 size="small"
                 type="icon"

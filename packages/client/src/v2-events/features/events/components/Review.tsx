@@ -36,7 +36,8 @@ import {
   isFieldDisplayedOnReview,
   isPageVisible,
   runFieldValidations,
-  Location
+  FieldTypesToHideInReview,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
@@ -276,26 +277,27 @@ function FormReview({
   formConfig,
   form,
   previousForm,
-  locations,
   onEdit,
   showPreviouslyMissingValuesAsChanged,
   readonlyMode,
   isCorrection = false,
-  isReviewCorrection = false
+  isReviewCorrection = false,
+  validatorContext
 }: {
   formConfig: FormConfig
   form: EventState
   previousForm: EventState
-  locations?: Location[]
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
+  validatorContext: ValidatorContext
   readonlyMode?: boolean
   isCorrection?: boolean
   isReviewCorrection?: boolean
 }) {
   const intl = useIntl()
+
   const visiblePages = formConfig.pages.filter((page) =>
-    isPageVisible(page, form)
+    isPageVisible(page, form, validatorContext)
   )
 
   return (
@@ -303,66 +305,54 @@ function FormReview({
       <ReviewContainter>
         {visiblePages.map((page) => {
           const fields = page.fields
-            .filter((field) => isFieldDisplayedOnReview(field, form))
+            .filter((field) =>
+              isFieldDisplayedOnReview(field, form, validatorContext)
+            )
             .map((field) => {
               const value = form[field.id]
               const previousValue = previousForm[field.id]
 
               // previousForm, formConfig are used to find previous values with the same label if required
-              const valueDisplay = Output({
-                field,
-                previousValue,
-                showPreviouslyMissingValuesAsChanged,
-                value,
-                previousForm,
-                formConfig
-              })
+              const valueDisplay = (
+                <Output
+                  field={field}
+                  formConfig={formConfig}
+                  previousForm={previousForm}
+                  previousValue={previousValue}
+                  showPreviouslyMissingValuesAsChanged={
+                    showPreviouslyMissingValuesAsChanged
+                  }
+                  value={value}
+                />
+              )
 
-              const context = locations ? { locations } : undefined
-
-              const error = runFieldValidations({
+              const errors = runFieldValidations({
                 field,
                 values: form,
-                context
+                context: validatorContext
               })
 
               const errorDisplay =
-                error.errors.length > 0 ? (
+                errors.length > 0 ? (
                   <ValidationError key={field.id}>
-                    {intl.formatMessage(error.errors[0].message)}
+                    {intl.formatMessage(errors[0].message)}
                   </ValidationError>
                 ) : null
 
               return { ...field, valueDisplay, errorDisplay }
             })
 
-          const shouldDisplayPage = fields.some(
-            ({ type, valueDisplay, errorDisplay }) => {
-              if (
-                type === FieldType.FILE ||
-                type === FieldType.FILE_WITH_OPTIONS
-              ) {
-                return true
-              }
-
-              // If page doesn't have any file inputs, we only want to display it if it has any fields with content
-              return valueDisplay || errorDisplay
-            }
-          )
-
-          if (!shouldDisplayPage) {
-            return <React.Fragment key={`Section_${page.id}`}></React.Fragment>
-          }
-
           // Only display fields that have a non-undefined/null value or have an validation error
           const displayedFields = fields.filter(
-            ({ valueDisplay, errorDisplay }) => {
-              // Explicitly check for undefined and null, so that e.g. number 0 and empty string outputs are shown
-              const hasValue =
-                valueDisplay !== undefined && valueDisplay !== null
-              return hasValue || Boolean(errorDisplay)
-            }
+            ({ type }) =>
+              !FieldTypesToHideInReview.some(
+                (typeToHide) => type === typeToHide
+              )
           )
+
+          if (displayedFields.length === 0) {
+            return <React.Fragment key={`Section_${page.id}`}></React.Fragment>
+          }
 
           const hasCorrectableFields = displayedFields.some(
             (field) => !field.uncorrectable
@@ -457,7 +447,7 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   form,
-  locations,
+  validatorContext,
   annotation,
   onEdit,
   children,
@@ -472,7 +462,7 @@ function ReviewComponent({
   children?: React.ReactNode
   formConfig: FormConfig
   form: EventState
-  locations?: Location[]
+  validatorContext: ValidatorContext
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
@@ -518,12 +508,12 @@ function ReviewComponent({
             formConfig={formConfig}
             isCorrection={isCorrection}
             isReviewCorrection={isReviewCorrection}
-            locations={locations}
             previousForm={previousForm}
             readonlyMode={readonlyMode}
             showPreviouslyMissingValuesAsChanged={
               showPreviouslyMissingValuesAsChanged
             }
+            validatorContext={validatorContext}
             onEdit={onEdit}
           />
 
@@ -535,6 +525,7 @@ function ReviewComponent({
                   id={'review'}
                   initialValues={annotation}
                   readonlyMode={readonlyMode}
+                  validatorContext={validatorContext}
                   onChange={onAnnotationChange}
                 />
               </ReviewContainter>
@@ -897,7 +888,7 @@ function RejectActionModal({
 export const Review = {
   Body: withSuspense(ReviewComponent),
   Actions: ReviewActionComponent,
-  EditModal: EditModal,
+  EditModal,
   ActionModal: {
     Accept: AcceptActionModal,
     Reject: RejectActionModal

@@ -21,7 +21,6 @@ import {
   isNonInteractiveFieldType,
   PageConfig
 } from '@opencrvs/commons/client'
-import { getCurrentEventState } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -29,6 +28,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 // Filter out pages where all fields either have 'uncorrectable' set to true or are non-interactive
 function getCorrectablePages(formPages: PageConfig[]) {
@@ -41,6 +41,7 @@ function getCorrectablePages(formPages: PageConfig[]) {
 }
 
 export function Pages() {
+  const validatorContext = useValidatorContext()
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const setFormValues = useEventFormData((state) => state.setFormValues)
@@ -92,6 +93,7 @@ export function Pages() {
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}
+        validatorContext={validatorContext}
         onPageChange={(nextPageId: string) =>
           navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(

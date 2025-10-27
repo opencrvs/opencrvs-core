@@ -158,14 +158,6 @@ const routeAccess: NavigationConfig[] = [
         scopes: [SCOPES.PERFORMANCE_READ_DASHBOARDS]
       },
       {
-        name: WORKQUEUE_TABS.statistics,
-        scopes: [SCOPES.PERFORMANCE_READ]
-      },
-      {
-        name: WORKQUEUE_TABS.leaderboards,
-        scopes: [SCOPES.PERFORMANCE_READ]
-      },
-      {
         name: WORKQUEUE_TABS.performance,
         scopes: [SCOPES.PERFORMANCE_READ]
       },
