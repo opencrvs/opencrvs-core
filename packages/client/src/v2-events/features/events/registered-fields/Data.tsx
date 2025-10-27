@@ -24,7 +24,7 @@ import {
   EventConfig,
   getDeclarationFields,
   FieldValue,
-  DataEntry
+  DataEntry,
   TranslationConfig,
   FieldReference
 } from '@opencrvs/commons/client'
