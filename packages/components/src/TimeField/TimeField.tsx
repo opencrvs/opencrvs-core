@@ -99,7 +99,7 @@ function TimeInput12(props: ITimeFieldProps) {
     mm: ''
   })
 
-  const [amPm, setAmPm] = React.useState<string>('AM') // Default to AM for 12-hour format
+  const [amPm, setAmPm] = React.useState<string>('AM')
 
   React.useEffect(() => {
     function getInitialState(time: string): IState {
