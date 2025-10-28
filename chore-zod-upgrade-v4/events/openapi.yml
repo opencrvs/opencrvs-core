@@ -103,7 +103,6 @@ paths:
                 transactionId:
                   type: string
                 declaration:
-                  default: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                   type: object
@@ -847,6 +846,7 @@ paths:
               required:
                 - eventId
                 - transactionId
+              additionalProperties: false
       responses:
         "200":
           description: Successful response
@@ -881,7 +881,6 @@ paths:
                 transactionId:
                   type: string
                 declaration:
-                  default: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                   type: object
@@ -1625,6 +1624,7 @@ paths:
               required:
                 - eventId
                 - transactionId
+              additionalProperties: false
       responses:
         "200":
           description: Successful response
@@ -1659,7 +1659,6 @@ paths:
                 transactionId:
                   type: string
                 declaration:
-                  default: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                   type: object
@@ -2406,6 +2405,7 @@ paths:
                 - eventId
                 - transactionId
                 - requestId
+              additionalProperties: false
       responses:
         "200":
           description: Successful response
@@ -2440,7 +2440,6 @@ paths:
                 transactionId:
                   type: string
                 declaration:
-                  default: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                   type: object
@@ -3197,6 +3196,7 @@ paths:
                 - transactionId
                 - requestId
                 - content
+              additionalProperties: false
       responses:
         "200":
           description: Successful response
@@ -3230,6 +3230,7 @@ paths:
                   default: 100
                   type: number
                 offset:
+                  default: 0
                   type: number
                 sort:
                   type: array
@@ -17483,6 +17484,7 @@ components:
                       defined, the page will be always shown.
                     $ref: "#/components/schemas/Conditional"
                   type:
+                    default: FORM
                     type: string
                     const: FORM
                 required:
@@ -17714,12 +17716,14 @@ components:
                             form.
 
                             \      "
+                          default: []
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
                         validations:
                           description: Option for overriding the field validations specifically for
                             advanced search form.
+                          default: []
                           type: array
                           items:
                             type: object
@@ -17946,12 +17950,14 @@ components:
                             form.
 
                             \      "
+                          default: []
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
                         validations:
                           description: Option for overriding the field validations specifically for
                             advanced search form.
+                          default: []
                           type: array
                           items:
                             type: object
@@ -18125,6 +18131,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -18244,6 +18251,7 @@ components:
                       id:
                         type: string
                       required:
+                        default: false
                         anyOf:
                           - type: boolean
                           - type: object
@@ -18260,6 +18268,7 @@ components:
                         type: string
                         const: TEXT
                       conditionals:
+                        default: []
                         type: array
                         items:
                           $ref: "#/components/schemas/FieldConditional"
@@ -18378,6 +18387,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -18477,6 +18487,8 @@ components:
               type: string
               minLength: 1
             configuration:
+              default:
+                type: text
               type: object
               properties:
                 maxLength:
@@ -18544,6 +18556,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -18707,6 +18720,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -18806,6 +18820,8 @@ components:
               type: string
               minLength: 1
             configuration:
+              default:
+                rows: 4
               type: object
               properties:
                 maxLength:
@@ -18874,6 +18890,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -19050,6 +19067,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -19209,6 +19227,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -19366,6 +19385,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -19544,6 +19564,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -19720,6 +19741,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -19819,6 +19841,7 @@ components:
               type: string
               minLength: 1
             configuration:
+              default: {}
               type: object
               properties:
                 styles:
@@ -19894,6 +19917,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -20075,6 +20099,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -20178,6 +20203,7 @@ components:
               items:
                 $ref: "#/components/schemas/TranslationConfig"
             configuration:
+              default: {}
               type: object
               properties:
                 styles:
@@ -20250,6 +20276,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -20400,6 +20427,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -20591,6 +20619,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -20700,15 +20729,27 @@ components:
                   minLength: 1
               additionalProperties: false
             configuration:
+              default:
+                name:
+                  firstname:
+                    required: true
+                  surname:
+                    required: true
               type: object
               properties:
                 name:
+                  default:
+                    firstname:
+                      required: true
+                    surname:
+                      required: true
                   type: object
                   properties:
                     firstname:
                       type: object
                       properties:
                         required:
+                          default: false
                           anyOf:
                             - type: boolean
                             - type: object
@@ -20726,6 +20767,7 @@ components:
                       type: object
                       properties:
                         required:
+                          default: false
                           anyOf:
                             - type: boolean
                             - type: object
@@ -20743,6 +20785,7 @@ components:
                       type: object
                       properties:
                         required:
+                          default: false
                           anyOf:
                             - type: boolean
                             - type: object
@@ -20825,6 +20868,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -20975,6 +21019,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -21125,6 +21170,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -21276,6 +21322,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -21389,9 +21436,12 @@ components:
                 - type
               additionalProperties: false
             configuration:
+              default:
+                maxFileSize: 5242880
               type: object
               properties:
                 maxFileSize:
+                  default: 5242880
                   description: Maximum file size in bytes
                   type: number
                 acceptedFileTypes:
@@ -21477,6 +21527,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -21627,6 +21678,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -21799,6 +21851,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -21946,6 +21999,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -22111,6 +22165,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -22261,6 +22316,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -22411,6 +22467,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -22512,9 +22569,12 @@ components:
             defaultValue:
               type: string
             configuration:
+              default:
+                maxFileSize: 5242880
               type: object
               properties:
                 maxFileSize:
+                  default: 5242880
                   description: Maximum file size in bytes
                   type: number
                 acceptedFileTypes:
@@ -22587,6 +22647,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -22683,6 +22744,8 @@ components:
               type: string
               const: EMAIL
             configuration:
+              default:
+                maxLength: 10
               type: object
               properties:
                 maxLength:
@@ -22743,6 +22806,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -22879,9 +22943,12 @@ components:
                   - option
                 additionalProperties: false
             configuration:
+              default:
+                maxFileSize: 5242880
               type: object
               properties:
                 maxFileSize:
+                  default: 5242880
                   description: Maximum file size in bytes
                   type: number
                 acceptedFileTypes:
@@ -22955,6 +23022,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -23141,6 +23209,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -23306,6 +23375,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -23466,6 +23536,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -23651,6 +23722,7 @@ components:
                         additionalProperties: false
                 timeout:
                   description: Request timeout in milliseconds
+                  default: 15000
                   type: number
               required:
                 - trigger
@@ -23711,6 +23783,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -23874,6 +23947,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -24042,6 +24116,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -24199,6 +24274,7 @@ components:
                               additionalProperties: false
                       required:
                         description: Indicates whether the field is mandatory.
+                        default: false
                         anyOf:
                           - type: boolean
                           - type: object
@@ -24374,6 +24450,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -24534,6 +24611,7 @@ components:
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
+              default: false
               anyOf:
                 - type: boolean
                 - type: object
@@ -24740,6 +24818,7 @@ components:
                 additionalProperties: false
         required:
           description: Indicates whether the field is mandatory.
+          default: false
           anyOf:
             - type: boolean
             - type: object
@@ -24945,13 +25024,18 @@ components:
             fieldId:
               type: string
             options:
+              default:
+                fuzziness: AUTO:4,7
+                boost: 1
               type: object
               properties:
                 fuzziness:
+                  default: AUTO:4,7
                   anyOf:
                     - type: string
                     - type: number
                 boost:
+                  default: 1
                   type: number
               required:
                 - fuzziness
@@ -24970,9 +25054,12 @@ components:
             fieldId:
               type: string
             options:
+              default:
+                boost: 1
               type: object
               properties:
                 boost:
+                  default: 1
                   type: number
                 value:
                   type: string
@@ -24999,6 +25086,7 @@ components:
                 days:
                   type: number
                 boost:
+                  default: 1
                   type: number
               required:
                 - days
@@ -25181,6 +25269,7 @@ components:
                           defined, the page will be always shown.
                         $ref: "#/components/schemas/Conditional"
                       type:
+                        default: FORM
                         type: string
                         const: FORM
                     required:
@@ -25303,6 +25392,7 @@ components:
                           defined, the page will be always shown.
                         $ref: "#/components/schemas/Conditional"
                       type:
+                        default: FORM
                         type: string
                         const: FORM
                     required:
