@@ -61,7 +61,7 @@ test('User without any search scopes should not see any events', async () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: '123e4567-e89b-12d3-a456-426614174000',
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a', // leaf level location
         streetLevelDetails: {
           province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
           district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
