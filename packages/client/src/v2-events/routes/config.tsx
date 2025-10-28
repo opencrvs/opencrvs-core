@@ -58,18 +58,21 @@ import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
 function PrefetchQueries() {
-  const workqueues = useWorkqueues()
+  const { prefetch } = useWorkqueues()
+
   useEffect(() => {
-    void queryClient.prefetchQuery({
-      queryKey: trpcOptionsProxy.locations.list.queryKey()
-    })
+    {
+      const { queryKey, queryFn } =
+        trpcOptionsProxy.locations.list.queryOptions()
 
-    function prefetch() {
-      void workqueues.prefetch()
+      // only fetch if we don't already have it cached
+      if (!queryClient.getQueryData(queryKey)) {
+        void queryClient.prefetchQuery({ queryKey, queryFn })
+      }
     }
-
-    prefetch()
-  }, [workqueues])
+    void prefetch()
+    // NOTE: Using anything else than prefetch will trigger load for each render. Destructure rather than passing entire object.
+  }, [prefetch])
 
   return null
 }

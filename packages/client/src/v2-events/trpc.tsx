@@ -118,6 +118,12 @@ export function TRPCProvider({
         buster: 'persisted-indexed-db',
         maxAge: undefined,
         dehydrateOptions: {
+          shouldDehydrateQuery: (query) => {
+            const cacheKeys = query.queryKey[0] as string | string[]
+
+            // Locations can be hundreds of thousands of items. They are cached separately to indexedDB.
+            return !cacheKeys.includes('locations')
+          },
           shouldDehydrateMutation: (mutation) => {
             if (mutation.state.status === 'error') {
               const error = mutation.state.error

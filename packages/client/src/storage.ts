@@ -31,6 +31,19 @@ async function removeItem(key: string) {
   return await localForage.removeItem(key)
 }
 
+/**
+ * Creates indexedDB store for locations. Used on application startup to cache locations for offline use.
+ *
+ * @returns A localForage instance for storing locations.
+ */
+export function createLocationsStore() {
+  return localForage.createInstance({
+    driver: localForage.INDEXEDDB,
+    name: 'locations-db',
+    storeName: 'locations'
+  })
+}
+
 export const storage = {
   configStorage,
   getItem,

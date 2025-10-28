@@ -10,10 +10,10 @@
  */
 
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
 import { Location, LocationType, UUID } from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
+import { createLocationsStore } from '../../storage'
 
 setQueryDefaults(trpcOptionsProxy.locations.list, {
   queryFn: async (...params) => {
@@ -21,7 +21,16 @@ setQueryDefaults(trpcOptionsProxy.locations.list, {
     if (typeof queryOptions.queryFn !== 'function') {
       throw new Error('queryFn is not a function')
     }
-    return queryOptions.queryFn(...params)
+
+    const result = await queryOptions.queryFn(...params)
+
+    const locationsStore = createLocationsStore()
+
+    requestIdleCallback(() => {
+      void locationsStore.setItem('all', result)
+    })
+
+    return result
   },
   staleTime: 1000 * 60 * 60 * 24 // keep it in cache 1 day
 })
@@ -114,19 +123,30 @@ export function getLeafLocationIds(
   return result
 }
 
+// Ref works since arrays are compared by reference.
+let cachedLocationsRef: unknown = null
+/** In-memory cache of leaf location IDs */
+let cachedLeafIds: { id: string }[] | null = null
+
 /**
- * Helper for minimising the number of locations passed to components.
- * System provides AVJ helper which only uses (admin) leaf locations. Before we have time to restructure rest of the code we try to avoid a situation where 100k+ locations are passed to components, since we do not develop regularly against such large datasets.
+ * Uses in-memory caching to avoid recomputation on re-renders. Becomes costly with large datasets.
  *
  * @returns array of leaf location IDs within the specified types. When no types are provided, returns leaf locations based on all types.
  */
 export function useSuspenseAdminLeafLevelLocations() {
-  const locationType = LocationType.Enum.ADMIN_STRUCTURE
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
 
-  return useMemo(
-    () => getLeafLocationIds(locations, [locationType]),
-    [locations, locationType]
-  )
+  if (cachedLeafIds && cachedLocationsRef === locations) {
+    return cachedLeafIds
+  }
+
+  const leafIds = getLeafLocationIds(locations, [
+    LocationType.Enum.ADMIN_STRUCTURE
+  ])
+
+  cachedLocationsRef = locations
+  cachedLeafIds = leafIds
+
+  return leafIds
 }
