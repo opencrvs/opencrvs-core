@@ -4,6 +4,139 @@
 
 ### New features
 
+#### Events V2
+
+We are excited to announce a major overhaul of our events system: **Events V2**.
+This is a complete rewrite that introduces a new level of flexibility and configurability to how life events are defined and managed across the system.
+
+The new Events V2 architecture is built around a set of core concepts designed to make event management more powerful and customizable.
+
+##### Events
+
+An **Event** represents a life event (or any kind of event), such as a birth or a marriage.
+Each event is defined by a configuration that specifies the sequence of **Actions** required to register it.
+
+##### Actions
+
+**Actions** are the steps users perform to register an event.
+The available actions depend on:
+
+* The user’s permissions (scopes)
+* The current status of the event
+
+Actions must be performed in a defined order and cannot be skipped.
+
+##### Forms, Pages, and Fields
+
+Event data is collected through **Forms**, which come in two types:
+
+* **Declaration Form** – collects data about the event itself
+* **Action Form** – collects data specific to a particular action
+
+Forms are composed of **Pages**, and pages are composed of **Fields**.
+Fields can be shown, hidden, or enabled dynamically based on the values of other fields, allowing for a responsive and intuitive user experience.
+
+To simplify configuration, we’ve introduced a set of helper functions:
+
+```ts
+defineDeclarationForm()
+defineActionForm()
+definePage()
+defineFormPage()
+```
+
+All of these are available in a **type-safe** manner via the new `@opencrvs/toolkit` npm package.
+
+##### Conditionals & Validation
+
+Validation has been significantly improved through the adoption of **AJV** and **JSON Schema**, providing standardized, robust, and extensible validation.
+
+The `field` function (exported from `@opencrvs/toolkit`) includes a set of helpers for defining complex validation rules and conditional logic.
+
+##### Available helpers include:
+
+* **Boolean connectors**: `and`, `or`, `not`
+* **Basic conditions**: `alwaysTrue`, `never`
+* **Comparisons**: `isAfter`, `isBefore`, `isGreaterThan`, `isLessThan`, `isBetween`, `isEqualTo`
+* **Field state checks**: `isFalsy`, `isUndefined`, `inArray`, `matches` (regex patterns)
+* **Age-specific helpers**: `asAge`, `asDob` (to compare age or date of birth)
+* **Nested fields**:
+
+  ```ts
+  field('parent.field.name').get('nested.field').isTruthy()
+  ```
+
+The `user` object, also exported from `@opencrvs/toolkit`, includes helpers for user-based conditions such as:
+
+```ts
+user.hasScope()
+user.hasRole()
+user.isOnline()
+```
+
+These conditions can control:
+
+* `SHOW` – whether a component is visible
+* `ENABLE` – whether a component is interactive
+* `DISPLAY_ON_REVIEW` – whether a field appears on review pages
+
+They can also be used to validate form data dynamically based on the current form state or user context.
+
+##### Drafts
+
+The new **Drafts** feature allows users to save progress on an event that has not yet been registered.
+Drafts act as temporary storage for an action and are visible only to the user who created them.
+
+##### Advanced Search
+
+Advanced search is now configurable through the `EventConfig.advancedSearch` property, allowing different sections of an advanced search form to be defined.
+
+You can search across:
+
+* **Declaration Fields** – using the same `field` function from declaration forms with helpers such as `range`, `exact`, `fuzzy`, and `within`
+* **Event Metadata** – using the `event` function to search against metadata such as:
+
+  * `trackingId`
+  * `status`
+  * `legalStatuses.REGISTERED.acceptedAt`
+  * `legalStatuses.REGISTERED.createdAtLocation`
+  * `updatedAt`
+
+More details about the metadata fields are available in `packages/commons/src/events/EventMetadata.ts`.
+
+##### Deduplication
+
+Event deduplication is now configurable **per action** via the `EventConfig.actions[].deduplication` property.
+Helpers for defining deduplication logic—such as `and`, `or`, `not`, and `field`—are available from `@opencrvs/toolkit/events/deduplication`.
+
+The `field` helper can reference declaration form fields and be combined with:
+
+```ts
+strictMatches()
+fuzzyMatches()
+dateRangeMatches()
+```
+
+to define precise deduplication rules.
+
+##### Greater Control over Actions
+
+Each action now has three states: `requested`, `accepted`, and `rejected`.
+Core now delegates more control to **countryconfig**, which decides whether to handle these states **synchronously** or **asynchronously**.
+
+By hooking into these actions, countryconfig can also:
+
+* Send customized **Notifications**
+* Access the full event data at the time an action is performed
+
+---
+
+To see Events V2 in action, check out the example configurations in the **countryconfig** repository.
+
+---
+
+
+
 - **Redis password support with authorization and authentication** [#9338](https://github.com/opencrvs/opencrvs-core/pull/9338). By default password is disabled for local development environment and enabled on server environments.
 - **Switch back to default redis image** [#10173](https://github.com/opencrvs/opencrvs-core/issues/10173)
 - **Certificate Template Conditionals**: Certificate template conditionals allow dynamic template selection based on print history using the template conditional helpers.. [#7585](https://github.com/opencrvs/opencrvs-core/issues/7585)
