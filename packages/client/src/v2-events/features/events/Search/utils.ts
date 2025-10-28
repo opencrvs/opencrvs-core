@@ -188,7 +188,7 @@ const OR_SEARCH_KEY = 'or' as const
 
 export function toAdvancedSearchQueryType(
   searchParams: QueryInputType,
-  searchFieldConfigs: SearchField[],
+  searchFieldConfigs: AdvancedSearchField[],
   eventType?: string
 ): QueryType {
   const metadata: Record<string, unknown> = {}
@@ -199,7 +199,7 @@ export function toAdvancedSearchQueryType(
       acc[field.fieldId] = field
       return acc
     },
-    {} as Record<string, SearchField>
+    {} as Record<string, AdvancedSearchField>
   )
 
   Object.entries(searchParams).forEach(([key, value]) => {
@@ -490,7 +490,9 @@ function getFieldConfigsWithSearchOverrides(eventConfig: EventConfig) {
   })
 }
 
-function generateSearchFieldConfig(searchField: SearchField): FieldConfig {
+function generateSearchFieldConfig(
+  searchField: AdvancedSearchField
+): FieldConfig {
   const baseFieldConfig: FieldConfig = {
     id: searchField.fieldId,
     type: searchField.type,

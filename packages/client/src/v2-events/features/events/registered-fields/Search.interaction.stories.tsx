@@ -190,13 +190,15 @@ export const SearchWithInvalidValue: StoryObj<typeof FormFieldGenerator> = {
                     id: 'event.birth.child.brn.totalResults.label',
                     description: 'Total results from BRN search'
                   },
-                  value: field('child.brn-search').get('data.total')
+                  value: field('child.brn-search').get('data.total'),
+                  id: 'total-results'
                 }
               ]
             }
           }
         ]}
         id="my-form"
+        validatorContext={{}}
         onChange={(data) => {
           args.onChange(data)
         }}
@@ -305,6 +307,18 @@ export const SearchWithRegistrationNumber: StoryObj<typeof FormFieldGenerator> =
                 id: 'event.birth.child.brn.label'
               },
               configuration: {
+                validation: {
+                  validator: defineConditional({
+                    type: 'string',
+                    pattern: '^[0-9]{10}$',
+                    description: 'Must be numeric and 10 digits long.'
+                  }),
+                  message: {
+                    defaultMessage: 'Invalid value',
+                    description: 'Error message for invalid value',
+                    id: 'form.validation.invalid'
+                  }
+                },
                 query: {
                   type: 'or',
                   clauses: [
@@ -331,6 +345,7 @@ export const SearchWithRegistrationNumber: StoryObj<typeof FormFieldGenerator> =
               configuration: {
                 data: [
                   {
+                    id: 'total-results',
                     label: {
                       defaultMessage: 'Total results',
                       id: 'event.birth.child.brn.totalResults.label',
@@ -343,6 +358,7 @@ export const SearchWithRegistrationNumber: StoryObj<typeof FormFieldGenerator> =
             }
           ]}
           id="my-form"
+          validatorContext={{}}
           onChange={(data) => {
             args.onChange(data)
           }}

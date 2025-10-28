@@ -32,6 +32,15 @@ import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { makeFormikFieldIdOpenCRVSCompatible } from '@client/v2-events/components/forms/utils'
 
+function isFieldReference(entry: unknown): entry is FieldReference {
+  return (
+    Boolean(entry) &&
+    typeof entry === 'object' &&
+    entry !== null &&
+    '$$field' in entry
+  )
+}
+
 function getFieldFromDataEntry({
   intl,
   formData,
@@ -44,12 +53,20 @@ function getFieldFromDataEntry({
   const { label, value: rawValue } = entry
 
   // Resolve value if it's a message descriptor
-  const formattedValue =
-    typeof rawValue === 'object' &&
-    'id' in rawValue &&
-    'defaultMessage' in rawValue
-      ? intl.formatMessage(rawValue)
-      : rawValue
+  let formattedValue: string
+
+  if (isFieldReference(rawValue)) {
+    formattedValue = rawValue.$$subfield
+      ? get(formData[rawValue.$$field], rawValue.$$subfield)
+      : formData[rawValue.$$field]
+  } else {
+    formattedValue =
+      typeof rawValue === 'object' &&
+      'id' in rawValue &&
+      'defaultMessage' in rawValue
+        ? intl.formatMessage(rawValue)
+        : rawValue
+  }
 
   let resolvedValue = formattedValue
 
@@ -106,15 +123,6 @@ const Subtitle = styled.div`
   margin: 0 0 2rem;
 `
 
-function isFieldReference(entry: unknown): entry is FieldReference {
-  return (
-    Boolean(entry) &&
-    typeof entry === 'object' &&
-    entry !== null &&
-    '$$field' in entry
-  )
-}
-
 /**
  * This is a read-only form field, which is used to display a collection of data, which can be either:
  *  1. static text entries
@@ -165,7 +173,8 @@ function DataInput({
         formData,
         entry: {
           label: entry.label,
-          value: resolvedValue ? String(resolvedValue) : ''
+          value: resolvedValue ? String(resolvedValue) : '',
+          id: entry.id
         }
       })
     }
@@ -175,7 +184,8 @@ function DataInput({
       formData,
       entry: {
         label: entry.label,
-        value
+        value,
+        id: entry.id
       }
     })
   })

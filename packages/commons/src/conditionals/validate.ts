@@ -159,7 +159,7 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
  * It is used for instance when an input component wants to validate something internally as per user
  * configured rules (e.g. Search field).
  */
-export function validateValue(schema: JSONSchema, data: ConditionalParameters) {
+export function validateValue(schema: JSONSchema, data: unknown) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
   const result = validator(data) as boolean
   return result

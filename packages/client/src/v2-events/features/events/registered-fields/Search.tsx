@@ -52,14 +52,14 @@ function SearchInput({
 
   return (
     <div>
-      <label htmlFor="search">Label</label>
+      <label htmlFor="search">{'Label'}</label>
       <TextInput
         data-testid="search-input"
         id="search"
         value={inputState}
         onChange={(e) => setInputState(e.target.value)}
       />
-      {httpState?.loading && <p>Loading...</p>}
+      {httpState?.loading && <p>{'Loading...'}</p>}
       <Http.Input
         configuration={{
           url: '/api/events/search',
@@ -70,19 +70,19 @@ function SearchInput({
           },
           body: {
             query: replaceTerm(inputState, configuration.query),
-            limit: configuration.limit ?? 100,
-            offset: configuration.offset ?? 0
+            limit: configuration.limit,
+            offset: configuration.offset
           }
         }}
         parentValue={buttonPressed}
         onChange={onHTTPChange}
       />
-      {!valid && <div data-testid="search-input-error">Invalid input</div>}
+      {!valid && <div data-testid="search-input-error">{'Invalid input'}</div>}
       <button
         disabled={!valid}
         onClick={() => setButtonPressed(buttonPressed + 1)}
       >
-        Confirm
+        {'Confirm'}
       </button>
     </div>
   )
