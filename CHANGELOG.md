@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.9.1
+
+### Breaking changes
+
+- **Removed support for following scopes**
+  - `NATLSYSADMIN`
+  - `DECLARE`
+  - `VALIDATE`
+  - `CERTIFY`
+  - `PERFORMANCE`
+  - `SYSADMIN`
+  - `TEAMS`
+  - `CONFIG`
+  - `RECORD_EXPORT_RECORDS`
+  - `RECORD_DECLARATION_PRINT`
+  - `RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS`
+  - `RECORD_REGISTRATION_PRINT`
+  - `RECORD_PRINT_CERTIFIED_COPIES`
+  - `RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES`
+  - `PROFILE_UPDATE`
+
 ## 1.9.0 Release candidate
 
 ### New features

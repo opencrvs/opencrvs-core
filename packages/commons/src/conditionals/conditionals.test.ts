@@ -983,7 +983,9 @@ describe('"user" conditionals', () => {
   }
 
   it('validates "user.hasScope" conditional', () => {
-    expect(validate(user.hasScope(SCOPES.VALIDATE), userParams)).toBe(false)
+    expect(validate(user.hasScope(SCOPES.BYPASSRATELIMIT), userParams)).toBe(
+      false
+    )
 
     expect(validate(user.hasScope(SCOPES.RECORD_REGISTER), userParams)).toBe(
       true

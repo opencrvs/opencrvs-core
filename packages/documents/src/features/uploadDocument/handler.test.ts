@@ -31,16 +31,12 @@ jest.mock('../../minio/client', () => {
 
 describe('fileExistsHandler', () => {
   let server: any
-  const token = jwt.sign(
-    { scope: ['declare'] },
-    readFileSync('./test/cert.key'),
-    {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:documents-user',
-      subject: '123123'
-    }
-  )
+  const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:documents-user',
+    subject: '123123'
+  })
 
   beforeEach(async () => {
     minioPutMock.mockClear()
@@ -109,16 +105,12 @@ describe('fileExistsHandler', () => {
 
 describe('fileUploadHandler', () => {
   let server: any
-  const token = jwt.sign(
-    { scope: ['declare'] },
-    readFileSync('./test/cert.key'),
-    {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:documents-user',
-      subject: '123123'
-    }
-  )
+  const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:documents-user',
+    subject: '123123'
+  })
 
   beforeEach(async () => {
     minioPutMock.mockClear()
@@ -206,16 +198,12 @@ describe('fileUploadHandler', () => {
 
 describe('verify document uploader handler', () => {
   let server: any
-  const token = jwt.sign(
-    { scope: ['declare'] },
-    readFileSync('./test/cert.key'),
-    {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:documents-user',
-      subject: '123123'
-    }
-  )
+  const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:documents-user',
+    subject: '123123'
+  })
 
   beforeEach(async () => {
     server = await createServer()

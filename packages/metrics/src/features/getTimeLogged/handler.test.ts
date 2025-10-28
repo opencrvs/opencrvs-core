@@ -20,15 +20,11 @@ const fetch = fetchMock as fetchMock.FetchMock
 
 describe('verify time logged handler', () => {
   let server: any
-  const token = jwt.sign(
-    { scope: ['declare'] },
-    readFileSync('./test/cert.key'),
-    {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:metrics-user'
-    }
-  )
+  const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:metrics-user'
+  })
 
   beforeEach(async () => {
     server = await createServer()
@@ -80,15 +76,11 @@ describe('verify time logged handler', () => {
 })
 describe('verify time logged by practitioner handler', () => {
   let server: any
-  const token = jwt.sign(
-    { scope: ['declare'] },
-    readFileSync('./test/cert.key'),
-    {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:metrics-user'
-    }
-  )
+  const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:metrics-user'
+  })
 
   beforeEach(async () => {
     server = await createServer()
