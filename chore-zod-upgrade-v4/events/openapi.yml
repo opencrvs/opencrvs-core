@@ -17716,14 +17716,12 @@ components:
                             form.
 
                             \      "
-                          default: []
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
                         validations:
                           description: Option for overriding the field validations specifically for
                             advanced search form.
-                          default: []
                           type: array
                           items:
                             type: object
@@ -17950,14 +17948,12 @@ components:
                             form.
 
                             \      "
-                          default: []
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
                         validations:
                           description: Option for overriding the field validations specifically for
                             advanced search form.
-                          default: []
                           type: array
                           items:
                             type: object
