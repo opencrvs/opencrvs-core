@@ -724,7 +724,25 @@ const SearchField = HttpField.extend({
     limit: true,
     offset: true
   }).extend({
-    validation: ValidationConfig
+    validation: ValidationConfig,
+    indicators: z
+      .object({
+        loading: TranslationConfig.optional().describe(
+          'Text to display while the search is in progress'
+        ),
+        offline: TranslationConfig.optional().describe(
+          'Text to display when the application is offline'
+        ),
+        noResultsError: TranslationConfig.optional().describe(
+          'Text to display when no results are found during the search'
+        ),
+        httpError: TranslationConfig.optional().describe(
+          'Text to display when there is an HTTP error during the search'
+        ),
+        confirmButton: TranslationConfig.optional(),
+        ok: TranslationConfig.optional()
+      })
+      .optional()
   })
 })
 
