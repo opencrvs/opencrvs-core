@@ -242,10 +242,10 @@ function AddressInput(props: Props) {
     (location) => location.locationType === 'ADMIN_STRUCTURE'
   )
 
-  let administrativeArea
-  if (value?.addressType === AddressType.DOMESTIC) {
-    administrativeArea = value.administrativeArea
-  }
+  const administrativeArea =
+    value?.addressType === AddressType.DOMESTIC
+      ? value.administrativeArea
+      : undefined
 
   const resolveAdministrativeArea = (
     adminArea:
@@ -369,11 +369,10 @@ function AddressOutput({
     return ''
   }
 
-  let administrativeArea
-
-  if (value.addressType === AddressType.DOMESTIC) {
-    administrativeArea = value.administrativeArea
-  }
+  const administrativeArea =
+    value.addressType === AddressType.DOMESTIC
+      ? value.administrativeArea
+      : undefined
   const adminStructureLocations = locations.filter(
     (location) => location.locationType === LocationType.enum.ADMIN_STRUCTURE
   )
@@ -457,10 +456,10 @@ function toCertificateVariables(
   const stringifiedResult = stringifier(ALL_ADDRESS_FIELDS, value as EventState)
   const { streetLevelDetails } = value
 
-  let administrativeArea
-  if (value.addressType === AddressType.DOMESTIC) {
-    administrativeArea = value.administrativeArea
-  }
+  const administrativeArea =
+    value.addressType === AddressType.DOMESTIC
+      ? value.administrativeArea
+      : undefined
 
   if (value.addressType === AddressType.INTERNATIONAL) {
     return { ...stringifiedResult, streetLevelDetails }

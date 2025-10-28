@@ -317,7 +317,7 @@ export function omitHiddenAnnotationFields(
 
   return omitHiddenFields(
     annotationFields,
-    { ...declaration, ...annotation } as EventState,
+    { ...declaration, ...annotation } satisfies ActionUpdate,
     context
   )
 }
