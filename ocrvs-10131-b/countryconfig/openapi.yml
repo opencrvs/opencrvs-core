@@ -1756,7 +1756,7 @@ components:
                 addressType:
                   type: string
                   enum:
-                    &a13
+                    &a14
                     - DOMESTIC
                     - INTERNATIONAL
                 administrativeArea:
@@ -7197,7 +7197,7 @@ components:
             defaultValue:
               type: string
               enum:
-                &a14
+                &a15
                 - verified
                 - authenticated
                 - failed
@@ -8146,6 +8146,233 @@ components:
             - configuration
           description: A non-interactive field that indicates an in progress operation in
             form
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier of the field.
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+              description: Human-readable label of the field.
+            parent:
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  required:
+                    - $$field
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        type: array
+                        items:
+                          type: string
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    required:
+                      - $$field
+                    description: Reference to a field by its ID
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+            required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      $ref: "#/components/schemas/TranslationConfig"
+                      description: Custom required validation message
+                  required:
+                    - message
+              default: false
+              description: Indicates whether the field is mandatory.
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a7
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+            secured:
+              type: boolean
+              default: false
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a8
+              description: Additional validation rules applied to the field.
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates whether the field can be modified during record
+                correction.
+            value:
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  required:
+                    - $$field
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        type: array
+                        items:
+                          type: string
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    required:
+                      - $$field
+                    description: Reference to a field by its ID
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+            analytics:
+              type: boolean
+              default: false
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+            type:
+              type: string
+              const: SEARCH
+            defaultValue:
+              type: object
+              properties:
+                loading:
+                  type: boolean
+                error:
+                  type:
+                    - object
+                    - "null"
+                  properties:
+                    statusCode:
+                      type: number
+                    message:
+                      type: string
+                  required:
+                    - statusCode
+                    - message
+                data: {}
+              required:
+                - loading
+            configuration:
+              type: object
+              properties:
+                query:
+                  allOf:
+                    - $ref: "#/components/schemas/QueryType"
+                  default:
+                    type: and
+                    clauses:
+                      - eventType: tennis-club-membership
+                        status:
+                          type: anyOf
+                          terms:
+                            &a12
+                            - CREATED
+                            - NOTIFIED
+                            - DECLARED
+                            - VALIDATED
+                            - REGISTERED
+                            - ARCHIVED
+                        updatedAt:
+                          type: range
+                          gte: 2025-05-22
+                          lte: 2025-05-29
+                        data: {}
+                limit:
+                  type: number
+                  default: 100
+                offset:
+                  type: number
+                  default: 0
+                validation:
+                  type: object
+                  properties:
+                    validator:
+                      $ref: "#/components/schemas/Conditional"
+                    message:
+                      $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - validator
+                    - message
+                indicators:
+                  type: object
+                  properties:
+                    loading:
+                      $ref: "#/components/schemas/TranslationConfig"
+                      description: Text to display while the search is in progress
+                    offline:
+                      $ref: "#/components/schemas/TranslationConfig"
+                      description: Text to display when the application is offline
+                    noResultsError:
+                      $ref: "#/components/schemas/TranslationConfig"
+                      description: Text to display when no results are found during the search
+                    httpError:
+                      $ref: "#/components/schemas/TranslationConfig"
+                      description: Text to display when there is an HTTP error during the search
+                    confirmButton:
+                      $ref: "#/components/schemas/TranslationConfig"
+                    ok:
+                      $ref: "#/components/schemas/TranslationConfig"
+              required:
+                - query
+                - limit
+                - offset
+                - validation
+          required:
+            - id
+            - label
+            - type
+            - configuration
+          description: HTTP request function triggered by a button click or other event
       description: Form field configuration
     FieldConditional:
       oneOf:
@@ -8189,6 +8416,288 @@ components:
             within declaration forms, as they are the only ones with review
             pages.
       description: Field conditional configuration
+    QueryType:
+      type: object
+      properties:
+        type:
+          anyOf:
+            - type: string
+              const: and
+            - type: string
+              const: or
+          default: and
+        clauses:
+          type: array
+          items:
+            anyOf:
+              - $ref: "#/components/schemas/QueryExpression"
+              - $ref: "#/components/schemas/QueryType"
+          minItems: 1
+          default:
+            - eventType: tennis-club-membership
+              status:
+                type: anyOf
+                terms: *a12
+              updatedAt:
+                type: range
+                gte: 2025-05-22
+                lte: 2025-05-29
+              data: {}
+      required:
+        - type
+        - clauses
+    QueryExpression:
+      type: object
+      properties:
+        id:
+          type: string
+        eventType:
+          type: string
+        status:
+          anyOf:
+            - $ref: "#/components/schemas/AnyOfStatus"
+            - $ref: "#/components/schemas/ExactStatus"
+        createdAt:
+          $ref: "#/components/schemas/DateCondition"
+        updatedAt:
+          $ref: "#/components/schemas/DateCondition"
+        legalStatuses.REGISTERED.acceptedAt:
+          $ref: "#/components/schemas/DateCondition"
+        legalStatuses.DECLARED.createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        legalStatuses.REGISTERED.createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        legalStatuses.REGISTERED.registrationNumber:
+          $ref: "#/components/schemas/Exact"
+        createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        updatedAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        assignedTo:
+          $ref: "#/components/schemas/Exact"
+        createdByUserType:
+          $ref: "#/components/schemas/ExactUserType"
+        createdBy:
+          $ref: "#/components/schemas/Exact"
+        updatedBy:
+          $ref: "#/components/schemas/Exact"
+        trackingId:
+          $ref: "#/components/schemas/Exact"
+        flags:
+          $ref: "#/components/schemas/ContainsFlags"
+        data:
+          $ref: "#/components/schemas/QueryInput"
+    AnyOfStatus:
+      type: object
+      properties:
+        type:
+          type: string
+          const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+            enum: *a12
+      required:
+        - type
+        - terms
+    ExactStatus:
+      type: object
+      properties:
+        type:
+          type: string
+          const: exact
+        term:
+          type: string
+          enum: *a12
+      required:
+        - type
+        - term
+    DateCondition:
+      anyOf:
+        - $ref: "#/components/schemas/ExactDate"
+        - $ref: "#/components/schemas/RangeDate"
+        - $ref: "#/components/schemas/TimePeriod"
+    Exact:
+      type: object
+      properties:
+        type:
+          type: string
+          const: exact
+        term:
+          type: string
+      required:
+        - type
+        - term
+    ExactDate:
+      type: object
+      properties:
+        type:
+          type: string
+          const: exact
+        term:
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
+      required:
+        - type
+        - term
+    RangeDate:
+      type: object
+      properties:
+        type:
+          type: string
+          const: range
+        gte:
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
+        lte:
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
+      required:
+        - type
+        - gte
+        - lte
+    TimePeriod:
+      type: object
+      properties:
+        type:
+          type: string
+          const: timePeriod
+        term:
+          type: string
+          enum: *a9
+      required:
+        - type
+        - term
+    Within:
+      type: object
+      properties:
+        type:
+          type: string
+          const: within
+        location:
+          type: string
+      required:
+        - type
+        - location
+    ExactUserType:
+      type: object
+      properties:
+        type:
+          type: string
+          const: exact
+        term:
+          type: string
+          enum:
+            &a13
+            - user
+            - system
+      required:
+        - type
+        - term
+    ContainsFlags:
+      type: object
+      properties:
+        anyOf:
+          type: array
+          items:
+            anyOf:
+              - type: string
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+              - type: string
+                enum:
+                  - pending-certification
+                  - incomplete
+                  - rejected
+                  - correction-requested
+                  - potential-duplicate
+        noneOf:
+          type: array
+          items:
+            anyOf:
+              - type: string
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+              - type: string
+                enum:
+                  - pending-certification
+                  - incomplete
+                  - rejected
+                  - correction-requested
+                  - potential-duplicate
+    QueryInput:
+      anyOf:
+        - oneOf:
+            - $ref: "#/components/schemas/Fuzzy"
+            - $ref: "#/components/schemas/Exact"
+            - $ref: "#/components/schemas/Range"
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/AnyOf"
+          discriminator:
+            propertyName: type
+            mapping:
+              fuzzy: "#/components/schemas/Fuzzy"
+              exact: "#/components/schemas/Exact"
+              range: "#/components/schemas/Range"
+              within: "#/components/schemas/Within"
+              anyOf: "#/components/schemas/AnyOf"
+        - type: object
+          additionalProperties:
+            $ref: "#/components/schemas/QueryInput"
+    Fuzzy:
+      type: object
+      properties:
+        type:
+          type: string
+          const: fuzzy
+        term:
+          type: string
+      required:
+        - type
+        - term
+    Range:
+      type: object
+      properties:
+        type:
+          type: string
+          const: range
+        gte:
+          type: string
+        lte:
+          type: string
+      required:
+        - type
+        - gte
+        - lte
+    AnyOf:
+      type: object
+      properties:
+        type:
+          type: string
+          const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - terms
     DeclareActionConfig:
       type: object
       properties:
@@ -8671,10 +9180,7 @@ components:
                     description: Unique identifier of the transaction.
                   createdByUserType:
                     type: string
-                    enum:
-                      &a12
-                      - user
-                      - system
+                    enum: *a13
                     description: Indicates whether the action was created by a human-user or by a
                       system-user.
                   createdAt:
@@ -8792,7 +9298,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -8849,7 +9355,7 @@ components:
                   addressType:
                     type: string
                     enum:
-                      &a15
+                      &a16
                       - DOMESTIC
                       - INTERNATIONAL
                   administrativeArea:
@@ -8951,7 +9457,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -9066,7 +9572,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -9156,7 +9662,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -9256,7 +9762,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -9371,7 +9877,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -9429,7 +9935,7 @@ components:
         status:
           type: string
           enum:
-            &a16
+            &a17
             - Requested
             - Accepted
             - Rejected
@@ -9467,7 +9973,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -9523,7 +10029,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -9623,7 +10129,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -9738,7 +10244,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -9828,7 +10334,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -9928,7 +10434,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -10043,7 +10549,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -10100,7 +10606,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10135,7 +10641,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10191,7 +10697,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -10291,7 +10797,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -10406,7 +10912,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -10496,7 +11002,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -10596,7 +11102,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -10711,7 +11217,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -10768,7 +11274,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10813,7 +11319,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10869,7 +11375,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -10969,7 +11475,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -11084,7 +11590,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -11174,7 +11680,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -11274,7 +11780,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -11389,7 +11895,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -11446,7 +11952,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11500,7 +12006,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11556,7 +12062,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -11656,7 +12162,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -11771,7 +12277,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -11861,7 +12367,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -11961,7 +12467,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -12076,7 +12582,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -12133,7 +12639,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -12168,7 +12674,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -12224,7 +12730,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -12324,7 +12830,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -12439,7 +12945,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -12529,7 +13035,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -12629,7 +13135,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -12744,7 +13250,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -12801,7 +13307,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -12844,7 +13350,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -12900,7 +13406,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -13000,7 +13506,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -13115,7 +13621,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -13205,7 +13711,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -13305,7 +13811,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -13420,7 +13926,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -13477,7 +13983,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -13522,7 +14028,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -13578,7 +14084,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -13678,7 +14184,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -13793,7 +14299,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -13883,7 +14389,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -13983,7 +14489,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -14098,7 +14604,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -14155,7 +14661,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -14190,7 +14696,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -14246,7 +14752,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -14346,7 +14852,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -14461,7 +14967,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -14551,7 +15057,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -14651,7 +15157,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -14766,7 +15272,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -14823,7 +15329,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -14862,7 +15368,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -14918,7 +15424,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -15018,7 +15524,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -15133,7 +15639,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -15223,7 +15729,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -15323,7 +15829,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -15438,7 +15944,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -15495,7 +16001,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -15530,7 +16036,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -15586,7 +16092,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -15686,7 +16192,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -15801,7 +16307,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -15891,7 +16397,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -15991,7 +16497,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -16106,7 +16612,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -16163,7 +16669,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -16202,7 +16708,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -16258,7 +16764,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -16358,7 +16864,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -16473,7 +16979,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -16563,7 +17069,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -16663,7 +17169,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -16778,7 +17284,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -16835,7 +17341,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -16870,7 +17376,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -16926,7 +17432,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -17026,7 +17532,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -17141,7 +17647,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -17231,7 +17737,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -17331,7 +17837,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -17446,7 +17952,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -17503,7 +18009,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -17541,7 +18047,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -17597,7 +18103,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -17697,7 +18203,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -17812,7 +18318,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -17902,7 +18408,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -18002,7 +18508,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -18117,7 +18623,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -18174,7 +18680,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -18222,7 +18728,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -18278,7 +18784,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -18378,7 +18884,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -18493,7 +18999,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -18583,7 +19089,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -18683,7 +19189,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -18798,7 +19304,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -18855,7 +19361,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -18890,7 +19396,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -18946,7 +19452,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -19046,7 +19552,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -19161,7 +19667,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -19251,7 +19757,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -19351,7 +19857,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -19466,7 +19972,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -19523,7 +20029,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -19565,7 +20071,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a12
+          enum: *a13
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -19621,7 +20127,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -19721,7 +20227,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -19836,7 +20342,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -19926,7 +20432,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a15
+                    enum: *a16
                   administrativeArea:
                     type:
                       - string
@@ -20026,7 +20532,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a13
+                          enum: *a14
                         administrativeArea:
                           type: string
                           format: uuid
@@ -20141,7 +20647,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a14
+                      enum: *a15
                     - type:
                         - object
                         - "null"
@@ -20198,7 +20704,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a16
+          enum: *a17
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
