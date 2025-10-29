@@ -72,11 +72,11 @@ const TabContainer = styled(Stack)`
 
 const messages = defineMessages({
   record: {
-    id: 'v2.events.overview.tabs.record',
+    id: 'events.overview.tabs.record',
     defaultMessage: 'Record'
   },
   audit: {
-    id: 'v2.events.overview.tabs.audit',
+    id: 'events.overview.tabs.audit',
     defaultMessage: 'Audit'
   }
 })

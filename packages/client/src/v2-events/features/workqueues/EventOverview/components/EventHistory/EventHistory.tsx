@@ -61,7 +61,7 @@ const TableDiv = styled.div`
 
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
-const messages = defineMessages({
+export const messages = defineMessages({
   timeFormat: {
     defaultMessage: 'MMMM dd, yyyy · hh.mm a',
     id: 'configuration.timeFormat',
@@ -101,7 +101,7 @@ const messages = defineMessages({
   audit: {
     defaultMessage: 'Audit',
     description: 'Audit heading',
-    id: 'constants.audit'
+    id: 'title.audit'
   },
   labelRole: {
     defaultMessage: 'Role',

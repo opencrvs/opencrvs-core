@@ -68,7 +68,7 @@ export const deletedScenariosForRegistrationAgent: StoryObj<typeof ActionMenu> =
       layout: 'centered',
       reactRouter: {
         router: routesConfig,
-        initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        initialPath: ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({
           eventId: createdEventDocument.id
         })
       },
@@ -104,13 +104,13 @@ export const deletedScenariosForRegistrationAgent: StoryObj<typeof ActionMenu> =
             document.querySelector('#action-Dropdown-Content')
           )
 
-          // click the 3rd <li>
+          // click the 2nd <li>
           const items = list?.querySelectorAll('li')
-          if (!items || items.length < 3) {
+          if (!items || items.length < 2) {
             throw new Error('Menu items not found')
           }
 
-          await userEvent.click(items[2])
+          await userEvent.click(items[1])
 
           await expect(canvas.getByText('Delete draft?')).toBeInTheDocument()
           await expect(

@@ -158,19 +158,38 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
         eventId: eventDocument.id
       })
     },
+    offline: {
+      events: [eventDocument],
+      drafts: [modifiedDraft]
+    },
     msw: {
       handlers: {
-        drafts: [
-          tRPCMsw.event.draft.list.query(() => {
-            return []
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues()
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: 7 }
+            }, {})
           })
         ],
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
+        event: [
           tRPCMsw.event.get.query(() => {
             return eventDocument
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              total: 1,
+              results: [
+                getCurrentEventState(eventDocument, tennisClubMembershipEvent)
+              ]
+            }
+          })
+        ],
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [modifiedDraft]
           })
         ],
         user: [
@@ -182,9 +201,9 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
             })
           }),
           tRPCMsw.user.list.query(() => {
-            return [generator.user.fieldAgent().v2]
+            return [generator.user.localRegistrar().v2]
           }),
-          tRPCMsw.user.get.query(() => generator.user.localRegistrar().v2)
+          tRPCMsw.user.get.query((id) => generator.user.localRegistrar().v2)
         ]
       }
     }
