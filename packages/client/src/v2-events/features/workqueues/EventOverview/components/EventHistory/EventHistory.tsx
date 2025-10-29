@@ -17,9 +17,6 @@ import { useSelector } from 'react-redux'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import { Divider } from '@opencrvs/components/lib/Divider'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
 import { ActionType, getAcceptedActions } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
@@ -299,21 +296,6 @@ function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
     </Link>
   ) : (
     locationName
-  )
-}
-
-export function EventHistorySkeleton() {
-  const intl = useIntl()
-  return (
-    <>
-      <Divider />
-      <Stack alignItems="stretch" direction="column" gap={16}>
-        <Text color="copy" element="h3" variant="h3">
-          {intl.formatMessage(messages.history)}
-        </Text>
-        <LargeGreyedInfo />
-      </Stack>
-    </>
   )
 }
 

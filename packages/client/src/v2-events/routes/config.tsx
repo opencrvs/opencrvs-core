@@ -111,11 +111,6 @@ export const routesConfig = {
     },
     workqueueRouter,
     {
-      // TODO CIHAN: remove this?
-      path: ROUTES.V2.EVENTS.VIEW.path,
-      element: <ReadonlyViewIndex />
-    },
-    {
       // TODO CIHAN: remove this
       path: ROUTES.V2.EVENTS.OVERVIEW.path,
       element: (

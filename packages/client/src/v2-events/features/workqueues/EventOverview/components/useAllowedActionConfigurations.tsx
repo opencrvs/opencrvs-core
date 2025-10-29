@@ -27,7 +27,6 @@ import {
   Draft,
   isActionInScope,
   configurableEventScopeAllowed,
-  canUserReadEvent,
   ITokenPayload
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
@@ -94,11 +93,6 @@ function getAvailableAssignmentActions(
 }
 
 export const actionLabels = {
-  [ActionType.READ]: {
-    id: 'action.view.record',
-    description: 'Label for view record',
-    defaultMessage: 'View'
-  },
   [ActionType.ASSIGN]: {
     defaultMessage: 'Assign',
     description: `Label for the ${ActionType.ASSIGN} action in the action menu`,
@@ -280,12 +274,6 @@ function useViewableActionConfigurations(
   return {
     modals: [assignModal, archiveModal, deleteModal],
     config: {
-      [ActionType.READ]: {
-        label: actionLabels[ActionType.READ],
-        icon: 'Eye' as const,
-        disabled: !isOnline,
-        onClick: () => navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId }))
-      },
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
         icon: 'PushPin' as const,
@@ -512,7 +500,7 @@ export function useUserAllowedActions(eventType: string) {
 export function useAllowedActionConfigurations(
   event: EventIndex,
   authentication: ITokenPayload
-) {
+): [React.ReactNode, ActionMenuItem[]] {
   const { isActionAllowed } = useUserAllowedActions(event.type)
   const drafts = useDrafts()
 
@@ -547,40 +535,17 @@ export function useAllowedActionConfigurations(
         ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
         workqueueActions.safeParse(action).success
     )
-    .filter(
-      (action) =>
-        isActionAllowed(action) ||
-        (action === ActionType.READ &&
-          canUserReadEvent(event, {
-            userId: authentication.sub,
-            scopes: authentication.scope
-          }))
-    )
+    .filter((action) => isActionAllowed(action))
     // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
     .map((a) => ({ ...config[a], type: a }))
     .filter((a: ActionConfig) => !a.hidden)
 
-  // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
+  // Check if the user can perform any action other than ASSIGN, or UNASSIGN
   const hasOnlyMetaActions = allowedWorkqueueConfigs.every(({ type }) =>
     isMetaAction(type)
   )
 
-  // If user has no other allowed actions, return only READ.
+  // If user has no other actions than assign or unassign, return no actions.
   // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
-  if (hasOnlyMetaActions) {
-    return [
-      modals,
-      [
-        {
-          ...config[ActionType.READ],
-          type: ActionType.READ
-        }
-      ].filter((a: ActionConfig) => !a.hidden)
-    ] satisfies [React.ReactNode, ActionMenuItem[]]
-  }
-
-  return [modals, allowedWorkqueueConfigs] satisfies [
-    React.ReactNode,
-    ActionMenuItem[]
-  ]
+  return [modals, hasOnlyMetaActions ? [] : allowedWorkqueueConfigs]
 }

@@ -170,10 +170,11 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
 export const ReadOnlyViewForUserWithReadPermission: Story = {
   parameters: {
     reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.VIEW.buildPath({
-        eventId
-      })
+      router: routesConfig
+      // TODO CIHAN:
+      // initialPath: ROUTES.V2.EVENTS.VIEW.buildPath({
+      //   eventId
+      // })
     },
     msw: {
       handlers: {
