@@ -26,6 +26,12 @@ The available actions depend on:
 
 Actions must be performed in a defined order and cannot be skipped.
 
+**Examples of actions include:**
+
+* **Declare** – Submits a declaration for an event, marking it as formally declared in the system
+* **Validate** – Reviews and validates a declared event, confirming the information is accurate
+* **Request correction** – Initiates a correction request for a registered event that contains errors
+
 ##### Forms, Pages, and Fields
 
 Event data is collected through **Forms**, which come in two types:
