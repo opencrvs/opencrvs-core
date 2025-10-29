@@ -13,9 +13,11 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { Location, LocationType, UUID } from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
-import { createLocationsStore } from '../../storage'
 
 setQueryDefaults(trpcOptionsProxy.locations.list, {
+  meta: {
+    useLargeQueryStorage: true
+  },
   queryFn: async (...params) => {
     const queryOptions = trpcOptionsProxy.locations.list.queryOptions()
     if (typeof queryOptions.queryFn !== 'function') {
@@ -23,12 +25,6 @@ setQueryDefaults(trpcOptionsProxy.locations.list, {
     }
 
     const result = await queryOptions.queryFn(...params)
-
-    const locationsStore = createLocationsStore()
-
-    requestIdleCallback(() => {
-      void locationsStore.setItem('all', result)
-    })
 
     return result
   },

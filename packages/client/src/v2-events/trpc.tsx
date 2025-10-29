@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { AppRouter } from '@gateway/v2-events/events/router'
+import partition from 'lodash-es/partition'
 import { QueryClient } from '@tanstack/react-query'
 import {
   PersistQueryClientProvider,
@@ -71,18 +72,78 @@ function getQueryClient() {
 
 function createIDBPersister(storageIdentifier: string) {
   const fullStorageIdentifier = `react-query-${storageIdentifier}`
+  const largeQueryStorageIdentifier = `react-query-large-query-${storageIdentifier}`
+
+  /** In-memory representation of the persisted large queries. Map<hashKey, timestamp>. */
+  const lastPersistedLargeQueries = new Map<string, number>()
+
   return {
+    /** By default, client is persisted on every page change, or whenever query/mutation occurs. */
     persistClient: async (client) => {
-      await storage.setItem(fullStorageIdentifier, client)
+      // 1. Since queries are persisted frequently, we separate out the ones that are flagged as large.
+      // Serializing data is a synchronous process and freezes the client, so we want to minimise how often it happens.
+      // For large payloads, ensure staleTime is set for queries to avoid frequent updates.
+      const [largeQueries, normalQueries] = partition(
+        client.clientState.queries,
+        (query) => query.meta?.useLargeQueryStorage === true
+      )
+
+      const clientWithoutLargeQueries = {
+        ...client,
+        clientState: {
+          ...client.clientState,
+          queries: normalQueries
+        }
+      }
+
+      // 2. Persist the main client without large queries
+      await storage.setItem(fullStorageIdentifier, clientWithoutLargeQueries)
+
+      // 3. Persist large queries only if they have changed since the last persist to avoid unnecessary serialization.
+      const changed = largeQueries.some((q) => {
+        const last = lastPersistedLargeQueries.get(q.queryHash) ?? 0
+        return q.state.dataUpdatedAt > last
+      })
+
+      if (changed) {
+        for (const q of largeQueries) {
+          lastPersistedLargeQueries.set(q.queryHash, q.state.dataUpdatedAt)
+        }
+
+        await storage.setItem(largeQueryStorageIdentifier, largeQueries)
+      }
     },
+
+    /** Restore client from storage on page change / refresh. Expected to happen more rarely. */
     restoreClient: async () => {
       const client = await storage.getItem<PersistedClient>(
         fullStorageIdentifier
       )
-      return client || undefined
+
+      if (!client) {
+        return undefined
+      }
+
+      const largeQueries = await storage.getItem<
+        PersistedClient['clientState']['queries']
+      >(largeQueryStorageIdentifier)
+
+      // 4. Re-attach large queries to the client to provide consistent state.
+      if (largeQueries) {
+        return {
+          ...client,
+          clientState: {
+            ...client.clientState,
+            queries: [...client.clientState.queries, ...largeQueries]
+          }
+        }
+      }
+
+      return client
     },
     removeClient: async () => {
       await storage.removeItem(fullStorageIdentifier)
+      await storage.removeItem(largeQueryStorageIdentifier)
     }
   } satisfies Persister
 }
@@ -118,12 +179,6 @@ export function TRPCProvider({
         buster: 'persisted-indexed-db',
         maxAge: undefined,
         dehydrateOptions: {
-          shouldDehydrateQuery: (query) => {
-            const cacheKeys = query.queryKey[0] as string | string[]
-
-            // Locations can be hundreds of thousands of items. They are cached separately to indexedDB.
-            return !cacheKeys.includes('locations')
-          },
           shouldDehydrateMutation: (mutation) => {
             if (mutation.state.status === 'error') {
               const error = mutation.state.error
