@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/toolkit",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "description": "OpenCRVS toolkit for building country configurations",
   "license": "MPL-2.0",
   "exports": {
@@ -30,7 +30,7 @@
     "@types/uuid": "^9.0.3",
     "esbuild": "^0.24.0",
     "typescript": "^5.6.3",
-    "@opencrvs/events": "^1.7.0",
+    "@opencrvs/events": "^1.9.0",
     "@types/object-hash": "^3.0.6"
   },
   "moduleNameMapper": {

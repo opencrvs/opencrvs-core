@@ -102,8 +102,8 @@ function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
  * Compares annotations of a given field between the current action and the previous state.
  *
  * @param field Field configuration of a review form field
- * @param fullEvent Extended EventDocument with a possible synthetic `UPDATE` action
- * @param currentActionIndex Index of the action from the actions array of fullEvent to evaluate
+ * @param acceptedActions Array of accepted actions from the event history
+ * @param currentActionIndex Index of the action from the acceptedActions array to compare.
  * @returns An object containing:
  *  - currentAnnotations: aggregated annotations including the current action
  *  - previousAnnotations: aggregated annotations up to (but not including) the current action
@@ -111,7 +111,7 @@ function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
  */
 export function getAnnotationComparisonForField(
   field: FieldConfig,
-  fullEvent: EventHistoryDocument,
+  acceptedActions: EventHistoryActionDocument[],
   currentActionIndex: number,
   context: ValidatorContext
 ) {
@@ -123,11 +123,11 @@ export function getAnnotationComparisonForField(
     }
   }
 
-  const eventUpToCurrentAction = fullEvent.actions.slice(
+  const eventUpToCurrentAction = acceptedActions.slice(
     0,
     currentActionIndex + 1
   )
-  const eventUpToPreviousAction = fullEvent.actions.slice(0, currentActionIndex)
+  const eventUpToPreviousAction = acceptedActions.slice(0, currentActionIndex)
 
   const currentAnnotations = aggregateAnnotations(eventUpToCurrentAction)
   const previousAnnotations = aggregateAnnotations(eventUpToPreviousAction)
@@ -254,15 +254,20 @@ export function hasAnnotationChanged(
     return false
   }
 
+  const acceptedActions = getAcceptedActions(fullEvent)
+
   const reviewFormFields = getReviewFormFields(eventConfiguration)
 
-  const index = fullEvent.actions.findIndex((a) => a.id === currentAction.id)
+  const index = acceptedActions.findIndex((a) => a.id === currentAction.id)
 
   const changedAnnotationFields = reviewFormFields.filter(
     (f) =>
-      // @ts-ignore
-      getAnnotationComparisonForField(f, fullEvent, index, validatorContext)
-        .valueHasChanged
+      getAnnotationComparisonForField(
+        f,
+        acceptedActions,
+        index,
+        validatorContext
+      ).valueHasChanged
   )
 
   return changedAnnotationFields.length > 0
