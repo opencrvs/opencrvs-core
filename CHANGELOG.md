@@ -18,20 +18,53 @@ Each event is defined by a configuration that specifies the sequence of **Action
 
 ##### Actions
 
-**Actions** are the steps users perform to register an event.
-The available actions depend on:
+###### Declaration Actions
 
-* The user’s permissions (scopes)
-* The current status of the event
+Declaration actions are used to modify an event’s declaration.
+These actions must be executed in a defined order and cannot be skipped.
 
-Actions must be performed in a defined order and cannot be skipped.
+1. **DECLARE**
+2. **VALIDATE**
+3. **REGISTER**
 
-**Examples of actions include:**
+Each action must be accepted by **countryconfig** before the next one can be performed.
 
-* **Declare** – Submits a declaration for an event, marking it as formally declared in the system
-* **Validate** – Reviews and validates a declared event, confirming the information is accurate
-* **Print certificate** – Print a certificate (PDF) for a registered event
-* **Request correction** – Initiates a correction request for a registered event that contains errors
+
+###### Rejecting and Archiving
+
+After declaration, instead of proceeding with registration, an event may be either **rejected** or **archived**.
+
+If **deduplication** is enabled for an action, performing that action may trigger a **DUPLICATE_DETECTED** action if duplicates are found.
+When this occurs, two additional actions become available:
+
+* **MARK_AS_DUPLICATE** – archives the event.
+* **MARK_AS_NOT_DUPLICATE** – resumes the normal action flow.
+
+If an event is rejected by a user, the preceding action must be repeated before continuing.
+
+
+###### Actions Before Declaration
+
+1. **NOTIFY** – a partial version of the `DECLARE` action.
+2. **DELETE** – an event can be deleted only if no declaration action has yet been performed.
+
+
+###### Actions After Registration
+
+Once an event has been registered, a certificate may be printed.
+If a correction is required due to an error in the registered declaration, a correction workflow must be initiated.
+
+1. **PRINT_CERTIFICATE**
+2. **REQUEST_CORRECTION**
+3. **REJECT_CORRECTION**
+4. **APPROVE_CORRECTION**
+
+
+###### General / Meta Actions
+
+1. **READ** – appended to the action trail whenever a complete event record is retrieved.
+2. **ASSIGN** – required before any action can be performed. By default, the user is automatically unassigned after completing an action.
+3. **UNASSIGN** – triggered either automatically by the system or manually by a user (if the record is assigned to themselves or if the user has the appropriate permission).
 
 ##### Forms, Pages, and Fields
 
