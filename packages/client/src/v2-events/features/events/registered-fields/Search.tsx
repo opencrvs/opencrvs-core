@@ -151,7 +151,8 @@ function SearchInput({
           message: intl.formatMessage(
             configuration.indicators?.ok || defaultIndicators.ok,
             { count: total }
-          )
+          ),
+          color: 'green'
         }
       } else {
         return {

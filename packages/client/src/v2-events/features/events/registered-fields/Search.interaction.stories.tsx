@@ -72,6 +72,11 @@ const searchFields = [
           defaultMessage: 'Confirm',
           description: 'Confirm button text',
           id: 'story.searchField.indicators.confirmButton'
+        },
+        ok: {
+          defaultMessage: 'Valid',
+          description: 'OK button text',
+          id: 'story.searchField.indicators.ok'
         }
       },
       query: {
