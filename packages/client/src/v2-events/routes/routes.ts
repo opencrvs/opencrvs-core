@@ -12,7 +12,6 @@
 import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
 import { zod } from 'react-router-typesafe-routes/zod'
 import * as z from 'zod'
-import { config } from '@client/config'
 import {
   requestRoutes as correctionRequestRoutes,
   reviewRoutes as correctionReviewRoutes
@@ -29,6 +28,27 @@ export const ROUTES = {
         'events',
         {},
         {
+          EVENT: route(
+            ':eventId',
+            {
+              params: { eventId: uuid().defined() },
+              searchParams: {
+                workqueue: string()
+              }
+            },
+            {
+              RECORD: route('record', {
+                searchParams: {
+                  workqueue: string()
+                }
+              }),
+              AUDIT: route('audit', {
+                searchParams: {
+                  workqueue: string()
+                }
+              })
+            }
+          ),
           VIEW: route('view/:eventId', {
             params: { eventId: uuid().defined() },
             searchParams: {

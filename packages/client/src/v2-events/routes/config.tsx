@@ -110,16 +110,40 @@ export const routesConfig = {
     },
     workqueueRouter,
     {
+      // TODO CIHAN: remove this?
       path: ROUTES.V2.EVENTS.VIEW.path,
       element: <ReadonlyViewIndex />
     },
     {
+      // TODO CIHAN: remove this
       path: ROUTES.V2.EVENTS.OVERVIEW.path,
       element: (
         <EventOverviewLayout>
           <EventOverviewIndex />
         </EventOverviewLayout>
       )
+    },
+    {
+      path: ROUTES.V2.EVENTS.EVENT.path,
+      element: (
+        <EventOverviewLayout>
+          <Outlet />
+        </EventOverviewLayout>
+      ),
+      children: [
+        {
+          index: true,
+          element: <EventOverviewIndex />
+        },
+        {
+          path: ROUTES.V2.EVENTS.EVENT.RECORD.path,
+          element: <div>Record</div>
+        },
+        {
+          path: ROUTES.V2.EVENTS.EVENT.AUDIT.path,
+          element: <div>Audit</div>
+        }
+      ]
     },
     {
       path: ROUTES.V2.EVENTS.CREATE.path,

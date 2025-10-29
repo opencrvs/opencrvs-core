@@ -11,12 +11,27 @@
 
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { applyDraftToEventIndex, deepDropNulls } from '@opencrvs/commons/client'
-import { AppBar, Button, Frame, Stack } from '@opencrvs/components'
+import { useLocation, useNavigate, matchPath } from 'react-router-dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
+import styled from 'styled-components'
+import {
+  applyDraftToEventIndex,
+  deepDropNulls,
+  EventConfig,
+  EventIndex
+} from '@opencrvs/commons/client'
+import {
+  APP_BAR_HEIGHT,
+  AppBar,
+  Button,
+  Frame,
+  Stack
+} from '@opencrvs/components'
 import { BackArrow } from '@opencrvs/components/lib/icons'
-import { Plus } from '@opencrvs/components/src/icons'
+
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -25,13 +40,93 @@ import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { CoreWorkqueues, flattenEventIndex } from '@client/v2-events/utils'
-import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
-import { Sidebar } from '../sidebar/Sidebar'
-/**
- * Basic frame for the workqueues. Includes the left navigation and the app bar.
- */
+
+const Tab = styled.button`
+  border: none;
+  background: none;
+  color: ${({ theme }) => theme.colors.supportingCopy};
+  ${({ theme }) => theme.fonts.bold16};
+  cursor: pointer;
+  height: 100%;
+  box-sizing: border-box;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.copy};
+  }
+
+  &.active {
+    color: ${({ theme }) => theme.colors.copy};
+    border-bottom: 3px solid ${({ theme }) => theme.colors.primary};
+    border-top: 3px solid transparent;
+  }
+`
+
+const TabContainer = styled(Stack)`
+  height: ${APP_BAR_HEIGHT};
+`
+
+const messages = defineMessages({
+  record: {
+    id: 'v2.events.overview.tabs.record',
+    defaultMessage: 'Record'
+  },
+  audit: {
+    id: 'v2.events.overview.tabs.audit',
+    defaultMessage: 'Audit'
+  }
+})
+
+function EventOverviewTabs({
+  configuration,
+  event
+}: {
+  configuration: EventConfig
+  event: EventIndex
+}) {
+  const intl = useIntl()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT)
+  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
+
+  const isActive = (pattern: string) => {
+    return !!matchPath({ path: pattern, end: true }, location.pathname)
+  }
+
+  return (
+    <TabContainer gap={16}>
+      <Tab
+        className={isActive(ROUTES.V2.EVENTS.EVENT.path) ? 'active' : ''}
+        onClick={() => {
+          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { workqueue }))
+        }}
+      >{`${intl.formatMessage(configuration.label)} • ${event.trackingId}`}</Tab>
+      <Tab
+        className={isActive(ROUTES.V2.EVENTS.EVENT.RECORD.path) ? 'active' : ''}
+        onClick={() => {
+          navigate(
+            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
+          )
+        }}
+      >
+        {intl.formatMessage(messages.record)}
+      </Tab>
+      <Tab
+        className={isActive(ROUTES.V2.EVENTS.EVENT.AUDIT.path) ? 'active' : ''}
+        onClick={() => {
+          navigate(
+            ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({ eventId }, { workqueue })
+          )
+        }}
+      >
+        {intl.formatMessage(messages.audit)}
+      </Tab>
+    </TabContainer>
+  )
+}
 
 export function EventOverviewLayout({
   children
@@ -54,29 +149,22 @@ export function EventOverviewLayout({
     throw new Error(`Event details with id ${eventId} not found`)
   }
 
-  const eventIndex = eventResults.results[0]
+  const event = eventResults.results[0]
 
-  const { eventConfiguration } = useEventConfiguration(eventIndex.type)
+  const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndexWithDraftApplied = draft
-    ? applyDraftToEventIndex(eventIndex, draft, eventConfiguration)
-    : eventIndex
+    ? applyDraftToEventIndex(event, draft, eventConfiguration)
+    : event
 
   return (
     <Frame
       header={
         <AppBar
-          desktopCenter={
-            <Stack gap={16}>
-              <Button
-                type="iconPrimary"
-                onClick={() => {
-                  navigate(ROUTES.V2.EVENTS.CREATE.path)
-                }}
-              >
-                <Plus />
-              </Button>
-              <SearchToolbar />
-            </Stack>
+          desktopLeft={
+            <EventOverviewTabs
+              configuration={eventConfiguration}
+              event={event}
+            />
           }
           desktopRight={<ProfileMenu key="profileMenu" />}
           mobileLeft={
@@ -102,7 +190,6 @@ export function EventOverviewLayout({
           }
         />
       }
-      navigation={<Sidebar />}
       skipToContentText="skip"
     >
       {children}
