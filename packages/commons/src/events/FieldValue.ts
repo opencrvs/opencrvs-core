@@ -120,6 +120,7 @@ const FieldValuesWithoutDataField = z.union([
   QrReaderFieldValue,
   IdReaderFieldValue
 ])
+type FieldValuesWithoutDataField = z.infer<typeof FieldValuesWithoutDataField>
 
 // As data field value can refer to other field values, it can contain any other field value types
 export const DataFieldValue = z
@@ -129,10 +130,30 @@ export const DataFieldValue = z
   .nullish()
 export type DataFieldValue = z.infer<typeof DataFieldValue>
 
-export const FieldValue = z.union([FieldValuesWithoutDataField, DataFieldValue])
-export type FieldValue = z.infer<typeof FieldValue>
+export type FieldValue = FieldValuesWithoutDataField | DataFieldValue
+export const FieldValue: z.ZodType<FieldValue> = z.union([
+  FieldValuesWithoutDataField,
+  DataFieldValue
+])
 
-export const FieldUpdateValue = z.union([
+export type FieldUpdateValue =
+  | z.infer<typeof TextValue>
+  | z.infer<typeof DateValue>
+  | z.infer<typeof TimeValue>
+  | z.infer<typeof AgeUpdateValue>
+  | z.infer<typeof AddressFieldUpdateValue>
+  | z.infer<typeof DateRangeFieldValue>
+  | z.infer<typeof SelectDateRangeValue>
+  | z.infer<typeof CheckboxFieldValue>
+  | z.infer<typeof NumberFieldValue>
+  | z.infer<typeof FileFieldValue>
+  | z.infer<typeof FileFieldWithOptionValue>
+  | z.infer<typeof DataFieldValue>
+  | z.infer<typeof NameFieldUpdateValue>
+  | z.infer<typeof HttpFieldUpdateValue>
+  | z.infer<typeof QueryParamReaderFieldUpdateValue>
+
+export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = z.union([
   TextValue,
   DateValue,
   TimeValue,
@@ -149,8 +170,6 @@ export const FieldUpdateValue = z.union([
   HttpFieldUpdateValue,
   QueryParamReaderFieldUpdateValue
 ])
-
-export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
 
 /**
  * NOTE: This is an exception. We need schema as a type in order to generate schema dynamically.
