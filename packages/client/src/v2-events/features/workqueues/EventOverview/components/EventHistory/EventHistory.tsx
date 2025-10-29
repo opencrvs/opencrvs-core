@@ -18,7 +18,11 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Table } from '@opencrvs/components/lib/Table'
-import { ActionType, getAcceptedActions } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  EventDocument,
+  getAcceptedActions
+} from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { ROUTES } from '@client/v2-events/routes'
@@ -299,20 +303,24 @@ function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
   )
 }
 
+export function EventHistorySkeleton() {
+  const intl = useIntl()
+  return (
+    <Content
+      size={ContentSize.LARGE}
+      title={intl.formatMessage(messages.audit)}
+    >
+      <LargeGreyedInfo />
+    </Content>
+  )
+}
+
 /**
  *  Renders the event history table. Used for audit trail.
  */
-export function EventHistory() {
-  const validatorContext = useValidatorContext()
+function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
-  const params = useTypedParams(ROUTES.V2.EVENTS.EVENT.AUDIT)
-  const { getEvent } = useEvents()
-  const fullEvent = getEvent.findFromCache(params.eventId).data
-
-  if (!fullEvent) {
-    return
-  }
-
+  const validatorContext = useValidatorContext()
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
   const intl = useIntl()
@@ -468,4 +476,16 @@ export function EventHistory() {
       {modal}
     </Content>
   )
+}
+
+export function EventHistoryIndex() {
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.AUDIT)
+  const { getEvent } = useEvents()
+  const fullEvent = getEvent.findFromCache(eventId).data
+
+  if (!fullEvent) {
+    return <EventHistorySkeleton />
+  }
+
+  return <EventHistory fullEvent={fullEvent} />
 }

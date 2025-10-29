@@ -54,7 +54,7 @@ import { ProtectedRoute } from '../../components/ProtectedRoute'
 import { UserAudit } from '../../views/UserAudit/UserAudit'
 import { SystemList } from '../../views/SysAdmin/Config/Systems/Systems'
 import AllUserEmail from '../../views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
-import { EventHistory } from '../features/workqueues/EventOverview/components/EventHistory'
+import { EventHistoryIndex } from '../features/workqueues/EventOverview/components/EventHistory'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
@@ -111,15 +111,6 @@ export const routesConfig = {
     },
     workqueueRouter,
     {
-      // TODO CIHAN: remove this
-      path: ROUTES.V2.EVENTS.OVERVIEW.path,
-      element: (
-        <EventOverviewLayout>
-          <EventOverviewIndex />
-        </EventOverviewLayout>
-      )
-    },
-    {
       path: ROUTES.V2.EVENTS.EVENT.path,
       element: (
         <EventOverviewLayout>
@@ -137,7 +128,7 @@ export const routesConfig = {
         },
         {
           path: ROUTES.V2.EVENTS.EVENT.AUDIT.path,
-          element: <EventHistory />
+          element: <EventHistoryIndex />
         }
       ]
     },

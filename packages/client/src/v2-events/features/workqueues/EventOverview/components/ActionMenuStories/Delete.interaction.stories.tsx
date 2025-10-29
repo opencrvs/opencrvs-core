@@ -68,7 +68,7 @@ export const deletedScenariosForRegistrationAgent: StoryObj<typeof ActionMenu> =
       layout: 'centered',
       reactRouter: {
         router: routesConfig,
-        initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+        initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
           eventId: createdEventDocument.id
         })
       },

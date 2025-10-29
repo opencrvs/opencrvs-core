@@ -155,7 +155,7 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
 }
 
 function EventOverviewContainer() {
-  const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
+  const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
   const { searchEventById } = useEvents()
   const { getEvent } = useEvents()
   const maybeAuth = useAuthentication()

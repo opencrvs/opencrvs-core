@@ -160,7 +160,7 @@ export function useGetEvent() {
           message: `Event with id ${id} not found in cache. Please ensure the event is first assigned and downloaded to the browser.`,
           redirection: {
             label: intl.formatMessage(buttonMessages.refresh),
-            path: ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId: id })
+            path: ROUTES.V2.EVENTS.EVENT.buildPath({ eventId: id })
           }
         })
       }

@@ -35,7 +35,7 @@ export function ActionMenu({
   onAction?: () => void
 }) {
   const intl = useIntl()
-  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.OVERVIEW)
+  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
   const { getUser } = useUsers()
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()

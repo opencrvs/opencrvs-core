@@ -125,7 +125,7 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
           if (slug) {
             navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
           } else {
-            navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+            navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
           }
         }
       }}

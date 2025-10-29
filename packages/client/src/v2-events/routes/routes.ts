@@ -49,12 +49,6 @@ export const ROUTES = {
               })
             }
           ),
-          OVERVIEW: route('overview/:eventId', {
-            params: { eventId: uuid().defined() },
-            searchParams: {
-              workqueue: string()
-            }
-          }),
           CREATE: route('create', {
             searchParams: {
               workqueue: string()

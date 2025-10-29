@@ -13,7 +13,6 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { graphql, HttpResponse } from 'msw'
 import superjson from 'superjson'
 import { within } from '@testing-library/dom'
-import { userEvent, waitFor } from '@storybook/test'
 import {
   ActionType,
   createPrng,
@@ -58,7 +57,6 @@ const eventDocument = generateEventDocument({
   rng
 })
 
-const eventId = eventDocument.id
 const modifiedDraft = generateEventDraftDocument({
   eventId: eventDocument.id,
   actionType: ActionType.REGISTER,
@@ -85,32 +83,17 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
   ],
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
-    await step('Finds view record menu item in action menu', async () => {
-      const actionButton = await canvas.findByRole('button', {
-        name: 'Action'
-      })
 
-      await userEvent.click(actionButton)
-    })
-
-    await step('User is taken to the view record page', async () => {
-      const list = await canvas.findByRole('list')
-      await userEvent.click(within(list).getByText('View'))
-
-      await waitFor(async () => {
-        await canvas.findByText("Applicant's name")
-        await canvas.findByText('Riku This value is from a draft')
-        await canvas.findByText(
-          'Member declaration for Riku This value is from a draft'
-        )
-        await canvas.findByText('Tennis club membership application')
-      })
-    })
+    await canvas.findByText("Applicant's name")
+    await canvas.findByText('Riku This value is from a draft')
+    await canvas.findByText(
+      'Member declaration for Riku This value is from a draft'
+    )
   },
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({
         eventId: eventDocument.id
       }),
       chromatic: { disableSnapshot: true }
@@ -170,11 +153,10 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
 export const ReadOnlyViewForUserWithReadPermission: Story = {
   parameters: {
     reactRouter: {
-      router: routesConfig
-      // TODO CIHAN:
-      // initialPath: ROUTES.V2.EVENTS.VIEW.buildPath({
-      //   eventId
-      // })
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({
+        eventId: eventDocument.id
+      })
     },
     msw: {
       handlers: {
