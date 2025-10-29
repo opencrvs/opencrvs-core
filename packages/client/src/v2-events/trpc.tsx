@@ -78,11 +78,12 @@ function createIDBPersister(storageIdentifier: string) {
   const lastPersistedLargeQueries = new Map<string, number>()
 
   return {
-    /** By default, client is persisted on every page change, or whenever query/mutation occurs. */
+    /** By default, client is persisted whenever a query/mutation occurs */
     persistClient: async (client) => {
-      // 1. Since queries are persisted frequently, we separate out the ones that are flagged as large.
-      // Serializing data is a synchronous process and freezes the client, so we want to minimise how often it happens.
-      // For large payloads, ensure staleTime is set for queries to avoid frequent updates.
+      /* 1. Since queries are persisted frequently, we separate out the ones that are flagged as large.
+       * Serializing data is a synchronous process and freezes the client, so we want to minimise how often it happens.
+       * For large payloads, ensure staleTime is set for queries to avoid frequent updates.
+       */
       const [largeQueries, normalQueries] = partition(
         client.clientState.queries,
         (query) => query.meta?.useLargeQueryStorage === true

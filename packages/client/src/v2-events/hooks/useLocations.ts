@@ -24,9 +24,7 @@ setQueryDefaults(trpcOptionsProxy.locations.list, {
       throw new Error('queryFn is not a function')
     }
 
-    const result = await queryOptions.queryFn(...params)
-
-    return result
+    return queryOptions.queryFn(...params)
   },
   staleTime: 1000 * 60 * 60 * 24 // keep it in cache 1 day
 })
