@@ -515,7 +515,7 @@ export const RejectModalInteraction: StoryObj<typeof Review.Body> = {
 
 const declareEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
 })
 
 const eventDocumentWithoutSurname = {

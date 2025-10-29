@@ -55,7 +55,7 @@ export async function getLocations(params?: {
   return locations
 }
 
-export const getChildLocations = async (parentIdToSearch: string) => {
+export const getChildLocations = async (parentIdToSearch: UUID) => {
   const locations = await locationsRepo.getChildLocations(parentIdToSearch)
 
   return locations.map(({ id, name, parentId, validUntil, locationType }) => ({
@@ -65,8 +65,4 @@ export const getChildLocations = async (parentIdToSearch: string) => {
     parentId,
     locationType
   }))
-}
-
-export const getLocationById = async (id: UUID) => {
-  return locationsRepo.getLocationById(id)
 }

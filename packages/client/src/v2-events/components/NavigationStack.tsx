@@ -60,8 +60,14 @@ export function NavigationStack(props: PropsWithChildren) {
   const [backing, setBacking] = useState(false)
 
   useEffect(() => {
-    // User is accessing the view directly if there's no navigation history
-    const userAccessingViewDirectly = history.length === 0
+    /**
+     * User is accessing the view directly if there's no navigation history
+     * previously it was
+     * const userAccessingViewDirectly = history.length === 0
+     * but that did not supporting returning from external redirection
+     * Any impact of current change is not recongnized yet
+     */
+    const userAccessingViewDirectly = history.length === 1
 
     // We also don't want to start backing the user if its only a page reload
     const navEntry = performance.getEntriesByType(

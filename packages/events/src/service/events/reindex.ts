@@ -93,7 +93,8 @@ export async function reindex(token: TokenWithBearer) {
     {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: token
       },
       // Converts object stream to JSON string stream so that it can
       // be sent to the country config reindex endpoint

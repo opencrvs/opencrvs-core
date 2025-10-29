@@ -19,12 +19,12 @@ import { Plus } from '@opencrvs/components/src/icons'
 import { ActionType, isActionInScope } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
-import { advancedSearchMessages } from '@client/v2-events/features/events/Search/AdvancedSearch'
 import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useAllWorkqueueConfigurations } from '@client/v2-events/features/events/useAllWorkqueueConfigurations'
 import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { emptyMessage } from '@client/v2-events/utils'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
 
@@ -58,7 +58,13 @@ export function DesktopCenter() {
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
-export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
+export function WorkqueueLayout({
+  children,
+  title
+}: {
+  children: React.ReactNode
+  title?: string
+}) {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const navigate = useNavigate()
   const intl = useIntl()
@@ -74,15 +80,16 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
           mobileLeft={<Hamburger />}
           mobileRight={
             <Button
+              aria-label="Go to search"
               type={'icon'}
               onClick={() => navigate(ROUTES.V2.SEARCH.buildPath({}))}
             >
               <Icon color="primary" name="MagnifyingGlass" size="medium" />
             </Button>
           }
-          mobileTitle={intl.formatMessage(
-            workqueueConfig?.name ?? advancedSearchMessages.advancedSearch
-          )}
+          mobileTitle={
+            title ?? intl.formatMessage(workqueueConfig?.name ?? emptyMessage)
+          }
         />
       }
       navigation={<Sidebar key={workqueueSlug} />}

@@ -21,7 +21,7 @@ import {
   generateEventDocument,
   generateWorkqueues,
   tennisClubMembershipEvent,
-  field
+  never
 } from '@opencrvs/commons/client'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -46,6 +46,94 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   ],
   transformer: { input: superjson, output: superjson }
 })
+
+export const NoTemplateAvailable: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
+        eventId: tennisClubMembershipEventDocument.id,
+        pageId: 'collector'
+      })
+    },
+    test: {
+      // Ignoring the failed font request
+      dangerouslyIgnoreUnhandledErrors: true
+    },
+    msw: {
+      handlers: {
+        config: [
+          http.get(
+            '/api/countryconfig/certificates/simple-certificate.svg',
+            () => {
+              return HttpResponse.text(
+                `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100"><text x="10" y="20">Simple Certificate</text></svg>`
+              )
+            }
+          ),
+          http.get('http://localhost:2021/config', () => {
+            return HttpResponse.json({
+              systems: [],
+              config: mockOfflineData.config,
+              certificates: [
+                {
+                  id: 'simple-certificate',
+                  isV2Template: true,
+                  event: 'tennis-club-membership',
+                  label: {
+                    id: 'certificates.simple.certificate.copy',
+                    defaultMessage: 'Simple Certificate copy',
+                    description: 'The label for a simple certificate'
+                  },
+                  conditionals: [
+                    {
+                      type: 'SHOW',
+                      conditional: never()
+                    }
+                  ],
+                  isDefault: false,
+                  fee: {
+                    onTime: 7,
+                    late: 10.6,
+                    delayed: 18
+                  },
+                  svgUrl:
+                    '/api/countryconfig/certificates/simple-certificate.svg'
+                }
+              ]
+            })
+          })
+        ],
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Click Certification Type and find no options message',
+      async () => {
+        await userEvent.click(
+          await canvas.findByTestId('select__certificateTemplateId')
+        )
+        await expect(
+          await canvas.findByText(
+            'No template available for this event, contact Admin'
+          )
+        ).toBeVisible()
+      }
+    )
+  }
+}
 
 export const ContinuingAndGoingBack: Story = {
   parameters: {
@@ -206,10 +294,10 @@ export const RedirectAfterPrint: Story = {
             return generateEventDocument({
               configuration: tennisClubMembershipEvent,
               actions: [
-                ActionType.DECLARE,
-                ActionType.VALIDATE,
-                ActionType.REGISTER,
-                ActionType.PRINT_CERTIFICATE
+                { type: ActionType.DECLARE },
+                { type: ActionType.VALIDATE },
+                { type: ActionType.REGISTER },
+                { type: ActionType.PRINT_CERTIFICATE }
               ]
             })
           })
@@ -287,109 +375,5 @@ export const RedirectAfterPrint: Story = {
         { timeout: 7000 } // Generating the PDF takes a long time.
       )
     })
-  }
-}
-
-export const NoTemplateAvailable: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
-        eventId: tennisClubMembershipEventDocument.id,
-        pageId: 'collector'
-      })
-    },
-    test: {
-      // Ignoring the failed font request
-      dangerouslyIgnoreUnhandledErrors: true
-    },
-    msw: {
-      handlers: {
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ],
-        config: [
-          http.get(
-            '/api/countryconfig/certificates/simple-certificate.svg',
-            () => {
-              return HttpResponse.text(
-                `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100"><text x="10" y="20">Simple Certificate</text></svg>`
-              )
-            }
-          ),
-          http.get('http://localhost:2021/config', () => {
-            return HttpResponse.json({
-              systems: [],
-              config: mockOfflineData.config,
-              certificates: [
-                {
-                  id: 'simple-certificate',
-                  isV2Template: true,
-                  event: 'tennis-club-membership',
-                  label: {
-                    id: 'certificates.simple.certificate.copy',
-                    defaultMessage: 'Simple Certificate copy',
-                    description: 'The label for a simple certificate'
-                  },
-                  conditionals: [
-                    {
-                      type: 'SHOW',
-                      conditional: field('applicant.dob')
-                        .isBefore()
-                        .date('2007-01-01')
-                    }
-                  ],
-                  isDefault: false,
-                  fee: {
-                    onTime: 7,
-                    late: 10.6,
-                    delayed: 18
-                  },
-                  svgUrl:
-                    '/api/countryconfig/certificates/simple-certificate.svg'
-                }
-              ]
-            })
-          })
-        ]
-      }
-    }
-  },
-  play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement)
-
-    await step('Try continuing without filling the form', async () => {
-      await expect(
-        await canvas.findByText('Print certified copy')
-      ).toBeInTheDocument()
-
-      const continueButton = await canvas.findByRole('button', {
-        name: 'Continue'
-      })
-      await userEvent.click(continueButton)
-      const requiredErrors = await canvas.findAllByText('Required')
-
-      await expect(requiredErrors.length).toBe(2)
-    })
-
-    await step(
-      'Click Certification Type and find no options message',
-      async () => {
-        await userEvent.click(
-          await canvas.findByTestId('select__certificateTemplateId')
-        )
-        await expect(
-          await canvas.findByText(
-            'No template available for this event, contact Admin'
-          )
-        ).toBeVisible()
-      }
-    )
   }
 }

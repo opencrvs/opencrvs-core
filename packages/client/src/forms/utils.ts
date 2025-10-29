@@ -58,7 +58,7 @@ import {
   LINK_BUTTON,
   LOADER,
   PARAGRAPH,
-  QRReaderType,
+  QrReaderType,
   RADIO_GROUP,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   ReaderType,
@@ -841,7 +841,7 @@ function isFieldLoader(field: IFormField): field is ILoaderFormField {
   return field.type === LOADER
 }
 
-export function isReaderQR(reader: ReaderType): reader is QRReaderType {
+export function isReaderQR(reader: ReaderType): reader is QrReaderType {
   return reader.type === 'QR'
 }
 

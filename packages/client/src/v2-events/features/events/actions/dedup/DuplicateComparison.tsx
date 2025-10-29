@@ -144,8 +144,8 @@ export function DuplicateComparison({
     eventConfiguration.declaration.pages
       .filter(
         (page) =>
-          isPageVisible(page, originalDeclaration) ||
-          isPageVisible(page, potentialDuplicateDeclaration)
+          isPageVisible(page, originalDeclaration, validatorContext) ||
+          isPageVisible(page, potentialDuplicateDeclaration, validatorContext)
       )
       .map((page) => ({
         title: intl.formatMessage(page.title),
@@ -182,20 +182,20 @@ export function DuplicateComparison({
             rightValue: (
               <Output
                 displayEmptyAsDash={true}
+                eventConfig={eventConfiguration}
                 field={field}
                 formConfig={eventConfiguration.declaration}
                 previousForm={potentialDuplicateDeclaration}
-                showPreviouslyMissingValuesAsChanged={false}
                 value={potentialDuplicateDeclaration[field.id]}
               />
             ),
             leftValue: (
               <Output
                 displayEmptyAsDash={true}
+                eventConfig={eventConfiguration}
                 field={field}
                 formConfig={eventConfiguration.declaration}
                 previousForm={originalDeclaration}
-                showPreviouslyMissingValuesAsChanged={false}
                 value={originalDeclaration[field.id]}
               />
             )

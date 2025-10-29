@@ -19,10 +19,16 @@ import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
-import { FieldUpdateValue } from '../events/FieldValue'
+import {
+  DateValue,
+  FieldUpdateValue,
+  FieldValue,
+  AgeValue
+} from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
+import { ageToDate } from '../events/utils'
 
 const ajv = new Ajv({
   $data: true,
@@ -111,7 +117,6 @@ ajv.addKeyword({
   // @ts-ignore -- Force type. We will move this away from AJV next. Parsing the array will take seconds and is only called by core.
   validate(schema: {}, data: string, _: unknown, dataContext?: DataContext) {
     const locationIdInput = data
-
     const locations = dataContext?.rootData.$leafAdminStructureLocationIds ?? []
 
     return locations.some((location) => location.id === locationIdInput)
@@ -120,6 +125,31 @@ ajv.addKeyword({
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
+  if ('$form' in data) {
+    data.$form = Object.fromEntries(
+      Object.entries(data.$form).map(([key, value]) => {
+        const maybeAgeValue = AgeValue.safeParse(value)
+        if (maybeAgeValue.success) {
+          const age = maybeAgeValue.data.age
+          const maybeAsOfDate = DateValue.safeParse(
+            data.$form[maybeAgeValue.data.asOfDateRef]
+          )
+
+          return [
+            key,
+            {
+              age,
+              dob: ageToDate(
+                age,
+                maybeAsOfDate.success ? maybeAsOfDate.data : data.$now
+              )
+            }
+          ]
+        }
+        return [key, value]
+      })
+    )
+  }
   const result = validator(data) as boolean
 
   return result
@@ -135,12 +165,14 @@ export function isOnline() {
 
 export function isConditionMet(
   conditional: JSONSchema,
-  values: Record<string, unknown>
+  values: Record<string, FieldValue>,
+  context: ValidatorContext
 ) {
   return validate(conditional, {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
-    $online: isOnline()
+    $online: isOnline(),
+    $user: context.user
   })
 }
 
@@ -159,10 +191,11 @@ function getConditionalActionsForField(
 
 export function areConditionsMet(
   conditions: FieldConditional[],
-  values: Record<string, unknown>
+  values: Record<string, FieldValue>,
+  context: ValidatorContext
 ) {
   return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values)
+    isConditionMet(condition.conditional, values, context)
   )
 }
 
@@ -412,9 +445,7 @@ export function runStructuralValidations({
     !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
-    return {
-      errors: []
-    }
+    return []
   }
 
   const fieldValidationResult = validateFieldInput({
@@ -422,9 +453,7 @@ export function runStructuralValidations({
     value: values[field.id]
   })
 
-  return {
-    errors: fieldValidationResult
-  }
+  return fieldValidationResult
 }
 
 export function runFieldValidations({
@@ -440,9 +469,7 @@ export function runFieldValidations({
     !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
-    return {
-      errors: []
-    }
+    return []
   }
 
   const conditionalParameters = {
@@ -470,10 +497,8 @@ export function runFieldValidations({
     conditionalParameters
   })
 
-  return {
-    // Assumes that custom validation errors are based on the field type, and extend the validation.
-    errors: [...fieldValidationResult, ...customValidationResults]
-  }
+  // Assumes that custom validation errors are based on the field type, and extend the validation.
+  return [...fieldValidationResult, ...customValidationResults]
 }
 
 export function getValidatorsForField(
@@ -537,9 +562,9 @@ export function getValidatorsForField(
 
 export function areCertificateConditionsMet(
   conditions: FieldConditional[],
-  values: Record<string, unknown>
+  values: ConditionalParameters
 ) {
   return conditions.every((condition) => {
-    return ajv.validate(condition.conditional, values)
+    return validate(condition.conditional, values)
   })
 }

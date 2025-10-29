@@ -24,9 +24,7 @@ import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
-import { Leaderboards } from '@client/views/Performance/Leaderboards'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
-import { PerformanceStatistics } from '@client/views/Performance/Statistics'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
 import { Payment } from '@client/views/PrintCertificate/Payment'
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
@@ -99,132 +97,16 @@ function createRedirect(from: string, to: string) {
     }
   }
 }
-export const routesConfig = config.FEATURES.V2_EVENTS
+
+// By default we now load V2 events in the '/' route. This is a temporary flag
+// to turn off V2 events in case IET wants to switch back to V1 events.
+// This will be removed after a few releases when V2 events will be finalized.
+const turnOffV2Events =
+  typeof config.FEATURES.V2_EVENTS === 'boolean' &&
+  config.FEATURES.V2_EVENTS === false
+
+export const routesConfig = turnOffV2Events
   ? [
-      {
-        path: '/',
-        element: (
-          <ScrollToTop>
-            <ReloadModal />
-            <SessionExpireConfirmation />
-            <NotificationComponent>
-              <Page>
-                <MainSection>
-                  <ProtectedPage
-                    unprotectedRouteElements={['documents', 'affidavit']}
-                  >
-                    <Outlet />
-                  </ProtectedPage>
-                </MainSection>
-              </Page>
-            </NotificationComponent>
-          </ScrollToTop>
-        ),
-        children: [
-          v2RoutesConfig,
-          createRedirect('/v2/*', '/'),
-          createRedirect('/registration-home/my-drafts/*', '/'),
-          createRedirect('/registration-home/requiresUpdate/*', '/'),
-          createRedirect('/registration-home/progress/*', '/'),
-          createRedirect('/registration-home/outbox/*', '/'),
-          createRedirect('/registration-home/readyToIssue/*', '/'),
-          createRedirect('/registration-home/print/*', '/'),
-          createRedirect('/registration-home/readyForReview/*', '/'),
-          createRedirect('/events', '/events/create'),
-          // Search results,
-          // Advanced search,
-          {
-            path: routes.VS_EXPORTS,
-            element: (
-              <ProtectedRoute
-                scopes={[SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS]}
-              >
-                <VSExport />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.PERFORMANCE_REGISTRATIONS_LIST,
-            element: <RegistrationList />
-          },
-          {
-            path: routes.PERFORMANCE_STATISTICS,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-                <PerformanceStatistics />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.PERFORMANCE_LEADER_BOARDS,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-                <Leaderboards />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.PERFORMANCE_DASHBOARD,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-                <PerformanceDashboard />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.PERFORMANCE_FIELD_AGENT_LIST,
-            element: <FieldAgentList />
-          },
-          {
-            path: routes.PERFORMANCE_HOME,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ]}>
-                <PerformanceHome />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.EVENT_COMPLETENESS_RATES,
-            element: <CompletenessRates />
-          },
-          {
-            path: routes.WORKFLOW_STATUS,
-            element: <WorkflowStatus />
-          },
-          {
-            path: routes.TEAM_SEARCH,
-            element: (
-              <ProtectedRoute
-                scopes={[
-                  SCOPES.USER_READ,
-                  SCOPES.USER_READ_MY_OFFICE,
-                  SCOPES.USER_READ_MY_JURISDICTION
-                ]}
-              >
-                <TeamSearch />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.CREATE_USER_ON_LOCATION,
-            element: <CreateNewUser />
-          },
-          {
-            path: routes.CREATE_USER_SECTION,
-            element: <CreateNewUser />
-          },
-          {
-            path: routes.REVIEW_USER_FORM,
-            element: <CreateNewUser />
-          },
-          {
-            path: routes.REVIEW_USER_DETAILS,
-            element: <CreateNewUser />
-          }
-        ]
-      }
-    ]
-  : [
       {
         path: '/',
         element: (
@@ -388,23 +270,7 @@ export const routesConfig = config.FEATURES.V2_EVENTS
             element: <RegistrationList />
           },
           {
-            path: routes.PERFORMANCE_STATISTICS,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-                <PerformanceStatistics />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.PERFORMANCE_LEADER_BOARDS,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-                <Leaderboards />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: routes.PERFORMANCE_DASHBOARD,
+            path: routes.DASHBOARD,
             element: (
               <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
                 <PerformanceDashboard />
@@ -478,8 +344,115 @@ export const routesConfig = config.FEATURES.V2_EVENTS
           {
             path: routes.REVIEW_USER_DETAILS,
             element: <CreateNewUser />
+          }
+        ]
+      }
+    ]
+  : [
+      {
+        path: '/',
+        element: (
+          <ScrollToTop>
+            <ReloadModal />
+            <SessionExpireConfirmation />
+            <NotificationComponent>
+              <Page>
+                <MainSection>
+                  <ProtectedPage
+                    unprotectedRouteElements={['documents', 'affidavit']}
+                  >
+                    <Outlet />
+                  </ProtectedPage>
+                </MainSection>
+              </Page>
+            </NotificationComponent>
+          </ScrollToTop>
+        ),
+        children: [
+          v2RoutesConfig,
+          createRedirect('/v2/*', '/'),
+          createRedirect('/registration-home/my-drafts/*', '/'),
+          createRedirect('/registration-home/requiresUpdate/*', '/'),
+          createRedirect('/registration-home/progress/*', '/'),
+          createRedirect('/registration-home/outbox/*', '/'),
+          createRedirect('/registration-home/readyToIssue/*', '/'),
+          createRedirect('/registration-home/print/*', '/'),
+          createRedirect('/registration-home/readyForReview/*', '/'),
+          createRedirect('/events', '/events/create'),
+          // Search results,
+          // Advanced search,
+          {
+            path: routes.VS_EXPORTS,
+            element: (
+              <ProtectedRoute
+                scopes={[SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS]}
+              >
+                <VSExport />
+              </ProtectedRoute>
+            )
           },
-          v2RoutesConfig
+          {
+            path: routes.PERFORMANCE_REGISTRATIONS_LIST,
+            element: <RegistrationList />
+          },
+          {
+            path: routes.DASHBOARD,
+            element: (
+              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
+                <PerformanceDashboard />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.PERFORMANCE_FIELD_AGENT_LIST,
+            element: <FieldAgentList />
+          },
+          {
+            path: routes.PERFORMANCE_HOME,
+            element: (
+              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ]}>
+                <PerformanceHome />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.EVENT_COMPLETENESS_RATES,
+            element: <CompletenessRates />
+          },
+          {
+            path: routes.WORKFLOW_STATUS,
+            element: <WorkflowStatus />
+          },
+          {
+            path: routes.TEAM_SEARCH,
+            element: (
+              <ProtectedRoute
+                scopes={[
+                  SCOPES.USER_READ,
+                  SCOPES.USER_READ_MY_OFFICE,
+                  SCOPES.USER_READ_MY_JURISDICTION
+                ]}
+              >
+                <TeamSearch />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: routes.CREATE_USER_ON_LOCATION,
+            element: <CreateNewUser />
+          },
+          {
+            path: routes.CREATE_USER_SECTION,
+            element: <CreateNewUser />
+          },
+          {
+            path: routes.REVIEW_USER_FORM,
+            element: <CreateNewUser />
+          },
+          {
+            path: routes.REVIEW_USER_DETAILS,
+            element: <CreateNewUser />
+          }
         ]
       }
     ]

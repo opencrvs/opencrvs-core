@@ -105,7 +105,9 @@ export function useWorkqueues() {
 
           const key = trpc.event.search.queryKey({
             query: deserializedQuery,
-            limit: 10
+            offset: 0,
+            limit: 10,
+            sort: [{ field: 'updatedAt', direction: 'desc' }]
           })
 
           const data = queryClient.getQueryData(key)
@@ -121,7 +123,9 @@ export function useWorkqueues() {
           return queryClient.prefetchQuery({
             ...trpc.event.search.queryOptions({
               query: deserializedQuery,
-              limit: 10
+              offset: 0,
+              limit: 10,
+              sort: [{ field: 'updatedAt', direction: 'desc' }]
             })
           })
         })

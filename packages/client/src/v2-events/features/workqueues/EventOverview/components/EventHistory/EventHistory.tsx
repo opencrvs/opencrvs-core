@@ -22,6 +22,7 @@ import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
   ActionType,
+  EventConfig,
   EventDocument,
   getAcceptedActions,
   ValidatorContext
@@ -264,11 +265,7 @@ function ActionRole({ action }: { action: EventHistoryActionDocument }) {
     return null
   }
 
-  return (
-    <Text element="span" variant="reg14">
-      {intl.formatMessage(messages.role, { role })}
-    </Text>
-  )
+  return <>{intl.formatMessage(messages.role, { role })}</>
 }
 
 function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
@@ -333,10 +330,12 @@ export function EventHistorySkeleton() {
  */
 export function EventHistory({
   fullEvent,
-  validatorContext
+  validatorContext,
+  eventConfiguration
 }: {
   fullEvent: EventDocument
   validatorContext: ValidatorContext
+  eventConfiguration: EventConfig
 }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
@@ -347,19 +346,23 @@ export function EventHistory({
 
   const history = getAcceptedActions(fullEvent)
 
-  const historyWithUpdatedActions = expandWithUpdateActions(history)
+  const historyWithUpdatedActions = expandWithUpdateActions(
+    fullEvent,
+    validatorContext,
+    eventConfiguration
+  )
 
   const visibleHistoryWithUpdatedActions = historyWithUpdatedActions.filter(
     ({ type }) => type !== ActionType.CREATE
   )
 
   const onHistoryRowClick = (
-    item: EventHistoryActionDocument,
+    action: EventHistoryActionDocument,
     userName: string
   ) => {
     void openModal<void>((close) => (
       <EventHistoryDialog
-        action={item}
+        action={action}
         close={close}
         fullEvent={fullEvent}
         userName={userName}

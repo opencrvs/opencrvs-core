@@ -15,22 +15,26 @@ import {
   QueryParamReaderFieldValue
 } from '@opencrvs/commons/client'
 
-/**
- *  For params like ?input1=1&input2=2,
- *  and formProjection = { input1: 'output1', input2: 'output2' }
- *  will result in { output1: '1', output2: '2' }
- */
-function prepareFieldValueFromFormProjection(
+function prepareFieldValueFromPickedParams(
   params: URLSearchParams,
-  formProjection: NonNullable<
-    QueryParamReaderField['configuration']['formProjection']
-  >
+  pickParams: QueryParamReaderField['configuration']['pickParams']
 ) {
   const result: Record<string, string> = {}
-  for (const [key, entry] of Object.entries(formProjection)) {
-    result[entry] = params.get(key) || ''
+  for (const key of pickParams) {
+    const value = params.get(key)
+    if (value) {
+      result[key] = value
+    }
   }
   return result
+}
+
+function removeParams(params: URLSearchParams, pickParams: string[]) {
+  const updated = new URLSearchParams(params)
+  for (const key of pickParams) {
+    updated.delete(key)
+  }
+  return updated
 }
 
 function QueryParamReaderInput({
@@ -41,7 +45,7 @@ function QueryParamReaderInput({
   onChange: (params: QueryParamReaderFieldValue) => void
 }) {
   const [searchParams, setSearchParams] = useSearchParams()
-  const { formProjection } = configuration
+  const { pickParams } = configuration
   const onChangeRef = useRef(onChange)
   onChangeRef.current = onChange
   const searchString = searchParams.toString()
@@ -51,13 +55,18 @@ function QueryParamReaderInput({
       return
     }
     const params = new URLSearchParams(searchString)
-    const fieldValue = formProjection
-      ? prepareFieldValueFromFormProjection(params, formProjection)
-      : Object.fromEntries(params)
-
-    void Promise.resolve().then(() => onChangeRef.current(fieldValue))
-    setSearchParams(new URLSearchParams(), { replace: true })
-  }, [formProjection, onChangeRef, searchString, setSearchParams])
+    const fieldValue = prepareFieldValueFromPickedParams(params, pickParams)
+    void Promise.resolve().then(() => {
+      if (Object.keys(fieldValue).length) {
+        onChangeRef.current({
+          ...fieldValue,
+          // to ensure formik sees it as a new value even if the params are the same
+          [Symbol('updated')]: true
+        })
+        setSearchParams(removeParams(params, pickParams), { replace: true })
+      }
+    })
+  }, [pickParams, onChangeRef, searchString, setSearchParams])
   return null
 }
 

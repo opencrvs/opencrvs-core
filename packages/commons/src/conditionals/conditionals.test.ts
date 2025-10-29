@@ -23,7 +23,7 @@ import {
 import { formatISO } from 'date-fns'
 import { SCOPES } from '../scopes'
 import { ActionType } from '../events/ActionType'
-import { ActionStatus } from '../events/ActionDocument'
+import { ActionStatus, EventState } from '../events/ActionDocument'
 import { field } from '../events/field'
 import { event } from '../events/event'
 import { TokenUserType } from '../authentication'
@@ -46,9 +46,9 @@ const DEFAULT_FORM = {
       addressLine5: '123456'
     }
   }
-}
+} satisfies EventState
 
-function getFieldParams(form: Record<string, unknown> = DEFAULT_FORM) {
+function getFieldParams(form: EventState = DEFAULT_FORM) {
   return {
     $form: form,
     $now: formatISO(new Date(), { representation: 'date' }),
@@ -306,6 +306,288 @@ describe('date comparisons', () => {
         }),
         $now: '1990-06-06'
       })
+    ).toBe(false)
+  })
+})
+
+describe('age asDob comparisons', () => {
+  it('validates comparisons where dob from age field is expected to be before a certain time', () => {
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isBefore()
+          .days(18 * 365)
+          .inPast(),
+        {
+          ...getFieldParams({
+            // dob is 1970-01-01
+            'applicant.age': { age: 20, asOfDateRef: 'some.field' }
+          }),
+          $now: '1990-01-01'
+        }
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isBefore()
+          .days(18 * 365)
+          .inPast(),
+        {
+          ...getFieldParams({
+            // dob is 1973-01-01
+            'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+          }),
+          $now: '1990-01-01'
+        }
+      )
+    ).toBe(false)
+  })
+
+  it('validates comparisons where dob from age field is expected to be after a certain time', () => {
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isAfter()
+          .days(18 * 365)
+          .inPast(),
+        {
+          ...getFieldParams({
+            // dob is 1973-01-01
+            'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+          }),
+          $now: '1990-01-01'
+        }
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isAfter()
+          .days(18 * 365)
+          .inPast(),
+        {
+          ...getFieldParams({
+            // dob is 1971-01-01
+            'applicant.age': { age: 19, asOfDateRef: 'some.field' }
+          }),
+          $now: '1990-01-01'
+        }
+      )
+    ).toBe(false)
+  })
+
+  it('validates comparisons where dob from age field is expected to be after a certain date', () => {
+    expect(
+      validate(field('applicant.age').asDob().isAfter().date('1970-01-01'), {
+        ...getFieldParams({
+          // dob is 1973-01-01
+          'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01'
+      })
+    ).toBe(true)
+
+    expect(
+      validate(field('applicant.age').asDob().isAfter().date('1970-01-01'), {
+        ...getFieldParams({
+          // dob is 1963-01-01
+          'applicant.age': { age: 27, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01'
+      })
+    ).toBe(false)
+  })
+
+  it('validates comparisons where dob from age field is expected to be before a certain date', () => {
+    expect(
+      validate(field('applicant.age').asDob().isBefore().date('1980-01-01'), {
+        ...getFieldParams({
+          // dob is 1973-01-01
+          'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01'
+      })
+    ).toBe(true)
+
+    expect(
+      validate(field('applicant.age').asDob().isBefore().date('1970-01-01'), {
+        ...getFieldParams({
+          // dob is 1973-01-01
+          'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01'
+      })
+    ).toBe(false)
+  })
+
+  it('validates comparisons where dob from age field is expected to be before dob from another age field', () => {
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isBefore()
+          .date(field('referrer.age').asDob()),
+        {
+          ...getFieldParams({
+            // dob is 1973-01-01
+            'applicant.age': {
+              age: 17,
+              asOfDateRef: 'reference.dob.one'
+            },
+            // dob is 1970-01-01
+            'referrer.age': {
+              age: 20,
+              asOfDateRef: 'reference.dob.two'
+            },
+            'reference.dob.one': '1990-01-01',
+            'reference.dob.two': '1995-01-01'
+          }),
+          $now: '1990-01-01'
+        }
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isBefore()
+          .date(field('referrer.age').asDob()),
+        {
+          ...getFieldParams({
+            // dob is 1973-01-01
+            'applicant.age': {
+              age: 17,
+              asOfDateRef: 'reference.dob.one'
+            },
+            // dob is 1970-01-01
+            'referrer.age': {
+              age: 25,
+              asOfDateRef: 'reference.dob.two'
+            },
+            'reference.dob.one': '1990-01-01',
+            'reference.dob.two': '1995-01-01'
+          }),
+          $now: '1990-01-01'
+        }
+      )
+    ).toBe(false)
+  })
+})
+
+describe('age asAge comparisons', () => {
+  it('validates comparisons where age is expected to be equal to a certain value', () => {
+    expect(
+      validate(
+        field('applicant.age').asAge().isEqualTo(20),
+        getFieldParams({
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age').asAge().isEqualTo(20),
+        getFieldParams({
+          'applicant.age': { age: 22, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(false)
+  })
+
+  it('validates comparisons where age is expected to be equal to another age field', () => {
+    expect(
+      validate(
+        field('applicant.age').asAge().isEqualTo(field('referrer.age').asAge()),
+        getFieldParams({
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' },
+          'referrer.age': { age: 20, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age').asAge().isEqualTo(field('referrer.age').asAge()),
+        getFieldParams({
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' },
+          'referrer.age': { age: 25, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(false)
+  })
+
+  it('validates comparisons where age is expected to be less than a certain value', () => {
+    expect(
+      validate(
+        field('applicant.age').asAge().isLessThan(25),
+        getFieldParams({
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age').asAge().isLessThan(25),
+        getFieldParams({
+          'applicant.age': { age: 30, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(false)
+  })
+
+  it('validates comparisons where age is expected to be less than another age field', () => {
+    expect(
+      validate(
+        field('applicant.age')
+          .asAge()
+          .isLessThan(field('referrer.age').asAge()),
+        getFieldParams({
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' },
+          'referrer.age': { age: 22, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age')
+          .asAge()
+          .isLessThan(field('referrer.age').asAge()),
+        getFieldParams({
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' },
+          'referrer.age': { age: 18, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(false)
+  })
+
+  it('validates comparisons where age is expected to be between a certain value range', () => {
+    expect(
+      validate(
+        field('applicant.age').asAge().isBetween(16, 25),
+        getFieldParams({
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age').asAge().isBetween(16, 25),
+        getFieldParams({
+          'applicant.age': { age: 30, asOfDateRef: 'some.field' }
+        })
+      )
     ).toBe(false)
   })
 })
@@ -664,6 +946,36 @@ describe('"field" conditionals', () => {
       )
     ).toBe(true)
   })
+
+  it('validates "field.isFalsy" conditional with null in parent when using `.get`', () => {
+    const falsyFormParams = {
+      $form: {
+        'deep.nonvalue': null,
+        'deep.value': {
+          some: {
+            value: null
+          }
+        }
+      },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $locations: [],
+      $online: false
+    }
+
+    expect(
+      validate(field('deep.nonvalue').get('foo.bar').isFalsy(), falsyFormParams)
+    ).toBe(true)
+
+    expect(
+      validate(field('deep.value').get('some.value').isFalsy(), falsyFormParams)
+    ).toBe(true)
+
+    expect(
+      validate(field('deep.value').get('some').isFalsy(), falsyFormParams)
+    ).toBe(false)
+
+    expect(validate(field('deep.value').isFalsy(), falsyFormParams)).toBe(false)
+  })
 })
 
 describe('"user" conditionals', () => {
@@ -686,7 +998,9 @@ describe('"user" conditionals', () => {
   }
 
   it('validates "user.hasScope" conditional', () => {
-    expect(validate(user.hasScope(SCOPES.VALIDATE), userParams)).toBe(false)
+    expect(validate(user.hasScope(SCOPES.BYPASSRATELIMIT), userParams)).toBe(
+      false
+    )
 
     expect(validate(user.hasScope(SCOPES.RECORD_REGISTER), userParams)).toBe(
       true
@@ -1415,7 +1729,8 @@ describe('isGreaterThan and isLessThan conditionals', () => {
     expect(
       validate(
         field('family.numberOfChildren').isGreaterThan({
-          $$field: 'family.numberOfDependents'
+          $$field: 'family.numberOfDependents',
+          $$subfield: []
         }),
         params
       )
@@ -1436,7 +1751,8 @@ describe('isGreaterThan and isLessThan conditionals', () => {
     expect(
       validate(
         field('family.numberOfChildren').isGreaterThan({
-          $$field: 'family.numberOfDependents'
+          $$field: 'family.numberOfDependents',
+          $$subfield: []
         }),
         params
       )
@@ -1485,7 +1801,8 @@ describe('isGreaterThan and isLessThan conditionals', () => {
     expect(
       validate(
         field('person.yearsMarried').isLessThan({
-          $$field: 'person.yearsSinceGraduation'
+          $$field: 'person.yearsSinceGraduation',
+          $$subfield: []
         }),
         params
       )
@@ -1506,7 +1823,8 @@ describe('isGreaterThan and isLessThan conditionals', () => {
     expect(
       validate(
         field('person.yearsMarried').isLessThan({
-          $$field: 'person.yearsSinceGraduation'
+          $$field: 'person.yearsSinceGraduation',
+          $$subfield: []
         }),
         params
       )

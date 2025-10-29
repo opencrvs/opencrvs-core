@@ -22,6 +22,7 @@ import {
   generateEventDocument,
   generateEventDraftDocument,
   generateWorkqueues,
+  getCurrentEventState,
   InherentFlags,
   NameFieldValue,
   tennisClubMembershipEvent
@@ -313,7 +314,7 @@ function generateDraft() {
   const createdEvent = {
     ...generateEventDocument({
       configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE]
+      actions: [{ type: ActionType.CREATE }]
     })
   }
 
@@ -396,5 +397,72 @@ export const DraftPagination: Story = {
       'Tennis club membership application'
     )
     await expect(secondPageRows).toHaveLength(5)
+  }
+}
+
+export const PaginationAfterDownload: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('recent')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: queryData.length }
+            }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          }),
+          tRPCMsw.event.search.query((input) => {
+            const { actions, ...rest } = tennisClubMembershipEventDocument
+
+            const eventDocumentWithoutAssign = {
+              ...rest,
+              actions: actions.slice(0, -1)
+            }
+
+            const newEventState = getCurrentEventState(
+              eventDocumentWithoutAssign,
+              tennisClubMembershipEvent
+            )
+            return {
+              results: [
+                newEventState,
+                ...queryData.slice(input.offset, input.limit)
+              ],
+              total: queryData.length + 5
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await canvas.findByText('Farajaland CRVS', {}, { timeout: 5000 })
+
+    const assignButton = await canvas.findByTestId('ListItemAction-0-icon')
+    await userEvent.click(assignButton)
+    const assignModalButton = await canvas.findByTestId('assign')
+    await userEvent.click(assignModalButton)
+
+    await step('Clicked assign record button', async () => {
+      const page0 = canvasElement.querySelector('[data-testid="page-number-0"]')
+      const page1 = canvasElement.querySelector('[data-testid="page-number-1"]')
+
+      await expect(page0).toBeTruthy()
+      await expect(page1).toBeTruthy()
+    })
   }
 }

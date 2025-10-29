@@ -38,7 +38,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 const declaredDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
 })
 
 export const Page: Story = {

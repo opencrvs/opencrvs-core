@@ -18,7 +18,7 @@ import Scanner from './Scanner'
 import { Box } from '../../../Box'
 import { Stack } from '../../../Stack'
 import { Text } from '../../../Text'
-import { ErrorHandler, ScannableQRReader } from '../../../IDReader/types'
+import { ErrorHandler, ScannableQrReader } from '../../types'
 import { useWindowSize } from '../../../hooks'
 import { getTheme } from '../../../theme'
 
@@ -34,15 +34,17 @@ const Info = styled(Stack)`
   width: 100%;
 `
 
-export const QRReader = (props: ScannableQRReader) => {
-  const { labels, validator, onScan, onError } = props
+export const QrReader = (
+  props: ScannableQrReader & { fullWidth?: boolean }
+) => {
+  const { labels, validator, onScan, onError, fullWidth } = props
   const [isScannerDialogOpen, setScannerDialogOpen] = useState(false)
   const windowSize = useWindowSize()
   const theme = getTheme()
   const isSmallDevice = windowSize.width <= theme.grid.breakpoints.md
   const [error, setError] = useState('')
   const handleScanSuccess = useCallback(
-    (data: Parameters<ScannableQRReader['onScan']>[0]) => {
+    (data: Parameters<ScannableQrReader['onScan']>[0]) => {
       onScan(data)
       setError('')
       setScannerDialogOpen(false)
@@ -69,6 +71,7 @@ export const QRReader = (props: ScannableQRReader) => {
           setScannerDialogOpen(true)
           setError('')
         }}
+        fullWidth={fullWidth}
       >
         <Icon name="QrCode" size="medium" />
         {labels.button}
