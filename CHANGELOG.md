@@ -30,6 +30,7 @@ Actions must be performed in a defined order and cannot be skipped.
 
 * **Declare** – Submits a declaration for an event, marking it as formally declared in the system
 * **Validate** – Reviews and validates a declared event, confirming the information is accurate
+* **Print certificate** – Print a certificate (PDF) for a registered event
 * **Request correction** – Initiates a correction request for a registered event that contains errors
 
 ##### Forms, Pages, and Fields
