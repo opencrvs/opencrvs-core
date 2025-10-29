@@ -88,12 +88,12 @@ These conditions can control:
 
 They can also be used to validate form data dynamically based on the current form state or user context.
 
-##### Drafts
+#### Drafts
 
 The new **Drafts** feature allows users to save progress on an event that has not yet been registered.
 Drafts act as temporary storage for an action and are visible only to the user who created them.
 
-##### Advanced Search
+#### Advanced Search
 
 Advanced search is now configurable through the `EventConfig.advancedSearch` property, allowing different sections of an advanced search form to be defined.
 
@@ -110,7 +110,7 @@ You can search across:
 
 More details about the metadata fields are available in `packages/commons/src/events/EventMetadata.ts`.
 
-##### Deduplication
+#### Deduplication
 
 Event deduplication is now configurable **per action** via the `EventConfig.actions[].deduplication` property.
 Helpers for defining deduplication logic—such as `and`, `or`, `not`, and `field`—are available from `@opencrvs/toolkit/events/deduplication`.
@@ -125,15 +125,38 @@ dateRangeMatches()
 
 to define precise deduplication rules.
 
-##### Greater Control over Actions
+#### Greater Control over Actions
 
 Each action now has three states: `requested`, `accepted`, and `rejected`.
-Core now delegates more control to **countryconfig**, which decides whether to handle these states **synchronously** or **asynchronously**.
+Core now delegates more control to **countryconfig**, which decides whether to accept or reject an action either **synchronously** or **asynchronously**.
 
 By hooking into these actions, countryconfig can also:
 
 * Send customized **Notifications**
 * Access the full event data at the time an action is performed
+
+#### Configurable Workqueues
+
+Workqueues can now be configured from countryconfig using the `defineWorkqueues` function from `@opencrvs/toolkit/events`.
+This enables the creation of role- or workflow-specific queues without requiring code changes in core.
+
+* The **`actions`** property is used to define the default actions displayed for records within a workqueue.
+* The **`query`** property is used to determine which events are included in the workqueue.
+* The **`workqueue[id=workqueue-one|workqueue-two]`** scope is used to control the visibility of workqueues for particular roles.
+
+Details on the available configuration options can be found in the `WorkqueueConfig.ts` file.
+
+
+#### Event Overview
+
+The configuration of the event overview page (formerly known as *Record Audit*) has been made customizable through the `EventConfig.summary` property.
+The record details displayed on this page can be referenced directly from the declaration form or defined as custom fields that combine multiple form values.
+
+
+#### Quick Search
+
+The dropdown previously available in the search bar has been removed.
+Any search performed through the **Quick Search** bar is now executed against common record properties such as names, tracking ID, and registration number by default, providing a more streamlined and consistent search experience.
 
 ---
 
