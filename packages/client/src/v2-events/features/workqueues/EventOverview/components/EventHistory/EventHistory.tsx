@@ -47,10 +47,6 @@ import {
   eventHistoryStatusMessage
 } from './EventHistoryDialog/EventHistoryDialog'
 
-/**
- * Based on packages/client/src/views/RecordAudit/History.tsx
- */
-
 const LargeGreyedInfo = styled.div`
   height: 231px;
   background-color: ${({ theme }) => theme.colors.grey200};

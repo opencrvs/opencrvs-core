@@ -29,10 +29,10 @@ import {
   AppBar,
   Button,
   Frame,
-  Stack
+  Stack,
+  Icon
 } from '@opencrvs/components'
 import { BackArrow } from '@opencrvs/components/lib/icons'
-import { ProfileMenu } from '@client/components/ProfileMenu'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -131,6 +131,12 @@ function EventOverviewTabs({
   )
 }
 
+const ExitButtonContainer = styled.div`
+  border-left: 1px solid ${({ theme }) => theme.colors.grey200};
+  padding-left: 8px;
+  margin-left: 6px;
+`
+
 export function EventOverviewLayout({
   children
 }: {
@@ -172,8 +178,30 @@ export function EventOverviewLayout({
               event={event}
             />
           }
-          desktopRight={<ProfileMenu key="profileMenu" />}
+          // TODO CIHAN: fix nav
+          desktopRight={
+            <Stack>
+              <ActionMenu eventId={eventId} />
+              <DownloadButton
+                key={`DownloadButton-${eventId}`}
+                event={eventIndexWithDraftApplied}
+                // isDraft={eventIndex.status === EventStatus.Values.CREATED}
+                isDraft={slug === CoreWorkqueues.DRAFT}
+              />
+              <ExitButtonContainer>
+                <Button
+                  data-testid="exit-event"
+                  size="small"
+                  type="icon"
+                  // onClick={() => closeActionView()}
+                >
+                  <Icon name="X" />
+                </Button>
+              </ExitButtonContainer>
+            </Stack>
+          }
           mobileLeft={
+            // TODO CIHAN: fix nav
             <Button type={'icon'} onClick={() => navigate(-1)}>
               <BackArrow />
             </Button>

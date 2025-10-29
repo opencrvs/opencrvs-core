@@ -18,7 +18,6 @@ import {
   EventIndex,
   applyDraftToEventIndex,
   deepDropNulls,
-  EventStatus,
   getOrThrow
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -35,23 +34,15 @@ import {
   getUsersFullName
 } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
-import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { EventSummary } from './components/EventSummary'
-import { ActionMenu } from './components/ActionMenu'
 
 /**
- * Renders the event overview page, including the event summary and history.
+ * Renders the event overview page which shows a summary of the event.
  */
-function EventOverviewFull({
-  event,
-  onAction
-}: {
-  event: EventDocument
-  onAction: () => void
-}) {
+function EventOverviewFull({ event }: { event: EventDocument }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
@@ -98,14 +89,6 @@ function EventOverviewFull({
       size={ContentSize.LARGE}
       title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
-      topActionButtons={[
-        <ActionMenu key={event.id} eventId={event.id} onAction={onAction} />,
-        <DownloadButton
-          key={`DownloadButton-${eventIndex.id}`}
-          event={eventIndex}
-          isDraft={eventIndex.status === EventStatus.Values.CREATED}
-        />
-      ]}
     >
       <EventSummary
         event={flattenedEventIndex}
@@ -119,13 +102,7 @@ function EventOverviewFull({
 /**
  * Renders the protected event overview page with PII hidden in the event summary
  */
-function EventOverviewProtected({
-  eventIndex,
-  onAction
-}: {
-  eventIndex: EventIndex
-  onAction: () => void
-}) {
+function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
   const { eventConfiguration } = useEventConfiguration(eventIndex.type)
   const { status } = eventIndex
   const { getRemoteDraftByEventId } = useDrafts()
@@ -166,18 +143,6 @@ function EventOverviewProtected({
       size={ContentSize.LARGE}
       title={title}
       titleColor={eventIndex.id ? 'copy' : 'grey600'}
-      topActionButtons={[
-        <ActionMenu
-          key={eventIndex.id}
-          eventId={eventIndex.id}
-          onAction={onAction}
-        />,
-        <DownloadButton
-          key={`DownloadButton-${eventIndex.id}`}
-          event={eventIndex}
-          isDraft={eventIndex.status === EventStatus.Values.CREATED}
-        />
-      ]}
     >
       <EventSummary
         hideSecuredFields
@@ -222,11 +187,12 @@ function EventOverviewContainer() {
         />
       )}
       {shouldShowFullOverview ? (
-        <EventOverviewFull event={fullEvent} onAction={getEventQuery.refetch} />
+        <EventOverviewFull event={fullEvent} />
       ) : (
         <EventOverviewProtected
           eventIndex={eventIndex}
-          onAction={getEventQuery.refetch}
+          // TODO CIHAN: do we need this in new one?
+          // onAction={getEventQuery.refetch}
         />
       )}
     </>

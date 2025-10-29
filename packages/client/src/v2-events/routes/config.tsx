@@ -138,7 +138,7 @@ export const routesConfig = {
         },
         {
           path: ROUTES.V2.EVENTS.EVENT.RECORD.path,
-          element: <div>Record</div>
+          element: <ReadonlyViewIndex />
         },
         {
           path: ROUTES.V2.EVENTS.EVENT.AUDIT.path,

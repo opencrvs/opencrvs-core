@@ -81,6 +81,7 @@ export function ActionMenu({
           <PrimaryButton
             data-testid="action-dropdownMenu"
             icon={() => <CaretDown />}
+            size="medium"
           >
             {intl.formatMessage(messages.action)}
           </PrimaryButton>
