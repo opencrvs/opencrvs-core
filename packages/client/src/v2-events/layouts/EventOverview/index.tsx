@@ -17,6 +17,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import styled from 'styled-components'
+import { useSelector } from 'react-redux'
 import {
   applyDraftToEventIndex,
   deepDropNulls,
@@ -31,7 +32,6 @@ import {
   Stack
 } from '@opencrvs/components'
 import { BackArrow } from '@opencrvs/components/lib/icons'
-
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -39,9 +39,12 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/components/ActionMenu'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { ROUTES } from '@client/v2-events/routes'
+import { getLocations } from '@client/offline/selectors'
 import { CoreWorkqueues, flattenEventIndex } from '@client/v2-events/utils'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { EventOverviewProvider } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
 
 const Tab = styled.button`
   border: none;
@@ -137,6 +140,9 @@ export function EventOverviewLayout({
   const { searchEventById } = useEvents()
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(eventId)
+  const { getUser } = useUsers()
+  const users = getUser.getAllCached()
+  const locations = useSelector(getLocations)
 
   const eventResults = searchEventById.useSuspenseQuery(eventId)
 
@@ -192,7 +198,9 @@ export function EventOverviewLayout({
       }
       skipToContentText="skip"
     >
-      {children}
+      <EventOverviewProvider locations={locations} users={users}>
+        {children}
+      </EventOverviewProvider>
     </Frame>
   )
 }

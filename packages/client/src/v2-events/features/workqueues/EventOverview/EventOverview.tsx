@@ -10,7 +10,6 @@
  */
 import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import {
   EventDocument,
@@ -28,7 +27,6 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import {
   AssignmentStatus,
@@ -39,13 +37,10 @@ import {
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useAuthentication } from '@client/utils/userUtils'
-import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
-import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 import { ActionMenu } from './components/ActionMenu'
-import { EventOverviewProvider } from './EventOverviewContext'
 
 /**
  * Renders the event overview page, including the event summary and history.
@@ -59,7 +54,6 @@ function EventOverviewFull({
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
-  const validatorContext = useValidatorContext()
   const { status } = eventIndex
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(eventIndex.id, {
@@ -117,11 +111,6 @@ function EventOverviewFull({
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
         flags={flags}
-      />
-      <EventHistory
-        eventConfiguration={eventConfiguration}
-        fullEvent={event}
-        validatorContext={validatorContext}
       />
     </Content>
   )
@@ -196,7 +185,6 @@ function EventOverviewProtected({
         eventConfiguration={eventConfiguration}
         flags={flags}
       />
-      <EventHistorySkeleton />
     </Content>
   )
 }
@@ -205,15 +193,11 @@ function EventOverviewContainer() {
   const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
   const { searchEventById } = useEvents()
   const { getEvent } = useEvents()
-  const { getUser } = useUsers()
-  const users = getUser.getAllCached()
   const maybeAuth = useAuthentication()
   const authentication = getOrThrow(
     maybeAuth,
     'Authentication is not available but is required'
   )
-
-  const locations = useSelector(getLocations)
 
   // Suspense query is not used here because we want to refetch when an event action is performed
   const getEventQuery = searchEventById.useQuery(params.eventId)
@@ -229,7 +213,7 @@ function EventOverviewContainer() {
     fullEvent && assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
 
   return (
-    <EventOverviewProvider locations={locations} users={users}>
+    <>
       {eventIndex.potentialDuplicates.length > 0 && (
         <DuplicateWarning
           duplicateTrackingIds={eventIndex.potentialDuplicates.map(
@@ -245,7 +229,7 @@ function EventOverviewContainer() {
           onAction={getEventQuery.refetch}
         />
       )}
-    </EventOverviewProvider>
+    </>
   )
 }
 

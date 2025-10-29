@@ -54,6 +54,7 @@ import { ProtectedRoute } from '../../components/ProtectedRoute'
 import { UserAudit } from '../../views/UserAudit/UserAudit'
 import { SystemList } from '../../views/SysAdmin/Config/Systems/Systems'
 import AllUserEmail from '../../views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
+import { EventHistory } from '../features/workqueues/EventOverview/components/EventHistory'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
@@ -141,7 +142,7 @@ export const routesConfig = {
         },
         {
           path: ROUTES.V2.EVENTS.EVENT.AUDIT.path,
-          element: <div>Audit</div>
+          element: <EventHistory />
         }
       ]
     },
