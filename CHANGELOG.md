@@ -31,7 +31,7 @@ Actions must be performed in a defined order and cannot be skipped.
 Event data is collected through **Forms**, which come in two types:
 
 * **Declaration Form** – collects data about the event itself
-* **Action Form** – collects data specific to a particular action
+* **Action Form** – collects data specific to a particular action, also known as annotation data in the system
 
 Forms are composed of **Pages**, and pages are composed of **Fields**.
 Fields can be shown, hidden, or enabled dynamically based on the values of other fields, allowing for a responsive and intuitive user experience.
