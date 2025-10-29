@@ -151,7 +151,7 @@ Details on the available configuration options can be found in the `WorkqueueCon
 #### Event Overview
 
 The configuration of the event overview page (formerly known as *Record Audit*) has been made customizable through the `EventConfig.summary` property.
-The record details displayed on this page can be referenced directly from the declaration form or defined as custom fields that combine multiple form values.
+The record details displayed on this page can be referenced directly from the declaration form or defined as custom fields that combine multiple form values. If some value contains PII data, they can optionally be hidden via the `secured` flag so that the data will only be visible once the record is assigned to the user.
 
 
 #### Quick Search
