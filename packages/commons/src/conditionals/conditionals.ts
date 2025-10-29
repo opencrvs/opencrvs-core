@@ -394,6 +394,12 @@ export function createFieldConditionals(fieldId: string) {
         $$subfield: fieldPath.split('.')
       }
     },
+    getByPath(fieldPath: string[]) {
+      return {
+        ...this,
+        $$subfield: fieldPath
+      }
+    },
     asDob() {
       return this.get('dob')
     },

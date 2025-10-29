@@ -960,7 +960,8 @@ export const FieldConfig: z.ZodType<
     QrReaderField,
     IdReaderField,
     QueryParamReaderField,
-    LoaderField
+    LoaderField,
+    SearchField
   ])
   .openapi({
     description: 'Form field configuration',

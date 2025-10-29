@@ -109,8 +109,13 @@ function SearchInput({
   const isOnline = useOnlineStatus()
 
   const onHTTPChange = (value: HttpFieldValue) => {
-    onChange(value)
-    setHttpState(value)
+    const normalizedData =
+      value.data && Array.isArray(value.data.results)
+        ? { ...value.data, results: value.data.results[0] || null }
+        : value.data
+
+    onChange({ ...value, data: normalizedData })
+    setHttpState({ ...value, data: normalizedData })
   }
   const valid = validateValue(configuration.validation.validator, inputState)
 
@@ -186,7 +191,7 @@ function SearchInput({
         />
         <Http.Input
           configuration={{
-            url: '/api/events/search',
+            url: '/api/events/events/search',
             timeout: 5000,
             method: 'POST',
             headers: {
