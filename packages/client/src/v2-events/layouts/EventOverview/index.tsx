@@ -22,7 +22,8 @@ import {
   applyDraftToEventIndex,
   deepDropNulls,
   EventConfig,
-  EventIndex
+  EventIndex,
+  EventStatus
 } from '@opencrvs/commons/client'
 import {
   APP_BAR_HEIGHT,
@@ -32,7 +33,6 @@ import {
   Stack,
   Icon
 } from '@opencrvs/components'
-import { BackArrow } from '@opencrvs/components/lib/icons'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -40,7 +40,7 @@ import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { getLocations } from '@client/offline/selectors'
-import { CoreWorkqueues, flattenEventIndex } from '@client/v2-events/utils'
+import { flattenEventIndex } from '@client/v2-events/utils'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
@@ -142,7 +142,8 @@ export function EventOverviewLayout({
 }: {
   children: React.ReactNode
 }) {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT)
+  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
   const { searchEventById } = useEvents()
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(eventId)
@@ -155,7 +156,6 @@ export function EventOverviewLayout({
   const navigate = useNavigate()
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
-  const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
   if (eventResults.total === 0) {
     throw new Error(`Event details with id ${eventId} not found`)
@@ -168,6 +168,17 @@ export function EventOverviewLayout({
     ? applyDraftToEventIndex(event, draft, eventConfiguration)
     : event
 
+  const isDraft = event.status === EventStatus.Values.CREATED
+
+  const exit = () => {
+    if (workqueue) {
+      navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
+      return
+    }
+
+    navigate(ROUTES.V2.buildPath({}))
+  }
+
   return (
     <Frame
       header={
@@ -178,22 +189,20 @@ export function EventOverviewLayout({
               event={event}
             />
           }
-          // TODO CIHAN: fix nav
           desktopRight={
             <Stack>
               <ActionMenu eventId={eventId} />
               <DownloadButton
                 key={`DownloadButton-${eventId}`}
                 event={eventIndexWithDraftApplied}
-                // isDraft={eventIndex.status === EventStatus.Values.CREATED}
-                isDraft={slug === CoreWorkqueues.DRAFT}
+                isDraft={isDraft}
               />
               <ExitButtonContainer>
                 <Button
                   data-testid="exit-event"
                   size="small"
                   type="icon"
-                  // onClick={() => closeActionView()}
+                  onClick={exit}
                 >
                   <Icon name="X" />
                 </Button>
@@ -201,9 +210,8 @@ export function EventOverviewLayout({
             </Stack>
           }
           mobileLeft={
-            // TODO CIHAN: fix nav
-            <Button type={'icon'} onClick={() => navigate(-1)}>
-              <BackArrow />
+            <Button type={'icon'} onClick={exit}>
+              <Icon name="X" />
             </Button>
           }
           mobileRight={
@@ -212,7 +220,7 @@ export function EventOverviewLayout({
               <DownloadButton
                 key={`DownloadButton-${eventId}`}
                 event={eventIndexWithDraftApplied}
-                isDraft={slug === CoreWorkqueues.DRAFT}
+                isDraft={isDraft}
               />
             </>
           }

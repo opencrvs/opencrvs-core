@@ -23,7 +23,7 @@ import {
 } from './CountryConfigQueryInput'
 import { AvailableIcons } from '../icons'
 import { QueryType } from './EventIndex'
-import { workqueueActions } from './ActionType'
+import { ActionType, workqueueActions } from './ActionType'
 
 export const mandatoryColumns = defineWorkqueuesColumns([
   {
@@ -46,7 +46,8 @@ export const mandatoryColumns = defineWorkqueuesColumns([
 
 export const WorkqueueActionsWithDefault = z.enum([
   ...workqueueActions.options,
-  'DEFAULT'
+  'DEFAULT',
+  ActionType.READ
 ] as const)
 
 export type WorkqueueActionsWithDefault = z.infer<
