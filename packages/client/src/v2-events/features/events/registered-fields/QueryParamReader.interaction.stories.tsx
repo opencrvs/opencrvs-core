@@ -141,8 +141,8 @@ const testHttpFetch = {
       'Content-Type': 'application/json'
     },
     params: {
-      token: field('test.query-param-reader').get('auth_token'),
-      session: field('test.query-param-reader').get('client_session')
+      token: field('test.query-param-reader').get('data.auth_token'),
+      session: field('test.query-param-reader').get('data.client_session')
     }
   }
 }
