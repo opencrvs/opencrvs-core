@@ -161,10 +161,12 @@ to define precise deduplication rules.
 
 #### Greater Control over Actions
 
-Each action now has three states: `requested`, `accepted`, and `rejected`.
-Core now delegates more control to **countryconfig**, which decides whether to accept or reject an action either **synchronously** or **asynchronously**.
+Each action now progresses through three possible states: **`requested`**, **`accepted`**, and **`rejected`**.
+When a user performs an action, it is first marked as **`requested`** and forwarded to **countryconfig** via the `/trigger/events/{event}/actions/{action}` route, with the complete event details included in the payload.
 
-By hooking into these actions, countryconfig can also:
+Countryconfig has full control over how the action is processed and may choose to **accept** or **reject** the action either **synchronously** or **asynchronously**.
+
+By hooking into these action trigger routes, countryconfig can also:
 
 * Send customized **Notifications**
 * Access the full event data at the time an action is performed
