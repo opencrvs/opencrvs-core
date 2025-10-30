@@ -752,7 +752,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 89ada113-3348-4d35-a3fb-85c7369e605f
+                transactionId: 30015c1c-bfc7-4f7f-a756-9f84b6c4a32f
                 type: birth
       responses:
         "200":
@@ -1426,7 +1426,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: be833823-5faa-4e3f-b4a6-abb6cf0e3b22
+                transactionId: 90d5b81a-096a-4d33-b875-bda1a56ff8dc
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -11402,6 +11402,19 @@ components:
                         - $ref: "#/components/schemas/TranslationConfig"
                     confirmButton:
                       $ref: "#/components/schemas/TranslationConfig"
+                    clearButton:
+                      $ref: "#/components/schemas/TranslationConfig"
+                    clearModal:
+                      type: object
+                      properties:
+                        title:
+                          $ref: "#/components/schemas/TranslationConfig"
+                        description:
+                          $ref: "#/components/schemas/TranslationConfig"
+                        cancel:
+                          $ref: "#/components/schemas/TranslationConfig"
+                        confirm:
+                          $ref: "#/components/schemas/TranslationConfig"
                     ok:
                       $ref: "#/components/schemas/TranslationConfig"
               required:

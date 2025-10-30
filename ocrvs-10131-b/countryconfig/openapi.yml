@@ -8360,6 +8360,19 @@ components:
                       description: Text to display when there is an HTTP error during the search
                     confirmButton:
                       $ref: "#/components/schemas/TranslationConfig"
+                    clearButton:
+                      $ref: "#/components/schemas/TranslationConfig"
+                    clearModal:
+                      type: object
+                      properties:
+                        title:
+                          $ref: "#/components/schemas/TranslationConfig"
+                        description:
+                          $ref: "#/components/schemas/TranslationConfig"
+                        cancel:
+                          $ref: "#/components/schemas/TranslationConfig"
+                        confirm:
+                          $ref: "#/components/schemas/TranslationConfig"
                     ok:
                       $ref: "#/components/schemas/TranslationConfig"
               required:
