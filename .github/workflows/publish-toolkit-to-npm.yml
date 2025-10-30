@@ -36,9 +36,15 @@ jobs:
       - name: Check if version exists on npm
         id: check-version
         run: |
-          PACKAGE_VERSION=$(node -p "require('../../package.json').version")
           if [ "$GITHUB_REF_TYPE" = "tag" ]; then
-            TOOLKIT_VERSION="$GITHUB_REF_NAME"
+            TAG_NAME="$GITHUB_REF_NAME"
+            if [[ "$TAG_NAME" =~ ([0-9]+)\.([0-9]+)\.([0-9]+)([-+][A-Za-z0-9.-]+)?$ ]]; then
+              TOOLKIT_VERSION="${BASH_REMATCH[0]}"
+              echo "✅ Using semantic version: $TOOLKIT_VERSION"
+            else
+              echo "❌ Tag '$TAG_NAME' is not a valid semantic version (expected something like 1.2.3 or v1.2.3)"
+              exit 1
+            fi
           else
             TOOLKIT_VERSION="$PACKAGE_VERSION-rc.$(git rev-parse --short=7 HEAD)"
           fi
