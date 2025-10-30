@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.9.0 Release candidate
+## 1.9.0 Release
 
 ### Breaking changes
 
