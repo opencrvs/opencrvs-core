@@ -2,6 +2,12 @@
 
 ## 1.9.0 Release candidate
 
+### Breaking changes
+
+* Dashboard configuration through **Metabase** has been fully migrated to **countryconfig**, and the standalone dashboard package has been removed.
+  For details on configuring dashboards and information about the latest updates, refer to the [ANALYTICS.md](https://github.com/opencrvs/opencrvs-countryconfig/blob/v1.9.0/infrastructure/metabase/README.md) documentation.
+
+
 ### New features
 
 #### Events V2
