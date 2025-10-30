@@ -1,6 +1,12 @@
 # Changelog
 
-## 1.9.0 Release candidate
+## 1.9.0 Release
+
+### Breaking changes
+
+* Dashboard configuration through **Metabase** has been fully migrated to **countryconfig**, and the standalone dashboard package has been removed.
+  For details on configuring dashboards and information about the latest updates, refer to the [ANALYTICS.md](https://github.com/opencrvs/opencrvs-countryconfig/blob/v1.9.0/infrastructure/metabase/README.md) documentation.
+
 
 ### New features
 
@@ -18,13 +24,53 @@ Each event is defined by a configuration that specifies the sequence of **Action
 
 ##### Actions
 
-**Actions** are the steps users perform to register an event.
-The available actions depend on:
+###### Declaration Actions
 
-* The user’s permissions (scopes)
-* The current status of the event
+Declaration actions are used to modify an event’s declaration.
+These actions must be executed in a defined order and cannot be skipped.
 
-Actions must be performed in a defined order and cannot be skipped.
+1. **DECLARE**
+2. **VALIDATE**
+3. **REGISTER**
+
+Each action must be accepted by **countryconfig** before the next one can be performed.
+
+
+###### Rejecting and Archiving
+
+After declaration, instead of proceeding with registration, an event may be either **rejected** or **archived**.
+
+If **deduplication** is enabled for an action, performing that action may trigger a **DUPLICATE_DETECTED** action if duplicates are found.
+When this occurs, two additional actions become available:
+
+* **MARK_AS_DUPLICATE** – archives the event.
+* **MARK_AS_NOT_DUPLICATE** – resumes the normal action flow.
+
+If an event is rejected by a user, the preceding action must be repeated before continuing.
+
+
+###### Actions Before Declaration
+
+1. **NOTIFY** – a partial version of the `DECLARE` action.
+2. **DELETE** – an event can be deleted only if no declaration action has yet been performed.
+
+
+###### Actions After Registration
+
+Once an event has been registered, a certificate may be printed.
+If a correction is required due to an error in the registered declaration, a correction workflow must be initiated.
+
+1. **PRINT_CERTIFICATE**
+2. **REQUEST_CORRECTION**
+3. **REJECT_CORRECTION**
+4. **APPROVE_CORRECTION**
+
+
+###### General / Meta Actions
+
+1. **READ** – appended to the action trail whenever a complete event record is retrieved.
+2. **ASSIGN** – required before any action can be performed. By default, the user is automatically unassigned after completing an action.
+3. **UNASSIGN** – triggered either automatically by the system or manually by a user (if the record is assigned to themselves or if the user has the appropriate permission).
 
 ##### Forms, Pages, and Fields
 
@@ -82,12 +128,12 @@ These conditions can control:
 
 They can also be used to validate form data dynamically based on the current form state or user context.
 
-##### Drafts
+#### Drafts
 
 The new **Drafts** feature allows users to save progress on an event that has not yet been registered.
 Drafts act as temporary storage for an action and are visible only to the user who created them.
 
-##### Advanced Search
+#### Advanced Search
 
 Advanced search is now configurable through the `EventConfig.advancedSearch` property, allowing different sections of an advanced search form to be defined.
 
@@ -104,7 +150,7 @@ You can search across:
 
 More details about the metadata fields are available in `packages/commons/src/events/EventMetadata.ts`.
 
-##### Deduplication
+#### Deduplication
 
 Event deduplication is now configurable **per action** via the `EventConfig.actions[].deduplication` property.
 Helpers for defining deduplication logic—such as `and`, `or`, `not`, and `field`—are available from `@opencrvs/toolkit/events/deduplication`.
@@ -119,15 +165,103 @@ dateRangeMatches()
 
 to define precise deduplication rules.
 
-##### Greater Control over Actions
+#### Greater Control over Actions
 
-Each action now has three states: `requested`, `accepted`, and `rejected`.
-Core now delegates more control to **countryconfig**, which decides whether to handle these states **synchronously** or **asynchronously**.
+Each action now progresses through three possible states: **`requested`**, **`accepted`**, and **`rejected`**.
+When a user performs an action, it is first marked as **`requested`** and forwarded to **countryconfig** via the `/trigger/events/{event}/actions/{action}` route, with the complete event details included in the payload.
 
-By hooking into these actions, countryconfig can also:
+Countryconfig has full control over how the action is processed and may choose to **accept** or **reject** the action either **synchronously** or **asynchronously**.
+
+By hooking into these action trigger routes, countryconfig can also:
 
 * Send customized **Notifications**
 * Access the full event data at the time an action is performed
+
+#### Configurable Workqueues
+
+Workqueues can now be configured from countryconfig using the `defineWorkqueues` function from `@opencrvs/toolkit/events`.
+This enables the creation of role- or workflow-specific queues without requiring code changes in core.
+
+* The **`actions`** property is used to define the default actions displayed for records within a workqueue.
+* The **`query`** property is used to determine which events are included in the workqueue.
+* The **`workqueue[id=workqueue-one|workqueue-two]`** scope is used to control the visibility of workqueues for particular roles.
+
+Details on the available configuration options can be found in the `WorkqueueConfig.ts` file.
+
+
+#### Event Overview
+
+The configuration of the event overview page (formerly known as *Record Audit*) has been made customizable through the `EventConfig.summary` property.
+The record details displayed on this page can be referenced directly from the declaration form or defined as custom fields that combine multiple form values. If some value contains PII data, they can optionally be hidden via the `secured` flag so that the data will only be visible once the record is assigned to the user.
+
+
+#### Quick Search
+
+The dropdown previously available in the search bar has been removed.
+Any search performed through the **Quick Search** bar is now executed against common record properties such as names, tracking ID, and registration number by default, providing a more streamlined and consistent search experience.
+
+#### Certificate Template Variables
+
+The following variables are available for use within certificate templates:
+
+* **`$declaration`** – Contains the latest raw declaration form data. Typically used with the `$lookup` Handlebars helper to resolve values into human-readable text.
+* **`$metadata`** – Contains the `EventMetadata` object. Commonly used with the `$lookup` helper for resolving metadata fields into readable values.
+* **`$review`** – A boolean flag indicating whether the certificate is being rendered in review mode.
+* **`$references`** – Contains reference data for locations and users, accessible via `{{ $references.locations }}` and `{{ $references.users }}`.
+  This is useful when manually resolving values from `$declaration`, `$metadata` or `action`.
+
+##### Handlebars Helpers
+
+The following helpers are supported within certificate templates:
+
+* **`$lookup`** – Resolves values from `$declaration`, `$metadata`, or `action` data into a human-readable format.
+* **`$intl`** – Dynamically constructs a translation key by joining multiple string parts.
+  Example:
+
+  ```hbs
+  {{ $intl 'constants.greeting' (lookup $declaration "child.name") }}
+  ```
+* **`$intlWithParams`** – Enables dynamic translations with parameters.
+  Takes a translation ID as the first argument, followed by parameter name–value pairs.
+  Example:
+
+  ```hbs
+  {{ $intlWithParams 'constants.greeting' 'name' (lookup $declaration "child.name") }}
+  ```
+* **`$actions`** – Resolves all actions for a specified action type.
+  Example:
+
+  ```hbs
+  {{ $actions "PRINT_CERTIFICATE" }}
+  ```
+* **`$action`** – Retrieves the latest action data for a specific action type.
+  Example:
+
+  ```hbs
+  {{ $action "PRINT_CERTIFICATE" }}
+  ```
+* **`ifCond`** – Compares two values (`v1` and `v2`) using the specified operator and conditionally renders a block based on the result.
+  **Supported operators:**
+
+  * `'==='` – strict equality
+  * `'!=='` – strict inequality
+  * `'<'`, `'<='`, `'>'`, `'>='` – numeric or string comparisons
+  * `'&&'` – both values must be truthy
+  * `'||'` – at least one value must be truthy
+
+  **Usage example:**
+
+  ```hbs
+  {{#ifCond value1 '===' value2}}
+    ...
+  {{/ifCond}}
+  ```
+* **`$or`** – Returns the first truthy value among the provided arguments.
+* **`$json`** – Converts any value to its JSON string representation (useful for debugging).
+
+Besides the ones introduced above, all built-in [Handlebars helpers](https://handlebarsjs.com/guide/builtin-helpers.html) are available.
+
+Custom helpers can also be added by exposing functions from this [file](https://github.com/opencrvs/opencrvs-countryconfig/blob/develop/src/form/common/certificate/handlebars/helpers.ts#L0-L1).
 
 ---
 
