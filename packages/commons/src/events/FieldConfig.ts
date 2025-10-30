@@ -740,6 +740,15 @@ const SearchField = HttpField.extend({
           'Text to display when there is an HTTP error during the search'
         ),
         confirmButton: TranslationConfig.optional(),
+        clearButton: TranslationConfig.optional(),
+        clearModal: z
+          .object({
+            title: TranslationConfig.optional(),
+            description: TranslationConfig.optional(),
+            cancel: TranslationConfig.optional(),
+            confirm: TranslationConfig.optional()
+          })
+          .optional(),
         ok: TranslationConfig.optional()
       })
       .optional()

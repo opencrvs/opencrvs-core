@@ -15,21 +15,23 @@ import * as z from 'zod'
 import styled from 'styled-components'
 import {
   SearchField,
-  TranslationConfig,
   validateValue,
   HttpFieldValue,
   EventIndex
 } from '@opencrvs/commons/client'
 import {
+  Button,
   IColor,
   Link,
   Loader,
+  ResponsiveModal,
   Stack,
   Text,
   TextInput
 } from '@opencrvs/components'
 import { SecondaryButton } from '@opencrvs/components/lib/buttons'
 import { useOnlineStatus } from '@client/utils'
+import { useModal } from '@client/v2-events/hooks/useModal'
 import { Http, Props } from './Http'
 
 const defaultIndicators = {
@@ -63,7 +65,88 @@ const defaultIndicators = {
     defaultMessage: 'Found {count} results',
     description: 'OK button text',
     id: 'searchField.indicators.ok'
+  },
+  clearButton: {
+    defaultMessage: 'Clear',
+    description: 'Clear button text',
+    id: 'searchField.indicators.clearButton'
+  },
+  clearModal: {
+    title: {
+      defaultMessage: 'Clear search results?',
+      description: 'Title for the clear confirmation modal',
+      id: 'searchField.indicators.clearModal.title'
+    },
+    description: {
+      defaultMessage: 'This will remove the current search results.',
+      description: 'Description for the clear confirmation modal',
+      id: 'searchField.indicators.clearModal.description'
+    },
+    cancel: {
+      defaultMessage: 'Cancel',
+      description: 'Cancel button for clear confirmation modal',
+      id: 'searchField.indicators.clearModal.cancel'
+    },
+    confirm: {
+      defaultMessage: 'Confirm',
+      description: 'Confirm button for clear confirmation modal',
+      id: 'searchField.indicators.clearModal.confirm'
+    }
   }
+}
+
+function ClearModal({
+  close,
+  configuration
+}: {
+  close: (result: boolean) => void
+  configuration: SearchField['configuration']
+}) {
+  const intl = useIntl()
+
+  return (
+    <ResponsiveModal
+      autoHeight
+      preventClickOnParent
+      show
+      actions={[
+        <Button
+          key="cancel-btn"
+          id="cancel"
+          type="tertiary"
+          onClick={() => close(false)}
+        >
+          {intl.formatMessage(
+            configuration.indicators?.clearModal?.cancel ??
+              defaultIndicators.clearModal.cancel
+          )}
+        </Button>,
+        <Button
+          key="clear-btn"
+          id="clear"
+          type="positive"
+          onClick={() => close(true)}
+        >
+          {intl.formatMessage(
+            configuration.indicators?.clearModal?.confirm ??
+              defaultIndicators.clearModal.confirm
+          )}
+        </Button>
+      ]}
+      handleClose={() => close(false)}
+      id="clearModal"
+      responsive={false}
+      title={intl.formatMessage(
+        configuration.indicators?.clearModal?.title ??
+          defaultIndicators.clearModal.title
+      )}
+    >
+      {intl.formatMessage(
+        configuration.indicators?.clearModal?.description ??
+          defaultIndicators.clearModal.description
+      )}
+    </ResponsiveModal>
+  )
 }
 
 const SearchInputWrapper = styled.div`
@@ -71,14 +154,13 @@ const SearchInputWrapper = styled.div`
   width: 100%;
   gap: 8px;
 `
-
 function Postfix({
-  loadingIndicator = defaultIndicators.loading,
+  configuration,
   isLoading = false,
   hasData = false,
   clearData
 }: {
-  loadingIndicator?: TranslationConfig
+  configuration: SearchField['configuration']
   isLoading?: boolean
   hasData?: boolean
   clearData: () => void
@@ -86,7 +168,13 @@ function Postfix({
   const intl = useIntl()
 
   if (hasData) {
-    return <Link onClick={clearData}>{'Clear'}</Link>
+    return (
+      <Link onClick={clearData}>
+        {intl.formatMessage(
+          configuration.indicators?.clearButton ?? defaultIndicators.clearButton
+        )}
+      </Link>
+    )
   }
 
   if (!isLoading) {
@@ -94,7 +182,9 @@ function Postfix({
   }
   return (
     <Stack>
-      {intl.formatMessage(loadingIndicator)}
+      {intl.formatMessage(
+        configuration.indicators?.loading ?? defaultIndicators.loading
+      )}
       <Loader
         id="search-loading-indicator"
         innerMargin={0}
@@ -137,17 +227,24 @@ function SearchInput({
 }) {
   const intl = useIntl()
 
-  const [inputState, setInputState] = useState(value?.data?.input ?? null)
+  const [modal, openModal] = useModal()
+
+  const [inputState, setInputState] = useState(value?.data?.input ?? '')
   const [buttonPressed, setButtonPressed] = useState(0)
   const [httpState, setHttpState] = useState<HttpFieldValue | null>(
     value ?? null
   )
   const isOnline = useOnlineStatus()
 
-  const clearData = () => {
-    setInputState(null)
-    setHttpState(null)
-    onChange(null)
+  const clearData = async () => {
+    const confirm = await openModal<boolean>((close) => (
+      <ClearModal close={close} configuration={configuration} />
+    ))
+    if (confirm) {
+      setInputState('')
+      setHttpState(null)
+      onChange(null)
+    }
   }
 
   const onHTTPChange = (val: HttpFieldValue) => {
@@ -241,10 +338,10 @@ function SearchInput({
           isDisabled={!isEditable}
           postfix={
             <Postfix
-              clearData={() => clearData()}
+              clearData={async () => clearData()}
+              configuration={configuration}
               hasData={!!((httpState?.data?.total ?? 0) > 0)}
               isLoading={httpState?.loading}
-              loadingIndicator={configuration.indicators?.loading}
             />
           }
           value={inputState}
@@ -293,6 +390,7 @@ function SearchInput({
           {message}
         </Text>
       )}
+      {modal}
     </Stack>
   )
 }
