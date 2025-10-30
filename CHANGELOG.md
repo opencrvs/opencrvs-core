@@ -192,6 +192,69 @@ The record details displayed on this page can be referenced directly from the de
 The dropdown previously available in the search bar has been removed.
 Any search performed through the **Quick Search** bar is now executed against common record properties such as names, tracking ID, and registration number by default, providing a more streamlined and consistent search experience.
 
+#### Certificate Template Variables
+
+The following variables are available for use within certificate templates:
+
+* **`$declaration`** – Contains the latest raw declaration form data. Typically used with the `$lookup` Handlebars helper to resolve values into human-readable text.
+* **`$metadata`** – Contains the `EventMetadata` object. Commonly used with the `$lookup` helper for resolving metadata fields into readable values.
+* **`$review`** – A boolean flag indicating whether the certificate is being rendered in review mode.
+* **`$references`** – Contains reference data for locations and users, accessible via `{{ $references.locations }}` and `{{ $references.users }}`.
+  This is useful when manually resolving values from `$declaration`, `$metadata` or `action`.
+
+##### Handlebars Helpers
+
+The following helpers are supported within certificate templates:
+
+* **`$lookup`** – Resolves values from `$declaration`, `$metadata`, or `action` data into a human-readable format.
+* **`$intl`** – Dynamically constructs a translation key by joining multiple string parts.
+  Example:
+
+  ```hbs
+  {{ $intl 'constants.greeting' (lookup $declaration "child.name") }}
+  ```
+* **`$intlWithParams`** – Enables dynamic translations with parameters.
+  Takes a translation ID as the first argument, followed by parameter name–value pairs.
+  Example:
+
+  ```hbs
+  {{ $intlWithParams 'constants.greeting' 'name' (lookup $declaration "child.name") }}
+  ```
+* **`$actions`** – Resolves all actions for a specified action type.
+  Example:
+
+  ```hbs
+  {{ $actions "PRINT_CERTIFICATE" }}
+  ```
+* **`$action`** – Retrieves the latest action data for a specific action type.
+  Example:
+
+  ```hbs
+  {{ $action "PRINT_CERTIFICATE" }}
+  ```
+* **`ifCond`** – Compares two values (`v1` and `v2`) using the specified operator and conditionally renders a block based on the result.
+  **Supported operators:**
+
+  * `'==='` – strict equality
+  * `'!=='` – strict inequality
+  * `'<'`, `'<='`, `'>'`, `'>='` – numeric or string comparisons
+  * `'&&'` – both values must be truthy
+  * `'||'` – at least one value must be truthy
+
+  **Usage example:**
+
+  ```hbs
+  {{#ifCond value1 '===' value2}}
+    ...
+  {{/ifCond}}
+  ```
+* **`$or`** – Returns the first truthy value among the provided arguments.
+* **`$json`** – Converts any value to its JSON string representation (useful for debugging).
+
+Besides the ones introduced above, all built-in [Handlebars helpers](https://handlebarsjs.com/guide/builtin-helpers.html) are available.
+
+Custom helpers can also be added by exposing functions from this [file](https://github.com/opencrvs/opencrvs-countryconfig/blob/develop/src/form/common/certificate/handlebars/helpers.ts#L0-L1).
+
 ---
 
 To see Events V2 in action, check out the example configurations in the **countryconfig** repository.
