@@ -128,7 +128,7 @@ export const HttpFieldUpdateValue = z
 
 export const QueryParamReaderFieldValue = z
   .object({
-    params: z.record(z.string(), z.string())
+    data: z.record(z.string(), z.string())
   })
   .nullish()
 
@@ -137,7 +137,7 @@ export type QueryParamReaderFieldValue = z.infer<
 >
 
 export const QueryParamReaderFieldUpdateValue = z.object({
-  params: z.record(z.string(), z.string())
+  data: z.record(z.string(), z.string())
 })
 
 const ReadDataValue = z.object({

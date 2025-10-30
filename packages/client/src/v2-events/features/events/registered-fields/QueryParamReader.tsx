@@ -59,7 +59,7 @@ function QueryParamReaderInput({
     void Promise.resolve().then(() => {
       if (Object.keys(fieldValue).length) {
         onChangeRef.current({
-          params: {
+          data: {
             ...fieldValue,
             // to ensure formik sees it as a new value even if the params are the same
             [Symbol('updated')]: true
