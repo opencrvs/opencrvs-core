@@ -281,7 +281,7 @@ export function createEmptyDraft(
       declaration: {},
       annotation: {},
       createdAt: new Date().toISOString(),
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdBy: '@todo',
       status: ActionStatus.Accepted,
       transactionId: '@todo',

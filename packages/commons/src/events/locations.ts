@@ -10,7 +10,7 @@
  */
 
 import { UUID } from '../uuid'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 export const LocationType = z.enum([
   'ADMIN_STRUCTURE',
@@ -24,7 +24,7 @@ export const Location = z.object({
   id: UUID,
   name: z.string(),
   parentId: UUID.nullable(),
-  validUntil: z.string().datetime().nullable(),
+  validUntil: z.iso.datetime().nullable(),
   locationType: LocationType.nullable()
 })
 

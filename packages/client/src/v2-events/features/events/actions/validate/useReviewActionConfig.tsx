@@ -57,7 +57,7 @@ export function useReviewActionConfig({
       buttonType: 'positive' as const,
       incomplete,
       onConfirm: (eventId: string) => {
-        if (status === EventStatus.Enum.NOTIFIED) {
+        if (status === EventStatus.enum.NOTIFIED) {
           return events.customActions.registerOnDeclare.mutate({
             eventId,
             declaration,
@@ -84,7 +84,7 @@ export function useReviewActionConfig({
       buttonType: 'positive' as const,
       incomplete,
       onConfirm: (eventId: string) => {
-        if (status === EventStatus.Enum.NOTIFIED) {
+        if (status === EventStatus.enum.NOTIFIED) {
           return events.customActions.validateOnDeclare.mutate({
             eventId,
             declaration,

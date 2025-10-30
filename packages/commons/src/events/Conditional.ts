@@ -9,22 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { JSONSchema } from '../conditionals/conditionals'
-import { z } from 'zod'
-import { extendZodWithOpenApi } from 'zod-openapi'
-extendZodWithOpenApi(z)
+import * as z from 'zod/v4'
 
 /*
  * Using JSONSchema directly here would cause a
  * "The inferred type of this node exceeds the maximum length the compiler will serialize."
  * error, so I've copied the type here
  */
-export const Conditional = z
-  .custom<JSONSchema>((val) => typeof val === 'object' && val !== null)
-  .openapi({
-    description: 'JSON schema conditional configuration',
-    ref: 'Conditional'
-  })
+export const Conditional = z.any().describe('JSONSchema').meta({
+  description: 'JSON schema conditional configuration',
+  id: 'Conditional'
+})
 
 /**
  * By default, when conditionals are undefined, action is visible and enabled to everyone.
@@ -77,7 +72,8 @@ export const ActionConditional = z.discriminatedUnion('type', [
   ShowConditional,
   // Action can be shown to the user in the list but as disabled
   EnableConditional
-]) as unknown as z.ZodDiscriminatedUnion<'type', ActionConditionalType[]>
+])
+// REMOVED_AS as unknown as z.ZodDiscriminatedUnion<'type', ActionConditionalType[]>
 
 export type ActionConditional = InferredActionConditional
 
@@ -117,9 +113,10 @@ export const FieldConditional = z
     // Field output can be shown / hidden on the review page
     DisplayOnReviewConditional
   ])
-  .openapi({
+  .meta({
     description: 'Field conditional configuration',
-    ref: 'FieldConditional'
-  }) as unknown as z.ZodDiscriminatedUnion<'type', FieldConditionalType[]>
+    id: 'FieldConditional'
+  })
+// REMOVED_AS as unknown as z.ZodDiscriminatedUnion<'type', FieldConditionalType[]>
 
 export type FieldConditional = z.infer<typeof FieldConditional>

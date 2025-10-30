@@ -121,7 +121,7 @@ export function getLeafLocationIds(
  * @returns array of leaf location IDs within the specified types. When no types are provided, returns leaf locations based on all types.
  */
 export function useSuspenseAdminLeafLevelLocations() {
-  const locationType = LocationType.Enum.ADMIN_STRUCTURE
+  const locationType = LocationType.enum.ADMIN_STRUCTURE
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
 

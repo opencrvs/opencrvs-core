@@ -123,8 +123,7 @@ const WarningText = styled.p`
   border-bottom: 1px solid ${({ theme }) => theme.colors.negative};
   color: ${({ theme }) => theme.colors.negative};
   ${({ theme }) => theme.fonts.bold14}
-  /* stylelint-disable-next-line opencrvs/no-font-styles */
-  line-height: 0.1em;
+  line-height: 0.1em; /* stylelint-disable-line opencrvs/no-font-styles */
   text-transform: uppercase;
 
   span {

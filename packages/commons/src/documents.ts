@@ -9,9 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-import { extendZodWithOpenApi } from 'zod-openapi'
-extendZodWithOpenApi(z)
+import * as z from 'zod/v4'
 
 export const MINIO_REGEX =
   /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|png|jpeg|svg)(\?.*)?$/i
@@ -38,8 +36,8 @@ export type FullDocumentUrl = z.infer<typeof FullDocumentUrl>
 
 export const FullDocumentPath = z
   .string()
-  .transform((val) => (val.startsWith('/') ? val : `/${val}`))
-  .openapi({ effectType: 'input', type: 'string' })
+  .overwrite((val) => (val.startsWith('/') ? val : `/${val}`))
+  .meta({ effectType: 'input', type: 'string' })
   .describe(
     'A full absolute path with bucket name, starting from the root of the S3 server, /bucket-name/document-id.jpg'
   )

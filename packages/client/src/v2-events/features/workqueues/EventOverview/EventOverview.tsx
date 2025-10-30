@@ -109,7 +109,7 @@ function EventOverviewFull({
         <DownloadButton
           key={`DownloadButton-${eventIndex.id}`}
           event={eventIndex}
-          isDraft={eventIndex.status === EventStatus.Values.CREATED}
+          isDraft={eventIndex.status === EventStatus.enum.CREATED}
         />
       ]}
     >
@@ -186,7 +186,7 @@ function EventOverviewProtected({
         <DownloadButton
           key={`DownloadButton-${eventIndex.id}`}
           event={eventIndex}
-          isDraft={eventIndex.status === EventStatus.Values.CREATED}
+          isDraft={eventIndex.status === EventStatus.enum.CREATED}
         />
       ]}
     >

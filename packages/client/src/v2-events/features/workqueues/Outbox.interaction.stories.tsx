@@ -89,7 +89,7 @@ const mockUser = generator.user.fieldAgent().v2
 
 export const SuccessfulMutation: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT,
+    userRole: TestUserRole.enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
@@ -171,7 +171,7 @@ const declarationTrpcMswFail = {
 
 export const FailedMutation: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT,
+    userRole: TestUserRole.enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
@@ -248,7 +248,7 @@ const declarationTrpcMswConflict = {
 
 export const FailedMutationConflict: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT,
+    userRole: TestUserRole.enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({

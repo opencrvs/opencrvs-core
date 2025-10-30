@@ -145,7 +145,11 @@ test('Throws when searching without payload', async () => {
     'search[event=tennis-club-membership,access=all]'
   ])
 
-  await expect(client.event.search({})).rejects.toMatchSnapshot()
+  await expect(
+    client.event.search({
+      query: undefined
+    })
+  ).rejects.toMatchSnapshot()
 })
 
 test('Throws when searching by unrelated properties', async () => {

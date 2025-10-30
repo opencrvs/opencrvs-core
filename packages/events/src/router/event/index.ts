@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-import { extendZodWithOpenApi } from 'zod-openapi'
+import * as z from 'zod/v4'
 import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -59,8 +58,6 @@ import { UserContext } from '../../context'
 import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
-
-extendZodWithOpenApi(z)
 
 export const eventRouter = router({
   config: router({
@@ -113,6 +110,7 @@ export const eventRouter = router({
     }),
   get: publicProcedure
     .input(UUID)
+    // @ts-expect-error: middleware.userCanReadEvent does not have proper type definitions but works as intended
     .use(middleware.userCanReadEvent)
     .query(async ({ ctx }) => {
       const event = ctx.event

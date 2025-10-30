@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { FullDocumentPath } from '../documents'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 /**
  * Composite field value consists of multiple field values.
@@ -58,10 +58,7 @@ export const StreetLevelDetailsValue = z
 export const AddressFieldValue = z.object({
   country: z.string(),
   addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL]),
-  administrativeArea: z
-    .string()
-    .uuid()
-    .optional() /* Leaf level admin structure */,
+  administrativeArea: z.uuid().optional() /* Leaf level admin structure */,
   streetLevelDetails: StreetLevelDetailsValue
 })
 
@@ -72,10 +69,7 @@ export const StreetLevelDetailsUpdateValue = z
 export const AddressFieldUpdateValue = z.object({
   country: z.string(),
   addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL]),
-  administrativeArea: z
-    .string()
-    .uuid()
-    .nullish() /* Leaf level admin structure */,
+  administrativeArea: z.uuid().nullish() /* Leaf level admin structure */,
   streetLevelDetails: StreetLevelDetailsUpdateValue
 })
 

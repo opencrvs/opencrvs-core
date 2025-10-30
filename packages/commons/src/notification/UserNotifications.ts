@@ -11,7 +11,7 @@
 
 import { joinUrl } from '../url'
 import { NameFieldValue } from '../events'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 export const TriggerEvent = {
   USER_CREATED: 'user-created',

@@ -93,7 +93,7 @@ export function testDataGenerator(rngSeed?: number) {
         mobile: '+260911111111',
         email: 'kalushabwalya17@gmail.com',
         role: {
-          id: TestUserRole.Enum.SOCIAL_WORKER,
+          id: TestUserRole.enum.SOCIAL_WORKER,
           label: {
             id: 'userRole.hospitalClerk',
             defaultMessage: 'Hospital Clerk',
@@ -128,7 +128,7 @@ export function testDataGenerator(rngSeed?: number) {
       v2: {
         id: user.id.registrationAgent,
         name: [{ use: 'en', given: ['Felix'], family: 'Katongo' }],
-        role: TestUserRole.Enum.REGISTRATION_AGENT,
+        role: TestUserRole.enum.REGISTRATION_AGENT,
         avatar: undefined,
         signature: undefined,
         fullHonorificName: undefined,
@@ -145,7 +145,7 @@ export function testDataGenerator(rngSeed?: number) {
         email: 'kalushabwalya17+@gmail.com',
         fullHonorificName: null,
         role: {
-          id: TestUserRole.Enum.REGISTRATION_AGENT,
+          id: TestUserRole.enum.REGISTRATION_AGENT,
           label: {
             id: 'userRole.registrationAgent',
             defaultMessage: 'Registration Agent',
@@ -180,7 +180,7 @@ export function testDataGenerator(rngSeed?: number) {
       v2: {
         id: user.id.localRegistrar,
         name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
-        role: TestUserRole.Enum.LOCAL_REGISTRAR,
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
         fullHonorificName: '1st Order Honorable Kennedy Mweene',
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
         avatar: undefined,
@@ -196,7 +196,7 @@ export function testDataGenerator(rngSeed?: number) {
         mobile: '+260933333333',
         email: 'kalushabwalya1.7@gmail.com',
         role: {
-          id: TestUserRole.Enum.LOCAL_REGISTRAR,
+          id: TestUserRole.enum.LOCAL_REGISTRAR,
           label: {
             id: 'userRole.localRegistrar',
             defaultMessage: 'Local Registrar',
@@ -251,7 +251,7 @@ export function testDataGenerator(rngSeed?: number) {
         email: 'kalushab.walya17@gmail.com',
         fullHonorificName: null,
         role: {
-          id: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN,
+          id: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
           label: {
             id: 'userRole.localSystemAdmin',
             defaultMessage: 'Local System Admin',
@@ -291,7 +291,7 @@ export function testDataGenerator(rngSeed?: number) {
             family: 'Campbell'
           }
         ],
-        role: TestUserRole.Enum.NATIONAL_SYSTEM_ADMIN,
+        role: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
         primaryOfficeId: '8788d17c-b639-4aa0-89f0-ebc64263d81c' as UUID,
         type: TokenUserType.enum.user
       },
@@ -305,7 +305,7 @@ export function testDataGenerator(rngSeed?: number) {
         email: 'kalushabwaly.a17@gmail.com',
         fullHonorificName: null,
         role: {
-          id: TestUserRole.Enum.NATIONAL_SYSTEM_ADMIN,
+          id: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
           label: {
             id: 'userRole.nationalAdministrator',
             defaultMessage: 'National Administrator',

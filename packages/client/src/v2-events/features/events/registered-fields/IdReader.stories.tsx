@@ -213,7 +213,7 @@ export const WithQrReader: StoryObj<Args> = {
             fields={fieldsWithQrReader}
             id="id-form"
             validatorContext={getTestValidatorContext(
-              TestUserRole.Enum.LOCAL_REGISTRAR
+              TestUserRole.enum.LOCAL_REGISTRAR
             )}
             onChange={onChange}
           />
@@ -244,7 +244,7 @@ export const WithQrReaderAndLinkButton: StoryObj<Args> = {
             fields={fieldsWithQrReaderAndLinkButton}
             id="id-form"
             validatorContext={getTestValidatorContext(
-              TestUserRole.Enum.LOCAL_REGISTRAR
+              TestUserRole.enum.LOCAL_REGISTRAR
             )}
             onChange={onChange}
           />

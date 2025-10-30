@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig, SelectOption, ValidationConfig } from './FieldConfig'
 import { FieldType } from './FieldType'
@@ -75,7 +75,6 @@ const BaseField = z.object({
   ),
   conditionals: z
     .array(FieldConditional)
-    .default([])
     .optional()
     .describe(
       `
@@ -93,7 +92,6 @@ const BaseField = z.object({
     ),
   validations: z
     .array(ValidationConfig)
-    .default([])
     .optional()
     .describe(
       `Option for overriding the field validations specifically for advanced search form.`
