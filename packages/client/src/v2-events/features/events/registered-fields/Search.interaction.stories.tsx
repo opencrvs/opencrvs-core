@@ -10,7 +10,14 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
+import {
+  expect,
+  fireEvent,
+  fn,
+  userEvent,
+  waitFor,
+  within
+} from '@storybook/test'
 import { http, HttpResponse } from 'msw'
 import React from 'react'
 import styled from 'styled-components'
@@ -72,11 +79,6 @@ const searchFields = [
           defaultMessage: 'Confirm',
           description: 'Confirm button text',
           id: 'story.searchField.indicators.confirmButton'
-        },
-        ok: {
-          defaultMessage: 'Valid',
-          description: 'OK button text',
-          id: 'story.searchField.indicators.ok'
         }
       },
       query: {
@@ -115,6 +117,24 @@ const searchFields = [
         }
       ]
     }
+  },
+  {
+    id: 'child.name',
+    type: FieldType.NAME,
+    required: true,
+    parent: field('child.brn-search'),
+    value: field('child.brn-search').getByPath([
+      'data',
+      'firstResult',
+      'declaration',
+      'child.name'
+    ]),
+    hideLabel: true,
+    label: {
+      defaultMessage: "child's name",
+      description: 'This is the label for the field',
+      id: 'story.child.field.name.label'
+    }
   }
 ]
 
@@ -129,7 +149,7 @@ export const InvalidValue_NoRecordsFound: StoryObj<typeof FormFieldGenerator> =
       msw: {
         handlers: {
           nidApi: [
-            http.post('/api/events/search', async () => {
+            http.post('/api/events/events/search', async () => {
               await new Promise((resolve) => setTimeout(resolve, 2000))
               return HttpResponse.json({
                 results: [],
@@ -142,6 +162,17 @@ export const InvalidValue_NoRecordsFound: StoryObj<typeof FormFieldGenerator> =
     },
     play: async ({ canvasElement }) => {
       const canvas = within(canvasElement)
+
+      await userEvent.type(
+        await canvas.findByTestId('text__firstname'),
+        'firstname'
+      )
+
+      await userEvent.type(
+        await canvas.findByTestId('text__surname'),
+        'surname'
+      )
+
       await userEvent.type(
         await canvas.findByTestId('search-input'),
         '456988542'
@@ -164,6 +195,14 @@ export const InvalidValue_NoRecordsFound: StoryObj<typeof FormFieldGenerator> =
         async () =>
           expect(canvas.getByText('No record found')).toBeInTheDocument(),
         { timeout: 3000 }
+      )
+
+      // names should not clear because search was not successfull
+      await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
+        'firstname'
+      )
+      await expect(await canvas.findByTestId('text__surname')).toHaveValue(
+        'surname'
       )
     },
     render: function Component(args) {
@@ -191,7 +230,7 @@ export const SearchWithRegistrationNumber: StoryObj<typeof FormFieldGenerator> =
       msw: {
         handlers: {
           nidApi: [
-            http.post('/api/events/search', async () => {
+            http.post('/api/events/events/search', async () => {
               await new Promise((resolve) => setTimeout(resolve, 1000 * 2))
               return HttpResponse.json({
                 results: [
@@ -260,6 +299,17 @@ export const SearchWithRegistrationNumber: StoryObj<typeof FormFieldGenerator> =
     },
     play: async ({ canvasElement }) => {
       const canvas = within(canvasElement)
+
+      await userEvent.type(
+        await canvas.findByTestId('text__firstname'),
+        'firstname'
+      )
+
+      await userEvent.type(
+        await canvas.findByTestId('text__surname'),
+        'surname'
+      )
+
       await userEvent.type(
         await canvas.findByTestId('search-input'),
         '6097821229'
@@ -273,6 +323,33 @@ export const SearchWithRegistrationNumber: StoryObj<typeof FormFieldGenerator> =
           expect(canvas.getByText('Found 1 results')).toBeInTheDocument(),
         { timeout: 3000 }
       )
+
+      // names should clear because search was successfull
+      await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
+        'Royal'
+      )
+      await expect(await canvas.findByTestId('text__surname')).toHaveValue(
+        'Dietrich'
+      )
+
+      await fireEvent.click(await canvas.findByText('Clear'))
+
+      await expect(
+        await canvas.findByText('Clear search results?')
+      ).toBeInTheDocument()
+      await expect(
+        await canvas.findByText('This will remove the current search results.')
+      ).toBeInTheDocument()
+
+      await fireEvent.click(await canvas.findByText('Confirm'))
+
+      // names should clear because of the clear button
+      await waitFor(
+        async () =>
+          expect(await canvas.findByTestId('text__firstname')).toHaveValue(''),
+        { timeout: 3000 }
+      )
+      await expect(await canvas.findByTestId('text__surname')).toHaveValue('')
     },
     render: function Component(args) {
       return (
@@ -297,8 +374,8 @@ export const TimeOut: StoryObj<typeof FormFieldGenerator> = {
     msw: {
       handlers: {
         nidApi: [
-          http.post('/api/events/search', async () => {
-            await new Promise((resolve) => setTimeout(resolve, 1000 * 10))
+          http.post('/api/events/events/search', async () => {
+            await new Promise((resolve) => setTimeout(resolve, 1000 * 100))
           })
         ]
       }
@@ -341,7 +418,7 @@ export const HttpError: StoryObj<typeof FormFieldGenerator> = {
     msw: {
       handlers: {
         nidApi: [
-          http.post('/api/events/search', () => {
+          http.post('/api/events/events/search', () => {
             return HttpResponse.text('Internal Server Error', { status: 500 })
           })
         ]
