@@ -750,7 +750,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 509f05b3-abb7-4172-97fd-04ce09c41eb0
+                transactionId: 2ae12f19-3582-450a-b017-b34088bd6db1
                 type: birth
       responses:
         "200":
@@ -1086,12 +1086,12 @@ paths:
                                 - type: object
                                   nullable: true
                                   properties:
-                                    params:
+                                    data:
                                       type: object
                                       additionalProperties:
                                         type: string
                                   required:
-                                    - params
+                                    - data
                                 - type: object
                                   properties:
                                     data: {}
@@ -1138,12 +1138,12 @@ paths:
                               - type: "null"
                       - type: object
                         properties:
-                          params:
+                          data:
                             type: object
                             additionalProperties:
                               type: string
                         required:
-                          - params
+                          - data
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                   default: &a7 {}
@@ -1422,12 +1422,12 @@ paths:
                                 - type: object
                                   nullable: true
                                   properties:
-                                    params:
+                                    data:
                                       type: object
                                       additionalProperties:
                                         type: string
                                   required:
-                                    - params
+                                    - data
                                 - type: object
                                   properties:
                                     data: {}
@@ -1474,12 +1474,12 @@ paths:
                               - type: "null"
                       - type: object
                         properties:
-                          params:
+                          data:
                             type: object
                             additionalProperties:
                               type: string
                         required:
-                          - params
+                          - data
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                 originalActionId:
@@ -1504,7 +1504,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 7a467241-1333-4869-898c-eb226763cc72
+                transactionId: a31086e3-dfc5-4439-95cb-5fc3e74dd809
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1834,12 +1834,12 @@ paths:
                                 - type: object
                                   nullable: true
                                   properties:
-                                    params:
+                                    data:
                                       type: object
                                       additionalProperties:
                                         type: string
                                   required:
-                                    - params
+                                    - data
                                 - type: object
                                   properties:
                                     data: {}
@@ -1886,12 +1886,12 @@ paths:
                               - type: "null"
                       - type: object
                         properties:
-                          params:
+                          data:
                             type: object
                             additionalProperties:
                               type: string
                         required:
-                          - params
+                          - data
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                   default: *a7
@@ -2170,12 +2170,12 @@ paths:
                                 - type: object
                                   nullable: true
                                   properties:
-                                    params:
+                                    data:
                                       type: object
                                       additionalProperties:
                                         type: string
                                   required:
-                                    - params
+                                    - data
                                 - type: object
                                   properties:
                                     data: {}
@@ -2222,12 +2222,12 @@ paths:
                               - type: "null"
                       - type: object
                         properties:
-                          params:
+                          data:
                             type: object
                             additionalProperties:
                               type: string
                         required:
-                          - params
+                          - data
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                 originalActionId:
@@ -2576,12 +2576,12 @@ paths:
                                 - type: object
                                   nullable: true
                                   properties:
-                                    params:
+                                    data:
                                       type: object
                                       additionalProperties:
                                         type: string
                                   required:
-                                    - params
+                                    - data
                                 - type: object
                                   properties:
                                     data: {}
@@ -2628,12 +2628,12 @@ paths:
                               - type: "null"
                       - type: object
                         properties:
-                          params:
+                          data:
                             type: object
                             additionalProperties:
                               type: string
                         required:
-                          - params
+                          - data
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                   default: *a7
@@ -2912,12 +2912,12 @@ paths:
                                 - type: object
                                   nullable: true
                                   properties:
-                                    params:
+                                    data:
                                       type: object
                                       additionalProperties:
                                         type: string
                                   required:
-                                    - params
+                                    - data
                                 - type: object
                                   properties:
                                     data: {}
@@ -2964,12 +2964,12 @@ paths:
                               - type: "null"
                       - type: object
                         properties:
-                          params:
+                          data:
                             type: object
                             additionalProperties:
                               type: string
                         required:
-                          - params
+                          - data
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                 originalActionId:
@@ -3321,12 +3321,12 @@ paths:
                                 - type: object
                                   nullable: true
                                   properties:
-                                    params:
+                                    data:
                                       type: object
                                       additionalProperties:
                                         type: string
                                   required:
-                                    - params
+                                    - data
                                 - type: object
                                   properties:
                                     data: {}
@@ -3373,12 +3373,12 @@ paths:
                               - type: "null"
                       - type: object
                         properties:
-                          params:
+                          data:
                             type: object
                             additionalProperties:
                               type: string
                         required:
-                          - params
+                          - data
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                   default: *a7
@@ -3657,12 +3657,12 @@ paths:
                                 - type: object
                                   nullable: true
                                   properties:
-                                    params:
+                                    data:
                                       type: object
                                       additionalProperties:
                                         type: string
                                   required:
-                                    - params
+                                    - data
                                 - type: object
                                   properties:
                                     data: {}
@@ -3709,12 +3709,12 @@ paths:
                               - type: "null"
                       - type: object
                         properties:
-                          params:
+                          data:
                             type: object
                             additionalProperties:
                               type: string
                         required:
-                          - params
+                          - data
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                 originalActionId:
@@ -12573,12 +12573,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -12625,12 +12625,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -12907,12 +12907,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -12959,12 +12959,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -13301,12 +13301,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -13353,12 +13353,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -13635,12 +13635,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -13687,12 +13687,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -14026,12 +14026,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -14078,12 +14078,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -14360,12 +14360,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -14412,12 +14412,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -14761,12 +14761,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -14813,12 +14813,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -15095,12 +15095,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -15147,12 +15147,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -15505,12 +15505,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -15557,12 +15557,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -15839,12 +15839,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -15891,12 +15891,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -16230,12 +16230,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -16282,12 +16282,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -16564,12 +16564,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -16616,12 +16616,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -16963,12 +16963,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -17015,12 +17015,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -17297,12 +17297,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -17349,12 +17349,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -17698,12 +17698,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -17750,12 +17750,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -18032,12 +18032,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -18084,12 +18084,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -18423,12 +18423,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -18475,12 +18475,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -18757,12 +18757,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -18809,12 +18809,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -19152,12 +19152,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -19204,12 +19204,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -19486,12 +19486,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -19538,12 +19538,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -19877,12 +19877,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -19929,12 +19929,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -20211,12 +20211,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -20263,12 +20263,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -20606,12 +20606,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -20658,12 +20658,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -20940,12 +20940,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -20992,12 +20992,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -21331,12 +21331,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -21383,12 +21383,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -21665,12 +21665,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -21717,12 +21717,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -22059,12 +22059,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -22111,12 +22111,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -22393,12 +22393,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -22445,12 +22445,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -22797,12 +22797,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -22849,12 +22849,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -23131,12 +23131,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -23183,12 +23183,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -23522,12 +23522,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -23574,12 +23574,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -23856,12 +23856,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -23908,12 +23908,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -24253,12 +24253,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -24305,12 +24305,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
         annotation:
@@ -24587,12 +24587,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
@@ -24639,12 +24639,12 @@ components:
                       - type: "null"
               - type: object
                 properties:
-                  params:
+                  data:
                     type: object
                     additionalProperties:
                       type: string
                 required:
-                  - params
+                  - data
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
@@ -25337,12 +25337,12 @@ components:
                   - type: object
                     nullable: true
                     properties:
-                      params:
+                      data:
                         type: object
                         additionalProperties:
                           type: string
                     required:
-                      - params
+                      - data
                   - type: object
                     properties:
                       data: {}
@@ -25511,12 +25511,12 @@ components:
                         - type: object
                           nullable: true
                           properties:
-                            params:
+                            data:
                               type: object
                               additionalProperties:
                                 type: string
                           required:
-                            - params
+                            - data
                         - type: object
                           properties:
                             data: {}
