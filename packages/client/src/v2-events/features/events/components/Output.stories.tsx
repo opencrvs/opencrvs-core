@@ -313,12 +313,14 @@ export const DataOutput: Story = {
       }
     },
     value: {
-      'applicant.name': {
-        firstname: 'John',
-        surname: 'Malkovich'
-      },
-      ['static.text']: 'Some static text here',
-      ['some-other-static-data']: 'Some other static text here'
-    } as unknown as FieldValue
+      data: {
+        'applicant.name': {
+          firstname: 'John',
+          surname: 'Malkovich'
+        },
+        ['static.text']: 'Some static text here',
+        ['some-other-static-data']: 'Some other static text here'
+      }
+    } satisfies FieldValue
   }
 }
