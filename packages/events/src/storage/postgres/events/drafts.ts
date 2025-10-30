@@ -10,7 +10,7 @@
  */
 
 import { sql } from 'kysely'
-import z from 'zod'
+import * as z from 'zod/v4'
 import { ActionStatus, Draft, TokenUserType, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import {

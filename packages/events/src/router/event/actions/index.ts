@@ -10,7 +10,7 @@
  */
 import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { logger, UUID } from '@opencrvs/commons'
 import {
@@ -334,7 +334,7 @@ export function getDefaultActionProcedures(
     request: systemProcedure
       .meta(meta)
       .use(requireScopesForRequestMiddleware)
-      .input(actionConfig.inputSchema)
+      .input(actionConfig.inputSchema.strict())
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
@@ -370,7 +370,9 @@ export function getDefaultActionProcedures(
       }),
 
     accept: systemProcedure
-      .input(actionConfig.inputSchema.merge(asyncAcceptInputFields))
+      .input(
+        actionConfig.inputSchema.extend(asyncAcceptInputFields.shape).strict()
+      )
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
@@ -469,7 +471,7 @@ export function getDefaultActionProcedures(
           originalActionId: actionId,
           type: actionType,
           createdBy: ctx.user.id,
-          createdByUserType: TokenUserType.Enum.user,
+          createdByUserType: TokenUserType.enum.user,
           createdByRole: ctx.user.role,
           createdAtLocation: ctx.user.primaryOfficeId ?? undefined,
           token: ctx.token,

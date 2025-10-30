@@ -457,7 +457,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
             }
           }
         ]
-      },
+      } as unknown as QueryType,
 
       [tennisClubMembershipEvent]
     )

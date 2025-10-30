@@ -119,7 +119,7 @@ describe('useActionForHistory', () => {
       new Date('2024-04-01')
     ),
     createdBy: generator.user.id.localRegistrar,
-    createdByRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
     createdAtLocation: generator.user.localRegistrar().v2.primaryOfficeId
   } satisfies Partial<ActionDocument>
 

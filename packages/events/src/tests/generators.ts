@@ -51,7 +51,7 @@ export function payloadGenerator(
 ) {
   const user = {
     create: (input: CreateUser) => ({
-      role: input.role ?? TestUserRole.Enum.REGISTRATION_AGENT,
+      role: input.role ?? TestUserRole.enum.REGISTRATION_AGENT,
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: input.primaryOfficeId,
       fullHonorificName: input.fullHonorificName
@@ -67,7 +67,7 @@ export function payloadGenerator(
           name: `Location name ${i}`,
           parentId: null,
           validUntil: null,
-          locationType: LocationType.Enum.ADMIN_STRUCTURE
+          locationType: LocationType.enum.ADMIN_STRUCTURE
         })) as Location[]
       }
 
@@ -76,7 +76,7 @@ export function payloadGenerator(
         name: location.name ?? `Location name ${i}`,
         parentId: location.parentId ?? null,
         validUntil: null,
-        locationType: LocationType.Enum.ADMIN_STRUCTURE
+        locationType: LocationType.enum.ADMIN_STRUCTURE
       })) as Location[]
     }
   }

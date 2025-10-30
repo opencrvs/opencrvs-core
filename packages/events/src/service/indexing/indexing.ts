@@ -10,7 +10,7 @@
  */
 
 import { type estypes } from '@elastic/elasticsearch'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
@@ -137,6 +137,7 @@ function mapFieldTypeToElasticsearch(
       } satisfies {
         [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
       }
+
       return {
         type: 'object',
         properties: addressProperties
@@ -394,10 +395,12 @@ export async function getIndexedEvents(
               { term: { status: EventStatus.enum.CREATED } },
               { term: { createdBy: userId } }
             ],
+
             should: undefined
           }
         }
       ],
+
       minimum_should_match: 1
     }
   } satisfies estypes.QueryDslQueryContainer

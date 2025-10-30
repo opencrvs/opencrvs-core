@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /*  eslint-disable max-lines */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 import { FieldType } from './FieldType'
@@ -34,16 +34,14 @@ import {
   IdReaderFieldValue,
   QrReaderFieldValue
 } from './CompositeFieldValue'
-import { extendZodWithOpenApi } from 'zod-openapi'
+
 import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 import { SearchQuery } from './EventIndex'
-import { JSONSchema } from '../client'
-extendZodWithOpenApi(z)
 
 const FieldId = z
   .string()
-  .refine(
+  .superRefine((val, ctx) => {
     /*
      * Disallow underscores '_' in field ids.
      * Why? Theres two reasons:
@@ -51,11 +49,13 @@ const FieldId = z
      *   2. On Kysely-SQL queries, we use the CamelCasePlugin. This plugin transforms snake_case to camelCase also on nested (jsonb) object keys.
      *      This could be disabled via 'maintainNestedObjectKeys: true', but this would also affect SQL queries which use e.g. json_agg() or to_jsonb() to aggregate results.
      */
-    (val) => !val.includes('_'),
-    (val) => ({
-      message: `id: '${val}' must not contain underscores '_'`
-    })
-  )
+    if (val.includes('_')) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `id: '${val}' must not contain underscores '_'`
+      })
+    }
+  })
   .describe('Unique identifier for the field')
 
 export const FieldReference = z
@@ -249,7 +249,7 @@ export const EmailField = BaseField.extend({
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text')
     })
-    .default({ maxLength: 10 })
+    .default({ maxLength: 255 })
     .optional(),
   defaultValue: NonEmptyTextValue.optional()
 })
@@ -699,8 +699,8 @@ const HttpField = BaseField.extend({
     trigger: FieldReference,
     url: z.string().describe('URL to send the HTTP request to'),
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
-    headers: z.record(z.string()).optional(),
-    body: z.record(z.any()).optional(),
+    headers: z.record(z.string(), z.string()).optional(),
+    body: z.record(z.string(), z.string()).optional(),
     errorValue: z
       .any()
       .optional()
@@ -802,11 +802,17 @@ const QrReaderField = BaseField.extend({
   defaultValue: QrReaderFieldValue.optional(),
   configuration: z
     .object({
-      validator: z.custom<JSONSchema>(
-        (val) => typeof val === 'object' && val !== null
-      )
+      validator: z.any().meta({
+        description:
+          'JSON Schema to validate the scanned QR code data against before populating the form fields.',
+        id: 'QrReaderFieldValidator'
+      })
     })
     .optional()
+}).meta({
+  description:
+    'Configuration for QR code reader field, including optional JSON Schema validator.',
+  id: 'QrReaderField'
 })
 
 export type QrReaderField = z.infer<typeof QrReaderField>
@@ -926,11 +932,7 @@ export type FieldConfigInput =
  *  type to be inferred causes typescript compiler to fail with "inferred type
  *  exeeds max lenght"
  */
-export const FieldConfig: z.ZodType<
-  FieldConfig,
-  z.ZodTypeDef,
-  FieldConfigInput
-> = z
+export const FieldConfig = z
   .discriminatedUnion('type', [
     Address,
     TextField,
@@ -972,9 +974,9 @@ export const FieldConfig: z.ZodType<
     LoaderField,
     SearchField
   ])
-  .openapi({
+  .meta({
     description: 'Form field configuration',
-    ref: 'FieldConfig'
+    id: 'FieldConfig'
   })
 
 export type SelectField = z.infer<typeof Select>
@@ -990,6 +992,7 @@ export type FieldPropsWithoutReferenceValue<T extends FieldType> = Omit<
   Extract<FieldConfig, { type: T }>,
   'value'
 >
+
 export type SelectOption = z.infer<typeof SelectOption>
 
 export type AdministrativeAreaConfiguration = z.infer<

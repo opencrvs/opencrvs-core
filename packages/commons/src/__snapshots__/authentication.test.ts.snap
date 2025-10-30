@@ -5,11 +5,10 @@ exports[`Token parser helpers  getUserId With bad token 1`] = `"getTokenPayload:
 exports[`Token parser helpers  getUserId With invalid payload 1`] = `
 "[
   {
-    "code": "invalid_type",
     "expected": "string",
-    "received": "number",
+    "code": "invalid_type",
     "path": [],
-    "message": "Expected string, received number"
+    "message": "Invalid input: expected string, received number"
   }
 ]"
 `;
@@ -21,14 +20,13 @@ exports[`Token parser helpers  getUserType With bad token 1`] = `"getTokenPayloa
 exports[`Token parser helpers  getUserType With invalid payload 1`] = `
 "[
   {
-    "received": "invalidType",
-    "code": "invalid_enum_value",
-    "options": [
+    "code": "invalid_value",
+    "values": [
       "user",
       "system"
     ],
     "path": [],
-    "message": "Invalid enum value. Expected 'user' | 'system', received 'invalidType'"
+    "message": "Invalid option: expected one of \\"user\\"|\\"system\\""
   }
 ]"
 `;
