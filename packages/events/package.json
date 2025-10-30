@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/events",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "description": "OpenCRVS Events service",
   "license": "MPL-2.0",
   "private": true,
@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "8.16.2",
-    "@opencrvs/commons": "^1.7.0",
+    "@opencrvs/commons": "^1.9.0",
     "@trpc/server": "11.4.3",
     "@types/luxon": "^3.6.2",
     "@types/pg": "^8.15.4",
