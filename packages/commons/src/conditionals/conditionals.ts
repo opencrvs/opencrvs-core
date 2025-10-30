@@ -574,20 +574,24 @@ export function createFieldConditionals(fieldId: string) {
         required: [fieldId]
       })
     },
-    isValidEnglishName: () =>
-      defineFormConditional({
+    isValidEnglishName() {
+      return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: {
-            type: 'string',
-            minLength: 1,
-            pattern:
-              "^[\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*( [\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*)*$",
-            description:
-              "Name must contain only letters, numbers, and allowed special characters ('.-). No double spaces."
-          }
+          [fieldId]: wrapToPath(
+            {
+              type: 'string',
+              minLength: 1,
+              pattern:
+                "^[\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*( [\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*)*$",
+              description:
+                "Name must contain only letters, numbers, and allowed special characters ('.-). No double spaces."
+            },
+            this.$$subfield
+          )
         }
-      }),
+      })
+    },
     isValidAdministrativeLeafLevel() {
       return defineFormConditional({
         type: 'object',
