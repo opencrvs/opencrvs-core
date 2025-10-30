@@ -243,7 +243,13 @@ function SearchInput({
     if (confirm) {
       setInputState('')
       setHttpState(null)
-      onChange(null)
+      onChange({
+        loading: false,
+        error: {
+          statusCode: 204,
+          message: 'cleard'
+        }
+      })
     }
   }
 
@@ -289,6 +295,9 @@ function SearchInput({
       }
     }
     if (httpState?.error) {
+      if (httpState.error.statusCode === 204) {
+        return {}
+      }
       return {
         message: intl.formatMessage(
           configuration.indicators?.httpError || defaultIndicators.httpError,
