@@ -110,7 +110,7 @@ export const actionLabels = {
     id: 'event.birth.action.declare.label'
   },
   [ActionType.VALIDATE]: {
-    defaultMessage: 'Review',
+    defaultMessage: 'Validate',
     description:
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'event.birth.action.validate.label'
@@ -121,7 +121,7 @@ export const actionLabels = {
     id: 'event.birth.action.archive.label'
   },
   [ActionType.REGISTER]: {
-    defaultMessage: 'Review',
+    defaultMessage: 'Register',
     description: 'Label for review record button in dropdown menu',
     id: 'event.birth.action.register.label'
   },
@@ -156,7 +156,12 @@ export const actionLabels = {
 interface ActionConfig {
   label: TranslationConfig
   icon: IconProps['name']
+  // onClick is used when clicking an action menu item.
   onClick: (workqueue?: string) => Promise<void> | void
+  // onCta is used when clicking a workqueue CTA button. If its not defined, the onClick will be used.
+  onCtaClick?: (workqueue?: string) => Promise<void> | void
+  // ctaLabel is used on workqueue CTA buttons to override the label
+  ctaLabel?: TranslationConfig
   disabled?: boolean
   hidden?: boolean
 }
@@ -348,6 +353,15 @@ function useViewableActionConfigurations(
             )
           )
         },
+        onCtaClick: (workqueue) =>
+          navigate(
+            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
+          ),
+        ctaLabel: {
+          id: 'buttons.review',
+          defaultMessage: 'Review',
+          description: 'Label for review CTA button'
+        },
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.ARCHIVE]: {
@@ -370,6 +384,15 @@ function useViewableActionConfigurations(
             )
           )
         },
+        ctaLabel: {
+          id: 'buttons.review',
+          defaultMessage: 'Review',
+          description: 'Label for review CTA button'
+        },
+        onCtaClick: (workqueue) =>
+          navigate(
+            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
+          ),
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.MARK_AS_DUPLICATE]: {

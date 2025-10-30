@@ -66,7 +66,7 @@ export function ActionMenu({
   const assignedOfficeName =
     locations.find((l) => l.id === assignedOffice)?.name || ''
 
-  const [modal, actionMenuItems] = useAllowedActionConfigurations(
+  const [modals, actionMenuItems] = useAllowedActionConfigurations(
     eventState,
     auth
   )
@@ -115,7 +115,7 @@ export function ActionMenu({
           })}
         </DropdownMenu.Content>
       </DropdownMenu>
-      {modal}
+      {modals}
     </>
   )
 }
