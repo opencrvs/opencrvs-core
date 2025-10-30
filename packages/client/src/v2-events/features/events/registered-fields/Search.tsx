@@ -11,13 +11,22 @@
 
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
+import * as z from 'zod'
 import {
-  HttpFieldValue,
   SearchField,
   TranslationConfig,
-  validateValue
+  validateValue,
+  HttpFieldValue,
+  EventState
 } from '@opencrvs/commons/client'
-import { IColor, Loader, Stack, Text, TextInput } from '@opencrvs/components'
+import {
+  IColor,
+  Link,
+  Loader,
+  Stack,
+  Text,
+  TextInput
+} from '@opencrvs/components'
 import { SecondaryButton } from '@opencrvs/components/lib/buttons'
 import { useOnlineStatus } from '@client/utils'
 import { Http, Props } from './Http'
@@ -58,12 +67,21 @@ const defaultIndicators = {
 
 function Postfix({
   loadingIndicator = defaultIndicators.loading,
-  isLoading = false
+  isLoading = false,
+  hasData = false,
+  clearData
 }: {
   loadingIndicator?: TranslationConfig
   isLoading?: boolean
+  hasData?: boolean
+  clearData: () => void
 }) {
   const intl = useIntl()
+
+  if (hasData) {
+    return <Link onClick={clearData}>{'Clear'}</Link>
+  }
+
   if (!isLoading) {
     return null
   }
@@ -96,26 +114,46 @@ function replaceTerm<T>(term: string, query: T): T {
 
 function SearchInput({
   onChange,
-  configuration
+  configuration,
+  value
 }: Omit<Props, 'configuration'> & {
   configuration: SearchField['configuration']
+  value: HttpFieldValue | null | undefined
 }) {
   const intl = useIntl()
 
-  const [inputState, setInputState] = useState('')
+  const [inputState, setInputState] = useState(value?.data.input ?? '')
   const [buttonPressed, setButtonPressed] = useState(0)
-  const [httpState, setHttpState] = useState<HttpFieldValue | null>(null)
+  const [httpState, setHttpState] = useState<HttpFieldValue | null>(
+    value ?? null
+  )
+
+  const SearchResponse = HttpFieldValue.extend({
+    data: z.object({
+      results: z.array(EventState),
+      total: z.number()
+    })
+  })
 
   const isOnline = useOnlineStatus()
 
-  const onHTTPChange = (value: HttpFieldValue) => {
-    const normalizedData =
-      value.data && Array.isArray(value.data.results)
-        ? { ...value.data, results: value.data.results[0] || null }
-        : value.data
+  const onHTTPChange = (val: HttpFieldValue) => {
+    const maybeVal = SearchResponse.safeParse(val)
+    if (maybeVal.error) {
+      return
+    }
 
-    onChange({ ...value, data: normalizedData })
-    setHttpState({ ...value, data: normalizedData })
+    const data = { ...val.data, input: value?.data.input }
+
+    if (!val.data.results.empty()) {
+      data.results = data.results[0]
+      data.input = inputState
+    } else {
+      data.results = null
+    }
+
+    onChange({ ...val, data })
+    setHttpState({ ...val, data })
   }
   const valid = validateValue(configuration.validation.validator, inputState)
 
@@ -142,14 +180,11 @@ function SearchInput({
         color: 'red'
       }
     }
-    if (httpState?.data) {
-      let total = 0
-      if (
-        'total' in httpState.data &&
-        typeof httpState.data.total === 'number'
-      ) {
-        total = httpState.data.total
-      }
+    if (!httpState?.error && httpState?.data) {
+      const total =
+        'total' in httpState.data && typeof httpState.data.total === 'number'
+          ? httpState.data.total
+          : 0
 
       if (total > 0) {
         return {
@@ -180,14 +215,20 @@ function SearchInput({
         <TextInput
           data-testid="search-input"
           id="search"
+          isDisabled={!!httpState}
           postfix={
             <Postfix
+              clearData={() => setHttpState(null)}
+              hasData={!!((httpState?.data.total ?? 0) > 0)}
               isLoading={httpState?.loading}
               loadingIndicator={configuration.indicators?.loading}
             />
           }
           value={inputState}
-          onChange={(e) => setInputState(e.target.value)}
+          onChange={(e) => {
+            setHttpState(null)
+            setInputState(e.target.value)
+          }}
         />
         <Http.Input
           configuration={{
@@ -206,7 +247,9 @@ function SearchInput({
           parentValue={buttonPressed}
           onChange={onHTTPChange}
         />
-        {!httpState && (
+        {(!httpState ||
+          !!httpState.error ||
+          inputState !== value?.data.input) && (
           <SecondaryButton
             disabled={!valid || !isOnline}
             size="large"
