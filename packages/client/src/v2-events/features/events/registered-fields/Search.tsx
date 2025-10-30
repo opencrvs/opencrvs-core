@@ -12,12 +12,13 @@
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
 import * as z from 'zod'
+import styled from 'styled-components'
 import {
   SearchField,
   TranslationConfig,
   validateValue,
   HttpFieldValue,
-  EventState
+  EventIndex
 } from '@opencrvs/commons/client'
 import {
   IColor,
@@ -64,6 +65,12 @@ const defaultIndicators = {
     id: 'searchField.indicators.ok'
   }
 }
+
+const SearchInputWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  gap: 8px;
+`
 
 function Postfix({
   loadingIndicator = defaultIndicators.loading,
@@ -112,6 +119,14 @@ function replaceTerm<T>(term: string, query: T): T {
   return query
 }
 
+const SearchResponse = HttpFieldValue.extend({
+  data: z.object({
+    results: z.array(EventIndex),
+    firstResult: EventIndex.nullish(),
+    total: z.number()
+  })
+})
+
 function SearchInput({
   onChange,
   configuration,
@@ -122,43 +137,48 @@ function SearchInput({
 }) {
   const intl = useIntl()
 
-  const [inputState, setInputState] = useState(value?.data.input ?? '')
+  const [inputState, setInputState] = useState(value?.data?.input ?? null)
   const [buttonPressed, setButtonPressed] = useState(0)
   const [httpState, setHttpState] = useState<HttpFieldValue | null>(
     value ?? null
   )
-
-  const SearchResponse = HttpFieldValue.extend({
-    data: z.object({
-      results: z.array(EventState),
-      total: z.number()
-    })
-  })
-
   const isOnline = useOnlineStatus()
 
+  const clearData = () => {
+    setInputState(null)
+    setHttpState(null)
+    onChange(null)
+  }
+
   const onHTTPChange = (val: HttpFieldValue) => {
-    const maybeVal = SearchResponse.safeParse(val)
-    if (maybeVal.error) {
+    if (val.loading) {
+      setHttpState(val)
       return
     }
 
-    const data = { ...val.data, input: value?.data.input }
-
-    if (!val.data.results.empty()) {
-      data.results = data.results[0]
-      data.input = inputState
-    } else {
-      data.results = null
+    const maybeResponse = SearchResponse.safeParse(val)
+    if (maybeResponse.error) {
+      return
     }
 
-    onChange({ ...val, data })
-    setHttpState({ ...val, data })
+    const response = maybeResponse.data
+
+    const data = { ...response.data, input: value?.data?.input }
+
+    if (response.data.results.length === 0) {
+      setHttpState({ ...response, data })
+      return
+    }
+
+    data.firstResult = response.data.results[0]
+    data.input = inputState
+    onChange({ ...response, data })
+    setHttpState({ ...response, data })
   }
   const valid = validateValue(configuration.validation.validator, inputState)
 
   const getMessages = (): { message?: string; color?: IColor } => {
-    if (!valid) {
+    if (inputState && !valid) {
       return {
         message: intl.formatMessage(configuration.validation.message),
         color: 'red'
@@ -209,17 +229,20 @@ function SearchInput({
 
   const { message, color = 'grey600' } = getMessages()
 
+  const isEditable =
+    !httpState || !!httpState.error || httpState.data?.total == 0
+
   return (
     <Stack alignItems="flex-start" direction="column" gap={8}>
-      <Stack>
+      <SearchInputWrapper>
         <TextInput
           data-testid="search-input"
           id="search"
-          isDisabled={!!httpState}
+          isDisabled={!isEditable}
           postfix={
             <Postfix
-              clearData={() => setHttpState(null)}
-              hasData={!!((httpState?.data.total ?? 0) > 0)}
+              clearData={() => clearData()}
+              hasData={!!((httpState?.data?.total ?? 0) > 0)}
               isLoading={httpState?.loading}
               loadingIndicator={configuration.indicators?.loading}
             />
@@ -247,9 +270,7 @@ function SearchInput({
           parentValue={buttonPressed}
           onChange={onHTTPChange}
         />
-        {(!httpState ||
-          !!httpState.error ||
-          inputState !== value?.data.input) && (
+        {isEditable && (
           <SecondaryButton
             disabled={!valid || !isOnline}
             size="large"
@@ -261,7 +282,7 @@ function SearchInput({
             )}
           </SecondaryButton>
         )}
-      </Stack>
+      </SearchInputWrapper>
       {message && (
         <Text
           color={color}
