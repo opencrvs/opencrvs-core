@@ -103,6 +103,7 @@ paths:
                 transactionId:
                   type: string
                 declaration:
+                  default: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                   type: object
@@ -881,6 +882,7 @@ paths:
                 transactionId:
                   type: string
                 declaration:
+                  default: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                   type: object
@@ -1659,6 +1661,7 @@ paths:
                 transactionId:
                   type: string
                 declaration:
+                  default: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                   type: object
@@ -2440,6 +2443,7 @@ paths:
                 transactionId:
                   type: string
                 declaration:
+                  default: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
                   type: object
