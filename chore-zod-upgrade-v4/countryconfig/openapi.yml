@@ -19206,7 +19206,7 @@ components:
               const: EMAIL
             configuration:
               default:
-                maxLength: 10
+                maxLength: 255
               type: object
               properties:
                 maxLength:
