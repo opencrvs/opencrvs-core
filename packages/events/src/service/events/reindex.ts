@@ -47,6 +47,10 @@ async function reindexSearch(token: TokenWithBearer) {
         }
         cb()
       } catch (e) {
+        logger.error(
+          `Failed to process event during reindex`,
+          JSON.stringify(e, null, 2)
+        )
         cb(e as Error)
       }
     },
@@ -55,6 +59,7 @@ async function reindexSearch(token: TokenWithBearer) {
         await flush()
         cb()
       } catch (e) {
+        logger.error(`Flush failed during reindex`, JSON.stringify(e, null, 2))
         cb(e as Error)
       }
     }

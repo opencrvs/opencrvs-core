@@ -16,6 +16,7 @@ import {
   ActionType,
   EventDocument,
   getUUID,
+  logger,
   UUID
 } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
@@ -85,7 +86,25 @@ async function* processBatch(batch: Events[]) {
   )
 
   for (const event of batch) {
-    yield toEventDocument(event, byEventId[event.id] ?? [])
+    try {
+      const doc = toEventDocument(event, byEventId[event.id] ?? [])
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (!doc) {
+        logger.error({
+          message: 'Missing event document during reindex',
+          eventId: event.id
+        })
+        continue
+      }
+      yield doc
+    } catch (err) {
+      logger.error({
+        message: 'Failed to convert event to document',
+        eventId: event.id,
+        error: (err as Error).message,
+        stack: (err as Error).stack
+      })
+    }
   }
 }
 
