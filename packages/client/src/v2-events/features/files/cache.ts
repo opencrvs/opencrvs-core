@@ -22,27 +22,9 @@ import {
 import { removeCached } from '@client/v2-events/cache'
 import { precacheFile } from './useFileUpload'
 
-/**
- *
- * @param storageKey - minio path including the bucket details. e.g. /ocrvs/signature.png
- * @returns filename extracted from the storage key.
- *
- */
-function extractFilepathFromStorageKey(storageKey: string) {
-  try {
-    const regex = new RegExp(`^/${window.config.MINIO_BUCKET}/(.*)`)
-    const match = storageKey.match(regex)
-
-    if (match && match[1]) {
-      return match[1]
-    }
-    // Since the key is defined in the window (external to us), we want to ensure we do not crash because of manual changes to the config.
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error extracting filepath from storage key:', error)
-
-    return undefined
-  }
+function isValidFilepath(filepath: string): filepath is FullDocumentPath {
+  const regex = new RegExp(`^/${window.config.MINIO_BUCKET}/(.*)`)
+  return regex.test(filepath)
 }
 
 export function getFilepathsFromActionDocument(
@@ -53,13 +35,9 @@ export function getFilepathsFromActionDocument(
     const declarationValues = Object.values(action.declaration)
     const annotationValues = Object.values(action.annotation ?? {})
 
-    // Signatures follow v1 pattern where storage key includes the bucket name. e.g. /ocrvs/signature.png
-    // We need to extract the filename from the storage key.
-    const metadataSignatureFilepaths = Object.values(metadata)
-      .map((val) =>
-        typeof val === 'string' ? extractFilepathFromStorageKey(val) : undefined
-      )
-      .filter((val): val is FullDocumentPath => typeof val === 'string')
+    const metadataSignatureFilepaths = Object.values(metadata).filter(
+      (val) => typeof val === 'string' && isValidFilepath(val)
+    )
 
     const actionFilePaths = [...declarationValues, ...annotationValues].flatMap(
       (value) => {
