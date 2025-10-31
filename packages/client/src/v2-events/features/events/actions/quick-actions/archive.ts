@@ -8,7 +8,13 @@ export const archive: QuickActionConfig = {
       'This will remove the declaration from the workqueue and change the status to Archive. To revert this change you will need to search for the declaration.',
     description: 'Confirmation body for archiving a declaration'
   },
-  onConfirm: (event, actions) => {
+  confirmButtonType: 'danger',
+  confirmButtonLabel: {
+    id: 'buttons.archive',
+    defaultMessage: 'Archive',
+    description: 'Archive button text'
+  },
+  onConfirm: ({ event, actions }) => {
     return actions.archive.mutate({
       eventId: event.id,
       transactionId: uuid(),
@@ -16,11 +22,5 @@ export const archive: QuickActionConfig = {
         reason: 'Archived from action menu'
       }
     })
-  },
-  confirmButtonType: 'danger',
-  confirmButtonLabel: {
-    id: 'buttons.archive',
-    defaultMessage: 'Archive',
-    description: 'Archive button text'
   }
 }

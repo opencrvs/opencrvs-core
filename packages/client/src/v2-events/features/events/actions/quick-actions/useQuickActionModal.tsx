@@ -20,7 +20,10 @@ import {
 import { ActionType, EventIndex } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { ROUTES } from '@client/v2-events/routes'
-import { actionLabels } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
+import {
+  actionLabels,
+  useUserAllowedActions
+} from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useModal } from '../../../../hooks/useModal'
 import { useEvents } from '../../useEvents/useEvents'
 import { validate } from './validate'
@@ -29,10 +32,17 @@ import { archive } from './archive'
 
 export interface QuickActionConfig {
   description: MessageDescriptor
-  onConfirm: (
-    event: EventIndex,
+  onConfirm: ({
+    event,
+    actions,
+    customActions,
+    isActionAllowed
+  }: {
+    event: EventIndex
     actions: ReturnType<typeof useEvents>['actions']
-  ) => void | Promise<void>
+    customActions: ReturnType<typeof useEvents>['customActions']
+    isActionAllowed: (action: ActionType) => boolean
+  }) => void | Promise<void>
   confirmButtonType?: 'primary' | 'danger'
   confirmButtonLabel?: MessageDescriptor
 }
@@ -93,7 +103,8 @@ function QuickActionModal({
 export function useQuickActionModal(event: EventIndex) {
   const [quickActionModal, openModal] = useModal()
   const navigate = useNavigate()
-  const { actions } = useEvents()
+  const { actions, customActions } = useEvents()
+  const { isActionAllowed } = useUserAllowedActions(event.type)
 
   const onQuickAction = async (
     actionType: keyof typeof quickActions,
@@ -107,7 +118,12 @@ export function useQuickActionModal(event: EventIndex) {
     // - Execute the configured onConfirm() for the action
     // - Redirect the user to the workqueue they arrived from if provided, or the home page if not
     if (confirmed) {
-      void quickActions[actionType].onConfirm(event, actions)
+      void quickActions[actionType].onConfirm({
+        event,
+        actions,
+        customActions,
+        isActionAllowed
+      })
 
       if (workqueue) {
         navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))

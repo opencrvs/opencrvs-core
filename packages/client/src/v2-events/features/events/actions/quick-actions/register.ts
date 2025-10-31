@@ -7,7 +7,7 @@ export const register: QuickActionConfig = {
     defaultMessage:
       "By clicking 'Confirm', you confirm that the information entered is correct and the event can be registered."
   },
-  onConfirm: (event, actions) => {
+  onConfirm: ({ event, actions }) => {
     return actions.register.mutate({
       eventId: event.id,
       declaration: event.declaration,

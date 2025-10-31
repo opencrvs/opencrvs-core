@@ -280,6 +280,12 @@ function useViewableActionConfigurations(
 
   const { quickActionModal, onQuickAction } = useQuickActionModal(event)
 
+  const userMayRegister = isActionInScope(
+    authentication.scope,
+    ActionType.REGISTER,
+    event.type
+  )
+
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
@@ -347,11 +353,12 @@ function useViewableActionConfigurations(
           )
         },
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
-        hidden: shouldHideDeclareAction,
-        ctaLabel: reviewLabel
+        hidden: shouldHideDeclareAction
       },
       [ActionType.VALIDATE]: {
-        label: actionLabels[ActionType.VALIDATE],
+        label: userMayRegister
+          ? actionLabels[ActionType.REGISTER]
+          : actionLabels[ActionType.VALIDATE],
         icon: 'PencilLine' as const,
         onClick: async (workqueue) =>
           onQuickAction(ActionType.VALIDATE, workqueue),
@@ -413,9 +420,7 @@ function useViewableActionConfigurations(
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
         icon: 'Trash' as const,
-        onClick: async (workqueue?: string) => {
-          await onDelete(workqueue)
-        },
+        onClick: onDelete,
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REQUEST_CORRECTION]: {
