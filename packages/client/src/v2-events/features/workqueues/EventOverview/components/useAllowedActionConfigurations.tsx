@@ -47,7 +47,6 @@ import { useOnlineStatus } from '@client/utils'
 import { UnassignModal } from '@client/v2-events/components/UnassignModal'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { useArchiveModal } from '@client/v2-events/hooks/useArchiveModal'
 import { useQuickActionModal } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
@@ -214,7 +213,6 @@ function useViewableActionConfigurations(
   const assignedOffice = assignedToUser.data?.primaryOfficeId || ''
   const assignedOfficeName =
     locations.find((l) => l.id === assignedOffice)?.name || ''
-  const { archiveModal, onArchive } = useArchiveModal()
 
   const { modal: deleteModal, deleteDeclaration } = useEventFormNavigation()
   const onDelete = useCallback(
@@ -287,7 +285,7 @@ function useViewableActionConfigurations(
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
   return {
-    modals: [assignModal, archiveModal, deleteModal, quickActionModal],
+    modals: [assignModal, deleteModal, quickActionModal],
     config: {
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
@@ -366,9 +364,8 @@ function useViewableActionConfigurations(
       [ActionType.ARCHIVE]: {
         label: actionLabels[ActionType.ARCHIVE],
         icon: 'Archive' as const,
-        onClick: async () => {
-          await onArchive(event.id)
-        },
+        onClick: async (workqueue) =>
+          onQuickAction(ActionType.ARCHIVE, workqueue),
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REGISTER]: {

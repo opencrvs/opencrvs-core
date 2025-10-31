@@ -12,7 +12,11 @@ import React from 'react'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { ResponsiveModal } from '@opencrvs/components'
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  DangerButton,
+  PrimaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
 import { ActionType, EventIndex } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { ROUTES } from '@client/v2-events/routes'
@@ -21,6 +25,7 @@ import { useModal } from '../../../../hooks/useModal'
 import { useEvents } from '../../useEvents/useEvents'
 import { validate } from './validate'
 import { register } from './register'
+import { archive } from './archive'
 
 export interface QuickActionConfig {
   description: MessageDescriptor
@@ -28,12 +33,14 @@ export interface QuickActionConfig {
     event: EventIndex,
     actions: ReturnType<typeof useEvents>['actions']
   ) => void | Promise<void>
+  confirmButtonType?: 'primary' | 'danger'
+  confirmButtonLabel?: MessageDescriptor
 }
 
 const quickActions = {
   [ActionType.VALIDATE]: validate,
-  [ActionType.REGISTER]: register
-  // TODO CIHAN: add archive
+  [ActionType.REGISTER]: register,
+  [ActionType.ARCHIVE]: archive
 } as const satisfies Partial<Record<ActionType, QuickActionConfig>>
 
 function QuickActionModal({
@@ -46,6 +53,9 @@ function QuickActionModal({
   const intl = useIntl()
   const config = quickActions[actionType]
 
+  const ConfirmButton =
+    config.confirmButtonType === 'danger' ? DangerButton : PrimaryButton
+
   return (
     <ResponsiveModal
       actions={[
@@ -56,13 +66,15 @@ function QuickActionModal({
         >
           {intl.formatMessage(buttonMessages.cancel)}
         </TertiaryButton>,
-        <PrimaryButton
+        <ConfirmButton
           key="confirm"
           id="confirm-btn"
           onClick={() => close(true)}
         >
-          {intl.formatMessage(buttonMessages.confirm)}
-        </PrimaryButton>
+          {intl.formatMessage(
+            config.confirmButtonLabel || buttonMessages.confirm
+          )}
+        </ConfirmButton>
       ]}
       autoHeight={true}
       handleClose={() => close(false)}
