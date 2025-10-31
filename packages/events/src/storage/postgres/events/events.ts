@@ -88,14 +88,8 @@ async function* processBatch(batch: Events[]) {
   for (const event of batch) {
     try {
       const doc = toEventDocument(event, byEventId[event.id] ?? [])
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (!doc) {
-        logger.error({
-          message: 'Missing event document during reindex',
-          eventId: event.id
-        })
-        continue
-      }
+      const doc = toEventDocument(event, byEventId[event.id] ?? [])
+      yield doc
       yield doc
     } catch (err) {
       logger.error({
