@@ -47,10 +47,10 @@ async function reindexSearch(token: TokenWithBearer) {
         }
         cb()
       } catch (e) {
-        logger.error(
-          `Failed to process event during reindex`,
-          JSON.stringify(e, null, 2)
-        )
+        logger.error({
+          message: 'Failed to process event during reindex',
+          error: JSON.stringify(e, null, 2)
+        })
         cb(e as Error)
       }
     },
