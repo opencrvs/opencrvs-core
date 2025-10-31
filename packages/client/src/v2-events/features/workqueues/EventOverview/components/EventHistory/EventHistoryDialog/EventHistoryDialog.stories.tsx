@@ -18,11 +18,11 @@ import {
   tennisClubMembershipEvent,
   generateActionDocument,
   createPrng,
-  getRandomDatetime,
   UUID,
   EventDocument,
   generateEventDocument,
-  TestUserRole
+  TestUserRole,
+  generateRandomDatetime
 } from '@opencrvs/commons/client'
 import {
   DECLARATION_ACTION_UPDATE,
@@ -172,7 +172,7 @@ export const Read: Story = {
   }
 }
 
-const createActionCreatedAt = getRandomDatetime(
+const createActionCreatedAt = generateRandomDatetime(
   prng,
   new Date('2023-12-12'),
   new Date('2023-12-31')
