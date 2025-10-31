@@ -35,7 +35,8 @@ export const ActionConfigBase = z.object({
   label: TranslationConfig.describe('Human readable description of the action')
 })
 
-export const DeclarationActionBase = ActionConfigBase.extend({
+// TODO CIHAN: move review to DeclareConfig only
+const DeclarationActionBase = ActionConfigBase.extend({
   review: DeclarationReviewConfig,
   deduplication: DeduplicationConfig.optional()
 })

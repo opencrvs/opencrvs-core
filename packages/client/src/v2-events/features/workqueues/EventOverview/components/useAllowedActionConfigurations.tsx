@@ -347,7 +347,8 @@ function useViewableActionConfigurations(
           )
         },
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
-        hidden: shouldHideDeclareAction
+        hidden: shouldHideDeclareAction,
+        ctaLabel: reviewLabel
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
