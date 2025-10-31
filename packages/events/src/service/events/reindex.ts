@@ -59,7 +59,7 @@ async function reindexSearch(token: TokenWithBearer) {
         await flush()
         cb()
       } catch (e) {
-        logger.error(`Flush failed during reindex`, JSON.stringify(e, null, 2))
+        logger.error({ message: 'Flush failed during reindex', error: JSON.stringify(e, null, 2) })
         cb(e as Error)
       }
     }
