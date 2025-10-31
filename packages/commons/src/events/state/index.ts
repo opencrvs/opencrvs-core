@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { ActionType } from '../ActionType'
 import { orderBy, findLast } from 'lodash'
 import {
@@ -193,6 +192,8 @@ export function getCurrentEventState(
   /** @TODO: remove config parameter, it is only used by resolveDateOfEvent. See if it can be achieved in some other way. */
   config: EventConfig
 ): EventIndex {
+  // Always work with sorted event actions
+  event.actions.sort((a, b) => a.createdAt.localeCompare(b.createdAt))
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
   )

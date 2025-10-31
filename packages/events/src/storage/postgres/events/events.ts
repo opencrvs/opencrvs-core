@@ -15,7 +15,10 @@ import {
   ActionStatus,
   ActionType,
   EventDocument,
+  EventStatus,
+  getStatusFromActions,
   getUUID,
+  logger,
   UUID
 } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
@@ -70,22 +73,28 @@ export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
 async function* processBatch(batch: Events[]) {
   const db = getClient()
   const ids = batch.map((event) => event.id)
-  const actions = await db
-    .selectFrom('eventActions')
-    .selectAll()
-    .where('eventId', 'in', ids)
-    .execute()
 
-  const byEventId = actions.reduce<Record<string, EventActions[] | undefined>>(
-    (actionsByEventId, action) => ({
-      ...actionsByEventId,
-      [action.eventId]: (actionsByEventId[action.eventId] || []).concat(action)
-    }),
-    {}
-  )
+  let eventDocs: EventDocument[] = []
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    eventDocs = await getEventsByIdsInTrx(db, ids)
+  } catch (err) {
+    logger.error({
+      message: 'Failed to fetch event documents',
+      eventIds: ids,
+      error: (err as Error).message,
+      stack: (err as Error).stack
+    })
+    return
+  }
 
-  for (const event of batch) {
-    yield toEventDocument(event, byEventId[event.id] ?? [])
+  for (const event of eventDocs) {
+    // filter out drafts
+    if (getStatusFromActions(event.actions) === EventStatus.enum.CREATED) {
+      continue
+    }
+
+    yield event
   }
 }
 
