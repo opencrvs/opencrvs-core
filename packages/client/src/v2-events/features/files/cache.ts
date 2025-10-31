@@ -23,8 +23,14 @@ import { removeCached } from '@client/v2-events/cache'
 import { precacheFile } from './useFileUpload'
 
 function isValidFilepath(filepath: string): filepath is FullDocumentPath {
-  const regex = new RegExp(`^/${window.config.MINIO_BUCKET}/(.*)`)
-  return regex.test(filepath)
+  try {
+    const regex = new RegExp(`^/${window.config.MINIO_BUCKET}/(.*)`)
+    return regex.test(filepath)
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(`Error matching "${filepath}" with regex`, error)
+  }
+  return false
 }
 
 export function getFilepathsFromActionDocument(
