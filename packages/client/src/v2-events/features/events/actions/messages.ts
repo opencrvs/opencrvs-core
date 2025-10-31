@@ -109,6 +109,8 @@ const confirmModalMessages = {
     }
   }
 }
+
+// TODO CIHAN: sort these out?
 const registerMessages = {
   title: {
     id: 'review.register.title',
@@ -155,6 +157,7 @@ const declareMessages = {
 
 export const reviewMessages = {
   complete: {
+    // TODO CIHAN: remove these for register and validate
     register: {
       title: registerMessages.title,
       description: {

@@ -42,6 +42,7 @@ export function useReviewActionConfig({
 }) {
   const events = useEvents()
 
+  // TODO CIHAN: we probably dont need this anymore?
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form: declaration,

@@ -75,6 +75,7 @@ function ArchiveModal({ close }: { close: (result: boolean) => void }) {
   )
 }
 
+// TODO CIHAN: use quick action modal?
 export function useArchiveModal() {
   const [modal, openModal] = useModal()
   const { actions } = useEvents()

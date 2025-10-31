@@ -48,6 +48,7 @@ import { UnassignModal } from '@client/v2-events/components/UnassignModal'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useArchiveModal } from '@client/v2-events/hooks/useArchiveModal'
+import { useQuickActionModal } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -92,6 +93,7 @@ function getAvailableAssignmentActions(
   return []
 }
 
+// TODO CIHAN: rejection
 export const actionLabels = {
   [ActionType.ASSIGN]: {
     defaultMessage: 'Assign',
@@ -147,11 +149,17 @@ export const actionLabels = {
     id: 'event.birth.action.request-correction.label'
   },
   [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
-    defaultMessage: 'Review',
+    defaultMessage: 'Review correction request',
     description: 'Label for review correction button in dropdown menu',
     id: 'event.action.review-correction.label'
   }
 } as const
+
+const reviewLabel = {
+  id: 'buttons.review',
+  defaultMessage: 'Review',
+  description: 'Label for review CTA button'
+}
 
 interface ActionConfig {
   label: TranslationConfig
@@ -272,12 +280,14 @@ function useViewableActionConfigurations(
     event.type
   )
 
+  const { quickActionModal, onQuickAction } = useQuickActionModal()
+
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
   return {
-    modals: [assignModal, archiveModal, deleteModal],
+    modals: [assignModal, archiveModal, deleteModal, quickActionModal],
     config: {
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
@@ -344,24 +354,14 @@ function useViewableActionConfigurations(
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
         icon: 'PencilLine' as const,
-        onClick: (workqueue?: string) => {
-          clearEphemeralFormState()
-          return navigate(
-            ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
-              { eventId },
-              { workqueue }
-            )
-          )
+        onClick: async (workqueue?: string) => {
+          await onQuickAction(ActionType.VALIDATE)
         },
         onCtaClick: (workqueue) =>
           navigate(
             ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
           ),
-        ctaLabel: {
-          id: 'buttons.review',
-          defaultMessage: 'Review',
-          description: 'Label for review CTA button'
-        },
+        ctaLabel: reviewLabel,
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.ARCHIVE]: {
@@ -375,20 +375,10 @@ function useViewableActionConfigurations(
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
         icon: 'PencilLine' as const,
-        onClick: (workqueue?: string) => {
-          clearEphemeralFormState()
-          return navigate(
-            ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
-              { eventId },
-              { workqueue }
-            )
-          )
+        onClick: async (workqueue?: string) => {
+          await onQuickAction(ActionType.REGISTER)
         },
-        ctaLabel: {
-          id: 'buttons.review',
-          defaultMessage: 'Review',
-          description: 'Label for review CTA button'
-        },
+        ctaLabel: reviewLabel,
         onCtaClick: (workqueue) =>
           navigate(
             ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
@@ -485,6 +475,7 @@ function useViewableActionConfigurations(
             )
           )
         },
+        ctaLabel: reviewLabel,
         disabled: !isDownloadedAndAssignedToUser,
         hidden: !eventIsWaitingForCorrection
       }
