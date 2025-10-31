@@ -261,6 +261,7 @@ function SearchInput({
 
     const maybeResponse = SearchResponse.safeParse(val)
     if (maybeResponse.error) {
+      setHttpState(val)
       return
     }
 
