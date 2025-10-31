@@ -280,7 +280,7 @@ function useViewableActionConfigurations(
     event.type
   )
 
-  const { quickActionModal, onQuickAction } = useQuickActionModal()
+  const { quickActionModal, onQuickAction } = useQuickActionModal(event)
 
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
@@ -354,9 +354,8 @@ function useViewableActionConfigurations(
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
         icon: 'PencilLine' as const,
-        onClick: async (workqueue?: string) => {
-          await onQuickAction(ActionType.VALIDATE)
-        },
+        onClick: async (workqueue) =>
+          onQuickAction(ActionType.VALIDATE, workqueue),
         onCtaClick: (workqueue) =>
           navigate(
             ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
@@ -375,9 +374,8 @@ function useViewableActionConfigurations(
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
         icon: 'PencilLine' as const,
-        onClick: async (workqueue?: string) => {
-          await onQuickAction(ActionType.REGISTER)
-        },
+        onClick: async (workqueue) =>
+          onQuickAction(ActionType.REGISTER, workqueue),
         ctaLabel: reviewLabel,
         onCtaClick: (workqueue) =>
           navigate(

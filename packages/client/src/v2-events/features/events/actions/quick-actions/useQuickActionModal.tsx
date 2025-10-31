@@ -10,18 +10,24 @@
  */
 import React from 'react'
 import { MessageDescriptor, useIntl } from 'react-intl'
+import { useNavigate } from 'react-router-dom'
 import { ResponsiveModal } from '@opencrvs/components'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType, EventIndex } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
+import { ROUTES } from '@client/v2-events/routes'
 import { actionLabels } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useModal } from '../../../../hooks/useModal'
+import { useEvents } from '../../useEvents/useEvents'
 import { validate } from './validate'
 import { register } from './register'
 
 export interface QuickActionConfig {
   description: MessageDescriptor
-  onConfirm: () => void | Promise<void>
+  onConfirm: (
+    event: EventIndex,
+    actions: ReturnType<typeof useEvents>['actions']
+  ) => void | Promise<void>
 }
 
 const quickActions = {
@@ -60,6 +66,7 @@ function QuickActionModal({
       ]}
       autoHeight={true}
       handleClose={() => close(false)}
+      id={`quick-action-modal-${actionType}`}
       responsive={true}
       show={true}
       title={intl.formatMessage(actionLabels[actionType])}
@@ -71,16 +78,30 @@ function QuickActionModal({
   )
 }
 
-export function useQuickActionModal() {
+export function useQuickActionModal(event: EventIndex) {
   const [quickActionModal, openModal] = useModal()
+  const navigate = useNavigate()
+  const { actions } = useEvents()
 
-  const onQuickAction = async (actionType: keyof typeof quickActions) => {
-    const result = await openModal<boolean>((close) => (
+  const onQuickAction = async (
+    actionType: keyof typeof quickActions,
+    workqueue?: string
+  ) => {
+    const confirmed = await openModal<boolean>((close) => (
       <QuickActionModal actionType={actionType} close={close} />
     ))
 
-    if (result) {
-      return quickActions[actionType].onConfirm()
+    // On confirmed modal, we will:
+    // - Execute the configured onConfirm() for the action
+    // - Redirect the user to the workqueue they arrived from if provided, or the home page if not
+    if (confirmed) {
+      void quickActions[actionType].onConfirm(event, actions)
+
+      if (workqueue) {
+        navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
+      } else {
+        navigate(ROUTES.V2.buildPath({}))
+      }
     }
   }
 

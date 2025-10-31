@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid'
 import { QuickActionConfig } from './useQuickActionModal'
 
 export const register: QuickActionConfig = {
@@ -6,7 +7,13 @@ export const register: QuickActionConfig = {
     defaultMessage:
       "By clicking 'Confirm', you confirm that the information entered is correct and the event can be registered."
   },
-  onConfirm: () => {
-    console.log('register')
+  onConfirm: (event, actions) => {
+    return actions.register.mutate({
+      eventId: event.id,
+      declaration: event.declaration,
+      // TODO CIHAN: annotation fields?
+      annotation: {},
+      transactionId: uuid()
+    })
   }
 }

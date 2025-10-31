@@ -1,8 +1,5 @@
+import { v4 as uuid } from 'uuid'
 import { QuickActionConfig } from './useQuickActionModal'
-
-function onConfirm() {
-  console.log('validate')
-}
 
 export const validate: QuickActionConfig = {
   description: {
@@ -10,5 +7,13 @@ export const validate: QuickActionConfig = {
     defaultMessage:
       'The informant will receive an email with a registration number that they can use to collect the certificate.'
   },
-  onConfirm
+  onConfirm: (event, actions) => {
+    return actions.validate.mutate({
+      eventId: event.id,
+      declaration: event.declaration,
+      // TODO CIHAN: annotation fields?
+      annotation: {},
+      transactionId: uuid()
+    })
+  }
 }
