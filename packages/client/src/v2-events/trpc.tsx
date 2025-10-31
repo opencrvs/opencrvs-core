@@ -72,10 +72,7 @@ function getQueryClient() {
 
 function createIDBPersister(storageIdentifier: string) {
   const fullStorageIdentifier = `react-query-${storageIdentifier}`
-  const largeQueryStorageIdentifier = `react-query-large-query-${storageIdentifier}`
-
-  /** In-memory representation of the persisted large queries. Map<hashKey, timestamp>. */
-  const lastPersistedLargeQueries = new Map<string, number>()
+  const largeQueryStorageIdentifier = `react-query-large-query-storage-${storageIdentifier}`
 
   return {
     /** By default, client is persisted whenever a query/mutation occurs */
@@ -101,20 +98,26 @@ function createIDBPersister(storageIdentifier: string) {
       await storage.setItem(fullStorageIdentifier, clientWithoutLargeQueries)
 
       // 3. Persist large queries only if they have changed since the last persist to avoid unnecessary serialization.
-      const changed = largeQueries.some((q) => {
-        const last = lastPersistedLargeQueries.get(q.queryHash) ?? 0
-        return q.state.dataUpdatedAt > last
+      const changed = largeQueries.some((query) => {
+        if (query.state.status !== 'success') {
+          return false
+        }
+
+        if (query.state.fetchStatus === 'fetching') {
+          return false
+        }
+
+        const updatedAt = query.state.dataUpdatedAt
+        const dehydratedAt = query.dehydratedAt
+
+        // During the first load updatedAt === dehydratedAt.
+        return dehydratedAt === undefined || updatedAt >= dehydratedAt
       })
 
       if (changed) {
-        for (const q of largeQueries) {
-          lastPersistedLargeQueries.set(q.queryHash, q.state.dataUpdatedAt)
-        }
-
         await storage.setItem(largeQueryStorageIdentifier, largeQueries)
       }
     },
-
     /** Restore client from storage on page change / refresh. Expected to happen more rarely. */
     restoreClient: async () => {
       const client = await storage.getItem<PersistedClient>(
