@@ -120,7 +120,7 @@ export function getLeafLocationIds(
 // Ref works since arrays are compared by reference.
 let cachedLocationsRef: unknown = null
 /** In-memory cache of leaf location IDs */
-let cachedLeafIds: { id: string }[] | null = null
+let cachedLeafIds: { id: UUID }[] | null = null
 
 /**
  * Uses in-memory caching to avoid recomputation on re-renders. Becomes costly with large datasets.

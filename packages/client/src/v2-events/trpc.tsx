@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { AppRouter } from '@gateway/v2-events/events/router'
-import partition from 'lodash-es/partition'
+import { partition } from 'lodash'
 import { QueryClient } from '@tanstack/react-query'
 import {
   PersistQueryClientProvider,
