@@ -332,6 +332,8 @@ export const SearchWithRegistrationNumber: StoryObj<typeof FormFieldGenerator> =
         'Dietrich'
       )
 
+      await expect(await canvas.findByTestId('search-input')).toBeDisabled()
+
       await fireEvent.click(await canvas.findByText('Clear'))
 
       await expect(
