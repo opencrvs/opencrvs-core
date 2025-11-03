@@ -21,7 +21,9 @@ import {
   UUID,
   ValidatorContext,
   DeclarationActions,
-  ActionStatus
+  ActionStatus,
+  getCompleteActionDeclaration,
+  getCompleteActionAnnotation
 } from '@opencrvs/commons/client'
 import { hasAnnotationChanged, getDeclarationComparison } from './utils'
 
@@ -81,6 +83,40 @@ function isDeclarationAction(
 }
 
 /**
+ * Includes a request action, if the corresponding accepted action has different transactionId
+ * Merges declarations and annotations from the corresponding request action for an accepted action
+ * @param fullEvent - The full EventDocument containing an actions array to filter.
+ * @returns An array of actionDocument considered part of the event history.
+ */
+export function extractHistoryActions(
+  fullEvent: EventDocument
+): ActionDocument[] {
+  function isHistoryAction(a: Action): a is ActionDocument {
+    if (a.status === ActionStatus.Accepted) {
+      return true
+    }
+
+    if (a.status === ActionStatus.Requested) {
+      const immediatelyAcceptedAction = fullEvent.actions.find(
+        ({ originalActionId, transactionId }) =>
+          originalActionId === a.id && transactionId === a.transactionId
+      )
+      if (!immediatelyAcceptedAction) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  return fullEvent.actions.filter(isHistoryAction).map((action) => ({
+    ...action,
+    declaration: getCompleteActionDeclaration({}, fullEvent, action),
+    annotation: getCompleteActionAnnotation({}, fullEvent, action)
+  }))
+}
+
+/**
  * Enhances an event’s action history by injecting synthetic `UPDATE` actions
  * whenever a `NOTIFY`, `DECLARE`, `VALIDATE`, or `REGISTER` action has a changed declaration.
  *
@@ -97,43 +133,44 @@ function isDeclarationAction(
  * const result = appendUpdateAction(actions);
  * // → [ { ...actions }, { ...synthetic UPDATE for a DECLARE action}, { ...original DECLARE action }, ... ]
  */
-export function expandWithUpdateActions(
+export function expandWithClientSpecificActions(
   fullEvent: EventDocument,
-  history: ActionDocument[],
   validatorContext: ValidatorContext,
   eventConfiguration: EventConfig
 ): EventHistoryActionDocument[] {
-  return history.flatMap<EventHistoryActionDocument>((action) => {
-    if (isDeclarationAction(action)) {
-      if (
-        !hasDeclarationChanged(
-          fullEvent,
-          action,
-          validatorContext,
-          eventConfiguration
-        )
-      ) {
-        return [action]
+  return extractHistoryActions(fullEvent).flatMap<EventHistoryActionDocument>(
+    (action) => {
+      if (isDeclarationAction(action)) {
+        if (
+          !hasDeclarationChanged(
+            fullEvent,
+            action,
+            validatorContext,
+            eventConfiguration
+          )
+        ) {
+          return [action]
+        }
+
+        return [
+          {
+            ...action,
+            // Cast suffixed id as UUID to ensure uniqueness for synthetic UPDATE actions.
+            // We can't generate random UUIDs here, since components rely on stable IDs
+            // to find actions across renders.
+            id: `${action.id}-update` as UUID,
+            type: DECLARATION_ACTION_UPDATE
+          },
+          // Preserve the original action’s declaration.
+          // This is required so that when the synthetic UPDATE action is later stripped out,
+          // declaration changes can still be detected correctly in getCurrentEventState.
+          action
+        ]
       }
 
-      return [
-        {
-          ...action,
-          // Cast suffixed id as UUID to ensure uniqueness for synthetic UPDATE actions.
-          // We can't generate random UUIDs here, since components rely on stable IDs
-          // to find actions across renders.
-          id: `${action.id}-update` as UUID,
-          type: DECLARATION_ACTION_UPDATE
-        },
-        // Preserve the original action’s declaration.
-        // This is required so that when the synthetic UPDATE action is later stripped out,
-        // declaration changes can still be detected correctly in getCurrentEventState.
-        action
-      ]
+      return [action]
     }
-
-    return [action]
-  })
+  )
 }
 
 export function useActionForHistory() {

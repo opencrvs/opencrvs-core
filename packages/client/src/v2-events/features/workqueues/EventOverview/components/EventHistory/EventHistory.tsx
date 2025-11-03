@@ -21,14 +21,9 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
-  Action,
-  ActionDocument,
-  ActionStatus,
   ActionType,
   EventConfig,
   EventDocument,
-  getCompleteActionAnnotation,
-  getCompleteActionDeclaration,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
@@ -40,9 +35,10 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import {
-  expandWithUpdateActions,
+  expandWithClientSpecificActions,
   EventHistoryActionDocument,
-  useActionForHistory
+  useActionForHistory,
+  extractHistoryActions
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import {
@@ -348,40 +344,18 @@ export function EventHistory({
   const { getActionTypeForHistory } = useActionForHistory()
   const { getActionCreator } = useActionCreator()
 
-  function ishistoryAction(a: Action): a is ActionDocument {
-    if (a.status === ActionStatus.Accepted) {
-      return true
-    }
+  const history = extractHistoryActions(fullEvent)
 
-    if (a.status === ActionStatus.Requested) {
-      const immediadelyAcceptedAction = fullEvent.actions.find(
-        ({ originalActionId, transactionId }) =>
-          originalActionId === a.id && transactionId === a.transactionId
-      )
-      if (!immediadelyAcceptedAction) {
-        return true
-      }
-    }
-
-    return false
-  }
-
-  const history = fullEvent.actions.filter(ishistoryAction).map((action) => ({
-    ...action,
-    declaration: getCompleteActionDeclaration({}, fullEvent, action),
-    annotation: getCompleteActionAnnotation({}, fullEvent, action)
-  }))
-
-  const historyWithUpdatedActions = expandWithUpdateActions(
+  const historyWithClientSpecificActions = expandWithClientSpecificActions(
     fullEvent,
-    history,
     validatorContext,
     eventConfiguration
   )
 
-  const visibleHistoryWithUpdatedActions = historyWithUpdatedActions.filter(
-    ({ type }) => type !== ActionType.CREATE
-  )
+  const visibleHistoryWithClientSpecificActions =
+    historyWithClientSpecificActions.filter(
+      ({ type }) => type !== ActionType.CREATE
+    )
 
   const onHistoryRowClick = (
     action: EventHistoryActionDocument,
@@ -398,11 +372,11 @@ export function EventHistory({
     ))
   }
 
-  const historyRows = visibleHistoryWithUpdatedActions
+  const historyRows = visibleHistoryWithClientSpecificActions
     .map((x) => {
       if (x.type === ActionType.REQUEST_CORRECTION) {
         const immediateApprovedCorrection =
-          visibleHistoryWithUpdatedActions.find(
+          visibleHistoryWithClientSpecificActions.find(
             (h) =>
               h.type === ActionType.APPROVE_CORRECTION &&
               (h.requestId === x.id || h.requestId === x.originalActionId) &&
@@ -505,12 +479,12 @@ export function EventHistory({
           noResultText=""
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
         />
-        {visibleHistoryWithUpdatedActions.length >
+        {visibleHistoryWithClientSpecificActions.length >
           DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
           <Pagination
             currentPage={currentPageNumber}
             totalPages={Math.ceil(
-              visibleHistoryWithUpdatedActions.length /
+              visibleHistoryWithClientSpecificActions.length /
                 DEFAULT_HISTORY_RECORD_PAGE_SIZE
             )}
             onPageChange={(page) => setCurrentPageNumber(page)}

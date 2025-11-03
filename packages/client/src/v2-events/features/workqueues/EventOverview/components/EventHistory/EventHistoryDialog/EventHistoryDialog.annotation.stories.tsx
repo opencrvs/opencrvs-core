@@ -25,7 +25,7 @@ import {
   generateTrackingId
 } from '@opencrvs/commons/client'
 import { getTestValidatorContext } from '../../../../../../../../.storybook/decorators'
-import { expandWithUpdateActions } from '../../../../../events/actions/correct/useActionForHistory'
+import { expandWithClientSpecificActions } from '../../../../../events/actions/correct/useActionForHistory'
 import { DECLARATION_ACTION_UPDATE } from '../../../../../events/registered-fields'
 import { testDataGenerator } from '../../../../../../../tests/test-data-generators'
 import { EventHistoryDialog } from './EventHistoryDialog'
@@ -119,7 +119,7 @@ const meta: Meta<typeof EventHistoryDialog> = {
   }
 }
 
-const updateActionForValidate = expandWithUpdateActions(
+const updateActionForValidate = expandWithClientSpecificActions(
   annotationUpdateOnValidateEvent,
   getTestValidatorContext(),
   tennisClubMembershipEvent
@@ -206,7 +206,7 @@ const annotationUpdateOnRegisterEvent = {
   createdAt: actionDefaults.createdAt
 }
 
-const updateActionForRegister = expandWithUpdateActions(
+const updateActionForRegister = expandWithClientSpecificActions(
   annotationUpdateOnRegisterEvent,
   getTestValidatorContext(),
   tennisClubMembershipEvent
