@@ -24,7 +24,6 @@ import {
 import { joinValues } from '@opencrvs/commons/client'
 import {
   EventHistoryActionDocument,
-  EventHistoryDocument,
   useActionForHistory
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { ActionTypeSpecificContent } from './components'
