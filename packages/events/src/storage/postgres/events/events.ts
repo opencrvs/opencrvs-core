@@ -130,7 +130,7 @@ async function* processBatch(batch: Events[]) {
   }
 
   for (const event of eventDocs) {
-    // filter out drafts
+    // filter out records without any DECLARE action
     if (getStatusFromActions(event.actions) === EventStatus.enum.CREATED) {
       continue
     }
