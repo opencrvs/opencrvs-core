@@ -83,9 +83,14 @@ import {
   HttpFieldUpdateValue,
   QueryParamReaderFieldUpdateValue,
   QrReaderFieldValue,
-  IdReaderFieldValue,
-  StreetLevelDetailsValue
+  IdReaderFieldValue
 } from './CompositeFieldValue'
+import {
+  getDynamicNameValue,
+  DynamicNameValue,
+  DynamicAddressFieldValue,
+  getDynamicAddressFieldValue
+} from './DynamicFieldValue'
 
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
@@ -111,7 +116,12 @@ type NullishFieldValueSchema = z.ZodOptional<
  * Useful for building dynamic validations against FieldConfig
  */
 export function mapFieldTypeToZod(field: FieldConfig) {
-  let schema: FieldUpdateValueSchema | NullishFieldValueSchema
+  let schema:
+    | FieldUpdateValueSchema
+    | NullishFieldValueSchema
+    | DynamicNameValue
+    | DynamicAddressFieldValue
+
   switch (field.type) {
     case FieldType.DATE:
       schema = DateValue
@@ -165,45 +175,13 @@ export function mapFieldTypeToZod(field: FieldConfig) {
       schema = FileFieldWithOptionValue
       break
     case FieldType.ADDRESS:
-      const streetAddressConfig = field.configuration?.streetAddressForm
-      const DynamicAddress = z.object({
-        country: z.string(),
-        addressType: z.literal(AddressType.DOMESTIC),
-        administrativeArea: z
-          .string()
-          .uuid()
-          .optional() /* Leaf level admin structure */,
-        streetLevelDetails: StreetLevelDetailsValue.refine((arg) => {
-          const streetIds =
-            (streetAddressConfig && streetAddressConfig.map((a) => a.id)) ?? []
-          return Object.keys(arg ?? {}).every((key) => streetIds.includes(key))
-        })
-      })
-
-      // @ts-ignore
-      schema = DynamicAddress
+      schema = getDynamicAddressFieldValue(field)
       break
     case FieldType.DATA:
       schema = DataFieldValue
       break
     case FieldType.NAME:
-      {
-        const nameConfiguration = field.configuration?.name
-        const DynamicName = z.object({
-          firstname: nameConfiguration?.firstname?.required
-            ? NonEmptyTextValue
-            : TextValue,
-          surname: nameConfiguration?.surname?.required
-            ? NonEmptyTextValue
-            : TextValue,
-          middlename: nameConfiguration?.middlename?.required
-            ? NonEmptyTextValue
-            : TextValue
-        })
-
-        // @ts-ignore
-        schema = field.required ? DynamicName : DynamicName.nullish()
-      }
+      schema = getDynamicNameValue(field)
       break
     case FieldType.BUTTON:
       schema = ButtonFieldValue
@@ -226,19 +204,6 @@ export function mapFieldTypeToZod(field: FieldConfig) {
   }
 
   return field.required ? schema : schema.nullish()
-}
-
-export function createValidationSchema(config: FieldConfig[]) {
-  const shape: Record<
-    string,
-    NullishFieldValueSchema | FieldUpdateValueSchema
-  > = {}
-
-  for (const field of config) {
-    shape[field.id] = mapFieldTypeToZod(field) as any
-  }
-
-  return z.object(shape)
 }
 
 /**

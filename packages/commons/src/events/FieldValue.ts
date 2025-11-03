@@ -199,7 +199,6 @@ export type FieldUpdateValueSchema =
   | typeof AddressFieldUpdateValue
   | typeof NumberFieldValue
   | typeof DataFieldValue
-  | typeof NameFieldValue
   | typeof NameFieldUpdateValue
   | typeof HttpFieldUpdateValue
   | typeof QueryParamReaderFieldUpdateValue
