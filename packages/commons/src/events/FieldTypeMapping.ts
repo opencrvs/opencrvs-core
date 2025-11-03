@@ -74,16 +74,17 @@ import { FullDocumentPath } from '../documents'
 
 import {
   AddressFieldValue,
-  AddressFieldUpdateValue,
+  // AddressFieldUpdateValue,
   FileFieldValue,
   FileFieldWithOptionValue,
   AddressType,
   NameFieldValue,
-  NameFieldUpdateValue,
+  // NameFieldUpdateValue,
   HttpFieldUpdateValue,
   QueryParamReaderFieldUpdateValue,
   QrReaderFieldValue,
-  IdReaderFieldValue
+  IdReaderFieldValue,
+  StreetLevelDetailsValue
 } from './CompositeFieldValue'
 
 /**
@@ -105,9 +106,13 @@ type NullishFieldValueSchema = z.ZodOptional<
  * Mapping of field types to Zod schema.
  * Useful for building dynamic validations against FieldConfig
  */
-export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
+/**
+ * Mapping of field types to Zod schema.
+ * Useful for building dynamic validations against FieldConfig
+ */
+export function mapFieldTypeToZod(field: FieldConfig) {
   let schema: FieldUpdateValueSchema | NullishFieldValueSchema
-  switch (type) {
+  switch (field.type) {
     case FieldType.DATE:
       schema = DateValue
       break
@@ -144,7 +149,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.VERIFICATION_STATUS:
     case FieldType.ID:
     case FieldType.LOADER:
-      schema = required ? NonEmptyTextValue : TextValue
+      schema = field.required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
       schema = NumberFieldValue
@@ -160,13 +165,45 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       schema = FileFieldWithOptionValue
       break
     case FieldType.ADDRESS:
-      schema = AddressFieldUpdateValue
+      const streetAddressConfig = field.configuration?.streetAddressForm
+      const DynamicAddress = z.object({
+        country: z.string(),
+        addressType: z.literal(AddressType.DOMESTIC),
+        administrativeArea: z
+          .string()
+          .uuid()
+          .optional() /* Leaf level admin structure */,
+        streetLevelDetails: StreetLevelDetailsValue.refine((arg) => {
+          const streetIds =
+            (streetAddressConfig && streetAddressConfig.map((a) => a.id)) ?? []
+          return Object.keys(arg ?? {}).every((key) => streetIds.includes(key))
+        })
+      })
+
+      // @ts-ignore
+      schema = DynamicAddress
       break
     case FieldType.DATA:
       schema = DataFieldValue
       break
     case FieldType.NAME:
-      schema = required ? NameFieldValue : NameFieldUpdateValue
+      {
+        const nameConfiguration = field.configuration?.name
+        const DynamicName = z.object({
+          firstname: nameConfiguration?.firstname?.required
+            ? NonEmptyTextValue
+            : TextValue,
+          surname: nameConfiguration?.surname?.required
+            ? NonEmptyTextValue
+            : TextValue,
+          middlename: nameConfiguration?.middlename?.required
+            ? NonEmptyTextValue
+            : TextValue
+        })
+
+        // @ts-ignore
+        schema = field.required ? DynamicName : DynamicName.nullish()
+      }
       break
     case FieldType.BUTTON:
       schema = ButtonFieldValue
@@ -188,7 +225,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       break
   }
 
-  return required ? schema : schema.nullish()
+  return field.required ? schema : schema.nullish()
 }
 
 export function createValidationSchema(config: FieldConfig[]) {
@@ -198,7 +235,7 @@ export function createValidationSchema(config: FieldConfig[]) {
   > = {}
 
   for (const field of config) {
-    shape[field.id] = mapFieldTypeToZod(field.type, !!field.required)
+    shape[field.id] = mapFieldTypeToZod(field) as any
   }
 
   return z.object(shape)

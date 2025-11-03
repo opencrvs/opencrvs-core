@@ -418,7 +418,7 @@ export function validateFieldInput({
   field: FieldConfig
   value: FieldUpdateValue
 }) {
-  const zodType = mapFieldTypeToZod(field.type, !!field.required)
+  const zodType = mapFieldTypeToZod(field)
 
   const rawError = zodType.safeParse(value, {
     // @ts-expect-error
