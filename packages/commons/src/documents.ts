@@ -31,7 +31,7 @@ export const FullDocumentUrl = z
   .string()
   .brand('FullDocumentUrl')
   .describe(
-    'A full url with protocol, host, bucket name, starting from the root of the S3 server, https://minio/bucket-name/document-id.jpg'
+    'A full url with protocol, host, bucket name, starting from the root of the S3 server, https://minio.opencrvs.com/bucket-name/document-id.jpg'
   )
 
 export type FullDocumentUrl = z.infer<typeof FullDocumentUrl>
