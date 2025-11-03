@@ -21,10 +21,14 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
+  Action,
+  ActionDocument,
+  ActionStatus,
   ActionType,
   EventConfig,
   EventDocument,
-  getAcceptedActions,
+  getCompleteActionAnnotation,
+  getCompleteActionDeclaration,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
@@ -344,10 +348,33 @@ export function EventHistory({
   const { getActionTypeForHistory } = useActionForHistory()
   const { getActionCreator } = useActionCreator()
 
-  const history = getAcceptedActions(fullEvent)
+  function ishistoryAction(a: Action): a is ActionDocument {
+    if (a.status === ActionStatus.Accepted) {
+      return true
+    }
+
+    if (a.status === ActionStatus.Requested) {
+      const immediadelyAcceptedAction = fullEvent.actions.find(
+        ({ originalActionId, transactionId }) =>
+          originalActionId === a.id && transactionId === a.transactionId
+      )
+      if (!immediadelyAcceptedAction) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  const history = fullEvent.actions.filter(ishistoryAction).map((action) => ({
+    ...action,
+    declaration: getCompleteActionDeclaration({}, fullEvent, action),
+    annotation: getCompleteActionAnnotation({}, fullEvent, action)
+  }))
 
   const historyWithUpdatedActions = expandWithUpdateActions(
     fullEvent,
+    history,
     validatorContext,
     eventConfiguration
   )

@@ -20,7 +20,8 @@ import {
   getCurrentEventState,
   UUID,
   ValidatorContext,
-  DeclarationActions
+  DeclarationActions,
+  ActionStatus
 } from '@opencrvs/commons/client'
 import { hasAnnotationChanged, getDeclarationComparison } from './utils'
 
@@ -98,10 +99,10 @@ function isDeclarationAction(
  */
 export function expandWithUpdateActions(
   fullEvent: EventDocument,
+  history: ActionDocument[],
   validatorContext: ValidatorContext,
   eventConfiguration: EventConfig
 ): EventHistoryActionDocument[] {
-  const history = getAcceptedActions(fullEvent)
   return history.flatMap<EventHistoryActionDocument>((action) => {
     if (isDeclarationAction(action)) {
       if (
@@ -140,6 +141,13 @@ export function useActionForHistory() {
     actions: ActionDocument[],
     action: EventHistoryActionDocument
   ) {
+    if (
+      action.type === ActionType.REGISTER &&
+      action.status === ActionStatus.Requested
+    ) {
+      return 'WAITING_FOR_EXTERNAL_VALIDATION'
+    }
+
     if (action.type === ActionType.REQUEST_CORRECTION) {
       const approveAction = actions.find(
         (x) =>
