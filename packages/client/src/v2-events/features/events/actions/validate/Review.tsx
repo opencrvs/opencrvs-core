@@ -11,7 +11,6 @@
 
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { v4 as uuid } from 'uuid'
 import {
   useTypedParams,
   useTypedSearchParams
@@ -26,11 +25,7 @@ import {
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import {
-  REJECT_ACTIONS,
-  RejectionState,
-  Review as ReviewComponent
-} from '@client/v2-events/features/events/components/Review'
+import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -42,6 +37,7 @@ import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitMod
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useRejectionModal } from '../reject/useRejectionModal'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 /**
@@ -57,6 +53,7 @@ export function Review() {
   const drafts = useDrafts()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
+  const { rejectionModal, handleRejection } = useRejectionModal(eventId)
   const { closeActionView } = useEventFormNavigation()
   const validatorContext = useValidatorContext()
 
@@ -167,45 +164,6 @@ export function Review() {
     }
   }
 
-  async function handleRejection() {
-    const confirmedRejection = await openModal<RejectionState | null>(
-      (close) => <ReviewComponent.ActionModal.Reject close={close} />
-    )
-    if (confirmedRejection) {
-      const { rejectAction, message, isDuplicate } = confirmedRejection
-
-      if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
-        events.actions.reject.mutate({
-          eventId,
-          declaration: {},
-          transactionId: uuid(),
-          annotation: {},
-          content: { reason: message }
-        })
-      }
-
-      if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
-        if (isDuplicate) {
-          events.customActions.archiveOnDuplicate.mutate({
-            eventId,
-            declaration: {},
-            transactionId: uuid(),
-            content: { reason: message }
-          })
-        } else {
-          events.actions.archive.mutate({
-            eventId,
-            declaration: {},
-            transactionId: uuid(),
-            annotation: {},
-            content: { reason: message }
-          })
-        }
-      }
-      closeActionView(slug)
-    }
-  }
-
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.VALIDATE}
@@ -236,12 +194,13 @@ export function Review() {
           onReject={
             currentEventState.flags.includes(InherentFlags.REJECTED)
               ? undefined
-              : handleRejection
+              : async () => handleRejection(() => closeActionView(slug))
           }
         />
         {modal}
       </ReviewComponent.Body>
       {saveAndExitModal}
+      {rejectionModal}
     </FormLayout>
   )
 }

@@ -48,6 +48,7 @@ import { UnassignModal } from '@client/v2-events/components/UnassignModal'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useQuickActionModal } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
+import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -92,7 +93,6 @@ function getAvailableAssignmentActions(
   return []
 }
 
-// TODO CIHAN: rejection
 export const actionLabels = {
   [ActionType.ASSIGN]: {
     defaultMessage: 'Assign',
@@ -109,6 +109,11 @@ export const actionLabels = {
     description:
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'event.birth.action.declare.label'
+  },
+  [ActionType.REJECT]: {
+    defaultMessage: 'Reject',
+    description: 'Label for reject button in dropdown menu',
+    id: 'event.birth.action.reject.label'
   },
   [ActionType.VALIDATE]: {
     defaultMessage: 'Validate',
@@ -221,6 +226,7 @@ function useViewableActionConfigurations(
     },
     [event, deleteDeclaration]
   )
+  const { rejectionModal, handleRejection } = useRejectionModal(event.id, false)
 
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
@@ -301,7 +307,7 @@ function useViewableActionConfigurations(
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
   return {
-    modals: [assignModal, deleteModal, quickActionModal],
+    modals: [assignModal, deleteModal, rejectionModal, quickActionModal],
     config: {
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
@@ -349,11 +355,10 @@ function useViewableActionConfigurations(
       },
       [ActionType.DECLARE]: {
         icon: 'PencilLine' as const,
-        // NOTE: Only label changes for convenience. Trying to actually VALIDATE before DECLARE will not work.
         label: isReviewingDeclaration
           ? reviewLabel
           : actionLabels[ActionType.DECLARE],
-        onClick: (workqueue?: string) => {
+        onClick: (workqueue) => {
           clearEphemeralFormState()
           return navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
@@ -364,6 +369,19 @@ function useViewableActionConfigurations(
         },
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
         hidden: shouldHideDeclareAction
+      },
+      [ActionType.REJECT]: {
+        label: actionLabels[ActionType.REJECT],
+        icon: 'FileX',
+        onClick: async (workqueue) =>
+          handleRejection(() =>
+            workqueue
+              ? navigate(
+                  ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue })
+                )
+              : navigate(ROUTES.V2.buildPath({}))
+          ),
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.VALIDATE]: {
         label: resolveValidateLabel(),
