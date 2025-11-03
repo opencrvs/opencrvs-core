@@ -20,7 +20,7 @@ import {
   Review as ReviewComponent
 } from '@client/v2-events/features/events/components/Review'
 
-export function useRejectionModal(eventId: UUID, allowArchive: boolean) {
+export function useRejectionModal(eventId: UUID, allowArchive = true) {
   const [modal, openModal] = useModal()
   const events = useEvents()
 

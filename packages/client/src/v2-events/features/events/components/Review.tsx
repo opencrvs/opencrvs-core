@@ -802,7 +802,7 @@ function RejectActionModal({
   allowArchive = true
 }: {
   close: (result: RejectionState | null) => void
-  allowArchive: boolean
+  allowArchive?: boolean
 }) {
   const [state, setState] = useState<RejectionState>({
     rejectAction: REJECT_ACTIONS.ARCHIVE,
