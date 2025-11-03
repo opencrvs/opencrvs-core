@@ -809,7 +809,7 @@ export const WithAnnotationChangeOnValidate: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: annotationUpdateOnValidateEvent.id
       })
     },
@@ -908,7 +908,7 @@ export const WithAnnotationChangeOnRegister: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: annotationChangeDuringRegisterEvent.id
       })
     },
