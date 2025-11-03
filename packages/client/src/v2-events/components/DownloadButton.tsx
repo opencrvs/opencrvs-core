@@ -139,7 +139,7 @@ export function DownloadButton({
     eventDocument.isFetched
 
   if (isDraft && isDownloadedToMe) {
-    return <Downloaded />
+    return <Downloaded data-testid="downloaded-icon" />
   }
 
   const isAssignedToSomeoneElse =
