@@ -49,6 +49,48 @@ function toEventDocument(
   })
 }
 
+/**
+ *
+ * @returns all events with the given ids in one query.
+ */
+async function getEventsByIdsInTrx(
+  trx: Kysely<Schema>,
+  eventIds: UUID[]
+): Promise<EventDocument[]> {
+  const events = (await trx
+    .selectFrom('events')
+    .selectAll('events')
+    .select(() =>
+      sql`json_agg(
+      jsonb_strip_nulls(to_jsonb(${sql.ref('eventActions')}))
+      ORDER BY
+        CASE WHEN ${sql.ref('eventActions.actionType')} = 'CREATE' THEN 0 ELSE 1 END,
+        ${sql.ref('eventActions.createdAt')}
+    )`.as('actions')
+    )
+    .leftJoin('eventActions', 'eventActions.eventId', 'events.id')
+    .where('events.id', 'in', eventIds)
+    .groupBy('events.id')
+    .orderBy('events.id')
+    // We parse on the next step so casting mistakes will be caught immediately.
+    .execute()) as (Events & { actions: EventActions[] })[]
+
+  return events.map((event) =>
+    EventDocument.parse({
+      ...event,
+      type: event.eventType,
+      actions: event.actions.map(({ actionType, createdAt, ...rest }) => {
+        return {
+          ...rest,
+          type: actionType,
+          // turns db format +00 to Z format
+          createdAt: DateTime.fromISO(createdAt).toISO()
+        }
+      })
+    })
+  )
+}
+
 export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
   const event = await trx
     .selectFrom('events')
@@ -76,7 +118,6 @@ async function* processBatch(batch: Events[]) {
 
   let eventDocs: EventDocument[] = []
   try {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     eventDocs = await getEventsByIdsInTrx(db, ids)
   } catch (err) {
     logger.error({
@@ -326,48 +367,6 @@ async function createActionsInTrx(
       oc.columns(['transactionId', 'actionType', 'status']).doNothing()
     )
     .execute()
-}
-
-/**
- *
- * @returns all events with the given ids in one query.
- */
-async function getEventsByIdsInTrx(
-  trx: Kysely<Schema>,
-  eventIds: UUID[]
-): Promise<EventDocument[]> {
-  const events = (await trx
-    .selectFrom('events')
-    .selectAll('events')
-    .select(() =>
-      sql`json_agg(
-      jsonb_strip_nulls(to_jsonb(${sql.ref('eventActions')}))
-      ORDER BY
-        CASE WHEN ${sql.ref('eventActions.actionType')} = 'CREATE' THEN 0 ELSE 1 END,
-        ${sql.ref('eventActions.createdAt')}
-    )`.as('actions')
-    )
-    .leftJoin('eventActions', 'eventActions.eventId', 'events.id')
-    .where('events.id', 'in', eventIds)
-    .groupBy('events.id')
-    .orderBy('events.id')
-    // We parse on the next step so casting mistakes will be caught immediately.
-    .execute()) as (Events & { actions: EventActions[] })[]
-
-  return events.map((event) =>
-    EventDocument.parse({
-      ...event,
-      type: event.eventType,
-      actions: event.actions.map(({ actionType, createdAt, ...rest }) => {
-        return {
-          ...rest,
-          type: actionType,
-          // turns db format +00 to Z format
-          createdAt: DateTime.fromISO(createdAt).toISO()
-        }
-      })
-    })
-  )
 }
 
 /**
