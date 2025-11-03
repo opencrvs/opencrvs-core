@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FieldType } from '../events/FieldType'
 import { AddressType } from '../events/CompositeFieldValue'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { UUID } from '../uuid'
+import { tennisClubMembershipEvent } from '../fixtures'
 
 const testCases = [
   {
@@ -29,7 +29,11 @@ const testCases = [
       addressType: AddressType.DOMESTIC,
       // @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
       // @TODO:  Find a way to give out context aware mock values in the future.
-      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
     },
     success: true
   },
@@ -55,10 +59,8 @@ const testCases = [
       country: 'BGD',
       addressType: AddressType.INTERNATIONAL,
       streetLevelDetails: {
-        streetName: 'Main St',
-        streetNumber: '123',
-        city: 'Dhaka',
-        postalCode: '1212'
+        state: 'state',
+        district2: 'district2'
       }
     },
     success: true
@@ -67,7 +69,15 @@ const testCases = [
 
 testCases.map(({ title, address, success }) => {
   test(title, () => {
-    const result = mapFieldTypeToZod(FieldType.ADDRESS).safeParse(address)
+    const addressConfig = tennisClubMembershipEvent.declaration.pages
+      .flatMap((page) => page.fields)
+      .find((f) => f.type === 'ADDRESS')
+
+    if (!addressConfig) {
+      throw new Error('Address config not found')
+    }
+
+    const result = mapFieldTypeToZod(addressConfig).safeParse(address)
     expect(result.success).toBe(success)
   })
 })
