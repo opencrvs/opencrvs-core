@@ -21,7 +21,7 @@ export const validate: QuickActionConfig = {
     return actions.validate.mutate({
       eventId: event.id,
       declaration: event.declaration,
-      // TODO CIHAN: annotation fields?
+      // @TODO Annotation is currently not used for this action. As part of custom actions work, we will add support for configuring annotation fields to the validate & register modals.
       annotation: {},
       transactionId: uuid()
     })

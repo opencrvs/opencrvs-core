@@ -286,6 +286,16 @@ function useViewableActionConfigurations(
     event.type
   )
 
+  function resolveValidateLabel() {
+    if (isReviewingIncompleteDeclaration) {
+      return reviewLabel
+    }
+
+    return userMayRegister
+      ? actionLabels[ActionType.REGISTER]
+      : actionLabels[ActionType.VALIDATE]
+  }
+
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
@@ -341,7 +351,7 @@ function useViewableActionConfigurations(
         icon: 'PencilLine' as const,
         // NOTE: Only label changes for convenience. Trying to actually VALIDATE before DECLARE will not work.
         label: isReviewingDeclaration
-          ? actionLabels[ActionType.VALIDATE]
+          ? reviewLabel
           : actionLabels[ActionType.DECLARE],
         onClick: (workqueue?: string) => {
           clearEphemeralFormState()
@@ -356,9 +366,7 @@ function useViewableActionConfigurations(
         hidden: shouldHideDeclareAction
       },
       [ActionType.VALIDATE]: {
-        label: userMayRegister
-          ? actionLabels[ActionType.REGISTER]
-          : actionLabels[ActionType.VALIDATE],
+        label: resolveValidateLabel(),
         icon: 'PencilLine' as const,
         onClick: async (workqueue) =>
           onQuickAction(ActionType.VALIDATE, workqueue),
@@ -377,7 +385,9 @@ function useViewableActionConfigurations(
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REGISTER]: {
-        label: actionLabels[ActionType.REGISTER],
+        label: isReviewingIncompleteDeclaration
+          ? reviewLabel
+          : actionLabels[ActionType.REGISTER],
         icon: 'PencilLine' as const,
         onClick: async (workqueue) =>
           onQuickAction(ActionType.REGISTER, workqueue),
