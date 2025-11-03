@@ -14,7 +14,9 @@ import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   ActionType,
+  createPrng,
   generateEventDocument,
+  generateTrackingId,
   getCurrentEventState,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
@@ -45,7 +47,10 @@ const createdEventDocument = generateEventDocument({
         assignedTo: '6821c175dce4d7886d4e8210'
       }
     }
-  ]
+  ],
+  defaults: {
+    trackingId: generateTrackingId(createPrng(1234))
+  }
 })
 
 const eventState = getCurrentEventState(

@@ -57,7 +57,9 @@ export function useToastAndRedirect() {
     eventId: UUID
   }) {
     showWarningToast({ message, toastType: 'warning', toastId })
-    return navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
+    return navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }), {
+      replace: true
+    })
   }
 
   return { redirectToEventOverviewPage }
