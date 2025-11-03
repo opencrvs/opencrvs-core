@@ -34,7 +34,7 @@ export function getDynamicAddressFieldValue(field: AddressField) {
   const streetAddressConfig = field.configuration?.streetAddressForm
   return z.object({
     country: z.string(),
-    addressType: z.literal(AddressType.DOMESTIC),
+    addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL]),
     administrativeArea: z
       .string()
       .uuid()
