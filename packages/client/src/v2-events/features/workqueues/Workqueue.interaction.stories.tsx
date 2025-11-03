@@ -16,9 +16,11 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { userEvent, within, expect } from '@storybook/test'
 import {
   ActionType,
+  createPrng,
   EventIndex,
   eventQueryDataGenerator,
   EventStatus,
+  generateActionDocument,
   generateEventDocument,
   generateEventDraftDocument,
   generateWorkqueues,
@@ -27,7 +29,7 @@ import {
   NameFieldValue,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
+import { AppRouter, trpcClient, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { formattedDuration } from '@client/utils/date-formatting'
@@ -311,8 +313,11 @@ export const WorkqueueCtaByStatusRejected: Story = {
 }
 
 function generateDraft() {
+  const rng = createPrng(9124)
+
   const createdEvent = {
     ...generateEventDocument({
+      rng,
       configuration: tennisClubMembershipEvent,
       actions: [{ type: ActionType.CREATE }]
     })
@@ -323,6 +328,7 @@ function generateDraft() {
     draft: generateEventDraftDocument({
       eventId: createdEvent.id,
       actionType: ActionType.DECLARE,
+      rng,
       declaration: {
         'applicant.name': {
           firstname: faker.person.firstName(),
@@ -420,6 +426,21 @@ export const PaginationAfterDownload: Story = {
           })
         ],
         event: [
+          tRPCMsw.event.actions.assignment.assign.mutation(() => {
+            return {
+              ...tennisClubMembershipEventDocument,
+              actions: [
+                ...tennisClubMembershipEventDocument.actions,
+                generateActionDocument({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.ASSIGN
+                })
+              ]
+            }
+          }),
+          tRPCMsw.event.getDuplicates.query(() => {
+            return []
+          }),
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
           }),
@@ -451,11 +472,11 @@ export const PaginationAfterDownload: Story = {
     const canvas = within(canvasElement)
 
     await canvas.findByText('Farajaland CRVS', {}, { timeout: 5000 })
+    await canvas.findByText('Riku Rouvila')
+    await userEvent.click(await canvas.findByTestId('ListItemAction-0-icon'))
 
-    const assignButton = await canvas.findByTestId('ListItemAction-0-icon')
-    await userEvent.click(assignButton)
-    const assignModalButton = await canvas.findByTestId('assign')
-    await userEvent.click(assignModalButton)
+    await canvas.findByText('Assign record?')
+    await userEvent.click(await canvas.findByRole('button', { name: 'Assign' }))
 
     await step('Clicked assign record button', async () => {
       const page0 = canvasElement.querySelector('[data-testid="page-number-0"]')

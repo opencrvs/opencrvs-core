@@ -167,7 +167,7 @@ const generator = testDataGenerator()
 /*
  * Clear all indexedDB databases before each story
  */
-async function clearStorage() {
+export async function clearStorage() {
   const databases = await window.indexedDB.databases()
   for (const db of databases) {
     window.indexedDB.deleteDatabase(db.name!)

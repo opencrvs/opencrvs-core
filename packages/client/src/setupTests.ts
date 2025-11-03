@@ -251,6 +251,7 @@ beforeEach(() => {
   getItem.mockReturnValue(validToken)
   storageGetItemMock.mockReset()
   storageSetItemMock.mockReset()
+  storageRemoveItemMock.mockReset()
   warn.mockReset()
   error.mockReset()
   debug.mockReset()
