@@ -13,48 +13,40 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { userEvent, within, expect, waitFor } from '@storybook/test'
 import { TRPCError } from '@trpc/server'
+import { get } from 'lodash'
 import {
   ActionType,
   tennisClubMembershipEvent,
   generateEventDocument,
   getCurrentEventState,
   footballClubMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  getUUID,
+  UUID
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
-import { testDataGenerator } from '@client/tests/test-data-generators'
 import { wrapHandlersWithSpies } from '@client/tests/v2-events/declaration.utils'
 import { ReviewIndex } from '../events/actions/declare/Review'
 
-const generator = testDataGenerator()
-
-const declareEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
-})
+function getDeclareEventDocument(id: UUID) {
+  return generateEventDocument({
+    configuration: tennisClubMembershipEvent,
+    actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }],
+    defaults: {
+      id
+    }
+  })
+}
 
 const meta: Meta<typeof ReviewIndex> = {
-  title: 'Outbox/Interaction',
-  beforeEach: () => {
-    useEventFormData.setState({
-      formValues: getCurrentEventState(
-        declareEventDocument,
-        tennisClubMembershipEvent
-      ).declaration
-    })
-  }
+  title: 'Outbox/Interaction'
 }
 
 export default meta
 
 const OUTBOX_FREEZE_TIME = 5 * 1000 // 5 seconds
-
-const createdEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [{ type: ActionType.CREATE }]
-})
 
 type Story = StoryObj<typeof ReviewIndex>
 const tRPCMsw = createTRPCMsw<AppRouter>({
@@ -66,38 +58,52 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const successfulMutationEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [{ type: ActionType.CREATE }],
+  defaults: {
+    id: getUUID()
+  }
+})
+
 const declarationTrpcMsw = {
   events: wrapHandlersWithSpies([
     {
       name: 'event.create',
       procedure: tRPCMsw.event.create.mutation,
-      handler: () => createdEventDocument
+      handler: () => successfulMutationEvent
     },
     {
       name: 'event.actions.declare.request',
       procedure: tRPCMsw.event.actions.declare.request.mutation,
       handler: async () => {
         await new Promise((resolve) => setTimeout(resolve, OUTBOX_FREEZE_TIME))
-        return declareEventDocument
+        return getDeclareEventDocument(successfulMutationEvent.id)
       }
     }
   ])
 }
 
-const mockUser = generator.user.fieldAgent().v2
-
 export const SuccessfulMutation: Story = {
+  beforeEach: () => {
+    useEventFormData.setState({
+      formValues: getCurrentEventState(
+        getDeclareEventDocument(successfulMutationEvent.id),
+        tennisClubMembershipEvent
+      ).declaration
+    })
+  },
   parameters: {
     userRole: TestUserRole.Enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: createdEventDocument.id
+        eventId: successfulMutationEvent.id
       })
     },
     chromatic: { disableSnapshot: true },
     offline: {
-      events: [createdEventDocument],
+      events: [successfulMutationEvent],
       configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
     },
     msw: {
@@ -122,7 +128,7 @@ export const SuccessfulMutation: Story = {
 
       const searchResult = await canvas.findByTestId('search-result')
       const { firstname, surname } = getCurrentEventState(
-        declareEventDocument,
+        getDeclareEventDocument(successfulMutationEvent.id),
         tennisClubMembershipEvent
       ).declaration['applicant.name'] as {
         firstname: string
@@ -148,12 +154,20 @@ export const SuccessfulMutation: Story = {
   }
 }
 
+const failedMutationEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [{ type: ActionType.CREATE }],
+  defaults: {
+    id: getUUID()
+  }
+})
+
 const declarationTrpcMswFail = {
   events: wrapHandlersWithSpies([
     {
       name: 'event.create',
       procedure: tRPCMsw.event.create.mutation,
-      handler: () => createdEventDocument
+      handler: () => failedMutationEvent
     },
     {
       name: 'event.actions.declare.request',
@@ -169,17 +183,25 @@ const declarationTrpcMswFail = {
 }
 
 export const FailedMutation: Story = {
+  beforeEach: () => {
+    useEventFormData.setState({
+      formValues: getCurrentEventState(
+        getDeclareEventDocument(failedMutationEvent.id),
+        tennisClubMembershipEvent
+      ).declaration
+    })
+  },
   parameters: {
     userRole: TestUserRole.Enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: createdEventDocument.id
+        eventId: failedMutationEvent.id
       })
     },
     chromatic: { disableSnapshot: true },
     offline: {
-      events: [createdEventDocument],
+      events: [failedMutationEvent],
       configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
     },
     msw: {
@@ -204,7 +226,7 @@ export const FailedMutation: Story = {
 
       const searchResult = await canvas.findByTestId('search-result')
       const { firstname, surname } = getCurrentEventState(
-        declareEventDocument,
+        getDeclareEventDocument(failedMutationEvent.id),
         tennisClubMembershipEvent
       ).declaration['applicant.name'] as {
         firstname: string
@@ -225,12 +247,20 @@ export const FailedMutation: Story = {
   }
 }
 
+const failedMutationConflictEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [{ type: ActionType.CREATE }],
+  defaults: {
+    id: getUUID()
+  }
+})
+
 const declarationTrpcMswConflict = {
   events: wrapHandlersWithSpies([
     {
       name: 'event.create',
       procedure: tRPCMsw.event.create.mutation,
-      handler: () => createdEventDocument
+      handler: () => failedMutationConflictEvent
     },
     {
       name: 'event.actions.declare.request',
@@ -246,17 +276,25 @@ const declarationTrpcMswConflict = {
 }
 
 export const FailedMutationConflict: Story = {
+  beforeEach: () => {
+    useEventFormData.setState({
+      formValues: getCurrentEventState(
+        getDeclareEventDocument(failedMutationConflictEvent.id),
+        tennisClubMembershipEvent
+      ).declaration
+    })
+  },
   parameters: {
     userRole: TestUserRole.Enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: createdEventDocument.id
+        eventId: failedMutationConflictEvent.id
       })
     },
     chromatic: { disableSnapshot: true },
     offline: {
-      events: [createdEventDocument],
+      events: [failedMutationConflictEvent],
       configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
     },
     msw: {
@@ -281,7 +319,7 @@ export const FailedMutationConflict: Story = {
 
       const searchResult = await canvas.findByTestId('search-result')
       const { firstname, surname } = getCurrentEventState(
-        declareEventDocument,
+        getDeclareEventDocument(failedMutationConflictEvent.id),
         tennisClubMembershipEvent
       ).declaration['applicant.name'] as {
         firstname: string
