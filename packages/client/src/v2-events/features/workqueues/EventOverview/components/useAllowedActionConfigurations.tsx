@@ -387,8 +387,13 @@ function useViewableActionConfigurations(
       [ActionType.VALIDATE]: {
         label: resolveValidateLabel(),
         icon: 'PencilLine' as const,
-        onClick: async (workqueue) =>
-          onQuickAction(ActionType.VALIDATE, workqueue),
+        onClick: async (workqueue) => {
+          if (userMayRegister) {
+            return onQuickAction(ActionType.REGISTER, workqueue)
+          }
+
+          return onQuickAction(ActionType.VALIDATE, workqueue)
+        },
         onCtaClick: (workqueue) =>
           navigate(
             ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
