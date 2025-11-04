@@ -222,22 +222,10 @@ export function omitHiddenPaginatedFields(
   values: EventState,
   validatorContext: ValidatorContext
 ) {
-  // If a page has a conditional, we set it as one of the field's conditionals with ConditionalType.SHOW
-  const fields = formConfig.pages.flatMap((p) =>
-    p.fields.map((f) => {
-      if (!p.conditional) {
-        return f
-      }
-
-      return {
-        ...f,
-        conditionals: [
-          ...(f.conditionals ?? []),
-          { type: ConditionalType.SHOW, conditional: p.conditional }
-        ]
-      }
-    })
-  )
+  // If a page is hidden, we ommit it's fields early
+  const fields = formConfig.pages
+    .filter((p) => isPageVisible(p, values, validatorContext))
+    .flatMap((p) => p.fields)
 
   return omitHiddenFields(fields, values, validatorContext)
 }
