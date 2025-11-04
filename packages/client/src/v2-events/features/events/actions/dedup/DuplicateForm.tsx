@@ -20,7 +20,7 @@ import {
 import { Content } from '@opencrvs/components/lib/Content'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { EventIndex, EventStatus, getUUID } from '@opencrvs/commons/client'
+import { EventIndex, getUUID } from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes/routes'
 import { useEventConfiguration } from '../../useEventConfiguration'
@@ -71,25 +71,21 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
       id="not-a-duplicate"
       type="positive"
       onClick={async () => {
-        const marAsNotDuplicate = await openModal<boolean>((close) => (
+        const markAsNotDuplicate = await openModal<boolean>((close) => (
           <MarkAsNotDuplicateModal
             close={close}
             name={name || ''}
             trackingId={eventIndex.trackingId}
           />
         ))
-        if (marAsNotDuplicate) {
+        if (markAsNotDuplicate) {
           actions.duplicate.markNotDuplicate.mutate({
             transactionId: getUUID(),
             eventId: eventIndex.id,
             keepAssignment: true
           })
 
-          if (eventIndex.status === EventStatus.Values.DECLARED) {
-            navigate(ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId }))
-          } else {
-            navigate(ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId }))
-          }
+          navigate(ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId }))
         }
       }}
     >

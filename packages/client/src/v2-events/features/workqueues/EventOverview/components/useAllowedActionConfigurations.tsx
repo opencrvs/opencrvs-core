@@ -381,7 +381,8 @@ function useViewableActionConfigurations(
                 )
               : navigate(ROUTES.V2.buildPath({}))
           ),
-        disabled: !isDownloadedAndAssignedToUser
+        disabled: !isDownloadedAndAssignedToUser,
+        hidden: isReviewingDeclaration
       },
       [ActionType.VALIDATE]: {
         label: resolveValidateLabel(),
