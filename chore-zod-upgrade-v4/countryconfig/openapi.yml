@@ -14032,6 +14032,7 @@ components:
                             - SIGNATURE
                             - DATA
                             - BUTTON
+                            - SEARCH
                             - ALPHA_PRINT_BUTTON
                             - HTTP
                             - LINK_BUTTON
@@ -14281,6 +14282,7 @@ components:
                             - SIGNATURE
                             - DATA
                             - BUTTON
+                            - SEARCH
                             - ALPHA_PRINT_BUTTON
                             - HTTP
                             - LINK_BUTTON
@@ -19600,8 +19602,25 @@ components:
                             $ref: "#/components/schemas/TranslationConfig"
                           value:
                             anyOf:
-                              - $ref: "#/components/schemas/TranslationConfig"
-                              - type: string
+                              - anyOf:
+                                  - $ref: "#/components/schemas/TranslationConfig"
+                                  - type: string
+                              - description: Reference to a field by its ID
+                                type: object
+                                properties:
+                                  $$field:
+                                    description: Unique identifier for the field
+                                    type: string
+                                  $$subfield:
+                                    description: 'If the FieldValue is an object, subfield can be used to refer to
+                                      e.g. `["foo", "bar"]` in `{ foo: { bar: 3
+                                      } }`'
+                                    type: array
+                                    items:
+                                      type: string
+                                required:
+                                  - $$field
+                                additionalProperties: false
                         required:
                           - id
                           - label
@@ -21183,6 +21202,257 @@ components:
             - type
             - configuration
           additionalProperties: false
+        - type: object
+          properties:
+            id:
+              description: Unique identifier of the field.
+              type: string
+            label:
+              description: Human-readable label of the field.
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                    additionalProperties: false
+            required:
+              description: Indicates whether the field is mandatory.
+              default: false
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+                  additionalProperties: false
+            conditionals:
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+              default: []
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+            secured:
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+              default: false
+              type: boolean
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              description: Additional validation rules applied to the field.
+              default: []
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+                additionalProperties: false
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              default: false
+              type: boolean
+            uncorrectable:
+              description: Indicates whether the field can be modified during record
+                correction.
+              default: false
+              type: boolean
+            value:
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                    additionalProperties: false
+            analytics:
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+              default: false
+              type: boolean
+            type:
+              type: string
+              const: SEARCH
+            defaultValue:
+              type: object
+              properties:
+                loading:
+                  type: boolean
+                error:
+                  anyOf:
+                    - type: object
+                      properties:
+                        statusCode:
+                          type: number
+                        message:
+                          type: string
+                      required:
+                        - statusCode
+                        - message
+                      additionalProperties: false
+                    - type: "null"
+                data: {}
+              required:
+                - loading
+                - data
+              additionalProperties: false
+            configuration:
+              type: object
+              properties:
+                query:
+                  default:
+                    type: and
+                    clauses:
+                      - eventType: tennis-club-membership
+                        status:
+                          type: anyOf
+                          terms:
+                            - CREATED
+                            - NOTIFIED
+                            - DECLARED
+                            - VALIDATED
+                            - REGISTERED
+                            - ARCHIVED
+                        updatedAt:
+                          type: range
+                          gte: 2025-05-22
+                          lte: 2025-05-29
+                        data: {}
+                  $ref: "#/components/schemas/QueryType"
+                limit:
+                  default: 100
+                  type: number
+                offset:
+                  default: 0
+                  type: number
+                validation:
+                  type: object
+                  properties:
+                    validator:
+                      $ref: "#/components/schemas/Conditional"
+                    message:
+                      $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - validator
+                    - message
+                  additionalProperties: false
+                indicators:
+                  type: object
+                  properties:
+                    loading:
+                      description: Text to display while the search is in progress
+                      $ref: "#/components/schemas/TranslationConfig"
+                    offline:
+                      description: Text to display when the application is offline
+                      $ref: "#/components/schemas/TranslationConfig"
+                    noResultsError:
+                      description: Text to display when no results are found during the search
+                      $ref: "#/components/schemas/TranslationConfig"
+                    httpError:
+                      description: Text to display when there is an HTTP error during the search
+                      $ref: "#/components/schemas/TranslationConfig"
+                    confirmButton:
+                      $ref: "#/components/schemas/TranslationConfig"
+                    clearButton:
+                      $ref: "#/components/schemas/TranslationConfig"
+                    clearModal:
+                      type: object
+                      properties:
+                        title:
+                          $ref: "#/components/schemas/TranslationConfig"
+                        description:
+                          $ref: "#/components/schemas/TranslationConfig"
+                        cancel:
+                          $ref: "#/components/schemas/TranslationConfig"
+                        confirm:
+                          $ref: "#/components/schemas/TranslationConfig"
+                      additionalProperties: false
+                    ok:
+                      $ref: "#/components/schemas/TranslationConfig"
+                  additionalProperties: false
+              required:
+                - query
+                - limit
+                - offset
+                - validation
+              additionalProperties: false
+          required:
+            - id
+            - label
+            - type
+            - configuration
+          additionalProperties: false
       type: object
     FieldConditional:
       description: Field conditional configuration
@@ -21396,6 +21666,332 @@ components:
     QrReaderFieldValidator:
       description: JSON Schema to validate the scanned QR code data against before
         populating the form fields.
+    QueryType:
+      type: object
+      properties:
+        type:
+          default: and
+          anyOf:
+            - type: string
+              const: and
+            - type: string
+              const: or
+        clauses:
+          default:
+            - eventType: tennis-club-membership
+              status:
+                type: anyOf
+                terms:
+                  - CREATED
+                  - NOTIFIED
+                  - DECLARED
+                  - VALIDATED
+                  - REGISTERED
+                  - ARCHIVED
+              updatedAt:
+                type: range
+                gte: 2025-05-22
+                lte: 2025-05-29
+              data: {}
+          minItems: 1
+          type: array
+          items:
+            anyOf:
+              - $ref: "#/components/schemas/QueryExpression"
+              - $ref: "#/components/schemas/QueryType"
+      required:
+        - type
+        - clauses
+      additionalProperties: false
+    QueryExpression:
+      type: object
+      properties:
+        id:
+          type: string
+        eventType:
+          type: string
+        status:
+          anyOf:
+            - $ref: "#/components/schemas/AnyOfStatus"
+            - $ref: "#/components/schemas/ExactStatus"
+        createdAt:
+          $ref: "#/components/schemas/DateCondition"
+        updatedAt:
+          $ref: "#/components/schemas/DateCondition"
+        legalStatuses.REGISTERED.acceptedAt:
+          $ref: "#/components/schemas/DateCondition"
+        legalStatuses.DECLARED.createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        legalStatuses.REGISTERED.createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        legalStatuses.REGISTERED.registrationNumber:
+          $ref: "#/components/schemas/Exact"
+        createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        updatedAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        assignedTo:
+          $ref: "#/components/schemas/Exact"
+        createdByUserType:
+          $ref: "#/components/schemas/ExactUserType"
+        createdBy:
+          $ref: "#/components/schemas/Exact"
+        updatedBy:
+          $ref: "#/components/schemas/Exact"
+        trackingId:
+          $ref: "#/components/schemas/Exact"
+        flags:
+          $ref: "#/components/schemas/ContainsFlags"
+        data:
+          $ref: "#/components/schemas/QueryInput"
+      additionalProperties: false
+    AnyOfStatus:
+      type: object
+      properties:
+        type:
+          type: string
+          const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+            enum:
+              - CREATED
+              - NOTIFIED
+              - DECLARED
+              - VALIDATED
+              - REGISTERED
+              - ARCHIVED
+      required:
+        - type
+        - terms
+      additionalProperties: false
+    ExactStatus:
+      type: object
+      properties:
+        type:
+          type: string
+          const: exact
+        term:
+          type: string
+          enum:
+            - CREATED
+            - NOTIFIED
+            - DECLARED
+            - VALIDATED
+            - REGISTERED
+            - ARCHIVED
+      required:
+        - type
+        - term
+      additionalProperties: false
+    DateCondition:
+      anyOf:
+        - $ref: "#/components/schemas/ExactDate"
+        - $ref: "#/components/schemas/RangeDate"
+        - $ref: "#/components/schemas/TimePeriod"
+    ExactDate:
+      type: object
+      properties:
+        type:
+          type: string
+          const: exact
+        term:
+          anyOf:
+            - type: string
+              format: date
+              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+            - type: string
+              format: date-time
+              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+        - type
+        - term
+      additionalProperties: false
+    RangeDate:
+      type: object
+      properties:
+        type:
+          type: string
+          const: range
+        gte:
+          anyOf:
+            - type: string
+              format: date
+              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+            - type: string
+              format: date-time
+              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        lte:
+          anyOf:
+            - type: string
+              format: date
+              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+            - type: string
+              format: date-time
+              pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+      required:
+        - type
+        - gte
+        - lte
+      additionalProperties: false
+    TimePeriod:
+      type: object
+      properties:
+        type:
+          type: string
+          const: timePeriod
+        term:
+          type: string
+          enum:
+            - last7Days
+            - last30Days
+            - last90Days
+            - last365Days
+      required:
+        - type
+        - term
+      additionalProperties: false
+    Within:
+      type: object
+      properties:
+        type:
+          type: string
+          const: within
+        location:
+          type: string
+      required:
+        - type
+        - location
+      additionalProperties: false
+    Exact:
+      type: object
+      properties:
+        type:
+          type: string
+          const: exact
+        term:
+          type: string
+      required:
+        - type
+        - term
+      additionalProperties: false
+    ExactUserType:
+      type: object
+      properties:
+        type:
+          type: string
+          const: exact
+        term:
+          type: string
+          enum:
+            - user
+            - system
+      required:
+        - type
+        - term
+      additionalProperties: false
+    ContainsFlags:
+      type: object
+      properties:
+        anyOf:
+          type: array
+          items:
+            anyOf:
+              - type: string
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+              - type: string
+                enum:
+                  - pending-certification
+                  - incomplete
+                  - rejected
+                  - correction-requested
+                  - potential-duplicate
+        noneOf:
+          type: array
+          items:
+            anyOf:
+              - type: string
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+              - type: string
+                enum:
+                  - pending-certification
+                  - incomplete
+                  - rejected
+                  - correction-requested
+                  - potential-duplicate
+      additionalProperties: false
+    QueryInput:
+      anyOf:
+        - oneOf:
+            - $ref: "#/components/schemas/Fuzzy"
+            - $ref: "#/components/schemas/Exact"
+            - $ref: "#/components/schemas/Range"
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/AnyOf"
+          type: object
+          discriminator:
+            propertyName: type
+            mapping:
+              fuzzy: "#/components/schemas/Fuzzy"
+              exact: "#/components/schemas/Exact"
+              range: "#/components/schemas/Range"
+              within: "#/components/schemas/Within"
+              anyOf: "#/components/schemas/AnyOf"
+        - type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/QueryInput"
+    Fuzzy:
+      type: object
+      properties:
+        type:
+          type: string
+          const: fuzzy
+        term:
+          type: string
+      required:
+        - type
+        - term
+      additionalProperties: false
+    Range:
+      type: object
+      properties:
+        type:
+          type: string
+          const: range
+        gte:
+          type: string
+        lte:
+          type: string
+      required:
+        - type
+        - gte
+        - lte
+      additionalProperties: false
+    AnyOf:
+      type: object
+      properties:
+        type:
+          type: string
+          const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - terms
+      additionalProperties: false
     DeclareActionConfig:
       type: object
       properties:
