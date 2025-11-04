@@ -151,7 +151,17 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
     )
   }
   const result = validator(data) as boolean
+  return result
+}
 
+/*
+ * This is for validating arbitrary JSON data against a JSON schema outside of the context of a form.
+ * It is used for instance when an input component wants to validate something internally as per user
+ * configured rules (e.g. Search field).
+ */
+export function validateValue(schema: JSONSchema, data: unknown) {
+  const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
+  const result = validator(data) as boolean
   return result
 }
 
