@@ -724,7 +724,34 @@ const SearchField = HttpField.extend({
     limit: true,
     offset: true
   }).extend({
-    validation: ValidationConfig
+    validation: ValidationConfig,
+    indicators: z
+      .object({
+        loading: TranslationConfig.optional().describe(
+          'Text to display while the search is in progress'
+        ),
+        offline: TranslationConfig.optional().describe(
+          'Text to display when the application is offline'
+        ),
+        noResultsError: TranslationConfig.optional().describe(
+          'Text to display when no results are found during the search'
+        ),
+        httpError: TranslationConfig.optional().describe(
+          'Text to display when there is an HTTP error during the search'
+        ),
+        confirmButton: TranslationConfig.optional(),
+        clearButton: TranslationConfig.optional(),
+        clearModal: z
+          .object({
+            title: TranslationConfig.optional(),
+            description: TranslationConfig.optional(),
+            cancel: TranslationConfig.optional(),
+            confirm: TranslationConfig.optional()
+          })
+          .optional(),
+        ok: TranslationConfig.optional()
+      })
+      .optional()
   })
 })
 
@@ -942,7 +969,8 @@ export const FieldConfig: z.ZodType<
     QrReaderField,
     IdReaderField,
     QueryParamReaderField,
-    LoaderField
+    LoaderField,
+    SearchField
   ])
   .openapi({
     description: 'Form field configuration',
