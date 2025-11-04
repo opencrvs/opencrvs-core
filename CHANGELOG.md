@@ -19,6 +19,7 @@
   This version enforces environment to have Node 22 installed (supported until 30 April 2027) and removes support for Node 18 for better performance and using [new features](https://github.com/nodejs/node/releases/tag/v22.0.0) offered by NodeJS
 
   - Use nvm to upgrade your local development environment to use node version `22.x.x.`
+  - Add collector form fields to the handlebars context so that helper can have logic targeting collector form values
 
 - **UI enhancements**
 
