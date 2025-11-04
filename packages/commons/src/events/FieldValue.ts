@@ -136,6 +136,35 @@ export const FieldValue: z.ZodType<FieldValue> = z.union([
   DataFieldValue
 ])
 
+function getRequiredKeyCount(schema: z.ZodTypeAny) {
+  if (schema._def?.shape) {
+    const shape = schema._def.shape()
+    return Object.values(shape).filter(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (v: any) => !v.isOptional() && v._def?.typeName !== 'ZodOptional'
+    ).length
+  }
+  return 0
+}
+
+function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(schemas: T) {
+  return z.custom<z.infer<T[number]>>((val) => {
+    const successful = schemas.filter((s) => s.safeParse(val).success)
+
+    if (successful.length === 1) {
+      return true
+    }
+    if (successful.length === 0) {
+      return false
+    }
+    // if multiple match, fail
+    // Pick the one with the most required keys
+    successful.sort((a, b) => getRequiredKeyCount(b) - getRequiredKeyCount(a))
+    const best = successful[0]
+    return best.safeParse(val).success
+  })
+}
+
 export type FieldUpdateValue =
   | z.infer<typeof TextValue>
   | z.infer<typeof DateValue>
@@ -153,7 +182,7 @@ export type FieldUpdateValue =
   | z.infer<typeof HttpFieldUpdateValue>
   | z.infer<typeof QueryParamReaderFieldUpdateValue>
 
-export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = z.union([
+export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
   TextValue,
   DateValue,
   TimeValue,
@@ -199,6 +228,7 @@ export type FieldUpdateValueSchema =
   | typeof AddressFieldUpdateValue
   | typeof NumberFieldValue
   | typeof DataFieldValue
+  | typeof NameFieldValue
   | typeof NameFieldUpdateValue
   | typeof HttpFieldUpdateValue
   | typeof QueryParamReaderFieldUpdateValue
