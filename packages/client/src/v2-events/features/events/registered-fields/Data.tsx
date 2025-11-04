@@ -11,6 +11,7 @@
 import React, { useEffect } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import styled from 'styled-components'
+import { get } from 'lodash'
 import {
   EventState,
   FieldProps,
@@ -23,11 +24,22 @@ import {
   EventConfig,
   getDeclarationFields,
   FieldValue,
-  DataEntry
+  DataEntry,
+  TranslationConfig,
+  FieldReference
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { makeFormikFieldIdOpenCRVSCompatible } from '@client/v2-events/components/forms/utils'
+
+function isFieldReference(entry: unknown): entry is FieldReference {
+  return (
+    Boolean(entry) &&
+    typeof entry === 'object' &&
+    entry !== null &&
+    '$$field' in entry
+  )
+}
 
 function getFieldFromDataEntry({
   intl,
@@ -41,12 +53,20 @@ function getFieldFromDataEntry({
   const { label, value: rawValue } = entry
 
   // Resolve value if it's a message descriptor
-  const formattedValue =
-    typeof rawValue === 'object' &&
-    'id' in rawValue &&
-    'defaultMessage' in rawValue
-      ? intl.formatMessage(rawValue)
-      : rawValue
+  let formattedValue: string
+
+  if (isFieldReference(rawValue)) {
+    formattedValue = rawValue.$$subfield
+      ? get(formData[rawValue.$$field], rawValue.$$subfield)
+      : formData[rawValue.$$field]
+  } else {
+    formattedValue =
+      typeof rawValue === 'object' &&
+      'id' in rawValue &&
+      'defaultMessage' in rawValue
+        ? intl.formatMessage(rawValue)
+        : rawValue
+  }
 
   let resolvedValue = formattedValue
 
@@ -112,12 +132,12 @@ function DataInput({
   configuration,
   label,
   formData,
-  declarationFields,
+  allKnownFields,
   onChange,
   id
 }: FieldProps<'DATA'> & {
   formData: EventState
-  declarationFields: FieldConfig[]
+  allKnownFields: FieldConfig[]
   onChange: (value: DataFieldValue) => void
 }) {
   const intl = useIntl()
@@ -127,7 +147,7 @@ function DataInput({
 
   const fields = data.map((entry) => {
     if ('fieldId' in entry) {
-      const config = declarationFields.find((f) => f.id === entry.fieldId)
+      const config = allKnownFields.find((f) => f.id === entry.fieldId)
 
       if (!config) {
         throw new Error(
@@ -141,10 +161,32 @@ function DataInput({
       }
     }
 
+    const value = entry.value
+
+    if (isFieldReference(value)) {
+      const resolvedValue = value.$$subfield
+        ? get(formData[value.$$field], value.$$subfield)
+        : formData[value.$$field]
+
+      return getFieldFromDataEntry({
+        intl,
+        formData,
+        entry: {
+          label: entry.label,
+          value: resolvedValue ? String(resolvedValue) : '',
+          id: entry.id
+        }
+      })
+    }
+
     return getFieldFromDataEntry({
       intl,
       formData,
-      entry
+      entry: {
+        label: entry.label,
+        value,
+        id: entry.id
+      }
     })
   })
 

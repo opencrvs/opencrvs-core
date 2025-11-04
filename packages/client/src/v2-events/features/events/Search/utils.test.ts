@@ -12,7 +12,7 @@
 import {
   EventStatus,
   QueryInputType,
-  SearchField,
+  AdvancedSearchField,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import {
@@ -245,7 +245,7 @@ describe('Nested Query Generation with searchFields', () => {
       'person-name': 'Bob',
       'child.dob': '1985-01-01'
     }
-    const searchFieldConfigs: SearchField[] = [
+    const searchFieldConfigs: AdvancedSearchField[] = [
       {
         fieldId: 'person-name',
         fieldType: 'field',
@@ -308,7 +308,7 @@ describe('Nested Query Generation with searchFields', () => {
       'child.name.firstname': 'Alice',
       'child.dob': '1990-01-01'
     }
-    const searchFieldConfigs: SearchField[] = [
+    const searchFieldConfigs: AdvancedSearchField[] = [
       {
         fieldId: 'child.name.firstname',
         fieldType: 'field',
@@ -347,7 +347,7 @@ describe('Nested Query Generation with searchFields', () => {
     const searchParams = {
       'custom-field': 'test-value'
     }
-    const searchFieldConfigs: SearchField[] = [
+    const searchFieldConfigs: AdvancedSearchField[] = [
       {
         fieldId: 'custom-field',
         fieldType: 'field',
@@ -388,7 +388,7 @@ describe('Nested Query Generation with searchFields', () => {
       'person-name': 'Bob'
     }
 
-    const searchFieldConfigs: SearchField[] = [
+    const searchFieldConfigs: AdvancedSearchField[] = [
       {
         fieldId: 'event.trackingId',
         fieldType: 'event',
@@ -440,7 +440,7 @@ describe('Nested Query Generation with searchFields', () => {
       'birth.date': '1980-01-01'
     }
 
-    const searchFieldConfigs: SearchField[] = [
+    const searchFieldConfigs: AdvancedSearchField[] = [
       {
         fieldId: 'applicant-name',
         fieldType: 'field',
