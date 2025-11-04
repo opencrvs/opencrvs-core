@@ -2,9 +2,9 @@
 
 exports[`event.actions.notify > NOTIFY action fails if payload includes field that is not in the declaration 1`] = `[TRPCError: [{"message":"Unexpected field","id":"foo.bar","value":"hello"}]]`;
 
-exports[`event.actions.notify > NOTIFY action fails if payload includes field with unexpected type 1`] = `[TRPCError: [{"message":"Invalid input","id":"applicant.name","value":{}}]]`;
+exports[`event.actions.notify > NOTIFY action fails if payload includes field with unexpected type 1`] = `[TRPCError: [{"message":"Invalid input","id":"applicant.name","value":{"firstname":999999,"surname":"999999"}}]]`;
 
-exports[`event.actions.notify > System client receives error for malformed input 1`] = `[TRPCError: [{"message":"Unexpected field","id":"foo.bar","value":"this should cause an error"},{"message":"Invalid input","id":"applicant.name","value":{}}]]`;
+exports[`event.actions.notify > System client receives error for malformed input 1`] = `[TRPCError: [{"message":"Unexpected field","id":"foo.bar","value":"this should cause an error"},{"message":"Required","id":"applicant.name","value":{"surname":"surnameoftheperson"}}]]`;
 
 exports[`event.actions.notify > system user > should require createdAtLocation for system user 1`] = `[TRPCError: createdAtLocation is required and must be a valid office id]`;
 

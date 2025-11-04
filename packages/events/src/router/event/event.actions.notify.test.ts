@@ -124,7 +124,10 @@ describe('event.actions.notify', () => {
       transactionId: getUUID(),
       annotation: {},
       declaration: {
-        'applicant.name': { firstname: 999999, surname: '999999' }
+        'applicant.name': {
+          firstname: 999999,
+          surname: '999999'
+        }
       }
     }
 
