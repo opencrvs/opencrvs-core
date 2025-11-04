@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuid } from 'uuid'
-import { ActionType, EventStatus } from '@opencrvs/commons/client'
+import { EventStatus } from '@opencrvs/commons/client'
 import { QuickActionConfig } from './useQuickActionModal'
 
 export const register: QuickActionConfig = {
@@ -18,8 +18,8 @@ export const register: QuickActionConfig = {
     defaultMessage:
       "By clicking 'Confirm', you confirm that the information entered is correct and the event can be registered."
   },
-  onConfirm: ({ event, actions, customActions, isActionAllowed }) => {
-    if (isActionAllowed(ActionType.VALIDATE)) {
+  onConfirm: ({ event, actions, customActions }) => {
+    if (event.status === EventStatus.enum.DECLARED) {
       return customActions.registerOnValidate.mutate({
         eventId: event.id,
         declaration: event.declaration,
