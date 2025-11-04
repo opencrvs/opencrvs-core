@@ -191,7 +191,7 @@ function EventOverviewContainer() {
       ) : (
         <EventOverviewProtected
           eventIndex={eventIndex}
-          // TODO CIHAN: do we need this in new one?
+          // @TODO: Is this needed after new event overview UI?
           // onAction={getEventQuery.refetch}
         />
       )}

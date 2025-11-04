@@ -35,7 +35,7 @@ export const ActionConfigBase = z.object({
   label: TranslationConfig.describe('Human readable description of the action')
 })
 
-// TODO CIHAN: move review to DeclareConfig only
+// @TODO: as part of custom actions work, we should probably move the 'review' to be only in DECLARE action config
 const DeclarationActionBase = ActionConfigBase.extend({
   review: DeclarationReviewConfig,
   deduplication: DeduplicationConfig.optional()
