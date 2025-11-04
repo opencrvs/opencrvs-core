@@ -23713,8 +23713,7 @@ components:
                   type: object
                   propertyNames:
                     type: string
-                  additionalProperties:
-                    type: string
+                  additionalProperties: {}
                 errorValue:
                   description: Value to set if the request fails
                 params:
