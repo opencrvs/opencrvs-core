@@ -83,30 +83,6 @@ export const ROUTES = {
               })
             }
           ),
-          VALIDATE: route(
-            'validate/:eventId',
-            {
-              params: { eventId: uuid().defined() },
-              searchParams: {
-                workqueue: string()
-              }
-            },
-            {
-              REVIEW: route('review', {
-                searchParams: {
-                  workqueue: string()
-                }
-              }),
-              PAGES: route('pages/:pageId', {
-                params: { pageId: string() },
-                searchParams: {
-                  from: string(),
-                  workqueue: string()
-                },
-                hash: hashValues()
-              })
-            }
-          ),
           PRINT_CERTIFICATE: route(
             'print-certificate/:eventId',
             {

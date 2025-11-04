@@ -21,7 +21,6 @@ import { router as correctionReviewRouter } from '@client/v2-events/features/eve
 import * as Declare from '@client/v2-events/features/events/actions/declare'
 import { DeleteEventIndex } from '@client/v2-events/features/events/actions/delete'
 import * as PrintCertificate from '@client/v2-events/features/events/actions/print-certificate'
-import * as Validate from '@client/v2-events/features/events/actions/validate'
 import {
   AdvancedSearch,
   SearchResult
@@ -158,28 +157,6 @@ export const routesConfig = {
         {
           path: ROUTES.V2.EVENTS.DECLARE.REVIEW.path,
           element: <Declare.Review />
-        }
-      ]
-    },
-    {
-      path: ROUTES.V2.EVENTS.VALIDATE.path,
-      element: (
-        <DeclarationAction actionType={ActionType.VALIDATE}>
-          <Outlet />
-        </DeclarationAction>
-      ),
-      children: [
-        {
-          index: true,
-          element: <Validate.Pages />
-        },
-        {
-          path: ROUTES.V2.EVENTS.VALIDATE.PAGES.path,
-          element: <Validate.Pages />
-        },
-        {
-          path: ROUTES.V2.EVENTS.VALIDATE.REVIEW.path,
-          element: <Validate.Review />
         }
       ]
     },

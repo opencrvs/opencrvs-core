@@ -85,7 +85,7 @@ export const DuplicateForm = ({ eventIndex }: { eventIndex: EventIndex }) => {
             keepAssignment: true
           })
 
-          navigate(ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId }))
+          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
         }
       }}
     >
