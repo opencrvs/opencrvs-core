@@ -43,7 +43,8 @@ import {
   omitHiddenPaginatedFields,
   runFieldValidations,
   runStructuralValidations,
-  ValidatorContext
+  ValidatorContext,
+  FieldType
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -284,8 +285,24 @@ function validateNotifyAction({
         }
       }
 
+      const relaxedField =
+        field.type === FieldType.NAME
+          ? ({
+              ...field,
+              required: false,
+              configuration: {
+                ...field.configuration,
+                name: Object.fromEntries(
+                  Object.entries(field.configuration?.name ?? {}).map(
+                    ([k, v]) => [k, { ...v, required: false }]
+                  )
+                )
+              }
+            } as FieldConfig)
+          : { ...field, required: false }
+
       const fieldErrors = runStructuralValidations({
-        field: { ...field, required: false },
+        field: relaxedField,
         values: declaration,
         context
       })

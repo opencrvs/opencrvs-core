@@ -63,10 +63,8 @@ test('User without any search scopes should not see any events', async () => {
         addressType: AddressType.DOMESTIC,
         administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a', // leaf level location
         streetLevelDetails: {
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          state: 'state',
+          district2: 'district2'
         }
       }
     }
@@ -111,10 +109,8 @@ test('Returns empty list when no events match search criteria', async () => {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
       streetLevelDetails: {
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        state: 'state',
+        district2: 'district2'
       }
     }
   } satisfies ActionUpdate
@@ -573,10 +569,8 @@ test('Should not match partially when searching with emails against name field',
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
       streetLevelDetails: {
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        state: 'state',
+        district2: 'district2'
       }
     }
   } satisfies ActionUpdate
@@ -624,10 +618,8 @@ test('Returns events that match date of birth of applicant', async () => {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
       streetLevelDetails: {
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        state: 'state',
+        district2: 'district2'
       }
     }
   } satisfies ActionUpdate
@@ -643,10 +635,8 @@ test('Returns events that match date of birth of applicant', async () => {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
       streetLevelDetails: {
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        state: 'state',
+        district2: 'district2'
       }
     }
   } satisfies ActionUpdate
@@ -707,10 +697,8 @@ test('Does not return events when searching with a similar but different date of
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
       streetLevelDetails: {
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        state: 'state',
+        district2: 'district2'
       }
     }
   } satisfies ActionUpdate
@@ -726,10 +714,8 @@ test('Does not return events when searching with a similar but different date of
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
       streetLevelDetails: {
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        state: 'state',
+        district2: 'district2'
       }
     }
   } satisfies ActionUpdate
@@ -786,10 +772,8 @@ test('Returns single document after creation', async () => {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
         streetLevelDetails: {
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          state: 'state',
+          district2: 'district2'
         }
       }
     }
@@ -839,10 +823,8 @@ test('Returns multiple documents after creation', async () => {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
         streetLevelDetails: {
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          state: 'state',
+          district2: 'district2'
         }
       }
     }
@@ -863,10 +845,8 @@ test('Returns multiple documents after creation', async () => {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
         streetLevelDetails: {
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          state: 'state',
+          district2: 'district2'
         }
       }
     }
@@ -886,10 +866,8 @@ test('Returns multiple documents after creation', async () => {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
         streetLevelDetails: {
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          state: 'state',
+          district2: 'district2'
         }
       }
     }
@@ -959,10 +937,8 @@ test('Returns correctly based on registration location even when a parent locati
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
         streetLevelDetails: {
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          state: 'state',
+          district2: 'district2'
         }
       }
     }
@@ -1008,10 +984,8 @@ test('Returns no documents when search params are not matched', async () => {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
         streetLevelDetails: {
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          state: 'state',
+          district2: 'district2'
         }
       }
     }
@@ -1032,10 +1006,8 @@ test('Returns no documents when search params are not matched', async () => {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
         streetLevelDetails: {
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          state: 'state',
+          district2: 'district2'
         }
       }
     }
@@ -1055,10 +1027,8 @@ test('Returns no documents when search params are not matched', async () => {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
         streetLevelDetails: {
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          state: 'state',
+          district2: 'district2'
         }
       }
     }
@@ -1108,10 +1078,8 @@ test('Throws error when search params are not matching proper schema', async () 
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
         streetLevelDetails: {
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          state: 'state',
+          district2: 'district2'
         }
       }
     }
@@ -1149,10 +1117,8 @@ test('Returns events assigned to a specific user', async () => {
     country: 'FAR',
     addressType: AddressType.DOMESTIC,
     streetLevelDetails: {
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Windmill village, Kingdom of Goa'
+      state: 'RURAL',
+      district2: 'Windmill village, Kingdom of Goa'
     }
   } satisfies AddressFieldUpdateValue
 
@@ -1695,10 +1661,8 @@ test('Returns paginated results when limit and size parameters are provided', as
           country: 'FAR',
           addressType: AddressType.DOMESTIC,
           streetLevelDetails: {
-            province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-            district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-            urbanOrRural: 'RURAL' as const,
-            village: 'Small village'
+            state: 'state',
+            district2: 'district2'
           }
         }
       }
@@ -1875,10 +1839,8 @@ test('Returns events using nested AND/OR query combinations', async () => {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
       streetLevelDetails: {
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        state: 'state',
+        district2: 'district2'
       }
     }
   } satisfies ActionUpdate
@@ -1895,10 +1857,8 @@ test('Returns events using nested AND/OR query combinations', async () => {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
       streetLevelDetails: {
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        state: 'state',
+        district2: 'district2'
       }
     }
   } satisfies ActionUpdate
@@ -1915,10 +1875,8 @@ test('Returns events using nested AND/OR query combinations', async () => {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
       streetLevelDetails: {
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        state: 'state',
+        district2: 'district2'
       }
     }
   } satisfies ActionUpdate
@@ -1935,10 +1893,8 @@ test('Returns events using nested AND/OR query combinations', async () => {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
       streetLevelDetails: {
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        state: 'state',
+        district2: 'district2'
       }
     }
   } satisfies ActionUpdate

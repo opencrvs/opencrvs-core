@@ -118,10 +118,8 @@ describe('Declare action', () => {
           country: 'FAR',
           addressType: AddressType.DOMESTIC,
           streetLevelDetails: {
-            province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-            district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-            urbanOrRural: 'RURAL' as const,
-            village: 'Small village'
+            state: 'state',
+            district2: 'district2'
           }
         }
       }
@@ -148,10 +146,8 @@ describe('Declare action', () => {
         addressType: 'DOMESTIC',
         administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a', // leaf level location
         streetLevelDetails: {
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          state: 'state',
+          district2: 'district2'
         }
       }
     } satisfies ActionUpdate
@@ -188,10 +184,8 @@ describe('Declare action', () => {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
         streetLevelDetails: {
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          state: 'state',
+          district2: 'district2'
         }
       }
     } satisfies ActionUpdate
@@ -222,10 +216,8 @@ describe('Declare action', () => {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
         streetLevelDetails: {
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          state: 'state',
+          district2: 'district2'
         }
       }
     } satisfies ActionUpdate
@@ -262,10 +254,8 @@ describe('Declare action', () => {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
         streetLevelDetails: {
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          state: 'state',
+          district2: 'district2'
         }
       }
     } satisfies ActionUpdate
