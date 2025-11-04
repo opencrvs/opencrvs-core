@@ -92,7 +92,6 @@ function QuickActionModal({
       responsive={true}
       show={true}
       title={intl.formatMessage(actionLabels[actionType])}
-      // TODO CIHAN: fix size
       width={800}
     >
       {intl.formatMessage(config.description)}
