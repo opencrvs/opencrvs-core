@@ -344,7 +344,7 @@ export const SearchResultComponent = ({
             type={type}
             onClick={() => {
               return navigate(
-                ROUTES.V2.EVENTS.OVERVIEW.buildPath(
+                ROUTES.V2.EVENTS.EVENT.buildPath(
                   {
                     eventId: event.id
                   },

@@ -40,10 +40,9 @@ const rejectedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.ASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [REJECTED_DECLARE_AS_REVIEW]: AssertType.DISABLED,
-      [ActionType.ARCHIVE]: AssertType.DISABLED
+      ['Assign']: AssertType.ENABLED,
+      ['Review']: AssertType.DISABLED,
+      ['Archive']: AssertType.DISABLED
     }
   },
   {
@@ -57,10 +56,9 @@ const rejectedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [REJECTED_DECLARE_AS_REVIEW]: AssertType.ENABLED,
-      [ActionType.ARCHIVE]: AssertType.ENABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Review']: AssertType.ENABLED,
+      ['Archive']: AssertType.ENABLED
     }
   },
   {
@@ -74,9 +72,8 @@ const rejectedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED,
-      [REJECTED_DECLARE_AS_REVIEW]: AssertType.DISABLED,
-      [ActionType.ARCHIVE]: AssertType.DISABLED
+      ['Review']: AssertType.DISABLED,
+      ['Archive']: AssertType.DISABLED
     }
   }
 ]

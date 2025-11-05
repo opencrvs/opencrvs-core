@@ -259,7 +259,7 @@ export function ReviewCorrection({
               })
             )
           } else {
-            return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+            return navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
           }
         }}
       />
@@ -286,7 +286,7 @@ export function ReviewCorrection({
             )
           } else {
             return navigate(
-              ROUTES.V2.EVENTS.OVERVIEW.buildPath(
+              ROUTES.V2.EVENTS.EVENT.buildPath(
                 { eventId },
                 { workqueue: searchParams.workqueue }
               )

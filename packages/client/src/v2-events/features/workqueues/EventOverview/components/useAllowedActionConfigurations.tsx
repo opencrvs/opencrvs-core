@@ -27,7 +27,6 @@ import {
   Draft,
   isActionInScope,
   configurableEventScopeAllowed,
-  canUserReadEvent,
   ITokenPayload
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
@@ -48,7 +47,8 @@ import { useOnlineStatus } from '@client/utils'
 import { UnassignModal } from '@client/v2-events/components/UnassignModal'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { useArchiveModal } from '@client/v2-events/hooks/useArchiveModal'
+import { useQuickActionModal } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
+import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -94,11 +94,6 @@ function getAvailableAssignmentActions(
 }
 
 export const actionLabels = {
-  [ActionType.READ]: {
-    id: 'action.view.record',
-    description: 'Label for view record',
-    defaultMessage: 'View'
-  },
   [ActionType.ASSIGN]: {
     defaultMessage: 'Assign',
     description: `Label for the ${ActionType.ASSIGN} action in the action menu`,
@@ -115,8 +110,13 @@ export const actionLabels = {
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'event.birth.action.declare.label'
   },
+  [ActionType.REJECT]: {
+    defaultMessage: 'Reject',
+    description: 'Label for reject button in dropdown menu',
+    id: 'event.birth.action.reject.label'
+  },
   [ActionType.VALIDATE]: {
-    defaultMessage: 'Review',
+    defaultMessage: 'Validate',
     description:
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'event.birth.action.validate.label'
@@ -127,7 +127,7 @@ export const actionLabels = {
     id: 'event.birth.action.archive.label'
   },
   [ActionType.REGISTER]: {
-    defaultMessage: 'Review',
+    defaultMessage: 'Register',
     description: 'Label for review record button in dropdown menu',
     id: 'event.birth.action.register.label'
   },
@@ -153,16 +153,27 @@ export const actionLabels = {
     id: 'event.birth.action.request-correction.label'
   },
   [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
-    defaultMessage: 'Review',
+    defaultMessage: 'Review correction request',
     description: 'Label for review correction button in dropdown menu',
     id: 'event.action.review-correction.label'
   }
 } as const
 
+const reviewLabel = {
+  id: 'buttons.review',
+  defaultMessage: 'Review',
+  description: 'Label for review CTA button'
+}
+
 interface ActionConfig {
   label: TranslationConfig
   icon: IconProps['name']
+  /** onClick is used when clicking an action menu item. */
   onClick: (workqueue?: string) => Promise<void> | void
+  /** onCtaClick is used when clicking a workqueue CTA button. If its not defined, the onClick will be used. */
+  onCtaClick?: (workqueue?: string) => Promise<void> | void
+  /** ctaLabel is used on workqueue CTA buttons to override the label */
+  ctaLabel?: TranslationConfig
   disabled?: boolean
   hidden?: boolean
 }
@@ -207,7 +218,6 @@ function useViewableActionConfigurations(
   const assignedOffice = assignedToUser.data?.primaryOfficeId || ''
   const assignedOfficeName =
     locations.find((l) => l.id === assignedOffice)?.name || ''
-  const { archiveModal, onArchive } = useArchiveModal()
 
   const { modal: deleteModal, deleteDeclaration } = useEventFormNavigation()
   const onDelete = useCallback(
@@ -216,6 +226,7 @@ function useViewableActionConfigurations(
     },
     [event, deleteDeclaration]
   )
+  const { rejectionModal, handleRejection } = useRejectionModal(event.id, false)
 
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
@@ -273,19 +284,31 @@ function useViewableActionConfigurations(
     event.type
   )
 
+  const { quickActionModal, onQuickAction } = useQuickActionModal(event)
+
+  const userMayRegister = isActionInScope(
+    authentication.scope,
+    ActionType.REGISTER,
+    event.type
+  )
+
+  function resolveValidateLabel() {
+    if (isReviewingIncompleteDeclaration) {
+      return reviewLabel
+    }
+
+    return userMayRegister
+      ? actionLabels[ActionType.REGISTER]
+      : actionLabels[ActionType.VALIDATE]
+  }
+
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
   return {
-    modals: [assignModal, archiveModal, deleteModal],
+    modals: [assignModal, deleteModal, rejectionModal, quickActionModal],
     config: {
-      [ActionType.READ]: {
-        label: actionLabels[ActionType.READ],
-        icon: 'Eye' as const,
-        disabled: !isOnline,
-        onClick: () => navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId }))
-      },
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
         icon: 'PushPin' as const,
@@ -332,11 +355,10 @@ function useViewableActionConfigurations(
       },
       [ActionType.DECLARE]: {
         icon: 'PencilLine' as const,
-        // NOTE: Only label changes for convenience. Trying to actually VALIDATE before DECLARE will not work.
         label: isReviewingDeclaration
-          ? actionLabels[ActionType.VALIDATE]
+          ? reviewLabel
           : actionLabels[ActionType.DECLARE],
-        onClick: (workqueue?: string) => {
+        onClick: (workqueue) => {
           clearEphemeralFormState()
           return navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
@@ -348,40 +370,56 @@ function useViewableActionConfigurations(
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
         hidden: shouldHideDeclareAction
       },
+      [ActionType.REJECT]: {
+        label: actionLabels[ActionType.REJECT],
+        icon: 'FileX',
+        onClick: async (workqueue) =>
+          handleRejection(() =>
+            workqueue
+              ? navigate(
+                  ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue })
+                )
+              : navigate(ROUTES.V2.buildPath({}))
+          ),
+        disabled: !isDownloadedAndAssignedToUser,
+        hidden: isReviewingDeclaration
+      },
       [ActionType.VALIDATE]: {
-        label: actionLabels[ActionType.VALIDATE],
+        label: resolveValidateLabel(),
         icon: 'PencilLine' as const,
-        onClick: (workqueue?: string) => {
-          clearEphemeralFormState()
-          return navigate(
-            ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
-              { eventId },
-              { workqueue }
-            )
-          )
+        onClick: async (workqueue) => {
+          if (userMayRegister) {
+            return onQuickAction(ActionType.REGISTER, workqueue)
+          }
+
+          return onQuickAction(ActionType.VALIDATE, workqueue)
         },
+        onCtaClick: (workqueue) =>
+          navigate(
+            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
+          ),
+        ctaLabel: reviewLabel,
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.ARCHIVE]: {
         label: actionLabels[ActionType.ARCHIVE],
         icon: 'Archive' as const,
-        onClick: async () => {
-          await onArchive(event.id)
-        },
+        onClick: async (workqueue) =>
+          onQuickAction(ActionType.ARCHIVE, workqueue),
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REGISTER]: {
-        label: actionLabels[ActionType.REGISTER],
+        label: isReviewingIncompleteDeclaration
+          ? reviewLabel
+          : actionLabels[ActionType.REGISTER],
         icon: 'PencilLine' as const,
-        onClick: (workqueue?: string) => {
-          clearEphemeralFormState()
-          return navigate(
-            ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
-              { eventId },
-              { workqueue }
-            )
-          )
-        },
+        onClick: async (workqueue) =>
+          onQuickAction(ActionType.REGISTER, workqueue),
+        ctaLabel: reviewLabel,
+        onCtaClick: (workqueue) =>
+          navigate(
+            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
+          ),
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.MARK_AS_DUPLICATE]: {
@@ -416,9 +454,7 @@ function useViewableActionConfigurations(
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
         icon: 'Trash' as const,
-        onClick: async (workqueue?: string) => {
-          await onDelete(workqueue)
-        },
+        onClick: onDelete,
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REQUEST_CORRECTION]: {
@@ -474,6 +510,7 @@ function useViewableActionConfigurations(
             )
           )
         },
+        ctaLabel: reviewLabel,
         disabled: !isDownloadedAndAssignedToUser,
         hidden: !eventIsWaitingForCorrection
       }
@@ -512,7 +549,7 @@ export function useUserAllowedActions(eventType: string) {
 export function useAllowedActionConfigurations(
   event: EventIndex,
   authentication: ITokenPayload
-) {
+): [React.ReactNode, ActionMenuItem[]] {
   const { isActionAllowed } = useUserAllowedActions(event.type)
   const drafts = useDrafts()
 
@@ -547,40 +584,17 @@ export function useAllowedActionConfigurations(
         ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
         workqueueActions.safeParse(action).success
     )
-    .filter(
-      (action) =>
-        isActionAllowed(action) ||
-        (action === ActionType.READ &&
-          canUserReadEvent(event, {
-            userId: authentication.sub,
-            scopes: authentication.scope
-          }))
-    )
+    .filter((action) => isActionAllowed(action))
     // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
     .map((a) => ({ ...config[a], type: a }))
     .filter((a: ActionConfig) => !a.hidden)
 
-  // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
+  // Check if the user can perform any action other than ASSIGN, or UNASSIGN
   const hasOnlyMetaActions = allowedWorkqueueConfigs.every(({ type }) =>
     isMetaAction(type)
   )
 
-  // If user has no other allowed actions, return only READ.
+  // If user has no other actions than assign or unassign, return no actions.
   // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
-  if (hasOnlyMetaActions) {
-    return [
-      modals,
-      [
-        {
-          ...config[ActionType.READ],
-          type: ActionType.READ
-        }
-      ].filter((a: ActionConfig) => !a.hidden)
-    ] satisfies [React.ReactNode, ActionMenuItem[]]
-  }
-
-  return [modals, allowedWorkqueueConfigs] satisfies [
-    React.ReactNode,
-    ActionMenuItem[]
-  ]
+  return [modals, hasOnlyMetaActions ? [] : allowedWorkqueueConfigs]
 }

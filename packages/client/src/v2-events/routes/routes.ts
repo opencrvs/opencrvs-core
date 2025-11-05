@@ -12,7 +12,6 @@
 import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
 import { zod } from 'react-router-typesafe-routes/zod'
 import * as z from 'zod'
-import { config } from '@client/config'
 import {
   requestRoutes as correctionRequestRoutes,
   reviewRoutes as correctionReviewRoutes
@@ -29,18 +28,27 @@ export const ROUTES = {
         'events',
         {},
         {
-          VIEW: route('view/:eventId', {
-            params: { eventId: uuid().defined() },
-            searchParams: {
-              workqueue: string()
+          EVENT: route(
+            ':eventId',
+            {
+              params: { eventId: uuid().defined() },
+              searchParams: {
+                workqueue: string()
+              }
+            },
+            {
+              RECORD: route('record', {
+                searchParams: {
+                  workqueue: string()
+                }
+              }),
+              AUDIT: route('audit', {
+                searchParams: {
+                  workqueue: string()
+                }
+              })
             }
-          }),
-          OVERVIEW: route('overview/:eventId', {
-            params: { eventId: uuid().defined() },
-            searchParams: {
-              workqueue: string()
-            }
-          }),
+          ),
           CREATE: route('create', {
             searchParams: {
               workqueue: string()
@@ -53,54 +61,6 @@ export const ROUTES = {
           }),
           DECLARE: route(
             'declare/:eventId',
-            {
-              params: { eventId: uuid().defined() },
-              searchParams: {
-                workqueue: string()
-              }
-            },
-            {
-              REVIEW: route('review', {
-                searchParams: {
-                  workqueue: string()
-                }
-              }),
-              PAGES: route('pages/:pageId', {
-                params: { pageId: string() },
-                searchParams: {
-                  from: string(),
-                  workqueue: string()
-                },
-                hash: hashValues()
-              })
-            }
-          ),
-          VALIDATE: route(
-            'validate/:eventId',
-            {
-              params: { eventId: uuid().defined() },
-              searchParams: {
-                workqueue: string()
-              }
-            },
-            {
-              REVIEW: route('review', {
-                searchParams: {
-                  workqueue: string()
-                }
-              }),
-              PAGES: route('pages/:pageId', {
-                params: { pageId: string() },
-                searchParams: {
-                  from: string(),
-                  workqueue: string()
-                },
-                hash: hashValues()
-              })
-            }
-          ),
-          REGISTER: route(
-            'register/:eventId',
             {
               params: { eventId: uuid().defined() },
               searchParams: {

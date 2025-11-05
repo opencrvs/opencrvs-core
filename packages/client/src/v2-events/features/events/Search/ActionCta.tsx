@@ -63,9 +63,13 @@ function ActionCtaComponent({
     <Button
       disabled={'disabled' in config && Boolean(config.disabled)}
       type="primary"
-      onClick={async () => config.onClick(redirectParam)}
+      onClick={async () =>
+        config.onCtaClick
+          ? config.onCtaClick(redirectParam)
+          : config.onClick(redirectParam)
+      }
     >
-      {intl.formatMessage(config.label)}
+      {intl.formatMessage(config.ctaLabel || config.label)}
     </Button>
   )
 }

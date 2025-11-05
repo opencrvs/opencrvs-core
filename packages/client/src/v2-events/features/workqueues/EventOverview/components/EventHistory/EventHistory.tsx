@@ -14,20 +14,18 @@ import styled from 'styled-components'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import { Divider } from '@opencrvs/components/lib/Divider'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
   ActionType,
-  EventConfig,
   EventDocument,
-  getAcceptedActions,
-  ValidatorContext
+  getAcceptedActions
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import * as routes from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
@@ -41,15 +39,14 @@ import {
   useActionForHistory
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { UserAvatar } from './UserAvatar'
 import {
   EventHistoryDialog,
   eventHistoryStatusMessage
 } from './EventHistoryDialog/EventHistoryDialog'
-import { UserAvatar } from './UserAvatar'
-
-/**
- * Based on packages/client/src/views/RecordAudit/History.tsx
- */
 
 const LargeGreyedInfo = styled.div`
   height: 231px;
@@ -64,7 +61,7 @@ const TableDiv = styled.div`
 
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
-const messages = defineMessages({
+export const messages = defineMessages({
   timeFormat: {
     defaultMessage: 'MMMM dd, yyyy · hh.mm a',
     id: 'configuration.timeFormat',
@@ -101,10 +98,10 @@ const messages = defineMessages({
     description: 'Date Label',
     id: 'constants.label.date'
   },
-  history: {
-    defaultMessage: 'History',
-    description: 'History heading',
-    id: 'constants.history'
+  audit: {
+    defaultMessage: 'Audit',
+    description: 'Audit heading',
+    id: 'constants.audit'
   },
   labelRole: {
     defaultMessage: 'Role',
@@ -117,10 +114,6 @@ const messages = defineMessages({
     id: 'constants.location'
   }
 })
-
-const Header = styled(Text)`
-  margin-bottom: 20px;
-`
 
 const SystemName = styled.div`
   display: flex;
@@ -313,31 +306,22 @@ function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
 export function EventHistorySkeleton() {
   const intl = useIntl()
   return (
-    <>
-      <Divider />
-      <Stack alignItems="stretch" direction="column" gap={16}>
-        <Text color="copy" element="h3" variant="h3">
-          {intl.formatMessage(messages.history)}
-        </Text>
-        <LargeGreyedInfo />
-      </Stack>
-    </>
+    <Content
+      size={ContentSize.LARGE}
+      title={intl.formatMessage(messages.audit)}
+    >
+      <LargeGreyedInfo />
+    </Content>
   )
 }
 
 /**
  *  Renders the event history table. Used for audit trail.
  */
-export function EventHistory({
-  fullEvent,
-  validatorContext,
-  eventConfiguration
-}: {
-  fullEvent: EventDocument
-  validatorContext: ValidatorContext
-  eventConfiguration: EventConfig
-}) {
+function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
+  const validatorContext = useValidatorContext()
+  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
   const intl = useIntl()
   const [modal, openModal] = useModal()
@@ -463,11 +447,10 @@ export function EventHistory({
   ]
 
   return (
-    <>
-      <Divider />
-      <Header color="copy" element="h3" variant="h3">
-        {intl.formatMessage(messages.history)}
-      </Header>
+    <Content
+      size={ContentSize.LARGE}
+      title={intl.formatMessage(messages.audit)}
+    >
       <TableDiv>
         <Table
           highlightRowOnMouseOver
@@ -491,6 +474,18 @@ export function EventHistory({
         )}
       </TableDiv>
       {modal}
-    </>
+    </Content>
   )
+}
+
+export function EventHistoryIndex() {
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.AUDIT)
+  const { getEvent } = useEvents()
+  const fullEvent = getEvent.findFromCache(eventId).data
+
+  if (!fullEvent) {
+    return <EventHistorySkeleton />
+  }
+
+  return <EventHistory fullEvent={fullEvent} />
 }

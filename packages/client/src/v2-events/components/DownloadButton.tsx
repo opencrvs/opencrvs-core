@@ -139,7 +139,7 @@ export function DownloadButton({
     eventDocument.isFetched
 
   if (isDraft && isDownloadedToMe) {
-    return <Downloaded />
+    return <Downloaded data-testid="downloaded-icon" />
   }
 
   const isAssignedToSomeoneElse =
@@ -171,10 +171,16 @@ export function DownloadButton({
     }
   }
 
+  const canAssign = !isAssignedToSomeoneElse && !isDownloadedToMe
+
   return (
     <>
       <DownloadAction
-        aria-label={intl.formatMessage(constantsMessages.assignRecord)}
+        aria-label={intl.formatMessage(
+          canAssign
+            ? constantsMessages.assignRecord
+            : { id: 'user.avatar', defaultMessage: 'User avatar' }
+        )}
         className={className}
         disabled={
           !(
@@ -187,7 +193,9 @@ export function DownloadButton({
         type="icon"
         onClick={handleDownload}
       >
-        {isAssignedToSomeoneElse || isDownloadedToMe ? (
+        {canAssign ? (
+          <Download isFailed={isFailed} />
+        ) : (
           <AvatarSmall
             key={user?.avatar || 'default'}
             avatar={
@@ -200,8 +208,6 @@ export function DownloadButton({
             }
             name={user && getUsersFullName(user.name, intl.locale)}
           />
-        ) : (
-          <Download isFailed={isFailed} />
         )}
       </DownloadAction>
       {modal}

@@ -236,7 +236,7 @@ export const FormFieldParentChildReset: Story = {
         children: [
           router,
           {
-            path: ROUTES.V2.EVENTS.OVERVIEW.path,
+            path: ROUTES.V2.EVENTS.EVENT.path,
             element: (
               <EventOverviewLayout>
                 <EventOverviewIndex />

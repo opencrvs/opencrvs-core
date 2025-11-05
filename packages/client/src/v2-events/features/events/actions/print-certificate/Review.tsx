@@ -324,7 +324,7 @@ export function Review() {
 
         slug
           ? navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
-          : navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+          : navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
       } catch (error) {
         // TODO: add notification alert
         // eslint-disable-next-line no-console

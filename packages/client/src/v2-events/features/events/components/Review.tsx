@@ -798,9 +798,11 @@ export interface RejectionState {
 }
 
 function RejectActionModal({
-  close
+  close,
+  allowArchive = true
 }: {
   close: (result: RejectionState | null) => void
+  allowArchive?: boolean
 }) {
   const [state, setState] = useState<RejectionState>({
     rejectAction: REJECT_ACTIONS.ARCHIVE,
@@ -809,49 +811,56 @@ function RejectActionModal({
   })
 
   const intl = useIntl()
+
+  const actions = [
+    <Button
+      key="cancel_reject"
+      id="cancel_reject"
+      type="tertiary"
+      onClick={() => {
+        close(null)
+      }}
+    >
+      {intl.formatMessage(reviewMessages.rejectModalCancel)}
+    </Button>,
+    ...(allowArchive
+      ? [
+          <Button
+            key="confirm_reject_with_archive"
+            disabled={!state.message}
+            id="confirm_reject_with_archive"
+            type="secondaryNegative"
+            onClick={() => {
+              close({
+                ...state,
+                rejectAction: REJECT_ACTIONS.ARCHIVE
+              })
+            }}
+          >
+            {intl.formatMessage(reviewMessages.rejectModalArchive)}
+          </Button>
+        ]
+      : []),
+    <Button
+      key="confirm_reject_with_update"
+      disabled={!state.message || state.isDuplicate}
+      id="confirm_reject_with_update"
+      type="negative"
+      onClick={() => {
+        close({
+          ...state,
+          rejectAction: REJECT_ACTIONS.SEND_FOR_UPDATE
+        })
+      }}
+    >
+      {intl.formatMessage(reviewMessages.rejectModalSendForUpdate)}
+    </Button>
+  ]
+
   return (
     <ResponsiveModal
       showHeaderBorder
-      actions={[
-        <Button
-          key="cancel_reject"
-          id="cancel_reject"
-          type="tertiary"
-          onClick={() => {
-            close(null)
-          }}
-        >
-          {intl.formatMessage(reviewMessages.rejectModalCancel)}
-        </Button>,
-        <Button
-          key="confirm_reject_with_archive"
-          disabled={!state.message}
-          id="confirm_reject_with_archive"
-          type="secondaryNegative"
-          onClick={() => {
-            close({
-              ...state,
-              rejectAction: REJECT_ACTIONS.ARCHIVE
-            })
-          }}
-        >
-          {intl.formatMessage(reviewMessages.rejectModalArchive)}
-        </Button>,
-        <Button
-          key="confirm_reject_with_update"
-          disabled={!state.message || state.isDuplicate}
-          id="confirm_reject_with_update"
-          type="negative"
-          onClick={() => {
-            close({
-              ...state,
-              rejectAction: REJECT_ACTIONS.SEND_FOR_UPDATE
-            })
-          }}
-        >
-          {intl.formatMessage(reviewMessages.rejectModalSendForUpdate)}
-        </Button>
-      ]}
+      actions={actions}
       contentHeight={270}
       handleClose={() => close(null)}
       id="reject-modal"

@@ -35,7 +35,7 @@ export function ActionMenu({
   onAction?: () => void
 }) {
   const intl = useIntl()
-  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.OVERVIEW)
+  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
   const { getUser } = useUsers()
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
@@ -66,7 +66,7 @@ export function ActionMenu({
   const assignedOfficeName =
     locations.find((l) => l.id === assignedOffice)?.name || ''
 
-  const [modal, actionMenuItems] = useAllowedActionConfigurations(
+  const [modals, actionMenuItems] = useAllowedActionConfigurations(
     eventState,
     auth
   )
@@ -81,6 +81,7 @@ export function ActionMenu({
           <PrimaryButton
             data-testid="action-dropdownMenu"
             icon={() => <CaretDown />}
+            size="medium"
           >
             {intl.formatMessage(messages.action)}
           </PrimaryButton>
@@ -114,7 +115,7 @@ export function ActionMenu({
           })}
         </DropdownMenu.Content>
       </DropdownMenu>
-      {modal}
+      {modals}
     </>
   )
 }
