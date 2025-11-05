@@ -169,7 +169,7 @@ interface ActionConfig {
   label: TranslationConfig
   icon: IconProps['name']
   /** onClick is used when clicking an action menu item. */
-onClick: (workqueue?: string) => Promise<void> | void
+  onClick: (workqueue?: string) => Promise<void> | void
   /** onCtaClick is used when clicking a workqueue CTA button. If its not defined, the onClick will be used. */
   onCtaClick?: (workqueue?: string) => Promise<void> | void
   /** ctaLabel is used on workqueue CTA buttons to override the label */
