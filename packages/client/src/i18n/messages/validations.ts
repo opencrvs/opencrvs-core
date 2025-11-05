@@ -10,6 +10,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
+// random change
+
 interface IValidationMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   phoneNumberNotValid: MessageDescriptor
