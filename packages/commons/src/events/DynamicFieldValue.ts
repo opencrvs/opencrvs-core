@@ -55,19 +55,6 @@ export function getDynamicAddressFieldValue(field: AddressField) {
         return false
       }
 
-      // Check that all required fields are present
-      const missingRequired = (streetAddressConfig ?? []).filter(
-        (f) => f.required && !submittedKeys.includes(f.id)
-      )
-      if (missingRequired.length) {
-        // eslint-disable-next-line no-console
-        console.log(
-          'Invalid streetLevelDetails: missing required fields',
-          missingRequired.map((f) => f.id).join(', ')
-        )
-        return false
-      }
-
       return true
     })
   })
