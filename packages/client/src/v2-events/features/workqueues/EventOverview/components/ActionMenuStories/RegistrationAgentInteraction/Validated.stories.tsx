@@ -40,7 +40,8 @@ const validatedScenariosForRegistrationAgent: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Assign']: AssertType.ENABLED,
-      ['Archive']: AssertType.DISABLED
+      ['Archive']: AssertType.DISABLED,
+      ['Reject']: AssertType.DISABLED
     }
   },
   {
@@ -72,7 +73,8 @@ const validatedScenariosForRegistrationAgent: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Unassign']: AssertType.ENABLED,
-      ['Archive']: AssertType.ENABLED
+      ['Archive']: AssertType.ENABLED,
+      ['Reject']: AssertType.ENABLED
     }
   }
 ]
