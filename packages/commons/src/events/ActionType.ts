@@ -37,7 +37,9 @@ export const ActionType = {
   // General actions
   READ: 'READ',
   ASSIGN: 'ASSIGN',
-  UNASSIGN: 'UNASSIGN'
+  UNASSIGN: 'UNASSIGN',
+  // Custom action
+  CUSTOM: 'CUSTOM'
 } as const
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType]
@@ -74,7 +76,8 @@ export const ActionTypes = z.enum([
   'APPROVE_CORRECTION',
   'READ',
   'ASSIGN',
-  'UNASSIGN'
+  'UNASSIGN',
+  'CUSTOM'
 ])
 
 /**
