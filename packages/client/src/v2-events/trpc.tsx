@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { AppRouter } from '@gateway/v2-events/events/router'
-import { partition } from 'lodash'
 import { QueryClient } from '@tanstack/react-query'
 import {
   PersistQueryClientProvider,
@@ -26,10 +25,12 @@ import {
   createTRPCContext,
   createTRPCOptionsProxy
 } from '@trpc/tanstack-react-query'
+import { partition } from 'lodash'
 import React from 'react'
 import superjson from 'superjson'
-import { storage } from '@client/storage'
+import { getUUID } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
+import { storage } from '@client/storage'
 
 const { TRPCProvider: TRPCProviderRaw, useTRPC } =
   createTRPCContext<AppRouter>()
@@ -167,7 +168,9 @@ export function TRPCProvider({
    * to the query client before the client is restored from the persisted storage.
    */
   waitForClientRestored = true,
-  storeIdentifier = 'DEFAULT_IDENTIFIER_FOR_TESTS_ONLY__THIS_SHOULD_NEVER_SHOW_OUTSIDE_STORYBOOK'
+  // In cases where multiple Storybooks are running against the same origin, when run in parallel, they may interfere with each other
+  // When tests are fast. Generate UUID to isolate storage for each Storybook instance. App uses userId for this purpose.
+  storeIdentifier = `DEFAULT_IDENTIFIER_FOR_TESTS_ONLY__THIS_SHOULD_NEVER_SHOW_OUTSIDE_STORYBOOK_${getUUID()}`
 }: {
   children: React.ReactNode
   storeIdentifier?: string
