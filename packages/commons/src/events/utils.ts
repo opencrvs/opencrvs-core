@@ -221,12 +221,23 @@ export function omitHiddenPaginatedFields(
   values: EventState,
   validatorContext: ValidatorContext
 ) {
-  // If a page is hidden, we ommit it's fields early
-  const fields = formConfig.pages
+  const visibleFields = formConfig.pages
     .filter((p) => isPageVisible(p, values, validatorContext))
     .flatMap((p) => p.fields)
 
-  return omitHiddenFields(fields, values, validatorContext)
+  const hiddenFields = formConfig.pages
+    .filter((p) => !isPageVisible(p, values, validatorContext))
+    .flatMap((p) => p.fields)
+
+  const valuesExceptHiddenPage = omitBy(values, (_, fieldId) => {
+    return hiddenFields.some((f) => f.id === fieldId)
+  })
+
+  return omitHiddenFields(
+    visibleFields,
+    valuesExceptHiddenPage,
+    validatorContext
+  )
 }
 
 /**
