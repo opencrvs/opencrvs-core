@@ -22,10 +22,8 @@ import {
   EventDocument,
   getCurrentEventState,
   getUUID,
-  IndexMap,
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent,
-  TranslationConfig,
   UUID,
   DisplayableAction,
   ClientSpecificAction,
@@ -280,13 +278,24 @@ export const enum AssertType {
   DISABLED = 'DISABLED'
 }
 
+type ActionLabel =
+  | (typeof actionLabels)[keyof typeof actionLabels]['defaultMessage']
+  | 'Review'
+
 export const getHiddenActions = () =>
   Object.values(ActionTypes.Values).reduce(
     (acc, action) => {
-      acc[action] = AssertType.HIDDEN
+      const label = actionLabels[action as keyof typeof actionLabels]
+
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (!label) {
+        return acc
+      }
+
+      acc[label.defaultMessage] = AssertType.HIDDEN
       return acc
     },
-    {} as Record<ActionType, AssertType>
+    {} as Record<ActionLabel, AssertType>
   )
 
 export interface Scenario {
@@ -295,23 +304,17 @@ export interface Scenario {
   actions: (keyof ReturnType<typeof getMockActions>)[]
   /** Sets the given ActionType as `requested` to mock async flows */
   requested?: ActionType
-  expected: Partial<Record<DisplayableAction, AssertType>>
+  expected: Partial<Record<ActionLabel, AssertType>>
 }
 
 async function checkMenuItems(
-  expected: Partial<Record<DisplayableAction, AssertType>>
+  expected: Partial<Record<ActionLabel, AssertType>>
 ) {
-  // We want to ensure compiler knows that action labels is a subset of action types.
-  const actionLabelsAsPartial: IndexMap<TranslationConfig> = actionLabels
-
   for (const [action, expectedState] of Object.entries(expected)) {
-    const label = actionLabelsAsPartial[action]?.defaultMessage
-    if (!label) {
-      continue
-    } else if (expectedState === AssertType.HIDDEN) {
-      await expect(screen.queryByText(label)).not.toBeInTheDocument()
+    if (expectedState === AssertType.HIDDEN) {
+      await expect(screen.queryByText(action)).not.toBeInTheDocument()
     } else {
-      const item = await screen.findByText(label)
+      const item = await screen.findByText(action)
 
       await waitFor(async () => {
         const isDisabled = item.hasAttribute('disabled')
@@ -320,38 +323,13 @@ async function checkMenuItems(
     }
   }
 }
+
 export function createStoriesFromScenarios(
   scenarios: Scenario[],
   role: UserRoles
 ): Record<string, StoryObj<typeof ActionMenu>> {
   return scenarios.reduce(
     (acc, { name, actions, expected, recordDownloaded, requested }) => {
-      // Because Validate, Register and Review correction both have same message ('Review'),
-      // We need to consider them as one
-      const reviewLikeActions: (keyof typeof expected)[] = [
-        ActionType.VALIDATE,
-        ActionType.REGISTER,
-        ClientSpecificAction.REVIEW_CORRECTION_REQUEST,
-        ActionType.MARK_AS_DUPLICATE
-      ]
-      // Normalize all review-like actions to the **first non-hidden value**
-      let normalizedValue: AssertType | undefined
-
-      for (const action of reviewLikeActions) {
-        const value = expected[action]
-        if (value !== AssertType.HIDDEN) {
-          normalizedValue = value
-          break
-        }
-      }
-
-      // Apply normalized value to all related actions
-      if (normalizedValue !== undefined) {
-        for (const action of reviewLikeActions) {
-          expected[action] = normalizedValue
-        }
-      }
-
       const event = getMockEvent(actions, role, requested)
       acc[name] = {
         loaders: [
@@ -436,7 +414,7 @@ export function createdByOtherUserScenario({
 }: {
   event: EventDocument
   role: UserRoles
-  expected: Partial<Record<DisplayableAction, AssertType>>
+  expected: Partial<Record<ActionLabel, AssertType>>
 }) {
   return {
     loaders: [

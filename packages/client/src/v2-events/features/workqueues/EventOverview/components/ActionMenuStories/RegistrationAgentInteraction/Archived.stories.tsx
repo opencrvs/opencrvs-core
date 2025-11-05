@@ -16,7 +16,6 @@ import {
   baseMeta,
   getHiddenActions,
   createStoriesFromScenarios,
-  AssertType,
   Scenario,
   UserRoles
 } from '../ActionMenu.common'
@@ -38,8 +37,7 @@ const archivedScenariosForRegistrationAgent: Scenario[] = [
       ActionType.UNASSIGN
     ],
     expected: {
-      ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      ...getHiddenActions()
     }
   },
 
@@ -55,8 +53,7 @@ const archivedScenariosForRegistrationAgent: Scenario[] = [
       AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
-      ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      ...getHiddenActions()
     }
   }
 ]

@@ -39,8 +39,7 @@ const inExternalValidationScenariosForLocalRegistrar: Scenario[] = [
     ],
     requested: ActionType.REGISTER,
     expected: {
-      ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      ...getHiddenActions()
     }
   }
 ]
