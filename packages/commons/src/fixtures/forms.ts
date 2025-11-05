@@ -1225,7 +1225,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           }
         }
       ],
-      conditional: not(never())
+      conditional: not(never()) // Intentional always-true page conditional to exercise interactions between page-level and field-level conditionals in tests
     }
   ]
 })
