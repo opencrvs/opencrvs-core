@@ -101,7 +101,7 @@ export const messages = defineMessages({
   audit: {
     defaultMessage: 'Audit',
     description: 'Audit heading',
-    id: 'title.audit'
+    id: 'constants.audit'
   },
   labelRole: {
     defaultMessage: 'Role',
