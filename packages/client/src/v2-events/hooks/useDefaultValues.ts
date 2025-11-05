@@ -30,7 +30,7 @@ export function handleDefaultValue({
 
   if (isFieldConfigDefaultValue(defaultValue)) {
     return replacePlaceholders({
-      fieldType: field.type,
+      field,
       defaultValue,
       systemVariables
     })
