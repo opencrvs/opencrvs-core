@@ -16,7 +16,7 @@ import {
   EventConfig,
   FieldConfig,
   QueryInputType,
-  SearchField,
+  AdvancedSearchField,
   EventFieldId,
   QueryType,
   SearchQueryParams,
@@ -58,7 +58,7 @@ export function getAdvancedSearchFieldErrors(
 
 const defaultSearchFieldGenerator: Record<
   EventFieldId,
-  (config: SearchField) => FieldConfig
+  (config: AdvancedSearchField) => FieldConfig
 > = {
   'event.legalStatuses.REGISTERED.createdAtLocation': (_) => ({
     id: 'event.legalStatuses.REGISTERED.createdAtLocation',
@@ -139,14 +139,14 @@ const defaultSearchFieldGenerator: Record<
     },
     options: statusOptions
   })
-} satisfies Record<EventFieldId, (config: SearchField) => FieldConfig>
+} satisfies Record<EventFieldId, (config: AdvancedSearchField) => FieldConfig>
 
 function isEventFieldId(id: string): id is EventFieldId {
   return EventFieldId.safeParse(id).success
 }
 
 export const getMetadataFieldConfigs = (
-  fields: SearchField[]
+  fields: AdvancedSearchField[]
 ): FieldConfig[] => {
   const searchFields: FieldConfig[] = []
   fields.forEach((fieldConfig) => {
@@ -188,7 +188,7 @@ const OR_SEARCH_KEY = 'or' as const
 
 export function toAdvancedSearchQueryType(
   searchParams: QueryInputType,
-  searchFieldConfigs: SearchField[],
+  searchFieldConfigs: AdvancedSearchField[],
   eventType?: string
 ): QueryType {
   const metadata: Record<string, unknown> = {}
@@ -199,7 +199,7 @@ export function toAdvancedSearchQueryType(
       acc[field.fieldId] = field
       return acc
     },
-    {} as Record<string, SearchField>
+    {} as Record<string, AdvancedSearchField>
   )
 
   Object.entries(searchParams).forEach(([key, value]) => {
@@ -403,7 +403,7 @@ function buildSearchQueryFields(
  */
 function applySearchFieldOverridesToFieldConfig(
   field: FieldConfig,
-  searchField: SearchField
+  searchField: AdvancedSearchField
 ): FieldConfig {
   const commonConfig = {
     conditionals: searchField.conditionals ?? field.conditionals,
@@ -479,7 +479,7 @@ function getFieldConfigsWithSearchOverrides(eventConfig: EventConfig) {
         acc[field.fieldId] = field
         return acc
       },
-      {} as Record<string, SearchField | undefined>
+      {} as Record<string, AdvancedSearchField | undefined>
     )
   return getAllUniqueFields(eventConfig).map((field) => {
     const searchField = searchFieldMap[field.id]
@@ -490,7 +490,9 @@ function getFieldConfigsWithSearchOverrides(eventConfig: EventConfig) {
   })
 }
 
-function generateSearchFieldConfig(searchField: SearchField): FieldConfig {
+function generateSearchFieldConfig(
+  searchField: AdvancedSearchField
+): FieldConfig {
   const baseFieldConfig: FieldConfig = {
     id: searchField.fieldId,
     type: searchField.type,
@@ -603,7 +605,7 @@ export function parseFieldSearchParams(
  * @param {FieldConfig[]} resolvedFieldConfigs - The resolved field configurations
  * for an advanced search form, including both metadata and declaration
  * fields.
- * @param {SearchField[]} searchFieldConfigs - The search field configurations
+ * @param {AdvancedSearchField[]} searchFieldConfigs - The search field configurations
  * the advanced search form
  * @returns {QueryInputType} A query object representing the current search condition,
  *                           ready to be used for filtering or querying data.
@@ -611,14 +613,14 @@ export function parseFieldSearchParams(
 export function buildSearchQuery(
   formValues: EventState,
   resolvedFieldConfigs: FieldConfig[],
-  searchFieldConfigs: SearchField[]
+  searchFieldConfigs: AdvancedSearchField[]
 ): QueryInputType {
   const fieldsMap = searchFieldConfigs.reduce(
     (acc, config) => {
       acc[config.fieldId] = config
       return acc
     },
-    {} as Record<string, SearchField>
+    {} as Record<string, AdvancedSearchField>
   )
 
   const searchConfigs = resolvedFieldConfigs.map((fieldConfig) => ({

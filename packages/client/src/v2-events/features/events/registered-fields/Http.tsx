@@ -93,15 +93,13 @@ async function fetchHttpFieldValue(
   return res.json()
 }
 
-function HttpInput({
-  parentValue,
-  configuration,
-  onChange
-}: {
+export interface Props {
   parentValue?: FieldValue
   configuration: Omit<HttpField['configuration'], 'trigger'>
   onChange: (val: HttpFieldValue) => void
-}) {
+}
+
+function HttpInput({ parentValue, configuration, onChange }: Props) {
   const systemVariables = useSystemVariables()
   const firstRunRef = useRef(true)
   const prevParentRef = useRef<FieldValue | undefined>(undefined)
