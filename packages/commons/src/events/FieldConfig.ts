@@ -700,7 +700,7 @@ const HttpField = BaseField.extend({
     url: z.string().describe('URL to send the HTTP request to'),
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
     headers: z.record(z.string(), z.string()).optional(),
-    body: z.record(z.string(), z.string()).optional(),
+    body: z.record(z.string(), z.any()).optional(),
     errorValue: z
       .any()
       .optional()

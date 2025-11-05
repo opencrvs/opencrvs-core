@@ -220,8 +220,8 @@ export const ReviewWithValidationErrors: Story = {
     form: {
       // @ts-ignore
       'applicant.name': {
-        firstname: 'Mia',
-        surname: undefined
+        firstname: '12345678',
+        surname: 12345678
       },
       // @ts-ignore
       'applicant.dob': undefined,

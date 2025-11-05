@@ -21,7 +21,12 @@ import {
 import { http, HttpResponse } from 'msw'
 import React from 'react'
 import styled from 'styled-components'
-import { defineConditional, field, FieldType } from '@opencrvs/commons/client'
+import {
+  defineConditional,
+  field,
+  FieldType,
+  FieldConfig
+} from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 
@@ -47,7 +52,7 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
 
-const searchFields = [
+const searchFields: FieldConfig[] = [
   {
     id: 'child.brn-search',
     type: FieldType.SEARCH,
@@ -82,7 +87,7 @@ const searchFields = [
         }
       },
       query: {
-        type: 'or',
+        type: 'or' as const,
         clauses: [
           {
             'legalStatuses.REGISTERED.registrationNumber': {
