@@ -45,6 +45,7 @@ import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { EventOverviewProvider } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
+import { constantsMessages } from '@client/i18n/messages/constants'
 
 const Tab = styled.button`
   border: none;
@@ -232,7 +233,9 @@ export function EventOverviewLayout({
           }
         />
       }
-      skipToContentText="skip"
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       <EventOverviewProvider locations={locations} users={users}>
         {children}
