@@ -180,6 +180,7 @@ function mapFieldTypeToElasticsearch(
           option: { type: 'keyword' }
         }
       }
+    case FieldType.SEARCH:
     case FieldType.ID_READER:
     case FieldType.QR_READER:
     case FieldType.HTTP:

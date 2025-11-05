@@ -52,7 +52,7 @@ describe('Rate limit', () => {
     fetch.resetMocks()
 
     const validateToken = jwt.sign(
-      { scope: ['validate'] },
+      { scope: [] },
       readFileSync('./test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
@@ -66,7 +66,7 @@ describe('Rate limit', () => {
     }
 
     const validateToken2 = jwt.sign(
-      { scope: ['validate'] },
+      { scope: [] },
       readFileSync('./test/cert.key'),
       {
         subject: '5bdc55ece42c82de9a529c36',
@@ -86,7 +86,7 @@ describe('Rate limit', () => {
         JSON.stringify({
           username: 'sakibal.hasan',
           id: '123',
-          scope: ['declare'],
+          scope: [],
           status: 'active'
         })
       )
@@ -103,7 +103,7 @@ describe('Rate limit', () => {
       JSON.stringify({
         username: 'sakibal.hasan',
         id: '123',
-        scope: ['declare'],
+        scope: [],
         status: 'active'
       })
     )
@@ -126,7 +126,7 @@ describe('Rate limit', () => {
         JSON.stringify({
           username: 'sakibal.hasan',
           id: '123',
-          scope: ['declare'],
+          scope: [],
           status: 'active'
         })
       )
@@ -143,7 +143,7 @@ describe('Rate limit', () => {
       JSON.stringify({
         username: 'sakibal.hasan',
         id: '123',
-        scope: ['declare'],
+        scope: [],
         status: 'active'
       })
     )
@@ -170,7 +170,7 @@ describe('Rate limit', () => {
         JSON.stringify({
           username: users[0].username,
           id: users[0].id,
-          scope: ['declare'],
+          scope: [],
           status: 'active'
         })
       )
@@ -189,7 +189,7 @@ describe('Rate limit', () => {
         JSON.stringify({
           username: users[1].username,
           id: users[1].id,
-          scope: ['declare'],
+          scope: [],
           status: 'active'
         })
       )
@@ -207,7 +207,7 @@ describe('Rate limit', () => {
       JSON.stringify({
         username: users[0].username,
         id: users[0].id,
-        scope: ['declare'],
+        scope: [],
         status: 'active'
       })
     )

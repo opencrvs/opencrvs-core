@@ -42,6 +42,7 @@ import {
   TimeField,
   AlphaPrintButton,
   HttpField,
+  SearchField,
   ButtonField,
   LinkButtonField,
   VerificationStatus,
@@ -175,6 +176,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       schema = TextValue
       break
     case FieldType.HTTP:
+    case FieldType.SEARCH:
       schema = HttpFieldUpdateValue
       break
     case FieldType.QUERY_PARAM_READER:
@@ -236,6 +238,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.BUTTON:
     case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.HTTP:
+    case FieldType.SEARCH:
     case FieldType.LINK_BUTTON:
     case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
@@ -491,6 +494,13 @@ export const isHttpFieldType = (field: {
   value: FieldValue
 }): field is { value: undefined; config: HttpField } => {
   return field.config.type === FieldType.HTTP
+}
+
+export const isSearchFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: SearchField } => {
+  return field.config.type === FieldType.SEARCH
 }
 
 export const isLinkButtonFieldType = (field: {

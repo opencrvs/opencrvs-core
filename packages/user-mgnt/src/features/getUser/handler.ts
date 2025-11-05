@@ -42,7 +42,10 @@ export default async function getUser(
     criteria = { ...criteria, mobile }
   }
   if (email) {
-    criteria = { ...criteria, emailForNotification: email }
+    criteria = {
+      ...criteria,
+      emailForNotification: { $regex: `^${email}$`, $options: 'i' }
+    }
   }
   const result = await User.findOne(criteria)
 

@@ -63,15 +63,11 @@ describe('duplicate record endpoint', () => {
   })
 
   it('returns OK after duplicating a birth declaration', async () => {
-    const token = jwt.sign(
-      { scope: ['declare'] },
-      readFileSync('./test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
+    const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:workflow-user'
+    })
 
     // Fetches a record from search
     mswServer.use(

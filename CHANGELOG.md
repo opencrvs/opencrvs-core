@@ -1,12 +1,32 @@
 # Changelog
 
-## 1.9.0 Release
+## 1.9.1 Release Candidate
+
+### Breaking changes
+
+- **Removed support for following scopes**
+  - `NATLSYSADMIN`
+  - `DECLARE`
+  - `VALIDATE`
+  - `CERTIFY`
+  - `PERFORMANCE`
+  - `SYSADMIN`
+  - `TEAMS`
+  - `CONFIG`
+  - `RECORD_EXPORT_RECORDS`
+  - `RECORD_DECLARATION_PRINT`
+  - `RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS`
+  - `RECORD_REGISTRATION_PRINT`
+  - `RECORD_PRINT_CERTIFIED_COPIES`
+  - `RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES`
+  - `PROFILE_UPDATE`
+
+## [1.9.0](https://github.com/opencrvs/opencrvs-core/compare/v1.8.1...v1.9.0)
 
 ### Breaking changes
 
 * Dashboard configuration through **Metabase** has been fully migrated to **countryconfig**, and the standalone dashboard package has been removed.
   For details on configuring dashboards and information about the latest updates, refer to the [ANALYTICS.md](https://github.com/opencrvs/opencrvs-countryconfig/blob/v1.9.0/ANALYTICS.md) documentation.
-
 
 ### New features
 
@@ -278,6 +298,7 @@ To see Events V2 in action, check out the example configurations in the **countr
 - Add Import/Export system client and `record.export` scope to enable data migrations [#10415](https://github.com/opencrvs/opencrvs-core/issues/10415)
 - Add an Alpha version of configurable "Print" button that will be refactored in a later release - this button can be used to print certificates during declaration/correction flow. [#10039](https://github.com/opencrvs/opencrvs-core/issues/10039)
 - Add bulk import endpoint [#10590](https://github.com/opencrvs/opencrvs-core/pull/10590)
+- Add multi-field search with a single component [#10617](https://github.com/opencrvs/opencrvs-core/issues/10617)
 
 ### Improvements
 
