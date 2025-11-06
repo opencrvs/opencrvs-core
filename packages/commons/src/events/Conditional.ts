@@ -73,7 +73,6 @@ export const ActionConditional = z.discriminatedUnion('type', [
   // Action can be shown to the user in the list but as disabled
   EnableConditional
 ])
-// REMOVED_AS as unknown as z.ZodDiscriminatedUnion<'type', ActionConditionalType[]>
 
 export type ActionConditional = InferredActionConditional
 
@@ -117,6 +116,5 @@ export const FieldConditional = z
     description: 'Field conditional configuration',
     id: 'FieldConditional'
   })
-// REMOVED_AS as unknown as z.ZodDiscriminatedUnion<'type', FieldConditionalType[]>
 
 export type FieldConditional = z.infer<typeof FieldConditional>

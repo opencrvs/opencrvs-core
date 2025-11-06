@@ -167,7 +167,6 @@ export const ActionConfig = z
     'Configuration of an action available for an event. Data collected depends on the action type and is accessible through the annotation property in ActionDocument.'
   )
   .meta({ id: 'ActionConfig' })
-//REMOVED_AS as unknown as z.ZodDiscriminatedUnion<'type', AllActionConfigFields[]>
 
 export type ActionConfig = InferredActionConfig
 

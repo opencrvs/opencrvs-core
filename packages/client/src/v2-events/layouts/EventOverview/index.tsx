@@ -169,7 +169,7 @@ export function EventOverviewLayout({
     ? applyDraftToEventIndex(event, draft, eventConfiguration)
     : event
 
-  const isDraft = event.status === EventStatus.Values.CREATED
+  const isDraft = event.status === EventStatus.enum.CREATED
 
   const exit = () => {
     if (workqueue) {

@@ -12,6 +12,7 @@
 import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
 import * as z from 'zod/v4'
+import { $ZodIssue } from 'zod/v4/core'
 import { formatISO, isAfter, isBefore } from 'date-fns'
 
 import { ConditionalParameters, JSONSchema } from './conditionals'
@@ -29,7 +30,6 @@ import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
 import { ageToDate } from '../events/utils'
-import { $ZodIssue } from 'zod/v4/core'
 
 const ajv = new Ajv({
   $data: true,
@@ -343,7 +343,10 @@ function zodToIntlErrorMap(
     }
 
     case 'invalid_type': {
-      if (!value && (issue.input === undefined || issue.input === null)) {
+      if (
+        issue.hasOwnProperty('input') &&
+        (issue.input === undefined || issue.input === null)
+      ) {
         return createIntlError(requiredMessage)
       }
       return createIntlError(errorMessages.invalidInput)
@@ -489,7 +492,6 @@ export function runFieldValidations({
      * In real use cases, there can be hundreds of thousands of locations.
      * Make sure that the context contains only the locations that are needed for validation.
      * E.g. if the user is a leaf admin, only the leaf locations under their admin structure are needed.
-     *
      * Loading few megabytes of locations to memory just for validation is not efficient and will choke the application.
      */
     $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? [],
@@ -519,7 +521,6 @@ export function getValidatorsForField(
     .map(({ validator, message }) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const jsonSchema = validator as any
-
       /*
        * It’s possible the validator is an or(...) / and(...) / similar combinator.
        * From these it's tricky to extract field-specific validation:

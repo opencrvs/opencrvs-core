@@ -9,14 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as z from 'zod/v4'
+import { z, ZodType } from 'zod/v4'
 import { EventMetadata, EventStatus, Flag } from './EventMetadata'
 import { EventState } from './ActionDocument'
 
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 import { TokenUserType } from '../authentication'
 import { SelectDateRangeValue } from './FieldValue'
-import { ZodType } from 'zod/v4'
 
 export const EventIndex = EventMetadata.extend({
   declaration: EventState

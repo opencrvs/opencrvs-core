@@ -135,7 +135,7 @@ const ValidateAction = ActionBase.extend(
 export const ReasonContent = z.object({
   reason: z
     .string()
-    .min(1, { message: 'Message cannot be empty' })
+    .min(1, { error: 'Message cannot be empty' })
     .describe(
       'Message describing the reason for rejecting or archiving the event.'
     )
