@@ -42,16 +42,15 @@ export type ITimeFieldProps = IProps &
 
 function get24HourNormalisedFormat(
   time: { hh: string; mm: string },
-  use12HourFormat: boolean,
-  amPm?: string | null
+  use12HourFormat: boolean
 ): string {
   let hours = parseInt(time.hh, 10)
 
   // Convert 12-hour format to 24-hour format
-  if (use12HourFormat && amPm) {
-    if (amPm === 'AM' && hours === 12) {
+  if (use12HourFormat) {
+    if (use12HourFormat && hours === 12) {
       hours = 0
-    } else if (amPm === 'PM' && hours !== 12) {
+    } else if (use12HourFormat && hours !== 12) {
       hours += 12
     }
   }
@@ -165,9 +164,9 @@ function TimeInput12(props: ITimeFieldProps) {
 
   React.useEffect(() => {
     if (isValidHours(state.hh, true) && isValidMinutes(state.mm)) {
-      onChange(get24HourNormalisedFormat(state, true, amPm))
+      onChange(get24HourNormalisedFormat(state, true))
     }
-  }, [state, amPm, onChange])
+  }, [state, onChange])
 
   return (
     <Container id={id}>

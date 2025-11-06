@@ -201,6 +201,7 @@ export const TimeInput12HourDisplay: StoryObj<typeof FormFieldGenerator> = {
     await step('Verify output is in 24-hour format', async () => {
       const outputDisplay = await canvas.findByTestId('time-output-12h')
       await expect(outputDisplay).toBeInTheDocument()
+      await expect(outputDisplay).toHaveTextContent('14:30')
     })
   },
   render: function Component(args) {
@@ -250,7 +251,7 @@ export const TimeInput12HourDisplayWith24HourInitialValue: StoryObj<
     const canvas = within(canvasElement)
 
     await step(
-      'Verify 24-hour initial value is correctly displayed in 12-hour format',
+      'Verify 24-hour initial value is correctly displayed a 24 hour value after being passed through a 12-hour format input',
       async () => {
         const outputDisplay = await canvas.findByTestId(
           'time-output-conversion'
@@ -263,11 +264,13 @@ export const TimeInput12HourDisplayWith24HourInitialValue: StoryObj<
       const hourInput = await canvas.findByDisplayValue('02')
       await userEvent.clear(hourInput)
       await userEvent.type(hourInput, '09')
+      await userEvent.tab()
     })
 
     await step('Test edge case: midnight and noon', async () => {
       const outputDisplay = await canvas.findByTestId('time-output-conversion')
       await expect(outputDisplay).toBeInTheDocument()
+      await expect(outputDisplay).toHaveTextContent('21:30')
     })
   },
   render: function Component(args) {
