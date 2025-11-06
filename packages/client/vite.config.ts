@@ -155,7 +155,7 @@ export default defineConfig(({ mode }) => {
                     JSON.stringify({
                       status: 'ok',
                       checks: {
-                        countryConfig: { status: 'ok' }
+                        countryconfig: { status: 'ok' }
                       }
                     })
                   )
@@ -165,7 +165,7 @@ export default defineConfig(({ mode }) => {
                     JSON.stringify({
                       status: 'error',
                       checks: {
-                        countryConfig: {
+                        countryconfig: {
                           status: 'error',
                           error: 'Country config service unavailable'
                         }
@@ -183,7 +183,7 @@ export default defineConfig(({ mode }) => {
                   JSON.stringify({
                     status: 'error',
                     checks: {
-                      countryConfig: {
+                      countryconfig: {
                         status: 'error',
                         error: 'Country config service unavailable'
                       }

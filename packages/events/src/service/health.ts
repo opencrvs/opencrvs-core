@@ -20,7 +20,7 @@ export interface HealthCheckResult {
   checks: {
     postgres: { status: 'ok' | 'error'; error?: string }
     elasticsearch: { status: 'ok' | 'error'; error?: string }
-    countryConfig: { status: 'ok' | 'error'; error?: string }
+    countryconfig: { status: 'ok' | 'error'; error?: string }
   }
 }
 
@@ -112,7 +112,7 @@ export async function performHealthCheck(): Promise<HealthCheckResponse> {
           elasticsearchCheck.status === 'fulfilled'
             ? elasticsearchCheck.value
             : { status: 'error', error: 'Health check failed' },
-        countryConfig:
+        countryconfig:
           countryConfigCheck.status === 'fulfilled'
             ? countryConfigCheck.value
             : { status: 'error', error: 'Health check failed' }
