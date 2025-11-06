@@ -128,3 +128,5 @@ export const IDReaderWithValidator: Story = {
     </Stack>
   )
 }
+
+export const TestComponent = <>Tester</>
