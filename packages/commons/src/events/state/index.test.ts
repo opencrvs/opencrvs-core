@@ -1060,3 +1060,74 @@ describe('deepDropNulls()', () => {
     expect(deepDropNulls(undefined)).toBe(undefined)
   })
 })
+
+function reorderEventActionDates(
+  event: EventDocument,
+  baseDate: string = '2025-02-06T03:36:00.000Z'
+): EventDocument {
+  const order = ['CREATE', 'DECLARE', 'REGISTER', 'REQUEST_CORRECTION']
+
+  // Sort actions based on logical order
+  const sortedActions = [...event.actions].sort(
+    (a, b) => order.indexOf(a.type) - order.indexOf(b.type)
+  )
+
+  // Generate new actions with updated timestamps
+  const base = new Date(baseDate)
+  const updatedActions = sortedActions.map((action, i) => {
+    const newDate = new Date(base)
+    newDate.setDate(base.getDate() + i)
+    return {
+      ...action,
+      createdAt: newDate.toISOString()
+    }
+  })
+
+  // Return a new document with updated actions
+  return {
+    ...event,
+    actions: updatedActions
+  } satisfies EventDocument
+}
+
+describe('test status of a record when actions are not in order', () => {
+  it('take REGISTER action as the status of a record', () => {
+    const event = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.REGISTER },
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.REQUEST_CORRECTION
+        }
+      ]
+    })
+
+    const orderedEvent = reorderEventActionDates(event)
+
+    expect(
+      getCurrentEventState(orderedEvent, tennisClubMembershipEvent).status
+    ).toBe(EventStatus.enum.REGISTERED)
+  })
+
+  it('take DECLARE action as the status of a record', () => {
+    const event = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.CREATE }
+      ]
+    })
+
+    const orderedEvent = reorderEventActionDates(event)
+
+    expect(
+      getCurrentEventState(orderedEvent, tennisClubMembershipEvent).status
+    ).toBe(EventStatus.enum.DECLARED)
+  })
+})
