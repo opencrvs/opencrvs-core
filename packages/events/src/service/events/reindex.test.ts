@@ -15,6 +15,7 @@ import {
   ActionStatus,
   ActionType,
   EventDocument,
+  EventIndex,
   generateEventDocument,
   getUUID,
   SCOPES,
@@ -56,6 +57,11 @@ beforeEach(async () => {
     ]
   })
 
+  const draftDocument = generateEventDocument({
+    configuration: tennisClubMembershipEvent,
+    actions: [{ type: ActionType.CREATE, user }]
+  })
+
   const eventInDb = await eventsDb
     .insertInto('events')
     .values({
@@ -74,6 +80,50 @@ beforeEach(async () => {
       id: getUUID(),
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       eventId: eventInDb!.id,
+      actionType: ActionType.CREATE,
+      createdBy: user.id,
+      createdAt: event.createdAt,
+      status: ActionStatus.Accepted,
+      createdByRole: user.role,
+      createdByUserType: 'user',
+      transactionId: getUUID()
+    })
+    .execute()
+
+  await eventsDb
+    .insertInto('eventActions')
+    .values({
+      id: getUUID(),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      eventId: eventInDb!.id,
+      actionType: ActionType.DECLARE,
+      createdBy: user.id,
+      createdAt: event.createdAt,
+      status: ActionStatus.Accepted,
+      createdByRole: user.role,
+      createdByUserType: 'user',
+      transactionId: getUUID()
+    })
+    .execute()
+
+  const drafteventInDb = await eventsDb
+    .insertInto('events')
+    .values({
+      eventType: draftDocument.type,
+      transactionId: getUUID(),
+      trackingId: draftDocument.trackingId,
+      createdAt: draftDocument.createdAt,
+      updatedAt: draftDocument.updatedAt
+    })
+    .returning('id')
+    .executeTakeFirst()
+
+  await eventsDb
+    .insertInto('eventActions')
+    .values({
+      id: getUUID(),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      eventId: drafteventInDb!.id,
       actionType: ActionType.CREATE,
       createdBy: user.id,
       createdAt: event.createdAt,
@@ -122,6 +172,7 @@ test('reindexing indexes all events into Elasticsearch', async () => {
   })
 
   expect(spy.mock.calls[0]).toHaveLength(1)
+  // Does not reindex draftDocument - thus only one record is indexed
   expect(body.hits.hits).toHaveLength(1)
 })
 
@@ -148,5 +199,10 @@ test('reindexing twice', async () => {
   })
 
   expect(postHandler.isUsed).toBe(true)
+
+  // Does not reindex draftDocument - thus only one record is indexed
   expect(body.hits.hits).toHaveLength(1)
+  expect((body.hits.hits[0]._source as EventIndex).trackingId).toEqual(
+    event.trackingId
+  )
 })

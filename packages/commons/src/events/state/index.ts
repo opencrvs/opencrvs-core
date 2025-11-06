@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { ActionType } from '../ActionType'
 import { orderBy, findLast } from 'lodash'
 import {
@@ -193,7 +192,11 @@ export function getCurrentEventState(
   /** @TODO: remove config parameter, it is only used by resolveDateOfEvent. See if it can be achieved in some other way. */
   config: EventConfig
 ): EventIndex {
-  const creationAction = event.actions.find(
+  // Always work with sorted event actions
+  const sortedActions = event.actions
+    .slice()
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+  const creationAction = sortedActions.find(
     (action) => action.type === ActionType.CREATE
   )
 
@@ -206,7 +209,7 @@ export function getCurrentEventState(
   )
 
   // Includes the metadata of the last action. Whether it was a 'request' by user or 'accept' by user or 3rd party.
-  const requestActionMetadata = getActionUpdateMetadata(event.actions)
+  const requestActionMetadata = getActionUpdateMetadata(sortedActions)
 
   // Includes only accepted actions metadata. Sometimes (e.g. on updatedAt) we want to show the accepted timestamp rather than the request timestamp.
   const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
@@ -216,8 +219,8 @@ export function getCurrentEventState(
   return deepDropNulls({
     id: event.id,
     type: event.type,
-    status: getStatusFromActions(event.actions),
-    legalStatuses: getLegalStatuses(event.actions),
+    status: getStatusFromActions(sortedActions),
+    legalStatuses: getLegalStatuses(sortedActions),
     createdAt: creationAction.createdAt,
     createdBy: creationAction.createdBy,
     createdByUserType: creationAction.createdByUserType,
@@ -232,8 +235,8 @@ export function getCurrentEventState(
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),
-    potentialDuplicates: extractPotentialDuplicatesFromActions(event.actions),
-    flags: getFlagsFromActions(event.actions)
+    potentialDuplicates: extractPotentialDuplicatesFromActions(sortedActions),
+    flags: getFlagsFromActions(sortedActions)
   })
 }
 

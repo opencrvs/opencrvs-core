@@ -71,6 +71,10 @@ export function WorkqueueLayout({
   const workqueues = useAllWorkqueueConfigurations()
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
 
+  const scopes = useSelector(getScope) ?? []
+
+  const hasSearchScope = scopes.some((scope) => scope.startsWith('search'))
+
   return (
     <Frame
       header={
@@ -79,13 +83,15 @@ export function WorkqueueLayout({
           desktopRight={<ProfileMenu key="profileMenu" />}
           mobileLeft={<Hamburger />}
           mobileRight={
-            <Button
-              aria-label="Go to search"
-              type={'icon'}
-              onClick={() => navigate(ROUTES.V2.SEARCH.buildPath({}))}
-            >
-              <Icon color="primary" name="MagnifyingGlass" size="medium" />
-            </Button>
+            hasSearchScope && (
+              <Button
+                aria-label="Go to search"
+                type={'icon'}
+                onClick={() => navigate(ROUTES.V2.SEARCH.buildPath({}))}
+              >
+                <Icon color="primary" name="MagnifyingGlass" size="medium" />
+              </Button>
+            )
           }
           mobileTitle={
             title ?? intl.formatMessage(workqueueConfig?.name ?? emptyMessage)
