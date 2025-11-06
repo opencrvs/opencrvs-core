@@ -178,13 +178,6 @@ export function useActionForHistory() {
     actions: ActionDocument[],
     action: EventHistoryActionDocument
   ) {
-    if (
-      action.type === ActionType.REGISTER &&
-      action.status === ActionStatus.Requested
-    ) {
-      return 'WAITING_FOR_EXTERNAL_VALIDATION'
-    }
-
     if (action.type === ActionType.REQUEST_CORRECTION) {
       const approveAction = actions.find(
         (x) =>

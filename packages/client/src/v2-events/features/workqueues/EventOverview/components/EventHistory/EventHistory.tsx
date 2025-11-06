@@ -419,7 +419,8 @@ export function EventHistory({
             onClick={() => onHistoryRowClick(action, actionCreatorName)}
           >
             {intl.formatMessage(eventHistoryStatusMessage, {
-              status: getActionTypeForHistory(history, action)
+              action: getActionTypeForHistory(history, action),
+              status: action.status
             })}
           </Link>
         ),
