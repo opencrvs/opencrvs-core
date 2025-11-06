@@ -172,7 +172,7 @@ jobs:
       - name: Checking out git repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2 # Ensure we have at least one previous commit for comparison
+          fetch-depth: 0 # Fetch history to compare PR changes against the base branch
 
       - name: Detect changes in v2-events
         id: detect-changes
