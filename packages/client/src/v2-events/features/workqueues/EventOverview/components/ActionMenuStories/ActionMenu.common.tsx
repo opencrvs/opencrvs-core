@@ -37,7 +37,6 @@ import {
   setEventData,
   addLocalEventConfig
 } from '@client/v2-events/features/events/useEvents/api'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ActionMenu } from '../ActionMenu'
 import { actionLabels } from '../useAllowedActionConfigurations'
 
@@ -228,7 +227,7 @@ export function getMockEvent(
 
   return {
     type: TENNIS_CLUB_MEMBERSHIP,
-    id: 'b4c52c54-f6eb-45ee-be70-142838f8c8d4' as UUID,
+    id: getUUID(),
     createdAt: '2025-04-18T08:34:20.711Z',
     updatedAt: '2025-04-18T10:40:59.442Z',
     trackingId: '75HT9J',
@@ -365,7 +364,7 @@ export function createStoriesFromScenarios(
                   ]
                 })),
                 tRPCMsw.event.get.query(() => {
-                  return tennisClubMembershipEventDocument
+                  return event
                 })
               ]
             }
@@ -444,7 +443,7 @@ export function createdByOtherUserScenario({
               results: [getCurrentEventState(event, tennisClubMembershipEvent)]
             })),
             tRPCMsw.event.get.query(() => {
-              return tennisClubMembershipEventDocument
+              return event
             })
           ]
         }

@@ -9,8 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta } from '@storybook/react'
-import { createTRPCMsw } from '@vafanassieff/msw-trpc'
-import { AppRouter } from '@events/router'
 import { ActionType } from '@opencrvs/commons/client'
 import { AssignmentStatus } from '@client/v2-events/utils'
 import { ActionMenu } from '../../ActionMenu'
