@@ -722,7 +722,8 @@ paths:
                           - requiresAction
                           - label
                       default: &a12 []
-                      description: Configuration of flags associated with the event actions.
+                      description: Configuration of flags associated with the actions of this event
+                        type.
                   required:
                     - id
                     - title
@@ -774,7 +775,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 4964f146-bf1f-44d5-9662-dd2184f6adf6
+                transactionId: 8780395c-b417-40b5-b5b3-064eb47e4903
                 type: birth
       responses:
         "200":
@@ -1448,7 +1449,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 423630ac-b267-4b16-b9c4-518df88fa1f1
+                transactionId: d99509aa-0da2-49d9-92df-19e4b6fd4cd1
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -3655,7 +3656,7 @@ paths:
                               rejected by a third-party integration.
                           type:
                             type: string
-                            enum: &a20
+                            enum: &a22
                               - NOTIFY
                               - DECLARE
                               - VALIDATE
@@ -4433,7 +4434,8 @@ components:
               - requiresAction
               - label
           default: *a12
-          description: Configuration of flags associated with the event actions.
+          description: Configuration of flags associated with the actions of this event
+            type.
       required:
         - id
         - title
@@ -4501,6 +4503,30 @@ components:
           description: Human readable description of the action
           allOf:
             - $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Id of the flag.
+              operation:
+                type: string
+                enum: &a20
+                  - add
+                  - remove
+                description: Operation to perform on the flag.
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                allOf:
+                  - $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+          default: &a21 []
+          description: Flag actions which are executed when the action is performed.
         type:
           type: string
           enum:
@@ -4523,6 +4549,7 @@ components:
           description: Configuration of the review page for read-only view.
       required:
         - label
+        - flags
         - type
         - review
     FieldConfig:
@@ -11819,6 +11846,28 @@ components:
           description: Human readable description of the action
           allOf:
             - $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Id of the flag.
+              operation:
+                type: string
+                enum: *a20
+                description: Operation to perform on the flag.
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                allOf:
+                  - $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+          default: *a21
+          description: Flag actions which are executed when the action is performed.
         review:
           type: object
           properties:
@@ -11855,6 +11904,7 @@ components:
             - DECLARE
       required:
         - label
+        - flags
         - review
         - type
     Clause:
@@ -11981,6 +12031,28 @@ components:
           description: Human readable description of the action
           allOf:
             - $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Id of the flag.
+              operation:
+                type: string
+                enum: *a20
+                description: Operation to perform on the flag.
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                allOf:
+                  - $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+          default: *a21
+          description: Flag actions which are executed when the action is performed.
         review:
           type: object
           properties:
@@ -12017,6 +12089,7 @@ components:
             - VALIDATE
       required:
         - label
+        - flags
         - review
         - type
     RejectDeclarationActionConfig:
@@ -12026,12 +12099,35 @@ components:
           description: Human readable description of the action
           allOf:
             - $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Id of the flag.
+              operation:
+                type: string
+                enum: *a20
+                description: Operation to perform on the flag.
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                allOf:
+                  - $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+          default: *a21
+          description: Flag actions which are executed when the action is performed.
         type:
           type: string
           enum:
             - REJECT
       required:
         - label
+        - flags
         - type
     ArchiveActionConfig:
       type: object
@@ -12040,12 +12136,35 @@ components:
           description: Human readable description of the action
           allOf:
             - $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Id of the flag.
+              operation:
+                type: string
+                enum: *a20
+                description: Operation to perform on the flag.
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                allOf:
+                  - $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+          default: *a21
+          description: Flag actions which are executed when the action is performed.
         type:
           type: string
           enum:
             - ARCHIVE
       required:
         - label
+        - flags
         - type
     RegisterActionConfig:
       type: object
@@ -12054,6 +12173,28 @@ components:
           description: Human readable description of the action
           allOf:
             - $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Id of the flag.
+              operation:
+                type: string
+                enum: *a20
+                description: Operation to perform on the flag.
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                allOf:
+                  - $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+          default: *a21
+          description: Flag actions which are executed when the action is performed.
         review:
           type: object
           properties:
@@ -12090,6 +12231,7 @@ components:
             - REGISTER
       required:
         - label
+        - flags
         - review
         - type
     DeleteActionConfig:
@@ -12099,12 +12241,35 @@ components:
           description: Human readable description of the action
           allOf:
             - $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Id of the flag.
+              operation:
+                type: string
+                enum: *a20
+                description: Operation to perform on the flag.
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                allOf:
+                  - $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+          default: *a21
+          description: Flag actions which are executed when the action is performed.
         type:
           type: string
           enum:
             - DELETE
       required:
         - label
+        - flags
         - type
     PrintCertificateActionConfig:
       type: object
@@ -12113,6 +12278,28 @@ components:
           description: Human readable description of the action
           allOf:
             - $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Id of the flag.
+              operation:
+                type: string
+                enum: *a20
+                description: Operation to perform on the flag.
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                allOf:
+                  - $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+          default: *a21
+          description: Flag actions which are executed when the action is performed.
         type:
           type: string
           enum:
@@ -12157,6 +12344,7 @@ components:
             declaration, supporting a wider range of page types.
       required:
         - label
+        - flags
         - type
         - printForm
     FormPageConfig:
@@ -12223,6 +12411,28 @@ components:
           description: Human readable description of the action
           allOf:
             - $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Id of the flag.
+              operation:
+                type: string
+                enum: *a20
+                description: Operation to perform on the flag.
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                allOf:
+                  - $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+          default: *a21
+          description: Flag actions which are executed when the action is performed.
         type:
           type: string
           enum:
@@ -12267,6 +12477,7 @@ components:
             declaration, supporting a wider range of page types.
       required:
         - label
+        - flags
         - type
         - correctionForm
     RejectCorrectionActionConfig:
@@ -12276,12 +12487,35 @@ components:
           description: Human readable description of the action
           allOf:
             - $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Id of the flag.
+              operation:
+                type: string
+                enum: *a20
+                description: Operation to perform on the flag.
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                allOf:
+                  - $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+          default: *a21
+          description: Flag actions which are executed when the action is performed.
         type:
           type: string
           enum:
             - REJECT_CORRECTION
       required:
         - label
+        - flags
         - type
     ApproveCorrectionActionConfig:
       type: object
@@ -12290,12 +12524,35 @@ components:
           description: Human readable description of the action
           allOf:
             - $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Id of the flag.
+              operation:
+                type: string
+                enum: *a20
+                description: Operation to perform on the flag.
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                allOf:
+                  - $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+          default: *a21
+          description: Flag actions which are executed when the action is performed.
         type:
           type: string
           enum:
             - APPROVE_CORRECTION
       required:
         - label
+        - flags
         - type
     CustomActionConfig:
       type: object
@@ -12304,6 +12561,28 @@ components:
           description: Human readable description of the action
           allOf:
             - $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Id of the flag.
+              operation:
+                type: string
+                enum: *a20
+                description: Operation to perform on the flag.
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                allOf:
+                  - $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+          default: *a21
+          description: Flag actions which are executed when the action is performed.
         type:
           type: string
           enum:
@@ -12319,6 +12598,7 @@ components:
             will be used on the custom action confirmation modal.
       required:
         - label
+        - flags
         - type
         - name
         - form
@@ -12483,7 +12763,7 @@ components:
                       rejected by a third-party integration.
                   type:
                     type: string
-                    enum: *a20
+                    enum: *a22
                 required:
                   - id
                   - transactionId
@@ -13163,7 +13443,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: &a21
+          enum: &a23
             - Requested
             - Accepted
             - Rejected
@@ -13809,7 +14089,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -14452,7 +14732,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -15105,7 +15385,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -15767,7 +16047,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -16410,7 +16690,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -17061,7 +17341,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -17714,7 +17994,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -18357,7 +18637,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -19004,7 +19284,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -19647,7 +19927,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -20294,7 +20574,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -20937,7 +21217,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -21583,7 +21863,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -22239,7 +22519,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -22882,7 +23162,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -23531,7 +23811,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a21
+          enum: *a23
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
