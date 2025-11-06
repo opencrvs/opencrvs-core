@@ -177,7 +177,7 @@ jobs:
       - name: Detect changes in v2-events
         id: detect-changes
         run: |
-          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -Eq 'packages/client/src/v2-events/|packages/commons/src/'; then
+          if git diff --name-only origin/${{ github.base_ref }}..HEAD | grep -Eq 'packages/client/src/v2-events/|packages/commons/src/'; then
             echo "chromatic_required=true" >> $GITHUB_OUTPUT
           else
             echo "chromatic_required=false" >> $GITHUB_OUTPUT
