@@ -22,7 +22,8 @@ import {
   getActionAnnotation,
   getDeclaration,
   getActionReview,
-  InherentFlags
+  InherentFlags,
+  EventDocument
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -48,57 +49,38 @@ import { useReviewActionConfig } from './useReviewActionConfig'
  *
  * Preview of event to be validated.
  */
-export function Review() {
+function ReviewContent({ event }: { event: EventDocument }) {
+  const navigate = useNavigate()
+  const events = useEvents()
+  const drafts = useDrafts()
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.VALIDATE)
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.VALIDATE.REVIEW
   )
-  const events = useEvents()
-  const drafts = useDrafts()
   const [modal, openModal] = useModal()
-  const navigate = useNavigate()
   const { closeActionView } = useEventFormNavigation()
-  const validatorContext = useValidatorContext()
-
-  const event = events.getEvent.findFromCache(eventId).data
-
-  useEffect(() => {
-    if (!event) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Event with id ${eventId} not found in cache. Redirecting to overview.`
-      )
-      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
-    }
-  }, [event, eventId, navigate])
-
-  if (!event) {
-    return <div />
-  }
 
   const { setAnnotation, getAnnotation } = useActionAnnotation()
 
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
+  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
+  const getFormValues = useEventFormData((state) => state.getFormValues)
 
   const previousAnnotation = getActionAnnotation({
     event,
     actionType: ActionType.VALIDATE
   })
 
-  const annotation = getAnnotation(previousAnnotation)
-
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
   const formConfig = getDeclaration(config)
-  const reviewConfig = getActionReview(config, ActionType.VALIDATE)
-  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
-
-  const getFormValues = useEventFormData((state) => state.getFormValues)
-
-  const currentEventState = getCurrentEventState(event, config)
-  const previousFormValues = currentEventState.declaration
   const form = getFormValues()
+  const annotation = getAnnotation(previousAnnotation)
+  const reviewConfig = getActionReview(config, ActionType.VALIDATE)
+  const currentEventState = getCurrentEventState(event, config)
+  const validatorContext = useValidatorContext()
 
+  const previousFormValues = currentEventState.declaration
   const reviewActionConfiguration = useReviewActionConfig({
     formConfig,
     declaration: form,
@@ -244,4 +226,25 @@ export function Review() {
       {saveAndExitModal}
     </FormLayout>
   )
+}
+export function Review() {
+  const navigate = useNavigate()
+  const events = useEvents()
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.VALIDATE)
+  const event = events.getEvent.findFromCache(eventId).data
+  useEffect(() => {
+    if (!event) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Event with id ${eventId} not found in cache. Redirecting to overview.`
+      )
+      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+    }
+  }, [event, eventId, navigate])
+
+  if (!event) {
+    return <div />
+  }
+
+  return <ReviewContent event={event} />
 }

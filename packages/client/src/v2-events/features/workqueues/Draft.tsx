@@ -37,9 +37,9 @@ export function Draft() {
 
   const outboxIds = useOutbox().map(({ id }) => id)
 
-  const { getAllRemoteDrafts } = useDrafts()
+  const { useRemoteDrafts } = useDrafts()
 
-  const drafts = getAllRemoteDrafts({
+  const drafts = useRemoteDrafts({
     refetchOnMount: 'always',
     staleTime: 0,
     refetchInterval: 20000

@@ -135,6 +135,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         {(formikProps) => {
           const { touched } = formikProps
 
+          // eslint-disable-next-line react-hooks/rules-of-hooks
           useEffect(() => {
             /**
              * Because 'enableReinitialize' prop is set to 'true' above, whenever initialValue changes,

@@ -17,6 +17,7 @@ import styled from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import {
   ActionType,
+  EventDocument,
   EventIndex,
   getActionReview,
   getCurrentEventState,
@@ -123,33 +124,11 @@ const TopBar = styled.div`
   position: sticky;
   z-index: 1;
 `
-
-function ReviewDuplicate() {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
-
-  const validatorContext = useValidatorContext()
-
+function ReviewDuplicateLoaded({ event }: { event: EventDocument }) {
   const intl = useIntl()
-  const navigate = useNavigate()
-  const events = useEvents()
-  const event = events.getEvent.findFromCache(eventId).data
-
-  useEffect(() => {
-    if (!event) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Event with id ${eventId} not found in cache. Redirecting to overview.`
-      )
-      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
-    }
-  }, [event, eventId, navigate])
-
-  if (!event) {
-    return <div />
-  }
-
+  const validatorContext = useValidatorContext()
   const [selectedTab, selectTab] = useState<string>(event.trackingId)
-
+  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
@@ -183,8 +162,6 @@ function ReviewDuplicate() {
   ]
 
   const { title, fields } = getActionReview(configuration, ActionType.READ)
-  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
-
   const formConfig = getDeclaration(configuration)
 
   return (
@@ -230,6 +207,29 @@ function ReviewDuplicate() {
       )}
     </Frame>
   )
+}
+
+function ReviewDuplicate() {
+  const navigate = useNavigate()
+  const events = useEvents()
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
+  const { data: event } = events.getEvent.findFromCache(eventId)
+
+  useEffect(() => {
+    if (!event) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Event with id ${eventId} not found in cache. Redirecting to overview.`
+      )
+      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+    }
+  }, [event, eventId, navigate])
+
+  if (!event) {
+    return <div />
+  }
+
+  return <ReviewDuplicateLoaded event={event} />
 }
 
 export const ReviewDuplicateIndex = withSuspense(ReviewDuplicate)

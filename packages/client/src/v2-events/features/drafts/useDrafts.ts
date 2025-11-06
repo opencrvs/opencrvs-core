@@ -182,7 +182,7 @@ export function useDrafts() {
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
 
-  function getAllRemoteDrafts(
+  function useRemoteDrafts(
     additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
   ): Draft[] {
     // Skip the queryFn defined by tRPC and use the one defined above
@@ -238,12 +238,12 @@ export function useDrafts() {
         status: localDraft.action.status
       })
     },
-    getAllRemoteDrafts,
+    useRemoteDrafts,
     getRemoteDraftByEventId: function useDraftList(
       eventId: string,
       additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
     ): Draft | undefined {
-      const eventDrafts = getAllRemoteDrafts(additionalOptions).filter(
+      const eventDrafts = useRemoteDrafts(additionalOptions).filter(
         (draft) => draft.eventId === eventId
       )
 

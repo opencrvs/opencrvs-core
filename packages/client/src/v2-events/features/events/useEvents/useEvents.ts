@@ -207,7 +207,7 @@ export function useEvents() {
       },
       assignment: {
         assign: {
-          isAssigning: (eventId: UUID) => {
+          useIsAssigning: (eventId: UUID) => {
             return useIsMutating(eventId, trpc.event.actions.assignment.assign)
           },
           mutate: async ({

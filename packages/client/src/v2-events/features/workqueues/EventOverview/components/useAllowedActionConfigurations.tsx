@@ -243,9 +243,8 @@ function useViewableActionConfigurations(
     event.type
   )
 
-  const isAssignmentInProgress = events.actions.assignment.assign.isAssigning(
-    event.id
-  )
+  const isAssignmentInProgress =
+    events.actions.assignment.assign.useIsAssigning(event.id)
 
   const isRejected = event.flags.includes(InherentFlags.REJECTED)
   const isDeclaredState = event.status === EventStatus.enum.DECLARED
@@ -517,7 +516,7 @@ export function useAllowedActionConfigurations(
   const drafts = useDrafts()
 
   const openDraft = drafts
-    .getAllRemoteDrafts()
+    .useRemoteDrafts()
     .find((draft) => draft.eventId === event.id)
 
   const { config, modals } = useViewableActionConfigurations(

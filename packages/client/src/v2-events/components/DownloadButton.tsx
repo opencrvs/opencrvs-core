@@ -100,7 +100,7 @@ export function DownloadButton({
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
   const eventDocument = getEvent.findFromCache(event.id)
-  const isAssignMutationFetching = actions.assignment.assign.isAssigning(
+  const isAssignMutationFetching = actions.assignment.assign.useIsAssigning(
     event.id
   )
 

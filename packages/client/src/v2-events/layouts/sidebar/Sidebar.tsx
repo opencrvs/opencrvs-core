@@ -98,8 +98,8 @@ export const SidebarComponent = ({
   const { getOutbox } = useEvents()
   const outbox = getOutbox()
 
-  const { getAllRemoteDrafts } = useDrafts()
-  const drafts = getAllRemoteDrafts()
+  const { useRemoteDrafts } = useDrafts()
+  const drafts = useRemoteDrafts()
 
   const workqueues = useCountryConfigWorkqueueConfigurations()
 
