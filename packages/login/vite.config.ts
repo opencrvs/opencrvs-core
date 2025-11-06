@@ -88,6 +88,59 @@ export default defineConfig(({ mode }): any => {
           target: 'http://localhost:3040',
           changeOrigin: true,
           rewrite: (path: string) => path.replace(/^\/api\/countryconfig/, '')
+        },
+        '/health/ready': {
+          target: 'http://localhost:3040',
+          changeOrigin: true,
+          rewrite: (path: string) => path.replace(/^\/health\/ready/, '/ping'),
+          configure: (proxy: any, _options: any) => {
+            proxy.on('proxyRes', (proxyRes: any, req: any, res: any) => {
+              if (req.url === '/health/ready') {
+                // Transform the response to health check format
+                if (proxyRes.statusCode === 200) {
+                  res.writeHead(200, { 'Content-Type': 'application/json' })
+                  res.end(
+                    JSON.stringify({
+                      status: 'ok',
+                      checks: {
+                        countryConfig: { status: 'ok' }
+                      }
+                    })
+                  )
+                } else {
+                  res.writeHead(500, { 'Content-Type': 'application/json' })
+                  res.end(
+                    JSON.stringify({
+                      status: 'error',
+                      checks: {
+                        countryConfig: {
+                          status: 'error',
+                          error: 'Country config service unavailable'
+                        }
+                      }
+                    })
+                  )
+                }
+              }
+            })
+
+            proxy.on('error', (_err: any, req: any, res: any) => {
+              if (req.url === '/health/ready') {
+                res.writeHead(500, { 'Content-Type': 'application/json' })
+                res.end(
+                  JSON.stringify({
+                    status: 'error',
+                    checks: {
+                      countryConfig: {
+                        status: 'error',
+                        error: 'Country config service unavailable'
+                      }
+                    }
+                  })
+                )
+              }
+            })
+          }
         }
       }
     },
