@@ -803,8 +803,6 @@ const annotationUpdateOnValidateEvent = {
   createdAt: actionDefaults.createdAt
 }
 
-console.log({ annotationUpdateOnValidateEvent })
-
 export const WithAnnotationChangeOnValidate: Story = {
   parameters: {
     offline: {
