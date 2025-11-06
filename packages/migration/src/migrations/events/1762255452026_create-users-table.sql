@@ -18,7 +18,7 @@ CREATE TABLE users (
   mobile text UNIQUE NULLS DISTINCT,
   signature_path text,
   profile_image_path text,
-  office_id uuid REFERENCES locations(id),
+  office_id uuid NOT NULL REFERENCES locations(id),
   CONSTRAINT email_or_mobile_not_null CHECK (email IS NOT NULL OR mobile IS NOT NULL)
 );
 

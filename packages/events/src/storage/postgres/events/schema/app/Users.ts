@@ -30,7 +30,7 @@ export default interface UsersTable {
 
   profileImagePath: ColumnType<string | null, string | null, string | null>
 
-  officeId: ColumnType<UUID | null, UUID | null, UUID | null>
+  officeId: ColumnType<UUID, UUID, UUID>
 }
 
 export type Users = Selectable<UsersTable>
