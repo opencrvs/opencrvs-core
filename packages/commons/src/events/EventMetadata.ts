@@ -11,10 +11,10 @@
 
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
-import { ActionType } from './ActionType'
-import { ActionStatus, PotentialDuplicate } from './ActionDocument'
+import { PotentialDuplicate } from './ActionDocument'
 import { UUID } from '../uuid'
 import { CreatedAtLocation } from './CreatedAtLocation'
+import { Flag } from './Flag'
 
 /**
  * Event statuses recognized by the system
@@ -29,33 +29,6 @@ export const EventStatus = z.enum([
 ])
 
 export type EventStatus = z.infer<typeof EventStatus>
-
-export const InherentFlags = {
-  PENDING_CERTIFICATION: 'pending-certification',
-  INCOMPLETE: 'incomplete',
-  REJECTED: 'rejected',
-  CORRECTION_REQUESTED: 'correction-requested',
-  POTENTIAL_DUPLICATE: 'potential-duplicate'
-} as const
-
-export type InherentFlags = (typeof InherentFlags)[keyof typeof InherentFlags]
-
-export const ActionFlag = z
-  .string()
-  .regex(
-    new RegExp(
-      `^(${Object.values(ActionType).join('|').toLowerCase()}):(${Object.values(
-        ActionStatus
-      )
-        .join('|')
-        .toLowerCase()})$`
-    ),
-    'Flag must be in the format ActionType:ActionStatus (lowerCase)'
-  )
-export const Flag = ActionFlag.or(z.nativeEnum(InherentFlags))
-
-export type ActionFlag = z.infer<typeof ActionFlag>
-export type Flag = z.infer<typeof Flag>
 
 export const ZodDate = z.string().date()
 

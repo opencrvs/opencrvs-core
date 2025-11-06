@@ -18,6 +18,7 @@ import { DeclarationFormConfig } from './FormConfig'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { FieldType } from './FieldType'
 import { FieldReference } from './FieldConfig'
+import { FlagConfig } from './Flag'
 extendZodWithOpenApi(z)
 
 /**
@@ -61,7 +62,12 @@ export const EventConfig = z
       .default([])
       .describe(
         'Configuration of fields available in the advanced search feature.'
-      )
+      ),
+    flags: z
+      .array(FlagConfig)
+      .optional()
+      .default([])
+      .describe('Configuration of flags associated with the event actions.')
   })
   .superRefine((event, ctx) => {
     const allFields = findAllFields(event)

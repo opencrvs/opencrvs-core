@@ -112,6 +112,19 @@ const ApproveCorrectionConfig = ActionConfigBase.merge(
   })
 )
 
+const CustomActionConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.CUSTOM),
+    name: z.string().describe('Name of the custom action.'),
+    /** Custom action form configuration supports a simple array of field configs, which should be rendered on the action modal. In the future, we might add support for pages etc. */
+    form: z
+      .array(FieldConfig)
+      .describe(
+        'Form configuration for the custom action. The form configured here will be used on the custom action confirmation modal.'
+      )
+  })
+)
+
 /*
  * This needs to be exported so that Typescript can refer to the type in
  * the declaration output type. If it can't do that, you might start encountering
@@ -131,6 +144,7 @@ export type AllActionConfigFields =
   | typeof RequestCorrectionConfig
   | typeof RejectCorrectionConfig
   | typeof ApproveCorrectionConfig
+  | typeof CustomActionConfig
 
 /** @knipignore */
 export type InferredActionConfig =
@@ -145,6 +159,7 @@ export type InferredActionConfig =
   | z.infer<typeof RequestCorrectionConfig>
   | z.infer<typeof RejectCorrectionConfig>
   | z.infer<typeof ApproveCorrectionConfig>
+  | z.infer<typeof CustomActionConfig>
 
 export const ActionConfig = z
   .discriminatedUnion('type', [
@@ -164,7 +179,8 @@ export const ActionConfig = z
     }),
     RequestCorrectionConfig.openapi({ ref: 'RequestCorrectionActionConfig' }),
     RejectCorrectionConfig.openapi({ ref: 'RejectCorrectionActionConfig' }),
-    ApproveCorrectionConfig.openapi({ ref: 'ApproveCorrectionActionConfig' })
+    ApproveCorrectionConfig.openapi({ ref: 'ApproveCorrectionActionConfig' }),
+    CustomActionConfig.openapi({ ref: 'CustomActionConfig' })
   ])
   .describe(
     'Configuration of an action available for an event. Data collected depends on the action type and is accessible through the annotation property in ActionDocument.'

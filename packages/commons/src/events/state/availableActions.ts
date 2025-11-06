@@ -14,7 +14,8 @@ import {
   ClientSpecificAction
 } from '../ActionType'
 import { EventIndex } from '../EventIndex'
-import { EventStatus, Flag, InherentFlags } from '../EventMetadata'
+import { EventStatus } from '../EventMetadata'
+import { Flag, InherentFlags } from '../Flag'
 
 const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   [EventStatus.enum.CREATED]: [

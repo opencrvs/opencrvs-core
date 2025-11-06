@@ -13,7 +13,8 @@ import { joinValues } from '../../utils'
 import { getStatusFromActions } from '.'
 import { Action, ActionStatus } from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
-import { InherentFlags, EventStatus, Flag } from '../EventMetadata'
+import { EventStatus } from '../EventMetadata'
+import { InherentFlags, Flag } from '../Flag'
 
 function isPendingCertification(actions: Action[]) {
   if (getStatusFromActions(actions) !== EventStatus.enum.REGISTERED) {

@@ -136,7 +136,9 @@ export const workqueueActions = ActionTypes.exclude([
   ActionType.DUPLICATE_DETECTED,
   ActionType.MARK_AS_NOT_DUPLICATE,
   ActionType.REJECT_CORRECTION,
-  ActionType.APPROVE_CORRECTION
+  ActionType.APPROVE_CORRECTION,
+  // TODO CIHAN: this might need to be removed from here
+  ActionType.CUSTOM
 ])
 
 export type WorkqueueActionType = z.infer<typeof workqueueActions>

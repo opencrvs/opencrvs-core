@@ -60,12 +60,7 @@ const actionProps: ActionBase = {
 
 const rng = createPrng(72)
 
-function getMockActions(
-  createdBy: string
-): Record<
-  ActionType | DisplayableAction | 'ASSIGNED_TO_SELF' | 'ASSIGNED_TO_OTHERS',
-  Action
-> {
+function getMockActions(createdBy: string) {
   return {
     [ActionType.CREATE]: {
       ...actionProps,
