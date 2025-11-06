@@ -257,7 +257,7 @@ function mapFieldTypeToMockValue(
   }
 }
 
-function fieldConfigsToActionPayload(
+export function fieldConfigsToActionPayload(
   fields: FieldConfig[],
   rng: () => number
 ): ActionUpdate {
