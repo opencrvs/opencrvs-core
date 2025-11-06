@@ -125,5 +125,3 @@ export type QrReaderFieldValue = z.infer<typeof QrReaderFieldValue>
 
 export const IdReaderFieldValue = ReadDataValue
 export type IdReaderFieldValue = z.infer<typeof IdReaderFieldValue>
-
-export const TestRunner = z.any()
