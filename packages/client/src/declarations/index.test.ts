@@ -373,14 +373,14 @@ describe('archiveDeclaration tests', () => {
     )
 
     // Mocking storage writing
-    storage.setItem = vi.fn(<T = string>(key: string, value: T): Promise<T> => {
+    storage.setItem = vi.fn(<T>(key: string, value: T): Promise<void> => {
       switch (key) {
         case 'USER_DATA':
         case 'USER_DETAILS':
           indexedDB[key] = value as string // Cast to string to match the logic
-          return Promise.resolve(value)
+          return Promise.resolve(value).then(() => undefined)
         default:
-          return Promise.resolve(value)
+          return Promise.resolve(value).then(() => undefined)
       }
     })
   })

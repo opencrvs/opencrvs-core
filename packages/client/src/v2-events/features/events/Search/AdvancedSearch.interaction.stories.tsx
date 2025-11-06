@@ -20,7 +20,8 @@ import {
   footballClubMembershipEvent,
   generateEventDocument,
   TENNIS_CLUB_MEMBERSHIP,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  TestUserRole
 } from '@opencrvs/commons/client'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -166,7 +167,15 @@ async function adjustYearLabel(
 
 export const AdvancedSearchDateRangePicker: Story = {
   parameters: {
-    ...storyParams,
+    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.ADVANCED_SEARCH.buildPath({})
+    },
+    chromatic: { disableSnapshot: true },
+    offline: {
+      configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
+    },
     viewport: { defaultViewport: 'mobile' }
   },
   play: async ({ canvasElement, step }) => {
