@@ -15,20 +15,24 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React from 'react'
 import superjson from 'superjson'
 import { userEvent, within } from '@storybook/test'
+import addDays from 'date-fns/addDays'
 import {
   ActionType,
   generateEventDraftDocument,
   ActionStatus,
   getUUID,
   createPrng,
-  getRandomDatetime,
+  generateRandomDatetime,
   tennisClubMembershipEvent,
   getCurrentEventState,
   UUID,
   SystemRole,
   TestUserRole,
   generateActionDocument,
-  ActionDocument
+  ActionDocument,
+  generateUuid,
+  generateTrackingId,
+  generateRandomSignature
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -201,7 +205,7 @@ export const WithSystemUserActions: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-01-01'),
             new Date('2024-02-01')
@@ -218,7 +222,7 @@ export const WithSystemUserActions: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-02-01'),
             new Date('2024-03-01')
@@ -235,7 +239,7 @@ export const WithSystemUserActions: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -251,7 +255,7 @@ export const WithSystemUserActions: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-04-01'),
             new Date('2024-05-01')
@@ -268,7 +272,7 @@ export const WithSystemUserActions: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-05-01'),
             new Date('2024-06-01')
@@ -338,7 +342,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-01-01'),
             new Date('2024-02-01')
@@ -354,7 +358,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-02-01'),
             new Date('2024-03-01')
@@ -371,7 +375,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -387,7 +391,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-05-01'),
             new Date('2024-06-01')
@@ -403,7 +407,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -419,7 +423,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -435,7 +439,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -451,7 +455,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -467,7 +471,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -483,7 +487,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -499,7 +503,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -515,7 +519,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -531,7 +535,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -547,7 +551,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -563,7 +567,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -622,7 +626,7 @@ export const WithVariousUserRoles: Story = {
 }
 
 const actionDefaults = {
-  createdAt: getRandomDatetime(
+  createdAt: generateRandomDatetime(
     createPrng(73),
     new Date('2024-03-01'),
     new Date('2024-04-01')
@@ -729,5 +733,202 @@ export const WithDuplicateDetectedActionModal: Story = {
         name: 'Flagged as potential duplicate'
       })
     )
+  }
+}
+
+const rng = createPrng(33123)
+const validateActionUuid = generateUuid(rng)
+
+const annotationUpdateOnValidateEvent = {
+  id: getUUID(),
+  type: 'tennis-club-membership',
+  actions: [
+    generateActionDocument({
+      action: ActionType.CREATE,
+      configuration: tennisClubMembershipEvent,
+      defaults: {
+        ...actionDefaults,
+        createdAt: actionDefaults.createdAt
+      }
+    }),
+    generateActionDocument({
+      action: ActionType.DECLARE,
+      configuration: tennisClubMembershipEvent,
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 1).toISOString(),
+        annotation: {
+          'review.signature': generateRandomSignature(rng)
+        }
+      }
+    }),
+    generateActionDocument({
+      action: ActionType.VALIDATE,
+      configuration: tennisClubMembershipEvent,
+      declarationOverrides: {},
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString(),
+        id: validateActionUuid,
+        status: ActionStatus.Requested,
+        annotation: {
+          'review.signature': generateRandomSignature(rng)
+        }
+      }
+    }),
+    generateActionDocument({
+      action: ActionType.VALIDATE,
+      configuration: tennisClubMembershipEvent,
+      declarationOverrides: {},
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString(),
+        status: ActionStatus.Accepted,
+        originalActionId: validateActionUuid
+      }
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.ASSIGN,
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 3).toISOString(),
+        assignedTo: refData.user.id.localRegistrar
+      }
+    })
+  ],
+  trackingId: generateTrackingId(rng),
+  updatedAt: actionDefaults.createdAt,
+  createdAt: actionDefaults.createdAt
+}
+
+export const WithAnnotationChangeOnValidate: Story = {
+  parameters: {
+    offline: {
+      events: [annotationUpdateOnValidateEvent]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+        eventId: annotationUpdateOnValidateEvent.id
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(
+                  annotationUpdateOnValidateEvent,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
+          })
+        ]
+      }
+    }
+  }
+}
+
+const registerActionUuid = generateUuid(rng)
+const annotationChangeDuringRegisterEvent = {
+  id: getUUID(),
+  type: 'tennis-club-membership',
+  actions: [
+    generateActionDocument({
+      action: ActionType.CREATE,
+      configuration: tennisClubMembershipEvent,
+      defaults: actionDefaults
+    }),
+    generateActionDocument({
+      action: ActionType.DECLARE,
+      configuration: tennisClubMembershipEvent,
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 1).toISOString(),
+        annotation: {
+          'review.signature': generateRandomSignature(rng)
+        }
+      }
+    }),
+    generateActionDocument({
+      action: ActionType.VALIDATE,
+      configuration: tennisClubMembershipEvent,
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString()
+      },
+      declarationOverrides: {}
+    }),
+    generateActionDocument({
+      action: ActionType.REGISTER,
+      configuration: tennisClubMembershipEvent,
+      declarationOverrides: {},
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 3).toISOString(),
+        id: registerActionUuid,
+        status: ActionStatus.Requested,
+        annotation: {
+          'review.signature': generateRandomSignature(rng)
+        }
+      }
+    }),
+    generateActionDocument({
+      action: ActionType.REGISTER,
+      configuration: tennisClubMembershipEvent,
+      declarationOverrides: {},
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 3).toISOString(),
+        originalActionId: registerActionUuid
+      }
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.ASSIGN,
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 3).toISOString(),
+        assignedTo: refData.user.id.localRegistrar
+      }
+    })
+  ],
+  trackingId: generateTrackingId(rng),
+  updatedAt: actionDefaults.createdAt,
+  createdAt: actionDefaults.createdAt
+}
+
+export const WithAnnotationChangeOnRegister: Story = {
+  parameters: {
+    offline: {
+      events: [annotationChangeDuringRegisterEvent]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+        eventId: annotationChangeDuringRegisterEvent.id
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(
+                  annotationChangeDuringRegisterEvent,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
+          })
+        ]
+      }
+    }
   }
 }

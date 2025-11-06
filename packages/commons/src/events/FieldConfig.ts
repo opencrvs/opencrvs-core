@@ -37,6 +37,7 @@ import {
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
+import { SearchQuery } from './EventIndex'
 import { JSONSchema } from '../client'
 extendZodWithOpenApi(z)
 
@@ -637,7 +638,7 @@ export const StaticDataEntry = z
   .object({
     id: z.string().describe('ID for the data entry.'),
     label: TranslationConfig,
-    value: TranslationConfig.or(z.string())
+    value: TranslationConfig.or(z.string()).or(FieldReference)
   })
   .describe('Static data entry')
 
@@ -703,7 +704,7 @@ const HttpField = BaseField.extend({
     url: z.string().describe('URL to send the HTTP request to'),
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
     headers: z.record(z.string()).optional(),
-    body: z.record(z.string()).optional(),
+    body: z.record(z.any()).optional(),
     errorValue: z
       .any()
       .optional()
@@ -719,6 +720,46 @@ const HttpField = BaseField.extend({
 }).describe('HTTP request function triggered by a button click or other event')
 
 export type HttpField = z.infer<typeof HttpField>
+
+const SearchField = HttpField.extend({
+  type: z.literal(FieldType.SEARCH),
+  configuration: SearchQuery.pick({
+    query: true,
+    limit: true,
+    offset: true
+  }).extend({
+    validation: ValidationConfig,
+    indicators: z
+      .object({
+        loading: TranslationConfig.optional().describe(
+          'Text to display while the search is in progress'
+        ),
+        offline: TranslationConfig.optional().describe(
+          'Text to display when the application is offline'
+        ),
+        noResultsError: TranslationConfig.optional().describe(
+          'Text to display when no results are found during the search'
+        ),
+        httpError: TranslationConfig.optional().describe(
+          'Text to display when there is an HTTP error during the search'
+        ),
+        confirmButton: TranslationConfig.optional(),
+        clearButton: TranslationConfig.optional(),
+        clearModal: z
+          .object({
+            title: TranslationConfig.optional(),
+            description: TranslationConfig.optional(),
+            cancel: TranslationConfig.optional(),
+            confirm: TranslationConfig.optional()
+          })
+          .optional(),
+        ok: TranslationConfig.optional()
+      })
+      .optional()
+  })
+})
+
+export type SearchField = z.infer<typeof SearchField>
 
 const LinkButtonField = BaseField.extend({
   type: z.literal(FieldType.LINK_BUTTON),
@@ -831,6 +872,7 @@ export type FieldConfig =
   | z.infer<typeof ButtonField>
   | z.infer<typeof AlphaPrintButton>
   | z.infer<typeof HttpField>
+  | z.infer<typeof SearchField>
   | z.infer<typeof LinkButtonField>
   | z.infer<typeof VerificationStatus>
   | z.infer<typeof QueryParamReaderField>
@@ -875,6 +917,7 @@ export type FieldConfigInput =
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
+  | z.input<typeof SearchField>
   | z.input<typeof LinkButtonField>
   | z.input<typeof VerificationStatus>
   | z.input<typeof QueryParamReaderField>
@@ -930,7 +973,8 @@ export const FieldConfig: z.ZodType<
     QrReaderField,
     IdReaderField,
     QueryParamReaderField,
-    LoaderField
+    LoaderField,
+    SearchField
   ])
   .openapi({
     description: 'Form field configuration',

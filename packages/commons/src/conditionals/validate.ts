@@ -151,7 +151,17 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
     )
   }
   const result = validator(data) as boolean
+  return result
+}
 
+/*
+ * This is for validating arbitrary JSON data against a JSON schema outside of the context of a form.
+ * It is used for instance when an input component wants to validate something internally as per user
+ * configured rules (e.g. Search field).
+ */
+export function validateValue(schema: JSONSchema, data: unknown) {
+  const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
+  const result = validator(data) as boolean
   return result
 }
 
@@ -509,6 +519,25 @@ export function getValidatorsForField(
     .map(({ validator, message }) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const jsonSchema = validator as any
+
+      /*
+       * It’s possible the validator is an or(...) / and(...) / similar combinator.
+       * From these it's tricky to extract field-specific validation:
+       *
+       * Currently we assume a plain object validator:
+       *   { firstname: aValidator, middlename: bValidator, lastname: cValidator }
+       * so "lastname" → cValidator directly.
+       *
+       * But with something like:
+       *   (firstname: aValidator) OR (middlename: bValidator) OR (lastname: cValidator)
+       * or even more nested logical combinations, there’s no clear properties structure
+       * (similar to JSON Schema `anyOf` not exposing `properties`).
+       *
+       * Handling all those cases is left unimplemented for now due to complexity/time.
+       */
+      if (!jsonSchema.properties) {
+        return null
+      }
 
       const $form = jsonSchema.properties.$form
 

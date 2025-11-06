@@ -11,6 +11,7 @@
 
 import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useNavigate } from 'react-router-dom'
 import {
   Draft,
   createEmptyDraft,
@@ -96,6 +97,7 @@ function useActionGuard(
     )
   }
 }
+
 /**
  * Creates a wrapper component for the declaration action.
  * Manages the state of the declaration action and its local draft.
@@ -107,40 +109,15 @@ function useActionGuard(
  */
 function DeclarationActionComponent({
   children,
-  actionType
+  actionType,
+  event
 }: PropsWithChildren<{
   actionType: AvailableActionTypes
+  event: EventDocument
 }>) {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
-  const events = useEvents()
+  const eventId = event.id
   const { setLocalDraft, getLocalDraftOrDefault, getRemoteDraftByEventId } =
     useDrafts()
-  const { redirectToEventOverviewPage } = useToastAndRedirect()
-  const event = events.getEvent.findFromCache(eventId).data
-
-  useEffect(() => {
-    if (!event) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Event with id ${eventId} not found in cache. Redirecting to overview.`
-      )
-      redirectToEventOverviewPage({
-        toastId: `${eventId}-not-found`,
-        message: {
-          id: 'event.not.downloaded',
-          defaultMessage:
-            'Please ensure the event is first assigned and downloaded to the browser.',
-          description:
-            'Shown when user tries to perform an action on event that is not available '
-        },
-        eventId
-      })
-    }
-  }, [event, eventId, redirectToEventOverviewPage])
-
-  if (!event) {
-    return <div />
-  }
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
@@ -295,4 +272,67 @@ function DeclarationActionComponent({
   return <NavigationStack>{children}</NavigationStack>
 }
 
-export const DeclarationAction = withSuspense(DeclarationActionComponent)
+/**
+ * Container for Declaration Action. Interacts with router state and cache.
+ * Having all the logic in single component breaks the rules of hooks.
+ *
+ */
+function DeclarationActionContainer({
+  children,
+  actionType
+}: PropsWithChildren<{
+  actionType: AvailableActionTypes
+}>) {
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
+  const events = useEvents()
+
+  const navigate = useNavigate()
+  const { redirectToEventOverviewPage } = useToastAndRedirect()
+  const event = events.getEvent.findFromCache(eventId).data
+
+  // Missing event should not happen in "regular" application flow.
+  // 1. User clicks browser 'back' button after completing flow.
+  // 2. User comes directly through the URL to the flow.
+  useEffect(() => {
+    if (!event) {
+      // eslint-disable-next-line no-console
+      console.warn(`Event with id ${eventId} not found in cache.`)
+
+      const reduxHistoryIndex = window.history.state?.idx
+      const appHasHistory =
+        typeof reduxHistoryIndex === 'number' && reduxHistoryIndex > 0
+
+      // As long as there is a page, go back to it.
+      if (appHasHistory) {
+        navigate(-1)
+
+        return
+      }
+
+      // Technically, user can end up within <NavigationStack> from any page. At least from workqueue and overview pages.
+      redirectToEventOverviewPage({
+        toastId: `${eventId}-not-found`,
+        message: {
+          id: 'event.not.downloaded',
+          defaultMessage:
+            'Please ensure the event is first assigned and downloaded to the browser.',
+          description:
+            'Shown when user tries to perform an action on event that is not available '
+        },
+        eventId
+      })
+    }
+  }, [event, eventId, redirectToEventOverviewPage, navigate])
+
+  if (!event) {
+    return <div />
+  }
+
+  return (
+    <DeclarationActionComponent actionType={actionType} event={event}>
+      {children}
+    </DeclarationActionComponent>
+  )
+}
+
+export const DeclarationAction = withSuspense(DeclarationActionContainer)

@@ -159,7 +159,8 @@ function DeclarationComparisonTableComponent({
     .map((f) => {
       const comparison = getAnnotationComparisonForField(
         f,
-        fullEvent,
+        // History contains only accepted actions.
+        fullEvent.actions,
         index,
         validatorContext
       )
