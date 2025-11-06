@@ -44,7 +44,7 @@ const messagesToDefine: IStepOneFormMessages = {
 
   stepOneLoginText: {
     id: 'login.stepOneText',
-    defaultMessage: '',
+    defaultMessage: ' ',
     description: 'The instruction that appears in step one of the login form'
   },
   submit: {
