@@ -3,7 +3,7 @@
 CREATE TYPE status_type AS ENUM (
   'pending',
   'active',
-  'inactive'
+  'deactivated'
 );
 
 CREATE TABLE users (
@@ -19,7 +19,7 @@ CREATE TABLE users (
   signature_path text,
   profile_image_path text,
   office_id uuid REFERENCES locations(id),
-  CONSTRAINT email_or_mobile_not_null CHECK (email IS NOT NULL OR mobile IS NOT NULL),
+  CONSTRAINT email_or_mobile_not_null CHECK (email IS NOT NULL OR mobile IS NOT NULL)
 );
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON users TO ${EVENTS_DB_USER};
@@ -32,7 +32,7 @@ CREATE TABLE user_credentials (
   username text UNIQUE NOT NULL,
   password_hash text NOT NULL,
   salt text NOT NULL,
-  security_questions jsonb DEFAULT '{}'::jsonb NOT NULL,
+  security_questions jsonb DEFAULT '{}':: jsonb NOT NULL
 );
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON user_credentials TO ${EVENTS_DB_USER};
