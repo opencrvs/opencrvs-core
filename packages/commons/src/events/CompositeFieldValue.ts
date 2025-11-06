@@ -83,13 +83,17 @@ export const AddressFieldValue = z.discriminatedUnion('addressType', [
   InternationalAddressFieldValue
 ])
 
+const StreetLevelDetailsUpdateValue = z
+  .record(z.string(), z.string().nullable())
+  .optional()
+
 const DomesticAddressUpdatedFieldValue = BaseAddressFieldValue.extend({
   addressType: z.literal(AddressType.DOMESTIC),
   administrativeArea: z
     .string()
     .uuid()
     .nullish() /* Leaf level admin structure */,
-  streetLevelDetails: StreetLevelDetailsValue.nullish()
+  streetLevelDetails: StreetLevelDetailsUpdateValue
 })
 
 export const AddressFieldUpdateValue = z.discriminatedUnion('addressType', [
