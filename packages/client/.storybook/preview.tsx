@@ -22,6 +22,7 @@ import { useApolloClient } from '@client/utils/apolloClient'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { Provider, useSelector } from 'react-redux'
+import { clear } from 'idb-keyval'
 import {
   createMemoryRouter,
   Outlet,
@@ -168,10 +169,7 @@ const generator = testDataGenerator()
  * Clear all indexedDB databases before each story
  */
 export async function clearStorage() {
-  const databases = await window.indexedDB.databases()
-  for (const db of databases) {
-    window.indexedDB.deleteDatabase(db.name!)
-  }
+  clear()
 }
 
 clearStorage()
