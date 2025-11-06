@@ -15,6 +15,7 @@ import { FieldConfig } from './FieldConfig'
 import { ActionFormConfig } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { ActionFlagConfig } from './Flag'
 
 extendZodWithOpenApi(z)
 
@@ -32,7 +33,12 @@ export const DeclarationReviewConfig = z
 export type ReviewPageConfig = z.infer<typeof DeclarationReviewConfig>
 
 export const ActionConfigBase = z.object({
-  label: TranslationConfig.describe('Human readable description of the action')
+  label: TranslationConfig.describe('Human readable description of the action'),
+  flags: z
+    .array(ActionFlagConfig)
+    .optional()
+    .default([])
+    .describe('Flag actions which are executed when the action is performed.')
 })
 
 // @TODO: as part of custom actions work, we should probably move the 'review' to be only in DECLARE action config

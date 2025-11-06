@@ -67,7 +67,9 @@ export const EventConfig = z
       .array(FlagConfig)
       .optional()
       .default([])
-      .describe('Configuration of flags associated with the event actions.')
+      .describe(
+        'Configuration of flags associated with the actions of this event type.'
+      )
   })
   .superRefine((event, ctx) => {
     const allFields = findAllFields(event)

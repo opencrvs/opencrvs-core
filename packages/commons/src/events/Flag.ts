@@ -12,6 +12,7 @@ import { ActionType } from './ActionType'
 import { ActionStatus } from './ActionDocument'
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
+import { Conditional } from './Conditional'
 
 export const InherentFlags = {
   PENDING_CERTIFICATION: 'pending-certification',
@@ -40,6 +41,9 @@ export const Flag = ActionFlag.or(z.nativeEnum(InherentFlags))
 export type ActionFlag = z.infer<typeof ActionFlag>
 export type Flag = z.infer<typeof Flag>
 
+/**
+ * Configuration of a custom flag that can be associated with a certain event type.
+ */
 export const FlagConfig = z.object({
   id: z.string().describe('Unique identifier of the flag.'),
   requiresAction: z.boolean().describe('Whether the flag requires an action.'),
@@ -47,3 +51,13 @@ export const FlagConfig = z.object({
 })
 
 export type FlagConfig = z.infer<typeof FlagConfig>
+
+export const ActionFlagConfig = z.object({
+  id: z.string().describe('Id of the flag.'),
+  operation: z
+    .enum(['add', 'remove'])
+    .describe('Operation to perform on the flag.'),
+  conditional: Conditional.optional().describe(
+    'When conditional is met, the operation is performed on the flag. If not provided, the operation is performed unconditionally.'
+  )
+})
