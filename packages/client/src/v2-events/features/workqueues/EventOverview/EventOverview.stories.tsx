@@ -633,7 +633,8 @@ const actionDefaults = {
   ),
   createdBy: refData.user.id.localRegistrar,
   createdByRole: TestUserRole.Enum.LOCAL_REGISTRAR,
-  createdAtLocation: refData.user.localRegistrar().v2.primaryOfficeId
+  createdAtLocation: refData.user.localRegistrar().v2.primaryOfficeId,
+  transactionId: getUUID()
 } satisfies Partial<ActionDocument>
 
 const duplicateEvent = {
@@ -801,6 +802,8 @@ const annotationUpdateOnValidateEvent = {
   updatedAt: actionDefaults.createdAt,
   createdAt: actionDefaults.createdAt
 }
+
+console.log({ annotationUpdateOnValidateEvent })
 
 export const WithAnnotationChangeOnValidate: Story = {
   parameters: {
