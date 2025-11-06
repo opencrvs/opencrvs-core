@@ -754,6 +754,27 @@ paths:
                       default:
                         &a6 []
                       description: Configuration of fields available in the advanced search feature.
+                    flags:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: Unique identifier of the flag.
+                          requiresAction:
+                            type: boolean
+                            description: Whether the flag requires an action.
+                          label:
+                            $ref: "#/components/schemas/TranslationConfig"
+                            description: Human readable label of the flag.
+                        required:
+                          - id
+                          - requiresAction
+                          - label
+                      default:
+                        &a7 []
+                      description: Configuration of flags associated with the event actions.
                   required:
                     - id
                     - title
@@ -762,6 +783,7 @@ paths:
                     - actions
                     - declaration
                     - advancedSearch
+                    - flags
                   description: Configuration defining an event type.
   "/trigger/events/{eventType}/actions/{actionType}":
     post:
@@ -1461,6 +1483,26 @@ components:
               - fields
           default: *a6
           description: Configuration of fields available in the advanced search feature.
+        flags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Unique identifier of the flag.
+              requiresAction:
+                type: boolean
+                description: Whether the flag requires an action.
+              label:
+                $ref: "#/components/schemas/TranslationConfig"
+                description: Human readable label of the flag.
+            required:
+              - id
+              - requiresAction
+              - label
+          default: *a7
+          description: Configuration of flags associated with the event actions.
       required:
         - id
         - title
@@ -1469,6 +1511,7 @@ components:
         - actions
         - declaration
         - advancedSearch
+        - flags
     TranslationConfig:
       type: object
       properties:
@@ -1501,6 +1544,7 @@ components:
         - $ref: "#/components/schemas/RequestCorrectionActionConfig"
         - $ref: "#/components/schemas/RejectCorrectionActionConfig"
         - $ref: "#/components/schemas/ApproveCorrectionActionConfig"
+        - $ref: "#/components/schemas/CustomActionConfig"
       discriminator:
         propertyName: type
         mapping:
@@ -1515,6 +1559,7 @@ components:
           REQUEST_CORRECTION: "#/components/schemas/RequestCorrectionActionConfig"
           REJECT_CORRECTION: "#/components/schemas/RejectCorrectionActionConfig"
           APPROVE_CORRECTION: "#/components/schemas/ApproveCorrectionActionConfig"
+          CUSTOM: "#/components/schemas/CustomActionConfig"
       description: Configuration of an action available for an event. Data collected
         depends on the action type and is accessible through the annotation
         property in ActionDocument.
@@ -1607,7 +1652,7 @@ components:
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default:
-                &a7 []
+                &a8 []
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -1631,7 +1676,7 @@ components:
                   - validator
                   - message
               default:
-                &a8 []
+                &a9 []
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -1757,7 +1802,7 @@ components:
                 addressType:
                   type: string
                   enum:
-                    &a14
+                    &a15
                     - DOMESTIC
                     - INTERNATIONAL
                 administrativeArea:
@@ -1849,7 +1894,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -1872,7 +1917,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2010,7 +2055,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2033,7 +2078,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2166,7 +2211,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2189,7 +2234,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2328,7 +2373,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2351,7 +2396,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2496,7 +2541,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2519,7 +2564,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2647,7 +2692,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2670,7 +2715,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2797,7 +2842,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2820,7 +2865,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2964,7 +3009,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2987,7 +3032,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3045,7 +3090,7 @@ components:
             defaultValue:
               type: string
               enum:
-                &a9
+                &a10
                 - last7Days
                 - last30Days
                 - last90Days
@@ -3057,7 +3102,7 @@ components:
                 properties:
                   value:
                     type: string
-                    enum: *a9
+                    enum: *a10
                     description: The value of the option
                   label:
                     $ref: "#/components/schemas/TranslationConfig"
@@ -3130,7 +3175,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3153,7 +3198,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3220,7 +3265,7 @@ components:
                     fontVariant:
                       type: string
                       enum:
-                        &a10
+                        &a11
                         - reg12
                         - reg14
                         - reg16
@@ -3298,7 +3343,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3321,7 +3366,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3470,7 +3515,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3493,7 +3538,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3563,7 +3608,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: *a10
+                      enum: *a11
               default: {}
           required:
             - id
@@ -3630,7 +3675,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3653,7 +3698,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3774,7 +3819,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3797,7 +3842,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3958,7 +4003,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3981,7 +4026,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4191,7 +4236,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4214,7 +4259,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4335,7 +4380,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4358,7 +4403,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4479,7 +4524,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4502,7 +4547,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4624,7 +4669,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4647,7 +4692,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4729,7 +4774,7 @@ components:
                   items:
                     type: string
                     enum:
-                      &a11
+                      &a12
                       - image/png
                       - image/jpg
                       - image/jpeg
@@ -4819,7 +4864,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4842,7 +4887,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4963,7 +5008,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4986,7 +5031,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5128,7 +5173,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5151,7 +5196,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5269,7 +5314,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5292,7 +5337,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5427,7 +5472,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5450,7 +5495,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5571,7 +5616,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5594,7 +5639,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5715,7 +5760,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5738,7 +5783,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5809,7 +5854,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a11
+                    enum: *a12
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -5880,7 +5925,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5903,7 +5948,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6032,7 +6077,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6055,7 +6100,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6158,7 +6203,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a11
+                    enum: *a12
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -6229,7 +6274,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6252,7 +6297,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6422,7 +6467,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6445,7 +6490,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6580,7 +6625,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6603,7 +6648,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6733,7 +6778,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6756,7 +6801,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6960,7 +7005,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6983,7 +7028,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7117,7 +7162,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7140,7 +7185,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7198,7 +7243,7 @@ components:
             defaultValue:
               type: string
               enum:
-                &a15
+                &a16
                 - verified
                 - authenticated
                 - failed
@@ -7279,7 +7324,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7302,7 +7347,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7430,7 +7475,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7453,7 +7498,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7576,7 +7621,7 @@ components:
                         type: array
                         items:
                           $ref: "#/components/schemas/FieldConditional"
-                        default: *a7
+                        default: *a8
                         description: Conditions determining when the field is shown or enabled. By
                           default, the field is always shown and enabled.
                       secured:
@@ -7599,7 +7644,7 @@ components:
                           required:
                             - validator
                             - message
-                        default: *a8
+                        default: *a9
                         description: Additional validation rules applied to the field.
                       helperText:
                         $ref: "#/components/schemas/TranslationConfig"
@@ -7733,7 +7778,7 @@ components:
                         type: array
                         items:
                           $ref: "#/components/schemas/FieldConditional"
-                        default: *a7
+                        default: *a8
                         description: Conditions determining when the field is shown or enabled. By
                           default, the field is always shown and enabled.
                       secured:
@@ -7756,7 +7801,7 @@ components:
                           required:
                             - validator
                             - message
-                        default: *a8
+                        default: *a9
                         description: Additional validation rules applied to the field.
                       helperText:
                         $ref: "#/components/schemas/TranslationConfig"
@@ -7901,7 +7946,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7924,7 +7969,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8054,7 +8099,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -8077,7 +8122,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8205,7 +8250,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a7
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -8228,7 +8273,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a8
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8316,7 +8361,7 @@ components:
                         status:
                           type: anyOf
                           terms:
-                            &a12
+                            &a13
                             - CREATED
                             - NOTIFIED
                             - DECLARED
@@ -8451,7 +8496,7 @@ components:
             - eventType: tennis-club-membership
               status:
                 type: anyOf
-                terms: *a12
+                terms: *a13
               updatedAt:
                 type: range
                 gte: 2025-05-22
@@ -8519,7 +8564,7 @@ components:
           type: array
           items:
             type: string
-            enum: *a12
+            enum: *a13
       required:
         - type
         - terms
@@ -8531,7 +8576,7 @@ components:
           const: exact
         term:
           type: string
-          enum: *a12
+          enum: *a13
       required:
         - type
         - term
@@ -8596,7 +8641,7 @@ components:
           const: timePeriod
         term:
           type: string
-          enum: *a9
+          enum: *a10
       required:
         - type
         - term
@@ -8620,7 +8665,7 @@ components:
         term:
           type: string
           enum:
-            &a13
+            &a14
             - user
             - system
       required:
@@ -9160,6 +9205,29 @@ components:
       required:
         - label
         - type
+    CustomActionConfig:
+      type: object
+      properties:
+        label:
+          $ref: "#/components/schemas/TranslationConfig"
+          description: Human readable description of the action
+        type:
+          type: string
+          const: CUSTOM
+        name:
+          type: string
+          description: Name of the custom action.
+        form:
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldConfig"
+          description: Form configuration for the custom action. The form configured here
+            will be used on the custom action confirmation modal.
+      required:
+        - label
+        - type
+        - name
+        - form
     EventDocument:
       type: object
       properties:
@@ -9194,7 +9262,7 @@ components:
                     description: Unique identifier of the transaction.
                   createdByUserType:
                     type: string
-                    enum: *a13
+                    enum: *a14
                     description: Indicates whether the action was created by a human-user or by a
                       system-user.
                   createdAt:
@@ -9312,7 +9380,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -9369,7 +9437,7 @@ components:
                   addressType:
                     type: string
                     enum:
-                      &a16
+                      &a17
                       - DOMESTIC
                       - INTERNATIONAL
                   administrativeArea:
@@ -9406,7 +9474,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -9471,7 +9539,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -9502,7 +9570,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -9586,7 +9654,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -9676,7 +9744,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -9711,7 +9779,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -9776,7 +9844,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -9807,7 +9875,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -9891,7 +9959,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -9949,7 +10017,7 @@ components:
         status:
           type: string
           enum:
-            &a17
+            &a18
             - Requested
             - Accepted
             - Rejected
@@ -9987,7 +10055,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10043,7 +10111,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -10078,7 +10146,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -10143,7 +10211,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -10174,7 +10242,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -10258,7 +10326,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -10348,7 +10416,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -10383,7 +10451,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -10448,7 +10516,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -10479,7 +10547,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -10563,7 +10631,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -10620,7 +10688,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10655,7 +10723,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10711,7 +10779,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -10746,7 +10814,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -10811,7 +10879,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -10842,7 +10910,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -10926,7 +10994,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -11016,7 +11084,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -11051,7 +11119,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -11116,7 +11184,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -11147,7 +11215,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -11231,7 +11299,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -11288,7 +11356,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11333,7 +11401,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11389,7 +11457,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -11424,7 +11492,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -11489,7 +11557,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -11520,7 +11588,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -11604,7 +11672,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -11694,7 +11762,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -11729,7 +11797,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -11794,7 +11862,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -11825,7 +11893,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -11909,7 +11977,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -11966,7 +12034,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -12020,7 +12088,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -12076,7 +12144,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -12111,7 +12179,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -12176,7 +12244,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -12207,7 +12275,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -12291,7 +12359,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -12381,7 +12449,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -12416,7 +12484,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -12481,7 +12549,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -12512,7 +12580,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -12596,7 +12664,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -12653,7 +12721,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -12688,7 +12756,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -12744,7 +12812,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -12779,7 +12847,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -12844,7 +12912,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -12875,7 +12943,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -12959,7 +13027,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -13049,7 +13117,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -13084,7 +13152,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -13149,7 +13217,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -13180,7 +13248,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -13264,7 +13332,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -13321,7 +13389,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -13364,7 +13432,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -13420,7 +13488,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -13455,7 +13523,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -13520,7 +13588,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -13551,7 +13619,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -13635,7 +13703,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -13725,7 +13793,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -13760,7 +13828,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -13825,7 +13893,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -13856,7 +13924,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -13940,7 +14008,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -13997,7 +14065,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -14042,7 +14110,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -14098,7 +14166,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -14133,7 +14201,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -14198,7 +14266,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -14229,7 +14297,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -14313,7 +14381,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -14403,7 +14471,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -14438,7 +14506,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -14503,7 +14571,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -14534,7 +14602,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -14618,7 +14686,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -14675,7 +14743,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -14710,7 +14778,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -14766,7 +14834,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -14801,7 +14869,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -14866,7 +14934,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -14897,7 +14965,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -14981,7 +15049,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -15071,7 +15139,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -15106,7 +15174,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -15171,7 +15239,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -15202,7 +15270,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -15286,7 +15354,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -15343,7 +15411,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -15382,7 +15450,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -15438,7 +15506,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -15473,7 +15541,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -15538,7 +15606,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -15569,7 +15637,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -15653,7 +15721,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -15743,7 +15811,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -15778,7 +15846,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -15843,7 +15911,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -15874,7 +15942,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -15958,7 +16026,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -16015,7 +16083,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -16050,7 +16118,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -16106,7 +16174,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -16141,7 +16209,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -16206,7 +16274,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -16237,7 +16305,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -16321,7 +16389,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -16411,7 +16479,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -16446,7 +16514,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -16511,7 +16579,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -16542,7 +16610,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -16626,7 +16694,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -16683,7 +16751,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -16722,7 +16790,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -16778,7 +16846,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -16813,7 +16881,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -16878,7 +16946,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -16909,7 +16977,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -16993,7 +17061,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -17083,7 +17151,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -17118,7 +17186,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -17183,7 +17251,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -17214,7 +17282,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -17298,7 +17366,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -17355,7 +17423,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -17390,7 +17458,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -17446,7 +17514,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -17481,7 +17549,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -17546,7 +17614,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -17577,7 +17645,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -17661,7 +17729,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -17751,7 +17819,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -17786,7 +17854,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -17851,7 +17919,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -17882,7 +17950,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -17966,7 +18034,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -18023,7 +18091,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -18061,7 +18129,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -18117,7 +18185,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -18152,7 +18220,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -18217,7 +18285,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -18248,7 +18316,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -18332,7 +18400,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -18422,7 +18490,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -18457,7 +18525,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -18522,7 +18590,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -18553,7 +18621,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -18637,7 +18705,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -18694,7 +18762,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -18742,7 +18810,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -18798,7 +18866,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -18833,7 +18901,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -18898,7 +18966,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -18929,7 +18997,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -19013,7 +19081,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -19103,7 +19171,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -19138,7 +19206,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -19203,7 +19271,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -19234,7 +19302,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -19318,7 +19386,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -19375,7 +19443,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -19410,7 +19478,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -19466,7 +19534,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -19501,7 +19569,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -19566,7 +19634,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -19597,7 +19665,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -19681,7 +19749,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -19771,7 +19839,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -19806,7 +19874,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -19871,7 +19939,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -19902,7 +19970,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -19986,7 +20054,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -20043,7 +20111,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -20085,7 +20153,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -20141,7 +20209,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -20176,7 +20244,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -20241,7 +20309,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -20272,7 +20340,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -20356,7 +20424,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -20446,7 +20514,7 @@ components:
                     type: string
                   addressType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                   administrativeArea:
                     type:
                       - string
@@ -20481,7 +20549,7 @@ components:
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
               - type: string
-                enum: *a9
+                enum: *a10
               - type: boolean
               - type: number
               - type: object
@@ -20546,7 +20614,7 @@ components:
                           type: string
                         addressType:
                           type: string
-                          enum: *a14
+                          enum: *a15
                         administrativeArea:
                           type: string
                           format: uuid
@@ -20577,7 +20645,7 @@ components:
                       description: Date range with start and end dates in the format YYYY-MM-DD.
                         Inclusive start, exclusive end.
                     - type: string
-                      enum: *a9
+                      enum: *a10
                     - type: boolean
                     - type: number
                     - type: object
@@ -20661,7 +20729,7 @@ components:
                       required:
                         - loading
                     - type: string
-                      enum: *a15
+                      enum: *a16
                     - type:
                         - object
                         - "null"
@@ -20718,7 +20786,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a17
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
