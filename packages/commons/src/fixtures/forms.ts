@@ -1224,7 +1224,8 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
             id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.id.label'
           }
         }
-      ]
+      ],
+      conditional: not(never()) // Intentional always-true page conditional to exercise interactions between page-level and field-level conditionals in tests
     }
   ]
 })
