@@ -13,7 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { userEvent, within, expect } from '@storybook/test'
+import { userEvent, within, expect, waitFor } from '@storybook/test'
 import {
   ActionType,
   createPrng,
@@ -27,9 +27,10 @@ import {
   getCurrentEventState,
   InherentFlags,
   NameFieldValue,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  TestUserRole
 } from '@opencrvs/commons/client'
-import { AppRouter, trpcClient, TRPCProvider } from '@client/v2-events/trpc'
+import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { formattedDuration } from '@client/utils/date-formatting'
@@ -406,8 +407,28 @@ export const DraftPagination: Story = {
   }
 }
 
+const downloadEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    { type: ActionType.CREATE },
+    {
+      type: ActionType.DECLARE,
+      declarationOverrides: {
+        'applicant.name': {
+          firstname: 'Riku',
+          surname: 'Rouvila'
+        }
+      }
+    },
+    {
+      type: ActionType.ASSIGN
+    }
+  ]
+})
+
 export const PaginationAfterDownload: Story = {
   parameters: {
+    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
@@ -428,9 +449,9 @@ export const PaginationAfterDownload: Story = {
         event: [
           tRPCMsw.event.actions.assignment.assign.mutation(() => {
             return {
-              ...tennisClubMembershipEventDocument,
+              ...downloadEvent,
               actions: [
-                ...tennisClubMembershipEventDocument.actions,
+                ...downloadEvent.actions,
                 generateActionDocument({
                   configuration: tennisClubMembershipEvent,
                   action: ActionType.ASSIGN
@@ -442,10 +463,10 @@ export const PaginationAfterDownload: Story = {
             return []
           }),
           tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
+            return downloadEvent
           }),
           tRPCMsw.event.search.query((input) => {
-            const { actions, ...rest } = tennisClubMembershipEventDocument
+            const { actions, ...rest } = downloadEvent
 
             const eventDocumentWithoutAssign = {
               ...rest,
@@ -472,11 +493,11 @@ export const PaginationAfterDownload: Story = {
     const canvas = within(canvasElement)
 
     await canvas.findByText('Farajaland CRVS', {}, { timeout: 5000 })
-    await canvas.findByText('Riku Rouvila')
-    await userEvent.click(await canvas.findByTestId('ListItemAction-0-icon'))
 
-    await canvas.findByText('Assign record?')
-    await userEvent.click(await canvas.findByRole('button', { name: 'Assign' }))
+    const assignButton = await canvas.findByTestId('ListItemAction-0-icon')
+    await userEvent.click(assignButton)
+    const assignModalButton = await canvas.findByTestId('assign')
+    await userEvent.click(assignModalButton)
 
     await step('Clicked assign record button', async () => {
       const page0 = canvasElement.querySelector('[data-testid="page-number-0"]')
