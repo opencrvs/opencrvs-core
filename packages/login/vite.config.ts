@@ -8,11 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, HttpProxy, loadEnv, ProxyOptions } from 'vite'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { VitePWA } from 'vite-plugin-pwa'
 import dns from 'node:dns'
+import { IncomingMessage, ServerResponse } from 'node:http'
 
 // fixes issue where Cypress was not able to resolve Vite's localhost
 // https://github.com/cypress-io/cypress/issues/25397#issuecomment-1775454875
@@ -93,21 +94,52 @@ export default defineConfig(({ mode }): any => {
           target: 'http://localhost:3040',
           changeOrigin: true,
           rewrite: (path: string) => path.replace(/^\/health\/ready/, '/ping'),
-          configure: (proxy: any, _options: any) => {
-            proxy.on('proxyRes', (proxyRes: any, req: any, res: any) => {
-              if (req.url === '/health/ready') {
-                // Transform the response to health check format
-                if (proxyRes.statusCode === 200) {
-                  res.writeHead(200, { 'Content-Type': 'application/json' })
-                  res.end(
-                    JSON.stringify({
-                      status: 'ok',
-                      checks: {
-                        countryconfig: { status: 'ok' }
-                      }
-                    })
-                  )
-                } else {
+          configure: (proxy: HttpProxy.Server, _options: ProxyOptions) => {
+            proxy.on(
+              'proxyRes',
+              (
+                proxyRes: IncomingMessage,
+                req: IncomingMessage,
+                res: ServerResponse<IncomingMessage>
+              ) => {
+                if (req.url === '/health/ready') {
+                  // Transform the response to health check format
+                  if (proxyRes.statusCode === 200) {
+                    res.writeHead(200, { 'Content-Type': 'application/json' })
+                    res.end(
+                      JSON.stringify({
+                        status: 'ok',
+                        checks: {
+                          countryconfig: { status: 'ok' }
+                        }
+                      })
+                    )
+                  } else {
+                    res.writeHead(500, { 'Content-Type': 'application/json' })
+                    res.end(
+                      JSON.stringify({
+                        status: 'error',
+                        checks: {
+                          countryconfig: {
+                            status: 'error',
+                            error: 'Country config service unavailable'
+                          }
+                        }
+                      })
+                    )
+                  }
+                }
+              }
+            )
+
+            proxy.on(
+              'error',
+              (
+                _err: Error,
+                req: IncomingMessage,
+                res: ServerResponse<IncomingMessage>
+              ) => {
+                if (req.url === '/health/ready') {
                   res.writeHead(500, { 'Content-Type': 'application/json' })
                   res.end(
                     JSON.stringify({
@@ -122,24 +154,7 @@ export default defineConfig(({ mode }): any => {
                   )
                 }
               }
-            })
-
-            proxy.on('error', (_err: any, req: any, res: any) => {
-              if (req.url === '/health/ready') {
-                res.writeHead(500, { 'Content-Type': 'application/json' })
-                res.end(
-                  JSON.stringify({
-                    status: 'error',
-                    checks: {
-                      countryconfig: {
-                        status: 'error',
-                        error: 'Country config service unavailable'
-                      }
-                    }
-                  })
-                )
-              }
-            })
+            )
           }
         }
       }
