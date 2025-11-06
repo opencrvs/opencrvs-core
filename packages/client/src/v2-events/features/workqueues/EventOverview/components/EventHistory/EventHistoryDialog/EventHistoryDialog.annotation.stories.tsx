@@ -43,7 +43,8 @@ const actionDefaults = {
   ),
   createdBy: generator.user.id.localRegistrar,
   createdByRole: TestUserRole.Enum.LOCAL_REGISTRAR,
-  createdAtLocation: generator.user.localRegistrar().v2.primaryOfficeId
+  createdAtLocation: generator.user.localRegistrar().v2.primaryOfficeId,
+  transactionId: getUUID()
 } satisfies Partial<ActionDocument>
 
 const annotationUpdateOnValidateEvent = {
