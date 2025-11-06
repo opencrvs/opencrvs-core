@@ -80,6 +80,16 @@ const validateAction = generateActionDocument({
   }
 })
 
+const declarationActionWithDob = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.DECLARE,
+  defaults: {
+    declaration: {
+      'applicant.dob': '2006-01-23'
+    }
+  }
+})
+
 const registerAction = generateActionDocument({
   configuration: tennisClubMembershipEvent,
   action: ActionType.REGISTER,
@@ -140,16 +150,6 @@ export const SummaryChangingDobToAge: Story = {
     }
   }
 }
-
-const declarationActionWithDob = generateActionDocument({
-  configuration: tennisClubMembershipEvent,
-  action: ActionType.DECLARE,
-  defaults: {
-    declaration: {
-      'applicant.dob': '2006-01-23'
-    }
-  }
-})
 
 const eventCorrectionDobToAge = {
   trackingId: generateUuid(prng),
