@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { PotentialDuplicate } from './ActionDocument'
 import { UUID } from '../uuid'
@@ -30,11 +30,10 @@ export const EventStatus = z.enum([
 
 export type EventStatus = z.infer<typeof EventStatus>
 
-export const ZodDate = z.string().date()
+export const ZodDate = z.iso.date()
 
 export const ActionCreationMetadata = z.object({
-  createdAt: z
-    .string()
+  createdAt: z.iso
     .datetime()
     .describe('The timestamp when the action request was created.'),
   createdBy: z
@@ -47,8 +46,7 @@ export const ActionCreationMetadata = z.object({
     .enum(['user', 'system'])
     .nullish()
     .describe('Whether the user is a normal user or a system.'),
-  acceptedAt: z
-    .string()
+  acceptedAt: z.iso
     .datetime()
     .describe('Timestamp when the action request was accepted.'),
   createdByRole: z
@@ -94,8 +92,7 @@ export const EventMetadata = z.object({
   legalStatuses: LegalStatuses.describe(
     'Metadata related to the legal registration of the event, such as who registered it and when.'
   ),
-  createdAt: z
-    .string()
+  createdAt: z.iso
     .datetime()
     .describe('The timestamp when the event was first created and saved.'),
   dateOfEvent: ZodDate.nullish(),
@@ -117,8 +114,7 @@ export const EventMetadata = z.object({
   updatedAtLocation: UUID.nullish().describe(
     'Location of the user who last changed the status.'
   ),
-  updatedAt: z
-    .string()
+  updatedAt: z.iso
     .datetime()
     .describe(
       'Timestamp of the most recent *accepted* status change. Possibly 3rd party update, if action is validation asynchronously.'

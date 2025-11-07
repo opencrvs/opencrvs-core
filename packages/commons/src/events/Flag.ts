@@ -10,7 +10,7 @@
  */
 import { ActionType } from './ActionType'
 import { ActionStatus } from './ActionDocument'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from './Conditional'
 
@@ -36,7 +36,7 @@ export const ActionFlag = z
     ),
     'Flag must be in the format ActionType:ActionStatus (lowerCase)'
   )
-export const Flag = ActionFlag.or(z.nativeEnum(InherentFlags))
+export const Flag = ActionFlag.or(z.enum(InherentFlags))
 
 export type ActionFlag = z.infer<typeof ActionFlag>
 export type Flag = z.infer<typeof Flag>

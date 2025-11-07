@@ -65,7 +65,7 @@ import {
 } from './CompositeFieldValue'
 import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { FullDocumentPath } from '../documents'
 
 /**
@@ -380,8 +380,7 @@ export function eventPayloadGenerator(
         omitFields = []
       }: {
         eventId: UUID
-        actionType: Draft['action']['type']
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        actionType: Draft['action']['type'] // eslint-disable-next-line @typescript-eslint/no-explicit-any
         annotation?: Record<string, any>
         omitFields?: string[] // list of declaration fields to exclude
       },
@@ -416,7 +415,7 @@ export function eventPayloadGenerator(
           },
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
-          createdByUserType: TokenUserType.Enum.user,
+          createdByUserType: TokenUserType.enum.user,
           createdByRole: '@todo'
         }
       }
@@ -510,7 +509,6 @@ export function eventPayloadGenerator(
             ActionType.VALIDATE,
             rng
           ),
-        duplicates: [],
         eventId,
         ...input
       }),
@@ -549,7 +547,6 @@ export function eventPayloadGenerator(
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
         annotation: {},
-        duplicates: [],
         eventId,
         content: {
           reason: `${ActionType.ARCHIVE}`
@@ -571,7 +568,6 @@ export function eventPayloadGenerator(
         annotation:
           input.annotation ??
           generateActionAnnotationInput(configuration, ActionType.REJECT, rng),
-        duplicates: [],
         eventId,
         content: { reason: `${ActionType.REJECT}` },
         ...input
@@ -792,8 +788,8 @@ export function generateActionDocument<T extends ActionType>({
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
     createdBy: generateUuid(rng),
-    createdByUserType: TokenUserType.Enum.user,
-    createdByRole: TestUserRole.Enum.FIELD_AGENT,
+    createdByUserType: TokenUserType.enum.user,
+    createdByRole: TestUserRole.enum.FIELD_AGENT,
     id: getUUID(),
     createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     declaration: generateActionDeclarationInput(

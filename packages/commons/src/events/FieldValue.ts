@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import {
   AddressFieldValue,
   AddressFieldUpdateValue,
@@ -41,10 +41,7 @@ import {
 export const TextValue = z.string()
 export const NonEmptyTextValue = TextValue.min(1)
 
-export const DateValue = z
-  .string()
-  .date()
-  .describe('Date in the format YYYY-MM-DD')
+export const DateValue = z.iso.date().describe('Date in the format YYYY-MM-DD')
 
 export type DateValue = z.infer<typeof DateValue>
 
@@ -57,7 +54,7 @@ export const AgeUpdateValue = AgeValue.optional().nullable()
 
 export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
 
-export const DatetimeValue = z.string().datetime()
+export const DatetimeValue = z.iso.datetime()
 
 export const SelectDateRangeValue = z.enum([
   'last7Days',
@@ -79,7 +76,7 @@ export const DateRangeFieldValue = z
 export type DateRangeFieldValue = z.infer<typeof DateRangeFieldValue>
 export type SelectDateRangeValue = z.infer<typeof SelectDateRangeValue>
 
-export const EmailValue = z.string().email()
+export const EmailValue = z.email()
 
 export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
@@ -195,5 +192,7 @@ export type FieldUpdateValueSchema =
   | typeof ButtonFieldValue
   | typeof QrReaderFieldValue
   | typeof IdReaderFieldValue
+  | typeof DateValue
+  | typeof EmailValue
   | z.ZodString
   | z.ZodBoolean

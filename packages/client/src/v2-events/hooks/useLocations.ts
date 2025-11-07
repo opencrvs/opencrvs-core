@@ -136,7 +136,7 @@ export function useSuspenseAdminLeafLevelLocations() {
   }
 
   const leafIds = getLeafLocationIds(locations, [
-    LocationType.Enum.ADMIN_STRUCTURE
+    LocationType.enum.ADMIN_STRUCTURE
   ])
 
   cachedLocationsRef = locations

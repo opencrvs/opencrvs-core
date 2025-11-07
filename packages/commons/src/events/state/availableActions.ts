@@ -118,13 +118,13 @@ function getAvailableActionsWithoutFlagFilters(
   flags: Flag[]
 ): DisplayableAction[] {
   switch (status) {
-    case EventStatus.Enum.CREATED: {
+    case EventStatus.enum.CREATED: {
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
-    case EventStatus.Enum.NOTIFIED: {
+    case EventStatus.enum.NOTIFIED: {
       if (flags.includes(InherentFlags.REJECTED)) {
         return getAvailableActionsWithoutFlagFilters(
-          EventStatus.Enum.CREATED,
+          EventStatus.enum.CREATED,
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
         )
           .filter((action) => action !== ActionType.DELETE)
@@ -132,10 +132,10 @@ function getAvailableActionsWithoutFlagFilters(
       }
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
-    case EventStatus.Enum.DECLARED: {
+    case EventStatus.enum.DECLARED: {
       if (flags.includes(InherentFlags.REJECTED)) {
         return getAvailableActionsWithoutFlagFilters(
-          EventStatus.Enum.CREATED,
+          EventStatus.enum.CREATED,
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
         )
           .filter((action) => action !== ActionType.DELETE)
@@ -143,19 +143,19 @@ function getAvailableActionsWithoutFlagFilters(
       }
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
-    case EventStatus.Enum.VALIDATED: {
+    case EventStatus.enum.VALIDATED: {
       if (flags.includes(InherentFlags.REJECTED)) {
         return getAvailableActionsWithoutFlagFilters(
-          EventStatus.Enum.DECLARED,
+          EventStatus.enum.DECLARED,
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
         )
       }
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
-    case EventStatus.Enum.REGISTERED: {
+    case EventStatus.enum.REGISTERED: {
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
-    case EventStatus.Enum.ARCHIVED: {
+    case EventStatus.enum.ARCHIVED: {
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
   }

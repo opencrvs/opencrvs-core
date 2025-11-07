@@ -277,7 +277,7 @@ type ActionLabel =
   | 'Review'
 
 export const getHiddenActions = () =>
-  Object.values(ActionTypes.Values).reduce(
+  Object.values(ActionTypes.enum).reduce(
     (acc, action) => {
       const label = actionLabels[action as keyof typeof actionLabels]
 

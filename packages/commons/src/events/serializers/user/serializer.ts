@@ -10,7 +10,7 @@
  */
 
 import { User } from '../../../users/User'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 export const SerializedUserField = z.object({
   $userField: z.enum([

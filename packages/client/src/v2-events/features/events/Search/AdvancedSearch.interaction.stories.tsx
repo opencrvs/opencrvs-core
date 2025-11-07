@@ -167,7 +167,7 @@ async function adjustYearLabel(
 
 export const AdvancedSearchDateRangePicker: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.ADVANCED_SEARCH.buildPath({})

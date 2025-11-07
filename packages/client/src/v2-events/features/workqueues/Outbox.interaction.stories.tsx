@@ -62,7 +62,7 @@ const successfulMutationEvent = generateEventDocument({
 
 export const SuccessfulMutation: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT,
+    userRole: TestUserRole.enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
@@ -145,7 +145,7 @@ const failedMutationEvent = generateEventDocument({
 
 export const FailedMutation: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT,
+    userRole: TestUserRole.enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
@@ -225,7 +225,7 @@ const failedMutationConflictEvent = generateEventDocument({
 
 export const FailedMutationConflict: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT,
+    userRole: TestUserRole.enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({

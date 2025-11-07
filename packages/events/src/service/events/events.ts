@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { NoResultError } from 'kysely'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TokenUserType, TokenWithBearer, UUID } from '@opencrvs/commons'
 import {
   ActionInputWithType,

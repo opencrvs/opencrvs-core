@@ -25,7 +25,7 @@ type Story = StoryObj<typeof OrganisationPage>
 export const OrganisationPageStory: Story = {
   name: 'Organisation Page',
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: V1_LEGACY_ROUTES.ORGANISATIONS_INDEX
