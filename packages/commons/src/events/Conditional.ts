@@ -51,22 +51,6 @@ export const EnableConditional = z
     "If 'ENABLE' conditional is defined, the component is enabled only if the condition is met"
   )
 
-/*
- * This needs to be exported so that Typescript can refer to the type in
- * the declaration output type. If it can't do that, you might start encountering
- * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
- * errors when compiling
- */
-/** @knipignore */
-export type ActionConditionalType =
-  | typeof ShowConditional
-  | typeof EnableConditional
-
-/** @knipignore */
-export type InferredActionConditional =
-  | z.infer<typeof ShowConditional>
-  | z.infer<typeof EnableConditional>
-
 export const ActionConditional = z.discriminatedUnion('type', [
   // Action can be shown / hidden
   ShowConditional,
@@ -74,7 +58,7 @@ export const ActionConditional = z.discriminatedUnion('type', [
   EnableConditional
 ])
 
-export type ActionConditional = InferredActionConditional
+export type ActionConditional = z.infer<typeof ActionConditional>
 
 export const DisplayOnReviewConditional = z
   .object({
@@ -84,24 +68,6 @@ export const DisplayOnReviewConditional = z
   .describe(
     "If 'DISPLAY_ON_REVIEW' conditional is defined, the component is shown on the review page only if both the 'DISPLAY_ON_REVIEW' and 'SHOW' conditions are met. This should only be used for fields within declaration forms, as they are the only ones with review pages."
   )
-
-/*
- * This needs to be exported so that Typescript can refer to the type in
- * the declaration output type. If it can't do that, you might start encountering
- * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
- * errors when compiling
- */
-/** @knipignore */
-export type FieldConditionalType =
-  | typeof ShowConditional
-  | typeof EnableConditional
-  | typeof DisplayOnReviewConditional
-
-/** @knipignore */
-export type InferredFieldConditional =
-  | z.infer<typeof ShowConditional>
-  | z.infer<typeof EnableConditional>
-  | z.infer<typeof DisplayOnReviewConditional>
 
 export const FieldConditional = z
   .discriminatedUnion('type', [
