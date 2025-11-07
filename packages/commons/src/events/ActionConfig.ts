@@ -127,6 +127,42 @@ const CustomActionConfig = ActionConfigBase.merge(
   })
 )
 
+/*
+ * This needs to be exported so that Typescript can refer to the type in
+ * the declaration output type. If it can't do that, you might start encountering
+ * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
+ * errors when compiling
+ */
+/** @knipignore */
+export type AllActionConfigFields =
+  | typeof ReadActionConfig
+  | typeof DeclareConfig
+  | typeof ValidateConfig
+  | typeof RejectDeclarationConfig
+  | typeof ArchiveConfig
+  | typeof RegisterConfig
+  | typeof DeleteConfig
+  | typeof PrintCertificateActionConfig
+  | typeof RequestCorrectionConfig
+  | typeof RejectCorrectionConfig
+  | typeof ApproveCorrectionConfig
+  | typeof CustomActionConfig
+
+/** @knipignore */
+export type InferredActionConfig =
+  | z.infer<typeof ReadActionConfig>
+  | z.infer<typeof DeclareConfig>
+  | z.infer<typeof ValidateConfig>
+  | z.infer<typeof RejectDeclarationConfig>
+  | z.infer<typeof ArchiveConfig>
+  | z.infer<typeof RegisterConfig>
+  | z.infer<typeof DeleteConfig>
+  | z.infer<typeof PrintCertificateActionConfig>
+  | z.infer<typeof RequestCorrectionConfig>
+  | z.infer<typeof RejectCorrectionConfig>
+  | z.infer<typeof ApproveCorrectionConfig>
+  | z.infer<typeof CustomActionConfig>
+
 export const ActionConfig = z
   .discriminatedUnion('type', [
     /*
@@ -155,7 +191,7 @@ export const ActionConfig = z
   )
   .meta({ id: 'ActionConfig' })
 
-export type ActionConfig = z.infer<typeof ActionConfig>
+export type ActionConfig = InferredActionConfig
 
 export const DeclarationActionConfig = z.discriminatedUnion('type', [
   DeclareConfig,
