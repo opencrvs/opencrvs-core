@@ -8,17 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { ActionConfig } from './ActionConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
 import { findAllFields, getDeclarationFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
-import { extendZodWithOpenApi } from 'zod-openapi'
+
 import { FieldType } from './FieldType'
 import { FieldReference } from './FieldConfig'
-extendZodWithOpenApi(z)
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -127,8 +126,8 @@ export const EventConfig = z
       }
     }
   })
-  .openapi({
-    ref: 'EventConfig'
+  .meta({
+    id: 'EventConfig'
   })
   .describe('Configuration defining an event type.')
 

@@ -19,9 +19,9 @@ describe('getAvailableActions', () => {
   }
 
   const REJECTABLE_STATUSES = [
-    EventStatus.Enum.NOTIFIED,
-    EventStatus.Enum.DECLARED,
-    EventStatus.Enum.VALIDATED
+    EventStatus.enum.NOTIFIED,
+    EventStatus.enum.DECLARED,
+    EventStatus.enum.VALIDATED
   ]
 
   for (const status of REJECTABLE_STATUSES) {
@@ -32,35 +32,35 @@ describe('getAvailableActions', () => {
     })
   }
 
-  it(`should return the correct actions for "${EventStatus.Enum.REGISTERED}" status with ${InherentFlags.CORRECTION_REQUESTED} flag`, () => {
+  it(`should return the correct actions for "${EventStatus.enum.REGISTERED}" status with ${InherentFlags.CORRECTION_REQUESTED} flag`, () => {
     expect(
-      getAvailableActions(EventStatus.Enum.REGISTERED, [
+      getAvailableActions(EventStatus.enum.REGISTERED, [
         InherentFlags.CORRECTION_REQUESTED
       ])
     ).toMatchSnapshot()
   })
 
-  it(`returns the correct actions for "${EventStatus.Enum.REGISTERED}" status with a "registered:requested" flag`, () => {
+  it(`returns the correct actions for "${EventStatus.enum.REGISTERED}" status with a "registered:requested" flag`, () => {
     expect(
-      getAvailableActions(EventStatus.Enum.REGISTERED, [
-        (EventStatus.Enum.REGISTERED + ':requested').toLowerCase()
+      getAvailableActions(EventStatus.enum.REGISTERED, [
+        (EventStatus.enum.REGISTERED + ':requested').toLowerCase()
       ])
     ).toMatchSnapshot()
   })
 
-  it(`returns the correct actions for "${EventStatus.Enum.DECLARED}" status with a "declared:requested" flag`, () => {
+  it(`returns the correct actions for "${EventStatus.enum.DECLARED}" status with a "declared:requested" flag`, () => {
     expect(
-      getAvailableActions(EventStatus.Enum.DECLARED, [
-        (EventStatus.Enum.DECLARED + ':requested').toLowerCase()
+      getAvailableActions(EventStatus.enum.DECLARED, [
+        (EventStatus.enum.DECLARED + ':requested').toLowerCase()
       ])
     ).toMatchSnapshot()
   })
 
-  it(`should return the correct actions for "${EventStatus.Enum.REGISTERED}" status with "registered:requested" ${InherentFlags.CORRECTION_REQUESTED} flag`, () => {
+  it(`should return the correct actions for "${EventStatus.enum.REGISTERED}" status with "registered:requested" ${InherentFlags.CORRECTION_REQUESTED} flag`, () => {
     expect(
-      getAvailableActions(EventStatus.Enum.REGISTERED, [
+      getAvailableActions(EventStatus.enum.REGISTERED, [
         InherentFlags.CORRECTION_REQUESTED,
-        (EventStatus.Enum.REGISTERED + ':requested').toLowerCase()
+        (EventStatus.enum.REGISTERED + ':requested').toLowerCase()
       ])
     ).toMatchSnapshot()
   })

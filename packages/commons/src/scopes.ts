@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { SearchScopeAccessLevels } from './events'
 
 export const SCOPES = {
@@ -476,6 +476,7 @@ export const scopes: Scope[] = Object.values(SCOPES)
 export type ParsedScopes = NonNullable<
   ReturnType<typeof parseConfigurableScope>
 >
+
 export type RawScopes = z.infer<typeof LiteralScopes> | (string & {})
 
 // for backwards compatibility

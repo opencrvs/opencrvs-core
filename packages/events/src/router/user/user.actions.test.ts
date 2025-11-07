@@ -110,14 +110,14 @@ test('Finds user in nested location with my jurisdiction scope', async () => {
     {
       name: 'Child office',
       parentId: userOnParentLocation.primaryOfficeId,
-      locationType: LocationType.Enum.ADMIN_STRUCTURE,
+      locationType: LocationType.enum.ADMIN_STRUCTURE,
       id: childLocationId,
       validUntil: null
     },
     {
       name: 'Grandchild office',
       parentId: childLocationId,
-      locationType: LocationType.Enum.CRVS_OFFICE,
+      locationType: LocationType.enum.CRVS_OFFICE,
       id: grandchildLocationId,
       validUntil: null
     }
@@ -126,7 +126,7 @@ test('Finds user in nested location with my jurisdiction scope', async () => {
   const userToSearch = seed.user({
     name: [{ family: 'Smith', given: ['John'], use: 'en' }],
     primaryOfficeId: grandchildLocationId,
-    role: TestUserRole.Enum.FIELD_AGENT
+    role: TestUserRole.enum.FIELD_AGENT
   })
 
   mswServer.use(
@@ -168,7 +168,7 @@ test('Find user with appropriate scopes', async () => {
     {
       name: 'Child office',
       parentId: userOnParentLocation.primaryOfficeId,
-      locationType: LocationType.Enum.CRVS_OFFICE,
+      locationType: LocationType.enum.CRVS_OFFICE,
       id: userToSearchLocationId,
       validUntil: null
     }
@@ -177,7 +177,7 @@ test('Find user with appropriate scopes', async () => {
   const userInTheSameOffice = seed.user({
     name: [{ family: 'Jones', given: ['James'], use: 'en' }],
     primaryOfficeId: userToSearchLocationId,
-    role: TestUserRole.Enum.FIELD_AGENT
+    role: TestUserRole.enum.FIELD_AGENT
   })
 
   const clientWithOfficeScope = createTestClient(userInTheSameOffice, [
@@ -187,7 +187,7 @@ test('Find user with appropriate scopes', async () => {
   const userToSearch = seed.user({
     name: [{ family: 'Smith', given: ['John'], use: 'en' }],
     primaryOfficeId: userToSearchLocationId,
-    role: TestUserRole.Enum.FIELD_AGENT
+    role: TestUserRole.enum.FIELD_AGENT
   })
 
   const userToSearchClient = createTestClient(userToSearch, [

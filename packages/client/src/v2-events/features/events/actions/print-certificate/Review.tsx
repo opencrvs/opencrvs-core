@@ -298,7 +298,6 @@ export function Review() {
         const printCertificate = await preparePdfCertificate(fullEvent)
 
         await onlineActions.printCertificate.mutateAsync({
-          fullEvent,
           eventId: fullEvent.id,
           declaration: {},
           annotation,

@@ -208,7 +208,7 @@ export const SameOptionsForDifferentFields: StoryObj<typeof DocumentViewer> = {
         formConfig={defineActionForm({
           pages: [
             {
-              type: PageTypes.Enum.FORM,
+              type: PageTypes.enum.FORM,
               fields: [
                 {
                   id: 'documents.one',
