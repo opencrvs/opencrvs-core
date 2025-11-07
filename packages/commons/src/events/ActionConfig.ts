@@ -184,8 +184,9 @@ export const ActionConfig = z
     RejectCorrectionConfig.meta({ id: 'RejectCorrectionActionConfig' }),
     ApproveCorrectionConfig.meta({
       id: 'ApproveCorrectionActionConfig'
-    }),
-    CustomActionConfig.meta({ id: 'CustomActionConfig' })
+    })
+    // @TODO: adding this causes too long inferred type error in EventConfig. Need to find a workaround.
+    // CustomActionConfig.meta({ id: 'CustomActionConfig' })
   ])
   .describe(
     'Configuration of an action available for an event. Data collected depends on the action type and is accessible through the annotation property in ActionDocument.'
