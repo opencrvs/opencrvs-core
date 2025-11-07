@@ -134,6 +134,22 @@ export const EventConfig = z
         })
       }
     }
+
+    // Validate that all referenced action flags are configured in the event flags array.
+    const configuredFlagIds = event.flags.map((flag) => flag.id)
+    const actionFlagIds = event.actions.flatMap((action) =>
+      action.flags.map((flag) => flag.id)
+    )
+
+    for (const actionFlagId of actionFlagIds) {
+      if (!configuredFlagIds.includes(actionFlagId)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Action flag id must match a configured flag in the flags array. Invalid action flag ID for event '${event.id}': '${actionFlagId}'`,
+          path: ['actions']
+        })
+      }
+    }
   })
   .openapi({
     ref: 'EventConfig'

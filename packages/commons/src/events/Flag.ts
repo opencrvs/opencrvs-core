@@ -46,7 +46,11 @@ export type Flag = z.infer<typeof Flag>
  */
 export const FlagConfig = z.object({
   id: z.string().describe('Unique identifier of the flag.'),
-  requiresAction: z.boolean().describe('Whether the flag requires an action.'),
+  requiresAction: z
+    .boolean()
+    .describe(
+      'Indicates if this flag expects an action to be performed to be cleared.'
+    ),
   label: TranslationConfig.describe('Human readable label of the flag.')
 })
 
