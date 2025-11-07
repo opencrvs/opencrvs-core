@@ -712,7 +712,8 @@ paths:
                             description: Unique identifier of the flag.
                           requiresAction:
                             type: boolean
-                            description: Whether the flag requires an action.
+                            description: Indicates if this flag expects an action to be performed to be
+                              cleared.
                           label:
                             description: Human readable label of the flag.
                             allOf:
@@ -775,7 +776,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 66902a48-c1de-47a7-b428-430619e6043a
+                transactionId: 3da1d608-59d1-4a25-b799-3c3413f7b3de
                 type: birth
       responses:
         "200":
@@ -1449,7 +1450,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: f8e01490-8fd0-4ac4-93a6-abde161d8ac0
+                transactionId: 94cd4a0f-e33d-47ad-8a40-4e7a9c484a8b
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -4424,7 +4425,8 @@ components:
                 description: Unique identifier of the flag.
               requiresAction:
                 type: boolean
-                description: Whether the flag requires an action.
+                description: Indicates if this flag expects an action to be performed to be
+                  cleared.
               label:
                 description: Human readable label of the flag.
                 allOf:

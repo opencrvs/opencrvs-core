@@ -764,7 +764,8 @@ paths:
                             description: Unique identifier of the flag.
                           requiresAction:
                             type: boolean
-                            description: Whether the flag requires an action.
+                            description: Indicates if this flag expects an action to be performed to be
+                              cleared.
                           label:
                             $ref: "#/components/schemas/TranslationConfig"
                             description: Human readable label of the flag.
@@ -1494,7 +1495,8 @@ components:
                 description: Unique identifier of the flag.
               requiresAction:
                 type: boolean
-                description: Whether the flag requires an action.
+                description: Indicates if this flag expects an action to be performed to be
+                  cleared.
               label:
                 $ref: "#/components/schemas/TranslationConfig"
                 description: Human readable label of the flag.
