@@ -27,8 +27,6 @@ export const DeclarationReviewConfig = z
     'Configuration of the declaration review page for collecting event-related metadata.'
   )
 
-export type ReviewPageConfig = z.infer<typeof DeclarationReviewConfig>
-
 export const ActionConfigBase = z.object({
   label: TranslationConfig.describe('Human readable description of the action'),
   flags: z
@@ -38,24 +36,28 @@ export const ActionConfigBase = z.object({
     .describe('Flag actions which are executed when the action is performed.')
 })
 
-// @TODO: as part of custom actions work, we should probably move the 'review' to be only in DECLARE action config
 const DeclarationActionBase = ActionConfigBase.extend({
-  review: DeclarationReviewConfig,
   deduplication: DeduplicationConfig.optional()
 })
 
-const ReadActionConfig = ActionConfigBase.extend(
+const ActionWithReviewBase = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.READ),
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page for read-only view.'
     )
   }).shape
 )
 
-const DeclareConfig = DeclarationActionBase.extend(
+const ReadActionConfig = ActionWithReviewBase.extend(
   z.object({
-    type: z.literal(ActionType.DECLARE)
+    type: z.literal(ActionType.READ)
+  }).shape
+)
+
+const DeclareConfig = ActionWithReviewBase.extend(
+  z.object({
+    type: z.literal(ActionType.DECLARE),
+    review: DeclarationReviewConfig
   }).shape
 )
 
@@ -128,42 +130,6 @@ const CustomActionConfig = ActionConfigBase.merge(
   })
 )
 
-/*
- * This needs to be exported so that Typescript can refer to the type in
- * the declaration output type. If it can't do that, you might start encountering
- * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
- * errors when compiling
- */
-/** @knipignore */
-export type AllActionConfigFields =
-  | typeof ReadActionConfig
-  | typeof DeclareConfig
-  | typeof ValidateConfig
-  | typeof RejectDeclarationConfig
-  | typeof ArchiveConfig
-  | typeof RegisterConfig
-  | typeof DeleteConfig
-  | typeof PrintCertificateActionConfig
-  | typeof RequestCorrectionConfig
-  | typeof RejectCorrectionConfig
-  | typeof ApproveCorrectionConfig
-  | typeof CustomActionConfig
-
-/** @knipignore */
-export type InferredActionConfig =
-  | z.infer<typeof ReadActionConfig>
-  | z.infer<typeof DeclareConfig>
-  | z.infer<typeof ValidateConfig>
-  | z.infer<typeof RejectDeclarationConfig>
-  | z.infer<typeof ArchiveConfig>
-  | z.infer<typeof RegisterConfig>
-  | z.infer<typeof DeleteConfig>
-  | z.infer<typeof PrintCertificateActionConfig>
-  | z.infer<typeof RequestCorrectionConfig>
-  | z.infer<typeof RejectCorrectionConfig>
-  | z.infer<typeof ApproveCorrectionConfig>
-  | z.infer<typeof CustomActionConfig>
-
 export const ActionConfig = z
   .discriminatedUnion('type', [
     /*
@@ -184,16 +150,15 @@ export const ActionConfig = z
     RejectCorrectionConfig.meta({ id: 'RejectCorrectionActionConfig' }),
     ApproveCorrectionConfig.meta({
       id: 'ApproveCorrectionActionConfig'
-    })
-    // @TODO: adding this causes too long inferred type error in EventConfig. Need to find a workaround.
-    // CustomActionConfig.meta({ id: 'CustomActionConfig' })
+    }),
+    CustomActionConfig.meta({ id: 'CustomActionConfig' })
   ])
   .describe(
     'Configuration of an action available for an event. Data collected depends on the action type and is accessible through the annotation property in ActionDocument.'
   )
   .meta({ id: 'ActionConfig' })
 
-export type ActionConfig = InferredActionConfig
+export type ActionConfig = z.infer<typeof ActionConfig>
 
 export const DeclarationActionConfig = z.discriminatedUnion('type', [
   DeclareConfig,

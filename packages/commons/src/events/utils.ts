@@ -24,12 +24,7 @@ import {
   orderBy,
   isEqual
 } from 'lodash'
-import {
-  ActionType,
-  DeclarationActionType,
-  DeclarationActions,
-  writeActions
-} from './ActionType'
+import { ActionType, DeclarationActionType, writeActions } from './ActionType'
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import {
@@ -58,12 +53,6 @@ import { subDays, subYears, format } from 'date-fns'
 export function ageToDate(age: number, asOfDate: DateValue) {
   const date = new Date(asOfDate)
   return DateValue.parse(format(subYears(date, age), 'yyyy-MM-dd'))
-}
-
-function isDeclarationActionConfig(
-  action: ActionConfig
-): action is DeclarationActionConfig {
-  return DeclarationActions.safeParse(action.type).success
 }
 
 export function getDeclarationFields(
@@ -100,7 +89,7 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
     return actionConfig.printForm.pages.flatMap(({ fields }) => fields)
   }
 
-  if (isDeclarationActionConfig(actionConfig)) {
+  if ('review' in actionConfig) {
     return actionConfig.review.fields
   }
 
@@ -152,17 +141,22 @@ export function getActionReview(
     (a): a is DeclarationActionConfig => a.type === actionType
   )
 
-  return getOrThrow(
-    actionConfig.review,
-    `No review config found for ${actionType}`
-  )
+  if ('review' in actionConfig) {
+    return actionConfig.review
+  }
+
+  return undefined
 }
 
 export function getActionReviewFields(
   configuration: EventConfig,
   actionType: DeclarationActionType
 ) {
-  return getActionReview(configuration, actionType).fields
+  const review = getActionReview(configuration, actionType)
+  if (!review) {
+    return []
+  }
+  return review.fields
 }
 
 export function isPageVisible(
