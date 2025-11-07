@@ -15,7 +15,7 @@ import { getOrCreateClient as getElasticsearchClient } from '@events/storage/ela
 import { getClient as getPostgresClient } from '@events/storage/postgres/events'
 import { env } from '@events/environment'
 
-export interface HealthCheckResult {
+interface HealthCheckResult {
   status: 'ok' | 'error'
   checks: {
     postgres: { status: 'ok' | 'error'; error?: string }
@@ -24,7 +24,7 @@ export interface HealthCheckResult {
   }
 }
 
-export interface HealthCheckResponse {
+interface HealthCheckResponse {
   statusCode: number
   body: string
   headers: { [key: string]: string }
