@@ -52,6 +52,9 @@ export const FlagConfig = z.object({
 
 export type FlagConfig = z.infer<typeof FlagConfig>
 
+/**
+ * Configuration for a flag action, which is executed when the action is performed.
+ */
 export const ActionFlagConfig = z.object({
   id: z.string().describe('Id of the flag.'),
   operation: z

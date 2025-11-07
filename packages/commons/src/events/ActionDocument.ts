@@ -249,6 +249,13 @@ const ReadAction = ActionBase.merge(
   })
 )
 
+const CustomAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.CUSTOM),
+    name: z.string()
+  })
+)
+
 export const ActionDocument = z
   .discriminatedUnion('type', [
     CreatedAction.openapi({ ref: 'CreatedAction' }),
@@ -267,7 +274,8 @@ export const ActionDocument = z
     RejectedCorrectionAction.openapi({ ref: 'RejectedCorrectionAction' }),
     UnassignedAction.openapi({ ref: 'UnassignedAction' }),
     PrintCertificateAction.openapi({ ref: 'PrintCertificateAction' }),
-    ReadAction.openapi({ ref: 'ReadAction' })
+    ReadAction.openapi({ ref: 'ReadAction' }),
+    CustomAction.openapi({ ref: 'CustomAction' })
   ])
   .openapi({
     ref: 'ActionDocument'
