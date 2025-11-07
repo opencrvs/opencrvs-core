@@ -805,8 +805,9 @@ export function generateActionDocument<T extends ActionType>({
   } satisfies ActionBase
 
   switch (action) {
-    // case ActionType.CUSTOM:
-    //   return { ...actionBase, type: action, name: 'ATTESTATION' }
+    case ActionType.CUSTOM:
+      throw new Error('TCustom action is not supported in test utils')
+    // return { ...actionBase, type: action, name: 'ATTESTATION' }
     case ActionType.READ:
       return { ...actionBase, type: action }
     case ActionType.MARK_AS_NOT_DUPLICATE:
