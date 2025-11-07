@@ -8,13 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { MessageDescriptor } from 'react-intl'
-import { EventState, FieldConfig, EventConfig } from '@opencrvs/commons/client'
+import { get } from 'lodash'
+import {
+  FieldReference,
+  FieldValue,
+  HttpField,
+  isFieldReference
+} from '@opencrvs/commons/client'
 import { IndexMap } from '@client/utils'
 import {
-  FIELD_SEPARATOR,
-  makeFormFieldIdFormikCompatible
+  makeFormFieldIdFormikCompatible,
+  makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 
 /**
@@ -40,8 +44,38 @@ export function makeFormikFieldIdsOpenCRVSCompatible<T>(
 ): IndexMap<T> {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
-      key.replaceAll(FIELD_SEPARATOR, '.'),
+      makeFormikFieldIdOpenCRVSCompatible(key),
       value
     ])
   )
+}
+
+function parseFieldReferenceToValue(
+  fieldReference: FieldReference,
+  fieldValues: Record<string, FieldValue>
+) {
+  return fieldReference.$$subfield && fieldReference.$$subfield.length > 0
+    ? get(fieldValues[fieldReference.$$field], fieldReference.$$subfield)
+    : fieldValues[fieldReference.$$field]
+}
+
+export function parseFieldReferencesInConfiguration(
+  configuration: HttpField['configuration'],
+  form: Record<string, FieldValue>
+) {
+  const result = {
+    ...configuration,
+    params: configuration.params
+      ? Object.fromEntries(
+          Object.entries(configuration.params).map(([key, value]) => [
+            key,
+            isFieldReference(value)
+              ? parseFieldReferenceToValue(value, form)
+              : value
+          ])
+        )
+      : undefined
+  }
+
+  return result
 }

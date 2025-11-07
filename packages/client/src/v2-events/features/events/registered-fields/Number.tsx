@@ -10,10 +10,12 @@
  */
 
 import * as React from 'react'
+import { useIntl } from 'react-intl'
 import {
   ITextInputProps as TextInputProps,
   TextInput as TextInputComponent
 } from '@opencrvs/components'
+import { NumberField } from '@opencrvs/commons/client'
 
 interface NumberInputProps
   extends Omit<TextInputProps, 'type' | 'maxLength' | 'onChange'> {
@@ -60,7 +62,20 @@ function NumberInput({ value, disabled, ...props }: NumberInputProps) {
 
 export const Number = {
   Input: NumberInput,
-  Output: ({ value }: { value?: number }) => {
-    return <>{value?.toString() || ''}</>
+  Output: ({ value, config }: { value?: number; config: NumberField }) => {
+    if (value === undefined) {
+      return null
+    }
+
+    const intl = useIntl()
+    const prefix = config.configuration?.prefix
+    const postfix = config.configuration?.postfix
+    return (
+      <>
+        {prefix && intl.formatMessage(prefix)}
+        {value.toString() || ''}
+        {postfix && intl.formatMessage(postfix)}
+      </>
+    )
   }
 }

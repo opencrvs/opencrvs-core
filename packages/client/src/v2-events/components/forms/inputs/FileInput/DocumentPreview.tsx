@@ -12,7 +12,10 @@
 import * as React from 'react'
 import { useState } from 'react'
 import styled from 'styled-components'
-import { FileFieldValue } from '@opencrvs/commons/client'
+import {
+  FileFieldValue,
+  FileFieldValueWithOption
+} from '@opencrvs/commons/client'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { DividerVertical } from '@opencrvs/components/lib/Divider'
@@ -20,8 +23,7 @@ import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanC
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Stack } from '@opencrvs/components/lib/Stack'
-import { FileFieldValueWithOption } from '@opencrvs/commons/client'
-import { getFullUrl } from '@client/v2-events/features/files/useFileUpload'
+import { getUnsignedFileUrl } from '@client/v2-events/cache'
 
 const ViewerWrapper = styled.div`
   position: fixed;
@@ -152,7 +154,7 @@ export function DocumentPreview({
         <PanViewer
           key={Math.random()}
           id="document_image"
-          image={getFullUrl(previewImage.filename)}
+          image={getUnsignedFileUrl(previewImage.path)}
           rotation={rotation}
           zoom={zoom}
         />

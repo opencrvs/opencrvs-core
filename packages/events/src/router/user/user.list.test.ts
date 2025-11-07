@@ -9,7 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { http, HttpResponse, HttpResponseInit } from 'msw'
+import { SystemRole, TokenUserType } from '@opencrvs/commons'
+import {
+  createTestClient,
+  sanitizeForSnapshot,
+  setupTestCase
+} from '@events/tests/utils'
+import { mswServer } from '../../tests/msw'
 
 test('Returns empty list when no ids provided', async () => {
   const { user } = await setupTestCase()
@@ -23,6 +30,11 @@ test('Returns empty list when no ids provided', async () => {
 test('Returns empty list when no ids match', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user)
+  mswServer.use(
+    http.post(`http://localhost:3030/getUser`, () => {
+      return HttpResponse.json({}, { status: 404 } as HttpResponseInit)
+    })
+  )
 
   const fetchedEvents = await client.user.list(['123-123-123'])
 
@@ -33,19 +45,27 @@ test('Returns user in correct format', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user)
 
+  mswServer.use(
+    http.post(`http://localhost:3030/getUser`, () => {
+      return HttpResponse.json(user)
+    })
+  )
   const fetchedUser = await client.user.list([user.id])
 
   expect(fetchedUser).toEqual([
     {
       id: user.id,
       name: user.name,
-      role: user.role
+      role: user.role,
+      signature: user.signature,
+      primaryOfficeId: user.primaryOfficeId,
+      type: TokenUserType.enum.user
     }
   ])
 })
 
-test('Returns multiple users', async () => {
-  const { user, generator, locations, seed, userMgntDb } = await setupTestCase()
+test('Returns both normal users and system users', async () => {
+  const { user, generator, locations, seed } = await setupTestCase()
   const client = createTestClient(user)
 
   const usersToCreate = locations.map((location) =>
@@ -53,12 +73,158 @@ test('Returns multiple users', async () => {
   )
 
   const userIds = []
+  const users: Array<ReturnType<typeof seed.user>> = []
+
   for (const userToCreate of usersToCreate) {
-    const userId = (await seed.user(userMgntDb, userToCreate)).id
+    const createdUser = seed.user(userToCreate)
+    const userId = createdUser.id
     userIds.push(userId)
+    users.push(createdUser)
   }
 
-  const users = await client.user.list(userIds)
+  mswServer.use(
+    http.post(`http://localhost:3030/getUser`, async ({ request }) => {
+      const body = (await request.clone().json()) as { userId: string }
+      const userId = body.userId
+      const foundUser = users.find((u) => u.id === userId)
 
-  expect(users).toHaveLength(locations.length)
+      if (foundUser) {
+        return HttpResponse.json(foundUser)
+      }
+
+      return HttpResponse.json(
+        null,
+        // @ts-expect-error - MSW does not have a type for this?
+        { status: 401 }
+      )
+    })
+  )
+
+  const systemUserId = '67bda93bfc07dee78ae55114'
+
+  mswServer.use(
+    http.post(`http://localhost:3030/getSystem`, async ({ request }) => {
+      const body = (await request.clone().json()) as { systemId: string }
+
+      if (body.systemId === systemUserId) {
+        return HttpResponse.json({
+          name: 'My health system integration',
+          createdBy: '',
+          username: '',
+          client_id: 'string',
+          status: '',
+          scope: [''],
+          sha_secret: '',
+          type: SystemRole.enum.HEALTH
+        })
+      }
+
+      return HttpResponse.json(
+        null,
+        // @ts-expect-error - MSW does not have a type for this?
+        { status: 401 }
+      )
+    })
+  )
+
+  const fetchedUsers = await client.user.list([...userIds, systemUserId])
+
+  expect(sanitizeForSnapshot(fetchedUsers, ['id'])).toMatchSnapshot()
+})
+
+test('Does not return users or systems which are not found', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user)
+
+  mswServer.use(
+    http.post(`http://localhost:3030/getUser`, async ({ request }) => {
+      const body = (await request.clone().json()) as { userId: string }
+      if (body.userId === user.id) {
+        return HttpResponse.json(user)
+      }
+
+      return HttpResponse.json(
+        null,
+        // @ts-expect-error - MSW does not have a type for this?
+        { status: 401 }
+      )
+    })
+  )
+  const fetchedUser = await client.user.list([user.id, '123-123-123', 'foobar'])
+
+  expect(fetchedUser).toEqual([
+    {
+      id: user.id,
+      name: user.name,
+      role: user.role,
+      signature: user.signature,
+      primaryOfficeId: user.primaryOfficeId,
+      type: TokenUserType.enum.user
+    }
+  ])
+})
+
+test('Returns multiple users', async () => {
+  const { user, generator, locations, seed } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const usersToCreate = locations.map((location) =>
+    generator.user.create({ primaryOfficeId: location.id })
+  )
+
+  const userIds = []
+  const users: Array<ReturnType<typeof seed.user>> = []
+  for (const userToCreate of usersToCreate) {
+    const createdUser = seed.user(userToCreate)
+    const userId = createdUser.id
+    userIds.push(userId)
+    users.push(createdUser)
+  }
+
+  mswServer.use(
+    http.post(`http://localhost:3030/getUser`, async ({ request }) => {
+      const body = (await request.clone().json()) as { userId: string }
+      const userId = body.userId
+      return HttpResponse.json(users.find((u) => u.id === userId))
+    })
+  )
+
+  const fetchedUsers = await client.user.list(userIds)
+
+  expect(fetchedUsers).toHaveLength(locations.length)
+})
+
+test('Returns multiple users with honorifics', async () => {
+  const { user, generator, locations, seed } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const usersToCreate = locations.map((location, i) =>
+    generator.user.create({
+      primaryOfficeId: location.id,
+      // 4 to make the nth work.
+      fullHonorificName: `${i + 4}th Class Registration Officer, John Doe`
+    })
+  )
+
+  const userIds = []
+  const users: Array<ReturnType<typeof seed.user>> = []
+  for (const userToCreate of usersToCreate) {
+    const createdUser = seed.user(userToCreate)
+    const userId = createdUser.id
+    userIds.push(userId)
+    users.push(createdUser)
+  }
+
+  mswServer.use(
+    http.post(`http://localhost:3030/getUser`, async ({ request }) => {
+      const body = (await request.clone().json()) as { userId: string }
+      const userId = body.userId
+      return HttpResponse.json(users.find((u) => u.id === userId))
+    })
+  )
+
+  const fetchedUsers = await client.user.list(userIds)
+
+  expect(fetchedUsers).toHaveLength(locations.length)
+  expect(sanitizeForSnapshot(fetchedUsers, ['id'])).toMatchSnapshot()
 })

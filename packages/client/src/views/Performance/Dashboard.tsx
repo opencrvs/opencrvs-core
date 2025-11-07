@@ -9,19 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
-import { useIntl } from 'react-intl'
-import { AppBar, Content, ContentSize, Frame } from '@opencrvs/components'
+import { constantsMessages } from '@client/i18n/messages'
 import { generatePerformanceHomeUrl } from '@client/navigation'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { AppBar, Frame } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import styled from 'styled-components'
 import IframeResizer from 'iframe-resizer-react'
-import { messages } from '@client/i18n/messages/views/dashboard'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { constantsMessages } from '@client/i18n/messages'
+import React from 'react'
+import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import styled from 'styled-components'
 
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
@@ -37,7 +36,6 @@ interface IdashboardView {
 export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
   const intl = useIntl()
   const userDetails = useSelector(getUserDetails)
-
   const location = useLocation()
   const navigate = useNavigate()
   const handleCrossBar = () => {
@@ -88,26 +86,7 @@ export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
           constantsMessages.skipToMainContent
         )}
       >
-        {window.config && url ? (
-          <StyledIFrame
-            id={`${title.toLowerCase()}_main`}
-            src={url}
-            allowFullScreen
-          />
-        ) : (
-          <div id={`${title.toLowerCase()}_noContent`}>
-            <Content title={title} size={ContentSize.LARGE}>
-              {intl.formatMessage(messages.noContent, {
-                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                strong: (chunks: any) => <strong>{chunks}</strong>,
-                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                ul: (chunks: any) => <ul>{chunks}</ul>,
-                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                li: (chunks: any) => <li>{chunks}</li>
-              })}
-            </Content>
-          </div>
-        )}
+        <StyledIFrame id={title} src={url} allowFullScreen />
       </Frame>
     </>
   )
@@ -115,10 +94,13 @@ export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
 
 export const PerformanceDashboard = () => {
   const intl = useIntl()
+  const params = useParams()
+  const id = params.id
+  const config = window.config.DASHBOARDS.find((d) => d.id === id)!
   return (
     <DashboardEmbedView
-      title={intl.formatMessage(messages.dashboardTitle)}
-      url={window.config.REGISTRATIONS_DASHBOARD_URL}
+      title={intl.formatMessage(config.title)}
+      url={config.url}
       icon={<Icon name="Activity" size="medium" />}
     />
   )

@@ -11,36 +11,41 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 
-import { fireEvent, within } from '@storybook/test'
+import { fireEvent, within, expect, userEvent, waitFor } from '@storybook/test'
 import React from 'react'
 import superjson from 'superjson'
 import { noop } from 'lodash'
 import {
+  ActionType,
   AddressFieldValue,
   AddressType,
   ConditionalType,
   defineDeclarationForm,
   field,
   FieldType,
+  generateEventDocument,
   generateTranslationConfig,
   TENNIS_CLUB_DECLARATION_FORM,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-
 import { useModal } from '@client/v2-events/hooks/useModal'
+import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { RejectionState, Review } from './Review'
 
 const mockDeclaration = {
-  'applicant.firstname': 'John',
-  'applicant.surname': 'Doe',
+  'applicant.name': {
+    firstname: 'John',
+    surname: 'Doe'
+  },
   'applicant.dob': '1990-01-01',
   'applicant.address': {
     country: 'FAR',
     addressType: AddressType.DOMESTIC,
     province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-    district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+    district: '27160bbd-32d1-4625-812f-860226bfb92a',
     street: '123 Tennis Club Avenue',
     number: '123',
     zipCode: 'Z12345',
@@ -61,11 +66,14 @@ const meta: Meta<typeof Review.Body> = {
     title: 'Member declaration for John Doe'
   },
   decorators: [
-    (Story) => (
+    (Story, context) => (
       <TRPCProvider>
-        <Story />
+        <React.Suspense>
+          <Story {...context} />
+        </React.Suspense>
       </TRPCProvider>
-    )
+    ),
+    withValidatorContext
   ]
 }
 
@@ -97,12 +105,12 @@ export const ReviewWithoutChanges: Story = {
 
 const reviewActionMessages = {
   title: {
-    id: 'v2.changeModal.title',
+    id: 'changeModal.title',
     defaultMessage: 'This is a title',
     description: 'The title for review action'
   },
   description: {
-    id: 'v2.changeModal.description',
+    id: 'changeModal.description',
     defaultMessage: 'This is a description',
     description: 'The title for review action'
   },
@@ -138,7 +146,7 @@ export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
       await fireEvent.click(cancelButton)
     })
   },
-  render: function Component() {
+  render: function Component(args) {
     const [modal, openModal] = useModal()
 
     async function handleDeclaration() {
@@ -176,12 +184,14 @@ export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
     return (
       <>
         <Review.Body
+          {...args}
           form={mockDeclaration}
           formConfig={TENNIS_CLUB_DECLARATION_FORM}
           title="My test action"
           onEdit={handleEdit}
         >
           <Review.Actions
+            icon="Check"
             incomplete={false}
             messages={reviewActionMessages}
             onConfirm={handleDeclaration}
@@ -208,22 +218,22 @@ export const ReviewWithValidationErrors: Story = {
   },
   args: {
     form: {
-      'applicant.firstname': 'Mia',
       // @ts-ignore
-      'applicant.surname': undefined,
+      'applicant.name': {
+        firstname: 'Mia',
+        surname: undefined
+      },
       // @ts-ignore
       'applicant.dob': undefined,
       'applicant.email': 'mia@',
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        urbanOrRural: 'RURAL',
-        village: 'Tennisville'
+        administrativeArea: 'invalid-uuid'
       } as AddressFieldValue
     }
   },
-  render: function Component() {
+  render: function Component(args) {
     const [modal, openModal] = useModal()
 
     async function handleRejection() {
@@ -233,12 +243,14 @@ export const ReviewWithValidationErrors: Story = {
     }
     return (
       <Review.Body
+        {...args}
         form={this.args?.form || {}}
         formConfig={TENNIS_CLUB_DECLARATION_FORM}
         title="My test action"
         onEdit={noop}
       >
         <Review.Actions
+          icon="Check"
           incomplete={false}
           messages={reviewActionMessages}
           onConfirm={noop}
@@ -269,7 +281,7 @@ export const ReviewWithConditionallyHiddenFields: Story = {
       'are-you-feeling-all-right': true
     }
   },
-  render: function Component() {
+  render: function Component(args) {
     const [modal, openModal] = useModal()
 
     async function handleRejection() {
@@ -279,6 +291,7 @@ export const ReviewWithConditionallyHiddenFields: Story = {
     }
     return (
       <Review.Body
+        {...args}
         form={this.args?.form || {}}
         formConfig={defineDeclarationForm({
           label: {
@@ -350,8 +363,7 @@ export const ReviewWithConditionallyHiddenFields: Story = {
                     }
                   ]
                 },
-                // By default, checkboxes are hidden unless selected
-                // I.e. this should be hidden
+                // These fields should be shown, since there are no conditions
                 {
                   id: 'has-it-been-a-nice-day',
                   type: FieldType.CHECKBOX,
@@ -362,7 +374,6 @@ export const ReviewWithConditionallyHiddenFields: Story = {
                     id: 'has-it-been-a-nice-day.label'
                   }
                 },
-                // This field should be shown, since its selected
                 {
                   id: 'are-you-feeling-all-right',
                   type: FieldType.CHECKBOX,
@@ -381,6 +392,7 @@ export const ReviewWithConditionallyHiddenFields: Story = {
         onEdit={noop}
       >
         <Review.Actions
+          icon="Check"
           incomplete={false}
           messages={reviewActionMessages}
           onConfirm={noop}
@@ -389,5 +401,154 @@ export const ReviewWithConditionallyHiddenFields: Story = {
         {modal}
       </Review.Body>
     )
+  }
+}
+
+export const RejectModalInteraction: StoryObj<typeof Review.Body> = {
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Open reject modal', async () => {
+      const [changeButton] = await canvas.findAllByRole('button', {
+        name: 'Reject test'
+      })
+
+      await fireEvent.click(changeButton)
+
+      const modal = await canvas.findByTestId('reject-modal')
+
+      await within(modal).findByRole('heading', {
+        name: 'Reason for rejection?'
+      })
+      const textarea = await within(modal).findByTestId('reject-reason')
+      const checkbox = await within(modal).findByRole('checkbox')
+      const cancel = await within(modal).findByRole('button', {
+        name: 'Cancel'
+      })
+      const archive = await within(modal).findByRole('button', {
+        name: 'Archive'
+      })
+      const sendForUpdate = await within(modal).findByRole('button', {
+        name: 'Send For Update'
+      })
+
+      await expect(cancel).toBeEnabled()
+      await expect(archive).toBeDisabled()
+      await expect(sendForUpdate).toBeDisabled()
+
+      await userEvent.type(textarea, 'Duplicate', { delay: 100 })
+
+      await expect(archive).toBeEnabled()
+      await expect(sendForUpdate).toBeEnabled()
+
+      await userEvent.click(checkbox)
+
+      await expect(archive).toBeEnabled()
+      await expect(sendForUpdate).toBeDisabled()
+
+      await userEvent.click(cancel)
+
+      await waitFor(async () => {
+        await expect(
+          canvas.queryByTestId('reject-modal')
+        ).not.toBeInTheDocument()
+      })
+    })
+  },
+  render: function Component(args) {
+    const [modal, openModal] = useModal()
+
+    async function handleDeclaration() {
+      await openModal<boolean | null>((close) => {
+        return (
+          <Review.ActionModal.Accept
+            action="Declare"
+            close={close}
+            copy={{
+              description: generateTranslationConfig('description'),
+              title: generateTranslationConfig('title'),
+              onCancel: generateTranslationConfig('onCancel'),
+              onConfirm: generateTranslationConfig('onConfirm'),
+              eventLabel: tennisClubMembershipEvent.label
+            }}
+          />
+        )
+      })
+    }
+
+    async function handleRejection() {
+      await openModal<RejectionState | null>((close) => (
+        <Review.ActionModal.Reject close={close} />
+      ))
+    }
+
+    async function handleEdit() {
+      await openModal<boolean | null>((close) => (
+        <Review.EditModal close={close}></Review.EditModal>
+      ))
+
+      return
+    }
+
+    return (
+      <>
+        <Review.Body
+          {...args}
+          form={mockDeclaration}
+          formConfig={TENNIS_CLUB_DECLARATION_FORM}
+          title="My test action"
+          onEdit={handleEdit}
+        >
+          <Review.Actions
+            icon="Check"
+            incomplete={false}
+            messages={reviewActionMessages}
+            onConfirm={handleDeclaration}
+            onReject={handleRejection}
+          />
+        </Review.Body>
+        {modal}
+      </>
+    )
+  }
+}
+
+const declareEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+})
+
+const eventDocumentWithoutSurname = {
+  ...declareEventDocument,
+  actions: declareEventDocument.actions.map((action) => {
+    if (action.type !== ActionType.DECLARE || action.status !== 'Accepted') {
+      return action
+    }
+
+    return {
+      ...action,
+      declaration: {
+        ...action.declaration,
+        'applicant.name': {
+          firstname: 'John',
+          surname: ''
+        }
+      }
+    }
+  })
+}
+
+export const ReviewWithIncompleteName: Story = {
+  name: 'Review with incomplete name',
+  parameters: {
+    offline: {
+      events: [eventDocumentWithoutSurname]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
+        eventId: eventDocumentWithoutSurname.id
+      })
+    }
   }
 }

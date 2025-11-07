@@ -9,25 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { PropsWithChildren, useEffect, useMemo } from 'react'
+import React, { PropsWithChildren, useEffect } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   createEmptyDraft,
-  findActiveDrafts,
-  getAnnotationFromDrafts
+  deepMerge,
+  findActiveDraftForEvent,
+  deepDropNulls,
+  mergeDrafts
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
-
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { createTemporaryId } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 
-// @TODO: Update type to more strict once REQUEST_CORRECTION uses annotations
-type Props = PropsWithChildren<{ actionType: ActionType }>
+type Props = PropsWithChildren<{ actionType: Exclude<ActionType, 'DELETE'> }>
 
 /**
  * Creates a wrapper component for the annotation action.
@@ -44,16 +44,18 @@ function AnnotationActionComponent({ children, actionType }: Props) {
 
   const { getEvent } = useEvents()
 
-  const { setLocalDraft, getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
+  const { setLocalDraft, getLocalDraftOrDefault, getRemoteDraftByEventId } =
+    useDrafts()
 
-  const drafts = getRemoteDrafts()
+  const event = getEvent.getFromCache(params.eventId)
+  const remoteDraft = getRemoteDraftByEventId(event.id)
 
-  const [event] = getEvent.useSuspenseQuery(params.eventId)
+  const activeRemoteDraft = remoteDraft
+    ? findActiveDraftForEvent(event, remoteDraft)
+    : undefined
 
-  const activeDraft = findActiveDrafts(event, drafts)[0]
   const localDraft = getLocalDraftOrDefault(
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    activeDraft ||
+    activeRemoteDraft ||
       createEmptyDraft(params.eventId, createTemporaryId(), actionType)
   )
 
@@ -78,45 +80,40 @@ function AnnotationActionComponent({ children, actionType }: Props) {
   /*
    * Initialize the form state
    */
-  const setInitialAnnotation = useActionAnnotation(
-    (state) => state.setInitialAnnotation
-  )
+  const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
-  const eventDrafts = drafts
-    .filter((d) => d.eventId === event.id)
-    .concat({
-      ...localDraft,
-      /*
-       * Force the local draft always to be the latest
-       * This is to prevent a situation where the local draft gets created,
-       * then a CREATE action request finishes in the background and is stored with a later
-       * timestamp
-       */
-      createdAt: new Date().toISOString(),
-      /*
-       * If params.eventId changes (from tmp id to concrete id) then change the local draft id
-       */
-      eventId: event.id,
-      action: {
-        ...localDraft.action,
-        createdAt: new Date().toISOString()
-      }
-    })
+  const localDraftWithAdjustedTimestamp = {
+    ...localDraft,
+    /*
+     * Force the local draft always to be the latest
+     * This is to prevent a situation where the local draft gets created,
+     * then a CREATE action request finishes in the background and is stored with a later
+     * timestamp
+     */
+    createdAt: new Date().toISOString(),
+    /*
+     * If params.eventId changes (from tmp id to concrete id) then change the local draft id
+     */
+    eventId: event.id,
+    action: {
+      ...localDraft.action,
+      createdAt: new Date().toISOString()
+    }
+  }
 
-  const actionAnnotation = useMemo(() => {
-    return getAnnotationFromDrafts(eventDrafts)
-  }, [eventDrafts])
+  const mergedDraft = activeRemoteDraft
+    ? mergeDrafts(activeRemoteDraft, localDraftWithAdjustedTimestamp)
+    : localDraftWithAdjustedTimestamp
+
+  const actionAnnotation = deepDropNulls(mergedDraft.action.annotation)
 
   useEffect(() => {
-    setInitialAnnotation(actionAnnotation)
+    // Use the annotation values from the zustand state, so that filled form state is not lost
+    // If user e.g. enters the 'screen lock' flow while filling form.
+    // Then use annotation values from drafts.
+    const initialAnnotation = deepMerge(annotation || {}, actionAnnotation)
 
-    return () => {
-      /*
-       * When user leaves the action, remove all
-       * staged drafts the user has for this event id and type
-       */
-      setLocalDraft(null)
-    }
+    setAnnotation(initialAnnotation)
 
     /*
      * This is fine to only run once on mount and unmount as
@@ -126,7 +123,13 @@ function AnnotationActionComponent({ children, actionType }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return <NavigationStack>{children}</NavigationStack>
+  return children
 }
 
-export const AnnotationAction = withSuspense(AnnotationActionComponent)
+export const AnnotationAction = withSuspense((props: Props) => {
+  return (
+    <NavigationStack>
+      <AnnotationActionComponent {...props} />
+    </NavigationStack>
+  )
+})

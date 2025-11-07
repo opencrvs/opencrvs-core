@@ -48,6 +48,7 @@ interface Window {
     LOGIN_URL: string
     AUTH_URL: string
     MINIO_URL: string
+    MINIO_BASE_URL: string // URL without path/bucket information, used for file uploads, v2
     MINIO_BUCKET: string
     COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
@@ -58,10 +59,17 @@ interface Window {
     NID_NUMBER_PATTERN: RegExp
     DECLARATION_AUDIT_LOCATIONS: string
     SENTRY: string
-    REGISTRATIONS_DASHBOARD_URL: string
-    STATISTICS_DASHBOARD_URL: string
-    LEADERBOARDS_DASHBOARD_URL: string
+    DASHBOARDS: Array<{
+      id: string
+      title: {
+        id: string
+        defaultMessage: string
+        description: string
+      }
+      url: string
+    }>
     SIGNATURE_REQUIRED_FOR_ROLES: string[]
+    SYSTEM_IANA_TIMEZONE: string
   }
   __localeId__: string
   __WB_MANIFEST: Array<{ url: string; revision: string }>

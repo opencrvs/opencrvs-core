@@ -10,27 +10,36 @@
  */
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
+import { ShowConditional } from './Conditional'
 
-const Field = z.object({
-  id: z.string().describe('Id of summary field'),
-  value: TranslationConfig.describe(
-    'Summary field value. Can utilise values defined in configuration and EventMetadata'
+const BaseField = z.object({
+  emptyValueMessage: TranslationConfig.optional().describe(
+    'Default message displayed when the field value is empty.'
   ),
-  label: TranslationConfig,
-  emptyValueMessage: TranslationConfig.optional()
+  conditionals: z.array(ShowConditional).default([]).optional()
 })
 
-const Title = z.object({
-  id: z.string(),
-  label: TranslationConfig.describe('Title content'),
-  emptyValueMessage: TranslationConfig.optional()
-})
+const ReferenceField = BaseField.extend({
+  fieldId: z.string(),
+  label: TranslationConfig.optional().describe(
+    'Overrides the default label from the referenced field when provided.'
+  )
+}).describe('Field referencing existing event data by field ID.')
+
+const Field = BaseField.extend({
+  id: z.string().describe('Identifier of the summary field.'),
+  value: TranslationConfig.describe(
+    'Field value template supporting variables from configuration and EventMetadata (e.g. "{informant.phoneNo} {informant.email}").'
+  ),
+  label: TranslationConfig
+}).describe('Custom field defined for the summary view.')
 
 export const SummaryConfig = z
   .object({
-    title: Title.describe('Title of summary view.'),
-    fields: z.array(Field).describe('Fields rendered in summary view.')
+    fields: z
+      .array(z.union([Field, ReferenceField]))
+      .describe('Fields displayed in the event summary view.')
   })
-  .describe('Configuration for summary in event.')
+  .describe('Configuration of the event summary section.')
 
 export type SummaryConfig = z.infer<typeof SummaryConfig>

@@ -88,9 +88,7 @@ type RowProps = {
 export const Row = ({ id, value, label, actions }: RowProps) => (
   <RowContainer id={id}>
     <td>{label}</td>
-    <td data-test-id={`row-value-${id}`} data-testid={`row-value-${id}`}>
-      {value}
-    </td>
+    <td data-testid={`row-value-${id}`}>{value}</td>
     <td>
       <ActionsContainer>{actions}</ActionsContainer>
     </td>

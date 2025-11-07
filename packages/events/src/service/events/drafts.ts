@@ -9,84 +9,56 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { DraftInput, Draft, ActionStatus } from '@opencrvs/commons/events'
+import { Draft, DraftInput, UUID } from '@opencrvs/commons'
+import * as draftsRepo from '@events/storage/postgres/events/drafts'
+import { UserContext } from '@events/context'
 
-import { getUUID } from '@opencrvs/commons'
-import * as events from '@events/storage/mongodb/events'
-
-export async function createDraft(
+export const createDraft = async (
   input: DraftInput,
   {
     eventId,
-    createdBy,
-    createdAtLocation,
+    user,
     transactionId
   }: {
-    eventId: string
-    createdBy: string
-    createdAtLocation: string
-    token: string
+    eventId: UUID
+    user: UserContext
     transactionId: string
   }
-) {
-  const db = await events.getClient()
-  const now = new Date().toISOString()
-
-  const draft: Draft = {
-    id: getUUID(),
-    eventId: eventId,
-    createdAt: now,
+): Promise<Draft> => {
+  const draft = await draftsRepo.createDraft({
+    eventId,
     transactionId,
-    action: {
-      ...input,
-      status: ActionStatus.Accepted,
-      type: input.type,
-      createdBy,
-      createdAt: now,
-      createdAtLocation
-    }
+    actionType: input.type,
+    declaration: input.declaration,
+    annotation: input.annotation,
+    createdBy: user.id,
+    createdByRole: user.role,
+    createdByUserType: user.type,
+    createdAtLocation: user.primaryOfficeId,
+    createdBySignature: user.signature
+  })
+
+  if (!draft) {
+    throw new Error('Failed to create draft')
   }
 
-  await db.collection<Draft>('drafts').updateOne(
-    // Match by transactionId
-    { transactionId },
-    // Update document
-    { $set: draft },
-    // Insert if not found
-    { upsert: true }
-  )
-
-  return draft
+  return {
+    id: draft.id,
+    transactionId: draft.transactionId,
+    createdAt: draft.createdAt,
+    eventId: draft.eventId,
+    action: {
+      transactionId: draft.transactionId,
+      createdAt: draft.createdAt,
+      createdBy: user.id,
+      createdByRole: user.role,
+      createdByUserType: user.type,
+      declaration: draft.declaration,
+      annotation: draft.annotation,
+      type: input.type,
+      status: 'Accepted'
+    }
+  }
 }
 
-export async function getDraftsByUserId(createdBy: string) {
-  const db = await events.getClient()
-  const collection = db.collection<Draft>('drafts')
-
-  const drafts = await collection
-    .find({ 'action.createdBy': createdBy })
-    .toArray()
-
-  return drafts
-}
-
-export async function getDraftsForAction(
-  eventId: string,
-  createdBy: string,
-  actionType: string
-) {
-  const db = await events.getClient()
-  const collection = db.collection<Draft>('drafts')
-
-  const drafts = await collection
-    .find({ eventId, 'action.createdBy': createdBy, 'action.type': actionType })
-    .toArray()
-
-  return drafts
-}
-
-export async function deleteDraftsByEventId(eventId: string) {
-  const db = await events.getClient()
-  const collection = db.collection<Draft>('drafts')
-  await collection.deleteMany({ eventId: eventId })
-}
+export const getDraftsByUserId = draftsRepo.getDraftsByUserId

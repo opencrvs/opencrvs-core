@@ -1,4 +1,5 @@
 {
-  "watch": ["src/**", "../commons/build/**"],
+  "watch": ["src/**", "../commons/build/dist/common/**"],
+  "delay": 2000,
   "ext": "js,ts"
 }

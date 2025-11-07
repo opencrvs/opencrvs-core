@@ -10,14 +10,17 @@
  */
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { FieldProps } from '@opencrvs/commons/client'
 import {
-  getAdminStructureLocations,
-  getLocations
-} from '@client/offline/selectors'
+  Location,
+  FieldPropsWithoutReferenceValue
+} from '@opencrvs/commons/client'
+import { getAdminStructureLocations } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Select } from './Select'
+import { LocationSearch } from './LocationSearch'
 
 function useAdminLocations(partOf: string) {
   const locationMap = useSelector(getAdminStructureLocations)
@@ -30,23 +33,20 @@ function useAdminLocations(partOf: string) {
 
   return filteredLocations.map((location) => ({
     value: location.id,
-    label: {
-      id: 'v2.location.' + location.id,
-      description: 'Label for location: ' + location.name,
-      defaultMessage: location.name
-    }
+    label: location.name
   }))
 }
 
 function AdministrativeAreaInput({
-  setFieldValue,
+  onChange,
   value,
   partOf,
   ...props
-}: FieldProps<'ADMINISTRATIVE_AREA'> & {
-  setFieldValue: (name: string, val: string | undefined) => void
+}: FieldPropsWithoutReferenceValue<'ADMINISTRATIVE_AREA'> & {
+  onChange: (val: string | undefined) => void
   partOf: string | null
   value?: string
+  disabled?: boolean
 }) {
   const options = useAdminLocations(partOf ?? '0')
 
@@ -57,29 +57,37 @@ function AdministrativeAreaInput({
       options={options}
       type="SELECT"
       value={value}
-      onChange={(val: string) => setFieldValue(props.id, val)}
+      onChange={onChange}
     />
   )
 }
 
 function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
-  const locations = useSelector(getLocations)
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
 
-  const location = value.toString() && locations[value.toString()]
+  const location = value.toString()
+    ? locations.find((l) => l.id === value.toString())
+    : null
 
   return location ? location.name : ''
 }
 
-function useStringifier() {
-  const locations = useSelector(getLocations)
-  return (value: string): string => {
-    const name = locations[value]?.name
-    return name ?? EMPTY_TOKEN
-  }
+function stringify(value: string, context: { locations: Location[] }) {
+  const location = context.locations.find((l) => l.id === value)
+
+  const name = location?.name
+  return name ?? EMPTY_TOKEN
+}
+
+function isAdministrativeAreaEmpty(value: Stringifiable) {
+  return !value.toString()
 }
 
 export const AdministrativeArea = {
-  Input: AdministrativeAreaInput,
+  Input: withSuspense(AdministrativeAreaInput),
   Output: AdministrativeAreaOutput,
-  useStringifier: useStringifier
+  stringify,
+  toCertificateVariables: LocationSearch.toCertificateVariables,
+  isEmptyValue: isAdministrativeAreaEmpty
 }

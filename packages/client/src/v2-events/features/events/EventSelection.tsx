@@ -12,6 +12,7 @@
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { Spinner } from '@opencrvs/components'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -19,41 +20,44 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { RadioButton } from '@opencrvs/components/lib/Radio'
+import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
+import { ActionType, isActionInScope } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
-import { withSuspense } from '@client/v2-events/components/withSuspense'
+
 import { createTemporaryId } from '@client/v2-events/utils'
+import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfigurations } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEvents } from './useEvents/useEvents'
+import { useActionAnnotation } from './useActionAnnotation'
 
 const messages = defineMessages({
   registerNewEventTitle: {
-    id: 'v2.register.selectVitalEvent.registerNewEventTitle',
+    id: 'register.selectVitalEvent.registerNewEventTitle',
     defaultMessage: 'New declaration',
     description: 'The title that appears on the select vital event page'
   },
   registerNewEventHeading: {
-    id: 'v2.register.selectVitalEvent.registerNewEventHeading',
+    id: 'register.selectVitalEvent.registerNewEventHeader',
     defaultMessage: 'What type of event do you want to declare?',
     description: 'The section heading on the page'
   },
   continueButton: {
     defaultMessage: 'Continue',
     description: 'Continue Button Text',
-    id: 'v2.buttons.continue'
+    id: 'buttons.continue'
   },
   errorMessage: {
-    id: 'v2.register.selectVitalEvent.errorMessage',
+    id: 'register.selectVitalEvent.errorMessage',
     defaultMessage: 'Please select the type of event',
     description: 'Error Message to show when no event is being selected'
   },
   exitButton: {
     defaultMessage: 'EXIT',
     description: 'Label for Exit button on EventTopBar',
-    id: 'v2.buttons.exit'
+    id: 'buttons.exit'
   }
 })
 
@@ -62,7 +66,7 @@ const constantsMessages = defineMessages({
     defaultMessage: 'Skip to main content',
     description:
       'Label for a keyboard accessibility link which skips to the main content',
-    id: 'v2.constants.skipToMainContent'
+    id: 'constants.skipToMainContent'
   }
 })
 
@@ -73,14 +77,25 @@ function EventSelector() {
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
   const eventConfigurations = useEventConfigurations()
   const events = useEvents()
+  const scopes = useSelector(getScope) ?? []
   const clearForm = useEventFormData((state) => state.clear)
+  const clearAnnotation = useActionAnnotation((state) => state.clear)
   const createEvent = events.createEvent()
+
+  const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>
+    isActionInScope(scopes, ActionType.CREATE, id)
+  )
 
   function handleContinue() {
     if (eventType === '') {
       return setNoEventSelectedError(true)
     }
     const transactionId = createTemporaryId()
+    const eventConfig = eventConfigurations.find(({ id }) => id === eventType)
+
+    if (!eventConfig) {
+      throw new Error(`Configuration for event '${eventType}' not found`)
+    }
 
     createEvent.mutate({
       type: eventType,
@@ -88,6 +103,7 @@ function EventSelector() {
     })
 
     clearForm()
+    clearAnnotation()
 
     navigate(
       ROUTES.V2.EVENTS.DECLARE.buildPath({
@@ -103,27 +119,20 @@ function EventSelector() {
           {intl.formatMessage(messages.errorMessage)}
         </ErrorText>
       )}
-      <Stack
-        alignItems="left"
-        direction="column"
-        gap={16}
-        id="select_vital_event_view"
-      >
-        {eventConfigurations.map((event) => (
-          <RadioButton
-            key={`${event.id}event`}
-            id={`select_${event.id}_event`}
-            label={intl.formatMessage(event.label)}
-            name={`${event.id}event`}
-            selected={eventType === event.id ? event.id : ''}
-            size="large"
-            value={event.id}
-            onChange={() => {
-              setEventType(event.id)
-              setNoEventSelectedError(false)
-            }}
-          />
-        ))}
+      <Stack alignItems="left" direction="column" gap={16}>
+        <RadioGroup
+          name="eventType"
+          options={allowedEventConfigurations.map((event) => ({
+            value: event.id,
+            label: intl.formatMessage(event.label)
+          }))}
+          size={RadioSize.LARGE}
+          value={eventType}
+          onChange={(val) => {
+            setEventType(val)
+            setNoEventSelectedError(false)
+          }}
+        />
 
         <Button
           key="select-vital-event-continue"
@@ -140,9 +149,9 @@ function EventSelector() {
   )
 }
 
-function EventSelection() {
+export function EventSelection() {
   const intl = useIntl()
-  const { goToHome } = useEventFormNavigation()
+  const { closeActionView } = useEventFormNavigation()
 
   return (
     <Frame
@@ -154,7 +163,7 @@ function EventSelection() {
               id="goBack"
               size="small"
               type="secondary"
-              onClick={goToHome}
+              onClick={() => closeActionView()}
             >
               <Icon name="X" />
               {intl.formatMessage(messages.exitButton)}
@@ -163,7 +172,7 @@ function EventSelection() {
           desktopTitle={intl.formatMessage(messages.registerNewEventTitle)}
           mobileLeft={<Icon name="Draft" size="large" />}
           mobileRight={
-            <Button size="medium" type="icon" onClick={goToHome}>
+            <Button size="medium" type="icon" onClick={() => closeActionView()}>
               <Icon name="X" />
             </Button>
           }
@@ -185,5 +194,3 @@ function EventSelection() {
     </Frame>
   )
 }
-
-export const EventSelectionIndex = withSuspense(EventSelection)

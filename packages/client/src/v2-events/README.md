@@ -31,7 +31,11 @@ We will be iterating over the structure during the project. Treat it as a starti
 
 ## Route structure
 
-By default, Events V2 is accessible via the /v2 route, allowing the application’s normal operations to continue alongside its development. When Events V2 needs to be deployed to a live environment as the primary event type, the environment variable `V2_EVENTS=true` can be set in the country config package. This hides the old event views completely and replaces them with Events V2. Once Events V2 is officially released, it will become the default event view.
+By default, Events V2 loads from the root `('/')` route.
+To view the legacy event interface, append the query parameter `?V2_EVENTS=false` to the `('/)` URL and reload the app in your browser — this disables Events V2 and loads the old event views.
+To switch back, set the query parameter to `?V2_EVENTS=true`.
+
+Once Events V2 is fully released, it will replace the legacy event views as the default and the query parameter override will no longer work.
 
 ### Creating route components
 
@@ -60,7 +64,7 @@ const ReviewIndex = withSuspense(Review)
 export { PagesIndex as Pages, ReviewIndex as Review }
 ```
 
-- `withSuspense` allows the route to use suspense queries. Usage without the hook will result to intermittent crashing of the route components.
+- `withSuspense` allows the route to use suspense queries. **Usage without the hook will result to intermittent crashing of the route components**.
 
 ## Development practices
 

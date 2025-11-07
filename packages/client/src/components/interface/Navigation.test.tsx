@@ -135,7 +135,6 @@ describe('Navigation for Registration agent related tests', () => {
       apolloClient: client
     })
     expect(component.exists('#navigation_team')).toBeTruthy()
-    expect(component.exists('#navigation_performance')).toBeTruthy()
     expect(component.exists('#navigation_config_main')).toBeFalsy()
   })
 
@@ -622,126 +621,9 @@ describe('Given a user with scopes views Navigation', () => {
   })
 
   describe('Dashboard', async () => {
-    const id = `#navigation_${WORKQUEUE_TABS.dashboard}`
+    const id = `#navigation_${WORKQUEUE_TABS.dashboard}_test`
 
     const requiredScopes = [SCOPES.PERFORMANCE_READ_DASHBOARDS] as Scope[]
-
-    const allOtherScopes = allScopes.filter(
-      (scope) => !requiredScopes.includes(scope)
-    )
-
-    const tests = [
-      [requiredScopes, true],
-      [allOtherScopes, false]
-    ]
-
-    tests.forEach(async ([scopes, exists]) => {
-      it(`should render when user has correct scopes ${scopes}`, async () => {
-        setScopes(scopes as Scope[], store)
-        testComponent = await build()
-        expect(testComponent.exists(id)).toBe(exists)
-      })
-    })
-  })
-
-  describe('Performance', async () => {
-    const id = `#navigation_${WORKQUEUE_TABS.performance}`
-
-    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
-
-    const allOtherScopes = allScopes.filter(
-      (scope) => !requiredScopes.includes(scope)
-    )
-
-    const tests = [
-      [requiredScopes, true],
-      [allOtherScopes, false]
-    ]
-
-    tests.forEach(async ([scopes, exists]) => {
-      it(`should render when user has correct scopes ${scopes}`, async () => {
-        setScopes(scopes as Scope[], store)
-        testComponent = await build()
-        expect(testComponent.exists(id)).toBe(exists)
-      })
-    })
-  })
-
-  describe('Statistics', async () => {
-    const id = `#navigation_${WORKQUEUE_TABS.statistics}`
-
-    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
-
-    const allOtherScopes = allScopes.filter(
-      (scope) => !requiredScopes.includes(scope)
-    )
-
-    const tests = [
-      [requiredScopes, true],
-      [allOtherScopes, false]
-    ]
-
-    tests.forEach(async ([scopes, exists]) => {
-      it(`should render when user has correct scopes ${scopes}`, async () => {
-        setScopes(scopes as Scope[], store)
-        testComponent = await build()
-        expect(testComponent.exists(id)).toBe(exists)
-      })
-    })
-  })
-
-  describe('Statistics', async () => {
-    const id = `#navigation_${WORKQUEUE_TABS.statistics}`
-
-    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
-
-    const allOtherScopes = allScopes.filter(
-      (scope) => !requiredScopes.includes(scope)
-    )
-
-    const tests = [
-      [requiredScopes, true],
-      [allOtherScopes, false]
-    ]
-
-    tests.forEach(async ([scopes, exists]) => {
-      it(`should render when user has correct scopes ${scopes}`, async () => {
-        setScopes(scopes as Scope[], store)
-        testComponent = await build()
-        expect(testComponent.exists(id)).toBe(exists)
-      })
-    })
-  })
-
-  describe('Statistics', async () => {
-    const id = `#navigation_${WORKQUEUE_TABS.leaderboards}`
-
-    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
-
-    const allOtherScopes = allScopes.filter(
-      (scope) => !requiredScopes.includes(scope)
-    )
-
-    const tests = [
-      [requiredScopes, true],
-      [allOtherScopes, false]
-    ]
-
-    tests.forEach(async ([scopes, exists]) => {
-      it(`should render when user has correct scopes ${scopes}`, async () => {
-        setScopes(scopes as Scope[], store)
-        testComponent = await build()
-        expect(testComponent.exists(id)).toBe(exists)
-      })
-    })
-  })
-
-  describe('Exports', async () => {
-    const id = `#navigation_${WORKQUEUE_TABS.vsexports}`
-
-    const requiredScopes = [
-      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
-    ] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)

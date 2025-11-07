@@ -27,16 +27,6 @@ services:
     environment:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
       - GATEWAY_URL_INTERNAL=http://gateway:7070
-  dashboards:
-    image: ghcr.io/opencrvs/ocrvs-dashboards:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/dashboards/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
-
   login:
     image: ghcr.io/opencrvs/ocrvs-login:${VERSION}
     #platform: linux/amd64
@@ -73,12 +63,11 @@ services:
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - NOTIFICATION_URL=http://notification:2020/
       - WORKFLOW_URL=http://workflow:5050/
-      - APPLICATION_CONFIG_URL=http://config:2021/
       - WEBHOOKS_URL=http://webhooks:2525/
+      - APPLICATION_CONFIG_URL=http://config:2021/
       - CHECK_INVALID_TOKEN=true
       - MINIO_BUCKET=ocrvs
       - DOCUMENTS_URL=http://documents:9050
-
   events:
     image: ghcr.io/opencrvs/ocrvs-events:${VERSION}
     #platform: linux/amd64
@@ -89,13 +78,12 @@ services:
     depends_on:
       - base
     environment:
-      - EVENTS_MONGO_URL=mongodb://mongo1/events
-      - USER_MGNT_MONGO_URL=mongodb://mongo1/user-mgnt
       - ES_URL=http://elasticsearch:9200
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - DOCUMENTS_URL=http://documents:9050
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
       - AUTH_URL=http://auth:4040
+      - CONFIG_URL=http://config:2021
   # User facing services
   workflow:
     image: ghcr.io/opencrvs/ocrvs-workflow:${VERSION}
@@ -184,7 +172,6 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
-      - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - METRICS_URL=http://metrics:1050
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
   user-mgnt:
@@ -198,7 +185,6 @@ services:
       - base
     environment:
       - MONGO_URL=mongodb://mongo1/user-mgnt
-      - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - HOST=0.0.0.0
       - METRICS_URL=http://metrics:1050
       - FHIR_URL=http://hearth:3447/fhir
@@ -293,7 +279,6 @@ services:
     environment:
       - NODE_ENV=development
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
-  
   data-seeder:
     image: ghcr.io/opencrvs/ocrvs-data-seeder:${VERSION}
     #platform: linux/amd64
@@ -304,3 +289,6 @@ services:
       - base
     deploy:
       replicas: 0
+    environment:
+      - EVENTS_URL=http://events:5555/
+      - AUTH_URL=http://auth:4040/

@@ -19,17 +19,17 @@ interface IWorkqueueMessages
 
 const messagesToDefine: IWorkqueueMessages = {
   CREATED: {
-    id: 'v2.wq.noRecords.CREATED',
+    id: 'wq.noRecords.CREATED',
     defaultMessage: 'No records in progress',
     description: 'No records messages for empty draft tab'
   },
   DECLARED: {
-    id: 'v2.wq.noRecords.DECLARED',
+    id: 'wq.noRecords.DECLARED',
     defaultMessage: 'No records ready for review',
     description: 'No records messages for ready for review tab'
   },
   REGISTERED: {
-    id: 'v2.wq.noRecords.REGISTERED',
+    id: 'wq.noRecords.REGISTERED',
     defaultMessage: 'No records ready to print',
     description: 'No records messages for ready to print tab'
   }

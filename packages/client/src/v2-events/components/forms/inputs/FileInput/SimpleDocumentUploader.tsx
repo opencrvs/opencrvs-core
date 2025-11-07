@@ -14,7 +14,7 @@ import styled from 'styled-components'
 import { MimeType, FieldValue, FileFieldValue } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
-import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
+import { formMessages as messages } from '@client/i18n/messages'
 import { DocumentPreview } from './DocumentPreview'
 import { SingleDocumentPreview } from './SingleDocumentPreview'
 import { useOnFileChange } from './useOnFileChange'
@@ -32,6 +32,10 @@ export const DocumentUploader = styled(ImageUploader)<{ fullWidth?: boolean }>`
   }
 `
 
+const Preview = styled(SingleDocumentPreview)`
+  padding: 0px 10px 8px 10px;
+`
+
 const FieldDescription = styled.div`
   margin-top: 0px;
   margin-bottom: 6px;
@@ -39,7 +43,7 @@ const FieldDescription = styled.div`
 
 interface SimpleDocumentUploaderProps {
   name: string
-  label?: string
+  label: string
   file?: FileFieldValue
   description?: string
   width?: 'full' | 'auto'
@@ -48,6 +52,7 @@ interface SimpleDocumentUploaderProps {
   disableDeleteInPreview?: boolean
   onComplete: (file: File | null) => void
   touched?: boolean
+  disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   previewTransformer?: (files: FileFieldValue) => FileFieldValue
   maxFileSize: number
@@ -63,6 +68,7 @@ export function SimpleDocumentUploader({
   file,
   description,
   error: errorProps,
+  disabled,
   disableDeleteInPreview,
   touched,
   width,
@@ -104,8 +110,9 @@ export function SimpleDocumentUploader({
       {errorMessage && (touched || error) && (
         <ErrorText id="field-error">{errorMessage}</ErrorText>
       )}
-      <SingleDocumentPreview
+      <Preview
         attachment={file}
+        disabled={disabled}
         label={label}
         onDelete={onDelete}
         onSelect={selectForPreview}
@@ -115,20 +122,20 @@ export function SimpleDocumentUploader({
           disableDelete={disableDeleteInPreview}
           goBack={closePreviewSection}
           previewImage={previewImage}
-          title={intl.formatMessage(buttonMessages.preview)}
+          title={label}
           onDelete={onDelete}
         />
       )}
-      {!file && (
-        <DocumentUploader
-          fullWidth={width === 'full'}
-          id={name}
-          name={name}
-          onChange={handleFileChange}
-        >
-          {intl.formatMessage(messages.uploadFile)}
-        </DocumentUploader>
-      )}
+      <DocumentUploader
+        data-testid={name}
+        disabled={disabled}
+        fullWidth={width === 'full'}
+        id={name}
+        name={name}
+        onChange={handleFileChange}
+      >
+        {intl.formatMessage(messages.uploadFile)}
+      </DocumentUploader>
     </>
   )
 }

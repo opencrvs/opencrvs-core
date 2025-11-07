@@ -43,9 +43,28 @@ if [ -d $PATH_TO_MINIO_DIR ] ; then
   echo "**** Removed minio data ****"
 fi
 
+####################
+# Clear PostgreSQL #
+####################
+
+echo "Resetting schema 'app' in database 'events'..."
+
+docker exec -i postgres psql -U postgres -d events <<EOF
+DROP SCHEMA IF EXISTS app CASCADE;
+CREATE SCHEMA app AUTHORIZATION events_migrator;
+GRANT USAGE ON SCHEMA app TO events_app;
+EOF
+
+echo "Schema 'app' dropped and recreated."
+
+##################
+# Run migrations #
+##################
+
 echo "Running migrations"
 echo
 
 yarn --cwd="$DIR/packages/migration" start
-
+echo
+yarn reindex
 echo

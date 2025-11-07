@@ -11,15 +11,21 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import {
-  EventDocument,
-  EventIndex,
-  getCurrentEventState
-} from '@opencrvs/commons/client'
+import { useIntl } from 'react-intl'
+import { EventDocument, UUID } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { cacheFiles } from '@client/v2-events/features/files/cache'
-import { useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
+import {
+  useTRPC,
+  trpcOptionsProxy,
+  queryClient,
+  trpcClient
+} from '@client/v2-events/trpc'
 import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+import { throwStructuredError } from '@client/v2-events/routes/TRPCErrorBoundary'
+import { ROUTES } from '@client/v2-events/routes'
+import { buttonMessages } from '@client/i18n/messages'
+import { updateLocalEventIndex } from '../api'
 import { setQueryDefaults } from './utils'
 
 /*
@@ -59,68 +65,123 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
       cacheFiles(eventDocument),
       cacheUsersFromEventDocument(eventDocument)
     ])
+
+    updateLocalEventIndex(eventDocument.id, eventDocument)
+
     return eventDocument
   }
 })
 
-export function useGetEvent() {
+function viewEvent(id: string) {
   const trpc = useTRPC()
-  return {
-    useQuery: (id: string, enabled?: boolean) => {
-      const eventConfig = useEventConfigurations()
-      // Skip the queryFn defined by tRPC and use our own default defined above
-      const { queryFn, ...options } = trpc.event.get.queryOptions(id)
-
-      return useQuery({
-        ...options,
-        enabled: enabled || true,
-        queryKey: trpc.event.get.queryKey(id),
-        meta: {
-          eventConfig
-        }
-      })
+  const eventConfig = useEventConfigurations()
+  const options = trpc.event.get.queryOptions(id)
+  return useSuspenseQuery({
+    // In this case we can use the queryFn as this is a ad-hoc query
+    ...options,
+    queryKey: [['view-event', id]],
+    queryFn: async () => {
+      const eventDocument = await trpcClient.event.get.query(id)
+      await Promise.all([
+        cacheFiles(eventDocument),
+        cacheUsersFromEventDocument(eventDocument)
+      ])
+      return eventDocument
     },
-    useSuspenseQuery: (id: string) => {
-      const eventConfig = useEventConfigurations()
-      // Skip the queryFn defined by tRPC and use our own default defined above
-      const { queryFn, ...options } = trpc.event.get.queryOptions(id)
-
-      return [
-        useSuspenseQuery({
-          ...options,
-          queryKey: trpc.event.get.queryKey(id),
-          meta: {
-            eventConfig
-          }
-        }).data
-      ]
-    }
-  }
+    meta: {
+      eventConfig
+    },
+    gcTime: 0,
+    /*
+     * We never want to refetch this query automatically
+     * because it is the user's explicit (audit logged) action to fetch a record
+     */
+    staleTime: Infinity,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false
+  }).data
 }
 
-/**
- * When full history of an event is not needed, this hook can be used to get the current state of an event.
- * @returns convenience hooks for getting EventState from EventDocument.
- */
-export function useGetEventState() {
-  const getEvent = useGetEvent()
+export function useGetEvent() {
+  const trpc = useTRPC()
+
+  /*
+   * Purpose of this functions is to be able to check if
+   * an event has been downloaded and to get its data
+   * from the cache without making a network request.
+   */
+  const findFromCache = (id: string) => {
+    const eventConfig = useEventConfigurations()
+    // Skip the queryFn defined by tRPC and use our own default defined above
+    const { queryFn, ...options } = trpc.event.get.queryOptions(id)
+
+    return useQuery({
+      ...options,
+      queryKey: trpc.event.get.queryKey(id),
+      meta: {
+        eventConfig
+      },
+      /*
+       * We never want to refetch this query automatically
+       * because it is the user's explicit (audit logged) action to fetch a record
+       */
+      enabled: false,
+      staleTime: Infinity,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false
+    })
+  }
 
   return {
-    useQuery: (id: string) => {
-      const response = getEvent.useQuery(id)
-      const eventState = response.data
-        ? getCurrentEventState(response.data)
-        : undefined
+    findFromCache,
+    /*
+     * This downloads the event document from the server without caching it
+     */
+    viewEvent,
+    getFromCache: (id: UUID) => {
+      const intl = useIntl()
+      const eventConfig = useEventConfigurations()
+      // Skip the queryFn defined by tRPC and use our own default defined above
+      const { queryFn, ...queryOptions } = trpc.event.get.queryOptions(id)
 
-      return {
-        ...response,
-        declaration: eventState
+      const downloaded = queryClient.getQueryData(trpc.event.get.queryKey(id))
+      const downloadedForViewing = queryClient.getQueryData([
+        ['view-event', id]
+      ])
+
+      if (downloadedForViewing) {
+        return viewEvent(id)
       }
-    },
-    useSuspenseQuery: (id: string): EventIndex => {
-      const [eventDocument] = getEvent.useSuspenseQuery(id)
 
-      return getCurrentEventState(eventDocument)
+      if (!downloaded) {
+        throwStructuredError({
+          message: `Event with id ${id} not found in cache. Please ensure the event is first assigned and downloaded to the browser.`,
+          redirection: {
+            label: intl.formatMessage(buttonMessages.refresh),
+            path: ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId: id })
+          }
+        })
+      }
+
+      return useSuspenseQuery({
+        ...queryOptions,
+        queryKey: downloadedForViewing
+          ? [['view-event', id]]
+          : trpc.event.get.queryKey(id),
+        meta: {
+          eventConfig
+        },
+        /*
+         * We never want to refetch this query automatically
+         * because it is the user's explicit (audit logged) action to fetch a record
+         */
+        staleTime: Infinity,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
+        refetchOnWindowFocus: false
+      }).data
     }
   }
 }

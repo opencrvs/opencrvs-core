@@ -11,7 +11,12 @@
 
 import { TRPCError } from '@trpc/server'
 import { ActionType } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createTestClient,
+  sanitizeForSnapshot,
+  setupTestCase,
+  UNSTABLE_EVENT_FIELDS
+} from '@events/tests/utils'
 
 test(`Should add an ${ActionType.ASSIGN} action when last action is not ${ActionType.ASSIGN}`, async () => {
   const { user, generator } = await setupTestCase()
@@ -27,9 +32,11 @@ test(`Should add an ${ActionType.ASSIGN} action when last action is not ${Action
     generator.event.actions.assign(originalEvent.id)
   )
   expect(response.actions.at(-1)?.type).toEqual(ActionType.ASSIGN)
+
+  expect(sanitizeForSnapshot(response, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
 })
 
-test(`Should not add any new actions when assigned to the same user`, async () => {
+test('Should not add any new actions when assigned to the same user', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -59,7 +66,7 @@ test(`Should not add any new actions when assigned to the same user`, async () =
   ])
 })
 
-test(`Should throw error when assigned to a different user`, async () => {
+test('Should throw error when assigned to a different user', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 

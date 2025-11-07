@@ -108,7 +108,7 @@ export const EventTopBar = (props: IEventTopBarProps) => {
             onClick={saveAction.handler}
             id="save_draft"
           >
-            <Icon name="DownloadSimple" />
+            <Icon name="FloppyDisk" />
             {saveAction.label}
           </Button>
         )}
@@ -131,8 +131,3 @@ export const EventTopBar = (props: IEventTopBarProps) => {
     </TopBar>
   )
 }
-
-/** @deprecated since the introduction of `<Frame>` */
-export const FixedEventTopBar = styled(EventTopBar)`
-  position: fixed;
-`

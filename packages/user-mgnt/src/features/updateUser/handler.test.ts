@@ -18,6 +18,14 @@ import { SCOPES } from '@opencrvs/commons/authentication'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
+jest.mock('@opencrvs/commons', () => {
+  const actual = jest.requireActual('@opencrvs/commons')
+  return {
+    ...actual,
+    triggerUserEventNotification: jest.fn()
+  }
+})
+
 const token = jwt.sign(
   { scope: [SCOPES.USER_UPDATE, SCOPES.CONFIG_UPDATE_ALL] },
   readFileSync('./test/cert.key'),
@@ -348,7 +356,7 @@ describe('updateUser handler with config.update:all scope to update primary offi
         ],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        role: 'SOCIAL_WORKER',
+        role: 'HOSPITAL_CLERK',
         primaryOfficeId: '322',
         deviceId: 'D444'
       },
@@ -398,7 +406,7 @@ describe('updateUser handler without config.update:all scope', () => {
         ],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        role: 'SOCIAL_WORKER',
+        role: 'HOSPITAL_CLERK',
         primaryOfficeId: '123456',
         deviceId: 'D444'
       },
@@ -439,7 +447,7 @@ describe('updateUser handler without config.update:all scope', () => {
         ],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        role: 'SOCIAL_WORKER',
+        role: 'HOSPITAL_CLERK',
         primaryOfficeId: '321',
         deviceId: 'D444'
       },

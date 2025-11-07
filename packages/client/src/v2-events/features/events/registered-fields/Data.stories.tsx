@@ -13,18 +13,29 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
 import { noop } from 'lodash'
-import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  FieldType,
+  tennisClubMembershipEvent,
+  TestUserRole
+} from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { FormFieldGeneratorProps } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorProps> = {
   title: 'Inputs/Data',
+  component: FormFieldGenerator,
+  argTypes: {
+    validatorContext: { control: false }
+  },
   decorators: [
-    (Story) => (
+    (Story, context) => (
       <TRPCProvider>
-        <Story />
+        <Story {...context} />
       </TRPCProvider>
-    )
+    ),
+    withValidatorContext
   ]
 }
 
@@ -39,15 +50,10 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
   parameters: {
     layout: 'centered'
   },
-  render: function Component() {
+  render: (args) => {
     return (
       <StyledFormFieldGenerator
-        declaration={{
-          'applicant.firstname': 'Tanya',
-          'applicant.id': '2370934578',
-          'applicant.surname': 'McQuaid',
-          'applicant.dob': '1975-01-02'
-        }}
+        {...args}
         eventConfig={tennisClubMembershipEvent}
         fields={[
           {
@@ -66,32 +72,37 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
               },
               data: [
                 {
-                  fieldId: 'applicant.firstname'
-                },
-                {
-                  fieldId: 'applicant.surname'
+                  fieldId: 'applicant.name'
                 },
                 {
                   fieldId: 'applicant.dob'
                 },
                 {
-                  fieldId: 'applicant'
-                },
-                {
+                  id: 'id',
                   label: {
                     defaultMessage: 'ID',
                     description: 'This is the label for the field',
-                    id: 'v2.event.tennis-club-membership.action.print.verify.id.label'
+                    id: 'event.tennis-club-membership.action.print.verify.id.label'
                   },
-                  value: 'National ID | {applicant.id}'
+                  value: {
+                    defaultMessage: `National ID | {applicant.id}`,
+                    description: 'This is the label for the field',
+                    id: 'event.tennis-club-membership.action.print.verify.id.label'
+                  }
                 }
               ]
             }
           }
         ]}
-        form={{}}
         id="my-form"
-        setAllFieldsDirty={false}
+        initialValues={{
+          'applicant.name': {
+            firstname: 'Tanya',
+            surname: 'McQuaid'
+          },
+          'applicant.id': '2370934578',
+          'applicant.dob': '1975-01-02'
+        }}
         onChange={noop}
       />
     )
@@ -102,16 +113,13 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
   typeof FormFieldGenerator
 > = {
   parameters: {
-    layout: 'centered'
+    layout: 'centered',
+    userRole: TestUserRole.Enum.REGISTRATION_AGENT
   },
-  render: function Component() {
+  render: (args) => {
     return (
       <StyledFormFieldGenerator
-        declaration={{
-          'recommender.none': true,
-          'recommender.firstname': 'John',
-          'applicant.firstname': 'Rasheed'
-        }}
+        {...args}
         eventConfig={tennisClubMembershipEvent}
         fields={[
           {
@@ -130,22 +138,38 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
               },
               data: [
                 {
-                  fieldId: 'applicant.firstname'
+                  fieldId: 'applicant.name'
                 },
                 {
                   fieldId: 'recommender.none'
                 },
-                // recommender.firstname is not rendered, because recommender.none is true
+                // recommender.name is not rendered, because recommender.none is true
                 {
-                  fieldId: 'recommender.firstname'
+                  fieldId: 'recommender.name'
+                },
+                // applicant.isRecommendedByFieldAgent is not rendered, because the user is registration agent
+                {
+                  fieldId: 'applicant.isRecommendedByFieldAgent'
                 }
               ]
             }
           }
         ]}
-        form={{}}
         id="my-form"
-        setAllFieldsDirty={false}
+        initialValues={{
+          'recommender.none': true,
+          // @ts-ignore
+          'recommender.name': {
+            firstname: 'John',
+            surname: ''
+          },
+          // @ts-ignore
+          'applicant.name': {
+            firstname: 'Rasheed',
+            surname: ''
+          },
+          'applicant.isRecommendedByFieldAgent': true
+        }}
         onChange={noop}
       />
     )
@@ -156,16 +180,13 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
   typeof FormFieldGenerator
 > = {
   parameters: {
-    layout: 'centered'
+    layout: 'centered',
+    userRole: TestUserRole.Enum.FIELD_AGENT
   },
-  render: function Component() {
+  render: (args, context) => {
     return (
       <StyledFormFieldGenerator
-        declaration={{
-          'recommender.none': false,
-          'recommender.firstname': 'John',
-          'applicant.firstname': 'Rasheed'
-        }}
+        {...args}
         eventConfig={tennisClubMembershipEvent}
         fields={[
           {
@@ -184,19 +205,33 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
               },
               data: [
                 {
-                  fieldId: 'applicant.firstname'
+                  fieldId: 'applicant.name'
                 },
-                // recommender.firstname is rendered, because recommender.none is false
+                // recommender.name is rendered, because recommender.none is false
                 {
-                  fieldId: 'recommender.firstname'
+                  fieldId: 'recommender.name'
+                },
+                // applicant.isRecommendedByFieldAgent is  rendered, because the user is field agent
+                {
+                  fieldId: 'applicant.isRecommendedByFieldAgent'
                 }
               ]
             }
           }
         ]}
-        form={{}}
         id="my-form"
-        setAllFieldsDirty={false}
+        initialValues={{
+          'recommender.name': {
+            firstname: 'John',
+            surname: ''
+          },
+          'applicant.name': {
+            firstname: 'Rasheed',
+            surname: ''
+          },
+          'recommender.none': false,
+          'applicant.isRecommendedByFieldAgent': true
+        }}
         onChange={noop}
       />
     )

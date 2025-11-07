@@ -34,6 +34,7 @@ const config = {
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
   MINIO_BUCKET: 'ocrvs',
+  MINIO_BASE_URL: 'http://localhost:3535',
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
   APPLICATION_NAME: 'Farajaland CRVS',
   BIRTH: {
@@ -50,7 +51,37 @@ const config = {
     REGISTRATION_TARGET: 45,
     PRINT_IN_ADVANCE: true
   },
+  ADMIN_STRUCTURE: [
+    {
+      id: 'province',
+      label: {
+        id: 'field.address.province.label',
+        defaultMessage: 'Province',
+        description: 'Label for province in address'
+      }
+    },
+    {
+      id: 'district',
+      label: {
+        id: 'field.address.district.label',
+        defaultMessage: 'District',
+        description: 'Label for district in address'
+      }
+    }
+  ],
+  DASHBOARDS: [
+    {
+      id: 'test',
+      title: {
+        id: 'navigation.dashboard',
+        defaultMessage: 'Test Dashboard',
+        description: 'Title for the test dashboard'
+      },
+      url: '/'
+    }
+  ],
   FEATURES: {
+    V2_EVENTS: false,
     DEATH_REGISTRATION: true,
     MARRIAGE_REGISTRATION: true,
     EXTERNAL_VALIDATION_WORKQUEUE: false,
@@ -82,6 +113,7 @@ import {
   getItem,
   setItem
 } from './tests/util'
+import { DASHBOARD } from './navigation/routes'
 
 vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
   createUserForm: mockOfflineData.userForms

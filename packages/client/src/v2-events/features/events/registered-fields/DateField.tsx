@@ -9,20 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/* eslint-disable */
+import format from 'date-fns/format'
+import * as React from 'react'
+import { defineMessages, useIntl } from 'react-intl'
+import {
+  DateField as DateFieldType,
+  DatetimeValue,
+  DateValue
+} from '@opencrvs/commons/client'
 import {
   DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
 } from '@opencrvs/components/lib/DateField'
-import format from 'date-fns/format'
-import * as React from 'react'
-import { DateValue } from '@opencrvs/commons/client'
-import { defineMessages, useIntl } from 'react-intl'
+import { StringifierContext } from './RegisteredField'
 
 const messages = defineMessages({
   dateFormat: {
     defaultMessage: 'd MMMM y',
-    id: 'v2.configuration.dateFormat',
+    id: 'configuration.dateFormat',
     description: 'Default format for date values'
   }
 })
@@ -47,9 +51,8 @@ function DateInput({
   return (
     <DateFieldComponent
       {...props}
-      value={value}
-      onChange={cleanOnChange}
       data-testid={`${props.id}`}
+      value={value}
       onBlur={(e) => {
         const segmentType = String(e.target.id.split('-').pop())
         const val = e.target.value
@@ -64,8 +67,9 @@ function DateInput({
           cleanOnChange(`${dateSegmentVals[0]}-0${val}-${dateSegmentVals[2]}`)
         }
 
-        return props.onBlur && props?.onBlur(e)
+        return props.onBlur && props.onBlur(e)
       }}
+      onChange={cleanOnChange}
     />
   )
 }
@@ -81,10 +85,29 @@ function DateOutput({ value }: { value?: string }) {
     )
   }
 
-  return value ?? ''
+  return String(value ?? '')
+}
+
+function stringify(
+  value: string | undefined,
+  context: StringifierContext<DateFieldType>
+) {
+  // We should allow parsing valid datetimes into the configured date format.
+  const parsed = DateValue.or(DatetimeValue).safeParse(value)
+
+  if (parsed.success) {
+    return format(
+      new Date(parsed.data),
+      context.intl.formatMessage(messages.dateFormat)
+    )
+  }
+
+  return String(value ?? '')
 }
 
 export const DateField = {
   Input: DateInput,
-  Output: DateOutput
+  Output: DateOutput,
+  stringify,
+  toCertificateVariables: stringify
 }

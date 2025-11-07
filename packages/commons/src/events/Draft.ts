@@ -10,27 +10,37 @@
  */
 
 import { z } from 'zod'
-import { ActionBase } from './ActionDocument'
+import { ActionBase, ActionStatus } from './ActionDocument'
 import { BaseActionInput } from './ActionInput'
 import { ActionTypes } from './ActionType'
+import { UUID } from '../uuid'
 
 /*
  * A temporary storage for an action.
  * Stored with details of the event, creator and creation time.
  * Drafts are deleted when the action is committed.
  */
-export const Draft = z.object({
-  id: z.string(),
-  eventId: z.string(),
-  transactionId: z.string(),
-  createdAt: z.string().datetime(),
-  action: ActionBase.extend({
-    type: ActionTypes
-  }).omit({ id: true })
-})
+export const Draft = z
+  .object({
+    id: UUID,
+    eventId: UUID,
+    transactionId: z.string(),
+    createdAt: z.string().datetime(),
+    action: ActionBase.extend({
+      type: ActionTypes.exclude([ActionTypes.Enum.DELETE])
+    }).omit({ id: true, createdAtLocation: true })
+  })
+  .describe(
+    'A temporary storage for an action. Stored with details of the event, creator and creation time.'
+  )
 
 export const DraftInput = BaseActionInput.extend({
-  type: ActionTypes
+  type: ActionTypes.exclude([ActionTypes.Enum.DELETE]),
+  status: z.enum([
+    ActionStatus.Requested,
+    ActionStatus.Accepted,
+    ActionStatus.Rejected
+  ])
 })
 
 export type Draft = z.infer<typeof Draft>

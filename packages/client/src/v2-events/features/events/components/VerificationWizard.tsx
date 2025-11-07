@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { VerificationPageConfig } from '@opencrvs/commons/client'
+import { EventState, VerificationPageConfig } from '@opencrvs/commons/client'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
 import {
   ResponsiveModal,
@@ -28,12 +28,12 @@ const messages = defineMessages({
   cancel: {
     defaultMessage: 'Cancel',
     description: 'Cancel button text in the modal',
-    id: 'v2.buttons.cancel'
+    id: 'buttons.cancel'
   },
   confirm: {
     defaultMessage: 'Confirm',
     description: 'Confirm button text',
-    id: 'v2.buttons.confirm'
+    id: 'buttons.confirm'
   }
 })
 
@@ -45,11 +45,10 @@ export const VerificationWizard = ({
   onNextPage,
   onPreviousPage,
   showReviewButton,
-  pageConfig,
-  onVerifyAction
+  pageConfig
 }: FormWizardProps & {
   pageConfig: VerificationPageConfig
-  onVerifyAction: (val: boolean) => void
+  onNextPage: (values: EventState) => void
 }) => {
   const intl = useIntl()
   const [cancelModal, openCancelModal] = useModal()
@@ -71,9 +70,8 @@ export const VerificationWizard = ({
             key="confirm"
             type="primary"
             onClick={() => {
-              onVerifyAction(false)
               close()
-              return onNextPage()
+              return onNextPage({ [pageConfig.id]: false })
             }}
           >
             {intl.formatMessage(messages.confirm)}
@@ -111,24 +109,21 @@ export const VerificationWizard = ({
             <Button
               role="button"
               size="large"
-              type="negative"
-              onClick={onCancelButtonClick}
+              type="positive"
+              onClick={() => onNextPage({ [pageConfig.id]: true })}
             >
-              <Cross color="white" />
-              {intl.formatMessage(pageConfig.actions.cancel.label)}
+              <Check color="white" />
+              {intl.formatMessage(pageConfig.actions.verify.label)}
             </Button>
 
             <Button
               role="button"
               size="large"
-              type="positive"
-              onClick={() => {
-                onVerifyAction(true)
-                onNextPage()
-              }}
+              type="negative"
+              onClick={onCancelButtonClick}
             >
-              <Check color="white" />
-              {intl.formatMessage(pageConfig.actions.verify.label)}
+              <Cross color="white" />
+              {intl.formatMessage(pageConfig.actions.cancel.label)}
             </Button>
 
             {showReviewButton && (

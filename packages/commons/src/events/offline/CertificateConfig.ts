@@ -10,6 +10,7 @@
  */
 
 import { z } from 'zod'
+import { ShowConditional } from '../Conditional'
 import { TranslationConfig } from '../TranslationConfig'
 
 const FontFamily = z.object({
@@ -24,6 +25,7 @@ const FontFamily = z.object({
 export const CertificateConfig = z.object({
   id: z.string(),
   event: z.string(),
+  isV2Template: z.boolean().optional(),
   label: TranslationConfig,
   isDefault: z.boolean(),
   fee: z.object({
@@ -32,8 +34,11 @@ export const CertificateConfig = z.object({
     delayed: z.number()
   }),
   svgUrl: z.string(),
-  fonts: z.record(FontFamily).optional()
+  fonts: z.record(FontFamily).optional(),
+  conditionals: z.array(ShowConditional).optional()
 })
+
+export type CertificateConfig = z.infer<typeof CertificateConfig>
 
 /**
  * Represents the way client uses it

@@ -11,15 +11,14 @@
 
 import { flatten, uniq } from 'lodash'
 import { EventDocument, EventIndex } from '@opencrvs/commons/client'
-import {
-  queryClient,
-  trpcClient,
-  trpcOptionsProxy
-} from '@client/v2-events/trpc'
+import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { findUserIdsFromDocument, findUserIdsFromIndex } from './utils'
 
 async function cacheUsers(userIds: string[]) {
-  const users = await trpcClient.user.list.query(userIds)
+  const { queryFn, ...options } =
+    trpcOptionsProxy.user.list.queryOptions(userIds)
+
+  const users = await queryClient.fetchQuery(options)
 
   for (const user of users) {
     queryClient.setQueryData(trpcOptionsProxy.user.get.queryKey(user.id), user)

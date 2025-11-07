@@ -74,6 +74,7 @@ export function isFieldValueWithoutTemplates(
 
   if (
     typeof value === 'object' &&
+    value !== null &&
     Object.values(value).some((val) => isTemplateVariable(val))
   ) {
     return false

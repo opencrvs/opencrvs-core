@@ -11,29 +11,34 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 import { expect, fireEvent, fn, userEvent, within } from '@storybook/test'
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
+import { noop } from 'lodash'
 import {
   ConditionalType,
   field,
   FieldType,
   not,
   FieldConfig,
-  EventState
+  EventState,
+  generateTranslationConfig
 } from '@opencrvs/commons/client'
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { FormWizard } from '@client/v2-events/features/events/components/FormWizard'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'FormFieldGenerator/Interaction',
   args: { onChange: fn() },
   decorators: [
-    (Story) => (
+    (Story, context) => (
       <TRPCProvider>
-        <Story />
+        <Story {...context} />
       </TRPCProvider>
-    )
+    ),
+    withValidatorContext
   ]
 }
 
@@ -51,7 +56,7 @@ const fields = [
     label: {
       defaultMessage: 'Date of birth',
       description: 'This is the label for the field',
-      id: 'v2.event.birth.action.declare.form.section.person.field.dob.label'
+      id: 'event.birth.action.declare.form.section.person.field.dob.label'
     },
     conditionals: [
       {
@@ -64,10 +69,11 @@ const fields = [
     id: 'tennis-member.dobUnknown',
     type: FieldType.CHECKBOX,
     required: false,
+    defaultValue: false,
     label: {
       defaultMessage: 'Exact date of birth unknown',
       description: 'This is the label for the field',
-      id: 'v2.event.birth.action.declare.form.section.person.field.age.checkbox.label'
+      id: 'event.birth.action.declare.form.section.person.field.age.checkbox.label'
     }
   },
   {
@@ -77,7 +83,7 @@ const fields = [
     label: {
       defaultMessage: 'Age of the member',
       description: 'This is the label for the field',
-      id: 'v2.event.birth.action.declare.form.section.tennis-member.field.age.label'
+      id: 'event.birth.action.declare.form.section.tennis-member.field.age.label'
     },
     conditionals: [
       {
@@ -103,18 +109,14 @@ export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
     chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
-    const [formData, setFormData] = React.useState<EventState>(declaration)
     return (
       <StyledFormFieldGenerator
-        declaration={declaration}
+        {...args}
         fields={fields}
-        form={formData}
         id="my-form"
-        initialValues={formData}
-        setAllFieldsDirty={false}
+        initialValues={declaration}
         onChange={(data) => {
           args.onChange(data)
-          setFormData(data)
         }}
       />
     )
@@ -168,6 +170,332 @@ export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
         await canvas.findByDisplayValue(12)
 
         await canvas.findByText('Exact date of birth unknown')
+      }
+    )
+  }
+}
+
+const tennisFamilyMembership = [
+  {
+    id: `tennis.membership.parent.firstname`,
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('parent firstname')
+  },
+  {
+    id: `tennis.membership.parent.surname`,
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('parent surname')
+  },
+  {
+    id: `tennis.membership.child.firstname`,
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('child firstname')
+  },
+  {
+    id: `tennis.membership.child.surname`,
+    type: FieldType.TEXT,
+    label: generateTranslationConfig('child surname'),
+    parent: field('tennis.membership.parent.surname'),
+    value: field('tennis.membership.parent.surname')
+  }
+]
+
+const tennisFamilyMembershipDeclaration = {
+  'tennis.membership.parent.firstname': 'Roger',
+  'tennis.membership.parent.surname': '',
+  'tennis.membership.child.firstname': 'Lenny',
+  'tennis.membership.child.surname': ''
+} satisfies EventState
+
+/**
+ * Test case for a bug where values of the parent field were not being copied to the dependent field, when the parent field is changed.
+ */
+export const UpdateParentFieldValues: StoryObj<typeof FormFieldGenerator> = {
+  name: 'Updating values of the parent field should update the child field value too',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={tennisFamilyMembership}
+        id="my-form"
+        initialValues={tennisFamilyMembershipDeclaration}
+        onChange={(data) => {
+          args.onChange(data)
+        }}
+      />
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Renders the form with correct initial values', async () => {
+      await canvas.findByText('parent firstname')
+      await canvas.findByDisplayValue('Roger')
+
+      await canvas.findByText('child firstname')
+      await canvas.findByDisplayValue('Lenny')
+    })
+
+    await step('fills in parent surname input', async () => {
+      await userEvent.type(
+        await canvas.findByTestId(
+          'text__tennis____membership____parent____surname'
+        ),
+        'Federer'
+      )
+      await userEvent.click(await canvas.findByText('parent firstname'))
+    })
+
+    await step(
+      'Renders the child surname with correct values from parent surname field',
+      async () => {
+        await expect(
+          canvas.getByTestId('text__tennis____membership____child____surname')
+        ).toHaveValue('Federer')
+      }
+    )
+
+    await step('change parent surname value', async () => {
+      await userEvent.type(
+        await canvas.findByTestId(
+          'text__tennis____membership____parent____surname'
+        ),
+        ' The GOAT'
+      )
+      await userEvent.click(await canvas.findByText('parent firstname'))
+    })
+
+    await step(
+      'Renders the child surname with correct values from parent surname field',
+      async () => {
+        await expect(
+          canvas.getByTestId('text__tennis____membership____child____surname')
+        ).toHaveValue('Federer The GOAT')
+      }
+    )
+  }
+}
+
+const tennisStyleFields = [
+  {
+    id: 'tennis.style',
+    type: FieldType.SELECT,
+    required: true,
+    label: generateTranslationConfig('tennis style'),
+    options: [
+      {
+        label: generateTranslationConfig('defensive'),
+        value: 'defensive'
+      },
+      {
+        label: generateTranslationConfig('allrounder'),
+        value: 'allrounder'
+      },
+      {
+        label: generateTranslationConfig('hard-hitter'),
+        value: 'hard-hitter'
+      }
+    ]
+  },
+  {
+    id: `tennis.style.firstname`,
+    type: FieldType.TEXT,
+    required: true,
+    label: generateTranslationConfig('first name'),
+    parent: field('tennis.style')
+  }
+] satisfies FieldConfig[]
+
+export const EmptiesWhenParentChanges: StoryObj<typeof FormFieldGenerator> = {
+  name: 'Toggling parent field resets children',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    const initialValues = {
+      'tennis.style': 'defensive',
+      'tennis.style.firstname': 'Roger'
+    }
+
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={tennisStyleFields}
+        id="my-form"
+        initialValues={initialValues}
+        onChange={(data) => {
+          args.onChange(data)
+        }}
+      />
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Renders the form with correct initial values', async () => {
+      await canvas.findByText('tennis style')
+      await canvas.findByText('defensive')
+
+      await canvas.findByText('first name')
+      await canvas.findByDisplayValue('Roger')
+    })
+
+    await step(
+      'Shows new, empty firstname input when selecting a different style',
+      async () => {
+        await userEvent.click(await canvas.findByText('defensive'))
+        await userEvent.click(await canvas.findByText('allrounder'))
+
+        await canvas.findByText('tennis style')
+        await canvas.findByText('allrounder')
+        await expect(canvas.queryByText('defensive')).not.toBeInTheDocument()
+
+        await canvas.findByText('first name')
+        await expect(
+          canvas.queryByDisplayValue('Roger')
+        ).not.toBeInTheDocument()
+      }
+    )
+
+    await step('fills in first name for allrounder player', async () => {
+      await userEvent.type(
+        await canvas.findByTestId('text__tennis____style____firstname'),
+        'Serena'
+      )
+    })
+
+    await step(
+      'Previous values are removed when selecting defensive style again',
+      async () => {
+        await userEvent.click(await canvas.findByText('allrounder'))
+        await userEvent.click(await canvas.findByText('defensive'))
+
+        await canvas.findByText('tennis style')
+        await canvas.findByText('defensive')
+
+        await expect(canvas.queryByText('allrounder')).not.toBeInTheDocument()
+
+        await canvas.findByText('first name')
+
+        await expect(
+          canvas.queryByDisplayValue('Roger')
+        ).not.toBeInTheDocument()
+        await expect(
+          canvas.queryByDisplayValue('Serena')
+        ).not.toBeInTheDocument()
+      }
+    )
+  }
+}
+
+export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
+  name: 'Error is reset when parent field changes',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    const initialValues = {
+      'tennis.style': 'defensive'
+    }
+
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={tennisStyleFields}
+        id="my-form"
+        initialValues={initialValues}
+        onChange={(data) => {
+          args.onChange(data)
+        }}
+      />
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Renders error for required field', async () => {
+      await canvas.findByText('tennis style')
+      await canvas.findByText('defensive')
+
+      await userEvent.click(
+        await canvas.findByTestId('text__tennis____style____firstname')
+      )
+      await userEvent.click(await canvas.findByText('first name'))
+
+      await canvas.findByText('Required')
+    })
+
+    await step('Empties error when selecting a different style', async () => {
+      await userEvent.click(await canvas.findByText('defensive'))
+      await userEvent.click(await canvas.findByText('allrounder'))
+
+      await canvas.findByText('tennis style')
+      await canvas.findByText('allrounder')
+      await expect(canvas.queryByText('defensive')).not.toBeInTheDocument()
+
+      await expect(canvas.queryByText('Required')).not.toBeInTheDocument()
+    })
+  }
+}
+
+export const CustomRequiredValidationMessage: StoryObj<
+  typeof FormFieldGenerator
+> = {
+  name: 'Custom required validation message',
+  parameters: {
+    layout: 'centered'
+  },
+  render: function Component(args) {
+    const [validateAllFields, setValidateAllFields] = useState(false)
+    return (
+      <FormWizard
+        currentPage={0}
+        pageTitle="Tennis form"
+        onNextPage={() => setValidateAllFields(true)}
+        onSubmit={noop}
+      >
+        <StyledFormFieldGenerator
+          {...args}
+          fields={tennisStyleFields.map((f) => {
+            const { parent, ...rest } = f
+            return {
+              ...rest,
+              required: {
+                message: generateTranslationConfig(
+                  `Please fill up ${f.label.defaultMessage} field`
+                )
+              }
+            } satisfies FieldConfig
+          })}
+          id="my-form"
+          initialValues={{}}
+          validateAllFields={validateAllFields}
+          onAllFieldsValidated={() => false}
+          onChange={(data) => {
+            args.onChange(data)
+          }}
+        />
+      </FormWizard>
+    )
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Renders error for required field with custom required validation message',
+      async () => {
+        await userEvent.click(
+          await canvas.findByRole('button', { name: 'Continue' })
+        )
+
+        await canvas.findByText('Please fill up tennis style field')
+        await canvas.findByText('Please fill up first name field')
       }
     )
   }

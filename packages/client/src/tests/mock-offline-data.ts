@@ -459,6 +459,24 @@ export const mockOfflineData = {
       REGISTRATION_TARGET: 45,
       PRINT_IN_ADVANCE: true
     },
+    ADMIN_STRUCTURE: [
+      {
+        id: 'province',
+        label: {
+          id: 'field.address.province.label',
+          defaultMessage: 'Province',
+          description: 'Label for province in address'
+        }
+      },
+      {
+        id: 'district',
+        label: {
+          id: 'field.address.district.label',
+          defaultMessage: 'District',
+          description: 'Label for district in address'
+        }
+      }
+    ],
     MARRIAGE: {
       REGISTRATION_TARGET: 45,
       PRINT_IN_ADVANCE: true
@@ -491,7 +509,7 @@ export const mockOfflineData = {
       isoCode: 'ZMW',
       languagesAndCountry: ['en-ZM']
     },
-    PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/,
+    PHONE_NUMBER_PATTERN: '^01[1-9][0-9]{8}$',
     BIRTH_REGISTRATION_TARGET: 45,
     DEATH_REGISTRATION_TARGET: 45,
     NID_NUMBER_PATTERN: /^[0-9]{9}$/,
@@ -511,7 +529,7 @@ export const mockOfflineData = {
       backgroundImage: '',
       imageFit: 'FILL'
     },
-    PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/
+    PHONE_NUMBER_PATTERN: '^01[1-9][0-9]{8}$'
   },
   systems
 }

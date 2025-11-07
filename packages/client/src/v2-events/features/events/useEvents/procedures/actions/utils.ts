@@ -9,44 +9,73 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  ActionDocument,
   ActionInput,
+  ActionStatus,
   ActionType,
-  EventDocument,
-  getCurrentEventState
+  UUID
 } from '@opencrvs/commons/client'
-import { setEventListData } from '@client/v2-events/features/events/useEvents/api'
+import {
+  findLocalEventConfig,
+  setEventData,
+  updateLocalEventIndex
+} from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
 
+/**
+ * Optimistically update an event by adding a 'dummy' action for the event, before the actual mutation completes.
+ *
+ * @param actionType - The type of action being performed
+ * @param status - Optional status override for the action (defaults to ActionStatus.Accepted)
+ * @param onlyUpdateLocalEventIndex - Whether to update the local event index instead of the full event data (defaults to false)
+ * @returns A function that performs the optimistic update and returns the created optimistic action
+ */
 export function updateEventOptimistically<T extends ActionInput>(
-  actionType: typeof ActionType.DECLARE
+  actionType: ActionType,
+  status: ActionStatus = ActionStatus.Accepted,
+  onlyUpdateLocalEventIndex: boolean = false
 ) {
   return (variables: T) => {
     const localEvent = queryClient.getQueryData(
       trpcOptionsProxy.event.get.queryKey(variables.eventId)
     )
+
     if (!localEvent) {
       return
     }
-    const optimisticEvent: EventDocument = {
-      ...localEvent,
-      actions: [
-        ...localEvent.actions,
-        {
-          id: createTemporaryId(),
-          type: actionType,
-          declaration: variables.declaration,
-          createdAt: new Date().toISOString(),
-          createdBy: '@todo',
-          createdAtLocation: '@todo'
-        }
-      ]
+
+    const eventConfig = findLocalEventConfig(localEvent.type)
+    if (!eventConfig) {
+      return
     }
 
-    setEventListData((eventIndices) =>
-      eventIndices
-        ?.filter((ei) => ei.id !== optimisticEvent.id)
-        .concat(getCurrentEventState(optimisticEvent))
-    )
+    // Unfortunately I was not able to get the typing correct without casting as ActionDocument
+    // but I think the solution is otherwise neat so let's go with it for now.
+    const optimisticAction = {
+      ...variables,
+      id: createTemporaryId(),
+      declaration: variables.declaration || {},
+      createdAt: new Date().toISOString(),
+      createdByUserType: 'user' as const,
+      createdBy: '@todo',
+      createdAtLocation: '@todo' as UUID,
+      status,
+      createdByRole: '@todo',
+      type: actionType
+    } as ActionDocument
+
+    const optimisticEvent = {
+      ...localEvent,
+      actions: [...localEvent.actions, optimisticAction]
+    }
+
+    if (onlyUpdateLocalEventIndex) {
+      updateLocalEventIndex(optimisticEvent.id, optimisticEvent)
+    } else {
+      setEventData(optimisticEvent.id, optimisticEvent)
+    }
+
+    return optimisticAction
   }
 }

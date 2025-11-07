@@ -11,21 +11,34 @@
 
 import { z } from 'zod'
 import { ActionType } from './ActionType'
-import { ActionUpdate } from './ActionDocument'
+import {
+  PrintContent as PrintContent,
+  ActionUpdate,
+  ReasonContent,
+  PotentialDuplicate
+} from './ActionDocument'
+import { extendZodWithOpenApi } from 'zod-openapi'
+import { UUID, getUUID } from '../uuid'
+import { CreatedAtLocation } from './CreatedAtLocation'
+extendZodWithOpenApi(z)
 
 export const BaseActionInput = z.object({
-  eventId: z.string(),
+  eventId: UUID,
   transactionId: z.string(),
   declaration: ActionUpdate.default({}),
   annotation: ActionUpdate.optional(),
-  originalActionId: z.string().optional(),
-  keepAssignment: z.boolean().optional()
+  originalActionId: UUID.optional(), // should not be part of base action.
+  keepAssignment: z.boolean().optional(),
+  // For normal users, the createdAtLocation is resolved on the backend from the user's primaryOfficeId.
+  createdAtLocation: CreatedAtLocation.describe(
+    'A valid office location ID. This is required for system users performing actions. The provided location must be a leaf-location, i.e. it must not have any children locations.'
+  )
 })
 
 const CreateActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.CREATE).default(ActionType.CREATE),
-    createdAtLocation: z.string()
+    createdAtLocation: CreatedAtLocation
   })
 )
 
@@ -34,14 +47,13 @@ export const RegisterActionInput = BaseActionInput.merge(
     type: z.literal(ActionType.REGISTER).default(ActionType.REGISTER),
     registrationNumber: z.string().optional()
   })
-)
+).strict()
 
 export type RegisterActionInput = z.infer<typeof RegisterActionInput>
 
 export const ValidateActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.VALIDATE).default(ActionType.VALIDATE),
-    duplicates: z.array(z.string())
+    type: z.literal(ActionType.VALIDATE).default(ActionType.VALIDATE)
   })
 )
 
@@ -51,7 +63,15 @@ export const NotifyActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY)
   })
-)
+).openapi({
+  default: {
+    eventId: '<event-id-here>',
+    transactionId: getUUID(),
+    declaration: {},
+    annotation: {},
+    type: ActionType.NOTIFY
+  }
+})
 
 export type NotifyActionInput = z.infer<typeof NotifyActionInput>
 
@@ -65,7 +85,8 @@ export const PrintCertificateActionInput = BaseActionInput.merge(
   z.object({
     type: z
       .literal(ActionType.PRINT_CERTIFICATE)
-      .default(ActionType.PRINT_CERTIFICATE)
+      .default(ActionType.PRINT_CERTIFICATE),
+    content: PrintContent.optional()
   })
 )
 
@@ -73,34 +94,63 @@ export type DeclareActionInput = z.infer<typeof DeclareActionInput>
 
 export const RejectDeclarationActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.REJECT).default(ActionType.REJECT)
+    type: z.literal(ActionType.REJECT).default(ActionType.REJECT),
+    content: ReasonContent
   })
 )
 export type RejectDeclarationActionInput = z.infer<
   typeof RejectDeclarationActionInput
 >
 
-export const MarkedAsDuplicateActionInput = BaseActionInput.merge(
+export const DuplicateDetectedActionInput = BaseActionInput.merge(
   z.object({
     type: z
-      .literal(ActionType.MARKED_AS_DUPLICATE)
-      .default(ActionType.MARKED_AS_DUPLICATE)
+      .literal(ActionType.DUPLICATE_DETECTED)
+      .default(ActionType.DUPLICATE_DETECTED),
+    content: z.object({
+      duplicates: z.array(PotentialDuplicate)
+    })
   })
 )
-export type MarkedAsDuplicateActionInput = z.infer<
-  typeof MarkedAsDuplicateActionInput
+
+export const MarkAsDuplicateActionInput = BaseActionInput.merge(
+  z.object({
+    type: z
+      .literal(ActionType.MARK_AS_DUPLICATE)
+      .default(ActionType.MARK_AS_DUPLICATE),
+    content: z
+      .object({
+        duplicateOf: UUID
+      })
+      .optional()
+  })
+)
+export type MarkAsDuplicateActionInput = z.infer<
+  typeof MarkAsDuplicateActionInput
+>
+
+export const MarkNotDuplicateActionInput = BaseActionInput.merge(
+  z.object({
+    type: z
+      .literal(ActionType.MARK_AS_NOT_DUPLICATE)
+      .default(ActionType.MARK_AS_NOT_DUPLICATE)
+  })
+)
+export type MarkNotDuplicateActionInput = z.infer<
+  typeof MarkNotDuplicateActionInput
 >
 
 export const ArchiveActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.ARCHIVE).default(ActionType.ARCHIVE)
+    type: z.literal(ActionType.ARCHIVE).default(ActionType.ARCHIVE),
+    content: ReasonContent
   })
 )
 export type ArchiveActionInput = z.infer<typeof ArchiveActionInput>
 
 export const AssignActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.ASSIGN).default(ActionType.ASSIGN),
+    type: z.literal(ActionType.ASSIGN),
     assignedTo: z.string()
   })
 )
@@ -113,6 +163,7 @@ export const UnassignActionInput = BaseActionInput.merge(
     assignedTo: z.literal(null).default(null)
   })
 )
+
 export type UnassignActionInput = z.infer<typeof UnassignActionInput>
 
 export const RequestCorrectionActionInput = BaseActionInput.merge(
@@ -132,7 +183,8 @@ export const RejectCorrectionActionInput = BaseActionInput.merge(
     requestId: z.string(),
     type: z
       .literal(ActionType.REJECT_CORRECTION)
-      .default(ActionType.REJECT_CORRECTION)
+      .default(ActionType.REJECT_CORRECTION),
+    content: ReasonContent
   })
 )
 
@@ -161,6 +213,9 @@ export const ReadActionInput = BaseActionInput.merge(
 
 export type ReadActionInput = z.infer<typeof ReadActionInput>
 
+export const DeleteActionInput = z.object({ eventId: UUID })
+export type DeleteActionInput = z.infer<typeof DeleteActionInput>
+
 /**
  * ActionInput types are used to validate the input data for the action.
  * In our use case, we use it directly with TRPC to validate the input data for the action.
@@ -169,23 +224,41 @@ export type ReadActionInput = z.infer<typeof ReadActionInput>
  *
  * e.g. mutation.declare({createdAt: new Date()}) vs mutation.declare({createdAt: new Date(), type: 'DECLARE'})
  */
-export const ActionInput = z.discriminatedUnion('type', [
-  CreateActionInput,
-  ValidateActionInput,
-  RegisterActionInput,
-  NotifyActionInput,
-  DeclareActionInput,
-  RejectDeclarationActionInput,
-  MarkedAsDuplicateActionInput,
-  ArchiveActionInput,
-  AssignActionInput,
-  UnassignActionInput,
-  PrintCertificateActionInput,
-  RequestCorrectionActionInput,
-  RejectCorrectionActionInput,
-  ApproveCorrectionActionInput,
-  ReadActionInput
-])
+export const ActionInput = z
+  .discriminatedUnion('type', [
+    CreateActionInput.openapi({ ref: 'CreateActionInput' }),
+    ValidateActionInput.openapi({ ref: 'ValidateActionInput' }),
+    RegisterActionInput.openapi({ ref: 'RegisterActionInput' }),
+    NotifyActionInput.openapi({ ref: 'NotifyActionInput' }),
+    DeclareActionInput.openapi({ ref: 'DeclareActionInput' }),
+    RejectDeclarationActionInput.openapi({
+      ref: 'RejectDeclarationActionInput'
+    }),
+    DuplicateDetectedActionInput.openapi({
+      ref: 'DuplicateDetectedActionInput'
+    }),
+    MarkAsDuplicateActionInput.openapi({
+      ref: 'MarkAsDuplicateActionInput'
+    }),
+    MarkNotDuplicateActionInput.openapi({
+      ref: 'MarkNotDuplicateActionInput'
+    }),
+    ArchiveActionInput.openapi({ ref: 'ArchiveActionInput' }),
+    AssignActionInput.openapi({ ref: 'AssignActionInput' }),
+    UnassignActionInput.openapi({ ref: 'UnassignActionInput' }),
+    PrintCertificateActionInput.openapi({ ref: 'PrintCertificateActionInput' }),
+    RequestCorrectionActionInput.openapi({
+      ref: 'RequestCorrectionActionInput'
+    }),
+    RejectCorrectionActionInput.openapi({ ref: 'RejectCorrectionActionInput' }),
+    ApproveCorrectionActionInput.openapi({
+      ref: 'ApproveCorrectionActionInput'
+    }),
+    ReadActionInput.openapi({ ref: 'ReadActionInput' })
+  ])
+  .openapi({
+    ref: 'ActionInput'
+  })
 
 export type ActionInput = z.input<typeof ActionInput>
 export type ActionInputWithType = z.infer<typeof ActionInput>

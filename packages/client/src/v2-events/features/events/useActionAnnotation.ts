@@ -21,7 +21,6 @@ import { EventState, deepDropNulls } from '@opencrvs/commons/client'
 interface ActionAnnotationProps {
   annotation?: EventState
   setAnnotation: (data: EventState) => void
-  setInitialAnnotation: (data: EventState) => void
   getAnnotation: (initialValues?: EventState) => EventState
   getTouchedFields: () => Record<string, boolean>
   clear: () => void
@@ -50,10 +49,6 @@ export const useActionAnnotation = create<ActionAnnotationProps>()(
     getAnnotation: (initialValues?: EventState) =>
       get().annotation || deepDropNulls(initialValues ?? {}),
     setAnnotation: (data: EventState) => {
-      const annotation = removeUndefinedKeys(data)
-      return set(() => ({ annotation }))
-    },
-    setInitialAnnotation: (data: EventState) => {
       const annotation = removeUndefinedKeys(data)
       return set(() => ({ annotation }))
     },

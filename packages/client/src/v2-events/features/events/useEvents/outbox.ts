@@ -9,90 +9,94 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { hashKey, Mutation, useQuery } from '@tanstack/react-query'
-import type {
-  DecorateMutationProcedure,
-  inferInput,
-  inferOutput
-} from '@trpc/tanstack-react-query'
-import { EventIndex } from '@opencrvs/commons/client'
-import { queryClient, useTRPC } from '@client/v2-events/trpc'
+import { hashKey, MutationKey, useMutationState } from '@tanstack/react-query'
+import * as z from 'zod'
+import { TRPCClientError } from '@trpc/client'
+import {
+  applyDeclarationToEventIndex,
+  getCurrentEventState
+} from '@opencrvs/commons/client'
+import { EventState } from '@opencrvs/commons/client'
+import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
+import { useEventConfigurations } from '../useEventConfiguration'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getPendingMutations<T extends DecorateMutationProcedure<any>>(
-  procedure: T
-) {
-  // type MutationFn = Exclude<T['mutationFn'], undefined>
-  type Data = inferOutput<T>
-  type Variables = inferInput<T>
+const MutationVariables = z.object({
+  eventId: z.string(),
+  declaration: EventState.optional()
+})
 
-  const mutationOptions = procedure.mutationOptions()
-  const key = mutationOptions.mutationKey
-
-  return queryClient
-    .getMutationCache()
-    .getAll()
-    .filter((mutation) => mutation.state.status !== 'success')
-    .filter(
-      (mutation) =>
-        mutation.options.mutationKey &&
-        hashKey(mutation.options.mutationKey) === hashKey(key)
-    ) as Mutation<Data, Error, Variables>[]
+function assignmentMutation(mutationKey: MutationKey) {
+  return [
+    hashKey(trpcOptionsProxy.event.actions.assignment.assign.mutationKey()),
+    hashKey(trpcOptionsProxy.event.actions.assignment.unassign.mutationKey())
+  ].includes(hashKey(mutationKey))
 }
-
-function filterOutboxEventsWithMutation<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends DecorateMutationProcedure<any>
->(
-  events: EventIndex[],
-  mutation: T,
-  filter: (event: EventIndex, parameters: inferInput<T>) => boolean
-) {
-  return getPendingMutations(mutation).flatMap((m) => {
-    const variables = m.state.variables
-    return events.filter((event) => filter(event, variables))
-  })
+function hasConflict(error: unknown) {
+  if (error instanceof TRPCClientError) {
+    return error.data.code === 'CONFLICT'
+  }
+  return false
 }
 
 export function useOutbox() {
   const trpc = useTRPC()
-  const eventListQuery = useQuery({
-    ...trpc.event.list.queryOptions(),
-    queryKey: trpc.event.list.queryKey()
+  const eventConfigurations = useEventConfigurations()
+
+  const pendingMutations = useMutationState({
+    filters: {
+      predicate: (mutation) =>
+        mutation.state.status !== 'success' &&
+        !hasConflict(mutation.state.error) &&
+        !assignmentMutation(mutation.options.mutationKey as MutationKey)
+    },
+    select: (mutation) => mutation
   })
 
-  const eventsList = eventListQuery.data ?? []
+  const outboxEvents = pendingMutations
+    .map((mutation) => {
+      if (mutation.options.meta?.ignoreOutbox) {
+        return null
+      }
+      const maybeVariables = mutation.state.variables
 
-  const eventFromDeclareActions = filterOutboxEventsWithMutation(
-    eventsList,
-    trpc.event.actions.declare.request,
-    (event, parameters) => {
-      return event.id === parameters.eventId
-    }
-  )
+      const parsedVariables = MutationVariables.safeParse(maybeVariables)
 
-  const eventFromValidateActions = filterOutboxEventsWithMutation(
-    eventsList,
-    trpc.event.actions.validate.request,
-    (event, parameters) => {
-      return event.id === parameters.eventId
-    }
-  )
+      if (!parsedVariables.success) {
+        return null
+      }
 
-  const eventFromRegisterActions = filterOutboxEventsWithMutation(
-    eventsList,
-    trpc.event.actions.register.request,
-    (event, parameters) => {
-      return event.id === parameters.eventId
-    }
-  )
+      const { eventId, declaration } = parsedVariables.data
 
-  return eventFromDeclareActions
-    .concat(eventFromDeclareActions)
-    .concat(eventFromValidateActions)
-    .concat(eventFromRegisterActions)
+      const event = queryClient.getQueryData(trpc.event.get.queryKey(eventId))
+
+      if (!event) {
+        return null
+      }
+
+      const eventConfiguration = eventConfigurations.find(
+        (config) => config.id === event.type
+      )
+      if (!eventConfiguration) {
+        return null
+      }
+
+      const eventState = getCurrentEventState(event, eventConfiguration)
+
+      return {
+        // Merge the declaration from mutation to get optimistic declaration
+        ...applyDeclarationToEventIndex(
+          eventState,
+          declaration ?? {},
+          eventConfiguration
+        ),
+        meta: mutation.options.meta
+      }
+    })
+    .filter((event) => event !== null)
     .filter(
       /* uniqueById */
       (e, i, arr) => arr.findIndex((a) => a.id === e.id) === i
     )
+
+  return outboxEvents
 }

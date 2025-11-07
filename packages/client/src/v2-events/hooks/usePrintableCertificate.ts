@@ -9,17 +9,23 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Location } from '@events/service/locations/locations'
+import { useSelector } from 'react-redux'
+import { cloneDeep } from 'lodash'
 import {
+  ActionDocument,
+  ActionType,
+  CertificateTemplateConfig,
+  EventConfig,
   EventDocument,
   EventState,
+  FieldType,
   getCurrentEventState,
   isMinioUrl,
-  User,
-  CertificateTemplateConfig,
-  LanguageConfig
+  LanguageConfig,
+  Location,
+  PrintCertificateAction,
+  UserOrSystem
 } from '@opencrvs/commons/client'
-
 import {
   addFontsToSvg,
   compileSvg,
@@ -27,96 +33,140 @@ import {
   svgToPdfTemplate
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
+import { getOfflineData } from '@client/offline/selectors'
+import { useEventConfiguration } from '../features/events/useEventConfiguration'
+import { hasStringFilename } from '../utils'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function replaceMinioUrlWithBase64(template: Record<string, any>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async function recursiveTransform(obj: any) {
-    if (typeof obj !== 'object' || obj === null) {
-      return obj
+async function replaceMinioUrlWithBase64(
+  declaration: EventState,
+  config: EventConfig
+) {
+  // Clone to avoid mutating the original declaration
+  const declarationClone = cloneDeep(declaration)
+
+  const fileFieldIds = config.declaration.pages
+    .flatMap((page) => page.fields)
+    .filter((field) => field.type === FieldType.FILE)
+    .map((field) => field.id)
+
+  for (const fieldId of fileFieldIds) {
+    const field = declarationClone[fieldId]
+
+    if (hasStringFilename(field) && isMinioUrl(field.filename)) {
+      // TypeScript now knows `field` has a `filename` property of type string
+      field.filename = await fetchImageAsBase64(field.filename)
     }
-
-    const transformedObject = Array.isArray(obj) ? [...obj] : { ...obj }
-
-    for (const key in obj) {
-      const value = obj[key]
-      if (typeof value === 'string' && isMinioUrl(value)) {
-        transformedObject[key] = await fetchImageAsBase64(value)
-      } else if (typeof value === 'object') {
-        transformedObject[key] = await recursiveTransform(value)
-      } else {
-        transformedObject[key] = value
-      }
-    }
-
-    return transformedObject
   }
-  return recursiveTransform(template)
+
+  return declarationClone
 }
 
 export const usePrintableCertificate = ({
   event,
+  config,
   locations,
   users,
   certificateConfig,
   language
 }: {
   event: EventDocument
+  config: EventConfig
   locations: Location[]
-  users: User[]
+  users: UserOrSystem[]
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
 }) => {
-  const currentState = getCurrentEventState(event)
-  const modifiedState = {
-    ...currentState,
+  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { config: appConfig } = useSelector(getOfflineData)
+  const { declaration, ...metadata } = getCurrentEventState(
+    event,
+    eventConfiguration
+  )
+  const copiesPrintedForTemplate = event.actions.filter(
+    (action) =>
+      action.type === ActionType.PRINT_CERTIFICATE &&
+      (action as PrintCertificateAction).content?.templateId ===
+        certificateConfig?.id
+  ).length
+
+  const modifiedMetadata = {
+    ...metadata,
     // Temporarily add `modifiedAt` to the last action's data to display
     // the current certification date in the certificate preview on the review page.
-    modifiedAt: new Date().toISOString()
+    modifiedAt: new Date().toISOString(),
     // Since 'modifiedDate' represents the last action's 'createdAt' date, and when
     // we actually print certificate, in this particular case, last action is PRINT_CERTIFICATE
+    copiesPrintedForTemplate
   }
 
-  if (!language || !certificateConfig) {
+  if (!language || !certificateConfig?.svg) {
     return { svgCode: null }
   }
 
+  const adminLevels = appConfig.ADMIN_STRUCTURE
+
   const certificateFonts = certificateConfig.fonts ?? {}
+
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
-    $state: modifiedState,
-    $declaration: currentState.declaration,
+    $metadata: modifiedMetadata,
+    $declaration: declaration,
+    $actions: event.actions as ActionDocument[],
+    review: true,
     locations,
     users,
-    language
+    language,
+    config,
+    adminLevels
   })
 
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
-  const handleCertify = async (updatedEvent: EventDocument) => {
-    const currentEventState = getCurrentEventState(updatedEvent)
-    const base64ReplacedTemplate = await replaceMinioUrlWithBase64(
-      currentEventState.declaration
+  /**
+   * NOTE: We have separated the preparing and printing of the PDF certificate. Without the separation, user is already unassigned from the event and cache is cleared. We end up losing the images in the PDF unless we run actions in correct order.
+   * 1. Prepare 2. Trigger print action 3. Open the PDF in a new window 4. Redirect user to workqueue.
+   *
+   * Prepares the PDF certificate by resolving image urls to base64 and compiles them into SVG template.
+   * @returns function that opens a new window with the PDF certificate
+   */
+  const preparePdfCertificate = async (updatedEvent: EventDocument) => {
+    const { declaration: updatedDeclaration, ...updatedMetadata } =
+      getCurrentEventState(updatedEvent, eventConfiguration)
+    const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
+      updatedDeclaration,
+      config
     )
 
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
-      $state: currentEventState,
-      $declaration: {
-        ...base64ReplacedTemplate,
-        preview: false
+      $metadata: {
+        ...updatedMetadata,
+        // Temporarily add `modifiedAt` to the last action's data to display
+        // the current certification date in the certificate preview on the review page.
+        modifiedAt: new Date().toISOString(),
+        copiesPrintedForTemplate
       },
+      $declaration: declarationWithResolvedImages,
+      $actions: event.actions as ActionDocument[],
       locations,
+      review: false,
       users,
-      language
+      language,
+      config,
+      adminLevels
     })
 
     const compiledSvgWithFonts = addFontsToSvg(compiledSvg, certificateFonts)
-    const pdfTemplate = svgToPdfTemplate(compiledSvgWithFonts, certificateFonts)
-    printAndDownloadPdf(pdfTemplate, event.id)
+    const pdfTemplate = await svgToPdfTemplate(
+      compiledSvgWithFonts,
+      certificateFonts
+    )
+
+    return () => printAndDownloadPdf(pdfTemplate, event.id)
   }
+
   return {
     svgCode,
-    handleCertify
+    preparePdfCertificate
   }
 }

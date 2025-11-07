@@ -9,45 +9,76 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import _ from 'lodash'
 import {
   ActionDocument,
+  Draft,
   EventDocument,
   FileFieldValue,
   FileFieldWithOptionValue,
+  FullDocumentPath,
   getAcceptedActions
 } from '@opencrvs/commons/client'
-import { precacheFile, removeCached } from './useFileUpload'
+import { removeCached } from '@client/v2-events/cache'
+import { precacheFile } from './useFileUpload'
 
-function getFileNames(actions: ActionDocument[]): string[] {
-  return actions.flatMap((action) =>
-    Object.values(action.declaration).flatMap((value) => {
-      // Handle single file field
-      const fileParsed = FileFieldValue.safeParse(value)
-      if (fileParsed.success) {
-        return [fileParsed.data.filename]
+function isValidFilepath(filepath: string): filepath is FullDocumentPath {
+  try {
+    const regex = new RegExp(`^/${window.config.MINIO_BUCKET}/(.*)`)
+    return regex.test(filepath)
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(`Error matching "${filepath}" with regex`, error)
+  }
+  return false
+}
+
+export function getFilepathsFromActionDocument(
+  actions: ActionDocument[] | Draft['action'][]
+): FullDocumentPath[] {
+  const filepaths = actions.flatMap((action) => {
+    const { declaration, annotation, ...metadata } = action
+    const declarationValues = Object.values(action.declaration)
+    const annotationValues = Object.values(action.annotation ?? {})
+
+    const metadataSignatureFilepaths = Object.values(metadata).filter(
+      (val) => typeof val === 'string' && isValidFilepath(val)
+    )
+
+    const actionFilePaths = [...declarationValues, ...annotationValues].flatMap(
+      (value) => {
+        // Handle single file field & signatures
+        const fileParsed = FileFieldValue.safeParse(value)
+        if (fileParsed.success) {
+          return [fileParsed.data.path]
+        }
+
+        // Handle multiple file field (file with options)
+        const fileOptionParsed = FileFieldWithOptionValue.safeParse(value)
+        if (fileOptionParsed.success) {
+          return fileOptionParsed.data.map((val) => val.path)
+        }
+
+        return []
       }
+    )
 
-      // Handle multiple file field (file with options)
-      const fileOptionParsed = FileFieldWithOptionValue.safeParse(value)
-      if (fileOptionParsed.success) {
-        return fileOptionParsed.data.map((val) => val.filename)
-      }
+    return [...actionFilePaths, ...metadataSignatureFilepaths]
+  })
 
-      return []
-    })
-  )
+  return _.uniq(filepaths)
 }
 
 export async function cacheFiles(eventDocument: EventDocument) {
   const actions = getAcceptedActions(eventDocument)
-  const fileNames = getFileNames(actions)
+  const fileNames = getFilepathsFromActionDocument(actions)
 
-  return Promise.all(fileNames.map(precacheFile))
+  return Promise.all(fileNames.map(async (filename) => precacheFile(filename)))
 }
 
 export async function removeCachedFiles(eventDocument: EventDocument) {
   const actions = getAcceptedActions(eventDocument)
-  const fileNames = getFileNames(actions)
+  const fileNames = getFilepathsFromActionDocument(actions)
 
   return Promise.all(fileNames.map(removeCached))
 }

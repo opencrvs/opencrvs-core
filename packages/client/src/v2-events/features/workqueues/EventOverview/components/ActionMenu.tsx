@@ -9,118 +9,70 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useMemo } from 'react'
-import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
-import formatISO from 'date-fns/formatISO'
-import {
-  validate,
-  ActionType,
-  ConditionalType,
-  SCOPES,
-  EventDocument,
-  type ActionConfig,
-  getCurrentEventStateWithDrafts,
-  getUUID,
-  isWriteAction
-} from '@opencrvs/commons/client'
+import React from 'react'
+import { useIntl } from 'react-intl'
+
+import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import { useAuthentication } from '@client/utils/userUtils'
+import { getOrThrow } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { ROUTES } from '@client/v2-events/routes'
 import { messages } from '@client/i18n/messages/views/action'
-import ProtectedComponent from '@client/components/ProtectedComponent'
-import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+import { useAuthentication } from '@client/utils/userUtils'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { getUsersFullName } from '@client/v2-events/utils'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { ROUTES } from '@client/v2-events/routes'
+import { useAllowedActionConfigurations } from './useAllowedActionConfigurations'
 
-const viewRecordMessage = {
-  id: 'v2.view.record',
-  description: 'Label for view record',
-  defaultMessage: 'View record'
-}
-
-function ReadOnlyViewOption({ event }: { event: EventDocument }) {
+export function ActionMenu({
+  eventId,
+  onAction
+}: {
+  eventId: string
+  onAction?: () => void
+}) {
   const intl = useIntl()
-  const navigate = useNavigate()
-  return (
-    <ProtectedComponent scopes={[SCOPES.RECORD_READ]}>
-      <DropdownMenu.Item
-        key="view-declaration"
-        onClick={() =>
-          navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId: event.id }))
-        }
-      >
-        {intl.formatMessage(viewRecordMessage)}
-      </DropdownMenu.Item>
-    </ProtectedComponent>
-  )
-}
+  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.OVERVIEW)
+  const { getUser } = useUsers()
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+  const { searchEventById } = useEvents()
 
-const actionMessages = defineMessages({
-  assignLabel: {
-    defaultMessage: 'Assign',
-    description: `Label for the ${ActionType.ASSIGN} action in the action menu`,
-    id: 'v2.action.assign.label'
-  },
-  unassignLabel: {
-    defaultMessage: 'Unassign',
-    description: `Label for the ${ActionType.UNASSIGN} action in the action menu`,
-    id: 'v2.action.unassign.label'
-  }
-})
-
-export function ActionMenu({ eventId }: { eventId: string }) {
-  const intl = useIntl()
-  const events = useEvents()
-  const navigate = useNavigate()
-  const authentication = useAuthentication()
-
-  /**
-   * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
-   * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
-   */
-  const { refetch: refetchEvent } = events.getEvent.useQuery(eventId, false)
-  const eventState = events.getEventState.useSuspenseQuery(eventId)
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
-
-  if (!authentication) {
-    throw new Error('Authentication is not available but is required')
-  }
-
-  const assignmentStatus = getAssignmentStatus(eventState, authentication.sub)
-
-  const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts()
-  const eventStateWithDrafts = useMemo(
-    () => getCurrentEventStateWithDrafts(event, drafts),
-    [drafts, event]
+  const maybeAuth = useAuthentication()
+  const auth = getOrThrow(
+    maybeAuth,
+    'Authentication is not available but is required'
   )
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
+  const getEventQuery = searchEventById.useSuspenseQuery(eventId)
+
+  const eventResults = getEventQuery
+
+  if (eventResults.total === 0) {
+    throw new Error(`Event ${eventId} not found`)
+  }
+  const eventState = eventResults.results[0]
+
+  const assignedToUser = getUser.useQuery(eventState.assignedTo || '', {
+    enabled: !!eventState.assignedTo
+  }).data
+  const assignedUserFullName = assignedToUser
+    ? getUsersFullName(assignedToUser.name, intl.locale)
+    : ''
+  const assignedOffice = assignedToUser?.primaryOfficeId || ''
+  const assignedOfficeName =
+    locations.find((l) => l.id === assignedOffice)?.name || ''
+
+  const [modal, actionMenuItems] = useAllowedActionConfigurations(
+    eventState,
+    auth
   )
 
-  function isActionVisible(action: ActionConfig) {
-    if (action.conditionals.length === 0) {
-      return true
-    }
-
-    const params = {
-      $event: event,
-      $user: authentication,
-      $now: formatISO(new Date(), { representation: 'date' })
-    }
-    return action.conditionals.reduce((acc, conditional) => {
-      if (conditional.type === ConditionalType.SHOW) {
-        return acc && validate(conditional.conditional, params)
-      }
-
-      return acc
-    }, true)
-  }
+  const assignedToOther =
+    eventState.assignedTo && eventState.assignedTo !== auth.sub
 
   return (
     <>
@@ -134,89 +86,35 @@ export function ActionMenu({ eventId }: { eventId: string }) {
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          {/* if an event has declaration, then it is viewable */}
-          {Object.keys(eventStateWithDrafts.declaration).length > 0 && (
-            <ReadOnlyViewOption event={event} />
+          {assignedToOther && (
+            <>
+              <DropdownMenu.Label>
+                {intl.formatMessage(messages.assignedTo, {
+                  name: assignedUserFullName,
+                  officeName: assignedOfficeName
+                })}
+              </DropdownMenu.Label>
+              <DropdownMenu.Separator />
+            </>
           )}
-          {configuration.actions.filter(isActionVisible).map((action) => {
+          {actionMenuItems.map((action) => {
             return (
               <DropdownMenu.Item
                 key={action.type}
-                disabled={
-                  assignmentStatus !== AssignmentStatus.ASSIGNED_TO_SELF &&
-                  isWriteAction(action.type)
-                }
-                onClick={() => {
-                  if (
-                    action.type === ActionType.REJECT ||
-                    action.type === ActionType.ARCHIVE ||
-                    action.type === ActionType.MARKED_AS_DUPLICATE ||
-                    action.type === ActionType.APPROVE_CORRECTION ||
-                    action.type === ActionType.REJECT_CORRECTION
-                  ) {
-                    alert(`Action ${action.type} is not implemented yet.`)
-                    return
-                  }
-
-                  if (
-                    action.type === ActionType.REGISTER ||
-                    action.type === ActionType.VALIDATE
-                  ) {
-                    navigate(
-                      ROUTES.V2.EVENTS[action.type].REVIEW.buildPath({
-                        eventId
-                      })
-                    )
-                  } else {
-                    navigate(
-                      ROUTES.V2.EVENTS[action.type].buildPath({ eventId })
-                    )
-                  }
+                disabled={'disabled' in action ? action.disabled : false}
+                onClick={async () => {
+                  await action.onClick(workqueue)
+                  onAction?.()
                 }}
               >
+                <Icon color="currentColor" name={action.icon} size="small" />
                 {intl.formatMessage(action.label)}
               </DropdownMenu.Item>
             )
           })}
-          {assignmentStatus === AssignmentStatus.UNASSIGNED && (
-            <DropdownMenu.Item
-              key={ActionType.ASSIGN}
-              onClick={async () => {
-                /**
-                 * Mutations typically follow a “fire-and-forget” approach and do not need to be awaited.
-                 * However, in this case, we need to finish refetching the event first before mutating.
-                 * Hence, awaiting is required.
-                 */
-                await events.actions.assignment.assign.mutate({
-                  eventId,
-                  assignedTo: authentication.sub,
-                  refetchEvent
-                })
-              }}
-            >
-              {intl.formatMessage(actionMessages.assignLabel)}
-            </DropdownMenu.Item>
-          )}
-          {(assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF ||
-            (assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS &&
-              authentication.scope.includes(
-                SCOPES.RECORD_UNASSIGN_OTHERS
-              ))) && (
-            <DropdownMenu.Item
-              key={ActionType.UNASSIGN}
-              onClick={() => {
-                events.actions.assignment.unassign.mutate({
-                  eventId,
-                  transactionId: getUUID(),
-                  assignedTo: null
-                })
-              }}
-            >
-              {intl.formatMessage(actionMessages.unassignLabel)}
-            </DropdownMenu.Item>
-          )}
         </DropdownMenu.Content>
       </DropdownMenu>
+      {modal}
     </>
   )
 }

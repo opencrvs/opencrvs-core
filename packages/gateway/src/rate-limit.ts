@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as client from '@gateway/utils/redis'
+import { redis } from '@gateway/utils/redis'
 import { GraphQLResolveInfo, GraphQLError } from 'graphql'
 import { Context } from '@gateway/graphql/context'
 import { getUserId, hasScope } from '@gateway/features/user/utils'
@@ -52,9 +52,15 @@ const withRateLimit = <A extends any[], R>(
   }
 
   return async function (...args: A) {
-    const [requests] = await client.incrementWithTTL(key, TTL_IN_MS)
+    const [requests] = await redis
+      .multi()
+      .incr(key)
+      .pExpire(key, TTL_IN_MS)
+      .exec()
 
-    if (requests > requestsPerMinute) {
+    const requestsNumber = Number(requests)
+
+    if (requestsNumber > requestsPerMinute) {
       throw new RateLimitError(
         'Too many requests within a minute. Please throttle your requests.'
       )

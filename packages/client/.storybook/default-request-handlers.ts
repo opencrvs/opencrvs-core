@@ -16,11 +16,21 @@ import { mockOfflineData } from '../src/tests/mock-offline-data'
 import forms from '../src/tests/forms.json'
 import { AppRouter } from '../src/v2-events/trpc'
 import {
-  tennisClubMembershipEventIndex,
-  tennisClubMembershipEventDocument
+  tennisClubMembershipEventDocument,
+  TestImage
 } from '../src/v2-events/features/events/fixtures'
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  generateWorkqueues,
+  TENNIS_CLUB_MEMBERSHIP,
+  UUID,
+  tennisClubMembershipEvent,
+  footballClubMembershipEvent,
+  libraryMembershipEvent,
+  LocationType,
+  TestUserRole
+} from '@opencrvs/commons/client'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 
 async function ensureCacheExists(cacheName: string) {
   const cacheNames = await caches.keys()
@@ -45,6 +55,165 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+export const V2_DEFAULT_MOCK_LOCATIONS = [
+  {
+    id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    name: 'Central',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: null,
+    validUntil: null
+  },
+  {
+    id: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
+    name: 'Sulaka',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: null,
+    validUntil: null
+  },
+  {
+    id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
+    name: 'Pualula',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: null,
+    validUntil: null
+  },
+  {
+    id: '6d1a59df-988c-4021-a846-ccbc021931a7' as UUID,
+    name: 'Chuminga',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: null,
+    validUntil: null
+  },
+  {
+    id: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    name: 'Ibombo',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    validUntil: null
+  },
+  {
+    // @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
+    // @TODO:  Find a way to give out context aware mock values in the future.
+    id: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
+    name: 'Isango',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    validUntil: null
+  },
+  {
+    id: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
+    name: 'Isamba',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    validUntil: null
+  },
+  {
+    id: '89a33893-b17d-481d-a26d-6461e7ac1651' as UUID,
+    name: 'Itambo',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    validUntil: null
+  },
+  {
+    id: 'd42ab2fe-e7ed-470e-8b31-4fb27f9b8250' as UUID,
+    name: 'Ezhi',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    validUntil: null
+  },
+  {
+    id: '423d000f-101b-47c0-8b86-21a908067cee' as UUID,
+    name: 'Chamakubi Health Post',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '4d3279be-d026-420c-88f7-f0a4ae986973' as UUID,
+    name: 'Ibombo Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '190902f4-1d77-476a-8947-41145af1db7d' as UUID,
+    name: 'Chikobo Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: 'f5ecbd9b-a01e-4a65-910e-70e86ab41b71' as UUID,
+    name: 'Chilochabalenje Health Post',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: 'dbfc178f-7295-4b90-b28d-111c95b03127' as UUID,
+    name: 'Chipeso Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '09862bfe-c7ac-46cd-987b-668681533c80' as UUID,
+    name: 'Chisamba Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '834ce389-e95b-4fb0-96a0-33e9ab323059' as UUID,
+    name: 'Chitanda Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '0431c433-6062-4a4c-aee9-25271aec61ee' as UUID,
+    name: 'Golden Valley Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: 'bc84d0b6-7ba7-480d-a339-5d9920d90eb2' as UUID,
+    name: 'Ipongo Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '4cf1f53b-b730-41d2-8649-dff7eeed970d' as UUID,
+    name: 'Itumbwe Health Post',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '4b3676cb-9355-4942-9eb9-2ce46acaf0e0' as UUID,
+    name: 'Kabangalala Rural Health Centre',
+    locationType: LocationType.enum.HEALTH_FACILITY,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+    name: 'Ibombo District Office',
+    locationType: LocationType.enum.CRVS_OFFICE,
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null
+  },
+  {
+    id: '62a0ccb4-4f30-4f30-8882-f256007dff9f' as UUID,
+    name: 'Isamba District Office',
+    locationType: LocationType.enum.CRVS_OFFICE,
+    parentId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
+    validUntil: null
+  }
+]
+
 export const handlers = {
   drafts: [
     tRPCMsw.event.draft.list.query(() => {
@@ -53,45 +222,21 @@ export const handlers = {
   ],
   deleteEvent: [
     tRPCMsw.event.delete.mutation(() => {
-      return { id: '123' }
+      return { id: '123' as UUID }
     })
   ],
   events: [
     tRPCMsw.event.config.get.query(() => {
-      return [tennisClubMembershipEvent]
-    }),
-    tRPCMsw.event.list.query(() => {
-      return [tennisClubMembershipEventIndex]
+      return [
+        tennisClubMembershipEvent,
+        footballClubMembershipEvent,
+        libraryMembershipEvent
+      ]
     })
   ],
   eventLocations: [
-    tRPCMsw.locations.get.query(() => {
-      return [
-        {
-          id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          externalId: 'AWn3s2RqgAN',
-          name: 'Central',
-          partOf: null
-        },
-        {
-          id: 'c599b691-fd2d-45e1-abf4-d185de727fb5',
-          externalId: 'KozcEjeTyuD',
-          name: 'Sulaka',
-          partOf: null
-        },
-        {
-          id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64',
-          externalId: 'B1u1bVtIA92',
-          name: 'Pualula',
-          partOf: null
-        },
-        {
-          id: '6d1a59df-988c-4021-a846-ccbc021931a7',
-          externalId: 'dbTLdTi7s8F',
-          name: 'Chuminga',
-          partOf: null
-        }
-      ]
+    tRPCMsw.locations.list.query(() => {
+      return V2_DEFAULT_MOCK_LOCATIONS
     })
   ],
   getUserRoles: [
@@ -142,11 +287,11 @@ export const handlers = {
               __typename: 'UserRole'
             },
             {
-              id: 'SOCIAL_WORKER',
+              id: 'HOSPITAL_CLERK',
               label: {
-                id: 'userRole.socialWorker',
-                defaultMessage: 'Social Worker',
-                description: 'Name for user role Social Worker',
+                id: 'userRole.hospitalClerk',
+                defaultMessage: 'Hospital Clerk',
+                description: 'Name for user role Hospital Clerk',
                 __typename: 'I18nMessage'
               },
               scopes: [
@@ -184,11 +329,11 @@ export const handlers = {
               __typename: 'UserRole'
             },
             {
-              id: 'LOCAL_LEADER',
+              id: 'COMMUNITY_LEADER',
               label: {
-                id: 'userRole.localLeader',
-                defaultMessage: 'Local Leader',
-                description: 'Name for user role Local Leader',
+                id: 'userRole.communityLeader',
+                defaultMessage: 'Community Leader',
+                description: 'Name for user role Community Leader',
                 __typename: 'I18nMessage'
               },
               scopes: [
@@ -372,7 +517,7 @@ export const handlers = {
     })
   ],
   files: [
-    http.get('/api/presigned-url/event-attachments/:filename', async (req) => {
+    http.get('/api/presigned-url/:filePath*', async (req) => {
       return HttpResponse.json({
         presignedURL: `http://localhost:3535/ocrvs/tree.svg`
       })
@@ -380,11 +525,9 @@ export const handlers = {
     http.post('/api/upload', async (req) => {
       const formData = await req.request.formData()
 
-      return HttpResponse.text(
-        `event-attachments/${formData.get('transactionId')}.jpg`
-      )
+      return HttpResponse.text(`${formData.get('transactionId')}.jpg`)
     }),
-    http.delete('/api/files/:filename', async (request) => {
+    http.delete('/api/files/:filePath*', async (request) => {
       return HttpResponse.text('OK')
     }),
     http.get('http://localhost:3535/ocrvs/:id', async (request) => {
@@ -396,55 +539,58 @@ export const handlers = {
         return response
       }
 
-      const defaultFile = `
-        <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M3 6C3 4.34315 4.34315 3 6 3H14C15.6569 3 17 4.34315 17 6V14C17 15.6569 15.6569 17 14 17H6C4.34315 17 3 15.6569 3 14V6Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M21 7V18C21 19.6569 19.6569 21 18 21H7" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M3 12.375L6.66789 8.70711C7.05842 8.31658 7.69158 8.31658 8.08211 8.70711L10.875 11.5M10.875 11.5L13.2304 9.1446C13.6209 8.75408 14.2541 8.75408 14.6446 9.14461L17 11.5M10.875 11.5L12.8438 13.4688" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      `
-
-      const tree = `
-        <svg width="150" height="200" xmlns="http://www.w3.org/2000/svg">
-        <rect x="65" y="100" width="20" height="60" fill="#8B4513" />
-        <circle cx="75" cy="80" r="40" fill="green" />
-        <circle cx="55" cy="90" r="30" fill="darkgreen" />
-        <circle cx="95" cy="90" r="30" fill="darkgreen" />
-        <circle cx="75" cy="60" r="30" fill="darkgreen" />
-        </svg>`
-
-      const fish = `
-        <svg width="150" height="100" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="75" cy="50" rx="50" ry="30" fill="#1E90FF" />
-        <polygon points="115,50 135,35 135,65" fill="#4682B4" />
-        <circle cx="55" cy="40" r="5" fill="white" />
-        <path d="M55,50 Q65,40 75,50 Q65,60 55,50" fill="lightblue" />
-        </svg>`
-
-      const mountain = `
-          <svg width="200" height="150" xmlns="http://www.w3.org/2000/svg">
-          <rect width="200" height="80" y="70" fill="#98FB98" />
-          <polygon points="50,70 100,20 150,70" fill="#A9A9A9" />
-          <polygon points="70,70 120,30 170,70" fill="#808080" />
-          <circle cx="30" cy="30" r="20" fill="#FFD700" />
-          </svg>`
-
       const url = new URL(request.request.url)
+
       const basename = url.pathname.split('/').pop()
 
       let file: string
       switch (basename) {
         case 'tree.svg':
-          file = tree
+          file = TestImage.Tree
           break
         case 'fish.svg':
-          file = fish
+          file = TestImage.Fish
           break
         case 'mountain.svg':
-          file = mountain
+          file = TestImage.Mountain
           break
         default:
-          file = defaultFile
+          file = TestImage.Box
+      }
+
+      return new HttpResponse(file, {
+        headers: {
+          'Content-Type': 'image/svg+xml',
+          'Cache-Control': 'no-cache'
+        }
+      })
+    }),
+    http.get('http://localhost:3535/ocrvs/:eventId/:id', async (request) => {
+      const cache = await caches.open(FAKE_CACHE_NAME)
+
+      const response = await cache.match(request.request)
+
+      if (response) {
+        return response
+      }
+
+      const url = new URL(request.request.url)
+
+      const basename = url.pathname.split('/').pop()
+
+      let file: string
+      switch (basename) {
+        case 'tree.svg':
+          file = TestImage.Tree
+          break
+        case 'fish.svg':
+          file = TestImage.Fish
+          break
+        case 'mountain.svg':
+          file = TestImage.Mountain
+          break
+        default:
+          file = TestImage.Box
       }
 
       return new HttpResponse(file, {
@@ -580,11 +726,11 @@ export const handlers = {
               __typename: 'UserRole'
             },
             {
-              id: 'SOCIAL_WORKER',
+              id: 'HOSPITAL_CLERK',
               label: {
-                id: 'userRole.socialWorker',
-                defaultMessage: 'Social Worker',
-                description: 'Name for user role Social Worker',
+                id: 'userRole.hospitalClerk',
+                defaultMessage: 'Hospital Clerk',
+                description: 'Name for user role Hospital Clerk',
                 __typename: 'I18nMessage'
               },
               scopes: [
@@ -622,11 +768,11 @@ export const handlers = {
               __typename: 'UserRole'
             },
             {
-              id: 'LOCAL_LEADER',
+              id: 'COMMUNITY_LEADER',
               label: {
-                id: 'userRole.localLeader',
-                defaultMessage: 'Local Leader',
-                description: 'Name for user role Local Leader',
+                id: 'userRole.communityLeader',
+                defaultMessage: 'Community Leader',
+                description: 'Name for user role Community Leader',
                 __typename: 'I18nMessage'
               },
               scopes: [
@@ -856,12 +1002,12 @@ export const handlers = {
                   labels: [
                     {
                       lang: 'en',
-                      label: 'Social Worker',
+                      label: 'Hospital Clerk',
                       __typename: 'RoleLabel'
                     },
                     {
                       lang: 'fr',
-                      label: 'Travailleur social',
+                      label: "Commis d'hôpital",
                       __typename: 'RoleLabel'
                     }
                   ],
@@ -888,12 +1034,12 @@ export const handlers = {
                   labels: [
                     {
                       lang: 'en',
-                      label: 'Local Leader',
+                      label: 'Community Leader',
                       __typename: 'RoleLabel'
                     },
                     {
                       lang: 'fr',
-                      label: 'Leader local',
+                      label: 'Leader communautaire',
                       __typename: 'RoleLabel'
                     }
                   ],
@@ -1065,78 +1211,219 @@ export const handlers = {
     })
   ],
   user: [
-    graphql.query('fetchUser', () => {
+    graphql.query('getUserAuditLog', (input) => {
+      const start = input.variables.skip || 0
+      const end = start + (input.variables.count || 10)
+      const total = 11
       return HttpResponse.json({
         data: {
-          getUser: {
-            id: '679397db138339c63cdc24e1',
-            userMgntUserID: '679397db138339c63cdc24e1',
-            creationDate: '1737725915295',
-            username: 'k.mweene',
-            practitionerId: '6f672b75-ec29-4bdc-84f6-4cb3ff9bb529',
-            mobile: '+260933333333',
-            email: 'kalushabwalya1.7@gmail.com',
-            role: {
-              label: {
-                id: 'userRole.localRegistrar',
-                defaultMessage: 'Local Registrar',
-                description: 'Name for user role Local Registrar',
-                __typename: 'I18nMessage'
-              },
-              __typename: 'UserRole'
-            },
-            status: 'active',
-            name: [
+          getUserAuditLog: {
+            total,
+            results: [
               {
-                use: 'en',
-                firstNames: 'Kennedy',
-                familyName: 'Mweene',
-                __typename: 'HumanName'
+                time: '2025-10-03T10:46:49.362Z',
+                userAgent: 'undefined',
+                practitionerId: input.variables.userId,
+                ipAddress: '127.0.0.1',
+                action: 'LOGGED_OUT',
+                isV2: null,
+                __typename: 'UserAuditLogItem'
+              },
+              {
+                time: '2025-10-03T10:44:55.012Z',
+                userAgent: 'undefined',
+                practitionerId: input.variables.userId,
+                ipAddress: '127.0.0.1',
+                action: 'LOGGED_IN',
+                isV2: null,
+                __typename: 'UserAuditLogItem'
+              },
+              {
+                time: '2025-10-03T10:44:49.362Z',
+                userAgent: 'undefined',
+                practitionerId: input.variables.userId,
+                ipAddress: '127.0.0.1',
+                action: 'LOGGED_OUT',
+                isV2: null,
+                __typename: 'UserAuditLogItem'
+              },
+              {
+                time: '2025-10-03T10:43:16.704Z',
+                userAgent:
+                  'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
+                practitionerId: input.variables.userId,
+                ipAddress: '127.0.0.1',
+                action: 'ASSIGNED',
+                isV2: null,
+                data: {
+                  compositionId: '0458a3ba-3f30-4345-be16-9ec81aa39b89',
+                  trackingId: 'BSK4XRC',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:24:25.604Z',
+                userAgent: '',
+                practitionerId: '68df9529f8f3a73007a44264',
+                ipAddress: '',
+                action: 'VIEWED',
+                isV2: true,
+                data: {
+                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+                  trackingId: 'MOX89J',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:24:25.604Z',
+                userAgent: '',
+                practitionerId: input.variables.userId,
+                ipAddress: '',
+                action: 'ASSIGNED',
+                isV2: true,
+                data: {
+                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+                  trackingId: 'MOX89J',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:24:25.604Z',
+                userAgent: '',
+                practitionerId: input.variables.userId,
+                ipAddress: '',
+                action: 'VIEWED',
+                isV2: true,
+                data: {
+                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+                  trackingId: 'MOX89J',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:24:25.604Z',
+                userAgent: '',
+                practitionerId: input.variables.userId,
+                ipAddress: '',
+                action: 'VIEWED',
+                isV2: true,
+                data: {
+                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+                  trackingId: 'MOX89J',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:23:45.604Z',
+                userAgent: '',
+                practitionerId: input.variables.userId,
+                ipAddress: '',
+                action: 'VIEWED',
+                isV2: true,
+                data: {
+                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+                  trackingId: 'MOX89J',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:23:25.604Z',
+                userAgent: '',
+                practitionerId: input.variables.userId,
+                ipAddress: '',
+                action: 'VIEWED',
+                isV2: true,
+                data: {
+                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+                  trackingId: 'MOX89J',
+                  __typename: 'AdditionalIdWithCompositionId'
+                },
+                __typename: 'UserAuditLogItemWithComposition'
+              },
+              {
+                time: '2025-10-03T09:22:10.128Z',
+                userAgent: 'undefined',
+                practitionerId: input.variables.userId,
+                ipAddress: '127.0.0.1',
+                action: 'LOGGED_IN',
+                isV2: null,
+                __typename: 'UserAuditLogItem'
               }
-            ],
-            primaryOffice: {
-              id: '028d2c85-ca31-426d-b5d1-2cef545a4902',
-              name: 'Ibombo District Office',
-              alias: ['Ibombo District Office'],
-              status: 'active',
-              __typename: 'Location'
-            },
-            localRegistrar: {
-              name: [
-                {
-                  use: 'en',
-                  firstNames: 'Kennedy',
-                  familyName: 'Mweene',
-                  __typename: 'HumanName'
-                }
-              ],
-              role: 'LOCAL_REGISTRAR',
-              signature: null,
-              __typename: 'LocalRegistrar'
-            },
-            avatar: null,
-            searches: [],
-            __typename: 'User'
+            ].slice(start, Math.min(end, total)),
+            __typename: 'UserAuditLogResultSet'
           }
         }
       })
     }),
-    tRPCMsw.user.list.query(() => {
-      return [
-        {
-          id: '6780dbf7a263c6515c7b97d2',
-          name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
-          role: 'LOCAL_REGISTRAR'
+    graphql.query('fetchUser', (input) => {
+      const userId = input.variables.userId
+      const generator = testDataGenerator()
+      let response
+
+      if (userId == generator.user.id.fieldAgent) {
+        response = generator.user.fieldAgent().v1
+      } else if (userId == generator.user.id.registrationAgent) {
+        response = generator.user.registrationAgent().v1
+      } else if (userId == generator.user.id.localSystemAdmin) {
+        response = generator.user.localSystemAdmin()
+      } else if (userId == generator.user.id.nationalSystemAdmin) {
+        response = generator.user.nationalSystemAdmin().v1
+      } else {
+        response = generator.user.localRegistrar().v1
+      }
+
+      return HttpResponse.json({
+        data: {
+          getUser: response
         }
-      ]
+      })
+    }),
+    graphql.query('getUser', (input) => {
+      const userId = input.variables.userId
+      const generator = testDataGenerator()
+      let response
+
+      if (userId == generator.user.id.fieldAgent) {
+        response = generator.user.fieldAgent().v1
+      } else if (userId == generator.user.id.registrationAgent) {
+        response = generator.user.registrationAgent().v1
+      } else if (userId == generator.user.id.localSystemAdmin) {
+        response = generator.user.localSystemAdmin()
+      } else if (userId == generator.user.id.nationalSystemAdmin) {
+        response = generator.user.nationalSystemAdmin().v1
+      } else {
+        response = generator.user.localRegistrar().v1
+      }
+
+      return HttpResponse.json({
+        data: {
+          getUser: response
+        }
+      })
+    }),
+    tRPCMsw.user.list.query(() => {
+      const generator = testDataGenerator()
+
+      return [generator.user.localRegistrar().v2]
+    }),
+    tRPCMsw.user.get.query((id) => {
+      const generator = testDataGenerator()
+
+      return generator.user.localRegistrar().v2
     })
   ],
   event: [
     tRPCMsw.event.get.query(() => {
       return tennisClubMembershipEventDocument
     }),
-    tRPCMsw.event.list.query(() => {
-      return [tennisClubMembershipEventIndex]
+    tRPCMsw.event.search.query((input) => {
+      return { results: [], total: 0 }
     })
   ],
   locations: [
@@ -1160,7 +1447,8 @@ export const handlers = {
         entry: [
           {
             fullUrl:
-              'http://localhost:2021/location/5ef450bc-712d-48ad-93f3-8da0fa453baa/_history/8ae119de-682a-40fa-be03-9de10fc07d53',
+              // @NOTE: Addresss component uses both V1 and V2. It should use only V2 api in the long run. Meanwhile, ensure ids match.
+              'http://localhost:2021/location/62a0ccb4-880d-4f30-8882-f256007dfff9/_history/8ae119de-682a-40fa-be03-9de10fc07d53',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1225,11 +1513,11 @@ export const handlers = {
                 lastUpdated: '2025-02-05T07:52:42.267+00:00',
                 versionId: '8ae119de-682a-40fa-be03-9de10fc07d53'
               },
-              id: '5ef450bc-712d-48ad-93f3-8da0fa453baa'
+              id: '62a0ccb4-880d-4f30-8882-f256007dfff9'
             },
             request: {
               method: 'PUT',
-              url: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+              url: 'Location/62a0ccb4-880d-4f30-8882-f256007dfff9'
             }
           },
           {
@@ -1248,7 +1536,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+                reference: 'Location/62a0ccb4-880d-4f30-8882-f256007dfff9'
               },
               type: {
                 coding: [
@@ -1325,7 +1613,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+                reference: 'Location/62a0ccb4-880d-4f30-8882-f256007dfff9'
               },
               type: {
                 coding: [
@@ -1587,7 +1875,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+                reference: 'Location/62a0ccb4-880d-4f30-8882-f256007dfff9'
               },
               type: {
                 coding: [
@@ -1883,7 +2171,7 @@ export const handlers = {
               status: 'active',
               mode: 'instance',
               partOf: {
-                reference: 'Location/5ef450bc-712d-48ad-93f3-8da0fa453baa'
+                reference: 'Location/62a0ccb4-880d-4f30-8882-f256007dfff9'
               },
               type: {
                 coding: [
@@ -1997,7 +2285,23 @@ export const handlers = {
   ],
   modules: [
     http.get('http://localhost:3040/conditionals.js', () => {
-      return HttpResponse.text('', { status: 404 })
+      const fileContent = `
+      const conditionals = {
+        isDefaultCountry: {
+          action: "hide",
+          expression: "isDefaultCountry(values.country)"
+        }
+      };
+      export {
+        conditionals
+      };
+    `
+      return new HttpResponse(fileContent, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/javascript'
+        }
+      })
     }),
     http.get('http://localhost:3040/handlebars.js', () => {
       return HttpResponse.text('', { status: 404 })
@@ -2012,6 +2316,11 @@ export const handlers = {
     })
   ],
   config: [
+    http.get('/api/countryconfig/certificates/simple-certificate.svg', () => {
+      return HttpResponse.text(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100"><text x="10" y="20">Simple Certificate</text></svg>`
+      )
+    }),
     http.get(
       '/api/countryconfig/certificates/tennis-club-membership-certificate.svg',
       () => {
@@ -2029,12 +2338,16 @@ export const handlers = {
       }
     ),
 
-    http.get('/api/countryconfig/fonts/NotoSans-Regular.ttf', async () => {
-      const fontResponse = await fetch(
-        'http://localhost:3040/fonts/NotoSans-Regular.ttf'
-      )
-      const fontArrayBuffer = await fontResponse.arrayBuffer()
-      return HttpResponse.arrayBuffer(fontArrayBuffer)
+    http.get('/api/countryconfig/fonts/*.ttf', async () => {
+      const fontArrayBuffer = await fetch(
+        '/assets/small-filesize-font-for-tests.ttf'
+      ).then((res) => res.arrayBuffer())
+
+      return new HttpResponse(fontArrayBuffer, {
+        headers: {
+          'Content-Type': 'font/ttf'
+        }
+      })
     }),
 
     http.get('http://localhost:2021/config', () => {
@@ -2044,8 +2357,34 @@ export const handlers = {
         config: mockOfflineData.config,
         certificates: [
           {
+            id: 'simple-certificate',
+            isV2Template: true,
+            event: TENNIS_CLUB_MEMBERSHIP,
+            label: {
+              id: 'certificates.simple.certificate.copy',
+              defaultMessage: 'Simple Certificate copy',
+              description: 'The label for a simple certificate'
+            },
+            isDefault: false,
+            fee: {
+              onTime: 7,
+              late: 10.6,
+              delayed: 18
+            },
+            svgUrl: '/api/countryconfig/certificates/simple-certificate.svg',
+            fonts: {
+              'Noto Sans': {
+                normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+                bold: '/api/countryconfig/fonts/NotoSans-Bold.ttf',
+                italics: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+                bolditalics: '/api/countryconfig/fonts/NotoSans-Regular.ttf'
+              }
+            }
+          },
+          {
             id: 'tennis-club-membership-certificate',
-            event: 'TENNIS_CLUB_MEMBERSHIP',
+            isV2Template: true,
+            event: TENNIS_CLUB_MEMBERSHIP,
             label: {
               id: 'certificates.tennis-club-membership.certificate.copy',
               defaultMessage: 'Tennis Club Membership Certificate copy',
@@ -2070,7 +2409,8 @@ export const handlers = {
           },
           {
             id: 'tennis-club-membership-certified-certificate',
-            event: 'TENNIS_CLUB_MEMBERSHIP',
+            isV2Template: true,
+            event: TENNIS_CLUB_MEMBERSHIP,
             label: {
               id: 'certificates.tennis-club-membership.certificate.certified-copy',
               defaultMessage:
@@ -2119,6 +2459,232 @@ export const handlers = {
   forms: [
     http.get('http://localhost:2021/forms', () => {
       return HttpResponse.json(forms.forms)
+    })
+  ],
+  avatars: [
+    http.get('https://eu.ui-avatars.com/api/', ({ request }) => {
+      const url = new URL(request.url)
+      const name = url.searchParams.get('name') || 'Unknown'
+
+      // Extract initials from name
+      const initials = name
+        .split(' ')
+        .map((word) => word.charAt(0).toUpperCase())
+        .join('')
+        .slice(0, 2)
+
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="64px" viewBox="0 0 64 64" version="1.1"><rect fill="#DEE5F2" cx="32" width="64" height="64" cy="32" r="32"/><text x="50%" y="50%" style="color: #222; line-height: 1;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;" alignment-baseline="middle" text-anchor="middle" font-size="28" font-weight="400" dy=".1em" dominant-baseline="middle" fill="#222">${initials}</text></svg>`
+
+      return new HttpResponse(svg, {
+        headers: {
+          'Content-Type': 'image/svg+xml'
+        }
+      })
+    })
+  ],
+  workqueues: [
+    tRPCMsw.workqueue.count.query((input) => {
+      if (input.length === 0) {
+        /** Ensure we catch situations where no input is provided before merging anything. */
+        throw new Error('No input provided.')
+      }
+
+      return input.reduce((acc, { slug }) => {
+        return { ...acc, [slug]: 7 }
+      }, {})
+    }),
+    tRPCMsw.workqueue.config.list.query(() => {
+      return generateWorkqueues()
+    })
+  ],
+  searchUsers: [
+    graphql.query('searchUsers', () => {
+      const generator = testDataGenerator()
+
+      return HttpResponse.json({
+        data: {
+          searchUsers: {
+            totalItems: 4,
+            results: [
+              {
+                id: generator.user.localSystemAdmin().id as UUID,
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Emmanuel',
+                    familyName: 'Mayuka',
+                    __typename: 'HumanName'
+                  }
+                ],
+                mobile: '+260921681112',
+                email: 'kalushabwalya.17@gmail.com',
+                fullHonorificName: null,
+                signature: null,
+                primaryOffice: {
+                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  __typename: 'Location'
+                },
+                role: {
+                  id: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+                  label: {
+                    id: 'userRole.administrator',
+                    defaultMessage: 'Administrator',
+                    description: 'Name for user role Administrator',
+                    __typename: 'I18nMessage'
+                  },
+                  __typename: 'UserRole'
+                },
+                status: 'active',
+                underInvestigation: false,
+                avatar: null,
+                __typename: 'User'
+              },
+              {
+                id: generator.user.localRegistrar().v2.id,
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Kennedy',
+                    familyName: 'Mweene',
+                    __typename: 'HumanName'
+                  }
+                ],
+                mobile: '+260933333333',
+                email: 'kalushabwalya1.7@gmail.com',
+                fullHonorificName: null,
+                signature: null,
+                primaryOffice: {
+                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  __typename: 'Location'
+                },
+                role: {
+                  id: TestUserRole.enum.LOCAL_REGISTRAR,
+                  label: {
+                    id: 'userRole.localRegistrar',
+                    defaultMessage: 'Local Registrar',
+                    description: 'Name for user role Local Registrar',
+                    __typename: 'I18nMessage'
+                  },
+                  __typename: 'UserRole'
+                },
+                status: 'active',
+                underInvestigation: false,
+                avatar: null,
+                __typename: 'User'
+              },
+              {
+                id: generator.user.registrationAgent().v2.id,
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Felix',
+                    familyName: 'Katongo',
+                    __typename: 'HumanName'
+                  }
+                ],
+                mobile: '+260922222222',
+                email: 'kalushabwalya17+@gmail.com',
+                fullHonorificName: null,
+                signature: null,
+                primaryOffice: {
+                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  __typename: 'Location'
+                },
+                role: {
+                  id: TestUserRole.enum.REGISTRATION_AGENT,
+                  label: {
+                    id: 'userRole.registrationOfficer',
+                    defaultMessage: 'Registration Officer',
+                    description: 'Name for user role Registration Officer',
+                    __typename: 'I18nMessage'
+                  },
+                  __typename: 'UserRole'
+                },
+                status: 'active',
+                underInvestigation: false,
+                avatar: null,
+                __typename: 'User'
+              },
+              {
+                id: generator.user.fieldAgent().v2.id,
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Kalusha',
+                    familyName: 'Bwalya',
+                    __typename: 'HumanName'
+                  }
+                ],
+                mobile: '+260911111111',
+                email: 'kalushabwalya17@gmail.com',
+                fullHonorificName: null,
+                signature: null,
+                primaryOffice: {
+                  id: 'a50d1d8f-fd48-4816-9ea0-573ceefcd6c2',
+                  __typename: 'Location'
+                },
+                role: {
+                  id: 'HOSPITAL_CLERK',
+                  label: {
+                    id: 'userRole.hospitalClerk',
+                    defaultMessage: 'Hospital Clerk',
+                    description: 'Name for user role Hospital Clerk',
+                    __typename: 'I18nMessage'
+                  },
+                  __typename: 'UserRole'
+                },
+                status: 'active',
+                underInvestigation: false,
+                avatar: null,
+                __typename: 'User'
+              }
+            ],
+            __typename: 'SearchUserResult'
+          }
+        }
+      })
+    })
+  ],
+  userSettings: [
+    graphql.query('getUserByMobile', () => {
+      return HttpResponse.json({
+        data: {
+          getUserByMobile: null
+        }
+      })
+    }),
+    graphql.query('getUserByEmail', () => {
+      return HttpResponse.json({
+        data: {
+          getUserByEmail: null
+        }
+      })
+    }),
+    graphql.mutation('changePhone', (input) => {
+      const isValidCode = input.variables.verifyCode === '000000'
+
+      return HttpResponse.json({
+        data: {
+          changePhone: isValidCode ? 'true' : null
+        }
+      })
+    }),
+    graphql.mutation('changeEmail', (input) => {
+      return HttpResponse.json({
+        data: {
+          changeEmail: 'true'
+        }
+      })
+    }),
+    http.post('http://localhost:7070/sendVerifyCode', () => {
+      const generator = testDataGenerator()
+      return HttpResponse.json({
+        userId: generator.user.registrationAgent().v2.id,
+        nonce: 'UxN/IFJ3jGCjQBySQ+JP+A==',
+        status: 'Success',
+        mobile: '+260734237472',
+        email: 'kalushabwalya1.7@gmail.com'
+      })
     })
   ]
 }

@@ -65,7 +65,7 @@ jobs:
         run: |
           echo "PR_BRANCH=$(gh pr view ${{ github.event.issue.number }} --json headRefName --jq .headRefName)" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.OLLIE_BOT_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Checkout PR branch
         uses: actions/checkout@v3
@@ -103,4 +103,4 @@ jobs:
           COMMENT="Storybook deployed: ${{ steps.deploy_storybook.outputs.storybook_url }}"
           gh pr comment ${{ github.event.issue.number }} --body "$COMMENT"
         env:
-          GITHUB_TOKEN: ${{ secrets.OLLIE_BOT_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}

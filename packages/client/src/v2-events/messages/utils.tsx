@@ -17,7 +17,10 @@ import {
   isPluralElement,
   parse
 } from '@formatjs/icu-messageformat-parser'
+import { useMemo } from 'react'
 import { EventState } from '@opencrvs/commons/client'
+import { useEventFormData } from '../features/events/useEventFormData'
+import { useActionAnnotation } from '../features/events/useActionAnnotation'
 
 const INTERNAL_SEPARATOR = '___'
 
@@ -35,18 +38,25 @@ function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
       (parentKey ? parentKey + INTERNAL_SEPARATOR : '') +
       key.replace(/\./g, INTERNAL_SEPARATOR)
     if (Array.isArray(value)) {
-      value.forEach((val, id) =>
-        Object.assign(
-          result,
-          convertDotToTripleUnderscore(
-            val,
-            (newKey ? newKey + INTERNAL_SEPARATOR : '') + id
+      value.forEach((val, id) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (typeof val === 'object' && val !== null) {
+          Object.assign(
+            result,
+            convertDotToTripleUnderscore(
+              val,
+              (newKey ? newKey + INTERNAL_SEPARATOR : '') + id
+            )
           )
-        )
-      )
+        }
+      })
       /* @TODO: Check if the typing is correct or is there a case where null could come in */
-      /*  eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */
     } else if (typeof value === 'object' && value !== null) {
+      if ('loading' in value) {
+        // HTTP field with a `{ loading: boolean; data: any; error: any }` object will not contain any keys that we want to convert
+        continue
+      }
+
       Object.assign(result, convertDotToTripleUnderscore(value, newKey))
     } else {
       result[newKey] = !value ? EMPTY_TOKEN : value
@@ -120,6 +130,38 @@ function flattenNestedObject(
 export function useIntlFormatMessageWithFlattenedParams() {
   const intl = useIntl()
 
+  function getDefaultMessage(messageDescriptor: MessageDescriptor): string {
+    const defaultMessage =
+      intl.messages[messageDescriptor.id as keyof typeof intl.messages] ||
+      messageDescriptor.defaultMessage
+    if (typeof defaultMessage !== 'string') {
+      // eslint-disable-next-line no-console
+      console.error(
+        'Message must be a string. Encountered',
+        defaultMessage,
+        'when searching with',
+        messageDescriptor.id
+      )
+      throw new Error('Message must be a string')
+    }
+    return defaultMessage
+  }
+
+  function variablesUsed(message: string): string[] {
+    // intl-messageformat-parser does not support dot notation in the variables,
+    // so we need to convert dots to triple underscores
+    const sanitizedMessage = convertDotInCurlyBraces(message)
+    const variables = parse(sanitizedMessage).flatMap(getVariablesFromElement)
+    // We replace the triple underscopes back to dots only if there
+    // was a conversion done in the first place
+    if (message !== sanitizedMessage) {
+      return variables.map((variable) =>
+        variable.replace(new RegExp(INTERNAL_SEPARATOR, 'g'), '.')
+      )
+    }
+    return variables
+  }
+
   function formatMessage<T extends {}>(
     message: MessageDescriptor,
     params?: T
@@ -128,25 +170,8 @@ export function useIntlFormatMessageWithFlattenedParams() {
     const flattenedParams = flattenNestedObject(params ?? {})
     const variables = convertDotToTripleUnderscore(flattenedParams)
 
-    const originalMessage =
-      intl.messages[message.id as keyof typeof intl.messages] ||
-      message.defaultMessage
-
-    if (typeof originalMessage !== 'string') {
-      // eslint-disable-next-line no-console
-      console.error(
-        'Message must be a string. Encountered',
-        originalMessage,
-        'when searching with',
-        message.id
-      )
-      throw new Error('Message must be a string')
-    }
-
-    const defaultMessage = convertDotInCurlyBraces(originalMessage)
-    const variablesInMessage = parse(defaultMessage).flatMap(
-      getVariablesFromElement
-    )
+    const defaultMessage = convertDotInCurlyBraces(getDefaultMessage(message))
+    const variablesInMessage = variablesUsed(defaultMessage)
     const variablesWithEmptyValues = Object.fromEntries(
       variablesInMessage.map((variable) => [variable, EMPTY_TOKEN])
     )
@@ -159,7 +184,32 @@ export function useIntlFormatMessageWithFlattenedParams() {
     }
     // When multiple variables are provided, we trim to ensure empty content in case both are missing.
     // We might need to adjust this and allow more freedom for configuration (e.g. provide values and join pattern)
-    return formatted.trim().replaceAll(EMPTY_TOKEN, '')
+    return formatted.replaceAll(EMPTY_TOKEN, '').trim()
+  }
+
+  return {
+    ...intl,
+    formatMessage,
+    variablesUsed: (message: MessageDescriptor) =>
+      variablesUsed(getDefaultMessage(message))
+  }
+}
+
+export function useIntlWithFormData() {
+  const intl = useIntlFormatMessageWithFlattenedParams()
+  const formValues = useEventFormData((state) => state.formValues)
+  const annotation = useActionAnnotation((state) => state.annotation)
+
+  const formData = useMemo(
+    () => ({ ...formValues, ...annotation }),
+    [formValues, annotation]
+  )
+
+  function formatMessage<T extends {}>(message: MessageDescriptor, params?: T) {
+    return intl.formatMessage(message, {
+      ...formData,
+      ...params
+    })
   }
 
   return {

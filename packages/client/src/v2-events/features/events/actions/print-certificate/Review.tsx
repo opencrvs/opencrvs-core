@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -19,13 +19,17 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import ReactTooltip from 'react-tooltip'
+import toast from 'react-hot-toast'
+import { useSelector } from 'react-redux'
 import {
   ActionType,
   EventConfig,
-  EventDocument,
   getOrThrow,
   getAcceptedActions,
-  SCOPES
+  SystemRole,
+  getUUID,
+  UUID,
+  PrintCertificateAction
 } from '@opencrvs/commons/client'
 import {
   Box,
@@ -35,7 +39,8 @@ import {
   Icon,
   ResponsiveModal,
   Spinner,
-  Stack
+  Stack,
+  Toast
 } from '@opencrvs/components'
 import { Print } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
@@ -47,11 +52,13 @@ import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getUserIdsFromActions } from '@client/v2-events/utils'
-import ProtectedComponent from '@client/components/ProtectedComponent'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useOnlineStatus } from '@client/utils'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 const CertificateContainer = styled.div`
   svg {
@@ -68,65 +75,60 @@ const TooltipMessage = styled.p`
   ${({ theme }) => theme.fonts.reg19};
   max-width: 200px;
 `
+
 const messages = defineMessages({
   printTitle: {
-    id: 'v2.printAction.title',
+    id: 'printAction.title',
     defaultMessage: 'Print certificate',
     description: 'The title for print action'
   },
   printDescription: {
-    id: 'v2.printAction.description',
+    id: 'printAction.description',
     defaultMessage:
       'Please confirm that the informant has reviewed that the information on the certificate is correct and that it is ready to print.',
     description: 'The description for print action'
   },
-  printModalTitle: {
-    id: 'v2.print.certificate.review.printModalTitle',
-    defaultMessage: 'Print certificate?',
-    description: 'Print certificate modal title text'
-  },
   printAndIssueModalTitle: {
-    id: 'v2.print.certificate.review.printAndIssueModalTitle',
+    id: 'print.certificate.review.printAndIssueModalTitle',
     defaultMessage: 'Print and issue certificate?',
     description: 'Print and issue certificate modal title text'
   },
-  printModalBody: {
-    id: 'v2.print.certificate.review.modal.body.print',
-    defaultMessage:
-      'A Pdf of the certificate will open in a new tab for printing. The record will move to the ready-to-issue queue.',
-    description: 'Print certificate modal body text'
-  },
   printAndIssueModalBody: {
-    id: 'v2.print.certificate.review.modal.body.printAndIssue',
+    id: 'print.certificate.review.modal.body.printAndIssue',
     defaultMessage:
       'A Pdf of the certificate will open in a new tab for printing and issuing.',
     description: 'Print certificate modal body text'
   },
   makeCorrection: {
-    id: 'v2.print.certificate.button.makeCorrection',
+    id: 'print.certificate.button.makeCorrection',
     defaultMessage: 'No, make correction',
     description: 'The label for correction button of print action'
   },
   confirmPrint: {
-    id: 'v2.print.certificate.button.confirmPrint',
+    id: 'print.certificate.button.confirmPrint',
     defaultMessage: 'Yes, print certificate',
     description: 'The text for print button'
   },
   cancel: {
-    id: 'v2.buttons.cancel',
+    id: 'buttons.cancel',
     defaultMessage: 'Cancel',
     description: 'Cancel button text in the modal'
   },
   print: {
-    id: 'v2.buttons.print',
+    id: 'buttons.print',
     defaultMessage: 'Print',
     description: 'Print button text'
   },
   onlineOnly: {
-    id: 'v2.print.certificate.onlineOnly',
+    id: 'print.certificate.onlineOnly',
     defaultMessage:
       'Print certificate is an online only action. Please go online to print the certificate',
     description: 'Print certificate online only message'
+  },
+  toastMessage: {
+    id: 'print.certificate.toast.message',
+    defaultMessage: 'Certificate is ready to print',
+    description: 'Floating Toast message upon certificate ready to print'
   }
 })
 
@@ -143,12 +145,13 @@ function getPrintForm(configuration: EventConfig) {
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW)
-  const [{ templateId }] = useTypedSearchParams(
+  const [{ templateId, workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW
   )
 
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
+  const validatorContext = useValidatorContext()
 
   if (!templateId) {
     throw new Error('Please select a template from the previous step')
@@ -159,10 +162,11 @@ export function Review() {
   const [modal, openModal] = useModal()
 
   const { getEvent, onlineActions } = useEvents()
-  const [fullEvent] = getEvent.useSuspenseQuery(eventId)
+  const fullEvent = getEvent.getFromCache(eventId)
 
   const actions = getAcceptedActions(fullEvent)
-  const userIds = getUserIdsFromActions(actions)
+  const userIds = getUserIdsFromActions(actions, [SystemRole.enum.HEALTH])
+
   const { getUsers } = useUsers()
   const [users] = getUsers.useSuspenseQuery(userIds)
 
@@ -174,29 +178,57 @@ export function Review() {
     (template) => template.id === templateId
   )
 
-  const { svgCode, handleCertify } = usePrintableCertificate({
-    event: fullEvent,
+  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const formConfig = getPrintForm(eventConfiguration)
+  const { isActionAllowed } = useUserAllowedActions(fullEvent.type)
+  const userDetails = useSelector(getUserDetails)
+  const { isPending } = onlineActions.printCertificate
+
+  if (!userDetails) {
+    throw new Error('User details are not available')
+  }
+
+  const userFromUsersList = users.find((user) => user.id === userDetails.id)
+  if (!userFromUsersList) {
+    throw new Error(`User with id ${userDetails.id} not found in users list`)
+  }
+
+  const actionsWithAnOptimisticPrintAction = actions.concat({
+    type: ActionType.PRINT_CERTIFICATE,
+    id: getUUID(),
+    transactionId: getUUID(),
+    createdByUserType: 'user',
+    createdAt: new Date().toISOString(),
+    createdBy: userFromUsersList.id,
+    createdByRole: userFromUsersList.role,
+    status: 'Accepted',
+    declaration: {},
+    annotation: null,
+    originalActionId: null,
+    createdBySignature: userFromUsersList.signature,
+    createdAtLocation: userDetails.primaryOffice.id as UUID,
+    content: {
+      templateId: certificateConfig?.id
+    }
+  } satisfies PrintCertificateAction)
+
+  const { svgCode, preparePdfCertificate } = usePrintableCertificate({
+    event: { ...fullEvent, actions: actionsWithAnOptimisticPrintAction },
+    config: eventConfiguration,
     locations,
     users,
     certificateConfig,
     language
   })
-
   /**
    * If there are validation errors in the form, redirect to the
    * print certificate form page, since the user should not be able to
    * review/print the certificate if there are validation errors.
    */
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
-  const formConfig = getPrintForm(eventConfiguration)
-
-  if (!svgCode) {
-    return <Spinner id="review-certificate-loading" />
-  }
-
   const validationErrorExist = validationErrorsInActionFormExist({
     formConfig,
-    form: annotation
+    form: annotation,
+    context: validatorContext
   })
 
   if (validationErrorExist) {
@@ -204,13 +236,25 @@ export function Review() {
     console.warn('Form is not properly filled. Redirecting to the beginning...')
     return (
       <Navigate
-        to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId })}
+        to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
+          { eventId },
+          { workqueue: slug }
+        )}
       />
     )
   }
 
+  if (!svgCode) {
+    return <Spinner id="review-certificate-loading" />
+  }
+
   const handleCorrection = () =>
-    navigate(ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath({ eventId }))
+    navigate(
+      ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath(
+        { eventId },
+        { workqueue: slug }
+      )
+    )
 
   const handlePrint = async () => {
     const confirmed = await openModal<boolean>((close) => (
@@ -228,6 +272,7 @@ export function Review() {
           </Button>,
           <Button
             key="print-certificate"
+            disabled={!isOnline || isPending}
             id="print-certificate"
             type="primary"
             onClick={() => close(true)}
@@ -245,29 +290,41 @@ export function Review() {
       </ResponsiveModal>
     ))
 
+    /**
+     * NOTE: We have separated the preparing and printing of the PDF certificate. Without the separation, user is already unassigned from the event and cache is cleared. @see preparePdfCertificate for more details.
+     */
     if (confirmed) {
       try {
-        const response: EventDocument =
-          await onlineActions.printCertificate.mutateAsync({
-            eventId: fullEvent.id,
-            declaration: {},
-            annotation: { ...annotation, templateId },
-            transactionId: uuid(),
-            type: ActionType.PRINT_CERTIFICATE
-          })
-        const printAction = response.actions
-          .reverse()
-          .find((a) => a.type === ActionType.PRINT_CERTIFICATE)
+        const printCertificate = await preparePdfCertificate(fullEvent)
 
-        if (printAction) {
-          await handleCertify({
-            ...fullEvent,
-            actions: [...fullEvent.actions, printAction]
-          })
-          navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
-        } else {
-          throw new Error('Print action not found in the response')
-        }
+        await onlineActions.printCertificate.mutateAsync({
+          fullEvent,
+          eventId: fullEvent.id,
+          declaration: {},
+          annotation,
+          content: { templateId },
+          transactionId: uuid(),
+          type: ActionType.PRINT_CERTIFICATE
+        })
+
+        printCertificate()
+
+        toast.custom(
+          <Toast
+            duration={null}
+            type={'success'}
+            onClose={() => toast.remove(`print-successful${eventId}`)}
+          >
+            {intl.formatMessage(messages.toastMessage)}
+          </Toast>,
+          {
+            id: `print-successful${eventId}`
+          }
+        )
+
+        slug
+          ? navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
+          : navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
       } catch (error) {
         // TODO: add notification alert
         // eslint-disable-next-line no-console
@@ -275,6 +332,20 @@ export function Review() {
       }
     }
   }
+
+  // Display make correction button only if the user has permission to correct or request correction
+  const userMayCorrect =
+    isActionAllowed(ActionType.REQUEST_CORRECTION) ||
+    isActionAllowed(ActionType.APPROVE_CORRECTION)
+
+  const makeCorrectionButton = userMayCorrect ? (
+    <Button fullWidth size="large" type="negative" onClick={handleCorrection}>
+      <Icon name="X" size="medium" />
+      {intl.formatMessage(messages.makeCorrection)}
+    </Button>
+  ) : (
+    <></>
+  )
 
   return (
     <FormLayout
@@ -299,24 +370,9 @@ export function Review() {
           )}
 
           <Content
+            showTitleOnMobile
             bottomActionButtons={[
-              <ProtectedComponent
-                key="edit-record"
-                scopes={[
-                  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-                  SCOPES.RECORD_REGISTRATION_CORRECT
-                ]}
-              >
-                <Button
-                  fullWidth
-                  size="large"
-                  type="negative"
-                  onClick={handleCorrection}
-                >
-                  <Icon name="X" size="medium" />
-                  {intl.formatMessage(messages.makeCorrection)}
-                </Button>
-              </ProtectedComponent>,
+              makeCorrectionButton,
               <TooltipContainer
                 key="confirm-and-print"
                 data-tip
@@ -324,7 +380,7 @@ export function Review() {
               >
                 <Button
                   fullWidth
-                  disabled={!isOnline}
+                  disabled={!isOnline || isPending}
                   id="confirm-print"
                   size="large"
                   type="positive"

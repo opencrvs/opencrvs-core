@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { EventDocument, ActionInput, logger } from '@opencrvs/commons'
+import { EventDocument, logger, ActionType } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
 export const ActionConfirmationResponse = {
@@ -28,47 +28,68 @@ const ActionConfirmationResponseCodes = {
 } as const
 
 export async function requestActionConfirmation(
-  action: ActionInput,
+  actionType: ActionType,
+  transactionId: string,
   event: EventDocument,
-  token: string,
-  actionId: string
+  token: string
 ): Promise<{
   responseStatus: ActionConfirmationResponse
-  body: Record<string, unknown> | undefined
+  responseBody: Record<string, unknown> | undefined
 }> {
-  try {
-    const res = await fetch(
-      new URL(
-        `/events/${event.type}/actions/${action.type}`,
-        env.COUNTRY_CONFIG_URL
-      ),
-      {
-        method: 'POST',
-        body: JSON.stringify({ event, actionId, action }),
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: token
-        }
-      }
-    )
+  const actionConfirmationUrl = new URL(
+    `/trigger/events/${event.type}/actions/${actionType}`,
+    env.COUNTRY_CONFIG_URL
+  )
 
-    const status = res.status
+  logger.debug(
+    {
+      url: actionConfirmationUrl,
+      eventType: event.type,
+      actionType,
+      eventId: event.id,
+      transactionId
+    },
+    `Action confirmation request`
+  )
+
+  try {
+    const res = await fetch(actionConfirmationUrl, {
+      method: 'POST',
+      body: JSON.stringify(event),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    })
+
+    const statusCode = res.status
     const responseStatus =
-      status in ActionConfirmationResponseCodes
+      statusCode in ActionConfirmationResponseCodes
         ? ActionConfirmationResponseCodes[
-            status as keyof typeof ActionConfirmationResponseCodes
+            statusCode as keyof typeof ActionConfirmationResponseCodes
           ]
         : ActionConfirmationResponse.UnexpectedFailure
 
+    logger.debug(
+      {
+        url: actionConfirmationUrl,
+        eventType: event.type,
+        actionType,
+        eventId: event.id,
+        transactionId
+      },
+      `Action confirmation response: ${statusCode} - ${responseStatus}`
+    )
+
     return {
       responseStatus,
-      body: await res.json().catch(() => undefined)
+      responseBody: await res.json().catch(() => undefined)
     }
   } catch (error) {
     logger.error(error)
     return {
       responseStatus: ActionConfirmationResponse.UnexpectedFailure,
-      body: undefined
+      responseBody: undefined
     }
   }
 }

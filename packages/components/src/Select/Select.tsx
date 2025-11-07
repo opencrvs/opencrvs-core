@@ -22,7 +22,7 @@ export interface ISelectOption {
   disabled?: boolean
 }
 
-export interface IStyledSelectProps extends Props<ISelectOption> {
+interface IStyledSelectProps extends Props<ISelectOption> {
   id: string
   error?: boolean
   touched?: boolean
@@ -58,23 +58,23 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
         error && touched
           ? theme.colors.negative
           : disabled
-          ? theme.colors.grey300
-          : theme.colors.copy};
+            ? theme.colors.grey300
+            : theme.colors.copy};
     &:hover {
       border: 1.5px solid
         ${({ error, touched, disabled, theme }) =>
           error && touched
             ? theme.colors.negative
             : disabled
-            ? theme.colors.grey300
-            : theme.colors.copy};
+              ? theme.colors.grey300
+              : theme.colors.copy};
       outline: 0.5px solid
         ${({ error, touched, disabled, theme }) =>
           error && touched
             ? theme.colors.negative
             : disabled
-            ? theme.colors.grey300
-            : theme.colors.copy};
+              ? theme.colors.grey300
+              : theme.colors.copy};
     }
     &:focus {
       outline: 0.5px solid ${({ theme }) => theme.colors.grey600};
@@ -161,6 +161,7 @@ export interface ISelectProps
   onChange: (value: string) => void
   value: string
   searchableLength?: number
+  noOptionsMessage?: (obj: { inputValue: string }) => string | null
 }
 
 type ControlProps = React.ComponentProps<typeof components.Control>

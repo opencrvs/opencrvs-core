@@ -15,6 +15,13 @@ build
 .env*
 *.log
 .secrets/*
+.wireit/*
+.wireit
+
+# gitignore graphql schema due to it often being accidentally edited
+packages/gateway/src/graphql/schema.d.ts
+packages/gateway/src/graphql/schema.graphql
+
 # But, keep the .gitignore so the folder is created
 !.secrets/.gitignore
 .idea

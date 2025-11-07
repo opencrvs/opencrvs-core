@@ -9,113 +9,197 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import React, { useEffect } from 'react'
-import { Outlet } from 'react-router-dom'
-import superjson from 'superjson'
-import { ActionType } from '@opencrvs/commons/client'
-import { testDataGenerator } from '@client/tests/test-data-generators'
-import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import {
+  ActionStatus,
+  ActionType,
+  generateActionDocument,
+  tennisClubMembershipEvent,
+  TestUserRole,
+  TokenUserType,
+  generateUuid,
+  createPrng,
+  Draft
+} from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
-import { AppRouter } from '@client/v2-events/trpc'
 import { router } from './router'
 import * as Request from './index'
 
 const meta: Meta<typeof Request.Pages> = {
-  title: 'CorrectionRequest'
+  title: 'CorrectionRequest',
+  parameters: {
+    userRole: TestUserRole.enum.REGISTRATION_AGENT
+  }
 }
-
 export default meta
 
 type Story = StoryObj<typeof Request.Pages>
-const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [
-    httpLink({
-      url: '/api/events'
-    })
-  ],
-  transformer: { input: superjson, output: superjson }
+
+const prng = createPrng(99887766)
+
+const createAction = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.CREATE
 })
 
-function FormClear() {
-  const drafts = useDrafts()
-  useEffect(() => {
-    drafts.setLocalDraft(
-      testDataGenerator().event.draft({
-        eventId: tennisClubMembershipEventDocument.id,
-        actionType: ActionType.REQUEST_CORRECTION
-      })
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  return <Outlet />
-}
-
-export const ReviewWithChanges: Story = {
-  parameters: {
-    reactRouter: {
-      router: {
-        path: '/',
-        element: <FormClear />,
-        children: [router]
+const declarationActionWithAge = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.DECLARE,
+  defaults: {
+    declaration: {
+      'applicant.name': {
+        firstname: 'Riku',
+        surname: 'Rouvila'
       },
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ]
-      }
+      'applicant.dob': '2025-01-23',
+      'applicant.address': {
+        country: 'FAR',
+        addressType: 'DOMESTIC',
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '27160bbd-32d1-4625-812f-860226bfb92a',
+        urbanOrRural: 'URBAN',
+        town: 'Example Town',
+        residentialArea: 'Example Residential Area',
+        street: 'Example Street',
+        number: '55',
+        zipCode: '123456'
+      },
+      'recommender.name': {
+        firstname: 'Euan',
+        surname: 'Millar'
+      },
+      'recommender.id': '123456789'
     }
   }
+})
+
+const validateAction = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.VALIDATE,
+  defaults: {
+    declaration: {}
+  }
+})
+
+const declarationActionWithDob = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.DECLARE,
+  defaults: {
+    declaration: {
+      'applicant.dob': '2006-01-23'
+    }
+  }
+})
+
+const registerAction = generateActionDocument({
+  configuration: tennisClubMembershipEvent,
+  action: ActionType.REGISTER,
+  defaults: {
+    declaration: {}
+  }
+})
+
+const eventCorrectionAgeToDob = {
+  trackingId: generateUuid(prng),
+  type: tennisClubMembershipEvent.id,
+  id: generateUuid(prng),
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  actions: [
+    createAction,
+    declarationActionWithAge,
+    validateAction,
+    registerAction
+  ]
 }
 
-export const AdditionalDetails: Story = {
-  parameters: {
-    reactRouter: {
-      router: router,
-      initialPath:
-        ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.buildPath({
-          eventId: tennisClubMembershipEventDocument.id
-        })
+const correctionDraftAgeToDob = {
+  id: generateUuid(prng),
+  transactionId: generateUuid(prng),
+  action: {
+    createdAt: new Date(Date.now() - 500).toISOString(),
+    status: ActionStatus.Accepted,
+    transactionId: generateUuid(prng),
+    createdBy: generateUuid(prng),
+    createdByUserType: TokenUserType.Enum.user,
+    createdByRole: TestUserRole.Enum.FIELD_AGENT,
+    type: ActionType.REQUEST_CORRECTION,
+    declaration: {
+      'applicant.age': 18,
+      'applicant.dobUnknown': true
     },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ]
-      }
-    }
-  }
-}
-export const Summary: Story = {
+    annotation: {}
+  },
+  createdAt: new Date().toISOString(),
+  eventId: eventCorrectionAgeToDob.id
+} satisfies Draft
+
+export const SummaryChangingDobToAge: Story = {
   parameters: {
+    offline: {
+      drafts: [correctionDraftAgeToDob],
+      events: [eventCorrectionAgeToDob]
+    },
     reactRouter: {
       router: {
         path: '/',
-        element: <FormClear />,
         children: [router]
       },
       initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
+        eventId: eventCorrectionAgeToDob.id
       })
+    }
+  }
+}
+
+const eventCorrectionDobToAge = {
+  trackingId: generateUuid(prng),
+  type: tennisClubMembershipEvent.id,
+  id: generateUuid(prng),
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  actions: [
+    createAction,
+    declarationActionWithDob,
+    validateAction,
+    registerAction
+  ]
+}
+
+const correctionDraftDobToAge = {
+  id: generateUuid(prng),
+  transactionId: generateUuid(prng),
+  action: {
+    createdAt: new Date(Date.now() - 500).toISOString(),
+    status: ActionStatus.Accepted,
+    transactionId: generateUuid(prng),
+    createdBy: generateUuid(prng),
+    createdByUserType: TokenUserType.Enum.user,
+    createdByRole: TestUserRole.Enum.FIELD_AGENT,
+    type: ActionType.REQUEST_CORRECTION,
+    declaration: {
+      'applicant.age': 25,
+      'applicant.dobUnknown': true
     },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ]
-      }
+    annotation: {}
+  },
+  createdAt: new Date().toISOString(),
+  eventId: eventCorrectionDobToAge.id
+} satisfies Draft
+
+export const SummaryChangingAgeToDob: Story = {
+  parameters: {
+    offline: {
+      drafts: [correctionDraftDobToAge],
+      events: [eventCorrectionDobToAge]
+    },
+    reactRouter: {
+      router: {
+        path: '/',
+        children: [router]
+      },
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({
+        eventId: eventCorrectionDobToAge.id
+      })
     }
   }
 }

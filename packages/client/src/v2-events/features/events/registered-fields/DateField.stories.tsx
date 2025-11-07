@@ -16,16 +16,18 @@ import styled from 'styled-components'
 import { FieldType } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/DateField',
   args: { onChange: fn() },
   decorators: [
-    (Story) => (
+    (Story, context) => (
       <TRPCProvider>
-        <Story />
+        <Story {...context} />
       </TRPCProvider>
-    )
+    ),
+    withValidatorContext
   ]
 }
 
@@ -56,7 +58,7 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
         '{backspace}'
       )
 
-      await canvas.findByText('Required for registration')
+      await canvas.findByText('Required')
     })
   },
   render: function Component(args) {
@@ -64,6 +66,7 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
 
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={[
           {
             id: 'storybook.date',
@@ -72,12 +75,12 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
               id: 'storybook.date.label',
               defaultMessage: 'Date input',
               description: 'The title for the date input'
-            }
+            },
+            required: true
           }
         ]}
-        form={formData}
         id="my-form"
-        setAllFieldsDirty={false}
+        initialValues={formData}
         onChange={(data) => {
           args.onChange(data)
           setFormData(data)

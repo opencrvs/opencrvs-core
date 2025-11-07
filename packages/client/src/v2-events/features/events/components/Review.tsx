@@ -20,6 +20,7 @@ import {
   Button,
   Checkbox,
   Icon,
+  IconProps,
   Link,
   ListReview,
   ResponsiveModal,
@@ -32,14 +33,15 @@ import {
   FieldConfig,
   FieldType,
   FormConfig,
-  getFieldValidationErrors,
   isFieldDisplayedOnReview,
   isPageVisible,
-  SCOPES
+  runFieldValidations,
+  FieldTypesToHideInReview,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
-import { getScope } from '@client/profile/profileSelectors'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -140,59 +142,59 @@ const DeclarationDataContainer = styled.div``
 
 const reviewMessages = defineMessages({
   changeAllButton: {
-    id: 'v2.buttons.changeAll',
+    id: 'buttons.changeAll',
     defaultMessage: 'Change all',
     description: 'The label for the change all button'
   },
   changeButton: {
-    id: 'v2.buttons.change',
+    id: 'buttons.change',
     defaultMessage: 'Change',
     description: 'The label for the change button'
   },
   actionModalCancel: {
-    id: 'v2.actionModal.cancel',
+    id: 'actionModal.cancel',
     defaultMessage: 'Cancel',
     description: 'The label for cancel button of action modal'
   },
   actionModalPrimaryAction: {
-    id: 'v2.actionModal.PrimaryAction',
+    id: 'actionModal.PrimaryAction',
     defaultMessage: '{action, select, declare{Declare} other{{action}}}',
     description: 'The label for primary action button of action modal'
   },
   actionModalTitle: {
-    id: 'v2.actionModal.title',
+    id: 'actionModal.title',
     defaultMessage:
       '{action, select, declare{Declare} other{{action}}} the member?',
     description: 'The title for action modal'
   },
   actionModalDescription: {
-    id: 'v2.actionModal.description',
+    id: 'actionModal.description',
     defaultMessage:
       'The declarant will be notified of this action and a record of this decision will be recorded',
     description: 'The description for action modal'
   },
   actionModalIncompleteDescription: {
-    id: 'v2.actionModal.description.incomplete',
+    id: 'actionModal.description.incomplete',
     defaultMessage: 'This incomplete declaration will be sent for review.',
     description: 'The description for action modal when incomplete'
   },
   changeModalCancel: {
-    id: 'v2.changeModal.cancel',
+    id: 'changeModal.cancel',
     defaultMessage: 'Cancel',
     description: 'The label for cancel button of change modal'
   },
   changeModalContinue: {
-    id: 'v2.changeModal.continue',
+    id: 'changeModal.continue',
     defaultMessage: 'Continue',
     description: 'The label for continue button of change modal'
   },
   changeModalTitle: {
-    id: 'v2.changeModal.title',
+    id: 'changeModal.title',
     defaultMessage: 'Edit declaration?',
     description: 'The title for change modal'
   },
   changeModalDescription: {
-    id: 'v2.changeModal.description',
+    id: 'changeModal.description',
     defaultMessage: 'A record will be created of any changes you make',
     description: 'The description for change modal'
   },
@@ -212,33 +214,33 @@ const reviewMessages = defineMessages({
     id: 'review.documents.editDocuments'
   },
   rejectModalCancel: {
-    id: 'v2.rejectModal.cancel',
+    id: 'rejectModal.cancel',
     defaultMessage: 'Cancel',
     description: 'The label for cancel button of reject modal'
   },
   rejectModalArchive: {
-    id: 'v2.rejectModal.archive',
+    id: 'rejectModal.archive',
     defaultMessage: 'Archive',
     description: 'The label for archive button of reject modal'
   },
   rejectModalSendForUpdate: {
-    id: 'v2.rejectModal.sendForUpdate',
+    id: 'rejectModal.sendForUpdate',
     defaultMessage: 'Send For Update',
     description: 'The label for send For Update button of reject modal'
   },
   rejectModalTitle: {
-    id: 'v2.rejectModal.title',
+    id: 'rejectModal.title',
     defaultMessage: 'Reason for rejection?',
     description: 'The title for reject modal'
   },
   rejectModalDescription: {
-    id: 'v2.rejectModal.description',
+    id: 'rejectModal.description',
     defaultMessage:
       'Please describe the updates required to this record for follow up action.',
     description: 'The description for reject modal'
   },
   rejectModalMarkAsDuplicate: {
-    id: 'v2.rejectModal.markAsDuplicate',
+    id: 'rejectModal.markAsDuplicate',
     defaultMessage: 'Mark as a duplicate',
     description: 'The label for mark as duplicate checkbox of reject modal'
   }
@@ -277,18 +279,25 @@ function FormReview({
   previousForm,
   onEdit,
   showPreviouslyMissingValuesAsChanged,
-  readonlyMode
+  readonlyMode,
+  isCorrection = false,
+  isReviewCorrection = false,
+  validatorContext
 }: {
   formConfig: FormConfig
   form: EventState
   previousForm: EventState
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   showPreviouslyMissingValuesAsChanged: boolean
+  validatorContext: ValidatorContext
   readonlyMode?: boolean
+  isCorrection?: boolean
+  isReviewCorrection?: boolean
 }) {
   const intl = useIntl()
+
   const visiblePages = formConfig.pages.filter((page) =>
-    isPageVisible(page, form)
+    isPageVisible(page, form, validatorContext)
   )
 
   return (
@@ -296,60 +305,64 @@ function FormReview({
       <ReviewContainter>
         {visiblePages.map((page) => {
           const fields = page.fields
-            .filter((field) => isFieldDisplayedOnReview(field, form))
+            .filter((field) =>
+              isFieldDisplayedOnReview(field, form, validatorContext)
+            )
             .map((field) => {
               const value = form[field.id]
               const previousValue = previousForm[field.id]
 
-              const valueDisplay = Output({
-                field,
-                previousValue,
-                showPreviouslyMissingValuesAsChanged,
-                value
-              })
+              // previousForm, formConfig are used to find previous values with the same label if required
+              const valueDisplay = (
+                <Output
+                  field={field}
+                  formConfig={formConfig}
+                  previousForm={previousForm}
+                  previousValue={previousValue}
+                  showPreviouslyMissingValuesAsChanged={
+                    showPreviouslyMissingValuesAsChanged
+                  }
+                  value={value}
+                />
+              )
 
-              const error = getFieldValidationErrors({
+              const errors = runFieldValidations({
                 field,
-                values: form
+                values: form,
+                context: validatorContext
               })
 
               const errorDisplay =
-                error.errors.length > 0 ? (
+                errors.length > 0 ? (
                   <ValidationError key={field.id}>
-                    {intl.formatMessage(error.errors[0].message)}
+                    {intl.formatMessage(errors[0].message)}
                   </ValidationError>
                 ) : null
 
               return { ...field, valueDisplay, errorDisplay }
             })
 
-          const shouldDisplayPage = fields.some(
-            ({ type, valueDisplay, errorDisplay }) => {
-              if (
-                type === FieldType.FILE ||
-                type === FieldType.FILE_WITH_OPTIONS
-              ) {
-                return true
-              }
-
-              // If page doesn't have any file inputs, we only want to display it if it has any fields with content
-              return valueDisplay || errorDisplay
-            }
-          )
-
-          if (!shouldDisplayPage) {
-            return <></>
-          }
-
           // Only display fields that have a non-undefined/null value or have an validation error
           const displayedFields = fields.filter(
-            ({ valueDisplay, errorDisplay }) => {
-              // Explicitly check for undefined and null, so that e.g. number 0 and empty string outputs are shown
-              const hasValue =
-                valueDisplay !== undefined && valueDisplay !== null
-              return hasValue || Boolean(errorDisplay)
-            }
+            ({ type }) =>
+              !FieldTypesToHideInReview.some(
+                (typeToHide) => type === typeToHide
+              )
           )
+
+          if (displayedFields.length === 0) {
+            return <React.Fragment key={`Section_${page.id}`}></React.Fragment>
+          }
+
+          const hasCorrectableFields = displayedFields.some(
+            (field) => !field.uncorrectable
+          )
+
+          // If the page has any correctable fields, show the change all link
+          const showChangeAllLink =
+            !readonlyMode &&
+            (!isCorrection || hasCorrectableFields) &&
+            !isReviewCorrection
 
           return (
             <DeclarationDataContainer
@@ -357,7 +370,7 @@ function FormReview({
             >
               <Accordion
                 action={
-                  !readonlyMode && (
+                  showChangeAllLink && (
                     <Link
                       onClick={(e) => {
                         e.stopPropagation()
@@ -376,31 +389,45 @@ function FormReview({
               >
                 <ListReview id={'Section_' + page.id}>
                   {displayedFields.map(
-                    ({ id, label, errorDisplay, valueDisplay }) => (
-                      <ListReview.Row
-                        key={id}
-                        actions={
-                          !readonlyMode && (
-                            <Link
-                              data-testid={`change-button-${id}`}
-                              onClick={(e) => {
-                                e.stopPropagation()
+                    ({
+                      id,
+                      label,
+                      errorDisplay,
+                      valueDisplay,
+                      uncorrectable
+                    }) => {
+                      const shouldHideEditLink =
+                        readonlyMode ||
+                        (isCorrection && uncorrectable) ||
+                        isReviewCorrection
 
-                                onEdit({
-                                  pageId: page.id,
-                                  fieldId: id
-                                })
-                              }}
-                            >
-                              {intl.formatMessage(reviewMessages.changeButton)}
-                            </Link>
-                          )
-                        }
-                        id={id}
-                        label={intl.formatMessage(label)}
-                        value={errorDisplay || valueDisplay}
-                      />
-                    )
+                      return (
+                        <ListReview.Row
+                          key={id}
+                          actions={
+                            !shouldHideEditLink && (
+                              <Link
+                                data-testid={`change-button-${id}`}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  onEdit({
+                                    pageId: page.id,
+                                    fieldId: id
+                                  })
+                                }}
+                              >
+                                {intl.formatMessage(
+                                  reviewMessages.changeButton
+                                )}
+                              </Link>
+                            )
+                          }
+                          id={id}
+                          label={intl.formatMessage(label)}
+                          value={errorDisplay || valueDisplay}
+                        />
+                      )
+                    }
                   )}
                 </ListReview>
               </Accordion>
@@ -420,17 +447,22 @@ function ReviewComponent({
   formConfig,
   previousFormValues,
   form,
+  validatorContext,
   annotation,
   onEdit,
   children,
   title,
   onAnnotationChange,
   readonlyMode,
-  reviewFields
+  reviewFields,
+  isCorrection = false,
+  isReviewCorrection = false,
+  banner
 }: {
-  children: React.ReactNode
+  children?: React.ReactNode
   formConfig: FormConfig
   form: EventState
+  validatorContext: ValidatorContext
   annotation?: EventState
   reviewFields?: FieldConfig[]
   previousFormValues?: EventState
@@ -446,8 +478,10 @@ function ReviewComponent({
   title: string
   onAnnotationChange?: (values: EventState) => void
   readonlyMode?: boolean
+  isCorrection?: boolean
+  isReviewCorrection?: boolean
+  banner?: React.ReactNode
 }) {
-  const scopes = useSelector(getScope)
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
 
@@ -466,16 +500,20 @@ function ReviewComponent({
   return (
     <Row>
       <LeftColumn>
+        {banner}
         <Card>
           <ReviewHeader title={title} />
           <FormReview
             form={form}
             formConfig={formConfig}
+            isCorrection={isCorrection}
+            isReviewCorrection={isReviewCorrection}
             previousForm={previousForm}
             readonlyMode={readonlyMode}
             showPreviouslyMissingValuesAsChanged={
               showPreviouslyMissingValuesAsChanged
             }
+            validatorContext={validatorContext}
             onEdit={onEdit}
           />
 
@@ -484,11 +522,10 @@ function ReviewComponent({
               <ReviewContainter>
                 <FormFieldGenerator
                   fields={reviewFields}
-                  form={annotation}
                   id={'review'}
                   initialValues={annotation}
                   readonlyMode={readonlyMode}
-                  setAllFieldsDirty={false}
+                  validatorContext={validatorContext}
                   onChange={onAnnotationChange}
                 />
               </ReviewContainter>
@@ -500,13 +537,9 @@ function ReviewComponent({
       {pageIdsWithFile.length > 0 && (
         <RightColumn>
           <DocumentViewer
-            disabled={readonlyMode}
+            disabled={readonlyMode || isCorrection || isReviewCorrection}
             form={form}
             formConfig={formConfig}
-            // @todo: ask about this rule
-            showInMobile={
-              scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT) ?? false
-            }
             onEdit={() =>
               onEdit({ pageId: pageIdsWithFile[0], confirmation: true })
             }
@@ -578,7 +611,8 @@ function ReviewActionComponent({
   onReject,
   messages,
   primaryButtonType,
-  canSendIncomplete
+  canSendIncomplete,
+  icon
 }: {
   incomplete: boolean
   onConfirm: () => void
@@ -591,6 +625,7 @@ function ReviewActionComponent({
   }
   primaryButtonType?: 'positive' | 'primary'
   canSendIncomplete?: boolean
+  icon: IconProps['name']
 }) {
   const intl = useIntl()
 
@@ -610,7 +645,7 @@ function ReviewActionComponent({
               type={primaryButtonType ?? 'positive'}
               onClick={onConfirm}
             >
-              <Icon color="white" name="Check" />
+              <Icon color="white" name={icon} />
               {intl.formatMessage(messages.onConfirm)}
             </Button>
             {onReject && messages.onReject && (
@@ -819,6 +854,7 @@ function RejectActionModal({
       ]}
       contentHeight={270}
       handleClose={() => close(null)}
+      id="reject-modal"
       show={true}
       title={intl.formatMessage(reviewMessages.rejectModalTitle)}
       width={918}
@@ -828,6 +864,7 @@ function RejectActionModal({
           {intl.formatMessage(reviewMessages.rejectModalDescription)}
         </Text>
         <TextArea
+          data-testid="reject-reason"
           required={true}
           value={state.message}
           onChange={(e) =>
@@ -849,9 +886,9 @@ function RejectActionModal({
 }
 
 export const Review = {
-  Body: ReviewComponent,
+  Body: withSuspense(ReviewComponent),
   Actions: ReviewActionComponent,
-  EditModal: EditModal,
+  EditModal,
   ActionModal: {
     Accept: AcceptActionModal,
     Reject: RejectActionModal

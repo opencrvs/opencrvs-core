@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig-base.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "build/dist/tests"
+  },
+  "references": [
+    {
+      "path": "./tsconfig-commonjs.json"
+    }
+  ],
+  "include": [
+    "src/**/*.test.ts",
+    "typings"
+  ]
+}

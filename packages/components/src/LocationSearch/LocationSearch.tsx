@@ -42,6 +42,9 @@ const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
   border-radius: 4px;
   ${({ theme }) => theme.fonts.reg19};
   padding-left: 40px;
+
+  color: ${({ theme }) => theme.colors.copy};
+  background: ${({ theme }) => theme.colors.white};
   border: 1.5px solid
     ${({ theme, error, touched }) =>
       error && touched ? theme.colors.negative : theme.colors.copy};
@@ -51,7 +54,14 @@ const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
     border: 1.5px solid ${({ theme }) => theme.colors.grey600};
     box-shadow: 0 0 0px 4px ${({ theme }) => theme.colors.yellow};
   }
+
+  &:disabled {
+    color: ${({ theme }) => theme.colors.disabled};
+    border: 1.5px solid ${({ theme }) => theme.colors.disabled};
+    box-shadow: none;
+  }
 `
+
 const DropDownWrapper = styled.ul`
   background: ${({ theme }) => theme.colors.white};
   box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54);
@@ -102,13 +112,13 @@ interface IProps {
   searchHandler?: (location: ISearchLocation) => void
   searchButtonHandler?: () => void
   id?: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onBlur?: (e: React.FocusEvent<any>) => void
   errorMessage?: string
   error?: boolean
   touched?: boolean
   className?: string
   buttonLabel: string
+  disabled?: boolean
 }
 export class LocationSearch extends React.Component<IProps, IState> {
   searchTimeout: NodeJS.Timeout | undefined
@@ -265,9 +275,13 @@ export class LocationSearch extends React.Component<IProps, IState> {
       <>
         <LocationSearchContainer>
           <Wrapper className={this.props.className}>
-            <Icon name="MapPin" size="medium" />
+            <Icon name="MapPin" size="medium" disabled={this.props.disabled} />
             <SearchTextInput
               id={this.props.id ? this.props.id : 'locationSearchInput'}
+              data-testid={
+                this.props.id ? this.props.id : 'locationSearchInput'
+              }
+              disabled={this.props.disabled}
               type="text"
               autoComplete="off"
               onFocus={this.onFocus}
@@ -290,7 +304,10 @@ export class LocationSearch extends React.Component<IProps, IState> {
             <SearchButton
               id="location-search-btn"
               onClick={this.props.searchButtonHandler}
-              disabled={!(this.state.selectedItem && this.state.selectedText)}
+              disabled={
+                !(this.state.selectedItem && this.state.selectedText) ||
+                this.props.disabled
+              }
             >
               {this.props.buttonLabel}
             </SearchButton>
@@ -299,6 +316,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
         {!this.state.selectedItem &&
           this.state.selectedText &&
           this.props.errorMessage &&
+          !this.props.disabled &&
           !this.state.isFocused && (
             <InputError id="location-search-error">
               {this.props.errorMessage}

@@ -11,40 +11,46 @@
 import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { ActionType } from '@opencrvs/commons/client'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
+import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { buttonMessages } from '@client/i18n/messages'
-import { generateGoToHomeTabUrl } from '@client/navigation'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 const messages = defineMessages({
   title: {
     defaultMessage: 'Correct Record',
     description: 'Label for correct record button in dropdown menu',
-    id: 'v2.action.correct'
+    id: 'action.correct'
   }
 })
 
 export function Onboarding() {
-  const navigate = useNavigate()
-
   const { eventId, pageId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
+  const [{ workqueue }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
+  )
+  const validatorContext = useValidatorContext()
   const events = useEvents()
   const annotation = useActionAnnotation((state) => state.getAnnotation())
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.getEvent.getFromCache(eventId)
 
+  const navigate = useNavigate()
   const intl = useIntl()
-
+  const { closeActionView } = useEventFormNavigation()
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
@@ -59,7 +65,8 @@ export function Onboarding() {
     )
   }
 
-  const formPages = actionConfiguration.onboardingForm
+  const formPages = actionConfiguration.correctionForm.pages
+  const eventIndex = getCurrentEventState(event, configuration)
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
@@ -67,12 +74,15 @@ export function Onboarding() {
   React.useEffect(() => {
     if (!currentPageId) {
       navigate(
-        ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-          eventId: event.id
-        })
+        ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
+          {
+            eventId: event.id
+          },
+          { workqueue }
+        )
       )
     }
-  }, [currentPageId, navigate, event.id])
+  }, [currentPageId, navigate, event.id, workqueue])
 
   if (!currentPageId) {
     return null
@@ -82,39 +92,38 @@ export function Onboarding() {
     <ActionPageLight
       hideBackground
       goBack={() => navigate(-1)}
-      goHome={() =>
-        navigate(
-          generateGoToHomeTabUrl({
-            tabId: WORKQUEUE_TABS.readyForReview
-          })
-        )
-      }
+      goHome={() => closeActionView()}
       id="corrector_form"
       title={intl.formatMessage(messages.title)}
     >
       <PagesComponent
-        // @TODO: Use subscription if needed
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
-        declaration={event.declaration}
+        declaration={eventIndex.declaration}
         eventConfig={configuration}
         form={annotation}
         formPages={formPages}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
         showReviewButton={false}
+        validateBeforeNextPage={true}
+        validatorContext={validatorContext}
         onPageChange={(nextPageId: string) => {
           return navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
-              eventId: event.id,
-              pageId: nextPageId
-            })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
+              {
+                eventId,
+                pageId: nextPageId
+              },
+              { workqueue }
+            )
           )
         }}
         onSubmit={() => {
           return navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-              eventId: event.id
-            })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
+              { eventId },
+              { workqueue }
+            )
           )
         }}
       />

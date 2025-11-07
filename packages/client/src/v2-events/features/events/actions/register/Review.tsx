@@ -10,16 +10,19 @@
  */
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import {
   getCurrentEventState,
   ActionType,
   getActionAnnotation,
   getDeclaration,
-  getActionReview
+  getActionReview,
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -38,6 +41,8 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { reviewMessages } from '../messages'
 
 function getTranslations(hasErrors: boolean) {
@@ -52,22 +57,25 @@ function getTranslations(hasErrors: boolean) {
  */
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER)
+  const [{ workqueue: slug }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.VALIDATE.REVIEW
+  )
   const events = useEvents()
   const drafts = useDrafts()
+  const validatorContext = useValidatorContext()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
-  const { goToHome } = useEventFormNavigation()
+  const { closeActionView: closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const registerMutation = events.actions.register
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEvent.getFromCache(eventId)
 
   const previousAnnotation = getActionAnnotation({
     event,
-    actionType: ActionType.REGISTER,
-    drafts: []
+    actionType: ActionType.REGISTER
   })
 
   const { setAnnotation, getAnnotation } = useActionAnnotation()
@@ -79,12 +87,14 @@ export function Review() {
   const reviewConfig = getActionReview(config, ActionType.REGISTER)
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
-  const previousFormValues = getCurrentEventState(event).declaration
+  const currentEventState = getCurrentEventState(event, config)
+  const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form,
+    context: validatorContext,
     annotation,
     reviewFields: reviewConfig.fields
   })
@@ -111,9 +121,10 @@ export function Review() {
         ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath(
           { pageId, eventId },
           {
-            from: 'review'
+            from: 'review',
+            workqueue: slug
           },
-          fieldId
+          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
       )
     }
@@ -145,8 +156,7 @@ export function Review() {
         transactionId: uuid(),
         annotation
       })
-
-      goToHome()
+      closeActionView(slug)
     }
   }
 
@@ -162,20 +172,31 @@ export function Review() {
           eventId,
           declaration: {},
           transactionId: uuid(),
-          annotation: { message }
+          annotation: {},
+          content: { reason: message }
         })
       }
 
       if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
-        events.actions.archive.mutate({
-          eventId,
-          declaration: {},
-          transactionId: uuid(),
-          annotation: { message, isDuplicate }
-        })
+        if (isDuplicate) {
+          events.customActions.archiveOnDuplicate.mutate({
+            eventId,
+            declaration: {},
+            transactionId: uuid(),
+            content: { reason: message }
+          })
+        } else {
+          events.actions.archive.mutate({
+            eventId,
+            declaration: {},
+            transactionId: uuid(),
+            annotation: {},
+            content: { reason: message }
+          })
+        }
       }
 
-      goToHome()
+      closeActionView(slug)
     }
   }
 
@@ -185,7 +206,7 @@ export function Review() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          goToHome()
+          closeActionView(slug)
         })
       }
     >
@@ -196,15 +217,21 @@ export function Review() {
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
+        validatorContext={validatorContext}
         onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions
+          icon="Check"
           incomplete={incomplete}
           messages={messages}
           primaryButtonType="positive"
           onConfirm={handleRegistration}
-          onReject={handleRejection}
+          onReject={
+            currentEventState.flags.includes(InherentFlags.REJECTED)
+              ? undefined
+              : handleRejection
+          }
         />
         {modal}
       </ReviewComponent.Body>

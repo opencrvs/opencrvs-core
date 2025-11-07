@@ -13,7 +13,9 @@ import {
   ActionType,
   tennisClubMembershipEvent,
   generateEventDocument,
-  generateEventDraftDocument
+  generateEventDraftDocument,
+  footballClubMembershipEvent,
+  EventDocument
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
@@ -51,7 +53,7 @@ function createSpy<Args extends unknown[], Result>(
  *
  * @returns handlers with spy methods
  */
-function wrapHandlersWithSpies<
+export function wrapHandlersWithSpies<
   Handlers extends {
     name: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -100,23 +102,29 @@ function wrapHandlersWithSpies<
 
 const eventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [{ type: ActionType.CREATE }]
 })
 const eventId = eventDocument.id
-const draft = generateEventDraftDocument(eventId, ActionType.REGISTER)
+const draft = generateEventDraftDocument({
+  eventId,
+  actionType: ActionType.REGISTER
+})
 
 /**
  * Shareable msw configuration for declaration action flows with spies.
  */
 export const createDeclarationTrpcMsw = (
-  trpcMsw: ReturnType<typeof createTRPCMsw<AppRouter>>
+  trpcMsw: ReturnType<typeof createTRPCMsw<AppRouter>>,
+  eventDocument: EventDocument
 ) => {
   return {
+    eventDocument,
+    draft,
     events: wrapHandlersWithSpies([
       {
         name: 'event.config.get',
         procedure: trpcMsw.event.config.get.query,
-        handler: () => [tennisClubMembershipEvent]
+        handler: () => [tennisClubMembershipEvent, footballClubMembershipEvent]
       },
       {
         name: 'event.get',
@@ -124,14 +132,13 @@ export const createDeclarationTrpcMsw = (
         handler: () => eventDocument
       },
       {
-        name: 'event.list',
-        procedure: trpcMsw.event.list.query,
-        handler: () => [tennisClubMembershipEventIndex]
-      },
-      {
         name: 'event.create',
         procedure: trpcMsw.event.create.mutation,
-        handler: () => eventDocument
+        handler: () =>
+          generateEventDocument({
+            configuration: tennisClubMembershipEvent,
+            actions: [{ type: ActionType.CREATE }]
+          })
       },
       {
         name: 'event.actions.notify.request',
@@ -139,7 +146,7 @@ export const createDeclarationTrpcMsw = (
         handler: () =>
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
-            actions: [ActionType.CREATE, ActionType.NOTIFY]
+            actions: [{ type: ActionType.CREATE }, { type: ActionType.NOTIFY }]
           })
       },
       {
@@ -148,7 +155,7 @@ export const createDeclarationTrpcMsw = (
         handler: () =>
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
-            actions: [ActionType.CREATE, ActionType.DECLARE]
+            actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
           })
       },
       {
@@ -158,9 +165,9 @@ export const createDeclarationTrpcMsw = (
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
             actions: [
-              ActionType.CREATE,
-              ActionType.DECLARE,
-              ActionType.VALIDATE
+              { type: ActionType.CREATE },
+              { type: ActionType.DECLARE },
+              { type: ActionType.VALIDATE }
             ]
           })
       },
@@ -171,10 +178,10 @@ export const createDeclarationTrpcMsw = (
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
             actions: [
-              ActionType.CREATE,
-              ActionType.DECLARE,
-              ActionType.VALIDATE,
-              ActionType.REGISTER
+              { type: ActionType.CREATE },
+              { type: ActionType.DECLARE },
+              { type: ActionType.VALIDATE },
+              { type: ActionType.REGISTER }
             ]
           })
       },
@@ -185,10 +192,24 @@ export const createDeclarationTrpcMsw = (
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
             actions: [
-              ActionType.CREATE,
-              ActionType.DECLARE,
-              ActionType.VALIDATE,
-              ActionType.ARCHIVE
+              { type: ActionType.CREATE },
+              { type: ActionType.DECLARE },
+              { type: ActionType.VALIDATE },
+              { type: ActionType.ARCHIVE }
+            ]
+          })
+      },
+      {
+        name: 'event.actions.duplicate.markAsDuplicate',
+        procedure: trpcMsw.event.actions.duplicate.markAsDuplicate.mutation,
+        handler: () =>
+          generateEventDocument({
+            configuration: tennisClubMembershipEvent,
+            actions: [
+              { type: ActionType.CREATE },
+              { type: ActionType.DECLARE },
+              { type: ActionType.VALIDATE },
+              { type: ActionType.MARK_AS_DUPLICATE }
             ]
           })
       },
@@ -199,10 +220,10 @@ export const createDeclarationTrpcMsw = (
           generateEventDocument({
             configuration: tennisClubMembershipEvent,
             actions: [
-              ActionType.CREATE,
-              ActionType.DECLARE,
-              ActionType.VALIDATE,
-              ActionType.REJECT
+              { type: ActionType.CREATE },
+              { type: ActionType.DECLARE },
+              { type: ActionType.VALIDATE },
+              { type: ActionType.REJECT }
             ]
           })
       }
@@ -212,6 +233,13 @@ export const createDeclarationTrpcMsw = (
         name: 'event.draft.list',
         procedure: trpcMsw.event.draft.list.query,
         handler: () => [draft]
+      }
+    ]),
+    search: wrapHandlersWithSpies([
+      {
+        name: 'event.search',
+        procedure: trpcMsw.event.search.query,
+        handler: () => [tennisClubMembershipEventIndex]
       }
     ])
   } as const

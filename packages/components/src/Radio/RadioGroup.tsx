@@ -74,6 +74,7 @@ export interface IRadioGroupProps {
   options: IRadioOption[]
   name: string
   value: string
+  disabled?: boolean
   size?: RadioSize
   notice?: string
   nestedFields?: { [key: string]: JSX.Element[] }
@@ -90,6 +91,7 @@ export const RadioGroup = ({
   notice,
   nestedFields,
   flexDirection,
+  disabled,
   ...props
 }: IRadioGroupProps) => (
   <Wrapper data-testid={props['data-testid']}>
@@ -107,7 +109,7 @@ export const RadioGroup = ({
                 {...props}
                 size={'large'}
                 name={name}
-                disabled={option.disabled}
+                disabled={option.disabled || disabled}
                 label={option.label}
                 value={option.value}
                 data-testid={`radio-option__${option.value}`}
@@ -139,7 +141,7 @@ export const RadioGroup = ({
                 {...props}
                 size={'small'}
                 name={name}
-                disabled={option.disabled}
+                disabled={option.disabled || disabled}
                 label={option.label}
                 value={option.value}
                 data-testid={`radio-option__${option.value}`}

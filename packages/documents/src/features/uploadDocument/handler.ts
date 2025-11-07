@@ -13,7 +13,13 @@ import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
 import { v4 as uuid } from 'uuid'
 import { fromBuffer } from 'file-type'
-import { getUserId, logger } from '@opencrvs/commons'
+import {
+  FullDocumentPath,
+  getUserId,
+  joinValues,
+  logger,
+  toDocumentPath
+} from '@opencrvs/commons'
 
 import { z } from 'zod'
 import { Readable } from 'stream'
@@ -45,9 +51,13 @@ const FileSchema = z
 
 const Payload = z.object({
   file: FileSchema,
-  transactionId: z.string()
+  transactionId: z.string(),
+  path: z.string().min(1).optional()
 })
 
+/**
+ * V2 version of the file upload handler.
+ */
 export async function fileUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -58,33 +68,46 @@ export async function fileUploadHandler(
     throw badRequest('Invalid payload')
   })
 
-  const { file, transactionId } = payload
+  const { file, transactionId, path } = payload
 
   const extension = file.hapi.filename.split('.').pop()
   const filename = `${transactionId}.${extension}`
 
-  await minioClient.putObject(
-    MINIO_BUCKET,
-    'event-attachments/' + filename,
-    file,
-    {
-      'created-by': userId
-    }
-  )
+  const filePath = joinValues([path, filename], '/')
 
-  return 'event-attachments/' + filename
+  await minioClient.putObject(MINIO_BUCKET, filePath, file, {
+    'created-by': userId
+  })
+
+  return `/${MINIO_BUCKET}/${filePath}` as FullDocumentPath
 }
 
 export async function fileExistsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { filename } = request.params
-  const exists = await minioClient.statObject(
-    MINIO_BUCKET,
-    'event-attachments/' + filename
-  )
-  if (!exists) {
+  // Ensure file is still in the desired format. forwarding url from gateway,
+  // '/files/{filePath*}' --> files//ocrvs/filename.jpg and the double slash is removed.
+  const filePath = FullDocumentPath.parse(request.params.filePath)
+
+  let stat
+
+  const documentPath = toDocumentPath(filePath)
+  try {
+    stat = await minioClient.statObject(MINIO_BUCKET, documentPath)
+  } catch (error) {
+    if (error.code === 'NotFound') {
+      return h
+        .response(
+          `request failed: document ${documentPath} does not exist in bucket ${MINIO_BUCKET}`
+        )
+        .code(404)
+    }
+
+    throw error
+  }
+
+  if (!stat) {
     return notFound('File not found')
   }
   return h.response().code(200)

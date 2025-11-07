@@ -13,20 +13,28 @@ import * as Joi from 'joi'
 import {
   CERT_PUBLIC_KEY_PATH,
   CONFIG_SMS_CODE_EXPIRY_SECONDS,
-  NOTIFICATION_URL,
   PRODUCTION,
   QA_ENV
 } from '@gateway/constants'
-import { del, get, set } from '@gateway/utils/redis'
+import { redis } from '@gateway/utils/redis'
 import * as crypto from 'crypto'
-import { resolve } from 'url'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import fetch from '@gateway/fetch'
 import { unauthorized } from '@hapi/boom'
-import { logger } from '@opencrvs/commons'
+import {
+  IUserName,
+  logger,
+  personNameFromV1ToV2,
+  TriggerEvent,
+  triggerUserEventNotification
+} from '@opencrvs/commons'
 import * as t from 'io-ts'
 import * as F from 'fp-ts'
+import { env } from '../../environment'
+
+type VerifyUserChangeTrigger =
+  | typeof TriggerEvent.CHANGE_PHONE_NUMBER
+  | typeof TriggerEvent.CHANGE_EMAIL_ADDRESS
 
 const pipe = F.function.pipe
 const { chainW, tryCatch } = F.either
@@ -48,15 +56,9 @@ interface ISendVerifyCodeResponse {
   email?: string
 }
 
-interface IUserName {
-  use: string
-  family: string
-  given: string[]
-}
-
 interface ISendVerifyCodePayload {
   userFullName: IUserName[]
-  notificationEvent: string
+  notificationEvent: VerifyUserChangeTrigger
   phoneNumber?: string
   email?: string
 }
@@ -66,7 +68,7 @@ export async function storeVerificationCode(nonce: string, code: string) {
     code,
     createdAt: Date.now()
   }
-  await set(`verification_${nonce}`, JSON.stringify(codeDetails))
+  await redis.set(`verification_${nonce}`, JSON.stringify(codeDetails))
 }
 
 export async function generateAndStoreVerificationCode(
@@ -81,11 +83,7 @@ export async function checkVerificationCode(
   nonce: string,
   code: string
 ): Promise<void> {
-  const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
-
-  if (!codeDetails) {
-    throw new Error('sms code not found')
-  }
+  const codeDetails = await getVerificationCodeDetails(nonce)
 
   const codeExpired =
     (Date.now() - codeDetails.createdAt) / 1000 >=
@@ -103,14 +101,19 @@ export async function checkVerificationCode(
 export async function getVerificationCodeDetails(
   nonce: string
 ): Promise<ICodeDetails> {
-  const codeDetails = await get(`verification_${nonce}`)
+  const codeDetails = await redis.get(`verification_${nonce}`)
+
+  if (!codeDetails) {
+    throw new Error('sms code not found')
+  }
+
   return JSON.parse(codeDetails) as ICodeDetails
 }
 
 export async function deleteUsedVerificationCode(
   nonce: string
 ): Promise<boolean> {
-  const count = await del(`verification_${nonce}`)
+  const count = await redis.del(`verification_${nonce}`)
   return Boolean(count)
 }
 
@@ -121,24 +124,23 @@ export function generateNonce() {
 export async function sendVerificationCode(
   verificationCode: string,
   token: string,
-  notificationEvent: string,
+  notificationEvent: VerifyUserChangeTrigger,
   userFullName: IUserName[],
   mobile?: string,
   email?: string
 ): Promise<void> {
-  const params = {
-    msisdn: mobile,
-    email,
-    code: verificationCode,
-    notificationEvent,
-    userFullName
-  }
-
-  await fetch(resolve(NOTIFICATION_URL, 'authenticationCode'), {
-    method: 'POST',
-    body: JSON.stringify(params),
-    headers: {
-      'Content-Type': 'application/json',
+  await triggerUserEventNotification({
+    event: notificationEvent,
+    payload: {
+      recipient: {
+        mobile,
+        email,
+        name: personNameFromV1ToV2(userFullName)
+      },
+      code: verificationCode
+    },
+    countryConfigUrl: env.COUNTRY_CONFIG_URL,
+    authHeader: {
       Authorization: `Bearer ${token}`
     }
   })
@@ -150,7 +152,7 @@ export async function generateAndSendVerificationCode(
   nonce: string,
   scope: string[],
   token: string,
-  notificationEvent: string,
+  notificationEvent: VerifyUserChangeTrigger,
   userFullName: IUserName[],
   mobile?: string,
   email?: string

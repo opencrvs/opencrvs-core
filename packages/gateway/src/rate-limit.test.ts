@@ -8,27 +8,24 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { resolvers as rootResolvers } from '@gateway/features/user/root-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import {
-  startContainer,
-  stopContainer,
-  flushAll
-} from './utils/redis-test-utils'
+import { startContainer, stopContainer } from './utils/redis-test-utils'
 import { StartedTestContainer } from 'testcontainers'
 import { savedAdministrativeLocation } from '@opencrvs/commons/fixtures'
 import { createServer } from '@gateway/server'
 import { UUID } from '@opencrvs/commons'
+import { redis } from './utils/redis'
 
 const fetch = fetchAny as any
 const resolvers = rootResolvers as any
 const locationResolvers = locationRootResolvers as any
 
 let container: StartedTestContainer
+
 jest.mock('./constants', () => {
   const originalModule = jest.requireActual('./constants')
   return {
@@ -37,6 +34,7 @@ jest.mock('./constants', () => {
     DISABLE_RATE_LIMIT: false
   }
 })
+
 describe('Rate limit', () => {
   let authHeaderRegAgent: { Authorization: string }
   let authHeaderRegAgent2: { Authorization: string }
@@ -44,12 +42,13 @@ describe('Rate limit', () => {
   beforeAll(async () => {
     container = await startContainer()
   })
+
   afterAll(async () => {
     await stopContainer(container)
   })
 
   beforeEach(async () => {
-    await flushAll()
+    await redis.flushAll()
     fetch.resetMocks()
 
     const validateToken = jwt.sign(

@@ -10,13 +10,15 @@
  */
 import { z } from 'zod'
 import { ActionConfig } from './ActionConfig'
-import { DeduplicationConfig } from './DeduplicationConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
-import { WorkqueueConfig } from './WorkqueueConfig'
-import { AdvancedSearchConfig } from './AdvancedSearchConfig'
-import { findAllFields } from './utils'
+import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
+import { findAllFields, getDeclarationFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
+import { extendZodWithOpenApi } from 'zod-openapi'
+import { FieldType } from './FieldType'
+import { FieldReference } from './FieldConfig'
+extendZodWithOpenApi(z)
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -28,15 +30,38 @@ export const EventConfig = z
     id: z
       .string()
       .describe(
-        'A machine-readable identifier for the event, e.g. "birth" or "death"'
+        'Machine-readable identifier of the event (e.g. "birth", "death").'
       ),
-    summary: SummaryConfig,
-    label: TranslationConfig,
-    actions: z.array(ActionConfig),
-    declaration: DeclarationFormConfig,
-    workqueues: z.array(WorkqueueConfig),
-    deduplication: z.array(DeduplicationConfig).optional().default([]),
-    advancedSearch: z.array(AdvancedSearchConfig).optional().default([])
+    dateOfEvent: FieldReference.optional().describe(
+      'Reference to the field capturing the date of the event (e.g. date of birth). Defaults to the event creation date if unspecified.'
+    ),
+    title: TranslationConfig.describe(
+      'Title template for the singular event, supporting variables (e.g. "{applicant.name.firstname} {applicant.name.surname}").'
+    ),
+    fallbackTitle: TranslationConfig.optional().describe(
+      'Fallback title shown when the main title resolves to an empty value.'
+    ),
+    summary: SummaryConfig.describe(
+      'Summary information displayed in the event overview.'
+    ),
+    label: TranslationConfig.describe(
+      'Human-readable label for the event type.'
+    ),
+    actions: z
+      .array(ActionConfig)
+      .describe(
+        'Configuration of system-defined actions associated with the event.'
+      ),
+    declaration: DeclarationFormConfig.describe(
+      'Configuration of the form used to gather event data.'
+    ),
+    advancedSearch: z
+      .array(AdvancedSearchConfig)
+      .optional()
+      .default([])
+      .describe(
+        'Configuration of fields available in the advanced search feature.'
+      )
   })
   .superRefine((event, ctx) => {
     const allFields = findAllFields(event)
@@ -57,19 +82,51 @@ export const EventConfig = z
     }
 
     const invalidFields = event.advancedSearch.flatMap((section) =>
-      section.fields.filter((field) => !fieldIds.includes(field.fieldId))
+      // Check if the fieldId is not in the fieldIds array
+      // and also not in the metadataFields array
+      section.fields.filter(
+        (field) =>
+          !(
+            fieldIds.includes(field.fieldId) ||
+            (EventFieldId.options as string[]).includes(field.fieldId)
+          )
+      )
     )
 
     if (invalidFields.length > 0) {
       ctx.addIssue({
         code: 'custom',
-        message: `Advanced search id must match a field id in fields array.
+        message: `Advanced search id must match a field id of form fields or pre-defined metadata fields.
     Invalid AdvancedSearch field IDs for event ${event.id}: ${invalidFields
       .map((f) => f.fieldId)
       .join(', ')}`,
         path: ['advancedSearch']
       })
     }
+
+    if (event.dateOfEvent) {
+      const eventDateFieldId = getDeclarationFields(event).find(
+        ({ id }) => id === event.dateOfEvent?.$$field
+      )
+      if (!eventDateFieldId) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Date of event field id must match a field id in fields array.
+          Invalid date of event field ID for event ${event.id}: ${event.dateOfEvent.$$field}`,
+          path: ['dateOfEvent']
+        })
+      } else if (eventDateFieldId.type !== FieldType.DATE) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Field specified for date of event is of type: ${eventDateFieldId.type}, but it needs to be of type: ${FieldType.DATE}`,
+          path: ['dateOfEvent.fieldType']
+        })
+      }
+    }
   })
+  .openapi({
+    ref: 'EventConfig'
+  })
+  .describe('Configuration defining an event type.')
 
 export type EventConfig = z.infer<typeof EventConfig>

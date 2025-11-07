@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { ResolvedUser } from '@opencrvs/commons/client'
+import { User } from '@opencrvs/commons/client'
 import { Avatar, Maybe } from '@client/utils/gateway'
 import { AvatarSmall } from '@client/components/Avatar'
 import { getUsersFullName } from '@client/v2-events/utils'
@@ -24,6 +24,7 @@ const NameAvatar = styled.div`
 `
 
 /**
+ * @prop names - Name of the user. Can be a plain string or a localisation specific name object
  * @returns Avatar with full name of the user.
  */
 export function UserAvatar({
@@ -31,11 +32,12 @@ export function UserAvatar({
   avatar,
   locale
 }: {
-  names: ResolvedUser['name']
+  names: User['name'] | string
   avatar?: Maybe<Avatar>
   locale: string
 }) {
-  const name = getUsersFullName(names, locale)
+  const name =
+    typeof names === 'string' ? names : getUsersFullName(names, locale)
 
   return (
     <NameAvatar>

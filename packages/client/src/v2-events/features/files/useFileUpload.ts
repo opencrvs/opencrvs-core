@@ -11,20 +11,43 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
+import { useParams } from 'react-router-dom'
+import {
+  DocumentPath,
+  FullDocumentPath,
+  joinUrlPaths,
+  joinValues
+} from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { queryClient } from '@client/v2-events/trpc'
+import {
+  cacheFile,
+  getFullDocumentPath,
+  getUnsignedFileUrl,
+  removeCached
+} from '@client/v2-events/cache'
+import { fetchFileFromUrl } from '@client/utils/imageUtils'
+import { waitUntilEventIsCreated } from '../events/useEvents/procedures/utils'
+
+interface UploadFileParams {
+  file: File
+  eventId: string
+  meta: {
+    transactionId: string
+    referenceId: string
+  }
+}
 
 async function uploadFile({
   file,
-  transactionId
-}: {
-  file: File
-  transactionId: string
-  id: string
-}): Promise<{ url: string }> {
+  eventId,
+  meta
+}: UploadFileParams): Promise<{ url: string }> {
   const formData = new FormData()
   formData.append('file', file)
-  formData.append('transactionId', transactionId)
+  formData.append('transactionId', meta.transactionId)
+
+  formData.append('path', eventId)
 
   const response = await fetch('/api/upload', {
     method: 'POST',
@@ -41,6 +64,13 @@ async function uploadFile({
   return response
 }
 
+/**
+ * NOTE: This function is used to delete a file from the server.
+ * There are two worrying cases:
+ * 1. User deletes a file but does not save the changes when they leave. We try to access the file later and it is not there.
+ * 2. Documents service includes "fail-safe" for users other than the creator of the file. If a user tries to delete a file that they do not own, it will fail (silently). Given the above scenario, the file would still be there.
+ *
+ */
 async function deleteFile({ filename }: { filename: string }): Promise<void> {
   const response = await fetch('/api/files/' + filename, {
     method: 'DELETE',
@@ -50,7 +80,21 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
   })
 
   if (!response.ok) {
-    throw new Error('File deletation upload failed')
+    if (response.status === 403) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Unable to hard-delete the file ${filename}. Only the creator can remove it.`
+      )
+    }
+
+    if (response.status === 404) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Unable to hard-delete the file ${filename}. File not found.`
+      )
+    }
+
+    throw new Error('File deletion failed', { cause: response.status })
   }
 
   return
@@ -59,122 +103,94 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
 const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
-/* Must match the one defined src-sw.ts */
-const CACHE_NAME = 'workbox-runtime'
+async function getPresignedUrl(filePath: FullDocumentPath) {
+  const url = joinUrlPaths('/api/presigned-url', filePath)
 
-function withPostfix(str: string, postfix: string) {
-  if (str.endsWith(postfix)) {
-    return str
-  }
-
-  return str + postfix
-}
-
-export function getFullUrl(filename: string) {
-  const minioURL = window.config.MINIO_URL
-  if (minioURL && typeof minioURL === 'string') {
-    return new URL(filename, withPostfix(minioURL, '/')).toString()
-  }
-
-  throw new Error('MINIO_URL is not defined')
-}
-
-async function getPresignedUrl(fileUri: string) {
-  const response = await fetch(
-    '/api/presigned-url/event-attachments/' + fileUri,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${getToken()}`
-      }
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
     }
-  )
+  })
 
   const res = await response.json()
   return res
 }
 
-async function cacheFile(filename: string, file: File) {
-  const temporaryBlob = new Blob([file], { type: file.type })
-  const cacheKeys = await caches.keys()
+export async function precacheFile(path: FullDocumentPath) {
+  const presignedUrl = (await getPresignedUrl(path)).presignedURL
 
-  const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
+  const file = await fetchFileFromUrl(presignedUrl, path)
 
-  if (!cacheKey) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `Cache ${CACHE_NAME} not found. Is service worker running properly?`
-    )
-    return
+  if (file) {
+    const url = getUnsignedFileUrl(path)
+
+    await cacheFile({ url, file })
   }
-
-  const cache = await caches.open(cacheKey)
-  return cache.put(
-    getFullUrl(filename),
-    new Response(temporaryBlob, { headers: { 'Content-Type': file.type } })
-  )
-}
-
-export async function removeCached(filename: string) {
-  const cacheKeys = await caches.keys()
-  const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
-
-  if (!cacheKey) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `Cache ${CACHE_NAME} not found. Is service worker running properly?`
-    )
-    return
-  }
-
-  const cache = await caches.open(cacheKey)
-  return cache.delete(getFullUrl(filename))
-}
-
-export async function precacheFile(filename: string) {
-  const presignedUrl = (await getPresignedUrl(filename)).presignedURL
-  const response = await fetch(presignedUrl)
-  const blob = await response.blob()
-  const file = new File([blob], filename, { type: blob.type })
-  await cacheFile(filename, file)
 }
 
 queryClient.setMutationDefaults([DELETE_MUTATION_KEY], {
-  retry: true,
+  // @ts-ignore
+  retry: (_, error) => {
+    if (error.cause === 403) {
+      return false
+    }
+    if (error.cause === 404) {
+      return false
+    }
+
+    return true
+  },
   retryDelay: 5000,
   mutationFn: deleteFile
 })
 queryClient.setMutationDefaults([UPLOAD_MUTATION_KEY], {
   retry: true,
   retryDelay: 5000,
-  mutationFn: uploadFile
+  mutationFn: uploadFile,
+  meta: { ignoreOutbox: true }
 })
 
 interface Options {
   onSuccess?: (data: {
     originalFilename: string
     type: string
-    filename: string
+    path: FullDocumentPath
     id: string
   }) => void
 }
 
 export function useFileUpload(fieldId: string, options: Options = {}) {
+  // Introduce `eventId` to the params to allow uploading files related to a specific event.
+  // Main goal is to allow uploading files in the context of an event, which is helpful when we need to clean up orphans.
+  // Start with good enough: Components do not need to pass `eventId` explicitly, it is automatically derived from the URL params without forcing low-level components to know about events concept.
+  const { eventId } = useParams()
+
+  if (!eventId) {
+    throw new Error("`eventId` not found in URL params. Can't upload files")
+  }
+
   const upload = useMutation({
-    mutationFn: uploadFile,
+    mutationFn: waitUntilEventIsCreated(async (variables: UploadFileParams) =>
+      uploadFile({ ...variables, meta: { ...variables.meta } })
+    ),
     mutationKey: [UPLOAD_MUTATION_KEY, fieldId],
-    onMutate: async ({ file, transactionId, id }) => {
+    onMutate: async ({ file, meta, eventId: dir }: UploadFileParams) => {
       const extension = file.name.split('.').pop()
-      const temporaryUrl = `${transactionId}.${extension}`
+      const temporaryFilename = `${meta.transactionId}.${extension}`
+      const filePathWithDirectory = joinValues([dir, temporaryFilename], '/')
+      const path = getFullDocumentPath(filePathWithDirectory)
+      const url = getUnsignedFileUrl(path)
+      await cacheFile({ url, file })
 
-      await cacheFile(temporaryUrl, file)
-
+      // NOTE: In the long run, client should not reverse-engineer the file path.
+      // It should be read from the server response.
       options.onSuccess?.({
         ...file,
         originalFilename: file.name,
         type: file.type,
-        filename: temporaryUrl,
-        id
+        path,
+        id: meta.referenceId
       })
     }
   })
@@ -188,24 +204,23 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
   })
 
   return {
-    getFullUrl,
     deleteFile: (filename: string) => {
       return del.mutate({ filename })
     },
     /**
      * Uploads a file with an optional identifier.
      *
-     * @param {File} file - The file to be uploaded.
-     * @param {string} [id='default'] - An optional identifier for the file.
-     * This allows the caller to track the file when its upload completes.
-     *
-     * @returns {Promise} A promise representing the upload operation.
+     * @param file - The file to be uploaded.
+     * @param referenceId An optional identifier for the file. Allows the caller to track the file when its upload completes.
      */
-    uploadFile: (file: File, id = 'default') => {
+    uploadFile: (file: File, referenceId = 'default') => {
       return upload.mutate({
         file,
-        transactionId: uuid(),
-        id
+        eventId,
+        meta: {
+          transactionId: uuid(),
+          referenceId
+        }
       })
     }
   }

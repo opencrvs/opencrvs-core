@@ -13,13 +13,14 @@ import { cleanEnv, str, port, url, num, bool } from 'envalid'
 
 export const env = cleanEnv(process.env, {
   REDIS_HOST: str({ devDefault: 'localhost' }),
+  REDIS_USERNAME: str({ default: undefined }),
+  REDIS_PASSWORD: str({ default: undefined }),
   AUTH_HOST: str({ default: '0.0.0.0' }),
   AUTH_PORT: port({ default: 4040 }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
   METRICS_URL: url({ devDefault: 'http://localhost:1050' }),
-  NOTIFICATION_SERVICE_URL: url({ devDefault: 'http://localhost:2020/' }),
   DOMAIN: str({ devDefault: '*' }),
-  COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040/' }), // used for external requests (CORS whitelist)
+  COUNTRY_CONFIG_URL_EXTERNAL: url({ devDefault: 'http://localhost:3040/' }), // used for external requests (CORS whitelist)
   COUNTRY_CONFIG_URL_INTERNAL: url({ devDefault: 'http://localhost:3040/' }), // used for internal service-to-service communication
   LOGIN_URL: url({ devDefault: 'http://localhost:3020/' }),
   CLIENT_APP_URL: url({ devDefault: 'http://localhost:3000/' }),

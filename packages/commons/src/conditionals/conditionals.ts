@@ -8,21 +8,34 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+import * as objectHash from 'object-hash'
 import { EventDocument } from '../events/EventDocument'
 import { EventState } from '../events/ActionDocument'
 import { ITokenPayload as TokenPayload, Scope } from '../authentication'
-import { ActionType } from '../events/ActionType'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
+import { userSerializer } from '../events/serializers/user/serializer'
+import { omitKeyDeep } from '../utils'
+import { UUID } from '../uuid'
+
+/* eslint-disable max-lines */
 
 /** @knipignore */
 export type JSONSchema = {
+  $id: string
   readonly __nominal__type: 'JSONSchema'
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function defineConditional(schema: any) {
-  return schema as JSONSchema
+  // The same conditional schema may appear multiple times in the final schema.
+  // This causes duplicate $id values (since the hash is identical), and Ajv
+  // throws a `resolves to more than one schema` error.
+  // To avoid this, we only keep $id at the top level and remove it from all nested schemas.
+  const schemaWithooutIDRef = omitKeyDeep(schema, '$id')
+  return {
+    $id: `https://opencrvs.org/conditionals/${objectHash.sha1(schemaWithooutIDRef)}`,
+    ...schemaWithooutIDRef
+  } as JSONSchema
 }
 
 export function defineFormConditional(schema: Record<string, unknown>) {
@@ -37,19 +50,22 @@ export function defineFormConditional(schema: Record<string, unknown>) {
   return defineConditional(schemaWithForm)
 }
 
-export type UserConditionalParameters = {
+type CommonConditionalParameters = {
   $now: string
+  $online: boolean
+}
+
+export type UserConditionalParameters = CommonConditionalParameters & {
   $user: TokenPayload
 }
-export type EventConditionalParameters = {
-  $now: string
+
+export type EventConditionalParameters = CommonConditionalParameters & {
   $event: EventDocument
 }
-// @TODO: Reconcile which types should be used. The same values are used within form and config. In form values can be undefined, for example.
-export type FormConditionalParameters = {
-  $now: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  $form: EventState | Record<string, any>
+
+export type FormConditionalParameters = CommonConditionalParameters & {
+  $form: EventState | Record<string, unknown>
+  $locations?: Array<{ id: UUID }>
 }
 
 export type ConditionalParameters =
@@ -125,11 +141,47 @@ export function never(): JSONSchema {
   return not(alwaysTrue())
 }
 
+type FieldReference = { $$field: string; $$subfield: string[] }
+
+function jsonFieldPath(field: FieldReference) {
+  return [field.$$field, ...field.$$subfield].join('/')
+}
+
+function wrapToPath(condition: Record<string, unknown>, path: string[]) {
+  if (path.length === 0) {
+    return condition
+  }
+  return path.reduceRight((conditionNow, part) => {
+    return {
+      type: 'object',
+      properties: {
+        [part]: conditionNow
+      },
+      required: [part]
+    }
+  }, condition)
+}
+
+function wrapToPathOptional(
+  condition: Record<string, unknown>,
+  path: string[]
+) {
+  if (path.length === 0) {
+    return condition
+  }
+  return path.reduceRight((conditionNow, part) => {
+    return {
+      type: 'object',
+      properties: { [part]: conditionNow }
+    }
+  }, condition)
+}
+
 /**
  *
  * Generate conditional rules for user.
  */
-export const user = {
+export const user = Object.assign(userSerializer, {
   hasScope: (scope: Scope) =>
     defineConditional({
       type: 'object',
@@ -149,46 +201,46 @@ export const user = {
         }
       },
       required: ['$user']
-    })
-}
-
-/**
- *
- * Generate conditional rules for event.
- */
-export const event = {
-  hasAction: (action: ActionType) =>
+    }),
+  hasRole: (role: string) =>
     defineConditional({
       type: 'object',
       properties: {
-        $event: {
+        $user: {
           type: 'object',
+          required: ['role'],
           properties: {
-            actions: {
-              type: 'array',
-              contains: {
-                type: 'object',
-                properties: {
-                  type: {
-                    const: action
-                  }
-                },
-                required: ['type']
-              }
+            role: {
+              type: 'string',
+              const: role
             }
-          },
-          required: ['actions']
+          }
         }
       },
-      required: ['$event']
-    })
+      required: ['$user']
+    }),
+  isOnline: () =>
+    defineConditional({
+      type: 'object',
+      properties: {
+        $online: {
+          type: 'boolean',
+          const: true
+        }
+      },
+      required: ['$online']
+    }),
+  locationLevel: (adminLevelId: string) => ({
+    $user: {
+      $location: adminLevelId
+    }
+  })
+})
+
+export function isFieldReference(value: unknown): value is FieldReference {
+  return typeof value === 'object' && value !== null && '$$field' in value
 }
 
-function getDateFromNow(days: number) {
-  return new Date(Date.now() - days * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .split('T')[0]
-}
 /**
  * This function will output JSONSchema which looks for example like this:
  * @example
@@ -211,27 +263,69 @@ function getDateFromNow(days: number) {
  * }
  */
 function getDateRangeToFieldReference(
-  fieldId: string,
-  comparedFieldId: string,
+  field: FieldReference,
+  comparedField: FieldReference,
   clause: 'formatMinimum' | 'formatMaximum'
 ) {
   return {
     type: 'object',
     properties: {
-      [fieldId]: {
-        type: 'string',
-        format: 'date',
-        [clause]: { $data: `1/${comparedFieldId}` }
-      },
-      [comparedFieldId]: { type: 'string', format: 'date' }
+      [field.$$field]: wrapToPath(
+        {
+          type: 'string',
+          format: 'date',
+          [clause]: {
+            $data: `${field.$$subfield.length + 1}/${jsonFieldPath(comparedField)}`
+          }
+        },
+        field.$$subfield
+      ),
+      [comparedField.$$field]: wrapToPath(
+        { type: 'string', format: 'date' },
+        comparedField.$$subfield
+      )
     },
-    required: [fieldId]
+    required: [field.$$field]
   }
 }
 
-type FieldReference = { _fieldId: string; [key: string]: unknown }
-function isFieldReference(value: unknown): value is FieldReference {
-  return typeof value === 'object' && value !== null && '_fieldId' in value
+function defineComparison(
+  field: FieldReference,
+  value: number | FieldReference,
+  keyword: 'exclusiveMinimum' | 'exclusiveMaximum'
+) {
+  if (isFieldReference(value)) {
+    const comparedField = value
+    return defineFormConditional({
+      type: 'object',
+      properties: {
+        [field.$$field]: wrapToPath(
+          {
+            type: ['number'],
+            [keyword]: {
+              $data: `${field.$$subfield.length + 1}/${jsonFieldPath(comparedField)}`
+            }
+          },
+          field.$$subfield
+        ),
+        [comparedField.$$field]: wrapToPath(
+          { type: 'number' },
+          comparedField.$$subfield
+        )
+      },
+      required: [field.$$field]
+    })
+  }
+  return defineFormConditional({
+    type: 'object',
+    properties: {
+      [field.$$field]: wrapToPath(
+        { type: 'number', [keyword]: value },
+        field.$$subfield
+      )
+    },
+    required: [field.$$field]
+  })
 }
 
 /**
@@ -242,114 +336,166 @@ function isFieldReference(value: unknown): value is FieldReference {
  *  and(field('foo').isEqualTo('bar'), field('baz').isUndefined())
  *
  */
-export function field(fieldId: string) {
+
+export function createFieldConditionals(fieldId: string) {
+  const getDayRange = (
+    field: FieldReference,
+    days: number,
+    clause: 'before' | 'after'
+  ) => ({
+    type: 'object',
+    properties: {
+      [field.$$field]: wrapToPath(
+        {
+          type: 'string',
+          format: 'date',
+          daysFromNow: {
+            days,
+            clause
+          }
+        },
+        field.$$subfield
+      )
+    },
+    required: [field.$$field]
+  })
+
   const getDateRange = (
-    date: string,
+    field: FieldReference,
+    date: string | FieldReference | { $data: '/$now' },
     clause: 'formatMinimum' | 'formatMaximum'
   ) => ({
     type: 'object',
     properties: {
-      [fieldId]: {
-        type: 'string',
-        format: 'date',
-        [clause]: date
-      }
+      [field.$$field]: wrapToPath(
+        {
+          type: 'string',
+          format: 'date',
+          [clause]: date
+        },
+        field.$$subfield
+      )
     },
-    required: [fieldId]
+    required: [field.$$field]
   })
 
   return {
     /**
      * @private Internal property used for field reference tracking.
      */
-    _fieldId: fieldId,
-    isAfter: () => ({
-      days: (days: number) => ({
-        inPast: () =>
-          defineFormConditional(
-            getDateRange(getDateFromNow(days), 'formatMinimum')
-          ),
-        inFuture: () =>
-          defineFormConditional(
-            getDateRange(getDateFromNow(-days), 'formatMinimum')
-          )
-      }),
-      date: (date: string | FieldReference) => {
-        if (isFieldReference(date)) {
-          const comparedFieldId = date._fieldId
-          return defineFormConditional(
-            getDateRangeToFieldReference(
-              fieldId,
-              comparedFieldId,
-              'formatMinimum'
+    $$field: fieldId,
+    /**
+     * @private Internal property used for solving a object path within field's value
+     */
+    $$subfield: [] as string[],
+    get(fieldPath: string) {
+      return {
+        ...this,
+        $$subfield: fieldPath.split('.')
+      }
+    },
+    asDob() {
+      return this.get('dob')
+    },
+    asAge() {
+      return this.get('age')
+    },
+    isAfter() {
+      return {
+        days: (days: number) => ({
+          inPast: () =>
+            defineFormConditional(getDayRange(this, -days, 'after')),
+          inFuture: () =>
+            defineFormConditional(getDayRange(this, days, 'after'))
+        }),
+        date: (date: string | FieldReference) => {
+          if (isFieldReference(date)) {
+            const comparedField = date
+            return defineFormConditional(
+              getDateRangeToFieldReference(this, comparedField, 'formatMinimum')
             )
-          )
-        }
+          }
 
-        return defineFormConditional(getDateRange(date, 'formatMinimum'))
-      },
-      now: () =>
-        defineFormConditional(getDateRange(getDateFromNow(0), 'formatMinimum'))
-    }),
-    isBefore: () => ({
-      days: (days: number) => ({
-        inPast: () =>
-          defineFormConditional(
-            getDateRange(getDateFromNow(days), 'formatMaximum')
-          ),
-        inFuture: () =>
-          defineFormConditional(
-            getDateRange(getDateFromNow(-days), 'formatMaximum')
-          )
-      }),
-      date: (date: string | FieldReference) => {
-        if (isFieldReference(date)) {
-          const comparedFieldId = date._fieldId
           return defineFormConditional(
-            getDateRangeToFieldReference(
-              fieldId,
-              comparedFieldId,
-              'formatMaximum'
-            )
+            getDateRange(this, date, 'formatMinimum')
           )
-        }
+        },
+        now: () =>
+          defineFormConditional(
+            getDateRange(this, { $data: '/$now' }, 'formatMinimum')
+          )
+      }
+    },
+    isBefore() {
+      return {
+        days: (days: number) => ({
+          inPast: () =>
+            defineFormConditional(getDayRange(this, -days, 'before')),
+          inFuture: () =>
+            defineFormConditional(getDayRange(this, days, 'before'))
+        }),
+        date: (date: `${string}-${string}-${string}` | FieldReference) => {
+          if (isFieldReference(date)) {
+            const comparedField = date
+            return defineFormConditional(
+              getDateRangeToFieldReference(this, comparedField, 'formatMaximum')
+            )
+          }
 
-        return defineFormConditional(getDateRange(date, 'formatMaximum'))
-      },
-      now: () =>
-        defineFormConditional(getDateRange(getDateFromNow(0), 'formatMaximum'))
-    }),
-    isEqualTo: (value: string | boolean | FieldReference) => {
+          return defineFormConditional(
+            getDateRange(this, date, 'formatMaximum')
+          )
+        },
+        now: () =>
+          defineFormConditional(
+            getDateRange(this, { $data: '/$now' }, 'formatMaximum')
+          )
+      }
+    },
+    isGreaterThan(value: number | FieldReference) {
+      return defineComparison(this, value, 'exclusiveMinimum')
+    },
+    isLessThan(value: number | FieldReference) {
+      return defineComparison(this, value, 'exclusiveMaximum')
+    },
+    isEqualTo(value: string | boolean | number | FieldReference) {
       // If the value is a reference to another field, the JSON schema uses the field reference as the 'const' value we compare to
       if (isFieldReference(value)) {
-        const comparedFieldId = value._fieldId
+        const comparedField = value
 
         return defineFormConditional({
           type: 'object',
           properties: {
-            [fieldId]: {
-              type: ['string', 'boolean'],
-              const: { $data: `1/${comparedFieldId}` }
-            },
-            [comparedFieldId]: { type: ['string', 'boolean'] }
+            [this.$$field]: wrapToPath(
+              {
+                type: ['string', 'boolean', 'number'],
+                const: {
+                  $data: `/$form/${jsonFieldPath(comparedField)}`
+                }
+              },
+              this.$$subfield
+            ),
+            [comparedField.$$field]: wrapToPath(
+              { type: ['string', 'boolean', 'number'] },
+              comparedField.$$subfield
+            )
           },
-          required: [fieldId, comparedFieldId]
+          required: [this.$$field, comparedField.$$field]
         })
       }
 
-      // In the 'default' case, we compare the value of the field with the hard coded value
       return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: {
-            oneOf: [
-              { type: 'string', const: value },
-              { type: 'boolean', const: value }
-            ],
-            const: value
-          }
+          [this.$$field]: wrapToPath(
+            {
+              type: ['string', 'boolean', 'number'],
+              const: value
+            },
+            this.$$subfield
+          )
         },
-        required: [fieldId]
+        required: [this.$$field]
       })
     },
     /**
@@ -360,92 +506,166 @@ export function field(fieldId: string) {
      * NOTE: For now, this only works with string, boolean, and null types. 0 is still allowed.
      *
      */
-    isFalsy: () =>
-      defineFormConditional({
-        type: 'object',
-        properties: {
-          [fieldId]: {
-            anyOf: [
-              { const: 'undefined' },
-              { const: false },
-              { const: null },
-              { const: '' }
-            ]
-          }
-        },
+    isFalsy() {
+      // if we're targeting a nested leaf, be lenient about the parent shape
+      const hasSubpath = this.$$subfield.length > 0
+
+      const falsyLeaf = {
         anyOf: [
-          {
-            required: [fieldId]
-          },
-          {
-            not: {
-              required: [fieldId]
-            }
-          }
+          { const: 'undefined' },
+          { const: false },
+          { const: null },
+          { const: '' }
         ]
-      }),
-    isUndefined: () =>
-      defineFormConditional({
+      }
+
+      return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: {
-            type: 'string',
-            enum: ['undefined']
-          }
+          [fieldId]: hasSubpath
+            ? {
+                // either the whole parent is null (treat as undefined),
+                // or the nested leaf is falsy
+                anyOf: [
+                  { const: null },
+                  wrapToPathOptional(falsyLeaf, this.$$subfield)
+                ]
+              }
+            : falsyLeaf
+        },
+        anyOf: [{ required: [fieldId] }, { not: { required: [fieldId] } }]
+      })
+    },
+    isUndefined() {
+      return defineFormConditional({
+        type: 'object',
+        properties: {
+          [fieldId]: wrapToPath(
+            {
+              type: 'string',
+              enum: ['undefined']
+            },
+            this.$$subfield
+          )
         },
         not: {
           required: [fieldId]
         }
-      }),
-    inArray: (values: string[]) =>
-      defineFormConditional({
+      })
+    },
+    inArray(values: string[]) {
+      return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: {
-            type: 'string',
-            enum: values
-          }
+          [fieldId]: wrapToPath(
+            {
+              type: 'string',
+              enum: values
+            },
+            this.$$subfield
+          )
         },
         required: [fieldId]
-      }),
-    isValidEnglishName: () =>
-      defineFormConditional({
+      })
+    },
+    isValidEnglishName() {
+      return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: {
-            type: 'string',
-            pattern:
-              "^[\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*( [\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*)*$",
-            description:
-              "Name must contain only letters, numbers, and allowed special characters ('._-). No double spaces."
-          }
-        },
-        required: [fieldId]
-      }),
+          [fieldId]: wrapToPath(
+            {
+              type: 'string',
+              minLength: 1,
+              pattern:
+                "^[\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*( [\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*)*$",
+              description:
+                "Name must contain only letters, numbers, and allowed special characters ('.-). No double spaces."
+            },
+            this.$$subfield
+          )
+        }
+      })
+    },
+    isValidAdministrativeLeafLevel() {
+      return defineFormConditional({
+        type: 'object',
+        properties: {
+          [fieldId]: wrapToPath(
+            {
+              type: 'object',
+              properties: {
+                administrativeArea: {
+                  type: 'string',
+                  isLeafLevelLocation: true
+                }
+              },
+              description:
+                'The provided administrative value should have a value corresponding to the required lowest administrative level'
+            },
+            this.$$subfield
+          )
+        }
+      })
+    },
     /**
      * Checks if the field value matches a given regular expression pattern.
      * @param pattern - The regular expression pattern to match the field value against.
      * @returns A JSONSchema conditional that validates the field value against the pattern.
      */
-    matches: (pattern: string) =>
-      defineFormConditional({
+    matches(pattern: string) {
+      return defineFormConditional({
+        type: 'object',
+        properties: wrapToPath(
+          {
+            [fieldId]: {
+              type: 'string',
+              pattern
+            }
+          },
+          this.$$subfield
+        ),
+        required: [fieldId]
+      })
+    },
+    isBetween(min: number, max: number) {
+      return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: {
-            type: 'string',
-            pattern
-          }
+          [fieldId]: wrapToPath(
+            {
+              type: 'number',
+              minimum: min,
+              maximum: max
+            },
+            this.$$subfield
+          )
         },
         required: [fieldId]
-      }),
-    isBetween: (min: number, max: number) =>
+      })
+    },
+    getId: () => ({ fieldId }),
+    /**
+     * @deprecated
+     * use field(fieldId).get(nestedProperty) instead
+     * with 'and' combinator e.g.
+     * and(
+     *   field('child.name').get('firstname').isEqualTo('John'),
+     *   field('child.name').get('surname').isEqualTo('Doe')
+     * )
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    object: (options: Record<string, any>) =>
       defineFormConditional({
         type: 'object',
         properties: {
           [fieldId]: {
-            type: 'number',
-            minimum: min,
-            maximum: max
+            type: 'object',
+            properties: Object.fromEntries(
+              Object.entries(options).map(([key, value]) => {
+                return [key, value.properties.$form.properties[key]]
+              })
+            ),
+            required: Object.keys(options)
           }
         },
         required: [fieldId]

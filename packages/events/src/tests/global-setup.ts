@@ -10,7 +10,7 @@
  */
 
 import { ElasticsearchContainer } from '@testcontainers/elasticsearch'
-import { MongoMemoryServer } from 'mongodb-memory-server'
+import { PostgreSqlContainer } from '@testcontainers/postgresql'
 import type { ProvidedContext } from 'vitest'
 
 type ProvideFunction = <K extends keyof ProvidedContext>(
@@ -18,7 +18,7 @@ type ProvideFunction = <K extends keyof ProvidedContext>(
   value: ProvidedContext[K]
 ) => void
 
-async function setupServer() {
+async function setupElasticSearchServer() {
   return new ElasticsearchContainer('elasticsearch:8.16.4')
     .withExposedPorts(9200)
     .withStartupTimeout(120_000)
@@ -30,21 +30,32 @@ async function setupServer() {
     .start()
 }
 
-export default async function setup({ provide }: { provide: ProvideFunction }) {
-  const eventsMongoD = await MongoMemoryServer.create()
-  const userMgntMongoD = await MongoMemoryServer.create()
-  const es = await setupServer()
+async function setupPostgresServer() {
+  return new PostgreSqlContainer('postgres:17.6')
+    .withUsername('postgres')
+    .withPassword('postgres')
+    .withDatabase('postgres')
+    .withExposedPorts(5432)
+    .withCopyContentToContainer([
+      {
+        content: `CREATE ROLE events_migrator WITH LOGIN PASSWORD 'migrator_password'; CREATE ROLE events_app WITH LOGIN PASSWORD 'app_password';`,
+        target: '/docker-entrypoint-initdb.d/0001_init.sql'
+      }
+    ])
+    .withStartupTimeout(60_000)
+    .start()
+}
 
-  const eventsURI = eventsMongoD.getUri()
-  const userMgntURI = userMgntMongoD.getUri()
+export default async function setup({ provide }: { provide: ProvideFunction }) {
+  const es = await setupElasticSearchServer()
+  const psql = await setupPostgresServer()
 
   provide('ELASTICSEARCH_URI', `${es.getHost()}:${es.getMappedPort(9200)}`)
-  provide('EVENTS_MONGO_URI', eventsURI)
-  provide('USER_MGNT_MONGO_URI', userMgntURI)
+  provide('POSTGRES_URI', `${psql.getHost()}:${psql.getMappedPort(5432)}`)
 
   return async () => {
     await es.stop()
-    await eventsMongoD.stop()
-    await userMgntMongoD.stop()
+
+    await psql.stop()
   }
 }
