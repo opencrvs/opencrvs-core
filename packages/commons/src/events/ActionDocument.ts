@@ -253,48 +253,6 @@ const CustomAction = ActionBase.merge(
   })
 )
 
-/** @knipignore */
-export type AllActionDocuments =
-  | typeof CreatedAction
-  | typeof ValidateAction
-  | typeof RejectAction
-  | typeof DuplicateDetectedAction
-  | typeof MarkNotDuplicateAction
-  | typeof MarkAsDuplicateAction
-  | typeof ArchiveAction
-  | typeof NotifiedAction
-  | typeof RegisterAction
-  | typeof DeclareAction
-  | typeof AssignedAction
-  | typeof RequestedCorrectionAction
-  | typeof ApprovedCorrectionAction
-  | typeof RejectedCorrectionAction
-  | typeof UnassignedAction
-  | typeof PrintCertificateAction
-  | typeof ReadAction
-  | typeof CustomAction
-  | typeof AsyncRejectActionDocument
-
-export type InferredActionDocument =
-  | z.infer<typeof CreatedAction>
-  | z.infer<typeof ValidateAction>
-  | z.infer<typeof RejectAction>
-  | z.infer<typeof DuplicateDetectedAction>
-  | z.infer<typeof MarkNotDuplicateAction>
-  | z.infer<typeof MarkAsDuplicateAction>
-  | z.infer<typeof ArchiveAction>
-  | z.infer<typeof NotifiedAction>
-  | z.infer<typeof RegisterAction>
-  | z.infer<typeof DeclareAction>
-  | z.infer<typeof AssignedAction>
-  | z.infer<typeof RequestedCorrectionAction>
-  | z.infer<typeof ApprovedCorrectionAction>
-  | z.infer<typeof RejectedCorrectionAction>
-  | z.infer<typeof UnassignedAction>
-  | z.infer<typeof PrintCertificateAction>
-  | z.infer<typeof ReadAction>
-  | z.infer<typeof CustomAction>
-
 export const ActionDocument = z
   .discriminatedUnion('type', [
     CreatedAction.meta({ id: 'CreatedAction' }),
@@ -320,7 +278,7 @@ export const ActionDocument = z
     id: 'ActionDocument'
   })
 
-export type ActionDocument = InferredActionDocument
+export type ActionDocument = z.infer<typeof ActionDocument>
 
 export const AsyncRejectActionDocument = ActionBase.omit({
   declaration: true,
