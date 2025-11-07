@@ -119,7 +119,10 @@ interface IProps {
   className?: string
   buttonLabel: string
   disabled?: boolean
+  showOptionsWhenEmpty?: boolean
 }
+
+const DEFAULT_VISIBLE_OPTIONS_WHEN_EMPTY = 10
 export class LocationSearch extends React.Component<IProps, IState> {
   searchTimeout: NodeJS.Timeout | undefined
   constructor(props: IProps) {
@@ -170,6 +173,23 @@ export class LocationSearch extends React.Component<IProps, IState> {
       this.setState({
         selectedItem: null
       })
+    }
+
+    if (
+      !searchText &&
+      this.props.locationList &&
+      this.props.showOptionsWhenEmpty
+    ) {
+      this.setState({
+        ...this.state,
+        filteredList: this.props.locationList.slice(
+          0,
+          DEFAULT_VISIBLE_OPTIONS_WHEN_EMPTY
+        ),
+        dropDownIsVisible: true
+      })
+
+      return
     }
 
     this.setState({
@@ -223,6 +243,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
   }
 
   dropDownItemSelect = (item: ISearchLocation) => {
+    console.log('drop down item select', item)
     if (this.props.searchHandler) {
       this.props.searchHandler(item)
     }
@@ -268,6 +289,15 @@ export class LocationSearch extends React.Component<IProps, IState> {
       clearTimeout(this.searchTimeout)
     }
     document.removeEventListener('click', this.handler)
+  }
+
+  componentDidUpdate(prevProps: Readonly<IProps>): void {
+    if (!this.props.selectedLocation && !!prevProps.selectedLocation) {
+      this.setState({
+        selectedText: null,
+        selectedItem: null
+      })
+    }
   }
 
   render() {

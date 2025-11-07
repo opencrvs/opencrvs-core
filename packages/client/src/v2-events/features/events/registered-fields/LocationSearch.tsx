@@ -11,11 +11,15 @@
 import React from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
+import {
+  ISearchLocation,
+  LocationSearch as LocationSearchComponent
+} from '@opencrvs/components'
 import {
   FieldPropsWithoutReferenceValue,
   Location,
   LocationType,
+  UUID,
   joinValues
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
@@ -41,28 +45,41 @@ const resourceTypeMap: Record<
 }
 
 function useAdministrativeAreas(
-  searchableResource: ('locations' | 'facilities' | 'offices')[]
+  searchableResource: ('locations' | 'facilities' | 'offices')[],
+  parentId?: string | null
 ) {
   const { getLocations } = useLocations()
   const [allLocations] = getLocations.useSuspenseQuery({})
 
   return React.useMemo(() => {
-    const resourceLocations = allLocations.filter(
-      ({ locationType }) =>
-        locationType &&
-        searchableResource.some(
-          (r) =>
-            resourceTypeMap[r satisfies keyof typeof resourceTypeMap] ===
-            locationType
-        )
-    )
+    const resourceLocations = allLocations.filter((location) => {
+      if (!location.locationType) {
+        return false
+      }
+
+      const isRightLocationType = searchableResource.some(
+        (r) =>
+          resourceTypeMap[r satisfies keyof typeof resourceTypeMap] ===
+          location.locationType
+      )
+
+      if (!isRightLocationType) {
+        return false
+      }
+
+      if (parentId === undefined) {
+        return true
+      }
+
+      return parentId === location.parentId
+    })
 
     return resourceLocations.map((location) => ({
       id: location.id,
       searchableText: location.name.toLowerCase(),
       displayLabel: location.name
     }))
-  }, [searchableResource, allLocations])
+  }, [searchableResource, allLocations, parentId])
 }
 
 function LocationSearchInput({
@@ -70,33 +87,64 @@ function LocationSearchInput({
   value,
   searchableResource,
   onBlur,
+  partOf,
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
-  onChange: (val: string | undefined) => void
+  onChange: (val: string | null) => void
   searchableResource: ('locations' | 'facilities' | 'offices')[]
   value?: string
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
   disabled?: boolean
+  /** Additional filter for location resources. */
+  partOf?: string | null
 }) {
-  const locationList = useAdministrativeAreas(searchableResource)
-  const selectedLocation = locationList.find(
-    (location) => location.id === value
-  )
+  // 1. Get location options at the given hierarchy level.
+  const locationList = useAdministrativeAreas(searchableResource, partOf)
+
+  // 2. Cache location IDs for quick lookup. We expect there to be hundred of thousands of locations.
+  const locationIdSet = React.useMemo(() => {
+    return new Set(locationList.map((l) => l.id))
+  }, [locationList])
+
+  // 3. Set the selected location based on the value prop.
+  const [selectedLocation, setSelectedLocation] = React.useState<
+    ISearchLocation | undefined
+  >(locationList.find((l) => l.id === value))
+
+  // 4. When locations change (e.g. due to partOf change), update the selected location.
+  React.useEffect(() => {
+    if (value && locationIdSet.has(value as UUID)) {
+      setSelectedLocation(locationList.find((l) => l.id === value))
+    } else {
+      setSelectedLocation(undefined)
+    }
+  }, [value, locationList, locationIdSet])
+
+  // 5. If the current value is not valid anymore, clear it on all levels.
+  React.useEffect(() => {
+    if (value && !locationIdSet.has(value as UUID)) {
+      setSelectedLocation(undefined)
+      onChange(null)
+    }
+  }, [value, locationIdSet, onChange])
 
   return (
     <LocationSearchComponent
       buttonLabel="Health facility"
       locationList={locationList}
       searchHandler={(location: SearchLocation) => {
-        if (location.id === '0') {
-          onChange(undefined)
+        // Ignore legacy default values.
+        if (location.id === '' || location.id === '0') {
+          setSelectedLocation(undefined)
           return
         }
 
-        onChange(location.id)
+        setSelectedLocation(location)
       }}
       selectedLocation={selectedLocation}
+      showOptionsWhenEmpty={true}
       onBlur={(...args) => {
+        onChange(selectedLocation?.id ?? null)
         /*
          * This is here purely for legacy reasons.
          * As without passing this in, onChange will not trigger.
