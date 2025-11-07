@@ -10,17 +10,20 @@
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import User, { IUserModel, IUserName } from '@user-mgnt/model/user'
+import User from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
 import {
   generateRandomPassword,
   generateSaltedHash
 } from '@user-mgnt/utils/hash'
 import { getUserId, hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
-import { NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
-import { logger } from '@opencrvs/commons'
+import { COUNTRY_CONFIG_URL } from '@user-mgnt/constants'
+import {
+  logger,
+  triggerUserEventNotification,
+  personNameFromV1ToV2
+} from '@opencrvs/commons'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
-import fetch from 'node-fetch'
 
 interface IResendPasswordInvitePayload {
   userId: string
@@ -45,11 +48,15 @@ export default async function resetPasswordInviteHandler(
     request.headers['x-real-user-agent'] || request.headers['user-agent']
 
   const subjectPractitionerId = user.practitionerId
+  const systemAdminUser = await User.findById(
+    getUserId({ Authorization: request.headers.authorization })
+  )
+
+  if (!systemAdminUser) {
+    return h.response().code(400)
+  }
 
   try {
-    const systemAdminUser: IUserModel | null = await User.findById(
-      getUserId({ Authorization: request.headers.authorization })
-    )
     await postUserActionToMetrics(
       'PASSWORD_RESET_BY_ADMIN',
       request.headers.authorization,
@@ -71,50 +78,31 @@ export default async function resetPasswordInviteHandler(
 
   try {
     await User.update({ _id: user._id }, user)
-  } catch (err) {
-    return h.response().code(400)
-  }
-
-  sendPasswordNotification(
-    randomPassword,
-    {
-      Authorization: request.headers.authorization
-    },
-    user.name,
-    user.mobile,
-    user.emailForNotification
-  )
-
-  return h.response().code(200)
-}
-
-export async function sendPasswordNotification(
-  password: string,
-  authHeader: { Authorization: string },
-  userFullName: IUserName[],
-  msisdn?: string,
-  email?: string
-) {
-  const url = `${NOTIFICATION_SERVICE_URL}resetPasswordInvite`
-  try {
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({
-        msisdn,
-        email,
-        password,
-        userFullName
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
+    await triggerUserEventNotification({
+      event: 'reset-password-by-admin',
+      payload: {
+        temporaryPassword: randomPassword,
+        recipient: {
+          name: personNameFromV1ToV2(user.name),
+          email: user.emailForNotification,
+          mobile: user.mobile
+        },
+        admin: {
+          name: personNameFromV1ToV2(systemAdminUser.name),
+          id: systemAdminUser.id,
+          role: systemAdminUser.role
+        }
+      },
+      countryConfigUrl: COUNTRY_CONFIG_URL,
+      authHeader: {
+        Authorization: request.headers.authorization
       }
     })
   } catch (err) {
-    logger.error(`Unable to send notification for error : ${err}`)
+    return h.response().code(400)
   }
+  return h.response().code(200)
 }
-
 export const requestSchema = Joi.object({
   userId: Joi.string().required()
 })

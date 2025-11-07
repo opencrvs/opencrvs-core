@@ -142,6 +142,7 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/api/, '')
         }
       }
-    }
+    },
+    logLevel: 'error'
   }
 })

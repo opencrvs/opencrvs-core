@@ -46,10 +46,11 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Text } from '@opencrvs/components/lib/Text'
 import React, { useCallback, useState } from 'react'
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { useSystems } from './useSystems'
 import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
+import { SystemRole } from '@opencrvs/commons/client'
 
 interface ToggleModal {
   modalVisible: boolean
@@ -78,7 +79,49 @@ const populatePermissions = (
   return rest
 }
 
-export function SystemList() {
+/**
+ *
+ * Wrapper component that adds Frame around the page if withFrame is true.
+ * Created only for minimising impact of possible regression during v2 regression test period.
+ */
+function WithFrame({
+  children,
+  isHidden,
+  intl,
+  toggleModal
+}: {
+  children: React.ReactNode
+  isHidden: boolean
+  intl: IntlShape
+  toggleModal: () => void
+}) {
+  if (isHidden) {
+    return <>{children}</>
+  }
+
+  return (
+    <Frame
+      header={
+        <Header
+          mobileRight={[
+            {
+              icon: () => <Icon name="Plus" />,
+              handler: toggleModal
+            }
+          ]}
+        />
+      }
+      navigation={<Navigation loadWorkqueueStatuses={false} />}
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
+    >
+      {children}
+    </Frame>
+  )
+}
+
+export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   const intl = useIntl()
   const [showModal, setShowModal] = React.useState(false)
   const [toggleKeyModal, setToggleKeyModal] = useState<ToggleModal>({
@@ -179,7 +222,7 @@ export function SystemList() {
       }
     ]
 
-    if (system.type === SystemType.Webhook) {
+    if (system.type === SystemRole.enum.WEBHOOK) {
       menuItems.push({
         handler: () => {
           setSystemToShowPermission(system)
@@ -215,29 +258,21 @@ export function SystemList() {
     HEALTH: intl.formatMessage(integrationMessages.eventNotification),
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
     NATIONAL_ID: intl.formatMessage(integrationMessages.nationalId),
-    WEBHOOK: intl.formatMessage(integrationMessages.webhook)
+    WEBHOOK: intl.formatMessage(integrationMessages.webhook),
+    IMPORT_EXPORT: intl.formatMessage(integrationMessages.importExport)
   }
 
   const systemToLabel = (system: System) => {
-    return systemTypeLabels[system.type]
+    return system.type !== 'REINDEX'
+      ? systemTypeLabels[system.type]
+      : 'INVALID_SYSTEM_TYPE__REINDEX'
   }
 
   return (
-    <Frame
-      header={
-        <Header
-          mobileRight={[
-            {
-              icon: () => <Icon name="Plus" />,
-              handler: toggleModal
-            }
-          ]}
-        />
-      }
-      navigation={<Navigation loadWorkqueueStatuses={false} />}
-      skipToContentText={intl.formatMessage(
-        constantsMessages.skipToMainContent
-      )}
+    <WithFrame
+      isHidden={!!hideNavigation}
+      intl={intl}
+      toggleModal={toggleModal}
     >
       <Content
         title={intl.formatMessage(integrationMessages.pageTitle)}
@@ -521,17 +556,23 @@ export function SystemList() {
                       label: intl.formatMessage(
                         integrationMessages.eventNotification
                       ),
-                      value: SystemType.Health
+                      value: SystemRole.enum.HEALTH
                     },
                     {
                       label: intl.formatMessage(
                         integrationMessages.recordSearch
                       ),
-                      value: SystemType.RecordSearch
+                      value: SystemRole.enum.RECORD_SEARCH
                     },
                     {
                       label: intl.formatMessage(integrationMessages.webhook),
-                      value: SystemType.Webhook
+                      value: SystemRole.enum.WEBHOOK
+                    },
+                    {
+                      label: intl.formatMessage(
+                        integrationMessages.importExport
+                      ),
+                      value: SystemRole.enum.IMPORT_EXPORT
                     }
                   ]}
                   id={'permissions-selectors'}
@@ -539,7 +580,7 @@ export function SystemList() {
               </InputField>
             </Field>
 
-            {newSystemType === SystemType.Health && (
+            {newSystemType === SystemRole.enum.HEALTH && (
               <PaddedAlert type="info">
                 {intl.formatMessage(
                   integrationMessages.healthnotificationAlertDescription
@@ -555,7 +596,7 @@ export function SystemList() {
               </PaddedAlert>
             )}
 
-            {newSystemType === SystemType.RecordSearch && (
+            {newSystemType === SystemRole.enum.RECORD_SEARCH && (
               <PaddedAlert type="info">
                 {intl.formatMessage(
                   integrationMessages.recordSearchDescription
@@ -572,7 +613,7 @@ export function SystemList() {
               </PaddedAlert>
             )}
 
-            {newSystemType === SystemType.Webhook && (
+            {newSystemType === SystemRole.enum.WEBHOOK && (
               <>
                 <PaddedAlert type="info">
                   {intl.formatMessage(integrationMessages.webhookDescription)}
@@ -850,6 +891,6 @@ export function SystemList() {
           {intl.formatMessage(integrationMessages.error)}
         </Toast>
       )}
-    </Frame>
+    </WithFrame>
   )
 }

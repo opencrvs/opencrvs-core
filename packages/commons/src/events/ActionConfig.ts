@@ -9,70 +9,67 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { EnableConditional, ShowConditional } from './Conditional'
-import { PageConfig } from './PageConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
 import { ActionFormConfig } from './FormConfig'
+import { DeduplicationConfig } from './DeduplicationConfig'
+import { extendZodWithOpenApi } from 'zod-openapi'
 
-/**
- * By default, when conditionals are not defined, action is visible and enabled to the user.
- */
-const ActionConditional = z.discriminatedUnion('type', [
-  /** If conditional is defined, the action is shown to the user only if the condition is met */
-  ShowConditional,
-  /** If conditional is defined, the action is enabled only if the condition is met */
-  EnableConditional
-])
+extendZodWithOpenApi(z)
 
 export const DeclarationReviewConfig = z
   .object({
     title: TranslationConfig.describe('Title of the review page'),
     fields: z
       .array(FieldConfig)
-      .describe('Fields to be rendered on the review page for annotations.')
+      .describe('Fields displayed on the review page for annotations.')
   })
-  .describe('Configuration for **declaration** review page.')
+  .describe(
+    'Configuration of the declaration review page for collecting event-related metadata.'
+  )
 
 export type ReviewPageConfig = z.infer<typeof DeclarationReviewConfig>
 
 export const ActionConfigBase = z.object({
-  label: TranslationConfig,
-  conditionals: z.array(ActionConditional).optional().default([]),
-  draft: z.boolean().optional()
+  label: TranslationConfig.describe('Human readable description of the action')
 })
 
-const DeclareConfig = ActionConfigBase.merge(
+export const DeclarationActionBase = ActionConfigBase.extend({
+  review: DeclarationReviewConfig,
+  deduplication: DeduplicationConfig.optional()
+})
+
+const ReadActionConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.DECLARE),
-    review: DeclarationReviewConfig
+    type: z.literal(ActionType.READ),
+    review: DeclarationReviewConfig.describe(
+      'Configuration of the review page for read-only view.'
+    )
   })
 )
 
-const ValidateConfig = ActionConfigBase.merge(
+const DeclareConfig = DeclarationActionBase.merge(
   z.object({
-    type: z.literal(ActionType.VALIDATE),
-    review: DeclarationReviewConfig
+    type: z.literal(ActionType.DECLARE)
   })
 )
 
-const RegisterConfig = ActionConfigBase.merge(
+const ValidateConfig = DeclarationActionBase.merge(
   z.object({
-    type: z.literal(ActionType.REGISTER),
-    review: DeclarationReviewConfig
+    type: z.literal(ActionType.VALIDATE)
+  })
+)
+
+const RegisterConfig = DeclarationActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.REGISTER)
   })
 )
 
 const RejectDeclarationConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.REJECT)
-  })
-)
-
-const MarkedAsDuplicateConfig = ActionConfigBase.merge(
-  z.object({
-    type: z.literal(ActionType.MARKED_AS_DUPLICATE)
   })
 )
 
@@ -98,8 +95,7 @@ const PrintCertificateActionConfig = ActionConfigBase.merge(
 const RequestCorrectionConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.REQUEST_CORRECTION),
-    onboardingForm: z.array(PageConfig),
-    additionalDetailsForm: z.array(PageConfig)
+    correctionForm: ActionFormConfig
   })
 )
 
@@ -123,10 +119,10 @@ const ApproveCorrectionConfig = ActionConfigBase.merge(
  */
 /** @knipignore */
 export type AllActionConfigFields =
+  | typeof ReadActionConfig
   | typeof DeclareConfig
   | typeof ValidateConfig
   | typeof RejectDeclarationConfig
-  | typeof MarkedAsDuplicateConfig
   | typeof ArchiveConfig
   | typeof RegisterConfig
   | typeof DeleteConfig
@@ -137,10 +133,10 @@ export type AllActionConfigFields =
 
 /** @knipignore */
 export type InferredActionConfig =
+  | z.infer<typeof ReadActionConfig>
   | z.infer<typeof DeclareConfig>
   | z.infer<typeof ValidateConfig>
   | z.infer<typeof RejectDeclarationConfig>
-  | z.infer<typeof MarkedAsDuplicateConfig>
   | z.infer<typeof ArchiveConfig>
   | z.infer<typeof RegisterConfig>
   | z.infer<typeof DeleteConfig>
@@ -149,19 +145,33 @@ export type InferredActionConfig =
   | z.infer<typeof RejectCorrectionConfig>
   | z.infer<typeof ApproveCorrectionConfig>
 
-export const ActionConfig = z.discriminatedUnion('type', [
-  DeclareConfig,
-  ValidateConfig,
-  RejectDeclarationConfig,
-  MarkedAsDuplicateConfig,
-  ArchiveConfig,
-  RegisterConfig,
-  DeleteConfig,
-  PrintCertificateActionConfig,
-  RequestCorrectionConfig,
-  RejectCorrectionConfig,
-  ApproveCorrectionConfig
-]) as unknown as z.ZodDiscriminatedUnion<'type', AllActionConfigFields[]>
+export const ActionConfig = z
+  .discriminatedUnion('type', [
+    /*
+     * OpenAPI references are defined here so our generated OpenAPI spec knows to reuse the models
+     * and treat them as "models" instead of duplicating the data structure in each endpoint.
+     */
+    ReadActionConfig.openapi({ ref: 'ReadActionConfig' }),
+    DeclareConfig.openapi({ ref: 'DeclareActionConfig' }),
+    ValidateConfig.openapi({ ref: 'ValidateActionConfig' }),
+    RejectDeclarationConfig.openapi({ ref: 'RejectDeclarationActionConfig' }),
+    ArchiveConfig.openapi({ ref: 'ArchiveActionConfig' }),
+    RegisterConfig.openapi({ ref: 'RegisterActionConfig' }),
+    DeleteConfig.openapi({ ref: 'DeleteActionConfig' }),
+    PrintCertificateActionConfig.openapi({
+      ref: 'PrintCertificateActionConfig'
+    }),
+    RequestCorrectionConfig.openapi({ ref: 'RequestCorrectionActionConfig' }),
+    RejectCorrectionConfig.openapi({ ref: 'RejectCorrectionActionConfig' }),
+    ApproveCorrectionConfig.openapi({ ref: 'ApproveCorrectionActionConfig' })
+  ])
+  .describe(
+    'Configuration of an action available for an event. Data collected depends on the action type and is accessible through the annotation property in ActionDocument.'
+  )
+  .openapi({ ref: 'ActionConfig' }) as unknown as z.ZodDiscriminatedUnion<
+  'type',
+  AllActionConfigFields[]
+>
 
 export type ActionConfig = InferredActionConfig
 

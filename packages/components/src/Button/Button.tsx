@@ -27,18 +27,28 @@ type ButtonType =
 
 type ButtonModifier = 'disabled' | 'loading'
 
-interface ButtonCustomization extends React.HTMLAttributes<HTMLButtonElement> {
+interface ButtonCustomization {
   /** Size of the button */
   size?: ButtonSize
   /** Size of the button */
   fullWidth?: boolean
-  /** Element the button renders as */
-  element?: 'a' | 'button'
   /** Button type */
   type: ButtonType
 }
 
-export type ButtonProps = ButtonCustomization & {
+interface AnchorButtonProps
+  extends ButtonCustomization,
+    React.HTMLAttributes<HTMLAnchorElement> {
+  element: 'a'
+  href: string
+}
+
+interface NativeButtonProps
+  extends ButtonCustomization,
+    React.HTMLAttributes<HTMLButtonElement> {
+  element?: 'button'
+}
+export type ButtonProps = (AnchorButtonProps | NativeButtonProps) & {
   [modifier in ButtonModifier]?: boolean
 }
 
@@ -88,6 +98,7 @@ export const Button = ({
       variant={type}
       loading={loading}
       as={element}
+      data-testid={props.id}
       {...props}
     >
       {loading && (

@@ -17,6 +17,7 @@ import { Icon } from '@opencrvs/components/lib/Icon/Icon'
 import { Button } from '@opencrvs/components/lib/Button/Button'
 import {
   FileFieldValueWithOption,
+  FullDocumentPath,
   SelectOption
 } from '@opencrvs/commons/client'
 import { IAttachmentValue } from '@client/forms'
@@ -63,8 +64,9 @@ interface Props {
   label?: string
   onSelect: (document: FileFieldValueWithOption | IAttachmentValue) => void
   dropdownOptions?: SelectOption[]
-  onDelete?: (fileName: string) => void
+  onDelete?: (path: FullDocumentPath) => void
   inReviewSection?: boolean
+  disabled?: boolean
 }
 
 export const DocumentListPreview = ({
@@ -74,7 +76,8 @@ export const DocumentListPreview = ({
   onSelect,
   dropdownOptions,
   onDelete,
-  inReviewSection
+  inReviewSection,
+  disabled
 }: Props) => {
   const intl = useIntl()
 
@@ -82,10 +85,14 @@ export const DocumentListPreview = ({
     const matchingOptionForDocType =
       dropdownOptions &&
       dropdownOptions.find((option) => option.value === docType)
-    return (
-      matchingOptionForDocType &&
-      intl.formatMessage(matchingOptionForDocType.label)
-    )
+
+    if (!matchingOptionForDocType) {
+      return null
+    }
+
+    return typeof matchingOptionForDocType.label === 'string'
+      ? matchingOptionForDocType.label
+      : intl.formatMessage(matchingOptionForDocType.label)
   }
 
   return (
@@ -97,6 +104,7 @@ export const DocumentListPreview = ({
               <Icon color="grey600" name="Paperclip" size="large" />
               <Link
                 key={key}
+                disabled={disabled}
                 id={`document_${(document.option as string).replace(
                   /\s/g,
                   ''
@@ -106,7 +114,9 @@ export const DocumentListPreview = ({
                 <span>
                   {(inReviewSection &&
                     dropdownOptions &&
-                    intl.formatMessage(dropdownOptions[key]?.label)) ||
+                    (typeof dropdownOptions[key]?.label === 'string'
+                      ? dropdownOptions[key]?.label
+                      : intl.formatMessage(dropdownOptions[key]?.label))) ||
                     getFormattedLabelForDocType(document.option as string) ||
                     (document.option as string)}
                 </span>
@@ -115,10 +125,11 @@ export const DocumentListPreview = ({
             {onDelete && (
               <Button
                 aria-label="Delete attachment"
+                disabled={disabled}
                 id="preview_delete"
                 size="small"
                 type="icon"
-                onClick={() => onDelete(document.filename)}
+                onClick={() => onDelete(document.path)}
               >
                 <Icon color="red" name="Trash" size="small" />
               </Button>

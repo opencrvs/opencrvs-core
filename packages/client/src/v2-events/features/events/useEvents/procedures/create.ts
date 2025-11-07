@@ -17,14 +17,17 @@ import type {
 import {
   ActionType,
   CreatedAction,
-  getCurrentEventState,
-  ActionStatus
+  ActionStatus,
+  getUUID,
+  EventInput,
+  UUID,
+  AssignedAction,
+  getTokenPayload
 } from '@opencrvs/commons/client'
 
 import {
-  invalidateEventsList,
-  setEventData,
-  setEventListData
+  refetchAllSearchQueries,
+  setEventData
 } from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
 
@@ -57,11 +60,15 @@ function createEventCreationMutation<P extends DecorateMutationProcedure<any>>(
 
 setMutationDefaults(trpcOptionsProxy.event.create, {
   retry: true,
-  retryDelay: 1000,
+  retryDelay: 3333,
   mutationFn: createEventCreationMutation(trpcOptionsProxy.event.create),
   onMutate: (newEvent) => {
+    const token = window.localStorage.getItem('opencrvs')
+    const tokenPayload = token ? getTokenPayload(token) : null
+    const loggedInUserId = tokenPayload?.sub ?? 'offline'
+    const loggedInUserRole = tokenPayload?.role ?? 'offline'
     const optimisticEvent = {
-      id: newEvent.transactionId,
+      id: newEvent.transactionId as UUID, // not actually an UUID, but as as it's temporary for the optimistic update, we can satisfy the type this way
       type: newEvent.type,
       trackingId: '', // Tracking ID is generated on the server side, so optimistic event can use an empty string as a placeholder
       transactionId: newEvent.transactionId,
@@ -72,32 +79,44 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
           type: ActionType.CREATE,
           id: createTemporaryId(),
           createdAt: new Date().toISOString(),
-          createdBy: 'offline',
-          createdAtLocation: 'TODO',
+          createdBy: loggedInUserId,
+          createdByUserType: 'user',
+          createdByRole: loggedInUserId,
+          createdAtLocation: '00000000-0000-0000-0000-000000000000' as UUID,
           declaration: {},
-          status: ActionStatus.Accepted
-        } satisfies CreatedAction
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
+        } satisfies CreatedAction,
+        {
+          type: ActionType.ASSIGN,
+          id: createTemporaryId(),
+          createdAt: new Date().toISOString(),
+          createdBy: loggedInUserId,
+          assignedTo: loggedInUserId,
+          createdByUserType: 'user',
+          createdByRole: loggedInUserRole,
+          createdAtLocation: '00000000-0000-0000-0000-000000000000' as UUID,
+          declaration: {},
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
+        } satisfies AssignedAction
       ]
     }
 
     setEventData(newEvent.transactionId, optimisticEvent)
-    setEventListData((eventIndices) =>
-      eventIndices?.concat(getCurrentEventState(optimisticEvent))
-    )
     return optimisticEvent
   },
   onSuccess: async (response, _variables, context) => {
     setEventData(response.id, response)
     setEventData(context.transactionId, response)
-    await invalidateEventsList()
-  }
+    await refetchAllSearchQueries()
+  },
+  meta: { actionType: ActionType.CREATE }
 })
 
 export function useCreateEvent() {
   const trpc = useTRPC()
-  const options = trpc.event.create.mutationOptions<{
-    transactionId: string
-  }>()
+  const options = trpc.event.create.mutationOptions<EventInput>()
 
   const overrides = queryClient.getMutationDefaults(
     trpcOptionsProxy.event.create.mutationKey()

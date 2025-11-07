@@ -8,12 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { ActionType, getDeclaration } from '@opencrvs/commons/client'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
+import {
+  ActionType,
+  getDeclaration,
+  getCurrentEventState
+} from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
@@ -21,62 +27,52 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { useModal } from '@client/v2-events/hooks/useModal'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { hasDeclarationFieldChanged } from '../utils'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
-  const events = useEvents()
+  const [{ workqueue: slug }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.VALIDATE.REVIEW
+  )
   const intl = useIntl()
-  const [modal, openModal] = useModal()
   const navigate = useNavigate()
+  const events = useEvents()
+  const validatorContext = useValidatorContext()
 
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.getEvent.getFromCache(eventId)
 
-  const { eventConfiguration: config } = useEventConfiguration(event.type)
-  const formConfig = getDeclaration(config)
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
+  )
+  const eventIndex = getCurrentEventState(event, configuration)
+
+  const formConfig = getDeclaration(configuration)
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
-
   const form = getFormValues()
 
-  async function handleEdit({
-    pageId,
-    fieldId,
-    confirmation
-  }: {
-    pageId: string
-    fieldId?: string
-    confirmation?: boolean
-  }) {
-    const confirmedEdit =
-      confirmation ||
-      (await openModal<boolean | null>((close) => (
-        <ReviewComponent.EditModal close={close} />
-      )))
+  const previousFormValues = eventIndex.declaration
 
-    if (confirmedEdit) {
-      navigate(
-        ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
-          { pageId, eventId },
-          {
-            from: 'review'
-          },
-          fieldId
-        )
-      )
-    }
-    return
-  }
-
-  const previousFormValues = event.declaration
-  const valuesHaveChanged = Object.entries(form).some(
-    ([key, value]) => previousFormValues[key] !== value
+  const formFields = formConfig.pages.flatMap((page) => page.fields)
+  const changedFields = formFields.filter((f) =>
+    hasDeclarationFieldChanged(
+      f,
+      form,
+      previousFormValues,
+      configuration,
+      validatorContext
+    )
   )
+  const anyValuesHaveChanged = changedFields.length > 0
+
   const intlWithData = useIntlFormatMessageWithFlattenedParams()
 
-  const actionConfig = config.actions.find(
+  const actionConfig = configuration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
 
@@ -86,35 +82,52 @@ export function Review() {
     )
   }
 
+  const incomplete = validationErrorsInActionFormExist({
+    formConfig,
+    form,
+    context: validatorContext
+  })
+
   return (
-    <FormLayout route={ROUTES.V2.EVENTS.REGISTER}>
+    <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       <ReviewComponent.Body
         form={form}
         formConfig={formConfig}
+        isCorrection={true}
         previousFormValues={previousFormValues}
         title={intlWithData.formatMessage(
           actionConfig.label,
           previousFormValues
         )}
-        onEdit={handleEdit}
+        validatorContext={validatorContext}
+        onEdit={({ pageId, fieldId }) => {
+          navigate(
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
+              { pageId, eventId },
+              {
+                from: 'review',
+                workqueue: slug
+              },
+              fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
+            )
+          )
+        }}
       >
         <PrimaryButton
           key="continue_button"
-          disabled={!valuesHaveChanged}
+          disabled={!anyValuesHaveChanged || incomplete}
           id="continue_button"
           onClick={() => {
             navigate(
-              ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.buildPath(
-                {
-                  eventId
-                }
+              ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath(
+                { eventId },
+                { workqueue: slug }
               )
             )
           }}
         >
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
-        {modal}
       </ReviewComponent.Body>
     </FormLayout>
   )

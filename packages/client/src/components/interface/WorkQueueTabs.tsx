@@ -27,6 +27,7 @@ export const WORKQUEUE_TABS = {
   vsexports: 'vsexports',
   team: 'team',
   config: 'config',
+  dashboard: 'dashboard',
   organisation: 'organisation',
   application: 'application',
   certificate: 'certificate',
@@ -37,10 +38,7 @@ export const WORKQUEUE_TABS = {
   communications: 'communications',
   informantNotification: 'informantnotification',
   emailAllUsers: 'emailAllUsers',
-  readyToIssue: 'readyToIssue',
-  dashboard: 'dashboard',
-  statistics: 'statistics',
-  leaderboards: 'leaderboards'
+  readyToIssue: 'readyToIssue'
 } as const
 
 export const TAB_GROUPS = {

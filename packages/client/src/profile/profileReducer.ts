@@ -19,7 +19,6 @@ import {
 } from '@client/utils/userUtils'
 import {
   getTokenPayload,
-  ITokenPayload,
   storeToken,
   getToken,
   isTokenStillValid,
@@ -30,6 +29,7 @@ import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { serviceApi } from '@client/profile/serviceApi'
 import { IStoreState } from '@client/store'
+import { ITokenPayload } from '@opencrvs/commons/client'
 
 export type ProfileState = {
   authenticated: boolean
@@ -67,35 +67,34 @@ export const profileReducer: LoopReducer<
           tokenPayload: null,
           userDetails: null
         },
-        Cmd.list([
-          Cmd.run(() => {
-            removeToken()
-          }),
-          Cmd.run(() => {
-            removeUserDetails()
-          }),
-          Cmd.run(
-            (getState: () => IStoreState) => {
-              if (shouldRedirectBack) {
-                const baseUrl = window.location.origin
-                const restUrl = window.location.href.replace(baseUrl, '')
-                const redirectToURL = new URL(
-                  restUrl === '/'
-                    ? `?lang=${getState().i18n.language}`
-                    : `?lang=${getState().i18n.language}&redirectTo=${restUrl}`,
-                  window.config.LOGIN_URL
-                ).toString()
+        Cmd.list(
+          [
+            Cmd.run(() => removeToken()),
+            Cmd.run(() => removeUserDetails()),
+            Cmd.run(
+              (getState: () => IStoreState) => {
+                if (shouldRedirectBack) {
+                  const baseUrl = window.location.origin
+                  const restUrl = window.location.href.replace(baseUrl, '')
+                  const redirectToURL = new URL(
+                    restUrl === '/'
+                      ? `?lang=${getState().i18n.language}`
+                      : `?lang=${getState().i18n.language}&redirectTo=${restUrl}`,
+                    window.config.LOGIN_URL
+                  ).toString()
 
-                window.location.assign(redirectToURL)
-              } else {
-                window.location.assign(
-                  `${window.config.LOGIN_URL}?lang=${getState().i18n.language}`
-                )
-              }
-            },
-            { args: [Cmd.getState] }
-          )
-        ])
+                  window.location.assign(redirectToURL)
+                } else {
+                  window.location.assign(
+                    `${window.config.LOGIN_URL}?lang=${getState().i18n.language}`
+                  )
+                }
+              },
+              { args: [Cmd.getState] }
+            )
+          ],
+          { sequence: true }
+        )
       )
     case actions.CHECK_AUTH:
       const token = getToken()

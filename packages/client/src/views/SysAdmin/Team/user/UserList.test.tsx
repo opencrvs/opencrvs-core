@@ -18,7 +18,7 @@ import {
   mockOfflineDataDispatch,
   fetchUserMock
 } from '@client/tests/util'
-import { waitForElement } from '@client/tests/wait-for-element'
+import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
 import { ReactWrapper } from 'enzyme'
 import { stringify } from 'query-string'
@@ -264,7 +264,10 @@ describe('for user with update my jurisdiction scope', () => {
       })
     )
     component.update()
-    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
+
+    await waitFor(() => {
+      return component.find('#user-item-0-menu').length >= 1
+    })
   })
 
   it('should not show edit user button if the other user has update all scope even if under jurisdiction', async () => {
@@ -361,8 +364,11 @@ describe('for user with update scope', () => {
         networkStatus: NetworkStatus.ready
       })
     )
-    component.update()
-    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
+    await flushPromises()
+    await waitFor(() => {
+      component.update()
+      return component.find('#user-item-0-menu').length >= 1
+    })
   })
 
   it('should show edit user button even if the other user has update all scope', async () => {
@@ -391,7 +397,10 @@ describe('for user with update scope', () => {
       })
     )
     component.update()
-    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
+    await flushPromises()
+    await waitFor(() => {
+      return component.find('#user-item-0-menu').length >= 1
+    })
   })
 
   it('should show edit user button even if office is not under jurisdiction', async () => {
@@ -420,7 +429,56 @@ describe('for user with update scope', () => {
       })
     )
     component.update()
-    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
+    await waitFor(() => {
+      return component.find('#user-item-0-menu').length >= 1
+    })
+  })
+})
+
+describe('for user with defined scope that can edit only reg agent users', () => {
+  let store: AppStore
+  const selectedOfficeId = '213ec5f3-e306-4f95-8058-f37893dbfbb6'
+  let component: ReactWrapper
+
+  beforeAll(async () => {
+    ;({ store } = createStore())
+    setScopes(['user.edit[role=REGISTRATION_AGENT]'], store)
+    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)(
+      ({ component } = await createTestComponent(<UserList />, {
+        store,
+        path: TEAM_USER_LIST,
+        initialEntries: [
+          TEAM_USER_LIST +
+            '?' +
+            stringify({
+              locationId: selectedOfficeId
+            })
+        ],
+        graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+          mockRegistrationAgent(selectedOfficeId),
+          mockNationalSystemAdmin(selectedOfficeId)
+        ])
+      }))
+    )
+    await flushPromises()
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(selectedOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+  })
+
+  it('should show edit user buttons for reg agent user', () => {
+    return waitFor(() => {
+      return component.find('#user-item-0-menu').length >= 1
+    })
+  })
+
+  it('should not show edit user buttons for national system admin', () => {
+    expect(component.find('#user-item-1-menu').length >= 1).toBe(false)
   })
 })
 

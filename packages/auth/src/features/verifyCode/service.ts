@@ -8,13 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
-import { del, get, set } from '@auth/database'
+import { redis } from '@auth/database'
 import { JWT_ISSUER } from '@auth/constants'
 import { env } from '@auth/environment'
 import * as crypto from 'crypto'
-import { resolve } from 'url'
-import { IUserName, createToken } from '@auth/features/authenticate/service'
+import { createToken } from '@auth/features/authenticate/service'
+import {
+  triggerUserEventNotification,
+  personNameFromV1ToV2,
+  IUserName,
+  TriggerEvent
+} from '@opencrvs/commons'
 
 interface ICodeDetails {
   code: string
@@ -34,7 +38,7 @@ export async function storeVerificationCode(nonce: string, code: string) {
     createdAt: Date.now()
   }
 
-  await set(`verification_${nonce}`, JSON.stringify(codeDetails))
+  await redis.set(`verification_${nonce}`, JSON.stringify(codeDetails))
 }
 
 export async function generateVerificationCode(
@@ -48,7 +52,12 @@ export async function generateVerificationCode(
 export async function getVerificationCodeDetails(
   nonce: string
 ): Promise<ICodeDetails> {
-  const codeDetails = await get(`verification_${nonce}`)
+  const codeDetails = await redis.get(`verification_${nonce}`)
+
+  if (!codeDetails) {
+    throw new Error('Auth code not found')
+  }
+
   return JSON.parse(codeDetails) as ICodeDetails
 }
 
@@ -63,28 +72,31 @@ export async function sendVerificationCode(
   mobile?: string,
   email?: string
 ): Promise<void> {
-  const params = {
-    msisdn: mobile,
-    email,
-    code: verificationCode,
-    notificationEvent,
-    userFullName
-  }
-  await fetch(resolve(env.NOTIFICATION_SERVICE_URL, 'authenticationCode'), {
-    method: 'POST',
-    body: JSON.stringify(params),
-    headers: {
-      'Content-Type': 'application/json',
+  await triggerUserEventNotification({
+    event:
+      notificationEvent === NotificationEvent.TWO_FACTOR_AUTHENTICATION
+        ? TriggerEvent.TWO_FA
+        : TriggerEvent.RESET_PASSWORD,
+    payload: {
+      code: verificationCode,
+      recipient: {
+        name: personNameFromV1ToV2(userFullName),
+        mobile,
+        email
+      }
+    },
+    countryConfigUrl: env.COUNTRY_CONFIG_URL_INTERNAL,
+    authHeader: {
       Authorization: `Bearer ${await createToken(
         'auth',
         ['service'],
         ['opencrvs:notification-user', 'opencrvs:countryconfig-user'],
         JWT_ISSUER,
+        undefined,
         true
       )}`
     }
   })
-
   return undefined
 }
 
@@ -114,6 +126,6 @@ export async function checkVerificationCode(
 export async function deleteUsedVerificationCode(
   nonce: string
 ): Promise<boolean> {
-  const count = await del(`verification_${nonce}`)
+  const count = await redis.del(`verification_${nonce}`)
   return Boolean(count)
 }

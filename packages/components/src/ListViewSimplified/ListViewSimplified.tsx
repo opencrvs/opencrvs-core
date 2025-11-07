@@ -154,14 +154,14 @@ export function ListViewItemSimplified({
   return (
     <React.Fragment>
       {image && (
-        <ImageContainer className={className} data-test-id="list-view-image">
+        <ImageContainer className={className} data-testid="list-view-image">
           {image}
         </ImageContainer>
       )}
 
       <LabelValueContainer className={className}>
         <LabelContainer
-          data-test-id="list-view-label"
+          data-testid="list-view-label"
           compactLabel={compactLabel}
         >
           {label}
@@ -169,7 +169,7 @@ export function ListViewItemSimplified({
 
         {value && (
           <ValueContainer
-            data-test-id="list-view-value"
+            data-testid="list-view-value"
             compactLabel={compactLabel}
           >
             {value}
@@ -177,10 +177,10 @@ export function ListViewItemSimplified({
         )}
       </LabelValueContainer>
 
-      <ActionsContainer className={className} data-test-id="list-view-actions">
+      <ActionsContainer className={className} data-testid="list-view-actions">
         {actions}
       </ActionsContainer>
-      <MobileContainer className={className} data-test-id="list-view-mobile">
+      <MobileContainer className={className} data-testid="list-view-mobile">
         {image && <MobileImageContainer>{image}</MobileImageContainer>}
         <MobileLabelContainer>{label}</MobileLabelContainer>
         <MobileActionsContainer>{actions}</MobileActionsContainer>

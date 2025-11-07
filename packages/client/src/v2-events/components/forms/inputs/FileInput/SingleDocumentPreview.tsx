@@ -18,10 +18,6 @@ import { ISelectOption } from '@opencrvs/components/lib/Select'
 
 const Wrapper = styled.div`
   max-width: 100%;
-  & > *:last-child {
-    margin-bottom: 8px;
-    border-bottom: 1.5px solid ${({ theme }) => theme.colors.grey100};
-  }
 `
 const Container = styled.div`
   width: 100%;
@@ -29,9 +25,6 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 4px;
-  border-top: 1.5px solid ${({ theme }) => theme.colors.grey100};
-  height: 48px;
-  padding: 0px 10px;
 `
 
 const Label = styled.div`
@@ -54,6 +47,7 @@ interface Props {
   onSelect: (document: FieldValue | FileFieldValue) => void
   dropdownOptions?: ISelectOption[]
   onDelete?: (image: FieldValue | FileFieldValue) => void
+  disabled?: boolean
 }
 
 export function SingleDocumentPreview({
@@ -62,7 +56,9 @@ export function SingleDocumentPreview({
   label,
   onSelect,
   dropdownOptions,
-  onDelete
+  onDelete,
+  disabled,
+  ...props
 }: Props) {
   function getFormattedLabelForDocType(docType: string) {
     const matchingOptionForDocType =
@@ -71,24 +67,27 @@ export function SingleDocumentPreview({
     return matchingOptionForDocType && matchingOptionForDocType.label
   }
   return (
-    <Wrapper id={`preview-list-${id}`}>
+    <Wrapper id={`preview-list-${id}`} {...props}>
       {attachment && label && (
         <Container>
           <Label>
             <Icon color="grey600" name="Paperclip" size="medium" />
-            <Link onClick={() => onSelect(attachment)}>
+            <Link disabled={disabled} onClick={() => onSelect(attachment)}>
               <span>{getFormattedLabelForDocType(label) || label}</span>
             </Link>
           </Label>
-          <Button
-            aria-label="Delete attachment"
-            id="preview_delete"
-            size="small"
-            type="icon"
-            onClick={() => onDelete && onDelete(attachment)}
-          >
-            <Icon color="red" name="Trash" size="small" />
-          </Button>
+          {onDelete && (
+            <Button
+              aria-label="Delete attachment"
+              disabled={disabled}
+              id="preview_delete"
+              size="small"
+              type="icon"
+              onClick={() => onDelete(attachment)}
+            >
+              <Icon color="red" name="Trash" size="small" />
+            </Button>
+          )}
         </Container>
       )}
     </Wrapper>

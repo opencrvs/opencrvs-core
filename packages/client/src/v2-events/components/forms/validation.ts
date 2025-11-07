@@ -11,40 +11,61 @@
 import { MessageDescriptor } from 'react-intl'
 import {
   FieldConfig,
-  getFieldValidationErrors,
   EventState,
-  omitHiddenPaginatedFields,
   isPageVisible,
   FormConfig,
-  omitHiddenFields
+  IndexMap,
+  runStructuralValidations,
+  ValidatorContext,
+  runFieldValidations,
+  omitHiddenFields,
+  omitHiddenPaginatedFields
 } from '@opencrvs/commons/client'
 
-interface FieldErrors {
-  errors: {
-    message: MessageDescriptor
-  }[]
+interface FieldError {
+  message: MessageDescriptor
 }
 
-export interface Errors {
-  [fieldName: string]: FieldErrors
-}
+export type IntlErrors = IndexMap<FieldError[]>
 
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
-  values: EventState
+  values: EventState,
+  context: ValidatorContext
 ) {
-  return fields.reduce((errorsForAllFields: Errors, field) => {
-    if (
-      // eslint-disable-next-line
-      errorsForAllFields[field.id] &&
-      errorsForAllFields[field.id].errors.length > 0
-    ) {
+  return fields.reduce((errorsForAllFields: IntlErrors, field) => {
+    if ((errorsForAllFields[field.id] ?? []).length > 0) {
       return errorsForAllFields
     }
 
     return {
       ...errorsForAllFields,
-      [field.id]: getFieldValidationErrors({ field, values })
+      [field.id]: runFieldValidations({
+        field,
+        values,
+        context
+      })
+    }
+  }, {})
+}
+
+export function getStructuralValidationErrorsForForm(
+  fields: FieldConfig[],
+  values: EventState,
+  context: ValidatorContext
+) {
+  return fields.reduce((errorsForAllFields: IntlErrors, field) => {
+    if ((errorsForAllFields[field.id] ?? []).length > 0) {
+      return errorsForAllFields
+    }
+
+    return {
+      ...errorsForAllFields,
+      [field.id]: runStructuralValidations({
+        field,
+        values,
+        context
+      })
     }
   }, {})
 }
@@ -52,35 +73,46 @@ export function getValidationErrorsForForm(
 export function validationErrorsInActionFormExist({
   formConfig,
   form,
+  context,
   annotation,
   reviewFields = []
 }: {
   formConfig: FormConfig
   form: EventState
+  context: ValidatorContext
   annotation?: EventState
   reviewFields?: FieldConfig[]
 }): boolean {
   // We don't want to validate hidden fields
-  const formWithoutHiddenFields = omitHiddenPaginatedFields(formConfig, form)
+  const formWithoutHiddenFields = omitHiddenPaginatedFields(
+    formConfig,
+    form,
+    context
+  )
 
   const visibleAnnotationFields = omitHiddenFields(
     reviewFields,
-    annotation ?? {}
+    annotation ?? {},
+    context
   )
 
   const hasValidationErrors = formConfig.pages
-    .filter((page) => isPageVisible(page, form))
+    .filter((page) => isPageVisible(page, form, context))
     .some((page) => {
-      const fieldErrors = getValidationErrorsForForm(
+      const formErrors = getValidationErrorsForForm(
         page.fields,
-        formWithoutHiddenFields
+        formWithoutHiddenFields,
+        context
       )
-      return Object.values(fieldErrors).some((field) => field.errors.length > 0)
+
+      return Object.values(formErrors).some(
+        (fieldErrors) => (fieldErrors ?? []).length > 0
+      )
     })
 
   const hasAnnotationValidationErrors = Object.values(
-    getValidationErrorsForForm(reviewFields, visibleAnnotationFields)
-  ).some((field) => field.errors.length > 0)
+    getValidationErrorsForForm(reviewFields, visibleAnnotationFields, context)
+  ).some((fieldErrors) => (fieldErrors ?? []).length > 0)
 
   return hasValidationErrors || hasAnnotationValidationErrors
 }

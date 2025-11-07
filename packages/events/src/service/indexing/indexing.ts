@@ -9,22 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Transform } from 'stream'
 import { type estypes } from '@elastic/elasticsearch'
 import { z } from 'zod'
 import {
+  ActionCreationMetadata,
+  RegistrationCreationMetadata,
+  AgeValue,
   AddressFieldValue,
   EventConfig,
   EventDocument,
   EventIndex,
-  EventSearchIndex,
+  EventStatus,
   FieldConfig,
   FieldType,
   getCurrentEventState,
-  getDeclarationFields
+  getDeclarationFields,
+  WorkqueueCountInput,
+  getEventConfigById,
+  SearchScopeAccessLevels,
+  SearchQuery,
+  DateRangeField,
+  SelectDateRangeField
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
-import * as eventsDb from '@events/storage/mongodb/events'
 import {
   getEventAliasName,
   getEventIndexName,
@@ -32,15 +39,26 @@ import {
 } from '@events/storage/elasticsearch'
 import {
   decodeEventIndex,
-  DEFAULT_SIZE,
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
-  generateQuery
+  NAME_QUERY_KEY,
+  removeSecuredFields
 } from './utils'
+import {
+  buildElasticQueryFromSearchPayload,
+  withJurisdictionFilters
+} from './query'
 
-function eventToEventIndex(event: EventDocument): EventIndex {
-  return encodeEventIndex(getCurrentEventState(event))
+// Elasticsearch has a limit of 10,000 results for a query, and
+// trying to get beyond that will result in a “Result window is too large“ error
+const ELASTICSEARCH_MAXIMUM_QUERY_SIZE = 10000
+
+function eventToEventIndex(
+  event: EventDocument,
+  config: EventConfig
+): EventIndex {
+  return encodeEventIndex(getCurrentEventState(event, config), config)
 }
 
 /*
@@ -62,20 +80,28 @@ async function ensureAlias(indexName: string) {
   return res
 }
 
-function mapFieldTypeToElasticsearch(field: FieldConfig) {
+function mapFieldTypeToElasticsearch(
+  field: FieldConfig
+): estypes.MappingProperty {
   switch (field.type) {
     case FieldType.NUMBER:
       return { type: 'double' }
     case FieldType.DATE:
       return { type: 'date' }
+    case FieldType.DATE_RANGE:
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
-    case FieldType.SIGNATURE:
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
     case FieldType.EMAIL:
+    case FieldType.TIME:
       return { type: 'text' }
+    case FieldType.EMAIL:
+      return {
+        type: 'keyword',
+        normalizer: 'lowercase'
+      }
     case FieldType.DIVIDER:
     case FieldType.RADIO_GROUP:
     case FieldType.SELECT:
@@ -85,28 +111,29 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
-    case FieldType.DATA:
+    case FieldType.BUTTON:
+    case FieldType.ALPHA_PRINT_BUTTON:
+    case FieldType.ID:
+    case FieldType.PHONE:
+    case FieldType.VERIFICATION_STATUS:
       return { type: 'keyword' }
+    case FieldType.DATA:
+      return { type: 'object' }
     case FieldType.ADDRESS:
+      const streetLevelDetails = Object.fromEntries(
+        (field.configuration?.streetAddressForm ?? []).map((f) => [
+          f.id,
+          mapFieldTypeToElasticsearch(f)
+        ])
+      )
       const addressProperties = {
         country: { type: 'keyword' },
         addressType: { type: 'keyword' },
-        province: { type: 'keyword' },
-        district: { type: 'keyword' },
-        urbanOrRural: { type: 'keyword' },
-        town: { type: 'keyword' },
-        residentialArea: { type: 'keyword' },
-        street: { type: 'keyword' },
-        number: { type: 'keyword' },
-        zipCode: { type: 'keyword' },
-        village: { type: 'keyword' },
-        state: { type: 'keyword' },
-        district2: { type: 'keyword' },
-        cityOrTown: { type: 'keyword' },
-        addressLine1: { type: 'keyword' },
-        addressLine2: { type: 'keyword' },
-        addressLine3: { type: 'keyword' },
-        postcodeOrZip: { type: 'keyword' }
+        administrativeArea: { type: 'keyword' },
+        streetLevelDetails: {
+          type: 'object',
+          properties: streetLevelDetails
+        }
       } satisfies {
         [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
       }
@@ -114,40 +141,83 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
         type: 'object',
         properties: addressProperties
       }
+    case FieldType.AGE:
+      return {
+        type: 'object',
+        properties: {
+          age: { type: 'double' },
+          asOfDateRef: { type: 'keyword' }
+        } satisfies {
+          [K in keyof AgeValue]: estypes.MappingProperty
+        }
+      }
+    case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
         type: 'object',
         properties: {
-          filename: { type: 'keyword' },
+          path: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' }
+        }
+      }
+    case FieldType.NAME:
+      return {
+        type: 'object',
+        properties: {
+          firstname: { type: 'text', analyzer: 'classic' },
+          surname: { type: 'text', analyzer: 'classic' },
+          [NAME_QUERY_KEY]: { type: 'text', analyzer: 'classic' }
         }
       }
     case FieldType.FILE_WITH_OPTIONS:
       return {
         type: 'nested',
         properties: {
-          filename: { type: 'keyword' },
+          path: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' },
           option: { type: 'keyword' }
         }
       }
+    case FieldType.ID_READER:
+    case FieldType.QR_READER:
+    case FieldType.HTTP:
+    case FieldType.LINK_BUTTON:
+    case FieldType.QUERY_PARAM_READER:
+    case FieldType.LOADER:
+      /**
+       * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
+       * The field still lands in `_source`.
+       */
+      return {
+        type: 'object',
+        enabled: false
+      }
+    case FieldType.DATE_RANGE:
+    case FieldType.SELECT_DATE_RANGE:
     default:
-      const _exhaustiveCheck: never = field
+      /**
+       * The remaining fields are "search" only fields so should not be
+       * encountered when indexing events.
+       */
+      const _exhaustiveCheck: DateRangeField | SelectDateRangeField = field
       throw new Error(
-        `Unhandled field type: ${JSON.stringify(_exhaustiveCheck)}`
+        `Unsupported indexing field type: ${JSON.stringify(_exhaustiveCheck)}`
       )
   }
 }
 
 function formFieldsToDataMapping(fields: FieldConfig[]) {
-  return fields.reduce((acc, field) => {
-    return {
-      ...acc,
-      [encodeFieldId(field.id)]: mapFieldTypeToElasticsearch(field)
-    }
-  }, {})
+  return fields.reduce(
+    (acc, field) => {
+      return {
+        ...acc,
+        [encodeFieldId(field.id)]: mapFieldTypeToElasticsearch(field)
+      }
+    },
+    {} as Record<string, estypes.MappingProperty>
+  )
 }
 
 export async function createIndex(
@@ -165,17 +235,63 @@ export async function createIndex(
           type: { type: 'keyword' },
           status: { type: 'keyword' },
           createdAt: { type: 'date' },
+          createdByUserType: { type: 'keyword' },
           createdBy: { type: 'keyword' },
           createdAtLocation: { type: 'keyword' },
-          modifiedAt: { type: 'date' },
+          updatedAtLocation: { type: 'keyword' },
+          updatedAt: { type: 'date' },
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
+          updatedByUserRole: { type: 'keyword' },
           declaration: {
             type: 'object',
             properties: formFieldsToDataMapping(formFields)
           },
           trackingId: { type: 'keyword' },
-          registrationNumber: { type: 'keyword' }
+          legalStatuses: {
+            type: 'object',
+            properties: {
+              [EventStatus.enum.DECLARED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  createdBySignature: { type: 'keyword' },
+                  acceptedAt: { type: 'date' }
+                } satisfies Record<
+                  keyof ActionCreationMetadata,
+                  estypes.MappingProperty
+                >
+              },
+              [EventStatus.enum.REGISTERED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  createdBySignature: { type: 'keyword' },
+                  acceptedAt: { type: 'date' },
+                  registrationNumber: { type: 'keyword' }
+                } satisfies Record<
+                  keyof RegistrationCreationMetadata,
+                  estypes.MappingProperty
+                >
+              }
+            }
+          },
+          flags: { type: 'keyword' },
+          potentialDuplicates: {
+            type: 'object',
+            properties: {
+              id: { type: 'keyword' },
+              trackingId: { type: 'keyword' }
+            }
+          }
         } satisfies EventIndexMapping
       }
     }
@@ -184,7 +300,10 @@ export async function createIndex(
   return ensureAlias(indexName)
 }
 
-export async function ensureIndexExists(eventConfiguration: EventConfig) {
+export async function ensureIndexExists(
+  eventConfiguration: EventConfig,
+  { overwrite }: { overwrite?: boolean } = { overwrite: false }
+) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(eventConfiguration.id)
   const hasEventsIndex = await esClient.indices.exists({
@@ -195,8 +314,12 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
     logger.info(`Creating index ${indexName}`)
     await createIndex(indexName, getDeclarationFields(eventConfiguration))
   } else {
-    logger.info(`Index ${indexName} already exists`)
-    logger.info(JSON.stringify(hasEventsIndex))
+    logger.info(`Index ${indexName} already exists.`)
+    if (overwrite) {
+      logger.info(`. - Overwriting index ${indexName}`)
+      await esClient.indices.delete({ index: indexName })
+      await createIndex(indexName, getDeclarationFields(eventConfiguration))
+    }
   }
   return ensureAlias(indexName)
 }
@@ -209,43 +332,21 @@ type _Combine<
 type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
 
-export async function indexAllEvents(eventConfiguration: EventConfig) {
-  const mongoClient = await eventsDb.getClient()
+export async function indexEventsInBulk(
+  batch: EventDocument[],
+  configs: EventConfig[]
+) {
   const esClient = getOrCreateClient()
-  const indexName = getEventIndexName(eventConfiguration.id)
-  const hasEventsIndex = await esClient.indices.exists({
-    index: indexName
-  })
 
-  if (!hasEventsIndex) {
-    await createIndex(indexName, getDeclarationFields(eventConfiguration))
-  }
+  const body = batch.flatMap((doc) => [
+    { index: { _index: getEventIndexName(doc.type), _id: doc.id } },
+    eventToEventIndex(doc, getEventConfigById(configs, doc.type))
+  ])
 
-  const stream = mongoClient.collection(indexName).find().stream()
-
-  const transformedStreamData = new Transform({
-    readableObjectMode: true,
-    writableObjectMode: true,
-    transform: (record: EventDocument, _encoding, callback) => {
-      callback(null, eventToEventIndex(record))
-    }
-  })
-
-  await esClient.helpers.bulk({
-    retries: 3,
-    wait: 3000,
-    datasource: stream.pipe(transformedStreamData),
-    onDocument: (doc: EventIndex) => ({
-      index: {
-        _index: indexName,
-        _id: doc.id
-      }
-    }),
-    refresh: 'wait_for'
-  })
+  return esClient.bulk({ refresh: false, body })
 }
 
-export async function indexEvent(event: EventDocument) {
+export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
 
@@ -253,24 +354,15 @@ export async function indexEvent(event: EventDocument) {
     index: indexName,
     id: event.id,
     /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
-    document: eventToEventIndex(event),
+    document: eventToEventIndex(event, config),
     refresh: 'wait_for'
   })
 }
 
-export async function deleteEventIndex(event: EventDocument) {
-  const esClient = getOrCreateClient()
-
-  const response = await esClient.delete({
-    index: getEventIndexName(event.type),
-    id: event.id,
-    refresh: 'wait_for'
-  })
-
-  return response
-}
-
-export async function getIndexedEvents() {
+export async function getIndexedEvents(
+  userId: string,
+  eventConfigs: EventConfig[]
+) {
   const esClient = getOrCreateClient()
 
   const hasEventsIndex = await esClient.indices.existsAlias({
@@ -284,41 +376,154 @@ export async function getIndexedEvents() {
     return []
   }
 
+  const query = {
+    // We basically want to fetch all events,
+    // UNLESS they are in status 'CREATED' (i.e. undeclared drafts) and not created by current user.
+    bool: {
+      should: [
+        {
+          bool: {
+            must_not: [{ term: { status: EventStatus.enum.CREATED } }],
+            should: undefined
+          }
+        },
+        {
+          bool: {
+            must: [
+              { term: { status: EventStatus.enum.CREATED } },
+              { term: { createdBy: userId } }
+            ],
+            should: undefined
+          }
+        }
+      ],
+      minimum_should_match: 1
+    }
+  } satisfies estypes.QueryDslQueryContainer
+
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
-    size: 10000,
+    query,
+    size: ELASTICSEARCH_MAXIMUM_QUERY_SIZE,
     request_cache: false
   })
 
   return response.hits.hits
     .map((hit) => hit._source)
     .filter((event): event is EncodedEventIndex => event !== undefined)
-    .map(decodeEventIndex)
+    .map((eventIndex) => {
+      const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
+      const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
+      return removeSecuredFields(eventConfig, decodedEventIndex)
+    })
 }
 
-export async function getIndex(eventParams: EventSearchIndex) {
-  const esClient = getOrCreateClient()
-  const { type, ...queryParams } = eventParams
-
-  if (Object.values(queryParams).length === 0) {
-    throw new Error('No search params provided')
+function valueFromTotal(total?: number | estypes.SearchTotalHits) {
+  if (!total) {
+    return 0
   }
+  if (typeof total === 'number') {
+    return total
+  } else {
+    return total.value
+  }
+}
 
-  const query = generateQuery(queryParams)
+export async function findRecordsByQuery(
+  search: SearchQuery,
+  eventConfigs: EventConfig[],
+  options: Record<string, SearchScopeAccessLevels>,
+  userOfficeId: string | undefined
+) {
+  const esClient = getOrCreateClient()
 
-  const response = await esClient.search<EncodedEventIndex>({
-    index: getEventIndexName(type),
-    size: DEFAULT_SIZE,
-    request_cache: false,
-    query
-  })
+  const { query, limit, offset } = search
 
-  const events = z.array(EventIndex).parse(
-    response.hits.hits
-      .map((hit) => hit._source)
-      .filter((event): event is EncodedEventIndex => event !== undefined)
-      .map((event) => decodeEventIndex(event))
+  const esQuery = withJurisdictionFilters(
+    await buildElasticQueryFromSearchPayload(query, eventConfigs),
+    options,
+    userOfficeId
   )
 
-  return events
+  const response = await esClient.search<EncodedEventIndex>({
+    index: getEventAliasName(),
+    size: limit,
+    from: offset,
+    track_total_hits: true,
+    request_cache: false,
+    query: esQuery,
+    sort: search.sort?.map((sort) => ({
+      [sort.field]: {
+        order: sort.direction,
+        unmapped_type: 'keyword'
+      }
+    })) || {
+      _score: {
+        order: 'desc'
+      },
+      updatedAt: {
+        order: 'desc'
+      }
+    }
+  })
+
+  const events = response.hits.hits
+    .map((hit) => hit._source)
+    .filter((event): event is EncodedEventIndex => event !== undefined)
+    .map((eventIndex) => {
+      const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
+      const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
+      return removeSecuredFields(eventConfig, decodedEventIndex)
+    })
+
+  return { results: events, total: valueFromTotal(response.hits.total) }
+}
+
+/*
+ * The types provided by the Elasticsearch client library.
+ * Left the code having to check for almost all fields.
+ */
+const MsearchResponseSchema = z.object({
+  status: z.number(),
+  hits: z.object({
+    total: z.object({
+      value: z.number()
+    })
+  })
+})
+
+export async function getEventCount(
+  queries: WorkqueueCountInput,
+  eventConfigs: EventConfig[],
+  options: Record<string, SearchScopeAccessLevels>,
+  userOfficeId: string | undefined
+) {
+  const esClient = getOrCreateClient()
+
+  const esQueries = queries.map(async (query) =>
+    buildElasticQueryFromSearchPayload(query.query, eventConfigs)
+  )
+
+  const filteredQueries = (await Promise.all(esQueries)).map((query) =>
+    withJurisdictionFilters(query, options, userOfficeId)
+  )
+  const { responses } = await esClient.msearch({
+    searches: filteredQueries.flatMap((query) => [
+      { index: getEventAliasName() },
+      { size: 0, track_total_hits: true, query }
+    ])
+  })
+
+  return responses.reduce((acc: Record<string, number>, response, index) => {
+    const slug = queries[index].slug
+
+    const validatedResponse = MsearchResponseSchema.safeParse(response)
+
+    return {
+      ...acc,
+      [slug]: validatedResponse.success
+        ? validatedResponse.data.hits.total.value
+        : 0
+    }
+  }, {})
 }

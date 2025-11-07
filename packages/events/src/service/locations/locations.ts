@@ -9,60 +9,60 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-import * as _ from 'lodash'
-import * as events from '@events/storage/mongodb/events'
-
-export const Location = z.object({
-  id: z.string(),
-  externalId: z.string().nullable(),
-  name: z.string(),
-  partOf: z.string().nullable()
-})
-
-export type Location = z.infer<typeof Location>
+import { Location, LocationType, UUID } from '@opencrvs/commons'
+import * as locationsRepo from '@events/storage/postgres/events/locations'
+import * as config from '@events/service/config/config'
 
 /**
  * Sets incoming locations in the database for events. Should be only run as part of the initial seeding.
- * Clears all existing locations that are not in the incoming locations.
- *
- * @TODO: Consider removing the conditional logic after setting up dev environments for all devs.
- * In production it is run only once, and without transactions it is possible that the locations are not set correctly.
- *
  * @param incomingLocations - Locations to be set
  */
-export async function setLocations(incomingLocations: Array<Location>) {
-  const db = await events.getClient()
-  const currentLocations = await db
-    .collection<Location>('locations')
-    .find()
-    .toArray()
 
-  const [locationsToKeep, locationsToRemove] = _.partition(
-    currentLocations,
-    (location) =>
-      incomingLocations.some(
-        (incomingLocation) => incomingLocation.id === location.id
-      )
+export async function setLocations(locations: Location[]) {
+  return locationsRepo.setLocations(
+    locations.map(({ id, name, parentId, validUntil, locationType }) => ({
+      id,
+      name,
+      parentId,
+      validUntil: validUntil ? new Date(validUntil).toISOString() : null,
+      locationType
+    }))
   )
-
-  const [, newLocations] = _.partition(incomingLocations, (location) =>
-    locationsToKeep.some((l) => l.id === location.id)
-  )
-
-  if (locationsToRemove.length > 0) {
-    await db
-      .collection('locations')
-      .deleteMany({ id: { $in: locationsToRemove.map((l) => l.id) } })
-  }
-
-  if (newLocations.length > 0) {
-    await db.collection('locations').insertMany(newLocations)
-  }
 }
 
-export const getLocations = async () => {
-  const db = await events.getClient()
+/**
+ * Syncs locations from V1 to V2 database.
+ * @param incomingLocations - Locations to be set
+ */
 
-  return db.collection<Location>('locations').find().toArray()
+export async function syncLocations() {
+  const locations = await config.getLocations()
+  return setLocations(locations)
+}
+
+/**
+ * NOTE: Be cautious when calling this function as it fetches all locations from the database.
+ * Do you really need all of them? Consider using more specific functions if possible. Act as if there could be hundreds of thousands of locations.
+ *
+ */
+export async function getLocations(params?: {
+  locationType?: LocationType
+  locationIds?: UUID[]
+  isActive?: boolean
+}) {
+  const locations = await locationsRepo.getLocations(params)
+
+  return locations
+}
+
+export const getChildLocations = async (parentIdToSearch: UUID) => {
+  const locations = await locationsRepo.getChildLocations(parentIdToSearch)
+
+  return locations.map(({ id, name, parentId, validUntil, locationType }) => ({
+    id,
+    name,
+    validUntil,
+    parentId,
+    locationType
+  }))
 }

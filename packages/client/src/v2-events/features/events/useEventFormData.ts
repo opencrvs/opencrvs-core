@@ -12,18 +12,15 @@
 import { useEffect, useRef } from 'react'
 import { create } from 'zustand'
 import { FormikTouched } from 'formik'
-import { EventState, FieldValue } from '@opencrvs/commons/client'
+import { EventState } from '@opencrvs/commons/client'
 
 interface EventFormData {
   formValues: null | EventState
   setFormValues: (data: EventState) => void
-  setInitialFormValues: (data: EventState) => void
   getFormValues: (initialValues?: EventState) => EventState
   getTouchedFields: () => Record<string, boolean>
-  touchedFields: FormikTouched<Record<string, FieldValue>>
-  setAllTouchedFields: (
-    touchedFields: FormikTouched<Record<string, FieldValue>>
-  ) => void
+  touchedFields: FormikTouched<EventState>
+  setAllTouchedFields: (touchedFields: FormikTouched<EventState>) => void
   clear: () => void
 }
 
@@ -37,7 +34,7 @@ function removeUndefinedKeys(data: EventState) {
  * Interface representing the form data and related operations for an event.
  *
  * @property {EventState} formValues - The current form values.
- * @property {FormikTouched<Record<string, FieldValue>>} touchedFields - The current touched fields.
+ * @property {FormikTouched<EventState>} touchedFields - The current touched fields.
  * @property {function} setFormValues - Sets the form values. This method should only be used as directly connected to Formik's `onChange` hook.
  * @property {function} setFormValuesIfEmpty - Sets the form values only if they are empty.
  * This method is to be used when initializing the form state on load in form actions. Otherwise, what can happen is the user makes changes, for instance in correction views, reloads the page, and their changes get cleared out once the event is downloaded from the backend.
@@ -46,27 +43,31 @@ function removeUndefinedKeys(data: EventState) {
  * @property {function} getTouchedFields - Retrieves the fields that have been touched.
  * @property {function} clear - Clears the form values.
  */
-export const useEventFormData = create<EventFormData>()((set, get) => ({
-  formValues: {},
-  touchedFields: {},
-  getFormValues: (initialValues?: EventState) =>
-    get().formValues || initialValues || {},
-  setFormValues: (data: EventState) => {
-    const formValues = removeUndefinedKeys(data)
-    return set(() => ({ formValues }))
-  },
-  setInitialFormValues: (data: EventState) => {
-    return set(() => ({ formValues: removeUndefinedKeys(data) }))
-  },
-  setAllTouchedFields: (fields) => {
-    return set(() => ({ touchedFields: fields }))
-  },
-  getTouchedFields: () =>
-    Object.fromEntries(
-      Object.entries(get().getFormValues()).map(([key]) => [key, true])
-    ),
-  clear: () => set(() => ({ formValues: {}, touchedFields: {} }))
-}))
+export const useEventFormData = create<EventFormData>()((set, get) => {
+  return {
+    formValues: {},
+    touchedFields: {},
+
+    getFormValues: (initialValues?: EventState) =>
+      get().formValues || initialValues || {},
+
+    setFormValues: (form: EventState) => {
+      const formValues = removeUndefinedKeys(form)
+      return set(() => ({ formValues }))
+    },
+
+    setAllTouchedFields: (fields) => set(() => ({ touchedFields: fields })),
+
+    getTouchedFields: () =>
+      Object.fromEntries(
+        Object.entries(get().getFormValues()).map(([key]) => [key, true])
+      ),
+
+    clear: () => {
+      set(() => ({ formValues: {}, touchedFields: {} }))
+    }
+  }
+})
 /**
  * Based on https://github.com/pmndrs/zustand?tab=readme-ov-file#transient-updates-for-often-occurring-state-changes
  *

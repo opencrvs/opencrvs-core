@@ -9,14 +9,53 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FieldConfig, FieldType } from '@opencrvs/commons/client'
+import formatISO from 'date-fns/formatISO'
+import {
+  areCertificateConditionsMet,
+  ConditionalParameters,
+  EventDocument,
+  EventState,
+  FieldConfig,
+  FieldType
+} from '@opencrvs/commons/client'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
+import { useOnlineStatus } from '../../../utils'
 
 export const CERT_TEMPLATE_ID = 'certificateTemplateId'
 export const useCertificateTemplateSelectorFieldConfig = (
-  eventType: string
+  eventType: string,
+  declaration: EventState,
+  event: EventDocument
 ): FieldConfig => {
   const { certificateTemplates } = useAppConfig()
+
+  const isOnline = useOnlineStatus()
+  const declarationWithEventMetadata = {
+    $form: declaration,
+    $event: event,
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $online: isOnline
+  } satisfies ConditionalParameters
+
+  // Filter out certificates that are not for the event type and are not v2 templates
+  const validTemplates = certificateTemplates.filter(
+    (template) =>
+      template.event === eventType &&
+      template.isV2Template &&
+      (!template.conditionals ||
+        areCertificateConditionsMet(
+          template.conditionals,
+          declarationWithEventMetadata
+        ))
+  )
+
+  const defaultValue = validTemplates.find((template) => template.isDefault)?.id
+
+  const options = validTemplates.map((template) => ({
+    label: template.label,
+    value: template.id
+  }))
+
   return {
     id: CERT_TEMPLATE_ID,
     type: FieldType.SELECT,
@@ -24,13 +63,14 @@ export const useCertificateTemplateSelectorFieldConfig = (
     label: {
       defaultMessage: 'Type',
       description: 'This is the label for the field',
-      id: 'v2.event.default.action.certificate.template.type.label'
+      id: 'event.default.action.certificate.template.type.label'
     },
-    defaultValue: certificateTemplates.find(
-      (x) => x.event === eventType && x.isDefault
-    )?.id,
-    options: certificateTemplates
-      .filter((x) => x.event === eventType)
-      .map((x) => ({ label: x.label, value: x.id }))
+    noOptionsMessage: {
+      id: 'event.default.action.certificate.template.type.notFound',
+      description: 'Select certificate template options not found',
+      defaultMessage: 'No template available for this event, contact Admin'
+    },
+    defaultValue,
+    options
   }
 }

@@ -10,21 +10,59 @@
  */
 
 import { z } from 'zod'
-import { SCOPES } from '@opencrvs/commons'
-import { router, publicProcedure } from '@events/router/trpc'
-import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
+import { Location, LocationType, SCOPES, UUID } from '@opencrvs/commons'
+import { router, systemProcedure } from '@events/router/trpc'
 import {
   getLocations,
-  Location,
-  setLocations
+  setLocations,
+  syncLocations
 } from '@events/service/locations/locations'
+import { requiresAnyOfScopes } from '../middleware'
 
 export const locationRouter = router({
-  set: publicProcedure
-    .use(requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING]))
-    .input(z.array(Location).min(1))
-    .mutation(async (options) => {
-      await setLocations(options.input)
+  sync: systemProcedure
+    .use(
+      requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])
+    )
+    .input(z.void())
+    .output(z.void())
+    .meta({
+      openapi: {
+        summary: 'Sync locations between V1 and V2',
+        method: 'POST',
+        path: '/sync-locations',
+        tags: ['events'],
+        protect: true
+      }
+    })
+    .mutation(async () => {
+      await syncLocations()
     }),
-  get: publicProcedure.output(z.array(Location)).query(getLocations)
+  list: systemProcedure
+    .input(
+      z
+        .object({
+          isActive: z.boolean().optional(),
+          locationIds: z.array(UUID).optional(),
+          locationType: LocationType.optional()
+        })
+        .optional()
+    )
+    .output(z.array(Location))
+    .query(async ({ input }) =>
+      getLocations({
+        isActive: input?.isActive,
+        locationIds: input?.locationIds,
+        locationType: input?.locationType
+      })
+    ),
+  set: systemProcedure
+    .use(
+      requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])
+    )
+    .input(z.array(Location).min(1))
+    .output(z.void())
+    .mutation(async ({ input }) => {
+      await setLocations(input)
+    })
 })

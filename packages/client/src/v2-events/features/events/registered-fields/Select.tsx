@@ -9,35 +9,56 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useIntl } from 'react-intl'
 import {
-  FieldProps,
+  FieldPropsWithoutReferenceValue,
+  SelectField,
   SelectOption,
   TranslationConfig
 } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
+import { useIntlWithFormData } from '@client/v2-events/messages/utils'
+import { StringifierContext } from './RegisteredField'
 
-function SelectInput({
-  onChange,
-  value,
-  ...props
-}: Omit<FieldProps<'SELECT'>, 'label'> & {
+export type SelectInputProps = Omit<
+  FieldPropsWithoutReferenceValue<'SELECT'>,
+  'label'
+> & {
   onChange: (newValue: string) => void
   value?: string
   label?: TranslationConfig
-} & { 'data-testid'?: string }) {
-  const intl = useIntl()
+  disabled?: boolean
+  noOptionsMessage?: TranslationConfig
+} & { 'data-testid'?: string }
+
+function SelectInput({
+  onChange,
+  noOptionsMessage,
+  value,
+  ...props
+}: SelectInputProps) {
+  const intl = useIntlWithFormData()
   const { options } = props
   const selectedOption = options.find((option) => option.value === value)
   const formattedOptions = options.map((option: SelectOption) => ({
     value: option.value,
-    label: intl.formatMessage(option.label)
+    label:
+      typeof option.label === 'string'
+        ? option.label
+        : intl.formatMessage(option.label)
   }))
 
   const inputValue = selectedOption?.value ?? ''
+
+  const formattedNoOptionsMessage = noOptionsMessage
+    ? ({ inputValue: input }: { inputValue: string }) =>
+        intl.formatMessage(noOptionsMessage, { input })
+    : undefined
+
   return (
     <SelectComponent
       {...props}
+      data-testid={props['data-testid'] || `select__${props.id}`}
+      noOptionsMessage={formattedNoOptionsMessage}
       options={formattedOptions}
       value={inputValue}
       onChange={onChange}
@@ -52,13 +73,40 @@ function SelectOutput({
   value: string | undefined
   options: SelectOption[]
 }) {
-  const intl = useIntl()
+  const intl = useIntlWithFormData()
   const selectedOption = options.find((option) => option.value === value)
 
-  return selectedOption ? intl.formatMessage(selectedOption.label) : ''
+  if (!selectedOption) {
+    return ''
+  }
+
+  return typeof selectedOption.label === 'string'
+    ? selectedOption.label
+    : intl.formatMessage(selectedOption.label)
+}
+
+function stringify(value: string, context: StringifierContext<SelectField>) {
+  if (!context.config) {
+    return value
+  }
+
+  const option = context.config.options.find((opt) => opt.value === value)
+
+  if (!option) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `Could not find option with value ${value} for field ${context.config.id}`
+    )
+    return value
+  }
+
+  return typeof option.label === 'string'
+    ? option.label
+    : context.intl.formatMessage(option.label)
 }
 
 export const Select = {
   Input: SelectInput,
-  Output: SelectOutput
+  Output: SelectOutput,
+  stringify
 }

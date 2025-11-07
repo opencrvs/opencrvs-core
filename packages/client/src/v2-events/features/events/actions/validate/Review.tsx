@@ -9,17 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { useSelector } from 'react-redux'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import {
   getCurrentEventState,
   ActionType,
   getActionAnnotation,
   getDeclaration,
-  getActionReview
+  getActionReview,
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -37,7 +40,8 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { getScope } from '@client/profile/profileSelectors'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 /**
@@ -46,13 +50,31 @@ import { useReviewActionConfig } from './useReviewActionConfig'
  */
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.VALIDATE)
+  const [{ workqueue: slug }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.VALIDATE.REVIEW
+  )
   const events = useEvents()
   const drafts = useDrafts()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
-  const { goToHome } = useEventFormNavigation()
+  const { closeActionView } = useEventFormNavigation()
+  const validatorContext = useValidatorContext()
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEvent.findFromCache(eventId).data
+
+  useEffect(() => {
+    if (!event) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Event with id ${eventId} not found in cache. Redirecting to overview.`
+      )
+      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+    }
+  }, [event, eventId, navigate])
+
+  if (!event) {
+    return <div />
+  }
 
   const { setAnnotation, getAnnotation } = useActionAnnotation()
 
@@ -60,8 +82,7 @@ export function Review() {
 
   const previousAnnotation = getActionAnnotation({
     event,
-    actionType: ActionType.VALIDATE,
-    drafts: []
+    actionType: ActionType.VALIDATE
   })
 
   const annotation = getAnnotation(previousAnnotation)
@@ -73,17 +94,19 @@ export function Review() {
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
-  const previousFormValues = getCurrentEventState(event).declaration
-  const form = getFormValues()
 
-  const scopes = useSelector(getScope) ?? undefined
+  const currentEventState = getCurrentEventState(event, config)
+  const previousFormValues = currentEventState.declaration
+  const form = getFormValues()
 
   const reviewActionConfiguration = useReviewActionConfig({
     formConfig,
     declaration: form,
     annotation,
-    scopes,
-    reviewFields: reviewConfig.fields
+    reviewFields: reviewConfig.fields,
+    status: currentEventState.status,
+    eventType: event.type,
+    validatorContext
   })
 
   async function handleEdit({
@@ -106,9 +129,10 @@ export function Review() {
         ROUTES.V2.EVENTS.VALIDATE.PAGES.buildPath(
           { pageId, eventId },
           {
-            from: 'review'
+            from: 'review',
+            workqueue: slug
           },
-          fieldId
+          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
       )
     }
@@ -139,8 +163,7 @@ export function Review() {
 
     if (confirmedValidation) {
       reviewActionConfiguration.onConfirm(eventId)
-
-      goToHome()
+      closeActionView(slug)
     }
   }
 
@@ -156,20 +179,30 @@ export function Review() {
           eventId,
           declaration: {},
           transactionId: uuid(),
-          annotation: { message }
+          annotation: {},
+          content: { reason: message }
         })
       }
 
       if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
-        events.actions.archive.mutate({
-          eventId,
-          declaration: {},
-          transactionId: uuid(),
-          annotation: { message, isDuplicate }
-        })
+        if (isDuplicate) {
+          events.customActions.archiveOnDuplicate.mutate({
+            eventId,
+            declaration: {},
+            transactionId: uuid(),
+            content: { reason: message }
+          })
+        } else {
+          events.actions.archive.mutate({
+            eventId,
+            declaration: {},
+            transactionId: uuid(),
+            annotation: {},
+            content: { reason: message }
+          })
+        }
       }
-
-      goToHome()
+      closeActionView(slug)
     }
   }
 
@@ -179,7 +212,7 @@ export function Review() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          goToHome()
+          closeActionView(slug)
         })
       }
     >
@@ -190,15 +223,21 @@ export function Review() {
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
+        validatorContext={validatorContext}
         onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions
+          icon={reviewActionConfiguration.icon}
           incomplete={reviewActionConfiguration.incomplete}
           messages={reviewActionConfiguration.messages}
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleValidation}
-          onReject={handleRejection}
+          onReject={
+            currentEventState.flags.includes(InherentFlags.REJECTED)
+              ? undefined
+              : handleRejection
+          }
         />
         {modal}
       </ReviewComponent.Body>

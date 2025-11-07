@@ -28,11 +28,6 @@ export function getAuthHeader(request: Hapi.Request) {
   }
 }
 
-export function joinURL(base: string, path: string) {
-  const baseWithSlash = base.endsWith('/') ? base : base + '/'
-  return new URL(path, baseWithSlash)
-}
-
 export class NotFound extends Error {
   constructor(message: string) {
     super(message)

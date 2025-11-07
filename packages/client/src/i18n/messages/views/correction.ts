@@ -8,73 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface ICorrectionMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  whoRequestedCorrection: MessageDescriptor
-  title: MessageDescriptor
-  name: MessageDescriptor
-  correctorError: MessageDescriptor
-  mother: MessageDescriptor
-  father: MessageDescriptor
-  bride: MessageDescriptor
-  groom: MessageDescriptor
-  child: MessageDescriptor
-  legalGuardian: MessageDescriptor
-  anotherRegOrFieldAgent: MessageDescriptor
-  me: MessageDescriptor
-  court: MessageDescriptor
-  others: MessageDescriptor
-  informant: MessageDescriptor
-  whatWasTheReasonForCorrection: MessageDescriptor
-  reasonForChange: MessageDescriptor
-  additionalComment: MessageDescriptor
-  clericalError: MessageDescriptor
-  materialError: MessageDescriptor
-  materialOmission: MessageDescriptor
-  judicialOrder: MessageDescriptor
-  otherReason: MessageDescriptor
-  reasonForChangeError: MessageDescriptor
-  idCheckTitle: MessageDescriptor
-  otherIdCheckTitle: MessageDescriptor
-  idCheckVerify: MessageDescriptor
-  birthCorrectionNote: MessageDescriptor
-  proofOfLegalDocuments: MessageDescriptor
-  docTypeAffidavitProof: MessageDescriptor
-  docTypeCourtDocument: MessageDescriptor
-  docTypeOther: MessageDescriptor
-  supportDocumentForCorrection: MessageDescriptor
-  selectPlaceholder: MessageDescriptor
-  attestToSeeCorrectionDocument: MessageDescriptor
-  noDocumentsRequiredForCorrection: MessageDescriptor
-  supportingDocumentsTitle: MessageDescriptor
-  supportingDocumentsSubtitle: MessageDescriptor
-  correctionSummaryTitle: MessageDescriptor
-  correctionSummaryItem: MessageDescriptor
-  correctionSummaryOriginal: MessageDescriptor
-  correctionSummaryCorrection: MessageDescriptor
-  correctionSummaryRequestedBy: MessageDescriptor
-  correctionSummaryIdCheck: MessageDescriptor
-  correctionSummaryReasonForRequest: MessageDescriptor
-  correctionSummaryComments: MessageDescriptor
-  correctionSummaryAddComments: MessageDescriptor
-  correctionSummaryFeesRequired: MessageDescriptor
-  correctionSummaryFeesRequiredPositive: MessageDescriptor
-  correctionSummaryFeesRequiredNegative: MessageDescriptor
-  correctionSummaryProofOfPaymentRequired: MessageDescriptor
-  correctionSummaryProofOfPayment: MessageDescriptor
-  correctionSummaryTotalPaymentLabel: MessageDescriptor
-  correctionRequiredLabel: MessageDescriptor
-  correctionForApprovalDialogTitle: MessageDescriptor
-  correctionSummarySubmitter: MessageDescriptor
-  correctionSummaryOffice: MessageDescriptor
-  correctionSummaryRequestedOn: MessageDescriptor
-  correctRecordDialogTitle: MessageDescriptor
-  correctRecordDialogDescription: MessageDescriptor
-}
-
-const messagesToDefine: ICorrectionMessages = {
+const messagesToDefine = {
   requestedCorrection: {
     id: 'correction.request',
     defaultMessage: 'Requested correction',
@@ -429,7 +365,41 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.summary.requestedOn',
     defaultMessage: 'Requested on',
     description: 'Date when certificate correction summary was submitted'
+  },
+
+  // V2
+  correctionSectionTitle: {
+    id: 'correction.summary.section.title',
+    defaultMessage: 'Request correction(s)',
+    description: 'Corrections section title'
+  },
+  makeCorrectionSectionTitle: {
+    id: 'record-corrected.summary.section.title',
+    defaultMessage: 'Correction(s)',
+    description: 'Make corrections section title'
+  },
+  change: {
+    id: 'correction.summary.change',
+    defaultMessage: 'Change',
+    description: 'Change link label'
+  },
+  correctionApprovalDialogTitle: {
+    id: 'correction.correctionForApprovalDialog.title',
+    defaultMessage: 'Send record correction for approval?',
+    description:
+      'The title for the dialog when record correction sent by registration agent for approval'
+  },
+  verifyIdentity: {
+    id: 'correction.label.verifyIdentity.confirm',
+    defaultMessage: 'Yes',
+    description: 'Label for verification of identity in correction request'
+  },
+  cancelVerifyIdentity: {
+    id: 'correction.label.verifyIdentity.cancel',
+    defaultMessage: 'No',
+    description:
+      'Label for cancellation of identity verificationin correction request'
   }
 }
 
-export const messages: ICorrectionMessages = defineMessages(messagesToDefine)
+export const messages = defineMessages(messagesToDefine)

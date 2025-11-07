@@ -8,21 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { IAuthHeader } from './http'
 import decode from 'jwt-decode'
 import { Nominal } from './nominal'
 import { z } from 'zod'
 
 import { RawScopes, Scope, SCOPES } from './scopes'
+import { UUID } from './uuid'
 export * from './scopes'
-
-/** All the scopes system/integration can be assigned to */
-export const SYSTEM_INTEGRATION_SCOPES = {
-  recordsearch: SCOPES.RECORDSEARCH,
-  webhook: SCOPES.WEBHOOK,
-  nationalId: SCOPES.NATIONALID
-} as const
 
 export const DEFAULT_ROLES_DEFINITION = [
   {
@@ -33,7 +25,8 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.fieldAgent'
     },
     scopes: [
-      // new scopes
+      `record.create[event=birth|death|tennis-club-membership]`,
+      'record.declare[event=birth|death|tennis-club-membership]',
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -54,6 +47,8 @@ export const DEFAULT_ROLES_DEFINITION = [
     scopes: [
       SCOPES.PERFORMANCE,
       SCOPES.CERTIFY,
+      `record.create[event=birth|death|tennis-club-membership]`,
+      'record.declare[event=birth|death|tennis-club-membership]',
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -67,7 +62,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.RECORD_EXPORT_RECORDS,
       SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
       SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
-      SCOPES.RECORD_CREATE_COMMENTS,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.ORGANISATION_READ_LOCATIONS,
@@ -87,11 +81,14 @@ export const DEFAULT_ROLES_DEFINITION = [
     scopes: [
       SCOPES.PERFORMANCE,
       SCOPES.CERTIFY,
+      `record.create[event=birth|death|tennis-club-membership]`,
+      'record.declare[event=birth|death|tennis-club-membership]',
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
       SCOPES.RECORD_SUBMIT_FOR_UPDATES,
       SCOPES.RECORD_REVIEW_DUPLICATES,
+      'record.declared.review-duplicates[event=birth|death|tennis-club-membership]',
       SCOPES.RECORD_DECLARATION_ARCHIVE,
       SCOPES.RECORD_DECLARATION_REINSTATE,
       SCOPES.RECORD_REGISTER,
@@ -101,7 +98,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.RECORD_EXPORT_RECORDS,
       SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
       SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
-      SCOPES.RECORD_CREATE_COMMENTS,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.ORGANISATION_READ_LOCATIONS,
@@ -171,48 +167,43 @@ export const DEFAULT_ROLES_DEFINITION = [
   scopes: Scope[]
 }>
 
-export const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
-  HEALTH: [SCOPES.NOTIFICATION_API],
-  NATIONAL_ID: [SCOPES.NATIONALID],
-  RECORD_SEARCH: [SCOPES.RECORDSEARCH],
-  WEBHOOK: [SCOPES.WEBHOOK]
-} satisfies Record<string, Scope[]>
-
 /*
  * Describes a "legacy" user role such as FIELD_AGENT, REGISTRATION_AGENT, etc.
  * These are roles we are slowly sunsettings in favor of the new, more configurable user roles.
  */
 
-/** All the scopes user can be assigned to – old & new */
-export type UserScope =
-  | (typeof SCOPES)[keyof typeof SCOPES]
-  | 'profile.electronic-signature'
-
-export type SystemScope =
-  (typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES)[keyof typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES][number]
+export const TokenUserType = z.enum(['user', 'system'])
+export type TokenUserType = z.infer<typeof TokenUserType>
 
 export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
   scope: Scope[]
+  role: string
+  userType: TokenUserType
+  eventId?: UUID
+  actionId?: UUID
 }
 
-export function getScopes(authHeader: IAuthHeader): RawScopes[] {
-  if (!authHeader || !authHeader.Authorization) {
-    return []
-  }
+/**
+ * Depending on how the API is called, there might or might not be Bearer keyword in the header.
+ * To allow for usage with both direct HTTP calls and TRPC, ensure it's present to be able to use shared scope auth functions.
+ */
+export function setBearerForToken(token: string) {
+  const bearer = 'Bearer'
+  return token.startsWith(bearer) ? token : `${bearer} ${token}`
+}
+
+export function getScopes(token: string): RawScopes[] {
+  const authHeader = { Authorization: setBearerForToken(token) }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+
   return tokenPayload.scope || []
 }
 
-export function hasScope(authHeader: IAuthHeader, scope: Scope) {
-  return getScopes(authHeader).includes(scope)
-}
-
-export function inScope(authHeader: IAuthHeader, scopes: Scope[]) {
-  const tokenScopes = getScopes(authHeader)
-  return scopes.some((scope) => tokenScopes.includes(scope))
+export function hasScope(token: string, scope: Scope) {
+  return getScopes(token).includes(scope)
 }
 
 export const getTokenPayload = (token: string): ITokenPayload => {
@@ -229,7 +220,13 @@ export const getTokenPayload = (token: string): ITokenPayload => {
 
 export const getUserId = (token: TokenWithBearer): string => {
   const tokenPayload = getTokenPayload(token.split(' ')[1])
-  return tokenPayload.sub
+  return z.string().parse(tokenPayload.sub)
+}
+
+export const getUserTypeFromToken = (token: TokenWithBearer): TokenUserType => {
+  const tokenPayload = getTokenPayload(token.split(' ')[1])
+
+  return TokenUserType.parse(tokenPayload.userType)
 }
 
 export const TokenWithBearer = z

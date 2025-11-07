@@ -11,24 +11,92 @@
 
 import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useNavigate } from 'react-router-dom'
 import {
+  Draft,
   createEmptyDraft,
-  findActiveDrafts,
-  getCurrentEventStateWithDrafts,
+  findActiveDraftForEvent,
+  dangerouslyGetCurrentEventStateWithDrafts,
   getActionAnnotation,
-  DeclarationUpdateActionType
+  ActionType,
+  deepMerge,
+  getUUID,
+  deepDropNulls,
+  mergeDrafts,
+  EventDocument,
+  EventConfig,
+  getAvailableActionsForEvent,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
-
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { createTemporaryId } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useToastAndRedirect } from '@client/v2-events/features/events/useToastAndRedirect'
+import { useEventConfiguration } from '../../useEventConfiguration'
+import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
+import { AvailableActionTypes, getPreviousDeclarationActionType } from './utils'
 
-type Props = PropsWithChildren<{ actionType: DeclarationUpdateActionType }>
+/**
+ *
+ * @param actionType Action type of the declaration action
+ * @param event Event document
+ * @param configuration Event configuration
+ *
+ * If the action is not allowed for the event, redirect the user to overview page.
+ * Or throws an error if the user does not have permission to perform the action.
+ */
+function useActionGuard(
+  actionType: AvailableActionTypes,
+  event: EventDocument,
+  configuration: EventConfig
+) {
+  const eventState = getCurrentEventState(event, configuration)
+  const availableActions = getAvailableActionsForEvent(eventState)
+  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const { redirectToEventOverviewPage } = useToastAndRedirect()
+  // If the action is not available for the event, redirect to the overview page
+  if (!availableActions.includes(actionType)) {
+    const isProd = import.meta.env.PROD
+
+    // Some Storybook tests expect the action guard to throw errors.
+    // In the actual app, we want explicit failures in development but silent handling in production.
+    // Storybook verifies behavior based on these development-mode failures.
+    const isStory = import.meta.env.STORYBOOK
+
+    if (isProd && !isStory) {
+      // In prod mode, show a toast explaining why the action is not available
+      // and then redirect to the overview page
+      return redirectToEventOverviewPage({
+        toastId: `${actionType}-no-available-for-${event.id}`,
+        message: {
+          id: 'event.action.notAvailableForEvent',
+          defaultMessage:
+            "The action you're trying to perform is not available for this event anymore.",
+          description:
+            'Shown when user tries to perform an action that is not available for the event'
+        },
+        eventId: event.id
+      })
+    }
+
+    throw new Error(
+      `Action ${actionType} not available for the event ${event.id} with status ${eventState.status} ${eventState.flags.length > 0 ? `(flags: ${eventState.flags.join(', ')})` : ''}`
+    )
+  }
+
+  // If the user may not perform the action, redirect to the unauthorized page
+  if (!isActionAllowed(actionType)) {
+    throw new Error(
+      `User does not have permission to perform action ${actionType} on event ${event.id}`
+    )
+  }
+}
 
 /**
  * Creates a wrapper component for the declaration action.
@@ -39,31 +107,45 @@ type Props = PropsWithChildren<{ actionType: DeclarationUpdateActionType }>
  *
  * This differs from AnnotationAction, which modify the annotation, and can be triggered multiple times.
  */
-function DeclarationActionComponent({ children, actionType }: Props) {
-  const params = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
+function DeclarationActionComponent({
+  children,
+  actionType,
+  event
+}: PropsWithChildren<{
+  actionType: AvailableActionTypes
+  event: EventDocument
+}>) {
+  const eventId = event.id
+  const { setLocalDraft, getLocalDraftOrDefault, getRemoteDraftByEventId } =
+    useDrafts()
 
-  const { getEvent } = useEvents()
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
+  )
 
-  const { setLocalDraft, getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
+  useActionGuard(actionType, event, configuration)
 
-  const [event] = getEvent.useSuspenseQuery(params.eventId)
+  const remoteDraft: Draft | undefined = getRemoteDraftByEventId(event.id)
 
-  const drafts = getRemoteDrafts()
-  const activeDraft = findActiveDrafts(event, drafts)[0]
+  const activeRemoteDraft = remoteDraft
+    ? findActiveDraftForEvent(event, remoteDraft)
+    : undefined
+
   const localDraft = getLocalDraftOrDefault(
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    activeDraft ||
-      createEmptyDraft(params.eventId, createTemporaryId(), actionType)
+    activeRemoteDraft
+      ? // new transactionId must be generated for the draft to be saved. Otherwise it will hit the "idempotency wall"
+        { ...activeRemoteDraft, transactionId: getUUID() }
+      : createEmptyDraft(eventId, createTemporaryId(), actionType)
   )
 
   /*
    * Keep the local draft updated as per the form changes
    */
-  const formValues = useEventFormData((state) => state.formValues)
-  const annotation = useActionAnnotation((state) => state.annotation)
+  const currentDeclaration = useEventFormData((state) => state.formValues)
+  const currentAnnotation = useActionAnnotation((state) => state.annotation)
 
   useEffect(() => {
-    if (!formValues || !annotation) {
+    if (!currentDeclaration || !currentAnnotation) {
       return
     }
 
@@ -72,70 +154,112 @@ function DeclarationActionComponent({ children, actionType }: Props) {
       eventId: event.id,
       action: {
         ...localDraft.action,
-        declaration: formValues,
-        annotation
+        declaration: currentDeclaration,
+        annotation: currentAnnotation
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formValues, annotation])
+  }, [currentDeclaration, currentAnnotation])
 
   /*
    * Initialize the form state
    */
+  const setFormValues = useEventFormData((state) => state.setFormValues)
+  const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
-  const setInitialFormValues = useEventFormData(
-    (state) => state.setInitialFormValues
-  )
+  const localDraftWithAdjustedTimestamp = {
+    ...localDraft,
+    /*
+     * Force the local draft always to be the latest
+     * This is to prevent a situation where the local draft gets created,
+     * then a CREATE action request finishes in the background and is stored with a later
+     * timestamp
+     */
+    createdAt: new Date().toISOString(),
+    /*
+     * If params.eventId changes (from tmp id to concrete id) then change the local draft id
+     */
+    eventId: event.id,
+    action: {
+      ...localDraft.action,
+      createdAt: new Date().toISOString()
+    }
+  }
 
-  const setInitialAnnotation = useActionAnnotation(
-    (state) => state.setInitialAnnotation
-  )
-
-  const eventDrafts = drafts
-    .filter((d) => d.eventId === event.id)
-    .concat({
-      ...localDraft,
-      /*
-       * Force the local draft always to be the latest
-       * This is to prevent a situation where the local draft gets created,
-       * then a CREATE action request finishes in the background and is stored with a later
-       * timestamp
-       */
-      createdAt: new Date().toISOString(),
-      /*
-       * If params.eventId changes (from tmp id to concrete id) then change the local draft id
-       */
-      eventId: event.id,
-      action: {
-        ...localDraft.action,
-        createdAt: new Date().toISOString()
-      }
-    })
+  const mergedDraft: Draft = activeRemoteDraft
+    ? mergeDrafts(activeRemoteDraft, localDraftWithAdjustedTimestamp)
+    : localDraftWithAdjustedTimestamp
 
   const eventStateWithDrafts = useMemo(
-    () => getCurrentEventStateWithDrafts(event, eventDrafts),
-    [eventDrafts, event]
+    () =>
+      dangerouslyGetCurrentEventStateWithDrafts({
+        event,
+        draft: mergedDraft,
+        configuration
+      }),
+    [mergedDraft, event, configuration]
   )
 
   const actionAnnotation = useMemo(() => {
+    // For correction request, if we are not reviewing a correction, we don't want to use any previous action annotation
+    if (
+      actionType === ActionType.REQUEST_CORRECTION &&
+      !isLastActionCorrectionRequest(event)
+    ) {
+      return deepDropNulls(mergedDraft.action.annotation || {})
+    }
+
     return getActionAnnotation({
       event,
       actionType,
-      drafts: eventDrafts
+      draft: mergedDraft
     })
-  }, [eventDrafts, event, actionType])
+  }, [mergedDraft, event, actionType])
+
+  const previousActionAnnotation = useMemo(() => {
+    const previousActionType = getPreviousDeclarationActionType(
+      event.actions,
+      actionType
+    )
+
+    if (!previousActionType) {
+      return {}
+    }
+
+    const prevActionAnnotation = getActionAnnotation({
+      event,
+      actionType: previousActionType
+    })
+
+    // If we found annotation data from the previous action, use that.
+    if (Object.keys(prevActionAnnotation).length) {
+      return prevActionAnnotation
+    }
+
+    // As a fallback, lets see if there is a notify action annotation and use that.
+    return getActionAnnotation({
+      event,
+      actionType: ActionType.NOTIFY
+    })
+  }, [event, actionType])
 
   useEffect(() => {
-    setInitialFormValues(eventStateWithDrafts.declaration)
-    setInitialAnnotation(actionAnnotation)
+    // Use the form values from the zustand state, so that filled form state is not lost
+    // If user e.g. enters the 'screen lock' flow while filling form.
+    // Then use form values from drafts.
+    const initialFormValues = deepMerge(
+      currentDeclaration || {},
+      eventStateWithDrafts.declaration
+    )
 
-    return () => {
-      /*
-       * When user leaves the action, remove all
-       * staged drafts the user has for this event id and type
-       */
-      setLocalDraft(null)
-    }
+    setFormValues(initialFormValues)
+
+    const initialAnnotation = deepMerge(
+      deepMerge(currentAnnotation || {}, previousActionAnnotation),
+      actionAnnotation
+    )
+
+    setAnnotation(initialAnnotation)
 
     /*
      * This is fine to only run once on mount and unmount as
@@ -148,4 +272,67 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   return <NavigationStack>{children}</NavigationStack>
 }
 
-export const DeclarationAction = withSuspense(DeclarationActionComponent)
+/**
+ * Container for Declaration Action. Interacts with router state and cache.
+ * Having all the logic in single component breaks the rules of hooks.
+ *
+ */
+function DeclarationActionContainer({
+  children,
+  actionType
+}: PropsWithChildren<{
+  actionType: AvailableActionTypes
+}>) {
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
+  const events = useEvents()
+
+  const navigate = useNavigate()
+  const { redirectToEventOverviewPage } = useToastAndRedirect()
+  const event = events.getEvent.findFromCache(eventId).data
+
+  // Missing event should not happen in "regular" application flow.
+  // 1. User clicks browser 'back' button after completing flow.
+  // 2. User comes directly through the URL to the flow.
+  useEffect(() => {
+    if (!event) {
+      // eslint-disable-next-line no-console
+      console.warn(`Event with id ${eventId} not found in cache.`)
+
+      const reduxHistoryIndex = window.history.state?.idx
+      const appHasHistory =
+        typeof reduxHistoryIndex === 'number' && reduxHistoryIndex > 0
+
+      // As long as there is a page, go back to it.
+      if (appHasHistory) {
+        navigate(-1)
+
+        return
+      }
+
+      // Technically, user can end up within <NavigationStack> from any page. At least from workqueue and overview pages.
+      redirectToEventOverviewPage({
+        toastId: `${eventId}-not-found`,
+        message: {
+          id: 'event.not.downloaded',
+          defaultMessage:
+            'Please ensure the event is first assigned and downloaded to the browser.',
+          description:
+            'Shown when user tries to perform an action on event that is not available '
+        },
+        eventId
+      })
+    }
+  }, [event, eventId, redirectToEventOverviewPage, navigate])
+
+  if (!event) {
+    return <div />
+  }
+
+  return (
+    <DeclarationActionComponent actionType={actionType} event={event}>
+      {children}
+    </DeclarationActionComponent>
+  )
+}
+
+export const DeclarationAction = withSuspense(DeclarationActionContainer)

@@ -24,6 +24,7 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { Review } from './index'
 
 const generator = testDataGenerator()
@@ -36,49 +37,59 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   ],
   transformer: { input: superjson, output: superjson }
 })
-const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
+
+const declareEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+})
+
+const declarationTrpcMsw = createDeclarationTrpcMsw(
+  tRPCMsw,
+  declareEventDocument
+)
+
+const eventId = declareEventDocument.id
 
 const meta: Meta<typeof Review> = {
-  title: 'Validate/Review/Interaction/Local Registrar',
   beforeEach: () => {
-    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
-  }
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(eventId, declareEventDocument)
+  },
+  title: 'Validate/Review/Interaction/Local Registrar',
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.localRegistrar
+      )
+
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ]
 }
 
 export default meta
 
 type Story = StoryObj<typeof Review>
 
-const eventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
-})
-
-const eventId = eventDocument.id
-
-const mockUser = {
-  id: '67bda93bfc07dee78ae558cf',
-  name: [
-    {
-      use: 'en',
-      given: ['Kalusha'],
-      family: 'Bwalya'
-    }
-  ],
-  role: 'SOCIAL_WORKER'
-}
-
-const declareEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
-})
+const mockUser = generator.user.fieldAgent().v2
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).declaration
+      formValues: getCurrentEventState(
+        declareEventDocument,
+        tennisClubMembershipEvent
+      ).declaration
     })
   },
   parameters: {
@@ -97,12 +108,15 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
           tRPCMsw.user.list.query(() => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -111,9 +125,14 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based on content', async () => {
       const canvas = within(canvasElement)
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Register' })
-      )
+      await waitFor(async () => {
+        const registerButton = await canvas.findByRole('button', {
+          name: 'Register'
+        })
+
+        await expect(registerButton).toBeEnabled()
+        await userEvent.click(registerButton)
+      })
 
       const modal = within(await canvas.findByRole('dialog'))
 
@@ -125,7 +144,9 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     })
 
     await step('Confirm action triggers scope based actions', async () => {
-      await within(canvasElement).findByText('All events')
+      const searchResult =
+        await within(canvasElement).findByTestId('search-result')
+      await within(searchResult).findAllByText('All events')
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
@@ -159,12 +180,15 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
           tRPCMsw.user.list.query(() => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -177,52 +201,75 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
       const rejectButton = await canvas.findByRole('button', {
         name: 'Reject'
       })
+
+      await expect(rejectButton).toBeVisible()
       await userEvent.click(rejectButton)
+
+      // Wait explicitly for dialog to appear
+      await waitFor(async () =>
+        expect(canvas.getByRole('dialog')).toBeInTheDocument()
+      )
     })
 
-    const modal = within(await canvas.findByRole('dialog'))
-
     await step('Archive is disabled', async () => {
-      const archiveButton = await modal.findByRole('button', {
-        name: 'Archive'
-      })
+      const modal = within(canvas.getByRole('dialog'))
 
-      await expect(archiveButton).toBeDisabled()
+      await waitFor(async () => {
+        const archiveButton = modal.getByRole('button', { name: 'Archive' })
+        await expect(archiveButton).toBeDisabled()
+      })
     })
 
     await step('Add description', async () => {
-      const descriptionInput = await modal.findByRole('textbox')
+      const modal = within(canvas.getByRole('dialog'))
 
-      await fireEvent.change(descriptionInput, {
-        target: { value: 'Wrong data' }
-      })
+      await waitFor(async () =>
+        expect(modal.getByRole('textbox')).toBeInTheDocument()
+      )
+
+      const descriptionInput = modal.getByRole('textbox')
+      await userEvent.clear(descriptionInput)
+      await userEvent.type(descriptionInput, 'Wrong data')
     })
 
     await step('Archive is not disabled', async () => {
-      const archiveButton = await modal.findByRole('button', {
-        name: 'Archive'
-      })
+      const modal = within(canvas.getByRole('dialog'))
 
-      await expect(archiveButton).not.toBeDisabled()
+      await waitFor(async () => {
+        const archiveButton = modal.getByRole('button', { name: 'Archive' })
+        await expect(archiveButton).toBeEnabled()
+      })
     })
 
     await step('Mark as a duplicate', async () => {
-      const markAsDuplicateCheckbox = await modal.findByRole('checkbox', {
+      const modal = within(canvas.getByRole('dialog'))
+
+      await waitFor(async () =>
+        expect(
+          modal.getByRole('checkbox', { name: 'Mark as a duplicate' })
+        ).toBeInTheDocument()
+      )
+
+      const checkbox = modal.getByRole('checkbox', {
         name: 'Mark as a duplicate'
       })
-
-      await userEvent.click(markAsDuplicateCheckbox)
+      await userEvent.click(checkbox)
     })
 
-    await step('Archive is not disabled', async () => {
-      const archiveButton = await modal.findByRole('button', {
-        name: 'Archive'
+    await step('Archive is not disabled (after duplicate)', async () => {
+      const modal = within(canvas.getByRole('dialog'))
+
+      await waitFor(async () => {
+        const archiveButton = modal.getByRole('button', { name: 'Archive' })
+        await expect(archiveButton).toBeEnabled()
       })
 
-      await expect(archiveButton).not.toBeDisabled()
-
+      const archiveButton = modal.getByRole('button', { name: 'Archive' })
       await userEvent.click(archiveButton)
-      await within(canvasElement).findByText('All events')
+
+      const searchResult =
+        await within(canvasElement).findByTestId('search-result')
+      await within(searchResult).findAllByText('All events')
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
@@ -255,12 +302,15 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.localRegistrar().v1
               }
             })
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -273,12 +323,18 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
       const rejectButton = await canvas.findByRole('button', {
         name: 'Reject'
       })
+
+      await expect(rejectButton).toBeVisible()
       await userEvent.click(rejectButton)
+
+      // Wait explicitly for dialog to appear
+      await waitFor(async () =>
+        expect(canvas.getByRole('dialog')).toBeInTheDocument()
+      )
     })
 
-    const modal = within(await canvas.findByRole('dialog'))
-
     await step('Send For Update is disabled', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const sendForUpdateButton = await modal.findByRole('button', {
         name: 'Send For Update'
       })
@@ -287,6 +343,7 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
     })
 
     await step('Add description', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const descriptionInput = await modal.findByRole('textbox')
 
       await fireEvent.change(descriptionInput, {
@@ -295,6 +352,7 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
     })
 
     await step('Send For Update is not disabled', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const sendForUpdateButton = await modal.findByRole('button', {
         name: 'Send For Update'
       })
@@ -303,14 +361,22 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
     })
 
     await step('Mark as a duplicate', async () => {
-      const markAsDuplicateCheckbox = await modal.findByRole('checkbox', {
+      const modal = within(canvas.getByRole('dialog'))
+
+      await waitFor(async () =>
+        expect(
+          modal.getByRole('checkbox', { name: 'Mark as a duplicate' })
+        ).toBeInTheDocument()
+      )
+
+      const checkbox = modal.getByRole('checkbox', {
         name: 'Mark as a duplicate'
       })
-
-      await userEvent.click(markAsDuplicateCheckbox)
+      await userEvent.click(checkbox)
     })
 
     await step('Send For Update is disabled', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const sendForUpdateButton = await modal.findByRole('button', {
         name: 'Send For Update'
       })
@@ -319,6 +385,7 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
     })
 
     await step('Unmark as a duplicate', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const markAsDuplicateCheckbox = await modal.findByRole('checkbox', {
         name: 'Mark as a duplicate'
       })
@@ -327,6 +394,7 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
     })
 
     await step('Send For Update is not disabled', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const sendForUpdateButton = await modal.findByRole('button', {
         name: 'Send For Update'
       })
@@ -334,7 +402,9 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
       await expect(sendForUpdateButton).not.toBeDisabled()
 
       await userEvent.click(sendForUpdateButton)
-      await within(canvasElement).findByText('All events')
+      const searchResult =
+        await within(canvasElement).findByTestId('search-result')
+      await within(searchResult).findAllByText('All events')
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({

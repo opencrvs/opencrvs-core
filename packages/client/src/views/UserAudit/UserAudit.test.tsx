@@ -62,11 +62,11 @@ const mockAuditedUserGqlResponse = {
           value: '1014881922'
         },
         role: {
-          id: 'SOCIAL_WORKER',
+          id: 'HOSPITAL_CLERK',
           label: {
-            id: 'userRole.socialWorker',
-            defaultMessage: 'Social Worker',
-            description: 'Name for user role Social Worker',
+            id: 'userRole.hospitalClerk',
+            defaultMessage: 'Hospital Clerk',
+            description: 'Name for user role Hospital Clerk',
             __typename: 'I18nMessage'
           },
           __typename: 'UserRole'

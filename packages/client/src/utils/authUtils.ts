@@ -12,14 +12,7 @@ import decode from 'jwt-decode'
 import * as Sentry from '@sentry/react'
 import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
-import { Scope } from '@opencrvs/commons/client'
-
-export interface ITokenPayload {
-  sub: string
-  exp: string
-  algorithm: string
-  scope: Scope[]
-}
+import { ITokenPayload } from '@opencrvs/commons/client'
 
 export const isTokenStillValid = (decoded: ITokenPayload) => {
   return Number(decoded.exp) * 1000 > Date.now()
@@ -34,11 +27,11 @@ export function storeToken(token: string) {
   localStorage.setItem('opencrvs', token)
 }
 
-export function removeToken() {
+export async function removeToken() {
   const token = getToken()
   if (token) {
     try {
-      authApi.invalidateToken(token)
+      await authApi.invalidateToken(token)
     } catch (err) {
       Sentry.captureException(err)
     }
@@ -70,7 +63,8 @@ function isTokenAboutToExpire(token: string) {
 export async function refreshToken() {
   const token = getToken()
   if (isTokenAboutToExpire(token)) {
-    const res = await fetch(`${window.config.AUTH_URL}/refreshToken`, {
+    const refreshUrl = new URL('refreshToken', window.config.AUTH_URL)
+    const res = await fetch(refreshUrl.toString(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

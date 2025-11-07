@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/config",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "description": "OpenCRVS public configuration microservice",
   "license": "MPL-2.0",
   "scripts": {
@@ -12,13 +12,12 @@
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "test:compilation": "tsc --noEmit",
     "build": "tsc && copyfiles 'src/**/*.json' build/dist",
-    "build:clean": "rm -rf build",
-    "extract:translations": "bash extract-translations.sh"
+    "build:clean": "rm -rf build"
   },
   "dependencies": {
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.2.1",
-    "@opencrvs/commons": "^1.7.0",
+    "@opencrvs/commons": "^1.9.0",
     "cross-env": "^7.0.0",
     "envalid": "^8.0.0",
     "fast-csv": "^4.3.6",

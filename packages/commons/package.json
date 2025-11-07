@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/commons",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "description": "OpenCRVS common modules and utils",
   "license": "MPL-2.0",
   "main": "./build/dist/common/index.js",
@@ -14,20 +14,53 @@
     "./fixtures": "./build/dist/common/fixtures.js",
     "./assignment": "./build/dist/common/assignment.js",
     "./client": "./build/dist/esm/client.js",
-    "./events": "./build/dist/common/events/index.js"
+    "./events": "./build/dist/common/events/index.js",
+    "./events/deduplication": "./build/dist/common/events/deduplication.js"
   },
   "scripts": {
     "start": "yarn build:watch",
     "test": "yarn test:compilation && jest",
     "test:watch": "jest --watch",
-    "test:compilation": "tsc --noEmit",
+    "test:compilation": "wireit",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "postinstall": "yarn build",
-    "build:default": "tsc --project tsconfig.build.json",
-    "build:esm": "tsc --project tsconfig.esm.build.json",
-    "build": "yarn build:default && yarn build:esm",
-    "build:watch": "concurrently \"tsc --watch --project tsconfig.build.json\" \"tsc --watch --project tsconfig.esm.build.json\"",
-    "build:clean": "rm -rf build"
+    "build": "wireit",
+    "build:watch": "yarn build --watch",
+    "build:clean": "rm -rf build && rm -rf ./.wireit"
+  },
+  "wireit": {
+    "build": {
+      "command": "yarn tsc -b tsconfig.build.json --pretty",
+      "clean": "if-file-deleted",
+      "files": [
+        "src/**/*.ts",
+        "!src/**/*.test.ts",
+        "tsconfig-esm.json",
+        "tsconfig-commonjs.json",
+        "tsconfig.build.json"
+      ],
+      "output": [
+        "build/dist/common/**",
+        "build/dist/tsconfig-commonjs.tsbuildinfo",
+        "build/dist/esm/**",
+        "build/dist/tsconfig-esm.tsbuildinfo"
+      ]
+    },
+    "test:compilation": {
+      "command": "yarn tsc -b --pretty",
+      "clean": "if-file-deleted",
+      "files": [
+        "src/**/*.test.ts",
+        "tsconfig-commonjs.json",
+        "tsconfig.json"
+      ],
+      "output": [
+        "build/dist/common/**",
+        "build/dist/tsconfig-commonjs.tsbuildinfo",
+        "build/dist/tests/**",
+        "build/dist/tsconfig-tests.tsbuildinfo"
+      ]
+    }
   },
   "private": true,
   "dependencies": {
@@ -47,13 +80,18 @@
     "jwt-decode": "^3.0.0",
     "lodash": "^4.17.10",
     "node-fetch": "^2.6.7",
+    "object-hash": "^3.0.0",
     "pino": "^7.0.0",
     "pkg-up": "^3.1.0",
     "typescript": "5.6.3",
     "uuid": "^9.0.0",
-    "zod": "^3.23.8"
+    "wireit": "^0.14.12",
+    "zod": "^3.23.8",
+    "zod-openapi": "^4.2.4"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/object-hash": "^3.0.6",
     "@typescript-eslint/eslint-plugin": "8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "eslint": "^9.23.0",
@@ -62,6 +100,7 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.5",
     "jest-fetch-mock": "^2.1.2",
+    "jsonwebtoken": "^9.0.2",
     "pino-pretty": "^11.0.0",
     "ts-jest": "29.2.5"
   },
@@ -73,7 +112,13 @@
   },
   "jest": {
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig-tests.json",
+          "isolatedModules": true
+        }
+      ]
     },
     "coverageReporters": [
       "json",

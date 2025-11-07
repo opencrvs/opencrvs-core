@@ -37,7 +37,8 @@ import {
 } from '@client/views/OfficeHome/LoadingIndicator'
 import {
   GetUserAuditLogQuery,
-  UserAuditLogResultItem
+  UserAuditLogResultItem,
+  UserAuditLogResultSet
 } from '@client/utils/gateway'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import format from '@client/utils/date-formatting'
@@ -48,6 +49,9 @@ import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
 import { useNavigate } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'
+import { config } from '@client/config'
+import { ROUTES } from '@client/v2-events/routes'
+import { UUID } from '@opencrvs/commons/client'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -106,7 +110,7 @@ type State = {
   actionDetailsData: UserAuditLogResultItem | null
 }
 
-const isUserAuditItemWithDeclarationDetials = (
+const isUserAuditItemWithDeclarationDetails = (
   item: GQLUserAuditLogResultItem
 ): item is GQLUserAuditLogItemWithComposition => {
   return 'data' in item
@@ -198,6 +202,10 @@ function UserAuditHistoryComponent(props: Props) {
   }
 
   function getIpAdress(auditLog: UserAuditLogResultItem) {
+    if (!auditLog.userAgent) {
+      return auditLog.ipAddress || '-'
+    }
+
     const device = Bowser.getParser(auditLog.userAgent).getResult()
 
     return (
@@ -218,7 +226,7 @@ function UserAuditHistoryComponent(props: Props) {
     return actionDescriptor ? props.intl.formatMessage(actionDescriptor) : ''
   }
 
-  function getAuditData(data: GQLUserAuditLogResultSet) {
+  function getAuditData(data: UserAuditLogResultSet) {
     const auditList = data.results.map((userAuditItem) => {
       if (userAuditItem === null) {
         return {}
@@ -226,7 +234,7 @@ function UserAuditHistoryComponent(props: Props) {
       const actionMessage = getActionMessage(userAuditItem)
 
       return {
-        actionDescription: !isUserAuditItemWithDeclarationDetials(
+        actionDescription: !isUserAuditItemWithDeclarationDetails(
           userAuditItem
         ) ? (
           <Link
@@ -252,7 +260,7 @@ function UserAuditHistoryComponent(props: Props) {
         ),
 
         actionDescriptionWithAuditTime:
-          isUserAuditItemWithDeclarationDetials(userAuditItem) === undefined ? (
+          isUserAuditItemWithDeclarationDetails(userAuditItem) === undefined ? (
             <Link
               onClick={() => {
                 toggleActionDetails(userAuditItem)
@@ -272,27 +280,35 @@ function UserAuditHistoryComponent(props: Props) {
             <BoldContent>{actionMessage}</BoldContent>
           ),
         trackingId:
-          isUserAuditItemWithDeclarationDetials(userAuditItem) &&
+          isUserAuditItemWithDeclarationDetails(userAuditItem) &&
           canSearchRecords ? (
             <Link
               font="bold14"
+              /** When running V2 first, it is impossible to get back and forth to legacy events. At this stage country has already migrated, or should have never used v1 alongside of v2 */
+              disabled={config.FEATURES.V2_EVENTS && !userAuditItem.isV2}
               onClick={() =>
-                navigate(
-                  formatUrl(routes.DECLARATION_RECORD_AUDIT, {
-                    tab: 'printTab',
-                    declarationId: userAuditItem.data.compositionId as string
-                  })
-                )
+                userAuditItem.isV2
+                  ? navigate(
+                      ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+                        eventId: userAuditItem.data.compositionId as UUID
+                      })
+                    )
+                  : navigate(
+                      formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                        tab: 'printTab',
+                        declarationId: userAuditItem.data.compositionId as UUID
+                      })
+                    )
               }
             >
               {userAuditItem.data.trackingId}
             </Link>
-          ) : isUserAuditItemWithDeclarationDetials(userAuditItem) ? (
+          ) : isUserAuditItemWithDeclarationDetails(userAuditItem) ? (
             <AuditContent>{userAuditItem.data.trackingId}</AuditContent>
           ) : null,
 
         deviceIpAddress: getIpAdress(userAuditItem),
-        trackingIdString: isUserAuditItemWithDeclarationDetials(userAuditItem)
+        trackingIdString: isUserAuditItemWithDeclarationDetails(userAuditItem)
           ? userAuditItem.data.trackingId
           : null,
         auditTime: format(
@@ -329,7 +345,6 @@ function UserAuditHistoryComponent(props: Props) {
 
   const { intl, practitionerId, theme } = props
   const { timeStart, timeEnd, currentPageNumber } = state
-  const recordCount = DEFAULT_LIST_SIZE
 
   return (
     <RecentActionsHolder id="user-audit-list">
@@ -352,7 +367,7 @@ function UserAuditHistoryComponent(props: Props) {
               query={GET_USER_AUDIT_LOG}
               variables={{
                 practitionerId: practitionerId,
-                count: recordCount,
+                count: DEFAULT_LIST_SIZE,
                 skip: DEFAULT_LIST_SIZE * (currentPageNumber - 1),
                 timeStart: timeStart,
                 timeEnd: timeEnd

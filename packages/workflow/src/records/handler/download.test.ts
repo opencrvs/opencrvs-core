@@ -86,4 +86,46 @@ describe('download record endpoint', () => {
     expect(!!isDownloaded).toBe(true)
     expect(res.statusCode).toBe(200)
   })
+
+  it('skips assignment phase when token has RECORD_EXPORT scope', async () => {
+    const token = jwt.sign(
+      { scope: ['record.export'] },
+      readFileSync('./test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+
+    // Fetches a record from search
+    mswServer.use(
+      rest.get(
+        'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
+        (_, res, ctx) => {
+          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
+        }
+      )
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/download-record',
+      payload: {
+        id: '3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    // Since assignment phase is skipped for RECORD_EXPORT scope,
+    // the download extension should NOT be present
+    const isDownloaded = checkForDownloadExtenstion(
+      getTaskFromSavedBundle(JSON.parse(res.payload))
+    )
+
+    expect(!!isDownloaded).toBe(false)
+    expect(res.statusCode).toBe(200)
+  })
 })

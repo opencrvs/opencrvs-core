@@ -9,13 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { logger, isBase64FileString } from '@opencrvs/commons'
+import {
+  logger,
+  isBase64FileString,
+  triggerUserEventNotification,
+  personNameFromV1ToV2
+} from '@opencrvs/commons'
 import {
   Practitioner,
   findExtension,
   OPENCRVS_SPECIFICATION_URL
 } from '@opencrvs/commons/types'
-import { SCOPES } from '@opencrvs/commons/authentication'
+import { findScope, getScopes, SCOPES } from '@opencrvs/commons/authentication'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import {
   createFhirPractitioner,
@@ -24,12 +29,13 @@ import {
   getFromFhir,
   postFhir,
   rollbackUpdateUser,
-  sendUpdateUsernameNotification,
   uploadSignatureToMinio
 } from '@user-mgnt/features/createUser/service'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
 import { getUserId } from '@user-mgnt/utils/userUtils'
 import * as _ from 'lodash'
+import { COUNTRY_CONFIG_URL } from '@user-mgnt/constants'
+import { unauthorized } from '@hapi/boom'
 
 export default async function updateUser(
   request: Hapi.Request,
@@ -42,6 +48,13 @@ export default async function updateUser(
   if (!existingUser) {
     throw new Error(`No user found by given id: ${user.id}`)
   }
+  const scopes = getScopes(request.headers.authorization)
+  const editableRoleIds = findScope(scopes, 'user.edit')?.options?.role
+
+  if (Array.isArray(editableRoleIds) && !editableRoleIds.includes(user.role)) {
+    throw unauthorized()
+  }
+
   const existingPractitioner = (await getFromFhir(
     token,
     `/Practitioner/${existingUser.practitionerId}`
@@ -125,8 +138,10 @@ export default async function updateUser(
   }
   // Updating user in user-mgnt db
   let userNameChanged = false
+  const oldUsername = existingUser.username
+  let newUserName = existingUser.username
   try {
-    const newUserName = await generateUsername(
+    newUserName = await generateUsername(
       existingUser.name,
       existingUser.username
     )
@@ -158,15 +173,20 @@ export default async function updateUser(
   }
 
   if (userNameChanged) {
-    sendUpdateUsernameNotification(
-      user.name,
-      existingUser.username,
-      {
-        Authorization: request.headers.authorization
+    triggerUserEventNotification({
+      event: 'user-updated',
+      payload: {
+        recipient: {
+          name: personNameFromV1ToV2(user.name),
+          email: user.emailForNotification,
+          mobile: user.mobile
+        },
+        oldUsername,
+        newUsername: newUserName
       },
-      user.mobile,
-      user.emailForNotification
-    )
+      countryConfigUrl: COUNTRY_CONFIG_URL,
+      authHeader: { Authorization: request.headers.authorization }
+    })
   }
   const resUser = _.omit(existingUser, ['passwordHash', 'salt'])
 

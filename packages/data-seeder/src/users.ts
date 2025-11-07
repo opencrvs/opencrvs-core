@@ -14,31 +14,55 @@ import { z } from 'zod'
 import { parseGQLResponse, raise, delay } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
-import { joinURL } from '@opencrvs/commons'
-import { parseScope } from '@opencrvs/commons/authentication'
+import { EventConfig, joinUrl } from '@opencrvs/commons'
+import {
+  parseLiteralScope,
+  parseConfigurableScope
+} from '@opencrvs/commons/authentication'
 import { fromZodError } from 'zod-validation-error'
 
 const MAX_RETRY = 5
 const RETRY_DELAY_IN_MILLISECONDS = 5000
 
-const RoleSchema = z.array(
-  z.object({
-    id: z.string(),
-    label: z.object({
-      defaultMessage: z.string(),
-      description: z.string(),
-      id: z.string()
-    }),
-    scopes: z.array(
-      z.string().refine(
-        (scope) => Boolean(parseScope(scope)),
-        (invalidScope) => ({
-          message: `invalid scope "${invalidScope}" found\n`
+const RoleSchema = (eventIds: string[]) =>
+  z.array(
+    z.object({
+      id: z.string(),
+      label: z.object({
+        defaultMessage: z.string(),
+        description: z.string(),
+        id: z.string()
+      }),
+      scopes: z.array(
+        z.string().superRefine((scope, ctx) => {
+          const parsedConfigurableScope = parseConfigurableScope(scope)
+          const parsedLiteralScope = parseLiteralScope(scope)
+
+          if (!parsedConfigurableScope && !parsedLiteralScope) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Invalid scope: "${scope}"`
+            })
+            return
+          }
+
+          if (parsedConfigurableScope?.type === 'search') {
+            const options = parsedConfigurableScope.options
+            const invalidEventIds = options.event.filter(
+              (id) => !eventIds.includes(id)
+            )
+
+            if (invalidEventIds.length > 0) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
+              })
+            }
+          }
         })
       )
-    )
-  })
-)
+    })
+  )
 
 const WithoutContact = z.object({
   primaryOfficeId: z.string(),
@@ -102,13 +126,27 @@ async function getUsers(token: string) {
 
   const userRoles = parsedUsers.data.map((user) => user.role)
 
-  const rolesUrl = joinURL(env.COUNTRY_CONFIG_HOST, 'roles')
+  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'roles')
+  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'events')
 
-  const rolesResponse = await fetch(rolesUrl)
+  const [rolesResponse, eventsResponse] = await Promise.all([
+    fetch(rolesUrl),
+    fetch(eventsUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+  ])
 
   if (!rolesResponse.ok) raise(`Error fetching roles: ${rolesResponse.status}`)
+  if (!eventsResponse.ok)
+    raise(`Error fetching events: ${eventsResponse.status}`)
 
-  const parsedRoles = RoleSchema.safeParse(await rolesResponse.json())
+  const eventsConfig = (await eventsResponse.json()) as EventConfig[]
+  const eventIds = eventsConfig.map((event) => event.id)
+
+  const parsedRoles = RoleSchema(eventIds).safeParse(await rolesResponse.json())
 
   if (!parsedRoles.success) {
     raise(
@@ -129,6 +167,21 @@ async function getUsers(token: string) {
       raise(`Role with id ${userRole} is not found in roles.ts file`)
     if (currRole.scopes.includes(configScope))
       isConfigUpdateAllScopeAvailable = true
+  }
+
+  const seen = new Set<string>()
+  const duplicates: string[] = []
+
+  for (const role of allRoles) {
+    if (seen.has(role.id)) {
+      duplicates.push(role.id)
+    } else {
+      seen.add(role.id)
+    }
+  }
+
+  if (duplicates.length > 0) {
+    raise(`Duplicate role ids found: ${duplicates.join(', ')}`)
   }
 
   if (!isConfigUpdateAllScopeAvailable) {

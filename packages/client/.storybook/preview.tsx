@@ -21,7 +21,7 @@ import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useApolloClient } from '@client/utils/apolloClient'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
-import { Provider } from 'react-redux'
+import { Provider, useSelector } from 'react-redux'
 import {
   createMemoryRouter,
   Outlet,
@@ -32,6 +32,27 @@ import { ThemeProvider } from 'styled-components'
 import WebFont from 'webfontloader'
 import { handlers } from './default-request-handlers'
 import { NavigationHistoryProvider } from '@client/v2-events/components/NavigationStack'
+import {
+  addUserToQueryData,
+  setEventData,
+  addLocalEventConfig,
+  setDraftData
+} from '@client/v2-events/features/events/useEvents/api'
+import {
+  Draft,
+  EventDocument,
+  tennisClubMembershipEvent,
+  TestUserRole,
+  TokenUserType,
+  UUID
+} from '@opencrvs/commons/client'
+import {
+  tennisClubMembershipEventDocument,
+  tennisClubMembershipEventWithCorrectionRequest
+} from '@client/v2-events/features/events/fixtures'
+import { EventConfig } from '@opencrvs/commons/client'
+import { getUserDetails } from '@client/profile/profileSelectors'
+
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
@@ -55,13 +76,20 @@ initialize({
   }
 })
 
-const { store } = createStore()
-
 type WrapperProps = PropsWithChildren<{
   store: ReturnType<typeof createStore>['store']
   initialPath: string
   router?: RouteObject
 }>
+
+function WaitForUserDetails({ children }: PropsWithChildren<{}>) {
+  const currentUser = useSelector(getUserDetails)
+
+  if (!currentUser) {
+    return null
+  }
+  return children
+}
 
 function Wrapper({ store, router, initialPath, children }: WrapperProps) {
   const { client } = useApolloClient(store)
@@ -80,7 +108,9 @@ function Wrapper({ store, router, initialPath, children }: WrapperProps) {
                       element: (
                         <Page>
                           <NavigationHistoryProvider>
-                            <Outlet />
+                            <WaitForUserDetails>
+                              <Outlet />
+                            </WaitForUserDetails>
                           </NavigationHistoryProvider>
                         </Page>
                       ),
@@ -107,8 +137,28 @@ function Wrapper({ store, router, initialPath, children }: WrapperProps) {
 
 export const parameters = {
   layout: 'fullscreen',
+  mockingDate: new Date(2025, 7, 12),
   msw: {
-    handlers: handlers
+    handlers
+  },
+  viewport: {
+    viewports: {
+      mobile: {
+        name: 'Mobile',
+        styles: {
+          width: '375px',
+          height: '667px'
+        }
+      },
+      tablet: {
+        name: 'Tablet',
+        styles: {
+          width: '768px',
+          height: '1024px'
+        }
+      }
+    },
+    defaultViewport: 'responsive'
   }
 }
 
@@ -127,15 +177,119 @@ async function clearStorage() {
 clearStorage()
 
 const preview: Preview = {
-  loaders: [mswLoader],
-  beforeEach: async () => {
-    await clearStorage()
-    queryClient.clear()
+  loaders: [
+    mswLoader,
+    (options) => {
+      const mockingDate = options.parameters?.mockingDate
+      if (mockingDate) {
+        const OriginalDate = Date
+        global.Date = class extends OriginalDate {
+          constructor(...args: Parameters<typeof OriginalDate>) {
+            if (args.length === 0) {
+              super(mockingDate)
+            } else {
+              super(...args)
+            }
+          }
 
-    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
-  },
+          static now() {
+            return mockingDate.getTime()
+          }
+        } as DateConstructor
+      }
+    },
+    async (options) => {
+      await clearStorage()
+      queryClient.clear()
+      const primaryOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
+
+      if (options.parameters.userRole === TestUserRole.Enum.FIELD_AGENT) {
+        window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+        addUserToQueryData(generator.user.fieldAgent().v2)
+      } else if (
+        options.parameters.userRole === TestUserRole.Enum.REGISTRATION_AGENT
+      ) {
+        window.localStorage.setItem(
+          'opencrvs',
+          generator.user.token.registrationAgent
+        )
+
+        addUserToQueryData(generator.user.registrationAgent().v2)
+      } else if (
+        options.parameters.userRole === TestUserRole.Enum.LOCAL_SYSTEM_ADMIN
+      ) {
+        window.localStorage.setItem(
+          'opencrvs',
+          generator.user.token.localSystemAdmin
+        )
+
+        addUserToQueryData({
+          id: generator.user.id.localSystemAdmin,
+          name: [{ use: 'en', given: ['Alex'], family: 'Ngonga' }],
+          role: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN,
+          primaryOfficeId,
+          type: TokenUserType.enum.user
+        })
+      } else if (
+        options.parameters.userRole === TestUserRole.Enum.NATIONAL_SYSTEM_ADMIN
+      ) {
+        window.localStorage.setItem(
+          'opencrvs',
+          generator.user.token.nationalSystemAdmin
+        )
+
+        addUserToQueryData(generator.user.nationalSystemAdmin().v2)
+      } else {
+        window.localStorage.setItem(
+          'opencrvs',
+          generator.user.token.localRegistrar
+        )
+
+        addUserToQueryData(generator.user.localRegistrar().v2)
+      }
+
+      /*
+       * OFFLINE DATA INITIALISATION
+       * Ensure the default record is "downloaded offline" in the user's browser
+       * and that users cache has the user. This creates a situation identical to
+       * when the user has assigned & downloaded a record
+       *
+       * If configs are not set explicitly, the default tennis club membership event
+       * If events are not set explicitly, the default tennis club membership event document
+       *
+       */
+
+      const offlineConfigs: Array<EventConfig> = options.parameters?.offline
+        ?.configs ?? [tennisClubMembershipEvent]
+
+      offlineConfigs.forEach((config) => {
+        addLocalEventConfig(config)
+      })
+
+      const offlineEvents: Array<EventDocument> = options.parameters?.offline
+        ?.events ?? [
+        tennisClubMembershipEventDocument,
+        tennisClubMembershipEventWithCorrectionRequest
+      ]
+
+      offlineEvents.forEach((event) => {
+        setEventData(event.id, event)
+      })
+
+      if (options.parameters?.offline?.drafts) {
+        const offlineDrafts: Array<Draft> = options.parameters.offline.drafts
+        setDraftData(() => offlineDrafts)
+      }
+
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   decorators: [
     (Story, context) => {
+      const { store } = createStore()
+
       return (
         <Wrapper
           store={store}

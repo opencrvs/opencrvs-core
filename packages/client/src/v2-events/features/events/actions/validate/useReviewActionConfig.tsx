@@ -13,66 +13,96 @@ import { v4 as uuid } from 'uuid'
 import {
   EventState,
   DeclarationFormConfig,
-  Scope,
-  SCOPES,
-  FieldConfig
+  FieldConfig,
+  EventStatus,
+  ActionType,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { reviewMessages } from '@client/v2-events/features/events/actions/messages'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 
 export function useReviewActionConfig({
   formConfig,
   declaration,
   annotation,
   reviewFields,
-  scopes
+  status,
+  eventType,
+  validatorContext
 }: {
   formConfig: DeclarationFormConfig
   declaration: EventState
   annotation?: EventState
   reviewFields: FieldConfig[]
-  scopes?: Scope[]
+  status: EventStatus
+  eventType: string
+  validatorContext: ValidatorContext
 }) {
   const events = useEvents()
+
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
     form: declaration,
     annotation,
-    reviewFields
+    reviewFields,
+    context: validatorContext
   })
 
-  if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
+  const { isActionAllowed } = useUserAllowedActions(eventType)
+
+  if (isActionAllowed(ActionType.REGISTER)) {
     return {
       buttonType: 'positive' as const,
       incomplete,
-      onConfirm: (eventId: string) =>
-        events.customActions.registerOnValidate.mutate({
+      onConfirm: (eventId: string) => {
+        if (status === EventStatus.Enum.NOTIFIED) {
+          return events.customActions.registerOnDeclare.mutate({
+            eventId,
+            declaration,
+            transactionId: uuid(),
+            annotation
+          })
+        }
+        return events.customActions.registerOnValidate.mutate({
           eventId,
           declaration,
+          transactionId: uuid(),
           annotation
-        }),
+        })
+      },
       messages: incomplete
         ? reviewMessages.incomplete.register
-        : reviewMessages.complete.register
+        : reviewMessages.complete.register,
+      icon: 'PaperPlaneTilt'
     } as const
   }
 
-  if (scopes?.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL)) {
+  if (isActionAllowed(ActionType.VALIDATE)) {
     return {
       buttonType: 'positive' as const,
       incomplete,
-      onConfirm: (eventId: string) =>
-        events.actions.validate.mutate({
+      onConfirm: (eventId: string) => {
+        if (status === EventStatus.Enum.NOTIFIED) {
+          return events.customActions.validateOnDeclare.mutate({
+            eventId,
+            declaration,
+            annotation,
+            transactionId: uuid()
+          })
+        }
+        return events.actions.validate.mutate({
           eventId,
           declaration,
           annotation,
-          transactionId: uuid(),
-          duplicates: []
-        }),
+          transactionId: uuid()
+        })
+      },
       messages: incomplete
         ? reviewMessages.incomplete.validate
-        : reviewMessages.complete.validate
+        : reviewMessages.complete.validate,
+      icon: 'PaperPlaneTilt'
     } as const
   }
 

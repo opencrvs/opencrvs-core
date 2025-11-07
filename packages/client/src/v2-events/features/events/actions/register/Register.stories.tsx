@@ -11,13 +11,34 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import {
+  ActionType,
+  generateEventDocument,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { AppRouter } from '@client/v2-events/trpc'
+import { addLocalEventConfig, setEventData } from '../../useEvents/api'
 import * as Request from './index'
 
+const validatedDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    { type: ActionType.CREATE },
+    { type: ActionType.DECLARE },
+    { type: ActionType.VALIDATE }
+  ]
+})
+
 const meta: Meta<typeof Request.Pages> = {
-  title: 'Register'
+  title: 'Register',
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(validatedDocument.id, validatedDocument)
+  }
 }
 
 export default meta
@@ -37,7 +58,7 @@ export const Page: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath({
-        eventId: tennisClubMembershipEventDocument.id,
+        eventId: validatedDocument.id,
         pageId: 'applicant'
       })
     },
@@ -45,7 +66,13 @@ export const Page: Story = {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
+            return validatedDocument
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [],
+              total: 0
+            }
           })
         ]
       }
@@ -57,14 +84,20 @@ export const Review: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
+        eventId: validatedDocument.id
       })
     },
     msw: {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
+            return validatedDocument
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [],
+              total: 0
+            }
           })
         ]
       }

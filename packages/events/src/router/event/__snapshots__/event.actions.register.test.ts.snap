@@ -10,10 +10,12 @@ exports[`Request and confirmation flow > Asynchronous confirmation flow > Reject
 
 exports[`Request and confirmation flow > Asynchronous confirmation flow > Rejecting > should not be able to reject the action if action is not first requested 1`] = `[TRPCError: Action not found.]`;
 
-exports[`Request and confirmation flow > Synchronous confirmation flow > should not save action if notify API returns HTTP 500 1`] = `[TRPCError: Unexpected failure from notification API]`;
+exports[`Request and confirmation flow > Synchronous confirmation flow > should not save Accepted / Rejected action if notify API returns HTTP 500 1`] = `[TRPCError: Unexpected failure from country config action confirmation API]`;
 
-exports[`Request and confirmation flow > Synchronous confirmation flow > should not save action if notify API returns invalid registration number 1`] = `[TRPCError: Invalid payload received from notification API]`;
+exports[`Request and confirmation flow > Synchronous confirmation flow > should not save action if notify API returns invalid registration number 1`] = `[TRPCError: Invalid payload received from country config action confirmation API]`;
 
 exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-02"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"}]]`;
+
+exports[`can not register an event that is not first declared and validated 1`] = `[TRPCError: Action 'REGISTER' cannot be performed on an event in 'CREATED' state with [] flags. Available actions: READ, DECLARE, NOTIFY, DELETE.]`;
 
 exports[`when mandatory field is invalid, conditional hidden fields are still skipped 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-1-2024"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-1-2024"}]]`;

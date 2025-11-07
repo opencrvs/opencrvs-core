@@ -11,7 +11,7 @@
 
 // @TODO: Unify this file with @search/src/elasticsearch/dbhelper.ts
 import { Client } from '@elastic/elasticsearch'
-import { SearchDocument } from '@opencrvs/commons/types'
+import { SearchDocument } from '@opencrvs/commons'
 
 const ES_HOST = process.env.ES_HOST || 'localhost:9200'
 const ELASTICSEARCH_INDEX_NAME = process.env.ELASTICSEARCH_INDEX_NAME || 'ocrvs'

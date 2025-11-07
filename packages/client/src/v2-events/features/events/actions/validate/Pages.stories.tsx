@@ -11,9 +11,12 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  generateEventDocument,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { AppRouter } from '@client/v2-events/trpc'
 import * as Validate from './index'
 
@@ -33,12 +36,20 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const declaredDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
+})
+
 export const Page: Story = {
   parameters: {
+    offline: {
+      events: [declaredDocument]
+    },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.VALIDATE.PAGES.buildPath({
-        eventId: tennisClubMembershipEventDocument.id,
+        eventId: declaredDocument.id,
         pageId: 'applicant'
       })
     },
@@ -46,10 +57,16 @@ export const Page: Story = {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
+            return declaredDocument
           }),
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [],
+              total: 0
+            }
           })
         ]
       }

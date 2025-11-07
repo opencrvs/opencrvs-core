@@ -766,7 +766,7 @@ describe('when in device of large viewport', () => {
 
     it('renders only fields with values', () => {
       const addressList = reviewSectionComponent.find({
-        'data-test-id': 'row-value-TestAddress'
+        'data-testid': 'row-value-TestAddress'
       })
 
       const innerHtml = addressList

@@ -103,24 +103,6 @@ const router = {
   ]
 }
 
-export const NavigationStackBack: StoryObj<typeof NavigationStack> = {
-  name: 'Prevents user from navigating back to the stack',
-  parameters: {
-    reactRouter: {
-      router,
-      initialPath: '/home'
-    }
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByTestId('wizard'))
-    await userEvent.click(await canvas.findByTestId('next'))
-    await userEvent.click(await canvas.findByTestId('next'))
-    await userEvent.click(await canvas.findByTestId('submit'))
-    await userEvent.click(await canvas.findByTestId('back'))
-    await expect(canvas.queryByTestId('submit')).not.toBeInTheDocument()
-  }
-}
 export const NavigationStackDirect: StoryObj<typeof NavigationStack> = {
   name: 'Allows user to directly navigate to a stack view',
   parameters: {
@@ -134,6 +116,7 @@ export const NavigationStackDirect: StoryObj<typeof NavigationStack> = {
     await expect(await canvas.findByTestId('page-2')).toBeInTheDocument()
   }
 }
+
 export const NavigationStackView: StoryObj<typeof NavigationStack> = {
   name: 'Allows user to navigate backwards within the stack',
   parameters: {

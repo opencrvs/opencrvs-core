@@ -58,7 +58,7 @@ import {
   LINK_BUTTON,
   LOADER,
   PARAGRAPH,
-  QRReaderType,
+  QrReaderType,
   RADIO_GROUP,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   ReaderType,
@@ -388,6 +388,7 @@ export function getNextSectionIds(
 export const getVisibleGroupFields = (group: IFormSectionGroup) => {
   return group.fields.filter((field) => !field.hidden)
 }
+
 const getFieldOptionsSlow = (
   _sectionName: string,
   field:
@@ -847,7 +848,7 @@ function isFieldLoader(field: IFormField): field is ILoaderFormField {
   return field.type === LOADER
 }
 
-export function isReaderQR(reader: ReaderType): reader is QRReaderType {
+export function isReaderQR(reader: ReaderType): reader is QrReaderType {
   return reader.type === 'QR'
 }
 

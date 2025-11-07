@@ -21,16 +21,18 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { Review } from '@client/v2-events/features/events/components/Review'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Checkbox',
   args: { onChange: fn() },
   decorators: [
-    (Story) => (
+    (Story, context) => (
       <TRPCProvider>
-        <Story />
+        <Story {...context} />
       </TRPCProvider>
-    )
+    ),
+    withValidatorContext
   ]
 }
 
@@ -46,13 +48,14 @@ export const CheckboxInput: StoryObj<typeof FormFieldGenerator> = {
     layout: 'centered'
   },
   render: function Component(args) {
-    const [formData, setFormData] = React.useState({})
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={[
           {
             id: 'storybook.checkbox',
             type: FieldType.CHECKBOX,
+            defaultValue: false,
             label: {
               id: 'storybook.checkbox.label',
               defaultMessage: 'Is my question true?',
@@ -60,62 +63,30 @@ export const CheckboxInput: StoryObj<typeof FormFieldGenerator> = {
             }
           }
         ]}
-        form={formData}
         id="my-form"
-        setAllFieldsDirty={false}
         onChange={(data) => {
           args.onChange(data)
-          setFormData(data)
         }}
       />
     )
   }
 }
 
-export const CheckedCheckboxShouldAppearOnReview: StoryObj<typeof Review> = {
-  parameters: {
-    layout: 'center'
-  },
-  render: function Component() {
-    return (
-      <div>
-        <Review.Body
-          form={{ 'recommender.none': true }}
-          formConfig={TENNIS_CLUB_DECLARATION_FORM}
-          title="Checkbox review"
-          // eslint-disable-next-line no-console
-          onEdit={(values) => console.log(values)}
-        >
-          <div />
-        </Review.Body>
-      </div>
-    )
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-
-    await canvas.findByText(/Checkbox review?/)
-
-    await expect(canvas.queryByText('No recommender')).toBeInTheDocument()
-    await expect(
-      canvas.queryByTestId('row-value-recommender.none')
-    ).toHaveTextContent('Yes')
-  }
-}
-
-export const UncheckedCheckboxShouldNotAppearOnReview: StoryObj<typeof Review> =
+export const CheckedCheckboxShouldAppearOnReview: StoryObj<typeof Review.Body> =
   {
     parameters: {
       layout: 'center'
     },
-    render: function Component() {
+    render: function Component(args) {
       return (
         <div>
           <Review.Body
-            form={{}}
+            {...args}
+            form={{ 'recommender.none': true }}
             formConfig={TENNIS_CLUB_DECLARATION_FORM}
             title="Checkbox review"
-            onEdit={noop}
+            // eslint-disable-next-line no-console
+            onEdit={(values) => console.log(values)}
           >
             <div />
           </Review.Body>
@@ -127,8 +98,39 @@ export const UncheckedCheckboxShouldNotAppearOnReview: StoryObj<typeof Review> =
 
       await canvas.findByText(/Checkbox review?/)
 
+      await expect(canvas.queryByText('No recommender')).toBeInTheDocument()
       await expect(
-        canvas.queryByTestId('No recommender')
-      ).not.toBeInTheDocument()
+        canvas.queryByTestId('row-value-recommender.none')
+      ).toHaveTextContent('Yes')
     }
   }
+
+export const UncheckedCheckboxShouldNotAppearOnReview: StoryObj<
+  typeof Review.Body
+> = {
+  parameters: {
+    layout: 'center'
+  },
+  render: function Component(args) {
+    return (
+      <div>
+        <Review.Body
+          {...args}
+          form={{}}
+          formConfig={TENNIS_CLUB_DECLARATION_FORM}
+          title="Checkbox review"
+          onEdit={noop}
+        >
+          <div />
+        </Review.Body>
+      </div>
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await canvas.findByText(/Checkbox review?/)
+
+    await expect(canvas.queryByTestId('No recommender')).not.toBeInTheDocument()
+  }
+}

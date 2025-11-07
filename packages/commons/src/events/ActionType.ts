@@ -24,9 +24,10 @@ export const ActionType = {
   VALIDATE: 'VALIDATE',
   REGISTER: 'REGISTER',
   // Declaration system actions. Non-configurable.
-  DETECT_DUPLICATE: 'DETECT_DUPLICATE',
+  DUPLICATE_DETECTED: 'DUPLICATE_DETECTED',
   REJECT: 'REJECT', // REJECT_DECLARATION
-  MARKED_AS_DUPLICATE: 'MARKED_AS_DUPLICATE', // MARK_AS_DUPLICATE
+  MARK_AS_DUPLICATE: 'MARK_AS_DUPLICATE',
+  MARK_AS_NOT_DUPLICATE: 'MARK_AS_NOT_DUPLICATE',
   ARCHIVE: 'ARCHIVE',
   // Record actions
   PRINT_CERTIFICATE: 'PRINT_CERTIFICATE',
@@ -38,6 +39,7 @@ export const ActionType = {
   ASSIGN: 'ASSIGN',
   UNASSIGN: 'UNASSIGN'
 } as const
+
 export type ActionType = (typeof ActionType)[keyof typeof ActionType]
 
 export const ConfirmableActions = [
@@ -47,7 +49,10 @@ export const ConfirmableActions = [
   ActionType.REGISTER,
   ActionType.REJECT,
   ActionType.ARCHIVE,
-  ActionType.PRINT_CERTIFICATE
+  ActionType.PRINT_CERTIFICATE,
+  ActionType.REQUEST_CORRECTION,
+  ActionType.APPROVE_CORRECTION,
+  ActionType.REJECT_CORRECTION
 ] as const
 
 /** Testing building types from enums as an alternative */
@@ -58,9 +63,10 @@ export const ActionTypes = z.enum([
   'DECLARE',
   'VALIDATE',
   'REGISTER',
-  'DETECT_DUPLICATE',
+  'DUPLICATE_DETECTED',
   'REJECT',
-  'MARKED_AS_DUPLICATE',
+  'MARK_AS_DUPLICATE',
+  'MARK_AS_NOT_DUPLICATE',
   'ARCHIVE',
   'PRINT_CERTIFICATE',
   'REQUEST_CORRECTION',
@@ -71,10 +77,22 @@ export const ActionTypes = z.enum([
   'UNASSIGN'
 ])
 
+/**
+ * Non-persisted actions that are used in the client to control the UI.
+ */
+export const ClientSpecificAction = {
+  REVIEW_CORRECTION_REQUEST: 'REVIEW_CORRECTION_REQUEST'
+} as const
+
+export type ClientSpecificAction =
+  (typeof ClientSpecificAction)[keyof typeof ClientSpecificAction]
+
 const declarationActionValues = [
   ActionTypes.enum.DECLARE,
   ActionTypes.enum.VALIDATE,
-  ActionTypes.enum.REGISTER
+  ActionTypes.enum.REGISTER,
+  ActionTypes.enum.NOTIFY,
+  ActionTypes.enum.DUPLICATE_DETECTED
 ] as const
 
 /** Actions which change event data (declaration) before registration / during declaration. */
@@ -85,15 +103,17 @@ const declarationUpdateActionValues = [
   ...declarationActionValues,
   ActionTypes.enum.REQUEST_CORRECTION
 ] as const
+
 /** Actions that can modify declaration data. Request can be corrected after declaring it. */
 export const DeclarationUpdateActions = ActionTypes.extract(
   declarationUpdateActionValues
 )
+
 export type DeclarationUpdateActionType = z.infer<
   typeof DeclarationUpdateActions
 >
 
-/** Actions which update annotation or status of an event. */
+/** Actions which only update annotation or status of an event. */
 export const annotationActions = ActionTypes.exclude(declarationActionValues)
 export type AnnotationActionType = z.infer<typeof annotationActions>
 
@@ -104,3 +124,27 @@ export const writeActions = ActionTypes.exclude([
   ActionType.ASSIGN,
   ActionType.UNASSIGN
 ])
+
+/** Actions which are visible in action menu and workqueue */
+export const workqueueActions = ActionTypes.exclude([
+  ActionType.CREATE,
+  ActionType.NOTIFY,
+  ActionType.DUPLICATE_DETECTED,
+  ActionType.REJECT,
+  ActionType.MARK_AS_NOT_DUPLICATE,
+  ActionType.REJECT_CORRECTION,
+  ActionType.APPROVE_CORRECTION
+])
+
+export type WorkqueueActionType = z.infer<typeof workqueueActions>
+export type DisplayableAction = ActionType | ClientSpecificAction
+
+const META_ACTIONS: DisplayableAction[] = [
+  ActionType.ASSIGN,
+  ActionType.UNASSIGN,
+  ActionType.READ
+]
+
+export function isMetaAction(actionType: DisplayableAction) {
+  return META_ACTIONS.includes(actionType)
+}

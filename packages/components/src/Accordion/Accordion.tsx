@@ -36,7 +36,7 @@ const AccordionHeader = styled.div`
 `
 
 const AccordionHeaderTitle = styled.div`
-  width: 100%;
+  flex: 1;
   h2 {
     margin-top: 0;
     margin-bottom: 6px;
@@ -90,7 +90,7 @@ export const Accordion = ({
   const [isActive, setIsActive] = useState<boolean>(expand || false)
 
   return (
-    <Container id={`${name}-accordion`}>
+    <Container id={`${name}-accordion`} data-testid={`accordion-${name}`}>
       <AccordionHeader
         id={`${name}-accordion-header`}
         onClick={() => setIsActive(!isActive)}

@@ -69,22 +69,23 @@ function getQueryClient() {
   })
 }
 
-function createIDBPersister(idbValidKey = 'reactQuery') {
+function createIDBPersister(storageIdentifier: string) {
+  const fullStorageIdentifier = `react-query-${storageIdentifier}`
   return {
     persistClient: async (client) => {
-      await storage.setItem(idbValidKey, client)
+      await storage.setItem(fullStorageIdentifier, client)
     },
     restoreClient: async () => {
-      const client = await storage.getItem<PersistedClient>(idbValidKey)
+      const client = await storage.getItem<PersistedClient>(
+        fullStorageIdentifier
+      )
       return client || undefined
     },
     removeClient: async () => {
-      await storage.removeItem(idbValidKey)
+      await storage.removeItem(fullStorageIdentifier)
     }
   } satisfies Persister
 }
-
-const persister = createIDBPersister()
 
 export const trpcClient = getTrpcClient()
 
@@ -94,12 +95,26 @@ export const trpcOptionsProxy = createTRPCOptionsProxy({
   client: trpcClient
 })
 
-export function TRPCProvider({ children }: { children: React.ReactNode }) {
+export function TRPCProvider({
+  children,
+  /*
+   * Should never be "false" outside test environments where we might want to get access
+   * to the query client before the client is restored from the persisted storage.
+   */
+  waitForClientRestored = true,
+  storeIdentifier = 'DEFAULT_IDENTIFIER_FOR_TESTS_ONLY__THIS_SHOULD_NEVER_SHOW_OUTSIDE_STORYBOOK'
+}: {
+  children: React.ReactNode
+  storeIdentifier?: string
+  waitForClientRestored?: boolean
+}) {
+  const [queriesRestored, setQueriesRestored] = React.useState(false)
+
   return (
     <PersistQueryClientProvider
       client={queryClient}
       persistOptions={{
-        persister,
+        persister: createIDBPersister(storeIdentifier),
         buster: 'persisted-indexed-db',
         maxAge: undefined,
         dehydrateOptions: {
@@ -118,6 +133,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         }
       }}
       onSuccess={async () => {
+        setQueriesRestored(true)
         await queryClient.resumePausedMutations()
 
         const mutations = queryClient.getMutationCache().getAll()
@@ -128,7 +144,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       <TRPCProviderRaw queryClient={queryClient} trpcClient={trpcClient}>
-        {children}
+        {!waitForClientRestored || queriesRestored ? children : null}
       </TRPCProviderRaw>
     </PersistQueryClientProvider>
   )

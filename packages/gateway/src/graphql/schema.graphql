@@ -1075,6 +1075,8 @@ enum SystemType {
   HEALTH
   RECORD_SEARCH
   WEBHOOK
+  IMPORT_EXPORT
+  REINDEX
 }
 
 enum IntegratingSystemType {
@@ -1461,6 +1463,7 @@ type UserAuditLogItemWithComposition implements AuditLogItemBase {
   action: String!
   practitionerId: String!
   data: AdditionalIdWithCompositionId!
+  isV2: Boolean
 }
 
 type UserAuditLogItem implements AuditLogItemBase {
@@ -1469,6 +1472,7 @@ type UserAuditLogItem implements AuditLogItemBase {
   userAgent: String!
   action: String!
   practitionerId: String!
+  isV2: Boolean
 }
 
 type RegistrationSearchSet {
@@ -1656,6 +1660,7 @@ interface AuditLogItemBase {
   userAgent: String!
   action: String!
   practitionerId: String!
+  isV2: Boolean
 }
 
 type AdditionalIdWithCompositionId {

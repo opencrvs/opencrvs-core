@@ -13,41 +13,18 @@ import { TRPCError } from '@trpc/server'
 import _ from 'lodash'
 import {
   ActionUpdate,
-  FieldConfig,
-  getFieldValidationErrors,
-  Inferred,
-  errorMessages
+  errorMessages,
+  LocationType,
+  ValidatorContext
 } from '@opencrvs/commons/events'
+import { getOrThrow } from '@opencrvs/commons'
+import { getTokenPayload } from '@opencrvs/commons/authentication'
+import { getLeafLocationIds } from '@events/storage/postgres/events/locations'
 
 type ValidationError = {
   message: string
   id: string
   value: unknown
-}
-
-export function getFormFieldErrors(formFields: Inferred[], data: ActionUpdate) {
-  return formFields.reduce(
-    (errorResults: ValidationError[], field: FieldConfig) => {
-      const fieldErrors = getFieldValidationErrors({
-        field,
-        values: data
-      }).errors
-
-      if (fieldErrors.length === 0) {
-        return errorResults
-      }
-
-      // For backend, use the default message without translations.
-      const errormessageWithId = fieldErrors.map((error) => ({
-        message: error.message.defaultMessage,
-        id: field.id,
-        value: data[field.id as keyof typeof data]
-      }))
-
-      return [...errorResults, ...errormessageWithId]
-    },
-    []
-  )
 }
 
 export function getVerificationPageErrors(
@@ -120,4 +97,16 @@ export function getInvalidUpdateKeys<T>({
       id: key,
       value
     }))
+}
+
+export async function getValidatorContext(
+  token: string
+): Promise<ValidatorContext> {
+  const leafAdminStructureLocationIds = await getLeafLocationIds({
+    locationTypes: [LocationType.enum.ADMIN_STRUCTURE]
+  })
+
+  const user = getOrThrow(getTokenPayload(token), 'Token is missing.')
+
+  return { leafAdminStructureLocationIds, user }
 }

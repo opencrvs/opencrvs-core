@@ -15,7 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { getDeclarationPages } from '@opencrvs/commons/client'
+import { ActionType, getDeclarationPages } from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -27,6 +27,7 @@ import { isTemporaryId } from '@client/v2-events/utils'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
@@ -34,11 +35,13 @@ export function Pages() {
   const events = useEvents()
   const navigate = useNavigate()
   const drafts = useDrafts()
-  const { modal, goToHome } = useEventFormNavigation()
+  const { modal, closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { getFormValues, setFormValues } = useEventFormData()
   const formValues = getFormValues()
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const validatorContext = useValidatorContext()
+  const event = events.getEvent.getFromCache(eventId)
+
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
@@ -93,19 +96,20 @@ export function Pages() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          goToHome()
+          closeActionView(searchParams.workqueue)
         })
       }
     >
       {modal}
       <PagesComponent
-        declaration={event.declaration}
+        actionType={ActionType.DECLARE}
         eventConfig={configuration}
         form={formValues}
         formPages={declarationPages}
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}
+        validatorContext={validatorContext}
         onPageChange={(nextPageId: string) =>
           navigate(
             ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath(
@@ -118,7 +122,12 @@ export function Pages() {
           )
         }
         onSubmit={() =>
-          navigate(ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }))
+          navigate(
+            ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
+              { eventId },
+              { workqueue: searchParams.workqueue }
+            )
+          )
         }
       />
       {saveAndExitModal}

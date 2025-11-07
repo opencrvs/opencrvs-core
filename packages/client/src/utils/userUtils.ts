@@ -14,7 +14,7 @@ import { createNamesMap } from './data-formatting'
 import { LANG_EN } from './constants'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { ITokenPayload } from './authUtils'
+import { ITokenPayload } from '@opencrvs/commons/client'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
@@ -32,7 +32,7 @@ export async function storeUserDetails(userDetails: UserDetails) {
   storage.setItem(USER_DETAILS, JSON.stringify(userDetails))
 }
 export async function removeUserDetails() {
-  storage.removeItem(USER_DETAILS)
+  return storage.removeItem(USER_DETAILS)
 }
 
 export function getIndividualNameObj(

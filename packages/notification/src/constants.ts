@@ -18,6 +18,9 @@ import { env } from '@notification/environment'
 export const NON_UNICODED_LANGUAGES = ['en']
 export const DEFAULT_TIMEOUT = 600000
 
+export const ALL_USER_NOTIFICATION_RETRY_COUNT = 3
+export const DAILY_NOTIFICATION_LIMIT = 1
+
 export const HOST = env.HOST
 export const PORT = env.PORT
 export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH

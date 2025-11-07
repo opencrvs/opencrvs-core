@@ -9,24 +9,79 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
+import {
+  FullDocumentPath,
+  getFilePathsFromEvent,
+  joinUrlPaths,
+  EventDocument
+} from '@opencrvs/commons'
 import { env } from '@events/environment'
 
-export async function deleteFile(filename: string, token: string) {
-  const res = await fetch(new URL(`/files/${filename}`, env.DOCUMENTS_URL), {
-    method: 'DELETE',
-    headers: {
-      Authorization: token
+export async function deleteFile(path: FullDocumentPath, token: string) {
+  const res = await fetch(
+    new URL(joinUrlPaths('/files', path), env.DOCUMENTS_URL),
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: token
+      }
     }
-  })
-  return res.ok
-}
-export async function fileExists(filename: string, token: string) {
-  const res = await fetch(new URL(`/files/${filename}`, env.DOCUMENTS_URL), {
-    method: 'HEAD',
-    headers: {
-      Authorization: token
-    }
-  })
+  )
 
   return res.ok
+}
+export async function fileExists(path: FullDocumentPath, token: string) {
+  const res = await fetch(
+    new URL(joinUrlPaths('/files', path), env.DOCUMENTS_URL),
+    {
+      method: 'HEAD',
+      headers: {
+        Authorization: token
+      }
+    }
+  )
+
+  if (res.status === 404) {
+    return false
+  } else if (!res.ok) {
+    throw new Error(
+      `Failed to check file existence: ${res.status} ${res.statusText}`
+    )
+  }
+
+  return true
+}
+
+export async function listFiles(path: string, token: string) {
+  const res = await fetch(
+    new URL(joinUrlPaths('/list-files', path), env.DOCUMENTS_URL),
+    {
+      method: 'GET',
+      headers: {
+        Authorization: token
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(`Failed to list files in ${path}`)
+  }
+
+  return res.json() as Promise<string[]>
+}
+
+export async function cleanupUnreferencedFiles(
+  event: EventDocument,
+  token: string
+) {
+  const referencedFiles = getFilePathsFromEvent(event)
+  const filesSavedInMinio = await listFiles(event.id, token)
+
+  const filesToDelete = filesSavedInMinio.filter(
+    (file) => !referencedFiles.includes(file)
+  )
+
+  return Promise.all(
+    filesToDelete.map(async (file: string) => deleteFile(file, token))
+  )
 }

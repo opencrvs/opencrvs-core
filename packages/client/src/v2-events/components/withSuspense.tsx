@@ -10,17 +10,31 @@
  */
 
 import React from 'react'
+import styled from 'styled-components'
 import { Spinner } from '@opencrvs/components'
 
 /**
  * HOC to wrap a component in a suspense boundary with a spinner fallback.
  */
-export function withSuspense<
-  ComponentProps extends { children?: React.ReactNode }
->(Component: React.ComponentType<ComponentProps>) {
-  return (props: ComponentProps) => (
+
+const FullSizeWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+export function withSuspense<P extends object>(
+  Component: React.ComponentType<P>
+) {
+  return (props: P) => (
     <React.Suspense
-      fallback={<Spinner id={`page-spinner-${new Date().getTime()}`} />}
+      fallback={
+        <FullSizeWrapper>
+          <Spinner id={`page-spinner-${Date.now()}`} />
+        </FullSizeWrapper>
+      }
     >
       <Component {...props} />
     </React.Suspense>

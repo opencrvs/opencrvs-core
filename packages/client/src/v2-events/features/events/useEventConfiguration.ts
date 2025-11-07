@@ -18,7 +18,12 @@ import { useTRPC } from '@client/v2-events/trpc'
  */
 export function useEventConfigurations() {
   const trpc = useTRPC()
-  const config = useSuspenseQuery(trpc.event.config.get.queryOptions()).data
+  const config = useSuspenseQuery({
+    ...trpc.event.config.get.queryOptions(),
+    queryKey: trpc.event.config.get.queryKey(),
+    networkMode: 'offlineFirst'
+  }).data
+
   return config
 }
 
@@ -37,5 +42,6 @@ export function useEventConfiguration(eventIdentifier: string): {
   if (!eventConfiguration) {
     throw new Error('Event configuration not found')
   }
+
   return { eventConfiguration }
 }

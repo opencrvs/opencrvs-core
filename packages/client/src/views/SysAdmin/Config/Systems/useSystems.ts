@@ -30,7 +30,7 @@ import {
   UpdatePermissionsMutationVariables,
   WebhookPermission
 } from '@client/utils/gateway'
-
+import { SystemRole } from '@opencrvs/commons/client'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as mutations from './mutations'
@@ -290,7 +290,7 @@ export function useSystems() {
           type: newSystemType,
           name: newClientName,
           integratingSystemType: undefined,
-          ...(newSystemType === SystemType.Webhook && {
+          ...(newSystemType === SystemRole.enum.WEBHOOK && {
             settings: {
               dailyQuota: 0,
               webhook: [birthPermissions, deathPermissions]

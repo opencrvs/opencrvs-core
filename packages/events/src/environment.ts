@@ -17,11 +17,15 @@ import { cleanEnv, str, url } from 'envalid'
  */
 export const env = cleanEnv(process.env, {
   EVENTS_MONGO_URL: url({ devDefault: 'mongodb://localhost/events' }),
+  EVENTS_POSTGRES_URL: url({
+    devDefault: 'postgres://events_app:app_password@localhost:5432/events'
+  }),
   USER_MGNT_MONGO_URL: url({ devDefault: 'mongodb://localhost/user-mgnt' }),
   ES_URL: url({ devDefault: 'http://localhost:9200' }),
   ES_INDEX_PREFIX: str({ default: 'events' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030' }),
-  AUTH_URL: url({ devDefault: 'http://localhost:4040' })
+  AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
+  CONFIG_URL: url({ devDefault: 'http://localhost:2021' })
 })

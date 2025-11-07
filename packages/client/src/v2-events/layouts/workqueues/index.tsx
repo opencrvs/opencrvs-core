@@ -10,108 +10,95 @@
  */
 
 import React from 'react'
-
-import { noop } from 'lodash'
 import { useNavigate } from 'react-router-dom'
-import { useIntl, defineMessages } from 'react-intl'
-import {
-  AppBar,
-  Button,
-  Frame,
-  Icon,
-  INavigationType,
-  SearchTool,
-  Stack
-} from '@opencrvs/components'
+import { useIntl } from 'react-intl'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useSelector } from 'react-redux'
+import { AppBar, Button, Frame, Icon, Stack } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
-import { workqueues } from '@opencrvs/commons/client'
+import { ActionType, isActionInScope } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
+import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { useAllWorkqueueConfigurations } from '@client/v2-events/features/events/useAllWorkqueueConfigurations'
+import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import { Hamburger } from '@client/components/Header/Hamburger'
-import * as routes from '@client/navigation/routes'
+import { emptyMessage } from '@client/v2-events/utils'
+import { Hamburger } from '../sidebar/Hamburger'
+import { Sidebar } from '../sidebar/Sidebar'
+
+export function DesktopCenter() {
+  const { createNewDeclaration } = useEventFormNavigation()
+  const scopes = useSelector(getScope) ?? []
+
+  const eventConfigurations = useEventConfigurations()
+  const mayCreateEvents = eventConfigurations.some(({ id }) =>
+    isActionInScope(scopes, ActionType.CREATE, id)
+  )
+
+  return (
+    <Stack gap={16}>
+      {mayCreateEvents && (
+        <Button
+          disabled={!mayCreateEvents}
+          id="header-new-event"
+          type="iconPrimary"
+          onClick={() => createNewDeclaration()}
+        >
+          <Plus />
+        </Button>
+      )}
+
+      <SearchToolbar />
+    </Stack>
+  )
+}
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
-
-const messagesToDefine = {
-  header: {
-    id: 'home.header.advancedSearch',
-    defaultMessage: 'Advanced Search',
-    description: 'Search menu advanced search type'
-  }
-}
-const messages = defineMessages(messagesToDefine)
-
-export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
+export function WorkqueueLayout({
+  children,
+  title
+}: {
+  children: React.ReactNode
+  title?: string
+}) {
+  const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const navigate = useNavigate()
   const intl = useIntl()
-  const allEvents = useEventConfigurations()
+  const workqueues = useAllWorkqueueConfigurations()
+  const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
 
-  const advancedSearchEvents = allEvents.filter(
-    (event) => event.advancedSearch.length > 0
-  )
+  const scopes = useSelector(getScope) ?? []
 
-  const advancedSearchNavigationList: INavigationType[] = [
-    {
-      label: intl.formatMessage(messages.header),
-      id: 'advanced-search',
-      onClick: () => {
-        navigate(ROUTES.V2.ADVANCED_SEARCH.path)
-      }
-    }
-  ]
+  const hasSearchScope = scopes.some((scope) => scope.startsWith('search'))
 
   return (
     <Frame
       header={
         <AppBar
-          desktopCenter={
-            <Stack gap={16}>
-              <Button
-                id="header-new-event"
-                type="iconPrimary"
-                onClick={() => {
-                  navigate(ROUTES.V2.EVENTS.CREATE.path)
-                }}
-              >
-                <Plus />
-              </Button>
-
-              <SearchTool
-                language="en"
-                navigationList={
-                  advancedSearchEvents.length > 0
-                    ? advancedSearchNavigationList // only available when enable in at least one form
-                    : []
-                }
-                searchHandler={noop}
-                searchTypeList={[
-                  {
-                    name: 'TRACKING_ID',
-                    label: 'Tracking ID',
-                    icon: <Icon name="MagnifyingGlass" size="small" />,
-                    placeHolderText: 'Search'
-                  }
-                ]}
-              />
-            </Stack>
-          }
+          desktopCenter={<DesktopCenter />}
           desktopRight={<ProfileMenu key="profileMenu" />}
           mobileLeft={<Hamburger />}
           mobileRight={
-            <Button type={'icon'} onClick={() => navigate(routes.SEARCH)}>
-              <Icon color="primary" name="MagnifyingGlass" size="medium" />
-            </Button>
+            hasSearchScope && (
+              <Button
+                aria-label="Go to search"
+                type={'icon'}
+                onClick={() => navigate(ROUTES.V2.SEARCH.buildPath({}))}
+              >
+                <Icon color="primary" name="MagnifyingGlass" size="medium" />
+              </Button>
+            )
           }
-          /**
-           * We need to revisit on how the workqueue is picked
-           * during 'workqueue' feature.
-           */
-          mobileTitle={intl.formatMessage(workqueues.all.title)}
+          mobileTitle={
+            title ?? intl.formatMessage(workqueueConfig?.name ?? emptyMessage)
+          }
         />
       }
+      navigation={<Sidebar key={workqueueSlug} />}
       skipToContentText="skip"
     >
       {children}

@@ -110,6 +110,7 @@ export function withOnlineStatus<T>(
 ) {
   return function WithOnlineStatus(props: T) {
     const isOnline = useOnlineStatus()
+
     return <WrappedComponent isOnline={isOnline} {...props} />
   }
 }

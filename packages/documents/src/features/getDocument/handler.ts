@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { minioClient } from '@documents/minio/client'
 import { MINIO_BUCKET } from '@documents/minio/constants'
 import { signFileUrl } from '@documents/minio/sign'
 import * as Hapi from '@hapi/hapi'
@@ -18,15 +19,16 @@ export function createPreSignedUrl(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const fileUri = request.params.fileUri
+  const filePath = request.params.filePath?.replace(`${MINIO_BUCKET}/`, '')
+
   const payload = (
-    fileUri ? { fileUri: `/${MINIO_BUCKET}/${fileUri}` } : request.payload
+    filePath ? { filePath: `/${MINIO_BUCKET}/${filePath}` } : request.payload
   ) as {
-    fileUri: string
+    filePath: string
   }
 
   try {
-    const presignedURL = signFileUrl(payload.fileUri)
+    const presignedURL = signFileUrl(payload.filePath)
     return h.response({ presignedURL }).code(200)
   } catch (error) {
     return h.response(error).code(400)
@@ -52,4 +54,24 @@ export function createPresignedUrlsInBulk(
   )
 
   return h.response(response).code(200)
+}
+
+export async function listFiles(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const prefix = request.params.prefix
+
+  const urls = []
+  for await (const obj of minioClient.listObjectsV2(
+    MINIO_BUCKET,
+    prefix,
+    true
+  )) {
+    if (obj.name) {
+      urls.push(`/${MINIO_BUCKET}/${obj.name}`)
+    }
+  }
+
+  return h.response(urls)
 }

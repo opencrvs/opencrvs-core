@@ -12,6 +12,7 @@
 import { FieldType } from '../events/FieldType'
 import { AddressType } from '../events/CompositeFieldValue'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
+import { UUID } from '../uuid'
 
 const testCases = [
   {
@@ -26,9 +27,9 @@ const testCases = [
     address: {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'sadsad-sadsad-sadsadsd-sdsdsd',
-      district: 'gdgfhdfg-wwqret-dfgfgsd-ewrew',
-      urbanOrRural: 'URBAN'
+      // @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
+      // @TODO:  Find a way to give out context aware mock values in the future.
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID
     },
     success: true
   },
@@ -37,9 +38,14 @@ const testCases = [
     address: {
       country: 'BGD',
       addressType: AddressType.INTERNATIONAL,
-      province: 'sadsad-sadsad-sadsadsd-sdsdsd',
-      district: 'gdgfhdfg-wwqret-dfgfgsd-ewrew',
-      urbanOrRural: 'URBAN'
+      streetLevelDetails: [
+        {
+          streetName: 'Main St',
+          streetNumber: '123',
+          city: 'Dhaka',
+          postalCode: '1212'
+        }
+      ]
     },
     success: false
   },
@@ -48,8 +54,12 @@ const testCases = [
     address: {
       country: 'BGD',
       addressType: AddressType.INTERNATIONAL,
-      state: 'sadsad-sadsad-sadsadsd-sdsdsd',
-      district2: 'gdgfhdfg-wwqret-dfgfgsd-ewrew'
+      streetLevelDetails: {
+        streetName: 'Main St',
+        streetNumber: '123',
+        city: 'Dhaka',
+        postalCode: '1212'
+      }
     },
     success: true
   }

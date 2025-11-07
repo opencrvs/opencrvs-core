@@ -10,10 +10,14 @@
  */
 import User from '@user-mgnt/model/user'
 import { createServer } from '@user-mgnt/server'
+import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as mockingoose from 'mockingoose'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import { joinValues } from '@opencrvs/commons'
+
+const fetch = fetchMock as fetchMock.FetchMock
 
 let server: any
 
@@ -32,6 +36,7 @@ const token = jwt.sign(
 )
 const dummyUser = {
   _id: '5d027bc403b93b17526323f6',
+  id: '5d027bc403b93b17526323f6',
   name: [
     {
       use: 'en',
@@ -98,6 +103,7 @@ describe('getUser tests', () => {
     const parsedResult = JSON.parse(JSON.stringify(res.result))
     expect(parsedResult).toEqual(dummyUser)
   })
+
   it('Successfully returns user with practitioner id', async () => {
     mockingoose(User).toReturn(dummyUser, 'findOne')
 
@@ -113,6 +119,101 @@ describe('getUser tests', () => {
     const parsedResult = JSON.parse(JSON.stringify(res.result))
     expect(parsedResult).toEqual(dummyUser)
   })
+
+  it('Returns full honorific name when user has one', async () => {
+    const fullHonorificName = `${joinValues(['Dr.', ...dummyUser.name[0].given, dummyUser.name[0].family, 'PhD'], ' ')}`
+    const userWithHonorificName = {
+      ...dummyUser,
+      fullHonorificName
+    }
+
+    mockingoose(User).toReturn(userWithHonorificName, 'findOne')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/getUser',
+      payload: { practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de' },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    const parsedResult = JSON.parse(JSON.stringify(res.result))
+
+    expect(parsedResult.fullHonorificName).toEqual(fullHonorificName)
+    expect(parsedResult).toEqual(userWithHonorificName)
+  })
+
+  it('Returns signature when there is one', async () => {
+    const practitionerMock = {
+      _id: {
+        $oid: '677fb08739cc37001dd27dcf'
+      },
+      resourceType: 'Practitioner',
+      telecom: [
+        {
+          system: 'phone',
+          value: '+260915151515'
+        },
+        {
+          system: 'email',
+          value: 'kalush.abwalya17@gmail.com'
+        }
+      ],
+      name: [
+        {
+          use: 'en',
+          given: ['Joseph'],
+          family: 'Musonda'
+        }
+      ],
+      extension: [
+        {
+          url: 'http://opencrvs.org/specs/extension/employee-signature',
+          valueAttachment: {
+            contentType: 'image/png',
+            url: '/ocrvs/2bc24648-d600-4232-a81f-22b34b210f4b.png',
+            creation: '1747825563684'
+          }
+        }
+      ],
+      id: '49f04ad3-7c27-45f9-beff-6a98eb9793ff',
+      meta: {
+        lastUpdated: '2025-05-21T11:06:03.695+00:00',
+        versionId: '7913b35b-d1bd-40c6-a3fa-456846dc89fe'
+      },
+      _transforms: {
+        meta: {
+          lastUpdated: {
+            $date: '2025-05-21T11:06:03.695Z'
+          }
+        }
+      },
+      _request: {
+        method: 'PUT'
+      }
+    }
+
+    mockingoose(User).toReturn(dummyUser, 'findOne')
+    fetch.mockResponseOnce(JSON.stringify(practitionerMock))
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/getUser',
+      payload: { practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de' },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    const parsedResult = JSON.parse(JSON.stringify(res.result))
+
+    expect(parsedResult).toEqual({
+      ...dummyUser,
+      signature: practitionerMock.extension[0].valueAttachment.url
+    })
+  })
+
   it('returns 401 for an invalid userid', async () => {
     const res = await server.server.inject({
       method: 'POST',

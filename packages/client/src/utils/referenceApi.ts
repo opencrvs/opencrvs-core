@@ -20,7 +20,11 @@ import {
 } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { EventType, System } from '@client/utils/gateway'
+import { cacheFile } from '@client/v2-events/cache'
+import { TranslationConfig } from '@opencrvs/commons/client'
 import { IntlShape } from 'react-intl'
+import { fetchFileFromUrl } from './imageUtils'
+import { last } from 'lodash'
 
 export interface ILocationDataResponse {
   [locationId: string]: AdminStructure
@@ -80,6 +84,10 @@ interface ILoginBackground {
 export interface ICertificateConfigData {
   id: string
   event: EventType
+  // This is a temporary field to indicate that the certificate is a v2 template.
+  // As the templates are assigned to event types per id, we would not be able to define separate templates for v1 and v2 'birth' or 'death' events without this.
+  // After v1 is phased out, this field can be removed.
+  isV2Template?: boolean
   label: {
     id: string
     defaultMessage: string
@@ -105,11 +113,16 @@ export interface ICurrency {
   languagesAndCountry: string[]
 }
 
+export interface AdminStructureItem {
+  id: string
+  label: TranslationConfig
+}
+
 export interface IApplicationConfigAnonymous {
   APPLICATION_NAME: string
   COUNTRY_LOGO: ICountryLogo
   LOGIN_BACKGROUND: ILoginBackground
-  PHONE_NUMBER_PATTERN: RegExp
+  PHONE_NUMBER_PATTERN: RegExp | string
 }
 
 export interface IApplicationConfig {
@@ -119,6 +132,7 @@ export interface IApplicationConfig {
     LATE_REGISTRATION_TARGET: number
     PRINT_IN_ADVANCE: boolean
   }
+  ADMIN_STRUCTURE: AdminStructureItem[]
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
   DEATH: {
@@ -138,7 +152,7 @@ export interface IApplicationConfig {
   }
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
-  PHONE_NUMBER_PATTERN: RegExp
+  PHONE_NUMBER_PATTERN: RegExp | string
   NID_NUMBER_PATTERN: RegExp
   LOGIN_BACKGROUND: ILoginBackground
   USER_NOTIFICATION_DELIVERY_METHOD: string
@@ -170,7 +184,26 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
   if (res && res.status !== 200) {
     throw Error(res.statusText)
   }
-  const response = await res.json()
+  const response: IApplicationConfigResponse = await res.json()
+  /*
+   * We need to download all fonts used by certificates on app initialisation
+   * so that if and when a certificate is printed while offline, the fonts are
+   * already cached in the browser
+   */
+  const fonts = response.certificates.flatMap((c) =>
+    Object.values(c.fonts || {}).flatMap((p) => Object.values(p))
+  )
+  const uniqueFonts = [...new Set(fonts)]
+  const fontFiles = await Promise.all(
+    uniqueFonts.map(async (font: string) => {
+      return {
+        url: font,
+        file: (await fetchFileFromUrl(font, last(font.split('/'))!))!
+      }
+    })
+  )
+
+  await Promise.all(fontFiles.map((f) => cacheFile(f)))
   return response
 }
 

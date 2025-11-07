@@ -23,7 +23,7 @@ import {
   FieldConfig,
   File,
   FileUploadWithOptions,
-  Location,
+  LocationInput,
   Office,
   PageHeader,
   Paragraph,
@@ -33,7 +33,23 @@ import {
   TextAreaField,
   TextField,
   NumberField,
-  DataField
+  DataField,
+  NameField,
+  PhoneField,
+  IdField,
+  DateRangeField,
+  SelectDateRangeField,
+  TimeField,
+  AlphaPrintButton,
+  HttpField,
+  ButtonField,
+  LinkButtonField,
+  VerificationStatus,
+  QueryParamReaderField,
+  QrReaderField,
+  IdReaderField,
+  LoaderField,
+  AgeField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -43,16 +59,31 @@ import {
   FieldValue,
   FieldUpdateValueSchema,
   NumberFieldValue,
-  RequiredTextValue,
+  NonEmptyTextValue,
   TextValue,
-  DataFieldValue
+  DataFieldValue,
+  DateRangeFieldValue,
+  SelectDateRangeValue,
+  TimeValue,
+  ButtonFieldValue,
+  VerificationStatusValue,
+  AgeValue
 } from './FieldValue'
+
+import { FullDocumentPath } from '../documents'
+
 import {
   AddressFieldValue,
   AddressFieldUpdateValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  AddressType
+  AddressType,
+  NameFieldValue,
+  NameFieldUpdateValue,
+  HttpFieldUpdateValue,
+  QueryParamReaderFieldUpdateValue,
+  QrReaderFieldValue,
+  IdReaderFieldValue
 } from './CompositeFieldValue'
 
 /**
@@ -80,8 +111,20 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.DATE:
       schema = DateValue
       break
+    case FieldType.AGE:
+      schema = AgeValue
+      break
+    case FieldType.TIME:
+      schema = TimeValue
+      break
     case FieldType.EMAIL:
       schema = EmailValue
+      break
+    case FieldType.DATE_RANGE:
+      schema = DateRangeFieldValue
+      break
+    case FieldType.SELECT_DATE_RANGE:
+      schema = SelectDateRangeValue
       break
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
@@ -96,9 +139,12 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
-    case FieldType.SIGNATURE:
-    case FieldType.HIDDEN:
-      schema = required ? RequiredTextValue : TextValue
+    case FieldType.PHONE:
+    case FieldType.LINK_BUTTON:
+    case FieldType.VERIFICATION_STATUS:
+    case FieldType.ID:
+    case FieldType.LOADER:
+      schema = required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
       schema = NumberFieldValue
@@ -106,6 +152,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.CHECKBOX:
       schema = CheckboxFieldValue
       break
+    case FieldType.SIGNATURE:
     case FieldType.FILE:
       schema = FileFieldValue
       break
@@ -117,6 +164,27 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       break
     case FieldType.DATA:
       schema = DataFieldValue
+      break
+    case FieldType.NAME:
+      schema = required ? NameFieldValue : NameFieldUpdateValue
+      break
+    case FieldType.BUTTON:
+      schema = ButtonFieldValue
+      break
+    case FieldType.ALPHA_PRINT_BUTTON:
+      schema = TextValue
+      break
+    case FieldType.HTTP:
+      schema = HttpFieldUpdateValue
+      break
+    case FieldType.QUERY_PARAM_READER:
+      schema = QueryParamReaderFieldUpdateValue
+      break
+    case FieldType.QR_READER:
+      schema = QrReaderFieldValue
+      break
+    case FieldType.ID_READER:
+      schema = IdReaderFieldValue
       break
   }
 
@@ -130,64 +198,10 @@ export function createValidationSchema(config: FieldConfig[]) {
   > = {}
 
   for (const field of config) {
-    shape[field.id] = mapFieldTypeToZod(field.type, field.required)
+    shape[field.id] = mapFieldTypeToZod(field.type, !!field.required)
   }
 
   return z.object(shape)
-}
-
-/**
- * Quick-and-dirty mock data generator for event actions.
- */
-export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
-  switch (field.type) {
-    case FieldType.DIVIDER:
-    case FieldType.TEXT:
-    case FieldType.TEXTAREA:
-    case FieldType.BULLET_LIST:
-    case FieldType.PAGE_HEADER:
-    case FieldType.LOCATION:
-    case FieldType.SELECT:
-    case FieldType.COUNTRY:
-    case FieldType.RADIO_GROUP:
-    case FieldType.SIGNATURE:
-    case FieldType.PARAGRAPH:
-    case FieldType.ADMINISTRATIVE_AREA:
-    case FieldType.FACILITY:
-    case FieldType.OFFICE:
-      return `${field.id}-${field.type}-${i}`
-    case FieldType.NUMBER:
-      return 19
-    case FieldType.EMAIL:
-      return 'test@opencrvs.org'
-    case FieldType.ADDRESS:
-      return {
-        country: 'FAR',
-        addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'URBAN',
-        town: 'Example Town',
-        residentialArea: 'Example Residential Area',
-        street: 'Example Street',
-        number: '55',
-        zipCode: '123456'
-      }
-    case FieldType.DATE:
-      return '2021-01-01'
-    case FieldType.CHECKBOX:
-      return true
-    case FieldType.FILE:
-      return {
-        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
-        originalFilename: 'abcd.png',
-        type: 'image/png'
-      } satisfies FileFieldValue
-    case FieldType.FILE_WITH_OPTIONS:
-      return null
-    case FieldType.DATA:
-      return {}
-  }
 }
 
 /**
@@ -204,7 +218,6 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.SELECT:
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
-    case FieldType.SIGNATURE:
     case FieldType.PARAGRAPH:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
@@ -212,25 +225,36 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.NUMBER:
     case FieldType.EMAIL:
     case FieldType.DATE:
+    case FieldType.AGE:
+    case FieldType.TIME:
     case FieldType.CHECKBOX:
+    case FieldType.DATE_RANGE:
+    case FieldType.SELECT_DATE_RANGE:
     case FieldType.DATA:
+    case FieldType.NAME:
+    case FieldType.PHONE:
+    case FieldType.BUTTON:
+    case FieldType.ALPHA_PRINT_BUTTON:
+    case FieldType.HTTP:
+    case FieldType.LINK_BUTTON:
+    case FieldType.QUERY_PARAM_READER:
+    case FieldType.ID:
+    case FieldType.VERIFICATION_STATUS:
+    case FieldType.QR_READER:
+    case FieldType.ID_READER:
+    case FieldType.LOADER:
       return null
     case FieldType.ADDRESS:
       return {
-        country: null,
+        country: '',
         addressType: AddressType.DOMESTIC,
-        province: null,
-        district: null,
-        urbanOrRural: 'URBAN', // Default to urban needed for validation
-        town: null,
-        residentialArea: null,
-        street: null,
-        number: null,
-        zipCode: null
-      }
+        administrativeArea: '',
+        streetLevelDetails: {}
+      } satisfies AddressFieldValue
+    case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        filename: '',
+        path: '' as FullDocumentPath,
         originalFilename: '',
         type: ''
       } satisfies FileFieldValue
@@ -251,6 +275,37 @@ export const isDateFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: DateField } => {
   return field.config.type === FieldType.DATE
+}
+
+export const isAgeFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: AgeValue | undefined; config: AgeField } => {
+  return field.config.type === FieldType.AGE
+}
+
+export const isTimeFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: TimeField } => {
+  return field.config.type === FieldType.TIME
+}
+
+export const isDateRangeFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is {
+  value: DateRangeFieldValue
+  config: DateRangeField
+} => {
+  return field.config.type === FieldType.DATE_RANGE
+}
+
+export const isSelectDateRangeFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: SelectDateRangeValue; config: SelectDateRangeField } => {
+  return field.config.type === FieldType.SELECT_DATE_RANGE
 }
 
 export const isPageHeaderFieldType = (field: {
@@ -274,6 +329,27 @@ export const isNumberFieldType = (field: {
   return field.config.type === FieldType.NUMBER
 }
 
+export const isNameFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: NameFieldValue; config: NameField } => {
+  return field.config.type === FieldType.NAME
+}
+
+export const isPhoneFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: PhoneField } => {
+  return field.config.type === FieldType.PHONE
+}
+
+export const isIdFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: IdField } => {
+  return field.config.type === FieldType.ID
+}
+
 export const isTextAreaFieldType = (field: {
   config: FieldConfig
   value: FieldValue
@@ -283,8 +359,8 @@ export const isTextAreaFieldType = (field: {
 
 export const isSignatureFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
-}): field is { value: string; config: SignatureField } => {
+  value: FieldValue | undefined
+}): field is { value: FileFieldValue | undefined; config: SignatureField } => {
   return field.config.type === FieldType.SIGNATURE
 }
 
@@ -299,7 +375,6 @@ export const isFileFieldType = (field: {
   config: FieldConfig
   value: FieldValue
 }): field is { value: FileFieldValue; config: File } => {
-  // @TODO?
   return field.config.type === FieldType.FILE
 }
 
@@ -310,7 +385,6 @@ export const isFileFieldWithOptionType = (field: {
   value: FileFieldWithOptionValue
   config: FileUploadWithOptions
 } => {
-  // @TODO? (same as FILE?)
   return field.config.type === FieldType.FILE_WITH_OPTIONS
 }
 
@@ -359,7 +433,7 @@ export const isRadioGroupFieldType = (field: {
 export const isLocationFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: string; config: Location } => {
+}): field is { value: string; config: LocationInput } => {
   return field.config.type === FieldType.LOCATION
 }
 
@@ -394,6 +468,106 @@ export const isOfficeFieldType = (field: {
 export const isDataFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: undefined; config: DataField } => {
+}): field is { value: DataFieldValue; config: DataField } => {
   return field.config.type === FieldType.DATA
+}
+
+export const isButtonFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: ButtonField } => {
+  return field.config.type === FieldType.BUTTON
+}
+
+export const isPrintButtonFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: AlphaPrintButton } => {
+  return field.config.type === FieldType.ALPHA_PRINT_BUTTON
+}
+
+export const isHttpFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: HttpField } => {
+  return field.config.type === FieldType.HTTP
+}
+
+export const isLinkButtonFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: LinkButtonField } => {
+  return field.config.type === FieldType.LINK_BUTTON
+}
+
+export const isVerificationStatusType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is {
+  value: VerificationStatusValue | undefined
+  config: VerificationStatus
+} => {
+  return field.config.type === FieldType.VERIFICATION_STATUS
+}
+
+export const isQueryParamReaderFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is {
+  value: undefined
+  config: QueryParamReaderField
+} => {
+  return field.config.type === FieldType.QUERY_PARAM_READER
+}
+
+export const isQrReaderFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: QrReaderField } => {
+  return field.config.type === FieldType.QR_READER
+}
+
+export const isIdReaderFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: IdReaderField } => {
+  return field.config.type === FieldType.ID_READER
+}
+
+export const isLoaderFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: LoaderField } => {
+  return field.config.type === FieldType.LOADER
+}
+
+export type NonInteractiveFieldType =
+  | Divider
+  | PageHeader
+  | Paragraph
+  | BulletList
+  | DataField
+  | AlphaPrintButton
+  | HttpField
+  | LinkButtonField
+  | QueryParamReaderField
+  | LoaderField
+
+export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
+
+export const isNonInteractiveFieldType = (
+  field: FieldConfig
+): field is NonInteractiveFieldType => {
+  return (
+    field.type === FieldType.DIVIDER ||
+    field.type === FieldType.PAGE_HEADER ||
+    field.type === FieldType.PARAGRAPH ||
+    field.type === FieldType.BULLET_LIST ||
+    field.type === FieldType.DATA ||
+    field.type === FieldType.ALPHA_PRINT_BUTTON ||
+    field.type === FieldType.HTTP ||
+    field.type === FieldType.LINK_BUTTON ||
+    field.type === FieldType.QUERY_PARAM_READER ||
+    field.type === FieldType.LOADER
+  )
 }

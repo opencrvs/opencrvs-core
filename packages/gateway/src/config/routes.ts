@@ -22,7 +22,7 @@ import sendVerifyCodeHandler, {
   responseSchema
 } from '@gateway/routes/verifyCode/handler'
 import { trpcProxy } from '@gateway/v2-events/event-config/routes'
-import { DOCUMENTS_URL, MINIO_BUCKET } from '@gateway/constants'
+import { DOCUMENTS_URL } from '@gateway/constants'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -102,20 +102,20 @@ export const getRoutes = () => {
     },
     {
       method: 'GET',
-      path: '/presigned-url/{fileUri*}',
+      path: '/presigned-url/{filePath*}',
       handler: async (req, h) => {
         return h.proxy({
-          uri: `${DOCUMENTS_URL}/presigned-url/${MINIO_BUCKET}/${req.params.fileUri}`,
+          uri: `${DOCUMENTS_URL}/presigned-url/${req.params.filePath}`,
           passThrough: true
         })
       }
     },
     {
       method: 'DELETE',
-      path: '/files/{filename}',
+      path: '/files/{filePath*}',
       handler: async (req, h) => {
         return h.proxy({
-          uri: `${DOCUMENTS_URL}/files/${req.params.filename}`,
+          uri: `${DOCUMENTS_URL}/files/${req.params.filePath}`,
           passThrough: true
         })
       },
@@ -126,7 +126,9 @@ export const getRoutes = () => {
         }
       }
     },
-    catchAllProxy.locations,
+    catchAllProxy.getLocations,
+    catchAllProxy.updateLocations,
+    catchAllProxy.createLocations,
     catchAllProxy.locationsSuffix,
 
     catchAllProxy.location,
