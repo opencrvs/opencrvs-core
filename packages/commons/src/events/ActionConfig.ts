@@ -40,24 +40,21 @@ const DeclarationActionBase = ActionConfigBase.extend({
   deduplication: DeduplicationConfig.optional()
 })
 
-const ActionWithReviewBase = ActionConfigBase.extend(
+const ReadActionConfig = ActionConfigBase.extend(
   z.object({
+    type: z.literal(ActionType.READ),
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page for read-only view.'
     )
   }).shape
 )
 
-const ReadActionConfig = ActionWithReviewBase.extend(
-  z.object({
-    type: z.literal(ActionType.READ)
-  }).shape
-)
-
-const DeclareConfig = ActionWithReviewBase.extend(
+const DeclareConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.DECLARE),
-    review: DeclarationReviewConfig
+    review: DeclarationReviewConfig.describe(
+      'Configuration of the review page fields.'
+    )
   }).shape
 )
 
