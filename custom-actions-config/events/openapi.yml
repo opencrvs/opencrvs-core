@@ -18906,6 +18906,9 @@ components:
               - id
               - operation
             additionalProperties: false
+        type:
+          type: string
+          const: READ
         review:
           description: Configuration of the review page for read-only view.
           type: object
@@ -18922,14 +18925,11 @@ components:
             - title
             - fields
           additionalProperties: false
-        type:
-          type: string
-          const: READ
       required:
         - label
         - flags
-        - review
         - type
+        - review
       additionalProperties: false
     FieldConfig:
       description: Form field configuration
@@ -26082,62 +26082,6 @@ components:
               - id
               - operation
             additionalProperties: false
-        review:
-          description: Configuration of the declaration review page for collecting
-            event-related metadata.
-          type: object
-          properties:
-            title:
-              description: Title of the review page
-              $ref: "#/components/schemas/TranslationConfig"
-            fields:
-              description: Fields displayed on the review page for annotations.
-              type: array
-              items:
-                $ref: "#/components/schemas/FieldConfig"
-          required:
-            - title
-            - fields
-          additionalProperties: false
-        type:
-          type: string
-          const: DECLARE
-      required:
-        - label
-        - flags
-        - review
-        - type
-      additionalProperties: false
-    ValidateActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
-        flags:
-          description: Flag actions which are executed when the action is performed.
-          default: []
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                description: Id of the flag.
-                type: string
-              operation:
-                description: Operation to perform on the flag.
-                type: string
-                enum:
-                  - add
-                  - remove
-              conditional:
-                description: When conditional is met, the operation is performed on the flag. If
-                  not provided, the operation is performed unconditionally.
-                $ref: "#/components/schemas/Conditional"
-            required:
-              - id
-              - operation
-            additionalProperties: false
         deduplication:
           type: object
           properties:
@@ -26154,11 +26098,28 @@ components:
           additionalProperties: false
         type:
           type: string
-          const: VALIDATE
+          const: DECLARE
+        review:
+          description: Configuration of the review page fields.
+          type: object
+          properties:
+            title:
+              description: Title of the review page
+              $ref: "#/components/schemas/TranslationConfig"
+            fields:
+              description: Fields displayed on the review page for annotations.
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConfig"
+          required:
+            - title
+            - fields
+          additionalProperties: false
       required:
         - label
         - flags
         - type
+        - review
       additionalProperties: false
     Clause:
       oneOf:
@@ -26281,6 +26242,58 @@ components:
             - type
           additionalProperties: false
       type: object
+    ValidateActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          description: Flag actions which are executed when the action is performed.
+          default: []
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                description: Id of the flag.
+                type: string
+              operation:
+                description: Operation to perform on the flag.
+                type: string
+                enum:
+                  - add
+                  - remove
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+            additionalProperties: false
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
+          additionalProperties: false
+        type:
+          type: string
+          const: VALIDATE
+      required:
+        - label
+        - flags
+        - type
+      additionalProperties: false
     RejectDeclarationActionConfig:
       type: object
       properties:
