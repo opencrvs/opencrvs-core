@@ -18,7 +18,6 @@ import { useNavigate } from 'react-router-dom'
 import {
   ActionType,
   EventIndex,
-  getActionReview,
   getCurrentEventState,
   getDeclaration
 } from '@opencrvs/commons/client'
@@ -182,7 +181,14 @@ function ReviewDuplicate() {
     }))
   ]
 
-  const { title, fields } = getActionReview(configuration, ActionType.READ)
+  const actionConfiguration = configuration.actions.find(
+    (a) => a.type === ActionType.READ
+  )
+  if (!actionConfiguration) {
+    throw new Error('Action configuration not found')
+  }
+
+  const { title, fields } = actionConfiguration.review
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const formConfig = getDeclaration(configuration)

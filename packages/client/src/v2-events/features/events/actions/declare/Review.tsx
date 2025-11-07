@@ -18,7 +18,6 @@ import {
 import {
   ActionType,
   EventStatus,
-  getActionReview,
   getCurrentEventState,
   getDeclaration,
   InherentFlags
@@ -65,7 +64,15 @@ export function Review() {
   const currentEventState = getCurrentEventState(event, config)
 
   const formConfig = getDeclaration(config)
-  const reviewConfig = getActionReview(config, ActionType.DECLARE)
+
+  const actionConfiguration = config.actions.find(
+    (a) => a.type === ActionType.DECLARE
+  )
+  if (!actionConfiguration) {
+    throw new Error('Action configuration not found')
+  }
+
+  const reviewConfig = actionConfiguration.review
 
   const form = useEventFormData((state) => state.getFormValues())
 
