@@ -16,5 +16,6 @@
     "no-extra-semicolons": null,
     "annotation-no-unknown": null
   },
-  "plugins": ["./no-font-styles.js"]
+  "plugins": ["./no-font-styles.js"],
+  "ignoreFiles": "**/*.stories.tsx"
 }

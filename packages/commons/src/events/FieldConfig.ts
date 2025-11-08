@@ -287,6 +287,10 @@ const TimeField = BaseField.extend({
   defaultValue: TimeValue.optional(),
   configuration: z
     .object({
+      use12HourFormat: z
+        .boolean()
+        .optional()
+        .describe('Whether to use 12-hour format'),
       notice: TranslationConfig.describe(
         'Text to display above the time input'
       ).optional()

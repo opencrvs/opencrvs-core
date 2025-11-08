@@ -21,7 +21,8 @@ import { Table } from '@opencrvs/components/lib/Table'
 import {
   ActionType,
   EventDocument,
-  getAcceptedActions
+  getAcceptedActions,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -34,9 +35,10 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import {
-  expandWithUpdateActions,
+  expandWithClientSpecificActions,
   EventHistoryActionDocument,
-  useActionForHistory
+  useActionForHistory,
+  extractHistoryActions
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -328,17 +330,18 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const { getActionTypeForHistory } = useActionForHistory()
   const { getActionCreator } = useActionCreator()
 
-  const history = getAcceptedActions(fullEvent)
+  const history = extractHistoryActions(fullEvent)
 
-  const historyWithUpdatedActions = expandWithUpdateActions(
+  const historyWithClientSpecificActions = expandWithClientSpecificActions(
     fullEvent,
     validatorContext,
     eventConfiguration
   )
 
-  const visibleHistoryWithUpdatedActions = historyWithUpdatedActions.filter(
-    ({ type }) => type !== ActionType.CREATE
-  )
+  const visibleHistoryWithClientSpecificActions =
+    historyWithClientSpecificActions.filter(
+      ({ type }) => type !== ActionType.CREATE
+    )
 
   const onHistoryRowClick = (
     action: EventHistoryActionDocument,
@@ -355,11 +358,11 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     ))
   }
 
-  const historyRows = visibleHistoryWithUpdatedActions
+  const historyRows = visibleHistoryWithClientSpecificActions
     .map((x) => {
       if (x.type === ActionType.REQUEST_CORRECTION) {
         const immediateApprovedCorrection =
-          visibleHistoryWithUpdatedActions.find(
+          visibleHistoryWithClientSpecificActions.find(
             (h) =>
               h.type === ActionType.APPROVE_CORRECTION &&
               (h.requestId === x.id || h.requestId === x.originalActionId) &&
@@ -402,7 +405,8 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
             onClick={() => onHistoryRowClick(action, actionCreatorName)}
           >
             {intl.formatMessage(eventHistoryStatusMessage, {
-              status: getActionTypeForHistory(history, action)
+              action: getActionTypeForHistory(history, action),
+              status: action.status
             })}
           </Link>
         ),
@@ -461,12 +465,12 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
           noResultText=""
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
         />
-        {visibleHistoryWithUpdatedActions.length >
+        {visibleHistoryWithClientSpecificActions.length >
           DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
           <Pagination
             currentPage={currentPageNumber}
             totalPages={Math.ceil(
-              visibleHistoryWithUpdatedActions.length /
+              visibleHistoryWithClientSpecificActions.length /
                 DEFAULT_HISTORY_RECORD_PAGE_SIZE
             )}
             onPageChange={(page) => setCurrentPageNumber(page)}
