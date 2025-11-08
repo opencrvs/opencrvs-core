@@ -26,7 +26,7 @@ import {
 } from '@opencrvs/commons/client'
 import {
   DECLARATION_ACTION_UPDATE,
-  expandWithUpdateActions
+  expandWithClientSpecificActions
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { getTestValidatorContext } from '../../../../../../../../.storybook/decorators'
@@ -271,7 +271,7 @@ export const Validated: Story = {
   }
 }
 
-const updateActionForValidate = expandWithUpdateActions(
+const updateActionForValidate = expandWithClientSpecificActions(
   eventWhenValidateUpdatesDeclaration,
   getTestValidatorContext(),
   tennisClubMembershipEvent
@@ -806,7 +806,7 @@ const newFullEvent = {
   ]
 }
 
-const updateActions = expandWithUpdateActions(
+const updateActions = expandWithClientSpecificActions(
   newFullEvent,
   getTestValidatorContext(),
   tennisClubMembershipEvent
@@ -1027,7 +1027,7 @@ const eventWithNotifyActions = {
   ]
 } satisfies EventDocument
 
-const updateActionsForNotifyActions = expandWithUpdateActions(
+const updateActionsForNotifyActions = expandWithClientSpecificActions(
   eventWithNotifyActions,
   getTestValidatorContext(),
   tennisClubMembershipEvent
@@ -1060,7 +1060,7 @@ export const Registered: Story = {
   }
 }
 
-const updateActionForRegister = expandWithUpdateActions(
+const updateActionForRegister = expandWithClientSpecificActions(
   eventWhenRegisterUpdatesDeclaration,
   getTestValidatorContext(),
   tennisClubMembershipEvent
@@ -1229,7 +1229,7 @@ const notDuplicateUpdateEvent = generateEventDocument({
   ]
 })
 
-const updateActionForNotDuplicateActions = expandWithUpdateActions(
+const updateActionForNotDuplicateActions = expandWithClientSpecificActions(
   notDuplicateUpdateEvent,
   getTestValidatorContext(),
   tennisClubMembershipEvent
