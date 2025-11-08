@@ -20179,6 +20179,9 @@ components:
             configuration:
               type: object
               properties:
+                use12HourFormat:
+                  description: Whether to use 12-hour format
+                  type: boolean
                 notice:
                   description: Text to display above the time input
                   $ref: "#/components/schemas/TranslationConfig"
