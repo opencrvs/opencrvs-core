@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -29,6 +30,7 @@ import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
 import { ageToDate } from '../events/utils'
+import { ActionType } from '../client'
 
 const ajv = new Ajv({
   $data: true,
@@ -423,12 +425,14 @@ function runCustomFieldValidations({
  */
 export function validateFieldInput({
   field,
-  value
+  value,
+  actionType
 }: {
   field: FieldConfig
   value: FieldUpdateValue
+  actionType?: ActionType
 }) {
-  const zodType = mapFieldTypeToZod(field)
+  const zodType = mapFieldTypeToZod(field, actionType)
 
   const rawError = zodType.safeParse(value, {
     // @ts-expect-error
@@ -445,11 +449,13 @@ export function validateFieldInput({
 export function runStructuralValidations({
   field,
   values,
-  context
+  context,
+  actionType
 }: {
   field: FieldConfig
   values: ActionUpdate
   context: ValidatorContext
+  actionType?: ActionType
 }) {
   if (
     !isFieldVisible(field, values, context) ||
@@ -460,7 +466,8 @@ export function runStructuralValidations({
 
   const fieldValidationResult = validateFieldInput({
     field,
-    value: values[field.id]
+    value: values[field.id],
+    actionType
   })
 
   return fieldValidationResult

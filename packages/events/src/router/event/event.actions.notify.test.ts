@@ -355,7 +355,6 @@ describe('event.actions.notify', () => {
         type: 'NOTIFY',
         declaration: {
           'foo.bar': 'this should cause an error',
-          // @ts-expect-error - testing without firstname
           'applicant.name': { surname: 'surnameoftheperson' },
           'applicant.dob': '2002-02-02'
         },

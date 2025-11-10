@@ -84,7 +84,8 @@ import {
   HttpFieldUpdateValue,
   QueryParamReaderFieldUpdateValue,
   QrReaderFieldValue,
-  IdReaderFieldValue
+  IdReaderFieldValue,
+  NameFieldUpdateValue
 } from './CompositeFieldValue'
 import {
   getDynamicNameValue,
@@ -92,6 +93,7 @@ import {
   DynamicAddressFieldValue,
   getDynamicAddressFieldValue
 } from './DynamicFieldValue'
+import { ActionType } from './ActionType'
 
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
@@ -116,7 +118,7 @@ type NullishFieldValueSchema = z.ZodOptional<
  * Mapping of field types to Zod schema.
  * Useful for building dynamic validations against FieldConfig
  */
-export function mapFieldTypeToZod(field: FieldConfig) {
+export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
   let schema:
     | FieldUpdateValueSchema
     | NullishFieldValueSchema
@@ -182,7 +184,10 @@ export function mapFieldTypeToZod(field: FieldConfig) {
       schema = DataFieldValue
       break
     case FieldType.NAME:
-      schema = getDynamicNameValue(field)
+      schema =
+        actionType === ActionType.NOTIFY
+          ? NameFieldUpdateValue
+          : getDynamicNameValue(field)
       break
     case FieldType.BUTTON:
       schema = ButtonFieldValue
