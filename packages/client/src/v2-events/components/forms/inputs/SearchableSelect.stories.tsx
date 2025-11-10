@@ -11,7 +11,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { Option } from '../../../utils'
-import { SearchableSelect } from './SearchableSelect'
+import { SearchableSelect, SearchableSelectProps } from './SearchableSelect'
 
 const meta: Meta<typeof SearchableSelect> = {
   title: 'SearchableSelect',
@@ -39,7 +39,7 @@ export const Default: StoryObj<typeof SearchableSelect> = {
   }
 }
 
-export const InternalState: StoryObj<typeof SearchableSelect> = {
+export const InternalState: StoryObj<SearchableSelectProps> = {
   args: {
     options: [
       {
@@ -57,15 +57,14 @@ export const InternalState: StoryObj<typeof SearchableSelect> = {
     ]
   },
   render(args) {
-    const [value, setValue] = React.useState<any>()
-    console.log('value', value)
+    const [value, setValue] = React.useState<Option | null>(null)
     return (
       <SearchableSelect
-        {...args}
+        id={'123'}
+        options={args.options}
         value={value}
-        onChange={(newValue) => {
-          console.log('newValue', newValue)
-          setValue(newValue)
+        onChange={(option: Option | null) => {
+          setValue(option)
         }}
       />
     )

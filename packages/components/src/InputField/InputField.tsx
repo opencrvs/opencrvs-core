@@ -89,6 +89,7 @@ export const InputField = (props: IInputFieldProps) => {
               inputDescriptor={helperText}
               disabled={props.disabled}
               required={required}
+              htmlFor={id}
               hideAsterisk={hideAsterisk}
               tooltip={tooltip}
             >
