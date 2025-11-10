@@ -137,7 +137,7 @@ export const workqueueActions = ActionTypes.exclude([
   ActionType.MARK_AS_NOT_DUPLICATE,
   ActionType.REJECT_CORRECTION,
   ActionType.APPROVE_CORRECTION,
-  // TODO CIHAN: this might need to be removed from here
+  // @TODO We are still uncertain if this belongs here, will be specified later in custom actions work
   ActionType.CUSTOM
 ])
 
