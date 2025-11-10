@@ -111,18 +111,24 @@ function DropdownIndicator<T>(
   )
 }
 
+/** Props used for conditional styling with styled-components */
 interface StyledProps {
   error?: boolean
   touched?: boolean
 }
 
+/**
+ * Internal implementation of AsyncSelect to allow styled-components theming.
+ * @returns Passthrough AsyncSelect component to be used with styled-components.
+ */
 function BaseAsyncSelect<T>(
   props: AsyncProps<Option<T>, false, GroupBase<Option<T>>> & StyledProps
 ) {
   return <AsyncSelect {...props} />
 }
 
-const StyledSelect = styled(BaseAsyncSelect)<StyledProps>`
+/** Based on components/src/Select.tsx */
+const StyledAsyncSelect = styled(BaseAsyncSelect)<StyledProps>`
   width: 100%;
   ${({ theme }) => theme.fonts.reg19};
   background: ${({ theme }) => theme.colors.white};
@@ -231,25 +237,30 @@ const VISIBLE_OPTIONS_COUNT = 50
 
 export interface SearchableSelectProps<T = string> extends StyledProps {
   id: string
+  ['data-testid']?: string
   options: Option<T>[]
   value: Option<T> | null
-  placeholder?: string
   disabled?: boolean
-  onBlur?: (e: React.FocusEvent<HTMLElement>) => void
   onChange: (val: SingleValue<Option<T>>) => void
 }
 
-export function SearchableSelect<T>({
+/**
+ *
+ * A searchable select component using react-select and react-window for virtualization.
+ * Used for supporting larger option sets without performance issues. During 1.9.1. we'll only replace the administrative area selects with the component.
+ *
+ */
+export function SearchableSelect<T = string>({
   options,
   onChange,
   value,
   id,
   error,
-  onBlur,
-  placeholder,
   touched,
-  disabled
+  disabled,
+  ['data-testid']: dataTestId
 }: SearchableSelectProps<T>) {
+  // React-select provides their own filteringOptions method, but it doesn't work with large option sets and virtualization.
   const loadOptions = async (searchTerm: string) => {
     const term = searchTerm.toLowerCase()
     const matches = options.filter((o) => o.label.toLowerCase().includes(term))
@@ -258,7 +269,7 @@ export function SearchableSelect<T>({
   }
 
   return (
-    <StyledSelect
+    <StyledAsyncSelect
       cacheOptions
       isSearchable
       classNamePrefix="react-select"
@@ -267,16 +278,15 @@ export function SearchableSelect<T>({
         DropdownIndicator,
         IndicatorSeparator: () => null
       }}
+      data-testid={dataTestId}
       defaultOptions={options.slice(0, VISIBLE_OPTIONS_COUNT)}
       error={error}
-      id={id}
+      innerProps={{ 'data-testid': dataTestId }}
+      inputId={id}
       isDisabled={disabled}
       loadOptions={loadOptions}
-      placeholder={placeholder}
       touched={touched}
-      // NOTE: null is not the same as undefined for AsyncSelect.
-      value={value ?? null}
-      onBlur={onBlur}
+      value={value}
       // @ts-expect-error -- using styled components prevents inferring generic.
       onChange={onChange}
     />

@@ -8,36 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import {
   Location,
   FieldPropsWithoutReferenceValue,
-  LocationType,
-  UUID
+  LocationType
 } from '@opencrvs/commons/client'
 import { getAdminStructureLocations } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { SearchableSelect } from '../../../components/forms/inputs/SearchableSelect'
 import { LocationSearch } from './LocationSearch'
-import { SearchableSelect } from './SearchableSelect'
-
-function useAdminLocations(partOf: string) {
-  const locationMap = useSelector(getAdminStructureLocations)
-
-  const locations = Object.values(locationMap)
-
-  const filteredLocations = locations.filter(
-    (location) => location.partOf === 'Location/' + partOf
-  )
-
-  return filteredLocations.map((location) => ({
-    value: location.id,
-    label: location.name
-  }))
-}
 
 function useAdministrativeAreas(
   searchableLocationTypes: LocationType[],
@@ -74,12 +58,11 @@ function AdministrativeAreaInput({
   onChange,
   value,
   partOf,
-  ...props
+  id
 }: FieldPropsWithoutReferenceValue<'ADMINISTRATIVE_AREA'> & {
   onChange: (val: string | null) => void
   partOf: string | null
-  value?: string
-  disabled?: boolean
+  value?: string | null
 }) {
   const locationTypes = React.useMemo(
     () => [LocationType.enum.ADMIN_STRUCTURE],
@@ -95,12 +78,13 @@ function AdministrativeAreaInput({
 
   return (
     <SearchableSelect
+      data-testid={'location__' + id}
+      id={id}
       options={options}
       value={selectedLocation}
       onChange={(opt) => {
         onChange(opt?.value ?? null)
       }}
-      {...props}
     />
   )
 }
