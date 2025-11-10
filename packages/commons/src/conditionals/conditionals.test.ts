@@ -1174,8 +1174,8 @@ describe('"event" conditionals', () => {
 
 describe('"valid name" conditionals', () => {
   describe('Valid names', () => {
-    it.only('should pass for empty string', () => {
-      const validName = 'John'
+    it('should pass for empty string', () => {
+      const validName = ''
       const params = {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' }),
