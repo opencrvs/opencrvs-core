@@ -58,11 +58,13 @@ function AdministrativeAreaInput({
   onChange,
   value,
   partOf,
-  id
+  id,
+  disabled
 }: FieldPropsWithoutReferenceValue<'ADMINISTRATIVE_AREA'> & {
   onChange: (val: string | null) => void
   partOf: string | null
   value?: string | null
+  disabled?: boolean
 }) {
   const locationTypes = React.useMemo(
     () => [LocationType.enum.ADMIN_STRUCTURE],
@@ -79,6 +81,7 @@ function AdministrativeAreaInput({
   return (
     <SearchableSelect
       data-testid={'location__' + id}
+      disabled={disabled}
       id={id}
       options={options}
       value={selectedLocation}
