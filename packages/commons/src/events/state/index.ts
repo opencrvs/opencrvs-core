@@ -206,7 +206,7 @@ export function getCurrentEventState(
     throw new Error(`Event ${event.id} has no creation action`)
   }
 
-  const acceptedActions = getAcceptedActions(event.actions).sort((a, b) =>
+  const acceptedActions = getAcceptedActions(event).sort((a, b) =>
     a.createdAt.localeCompare(b.createdAt)
   )
 
@@ -216,7 +216,7 @@ export function getCurrentEventState(
   // Includes only accepted actions metadata. Sometimes (e.g. on updatedAt) we want to show the accepted timestamp rather than the request timestamp.
   const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
 
-  const declaration = aggregateActionDeclarations(event.actions)
+  const declaration = aggregateActionDeclarations(event)
 
   return deepDropNulls({
     id: event.id,
@@ -348,21 +348,21 @@ export function getAnnotationFromDrafts(drafts: Draft[]) {
 }
 
 export function getActionAnnotation({
-  allActions,
+  event,
   actionType,
   draft
 }: {
-  allActions: Action[]
+  event: EventDocument
   actionType: ActionType
   draft?: Draft
 }): EventState {
-  const activeActions = getAcceptedActions(allActions)
+  const activeActions = getAcceptedActions(event)
 
   const action = findLast(activeActions, (a) => a.type === actionType)
 
   const actionWithCompleteAnnotation = action && {
     ...action,
-    annotation: getCompleteActionAnnotation({}, allActions, action)
+    annotation: getCompleteActionAnnotation({}, event, action)
   }
 
   const matchingDraft = draft?.action.type === actionType ? draft : undefined
