@@ -13,6 +13,17 @@ import { AddressField, NameField } from './FieldConfig'
 import { NonEmptyTextValue, TextValue } from './FieldValue'
 import { AddressType, StreetLevelDetailsValue } from './CompositeFieldValue'
 
+/**
+ * Dynamically builds a Zod schema for a "NAME" field based on its configuration.
+ *
+ * Why this exists: each form field can have its own "required" configuration.
+ * NAME fields are composite — made up of subfields like firstname, surname, and middlename.
+ * We can’t just hardcode a single Zod schema for all names, because different forms
+ * (e.g. applicant, father, mother) may require different parts.
+ *
+ * This function reads the configuration and builds a schema that respects which
+ * subfields are required and which are optional.
+ */
 export function getDynamicNameValue(field: NameField) {
   const nameConfiguration = field.configuration?.name
   return z.object({
@@ -30,6 +41,21 @@ export function getDynamicNameValue(field: NameField) {
 
 export type DynamicNameValue = ReturnType<typeof getDynamicNameValue>
 
+/**
+ * Dynamically builds a Zod schema for an "ADDRESS" field.
+ *
+ * Why this exists:
+ * The address field is dynamic — its structure depends on whether it’s a domestic
+ * or international address and which street-level fields (e.g. house number, ward, block)
+ * are configured for that event type.
+ *
+ * The validation ensures:
+ *  - Required core fields (country, addressType) are always present.
+ *  - Administrative area (like a district or region) can be optional.
+ *  - Street-level details are validated against the configured set of keys.
+ *    This prevents clients from sending unexpected data keys that don’t exist
+ *    in the configuration (a common data integrity issue).
+ */
 export function getDynamicAddressFieldValue(field: AddressField) {
   const streetAddressConfig = field.configuration?.streetAddressForm
   return z.object({
