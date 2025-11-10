@@ -124,14 +124,16 @@ export function resolveEventCustomFlags(
 
     const addedFlags = actionConfig.flags
       .filter(({ operation }) => operation === 'add')
-      // .filter(({ conditional }) =>
-      //   isFlagConditionMet(conditional, form, action)
-      // )
+      .filter(({ conditional }) =>
+        isFlagConditionMet(conditional, form, action)
+      )
       .map(({ id }) => id)
 
     const removedFlags = actionConfig.flags
       .filter(({ operation }) => operation === 'remove')
-      // TODO resolve conditionals
+      .filter(({ conditional }) =>
+        isFlagConditionMet(conditional, form, action)
+      )
       .map(({ id }) => id)
 
     // Add and remove flags
