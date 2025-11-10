@@ -88,20 +88,17 @@ describe.skip('resolveEventCustomFlags()', () => {
     expect(flags).toEqual([])
   })
 
-  test.todo(
-    'flag conditional can refer to fields in previous declaration',
-    () => {
-      const event: DeepPartial<EventDocument> = {
-        actions: [
-          { type: ActionType.DECLARE, declaration: { 'number-field': 101 } },
-          { type: ActionType.REGISTER, declaration: { 'number-field': 99 } }
-        ]
-      }
-
-      // @ts-expect-error - allow partial actions and event config
-      const flags = resolveEventCustomFlags(event, eventConfig)
-
-      expect(flags).toEqual([])
+  test.skip('flag conditional can refer to fields in previous declaration', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        { type: ActionType.DECLARE, declaration: { 'number-field': 101 } },
+        { type: ActionType.REGISTER, declaration: { 'number-field': 99 } }
+      ]
     }
-  )
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+
+    expect(flags).toEqual([])
+  })
 })
