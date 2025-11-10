@@ -532,7 +532,7 @@ export function getCompleteActionAnnotation(
 
 export function getCompleteActionDeclaration(
   declaration: EventState,
-  allActions: Action[],
+  event: EventDocument,
   action: ActionDocument
 ): EventState {
   /*
@@ -547,7 +547,7 @@ export function getCompleteActionDeclaration(
    * so that the current action includes the original details.
    */
   if (action.originalActionId) {
-    const originalAction = allActions.find(
+    const originalAction = event.actions.find(
       ({ id }) => id === action.originalActionId
     )
 
@@ -563,11 +563,11 @@ export function getCompleteActionDeclaration(
   return deepMerge(declaration, action.declaration)
 }
 
-export function getAcceptedActions(allActions: Action[]): ActionDocument[] {
-  return allActions.filter(isAcceptedAction).map((action) => ({
+export function getAcceptedActions(event: EventDocument): ActionDocument[] {
+  return event.actions.filter(isAcceptedAction).map((action) => ({
     ...action,
-    declaration: getCompleteActionDeclaration({}, allActions, action),
-    annotation: getCompleteActionAnnotation({}, allActions, action)
+    declaration: getCompleteActionDeclaration({}, event, action),
+    annotation: getCompleteActionAnnotation({}, event, action)
   }))
 }
 
@@ -578,8 +578,8 @@ const EXCLUDED_ACTIONS = [
   ActionType.REJECT_CORRECTION
 ]
 
-export function aggregateActionDeclarations(allActions: Action[]): EventState {
-  const allAcceptedActions = getAcceptedActions(allActions)
+export function aggregateActionDeclarations(event: EventDocument): EventState {
+  const allAcceptedActions = getAcceptedActions(event)
   const aggregatedActions = allAcceptedActions
     .filter((a) => !EXCLUDED_ACTIONS.some((type) => type === a.type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
@@ -599,13 +599,9 @@ export function aggregateActionDeclarations(allActions: Action[]): EventState {
         return declaration
       }
 
-      return getCompleteActionDeclaration(
-        declaration,
-        allActions,
-        requestAction
-      )
+      return getCompleteActionDeclaration(declaration, event, requestAction)
     }
 
-    return getCompleteActionDeclaration(declaration, allActions, action)
+    return getCompleteActionDeclaration(declaration, event, action)
   }, {})
 }

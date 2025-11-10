@@ -12,12 +12,14 @@
 import { uniq } from 'lodash'
 import { joinValues } from '../../utils'
 import { getStatusFromActions } from '.'
-import { Action, ActionStatus } from '../ActionDocument'
+import { Action, ActionStatus, EventState } from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
 import { EventStatus } from '../EventMetadata'
 import { InherentFlags, Flag } from '../Flag'
 import { EventConfig } from '../EventConfig'
 import { aggregateActionDeclarations } from '../utils'
+import { EventDocument, JSONSchema, validate } from 'src/client'
+import { formatISO } from 'date-fns'
 
 function isPendingCertification(actions: Action[]) {
   if (getStatusFromActions(actions) !== EventStatus.enum.REGISTERED) {
@@ -73,10 +75,34 @@ function isPotentialDuplicate(actions: Action[]): boolean {
   }, false)
 }
 
+function isFlagConditionMet(
+  conditional: JSONSchema,
+  form: EventState,
+  action: Action
+) {
+  return validate(conditional, {
+    $form: form,
+    $now: formatISO(new Date(action.createdAt), { representation: 'date' }),
+    $online: true,
+    $user: {
+      sub: '',
+      exp: '',
+      role: action.createdByRole,
+      algorithm: '',
+      scope: [],
+      userType: action.createdByUserType
+    }
+  })
+}
+
 export function resolveCustomFlagsFromActions(
-  actions: Action[],
+  event: EventDocument,
   config: EventConfig
 ): Flag[] {
+  const actions = event.actions
+    .filter(({ type }) => !isMetaAction(type))
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+
   return actions.reduce((acc, action, idx) => {
     const actionConfig = config.actions.find((a) => a.type === action.type)
 
@@ -84,9 +110,13 @@ export function resolveCustomFlagsFromActions(
       return acc
     }
 
-    const declaration = aggregateActionDeclarations(actions.slice(0, idx))
-    const annotation = aggregateActionDeclarations(actions.slice(0, idx))
-
+    // Resolve the form from the actions so far
+    const eventUpToThisAction = {
+      ...event,
+      actions: actions.slice(0, idx)
+    }
+    const declaration = aggregateActionDeclarations(eventUpToThisAction)
+    const annotation = aggregateActionDeclarations(eventUpToThisAction)
     const form = { ...declaration, ...annotation }
 
     // eslint-disable-next-line no-console
@@ -94,8 +124,9 @@ export function resolveCustomFlagsFromActions(
 
     const addedFlags = actionConfig.flags
       .filter(({ operation }) => operation === 'add')
-      // .filter(({ conditional }) => conditional)
-      // TODO resolve conditionals
+      .filter(({ conditional }) =>
+        isFlagConditionMet(conditional, form, action)
+      )
       .map(({ id }) => id)
 
     const removedFlags = actionConfig.flags
@@ -112,11 +143,11 @@ export function resolveCustomFlagsFromActions(
   }, [] as Flag[])
 }
 
-export function getFlagsFromActions(
-  actions: Action[],
+export function getEventFlags(
+  event: EventDocument,
   config: EventConfig
 ): Flag[] {
-  const sortedActions = actions
+  const sortedActions = event.actions
     .filter(({ type }) => !isMetaAction(type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
@@ -158,5 +189,5 @@ export function getFlagsFromActions(
     flags.push(InherentFlags.POTENTIAL_DUPLICATE)
   }
 
-  return [...flags, ...resolveCustomFlagsFromActions(sortedActions, config)]
+  return [...flags, ...resolveCustomFlagsFromActions(event, config)]
 }
