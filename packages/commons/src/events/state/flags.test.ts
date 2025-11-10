@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { ActionStatus } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { EventConfig } from '../EventConfig'
 import { EventDocument } from '../EventDocument'
@@ -15,6 +16,7 @@ import { field } from '../field'
 import { FieldType } from '../FieldType'
 import { PageTypes } from '../PageConfig'
 import { resolveEventCustomFlags } from './flags'
+import { subDays, formatISO } from 'date-fns'
 
 type DeepPartial<T> = T extends object
   ? {
@@ -33,6 +35,16 @@ const eventConfig: DeepPartial<EventConfig> = {
           conditional: field('number-field').isGreaterThan(100)
         }
       ]
+    },
+    {
+      type: ActionType.REGISTER,
+      flags: [
+        {
+          id: 'too-small-number-flag',
+          operation: 'add',
+          conditional: field('number-field').isLessThan(10)
+        }
+      ]
     }
   ],
   declaration: {
@@ -48,11 +60,18 @@ const eventConfig: DeepPartial<EventConfig> = {
   }
 }
 
-describe.skip('resolveEventCustomFlags()', () => {
+const now = new Date()
+
+describe('resolveEventCustomFlags()', () => {
   test('should add flag when conditional is met', () => {
     const event: DeepPartial<EventDocument> = {
       actions: [
-        { type: ActionType.DECLARE, declaration: { 'number-field': 101 } }
+        {
+          type: ActionType.DECLARE,
+          declaration: { 'number-field': 101 },
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
       ]
     }
 
@@ -65,7 +84,12 @@ describe.skip('resolveEventCustomFlags()', () => {
   test('should not add flag when conditional is not met', () => {
     const event: DeepPartial<EventDocument> = {
       actions: [
-        { type: ActionType.DECLARE, declaration: { 'number-field': 99 } }
+        {
+          type: ActionType.DECLARE,
+          declaration: { 'number-field': 99 },
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
       ]
     }
 
@@ -78,7 +102,12 @@ describe.skip('resolveEventCustomFlags()', () => {
   test('should not add flag when action does not have a flag config', () => {
     const event: DeepPartial<EventDocument> = {
       actions: [
-        { type: ActionType.REGISTER, declaration: { 'number-field': 101 } }
+        {
+          type: ActionType.PRINT_CERTIFICATE,
+          declaration: { 'number-field': 101 },
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
       ]
     }
 
@@ -88,17 +117,31 @@ describe.skip('resolveEventCustomFlags()', () => {
     expect(flags).toEqual([])
   })
 
-  test.skip('flag conditional can refer to fields in previous declaration', () => {
+  test('flag conditional can refer to fields in previous declaration', () => {
     const event: DeepPartial<EventDocument> = {
       actions: [
-        { type: ActionType.DECLARE, declaration: { 'number-field': 101 } },
-        { type: ActionType.REGISTER, declaration: { 'number-field': 99 } }
+        {
+          type: ActionType.DECLARE,
+          declaration: { 'number-field': 4 },
+          createdAt: formatISO(subDays(now, 1)),
+          status: ActionStatus.Accepted
+        },
+        {
+          type: ActionType.REGISTER,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
       ]
     }
 
     // @ts-expect-error - allow partial actions and event config
     const flags = resolveEventCustomFlags(event, eventConfig)
 
-    expect(flags).toEqual([])
+    expect(flags).toEqual(['too-small-number-flag'])
   })
+
+  test.todo('should ignore actions that are not accepted')
+  test.todo('should resolve flag conditional which refers to user role')
+  test.todo('should resolve flag conditional which refers to date')
 })

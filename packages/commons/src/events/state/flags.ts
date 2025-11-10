@@ -18,7 +18,7 @@ import { EventStatus } from '../EventMetadata'
 import { InherentFlags, Flag } from '../Flag'
 import { EventConfig } from '../EventConfig'
 import { aggregateActionDeclarations } from '../utils'
-import { formatISO } from 'date-fns'
+import { formatISO, parseISO, isValid } from 'date-fns'
 import { EventDocument } from '../EventDocument'
 import { JSONSchema } from '../../conditionals/conditionals'
 import { validate } from '../../conditionals/validate'
@@ -82,9 +82,17 @@ function isFlagConditionMet(
   form: EventState,
   action: Action
 ) {
+  const now = isValid(parseISO(action.createdAt))
+    ? formatISO(parseISO(action.createdAt), { representation: 'date' })
+    : formatISO(new Date(), { representation: 'date' })
+
+  console.log('conditional', JSON.stringify(conditional, null, 2))
+  console.log('form', form)
+  console.log('action', action)
+
   return validate(conditional, {
     $form: form,
-    $now: formatISO(new Date(action.createdAt), { representation: 'date' }),
+    $now: now,
     $online: true,
     $user: {
       sub: '',
@@ -114,8 +122,9 @@ export function resolveEventCustomFlags(
 
     const eventUpToThisAction = {
       ...event,
-      actions: actions.slice(0, idx)
+      actions: actions.slice(0, idx + 1)
     }
+
     const declaration = aggregateActionDeclarations(eventUpToThisAction)
     const annotation = aggregateActionDeclarations(eventUpToThisAction)
     const form = { ...declaration, ...annotation }
