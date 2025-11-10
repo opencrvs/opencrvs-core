@@ -24,6 +24,7 @@ export const InherentFlags = {
 
 export type InherentFlags = (typeof InherentFlags)[keyof typeof InherentFlags]
 
+// @TODO cihan fix this
 export const ActionFlag = z
   .string()
   .regex(
@@ -45,6 +46,8 @@ export type Flag = z.infer<typeof Flag>
  * Configuration of a custom flag that can be associated with a certain event type.
  */
 export const FlagConfig = z.object({
+  // @TODO: don't allow any inherent flags to be used here
+  // The country config should not interfere with inherent flags
   id: z.string().describe('Unique identifier of the flag.'),
   requiresAction: z
     .boolean()

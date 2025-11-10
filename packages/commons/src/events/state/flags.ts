@@ -9,12 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { uniq } from 'lodash'
 import { joinValues } from '../../utils'
 import { getStatusFromActions } from '.'
 import { Action, ActionStatus } from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
 import { EventStatus } from '../EventMetadata'
 import { InherentFlags, Flag } from '../Flag'
+import { EventConfig } from '../EventConfig'
 
 function isPendingCertification(actions: Action[]) {
   if (getStatusFromActions(actions) !== EventStatus.enum.REGISTERED) {
@@ -70,7 +72,41 @@ function isPotentialDuplicate(actions: Action[]): boolean {
   }, false)
 }
 
-export function getFlagsFromActions(actions: Action[]): Flag[] {
+export function resolveCustomFlagsFromActions(
+  actions: Action[],
+  config: EventConfig
+): Flag[] {
+  return actions.reduce((acc, action) => {
+    const actionConfig = config.actions.find((a) => a.type === action.type)
+
+    if (!actionConfig) {
+      return acc
+    }
+
+    const addedFlags = actionConfig.flags
+      .filter(({ operation }) => operation === 'add')
+      // .filter(({ conditional }) => conditional)
+      // TODO resolve conditionals
+      .map(({ id }) => id)
+
+    const removedFlags = actionConfig.flags
+      .filter(({ operation }) => operation === 'remove')
+      // TODO resolve conditionals
+      .map(({ id }) => id)
+
+    // Add and remove flags
+    const flags = [...acc, ...addedFlags].filter(
+      (flag) => !removedFlags.includes(flag)
+    )
+
+    return uniq(flags)
+  }, [] as Flag[])
+}
+
+export function getFlagsFromActions(
+  actions: Action[],
+  config: EventConfig
+): Flag[] {
   const sortedActions = actions
     .filter(({ type }) => !isMetaAction(type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
@@ -90,7 +126,6 @@ export function getFlagsFromActions(actions: Action[]): Flag[] {
    *  - `ACTION:requested` : An action sent which is not yet accepted or rejected by country config.
    *  - `ACTION:rejected`  : An action which was rejected by country config.
    */
-
   const flags = Object.entries(actionStatus)
     .filter(([, status]) => status !== ActionStatus.Accepted)
     .map(([type, status]) => {
@@ -114,5 +149,5 @@ export function getFlagsFromActions(actions: Action[]): Flag[] {
     flags.push(InherentFlags.POTENTIAL_DUPLICATE)
   }
 
-  return flags
+  return [...flags, ...resolveCustomFlagsFromActions(sortedActions, config)]
 }
