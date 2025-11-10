@@ -224,7 +224,6 @@ export class LocationSearch extends React.Component<IProps, IState> {
   }
 
   dropDownItemSelect = (item: ISearchLocation) => {
-    console.log('drop down item select', item)
     if (this.props.searchHandler) {
       this.props.searchHandler(item)
     }

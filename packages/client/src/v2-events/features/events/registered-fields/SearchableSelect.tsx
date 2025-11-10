@@ -9,18 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { components, DropdownIndicatorProps, MenuListProps } from 'react-select'
-import AsyncSelect from 'react-select/async'
+import {
+  components,
+  DropdownIndicatorProps,
+  GroupBase,
+  MenuListProps,
+  OptionsOrGroups,
+  SingleValue
+} from 'react-select'
+import AsyncSelect, { AsyncProps } from 'react-select/async'
 import { List, RowComponentProps } from 'react-window'
 import styled from 'styled-components'
 import { Icon } from '@opencrvs/components/src/Icon'
+import { Option } from '../../../utils'
 
 const ITEM_HEIGHT = 40
-
-export interface Option<T = string> {
-  value: T
-  label: string
-}
 
 const DropDownItem = styled.li`
   height: 40px;
@@ -41,34 +44,30 @@ const DropDownItem = styled.li`
   }
 `
 
-interface SearchableSelectProps<T = string> {
-  onChange: (value: Option<T> | undefined) => void
-  onBlur?: (e: React.FocusEvent<HTMLElement>) => void
-  value: Option<T> | undefined
-  options: Option<T>[]
-  id: string
-  error?: boolean
-  touched?: boolean
-  placeholder?: string
-}
-
 function RowComponent<T>({
   selectOption,
   options,
   index,
   style
 }: RowComponentProps<{
-  options: Option<T>[]
+  options: OptionsOrGroups<Option<T>, GroupBase<Option<T>>>
   selectOption: (newValue: Option<T>) => void
 }>) {
+  const option = options[index]
+
+  if (!('value' in option)) {
+    // Groups are not selectable rows
+    return <div style={style} />
+  }
+
   return (
     <DropDownItem
       key={index}
       id={`locationOption${index}`}
       style={style}
-      onClick={() => selectOption(options[index])}
+      onClick={option.value ? () => selectOption(option) : undefined}
     >
-      {options[index].label}
+      {option.label}
     </DropDownItem>
   )
 }
@@ -79,7 +78,7 @@ function MenuList<T>({
   innerProps,
   innerRef,
   maxHeight
-}: MenuListProps<Option<T>, false>) {
+}: MenuListProps<Option<T>, false, GroupBase<Option<T>>>) {
   return (
     // This div becomes the scroll container
     <div
@@ -102,7 +101,9 @@ function MenuList<T>({
   )
 }
 
-function DropdownIndicator(props: DropdownIndicatorProps<Option>) {
+function DropdownIndicator<T>(
+  props: DropdownIndicatorProps<Option<T>, false, GroupBase<Option<T>>>
+) {
   return (
     <components.DropdownIndicator {...props}>
       <Icon color="grey600" name="CaretDown" size="small" />
@@ -110,7 +111,18 @@ function DropdownIndicator(props: DropdownIndicatorProps<Option>) {
   )
 }
 
-const StyledSelect = styled(AsyncSelect)<SearchableSelectProps>`
+interface StyledProps {
+  error?: boolean
+  touched?: boolean
+}
+
+function BaseAsyncSelect<T>(
+  props: AsyncProps<Option<T>, false, GroupBase<Option<T>>> & StyledProps
+) {
+  return <AsyncSelect {...props} />
+}
+
+const StyledSelect = styled(BaseAsyncSelect)<StyledProps>`
   width: 100%;
   ${({ theme }) => theme.fonts.reg19};
   background: ${({ theme }) => theme.colors.white};
@@ -124,26 +136,26 @@ const StyledSelect = styled(AsyncSelect)<SearchableSelectProps>`
     height: 46px;
     cursor: pointer;
     border: 1.5px solid
-      ${({ error, touched, disabled, theme }) =>
+      ${({ error, touched, isDisabled, theme }) =>
         /* eslint-disable no-nested-ternary */
         error && touched
           ? theme.colors.negative
-          : disabled
+          : isDisabled
             ? theme.colors.grey300
             : theme.colors.copy};
     &:hover {
       border: 1.5px solid
-        ${({ error, touched, disabled, theme }) =>
+        ${({ error, touched, isDisabled, theme }) =>
           error && touched
             ? theme.colors.negative
-            : disabled
+            : isDisabled
               ? theme.colors.grey300
               : theme.colors.copy};
       outline: 0.5px solid
-        ${({ error, touched, disabled, theme }) =>
+        ${({ error, touched, isDisabled, theme }) =>
           error && touched
             ? theme.colors.negative
-            : disabled
+            : isDisabled
               ? theme.colors.grey300
               : theme.colors.copy};
     }
@@ -217,7 +229,27 @@ const StyledSelect = styled(AsyncSelect)<SearchableSelectProps>`
 
 const VISIBLE_OPTIONS_COUNT = 50
 
-export function SearchableSelect({ options, ...props }: SearchableSelectProps) {
+export interface SearchableSelectProps<T = string> extends StyledProps {
+  id: string
+  options: Option<T>[]
+  value: Option<T> | null
+  placeholder?: string
+  disabled?: boolean
+  onBlur?: (e: React.FocusEvent<HTMLElement>) => void
+  onChange: (val: SingleValue<Option<T>>) => void
+}
+
+export function SearchableSelect<T>({
+  options,
+  onChange,
+  value,
+  id,
+  error,
+  onBlur,
+  placeholder,
+  touched,
+  disabled
+}: SearchableSelectProps<T>) {
   const loadOptions = async (searchTerm: string) => {
     const term = searchTerm.toLowerCase()
     const matches = options.filter((o) => o.label.toLowerCase().includes(term))
@@ -227,7 +259,6 @@ export function SearchableSelect({ options, ...props }: SearchableSelectProps) {
 
   return (
     <StyledSelect
-      {...props}
       cacheOptions
       isSearchable
       classNamePrefix="react-select"
@@ -237,9 +268,17 @@ export function SearchableSelect({ options, ...props }: SearchableSelectProps) {
         IndicatorSeparator: () => null
       }}
       defaultOptions={options.slice(0, VISIBLE_OPTIONS_COUNT)}
+      error={error}
+      id={id}
+      isDisabled={disabled}
       loadOptions={loadOptions}
+      placeholder={placeholder}
+      touched={touched}
       // NOTE: null is not the same as undefined for AsyncSelect.
-      value={props.value ?? null}
+      value={value ?? null}
+      onBlur={onBlur}
+      // @ts-expect-error -- using styled components prevents inferring generic.
+      onChange={onChange}
     />
   )
 }
