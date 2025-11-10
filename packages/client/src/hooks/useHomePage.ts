@@ -17,7 +17,7 @@ import {
   DASHBOARD
 } from '@client/navigation/routes'
 import { Path, useLocation } from 'react-router'
-import { useNavigation } from './useNavigation'
+import { NavigationConfig, useNavigation } from './useNavigation'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import {
   formatUrl,
@@ -35,17 +35,24 @@ export const useHomePage = () => {
 
   const firstDashboard = window.config.DASHBOARDS?.at(0)?.id
 
-  let firstNavItem: string | undefined
-
-  for (const group of routes) {
-    const tab = group.tabs.find((tab) =>
-      tab.name === WORKQUEUE_TABS.dashboard ? !!firstDashboard : true
-    )?.name
-    if (tab) {
-      firstNavItem = tab
-      break
-    }
+  const getFirstValidTab = (group: NavigationConfig) => {
+    const firstTab = group.tabs.find((tab) => {
+      if (
+        tab.name === WORKQUEUE_TABS.dashboard &&
+        window.config.DASHBOARDS.length === 0
+      ) {
+        return false
+      }
+      return true
+    })
+    return firstTab?.name
   }
+
+  const firstGroup = routes.find(
+    (navigationGroup) => !!getFirstValidTab(navigationGroup)
+  )
+
+  const firstNavItem = firstGroup && getFirstValidTab(firstGroup)
 
   let path: string | Partial<Path> = REGISTRAR_HOME
 
