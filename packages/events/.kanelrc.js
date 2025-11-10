@@ -26,6 +26,5 @@ module.exports = {
   enumStyle: 'type',
   generateIdentifierType: null, // Kanel creates nominal branded types by default but we're using custom UUID types. This overrides that.
   preRenderHooks: [makeKyselyHook(), kyselyCamelCaseHook],
-  schema: ['app'],
   typeFilter: (type) => type.name !== 'pgmigrations'
 }
