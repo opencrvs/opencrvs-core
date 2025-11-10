@@ -13,6 +13,7 @@ import { AddressType } from '../events/CompositeFieldValue'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { UUID } from '../uuid'
 import { tennisClubMembershipEvent } from '../fixtures'
+import { FieldType } from '../index'
 
 const testCases = [
   {
@@ -71,7 +72,7 @@ testCases.map(({ title, address, success }) => {
   test(title, () => {
     const addressConfig = tennisClubMembershipEvent.declaration.pages
       .flatMap((page) => page.fields)
-      .find((f) => f.type === 'ADDRESS')
+      .find((f) => f.type === FieldType.ADDRESS)
 
     if (!addressConfig) {
       throw new Error('Address config not found')
