@@ -65,7 +65,7 @@ export type EventConditionalParameters = CommonConditionalParameters & {
 
 export type FormConditionalParameters = CommonConditionalParameters & {
   $form: EventState | Record<string, unknown>
-  $locations?: Array<{ id: UUID }>
+  $leafAdminStructureLocationIds?: Array<{ id: UUID }>
 }
 
 export type ConditionalParameters =
