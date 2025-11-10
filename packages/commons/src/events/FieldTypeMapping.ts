@@ -70,17 +70,13 @@ import {
   VerificationStatusValue,
   AgeValue
 } from './FieldValue'
-
 import { FullDocumentPath } from '../documents'
-
 import {
   AddressFieldValue,
-  // AddressFieldUpdateValue,
   FileFieldValue,
   FileFieldWithOptionValue,
   AddressType,
   NameFieldValue,
-  // NameFieldUpdateValue,
   HttpFieldUpdateValue,
   QueryParamReaderFieldUpdateValue,
   QrReaderFieldValue,
