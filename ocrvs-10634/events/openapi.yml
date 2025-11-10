@@ -752,7 +752,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 68633bde-8554-4266-84b9-39726c96b89e
+                transactionId: fea5ed8c-db7c-4a88-a87e-9f7ef257e345
                 type: birth
       responses:
         "200":
@@ -838,7 +838,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: b9ac4438-739e-4199-9b29-8b27f5a4dd2e
+                transactionId: 869c5f58-1e77-4e6b-9e91-1068504a246c
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -11656,6 +11656,7 @@ components:
                         required:
                           - country
                           - addressType
+                          - administrativeArea
                       - type: object
                         properties:
                           country:
@@ -11759,14 +11760,13 @@ components:
                             properties:
                               firstname:
                                 type: string
+                                nullable: true
                               surname:
                                 type: string
+                                nullable: true
                               middlename:
                                 type: string
                                 nullable: true
-                            required:
-                              - firstname
-                              - surname
                           - type: "null"
                   - type: number
                   - type: object
@@ -11830,6 +11830,7 @@ components:
                               required:
                                 - country
                                 - addressType
+                                - administrativeArea
                             - type: object
                               properties:
                                 country:
@@ -11933,14 +11934,13 @@ components:
                                   properties:
                                     firstname:
                                       type: string
+                                      nullable: true
                                     surname:
                                       type: string
+                                      nullable: true
                                     middlename:
                                       type: string
                                       nullable: true
-                                  required:
-                                    - firstname
-                                    - surname
                                 - type: "null"
                         - type: number
                         - type: object
