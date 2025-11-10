@@ -415,7 +415,8 @@ const declaration = {
   'applicant.region': 'Dhaka',
   'applicant.address': {
     country: 'Bangladesh',
-    addressType: 'DOMESTIC'
+    addressType: 'DOMESTIC',
+    administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a'
   },
   'applicant.documents': [
     {
