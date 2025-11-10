@@ -77,7 +77,6 @@ describe('resolveEventCustomFlags()', () => {
 
     // @ts-expect-error - allow partial actions and event config
     const flags = resolveEventCustomFlags(event, eventConfig)
-
     expect(flags).toEqual(['too-large-number-flag'])
   })
 
@@ -95,7 +94,6 @@ describe('resolveEventCustomFlags()', () => {
 
     // @ts-expect-error - allow partial actions and event config
     const flags = resolveEventCustomFlags(event, eventConfig)
-
     expect(flags).toEqual([])
   })
 
@@ -113,7 +111,6 @@ describe('resolveEventCustomFlags()', () => {
 
     // @ts-expect-error - allow partial actions and event config
     const flags = resolveEventCustomFlags(event, eventConfig)
-
     expect(flags).toEqual([])
   })
 
@@ -137,11 +134,11 @@ describe('resolveEventCustomFlags()', () => {
 
     // @ts-expect-error - allow partial actions and event config
     const flags = resolveEventCustomFlags(event, eventConfig)
-
     expect(flags).toEqual(['too-small-number-flag'])
   })
 
   test.todo('should ignore actions that are not accepted')
   test.todo('should resolve flag conditional which refers to user role')
   test.todo('should resolve flag conditional which refers to date')
+  test.todo('should add and remove flags')
 })
