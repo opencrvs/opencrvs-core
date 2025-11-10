@@ -18,8 +18,10 @@ import { EventStatus } from '../EventMetadata'
 import { InherentFlags, Flag } from '../Flag'
 import { EventConfig } from '../EventConfig'
 import { aggregateActionDeclarations } from '../utils'
-import { EventDocument, JSONSchema, validate } from 'src/client'
 import { formatISO } from 'date-fns'
+import { EventDocument } from '../EventDocument'
+import { JSONSchema } from '../../conditionals/conditionals'
+import { validate } from '../../conditionals/validate'
 
 function isPendingCertification(actions: Action[]) {
   if (getStatusFromActions(actions) !== EventStatus.enum.REGISTERED) {
@@ -110,7 +112,6 @@ export function resolveEventCustomFlags(
       return acc
     }
 
-    // Resolve the form from the actions so far
     const eventUpToThisAction = {
       ...event,
       actions: actions.slice(0, idx)
@@ -139,7 +140,7 @@ export function resolveEventCustomFlags(
     )
 
     return uniq(flags)
-  }, [] as Flag[])
+  }, [])
 }
 
 export function getEventFlags(
