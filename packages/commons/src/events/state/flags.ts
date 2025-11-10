@@ -95,7 +95,7 @@ function isFlagConditionMet(
   })
 }
 
-export function resolveCustomFlagsFromActions(
+export function resolveEventCustomFlags(
   event: EventDocument,
   config: EventConfig
 ): Flag[] {
@@ -189,5 +189,5 @@ export function getEventFlags(
     flags.push(InherentFlags.POTENTIAL_DUPLICATE)
   }
 
-  return [...flags, ...resolveCustomFlagsFromActions(event, config)]
+  return [...flags, ...resolveEventCustomFlags(event, config)]
 }
