@@ -17,6 +17,7 @@ import { ActionType, isMetaAction } from '../ActionType'
 import { EventStatus } from '../EventMetadata'
 import { InherentFlags, Flag } from '../Flag'
 import { EventConfig } from '../EventConfig'
+import { aggregateActionDeclarations } from '../utils'
 
 function isPendingCertification(actions: Action[]) {
   if (getStatusFromActions(actions) !== EventStatus.enum.REGISTERED) {
@@ -76,12 +77,19 @@ export function resolveCustomFlagsFromActions(
   actions: Action[],
   config: EventConfig
 ): Flag[] {
-  return actions.reduce((acc, action) => {
+  return actions.reduce((acc, action, idx) => {
     const actionConfig = config.actions.find((a) => a.type === action.type)
 
     if (!actionConfig) {
       return acc
     }
+
+    const declaration = aggregateActionDeclarations(actions.slice(0, idx))
+    const annotation = aggregateActionDeclarations(actions.slice(0, idx))
+
+    const form = { ...declaration, ...annotation }
+
+    console.log('form that should be used in conditional?', form)
 
     const addedFlags = actionConfig.flags
       .filter(({ operation }) => operation === 'add')
