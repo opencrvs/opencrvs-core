@@ -173,7 +173,9 @@ function schemaPriority(schema: z.ZodTypeAny) {
 // Unlike z.union(), this allows us to detect overlapping schemas
 // (e.g. when multiple schemas return success=true for the same input)
 // and deterministically pick the "most specific" one.
-function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(schemas: T) {
+export function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(
+  schemas: T
+) {
   return z.custom<z.infer<T[number]>>((val) => {
     const successful = schemas.filter((s) => s.safeParse(val).success)
     if (successful.length === 1) {
