@@ -32,10 +32,20 @@ export const useHomePage = () => {
   const { pathname } = useLocation()
   const { routes } = useNavigation()
   const userDetails = useSelector(getUserDetails)
-  const firstNavItem = routes
-    .filter((navigationGroup) => navigationGroup.tabs.length > 0)
-    .at(0)
-    ?.tabs.at(0)?.name
+
+  const firstDashboard = window.config.DASHBOARDS?.at(0)?.id
+
+  let firstNavItem: string | undefined
+
+  for (const group of routes) {
+    const tab = group.tabs.find((tab) =>
+      tab.name === WORKQUEUE_TABS.dashboard ? !!firstDashboard : true
+    )?.name
+    if (tab) {
+      firstNavItem = tab
+      break
+    }
+  }
 
   let path: string | Partial<Path> = REGISTRAR_HOME
 
@@ -76,7 +86,7 @@ export const useHomePage = () => {
       path = ALL_USER_EMAIL
       break
     case WORKQUEUE_TABS.dashboard:
-      path = DASHBOARD
+      path = formatUrl(DASHBOARD, { id: firstDashboard! })
       break
     case WORKQUEUE_TABS.performance:
       path = generatePerformanceHomeUrl({
