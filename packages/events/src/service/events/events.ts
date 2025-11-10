@@ -89,7 +89,7 @@ async function deleteEventAttachments(
     token
   })
 
-  const actions = getAcceptedActions(event.actions)
+  const actions = getAcceptedActions(event)
   // @TODO: Check that this works after making sure data incldues only declaration fields.
   const fieldConfigs = getDeclarationFields(configuration)
   for (const ac of actions) {
