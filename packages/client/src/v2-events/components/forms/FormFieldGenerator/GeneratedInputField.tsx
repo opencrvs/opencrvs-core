@@ -305,6 +305,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <TimeField.Input
             {...inputProps}
+            use12HourFormat={field.config.configuration?.use12HourFormat}
             value={field.value}
             onChange={(val: string) =>
               onFieldValueChange(fieldDefinition.id, val)
