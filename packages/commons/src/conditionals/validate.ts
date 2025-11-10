@@ -184,7 +184,8 @@ export function isConditionMet(
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
     $online: isOnline(),
-    $user: context.user
+    $user: context.user,
+    $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? []
   })
 }
 
@@ -234,7 +235,8 @@ function isFieldConditionMet(
     $form: form,
     $now: formatISO(new Date(), { representation: 'date' }),
     $online: isOnline(),
-    $user: context.user
+    $user: context.user,
+    $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? []
   })
 
   return validConditionals.includes(conditionalType)
