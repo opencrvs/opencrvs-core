@@ -86,10 +86,6 @@ function isFlagConditionMet(
     ? formatISO(parseISO(action.createdAt), { representation: 'date' })
     : formatISO(new Date(), { representation: 'date' })
 
-  console.log('conditional', JSON.stringify(conditional, null, 2))
-  console.log('form', form)
-  console.log('action', action)
-
   return validate(conditional, {
     $form: form,
     $now: now,
