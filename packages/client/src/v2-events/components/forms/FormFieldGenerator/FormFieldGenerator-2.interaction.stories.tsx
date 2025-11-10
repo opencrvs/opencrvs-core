@@ -495,7 +495,7 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         ...(await canvas.findAllByRole('checkbox')),
         ...(await canvas.findAllByRole('radio'))
       ]
-      await expect(formFields).toHaveLength(31)
+      await expect(formFields).toHaveLength(32)
       for (const f of formFields) {
         await expect(f).toBeDisabled()
       }
@@ -545,7 +545,7 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         ...(await canvas.findAllByRole('checkbox')),
         ...(await canvas.findAllByRole('radio'))
       ]
-      await expect(formFields).toHaveLength(30)
+      await expect(formFields).toHaveLength(31)
 
       for (const f of formFields) {
         await expect(f).not.toBeDisabled()
