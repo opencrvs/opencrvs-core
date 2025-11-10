@@ -119,9 +119,6 @@ export function resolveEventCustomFlags(
     const annotation = aggregateActionDeclarations(eventUpToThisAction)
     const form = { ...declaration, ...annotation }
 
-    // eslint-disable-next-line no-console
-    console.log('form that should be used in conditional?', form)
-
     const addedFlags = actionConfig.flags
       .filter(({ operation }) => operation === 'add')
       .filter(({ conditional }) =>
