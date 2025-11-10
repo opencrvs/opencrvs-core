@@ -101,7 +101,7 @@ describe('event.actions.notify', () => {
     }
 
     const response = await client.event.actions.notify.request(payload)
-    const activeActions = getAcceptedActions(response)
+    const activeActions = getAcceptedActions(response.actions)
 
     expect(
       activeActions.find((action) => action.type === ActionType.NOTIFY)
