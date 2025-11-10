@@ -444,7 +444,7 @@ test('Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column',
   expect(resultForTomorrow).toHaveLength(0)
 })
 
-test.skip('Returns events that match the name field criteria of applicant', async () => {
+test('Returns events that match the name field criteria of applicant', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
@@ -463,12 +463,7 @@ test.skip('Returns events that match the name field criteria of applicant', asyn
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      streetLevelDetails: {
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
-      }
+      streetLevelDetails: {}
     }
   } satisfies ActionUpdate
 
@@ -482,12 +477,7 @@ test.skip('Returns events that match the name field criteria of applicant', asyn
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      streetLevelDetails: {
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
-      }
+      streetLevelDetails: {}
     }
   } satisfies ActionUpdate
 
@@ -501,12 +491,7 @@ test.skip('Returns events that match the name field criteria of applicant', asyn
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      streetLevelDetails: {
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
-      }
+      streetLevelDetails: {}
     }
   } satisfies ActionUpdate
 
@@ -537,8 +522,7 @@ test.skip('Returns events that match the name field criteria of applicant', asyn
         {
           eventType: TENNIS_CLUB_MEMBERSHIP,
           data: {
-            // @TODO: Fix when working on https://github.com/opencrvs/opencrvs-core/issues/9765
-            'applicant.name.firstname': { type: 'exact', term: 'John' },
+            'applicant.name': { type: 'fuzzy', term: 'John' },
             'applicant.dob': { type: 'exact', term: '2000-01-01' }
           }
         }
