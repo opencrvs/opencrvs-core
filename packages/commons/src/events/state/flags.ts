@@ -89,6 +89,7 @@ export function resolveCustomFlagsFromActions(
 
     const form = { ...declaration, ...annotation }
 
+    // eslint-disable-next-line no-console
     console.log('form that should be used in conditional?', form)
 
     const addedFlags = actionConfig.flags
