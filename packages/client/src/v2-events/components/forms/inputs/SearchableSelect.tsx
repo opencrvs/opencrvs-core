@@ -278,7 +278,6 @@ export function SearchableSelect<T = string>({
         DropdownIndicator,
         IndicatorSeparator: () => null
       }}
-      data-testid={dataTestId}
       defaultOptions={options.slice(0, VISIBLE_OPTIONS_COUNT)}
       error={error}
       innerProps={{ 'data-testid': dataTestId }}
