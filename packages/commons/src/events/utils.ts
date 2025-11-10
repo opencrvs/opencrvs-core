@@ -500,7 +500,7 @@ export function getPendingAction(actions: Action[]): ActionDocument {
 
 export function getCompleteActionAnnotation(
   annotation: EventState,
-  allActions: Action[],
+  event: EventDocument,
   action: ActionDocument
 ): EventState {
   /*
@@ -515,7 +515,7 @@ export function getCompleteActionAnnotation(
    * so that the current action includes the original details.
    */
   if (action.originalActionId) {
-    const originalAction = allActions.find(
+    const originalAction = event.actions.find(
       ({ id }) => id === action.originalActionId
     )
     if (originalAction?.status !== ActionStatus.Requested) {
