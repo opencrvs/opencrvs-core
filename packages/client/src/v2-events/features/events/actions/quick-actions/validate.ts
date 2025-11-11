@@ -13,12 +13,6 @@ import { QuickActionConfig } from './useQuickActionModal'
 
 export const validate: QuickActionConfig = {
   modal: {
-    label: {
-      defaultMessage: 'Validate',
-      description:
-        'This is shown as the action name anywhere the user can trigger the action from',
-      id: 'event.birth.action.validate.label'
-    },
     description: {
       id: 'review.validate.description.complete',
       defaultMessage:

@@ -27,12 +27,13 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useUserAllowedActions } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useModal } from '../../../../hooks/useModal'
 import { useEvents } from '../../useEvents/useEvents'
+import { actionLabels } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { validate } from './validate'
 import { register } from './register'
 import { archive } from './archive'
 
 interface ModalConfig {
-  label: MessageDescriptor
+  label?: MessageDescriptor
   description: MessageDescriptor
   confirmButtonType?: 'primary' | 'danger'
   confirmButtonLabel?: MessageDescriptor
@@ -64,7 +65,7 @@ function QuickActionModal({
   config
 }: {
   close: (result: boolean) => void
-  config: ModalConfig
+  config: ModalConfig & { label: MessageDescriptor }
 }) {
   const intl = useIntl()
 
@@ -115,8 +116,9 @@ export function useQuickActionModal(event: EventIndex) {
     workqueue?: string
   ) => {
     const config = quickActions[actionType]
+    const label = actionLabels[actionType]
     const confirmed = await openModal<boolean>((close) => (
-      <QuickActionModal close={close} config={config.modal} />
+      <QuickActionModal close={close} config={{ ...config.modal, label }} />
     ))
 
     // On confirmed modal, we will:
@@ -159,16 +161,18 @@ export function useCustomActionModal(event: EventIndex) {
     actionConfig: CustomActionConfig,
     workqueue?: string
   ) => {
-    const config: ModalConfig = {
-      ...customActionConfigBase,
-      label: actionConfig.label,
-      description: {
-        id: 'custom.action.description',
-        defaultMessage: 'Custom action description'
-      }
-    }
     const confirmed = await openModal<boolean>((close) => (
-      <QuickActionModal close={close} config={config} />
+      <QuickActionModal
+        close={close}
+        config={{
+          ...customActionConfigBase,
+          label: actionConfig.label,
+          description: {
+            id: 'custom.action.description',
+            defaultMessage: 'Custom action description'
+          }
+        }}
+      />
     ))
 
     if (confirmed) {

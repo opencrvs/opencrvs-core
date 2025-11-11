@@ -13,11 +13,6 @@ import { QuickActionConfig } from './useQuickActionModal'
 
 export const archive: QuickActionConfig = {
   modal: {
-    label: {
-      defaultMessage: 'Archive',
-      description: 'Label for archive record button in dropdown menu',
-      id: 'event.birth.action.archive.label'
-    },
     description: {
       id: 'recordAudit.archive.confirmation.body',
       defaultMessage:
