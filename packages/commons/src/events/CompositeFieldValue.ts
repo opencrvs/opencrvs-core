@@ -55,12 +55,19 @@ export const StreetLevelDetailsValue = z
   .record(z.string(), z.string())
   .optional()
 
-export const BaseAddressFieldValue = z.object({
+const StreetLevelDetailsUpdateValue = z
+  .record(z.string(), z.string().nullable())
+  .nullish()
+
+const BaseAddressFieldValue = z.object({
   country: z.string(),
   streetLevelDetails: StreetLevelDetailsValue
 })
 
-export type BaseAddressFieldValue = z.infer<typeof BaseAddressFieldValue>
+const BaseAddressFieldUpdateValue = z.object({
+  country: z.string().nullish(),
+  streetLevelDetails: StreetLevelDetailsUpdateValue
+})
 
 export const DomesticAddressFieldValue = BaseAddressFieldValue.extend({
   addressType: z.literal(AddressType.DOMESTIC),
@@ -80,26 +87,30 @@ export const AddressFieldValue = z.discriminatedUnion('addressType', [
   InternationalAddressFieldValue
 ])
 
-const StreetLevelDetailsUpdateValue = z
-  .record(z.string(), z.string().nullable())
-  .optional()
+export type AddressFieldValue = z.infer<typeof AddressFieldValue>
 
-const DomesticAddressUpdatedFieldValue = BaseAddressFieldValue.extend({
+const DomesticAddressUpdateFieldValue = BaseAddressFieldUpdateValue.extend({
   addressType: z.literal(AddressType.DOMESTIC),
   administrativeArea: z
     .string()
     .uuid()
-    .nullish() /* Leaf level admin structure */,
-  streetLevelDetails: StreetLevelDetailsUpdateValue
+    .nullish() /* Leaf level admin structure */
 })
 
-export const AddressFieldUpdateValue = z.discriminatedUnion('addressType', [
-  DomesticAddressUpdatedFieldValue,
-  InternationalAddressFieldValue
-])
-export type AddressFieldUpdateValue = z.infer<typeof AddressFieldUpdateValue>
+const InternationalAddressUpdateFieldValue = BaseAddressFieldUpdateValue.extend(
+  {
+    addressType: z.literal(AddressType.INTERNATIONAL)
+  }
+)
 
-export type AddressFieldValue = z.infer<typeof AddressFieldValue>
+export const AddressFieldUpdateValue = z
+  .discriminatedUnion('addressType', [
+    DomesticAddressUpdateFieldValue,
+    InternationalAddressUpdateFieldValue
+  ])
+  .nullish()
+
+export type AddressFieldUpdateValue = z.infer<typeof AddressFieldUpdateValue>
 
 export const FileFieldValueWithOption = z.object({
   path: FullDocumentPath,
