@@ -8,8 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { useEffect, useRef } from 'react'
 import { create } from 'zustand'
 import { FormikTouched } from 'formik'
 import { EventState } from '@opencrvs/commons/client'
