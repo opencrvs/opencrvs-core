@@ -132,6 +132,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
         streetLevelDetails: {
           state: 'State',
           district2: 'District2'
@@ -154,6 +155,7 @@ const declaration = {
   'applicant.address': {
     country: 'FAR',
     addressType: AddressType.DOMESTIC,
+    administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
     streetLevelDetails: {
       state: 'State',
       district2: 'District2'
@@ -205,6 +207,7 @@ test('Prevents adding birth date in future', async () => {
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
       streetLevelDetails: {
         state: 'State',
         district2: 'District2'
