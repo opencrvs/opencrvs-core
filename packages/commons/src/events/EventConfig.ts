@@ -18,6 +18,7 @@ import { DeclarationFormConfig } from './FormConfig'
 
 import { FieldType } from './FieldType'
 import { FieldReference } from './FieldConfig'
+import { FlagConfig } from './Flag'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -60,6 +61,13 @@ export const EventConfig = z
       .default([])
       .describe(
         'Configuration of fields available in the advanced search feature.'
+      ),
+    flags: z
+      .array(FlagConfig)
+      .optional()
+      .default([])
+      .describe(
+        'Configuration of flags associated with the actions of this event type.'
       )
   })
   .superRefine((event, ctx) => {
@@ -122,6 +130,22 @@ export const EventConfig = z
           code: 'custom',
           message: `Field specified for date of event is of type: ${eventDateFieldId.type}, but it needs to be of type: ${FieldType.DATE}`,
           path: ['dateOfEvent.fieldType']
+        })
+      }
+    }
+
+    // Validate that all referenced action flags are configured in the event flags array.
+    const configuredFlagIds = event.flags.map((flag) => flag.id)
+    const actionFlagIds = event.actions.flatMap((action) =>
+      action.flags.map((flag) => flag.id)
+    )
+
+    for (const actionFlagId of actionFlagIds) {
+      if (!configuredFlagIds.includes(actionFlagId)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Action flag id must match a configured flag in the flags array. Invalid action flag ID for event '${event.id}': '${actionFlagId}'`,
+          path: ['actions']
         })
       }
     }

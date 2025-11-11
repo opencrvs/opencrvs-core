@@ -21,5 +21,6 @@ type ActionType =
   | 'ASSIGN'
   | 'UNASSIGN'
   | 'MARK_AS_NOT_DUPLICATE'
+  | 'CUSTOM'
 
 export default ActionType

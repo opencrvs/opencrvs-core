@@ -55,6 +55,7 @@ export function getStatusFromActions(actions: Array<Action>) {
           return EventStatus.enum.ARCHIVED
         case ActionType.NOTIFY:
           return EventStatus.enum.NOTIFIED
+        case ActionType.CUSTOM:
         case ActionType.PRINT_CERTIFICATE:
         case ActionType.ASSIGN:
         case ActionType.UNASSIGN:
@@ -66,6 +67,7 @@ export function getStatusFromActions(actions: Array<Action>) {
         case ActionType.MARK_AS_DUPLICATE:
         case ActionType.REJECT_CORRECTION:
         case ActionType.READ:
+        case ActionType.CUSTOM:
         default:
           return status
       }

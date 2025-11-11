@@ -844,98 +844,6 @@ const LoaderField = BaseField.extend({
 
 export type LoaderField = z.infer<typeof LoaderField>
 
-/** @knipignore */
-export type FieldConfig =
-  | z.infer<typeof Address>
-  | z.infer<typeof TextField>
-  | z.infer<typeof NumberField>
-  | z.infer<typeof TextAreaField>
-  | z.infer<typeof DateField>
-  | z.infer<typeof AgeField>
-  | z.infer<typeof TimeField>
-  | z.infer<typeof DateRangeField>
-  | z.infer<typeof SelectDateRangeField>
-  | z.infer<typeof Paragraph>
-  | z.infer<typeof RadioGroup>
-  | z.infer<typeof BulletList>
-  | z.infer<typeof PageHeader>
-  | z.infer<typeof Select>
-  | z.infer<typeof NameField>
-  | z.infer<typeof PhoneField>
-  | z.infer<typeof IdField>
-  | z.infer<typeof Checkbox>
-  | z.infer<typeof File>
-  | z.infer<typeof FileUploadWithOptions>
-  | z.infer<typeof Country>
-  | z.infer<typeof AdministrativeArea>
-  | z.infer<typeof Divider>
-  | z.infer<typeof LocationInput>
-  | z.infer<typeof Facility>
-  | z.infer<typeof Office>
-  | z.infer<typeof SignatureField>
-  | z.infer<typeof EmailField>
-  | z.infer<typeof DataField>
-  | z.infer<typeof ButtonField>
-  | z.infer<typeof AlphaPrintButton>
-  | z.infer<typeof HttpField>
-  | z.infer<typeof SearchField>
-  | z.infer<typeof LinkButtonField>
-  | z.infer<typeof VerificationStatus>
-  | z.infer<typeof QueryParamReaderField>
-  | z.infer<typeof QrReaderField>
-  | z.infer<typeof IdReaderField>
-  | z.infer<typeof LoaderField>
-
-/** @knipignore */
-/**
- * This is the type that should be used for the input of the FieldConfig. Useful when config uses zod defaults.
- */
-export type FieldConfigInput =
-  | z.input<typeof Address>
-  | z.input<typeof TextField>
-  | z.input<typeof TimeField>
-  | z.input<typeof SelectDateRangeField>
-  | z.input<typeof ButtonField>
-  | z.input<typeof AlphaPrintButton>
-  | z.input<typeof NumberField>
-  | z.input<typeof TextAreaField>
-  | z.input<typeof DateField>
-  | z.input<typeof AgeField>
-  | z.input<typeof DateRangeField>
-  | z.input<typeof Paragraph>
-  | z.input<typeof RadioGroup>
-  | z.input<typeof BulletList>
-  | z.input<typeof PageHeader>
-  | z.input<typeof Select>
-  | z.input<typeof NameField>
-  | z.input<typeof PhoneField>
-  | z.input<typeof IdField>
-  | z.input<typeof Checkbox>
-  | z.input<typeof File>
-  | z.input<typeof FileUploadWithOptions>
-  | z.input<typeof Country>
-  | z.input<typeof AdministrativeArea>
-  | z.input<typeof Divider>
-  | z.input<typeof LocationInput>
-  | z.input<typeof Facility>
-  | z.input<typeof Office>
-  | z.input<typeof SignatureField>
-  | z.input<typeof EmailField>
-  | z.input<typeof DataField>
-  | z.input<typeof HttpField>
-  | z.input<typeof SearchField>
-  | z.input<typeof LinkButtonField>
-  | z.input<typeof VerificationStatus>
-  | z.input<typeof QueryParamReaderField>
-  | z.input<typeof QrReaderField>
-  | z.input<typeof IdReaderField>
-  | z.input<typeof LoaderField>
-/*
- *  Using explicit type for the FieldConfig schema intentionally as it's
- *  referenced quite extensively througout various other schemas. Leaving the
- *  type to be inferred causes typescript compiler to fail with "inferred type
- *  exeeds max lenght"
- */
 export const FieldConfig = z
   .discriminatedUnion('type', [
     Address,
@@ -983,6 +891,8 @@ export const FieldConfig = z
     id: 'FieldConfig'
   })
 
+export type FieldConfig = z.infer<typeof FieldConfig>
+
 export type SelectField = z.infer<typeof Select>
 export type NameField = z.infer<typeof NameField>
 export type PhoneField = z.infer<typeof PhoneField>
@@ -1013,6 +923,8 @@ export const AnyFileField = z.discriminatedUnion('type', [
 ])
 
 export type AnyFileField = z.infer<typeof AnyFileField>
+
+export type FieldConfigInput = z.input<typeof FieldConfig>
 
 export type FieldTypeToFieldConfig<T extends FieldType> = Extract<
   FieldConfigInput,

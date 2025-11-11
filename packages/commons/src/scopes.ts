@@ -287,7 +287,8 @@ export const RecordScopeType = z.enum([
   'record.registered.print-certified-copies',
   'record.registered.request-correction',
   'record.registered.correct',
-  'record.unassign-others'
+  'record.unassign-others',
+  'record.custom-action'
 ])
 export type RecordScopeType = z.infer<typeof RecordScopeType>
 

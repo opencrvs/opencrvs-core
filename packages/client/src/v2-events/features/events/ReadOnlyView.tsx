@@ -14,7 +14,6 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { noop } from 'lodash'
 import {
   ActionType,
-  getActionReview,
   applyDraftToEventIndex,
   getDeclaration,
   getOrThrow,
@@ -63,7 +62,14 @@ function ReadonlyView() {
     authentication.sub
   )
 
-  const { title, fields } = getActionReview(configuration, ActionType.READ)
+  const actionConfiguration = configuration.actions.find(
+    (a) => a.type === ActionType.READ
+  )
+  if (!actionConfiguration) {
+    throw new Error('Action configuration not found')
+  }
+
+  const { title, fields } = actionConfiguration.review
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const formConfig = getDeclaration(configuration)

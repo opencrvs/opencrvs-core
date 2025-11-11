@@ -351,6 +351,7 @@ function actionToClientAction(
     case ActionType.MARK_AS_DUPLICATE:
     case ActionType.REJECT_CORRECTION:
     case ActionType.DELETE:
+    case ActionType.CUSTOM:
     case ActionType.READ:
     default:
       throw new Error(

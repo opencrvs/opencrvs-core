@@ -10,7 +10,8 @@
  */
 
 import { z, ZodType } from 'zod/v4'
-import { EventMetadata, EventStatus, Flag } from './EventMetadata'
+import { EventMetadata, EventStatus } from './EventMetadata'
+import { Flag } from './Flag'
 import { EventState } from './ActionDocument'
 
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'

@@ -8,7 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventStatus, InherentFlags } from '../EventMetadata'
+import { EventStatus } from '../EventMetadata'
+import { InherentFlags } from '../Flag'
 import { getAvailableActions } from './availableActions'
 
 describe('getAvailableActions', () => {

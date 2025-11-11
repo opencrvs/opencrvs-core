@@ -54,7 +54,8 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.REJECT]: ['record.declared.reject'],
   [ActionType.ASSIGN]: null,
   [ActionType.UNASSIGN]: null,
-  [ActionType.DUPLICATE_DETECTED]: []
+  [ActionType.DUPLICATE_DETECTED]: [],
+  [ActionType.CUSTOM]: ['record.custom-action']
 } satisfies Record<DisplayableAction, RecordScopeType[] | AlwaysAllowed>
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {

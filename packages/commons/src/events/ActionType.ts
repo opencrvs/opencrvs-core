@@ -37,7 +37,9 @@ export const ActionType = {
   // General actions
   READ: 'READ',
   ASSIGN: 'ASSIGN',
-  UNASSIGN: 'UNASSIGN'
+  UNASSIGN: 'UNASSIGN',
+  // Custom action
+  CUSTOM: 'CUSTOM'
 } as const
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType]
@@ -74,7 +76,8 @@ export const ActionTypes = z.enum([
   'APPROVE_CORRECTION',
   'READ',
   'ASSIGN',
-  'UNASSIGN'
+  'UNASSIGN',
+  'CUSTOM'
 ])
 
 /**
@@ -133,7 +136,9 @@ export const workqueueActions = ActionTypes.exclude([
   ActionType.DUPLICATE_DETECTED,
   ActionType.MARK_AS_NOT_DUPLICATE,
   ActionType.REJECT_CORRECTION,
-  ActionType.APPROVE_CORRECTION
+  ActionType.APPROVE_CORRECTION,
+  // @TODO We are still uncertain if this belongs here, will be specified later in custom actions work
+  ActionType.CUSTOM
 ])
 
 export type WorkqueueActionType = z.infer<typeof workqueueActions>

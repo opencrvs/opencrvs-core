@@ -246,6 +246,13 @@ const ReadAction = ActionBase.extend(
   }).shape
 )
 
+const CustomAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.CUSTOM),
+    name: z.string()
+  })
+)
+
 export const ActionDocument = z
   .discriminatedUnion('type', [
     CreatedAction.meta({ id: 'CreatedAction' }),
@@ -264,7 +271,8 @@ export const ActionDocument = z
     RejectedCorrectionAction.meta({ id: 'RejectedCorrectionAction' }),
     UnassignedAction.meta({ id: 'UnassignedAction' }),
     PrintCertificateAction.meta({ id: 'PrintCertificateAction' }),
-    ReadAction.meta({ id: 'ReadAction' })
+    ReadAction.meta({ id: 'ReadAction' }),
+    CustomAction.meta({ id: 'CustomAction' })
   ])
   .meta({
     id: 'ActionDocument'
@@ -287,7 +295,7 @@ export type AsyncRejectActionDocument = z.infer<
 >
 
 export const Action = z.union([ActionDocument, AsyncRejectActionDocument])
-export type Action = ActionDocument | AsyncRejectActionDocument
+export type Action = z.infer<typeof Action>
 
 export type CreatedAction = z.infer<typeof CreatedAction>
 export type AssignedAction = z.infer<typeof AssignedAction>

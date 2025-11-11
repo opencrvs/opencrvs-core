@@ -15,7 +15,8 @@ import { getUUID, UUID } from '../../uuid'
 import { ActionStatus, EventState } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { AddressType } from '../CompositeFieldValue'
-import { EventStatus, InherentFlags } from '../EventMetadata'
+import { EventStatus } from '../EventMetadata'
+import { InherentFlags } from '../Flag'
 import {
   generateActionDocument,
   generateEventDocument,
