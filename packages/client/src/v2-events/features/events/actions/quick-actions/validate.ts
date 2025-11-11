@@ -9,13 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuid } from 'uuid'
-import { ActionType } from '@opencrvs/commons/client'
-import { actionLabels } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { QuickActionConfig } from './useQuickActionModal'
 
 export const validate: QuickActionConfig = {
   modal: {
-    label: actionLabels[ActionType.VALIDATE],
+    label: {
+      defaultMessage: 'Validate',
+      description:
+        'This is shown as the action name anywhere the user can trigger the action from',
+      id: 'event.birth.action.validate.label'
+    },
     description: {
       id: 'review.validate.description.complete',
       defaultMessage:

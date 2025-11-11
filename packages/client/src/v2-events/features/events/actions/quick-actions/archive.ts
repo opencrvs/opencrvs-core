@@ -9,13 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuid } from 'uuid'
-import { ActionType } from '@opencrvs/commons/client'
-import { actionLabels } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { QuickActionConfig } from './useQuickActionModal'
 
 export const archive: QuickActionConfig = {
   modal: {
-    label: actionLabels[ActionType.ARCHIVE],
+    label: {
+      defaultMessage: 'Archive',
+      description: 'Label for archive record button in dropdown menu',
+      id: 'event.birth.action.archive.label'
+    },
     description: {
       id: 'recordAudit.archive.confirmation.body',
       defaultMessage:

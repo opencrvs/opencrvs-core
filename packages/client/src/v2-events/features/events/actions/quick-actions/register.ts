@@ -15,7 +15,11 @@ import { QuickActionConfig } from './useQuickActionModal'
 
 export const register: QuickActionConfig = {
   modal: {
-    label: actionLabels[ActionType.REGISTER],
+    label: {
+      defaultMessage: 'Register',
+      description: 'Label for review record button in dropdown menu',
+      id: 'event.birth.action.register.label'
+    },
     description: {
       id: 'review.register.description.complete',
       defaultMessage:

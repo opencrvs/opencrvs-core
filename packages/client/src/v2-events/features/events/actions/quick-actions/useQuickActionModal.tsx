@@ -155,6 +155,8 @@ export function useCustomActionModal(event: EventIndex) {
   const navigate = useNavigate()
   const { actions, customActions } = useEvents()
 
+  console.log('customActions', customActions)
+
   const onCustomAction = async (
     actionConfig: CustomActionConfig,
     workqueue?: string
