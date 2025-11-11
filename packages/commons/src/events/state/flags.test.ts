@@ -17,6 +17,7 @@ import { FieldType } from '../FieldType'
 import { PageTypes } from '../PageConfig'
 import { resolveEventCustomFlags } from './flags'
 import { subDays, formatISO } from 'date-fns'
+import { not, user } from '../../conditionals/conditionals'
 
 type DeepPartial<T> = T extends object
   ? {
@@ -33,6 +34,11 @@ const eventConfig: DeepPartial<EventConfig> = {
           id: 'too-large-number-flag',
           operation: 'add',
           conditional: field('number-field').isGreaterThan(100)
+        },
+        {
+          id: 'executed-by-admin-flag',
+          operation: 'add',
+          conditional: user.hasRole('ADMIN')
         }
       ]
     },
@@ -43,6 +49,11 @@ const eventConfig: DeepPartial<EventConfig> = {
           id: 'too-small-number-flag',
           operation: 'add',
           conditional: field('number-field').isLessThan(10)
+        },
+        {
+          id: 'executed-by-admin-flag',
+          operation: 'remove',
+          conditional: not(user.hasRole('ADMIN'))
         }
       ]
     }
@@ -137,8 +148,88 @@ describe('resolveEventCustomFlags()', () => {
     expect(flags).toEqual(['too-small-number-flag'])
   })
 
-  test.todo('should ignore actions that are not accepted')
-  test.todo('should resolve flag conditional which refers to user role')
-  test.todo('should resolve flag conditional which refers to date')
-  test.todo('should add and remove flags')
+  test('should ignore actions that are not accepted', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.DECLARE,
+          declaration: { 'number-field': 101 },
+          createdAt: formatISO(now),
+          status: ActionStatus.Requested
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual([])
+  })
+
+  test('should resolve flag conditional which refers to user role', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.DECLARE,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted,
+          createdByRole: 'ADMIN'
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual(['executed-by-admin-flag'])
+  })
+
+  test('should add and remove flags', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.DECLARE,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted,
+          createdByRole: 'ADMIN'
+        },
+        {
+          type: ActionType.REGISTER,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted,
+          createdByRole: 'USER'
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual([])
+  })
+
+  test('should not remove flag if removal conditional is not met', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.DECLARE,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted,
+          createdByRole: 'ADMIN'
+        },
+        {
+          type: ActionType.REGISTER,
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted,
+          createdByRole: 'ADMIN'
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual(['executed-by-admin-flag'])
+  })
 })

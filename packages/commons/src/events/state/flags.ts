@@ -15,9 +15,9 @@ import { getStatusFromActions } from '.'
 import { Action, ActionStatus, EventState } from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
 import { EventStatus } from '../EventMetadata'
-import { InherentFlags, Flag } from '../Flag'
+import { InherentFlags, Flag, CustomFlag } from '../Flag'
 import { EventConfig } from '../EventConfig'
-import { aggregateActionDeclarations } from '../utils'
+import { aggregateActionDeclarations, getAcceptedActions } from '../utils'
 import { formatISO, parseISO, isValid } from 'date-fns'
 import { EventDocument } from '../EventDocument'
 import { JSONSchema } from '../../conditionals/conditionals'
@@ -104,8 +104,9 @@ function isFlagConditionMet(
 export function resolveEventCustomFlags(
   event: EventDocument,
   config: EventConfig
-): Flag[] {
-  const actions = event.actions
+): CustomFlag[] {
+  const acceptedActions = getAcceptedActions(event)
+  const actions = acceptedActions
     .filter(({ type }) => !isMetaAction(type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 

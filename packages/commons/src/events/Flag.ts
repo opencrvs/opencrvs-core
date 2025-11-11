@@ -24,7 +24,6 @@ export const InherentFlags = {
 
 export type InherentFlags = (typeof InherentFlags)[keyof typeof InherentFlags]
 
-// @TODO cihan fix this
 export const ActionFlag = z
   .string()
   .regex(
@@ -37,18 +36,24 @@ export const ActionFlag = z
     ),
     'Flag must be in the format ActionType:ActionStatus (lowerCase)'
   )
-export const Flag = ActionFlag.or(z.enum(InherentFlags))
 
 export type ActionFlag = z.infer<typeof ActionFlag>
+
+// @TODO: don't allow any inherent flags to be used here
+// The country config should not interfere with inherent flags
+export const CustomFlag = z
+  .string()
+  .describe('Custom flag identifier defined by the country config.')
+export type CustomFlag = z.infer<typeof CustomFlag>
+
+export const Flag = ActionFlag.or(z.enum(InherentFlags)).or(CustomFlag)
 export type Flag = z.infer<typeof Flag>
 
 /**
  * Configuration of a custom flag that can be associated with a certain event type.
  */
 export const FlagConfig = z.object({
-  // @TODO: don't allow any inherent flags to be used here
-  // The country config should not interfere with inherent flags
-  id: z.string().describe('Unique identifier of the flag.'),
+  id: CustomFlag,
   requiresAction: z
     .boolean()
     .describe(
@@ -63,7 +68,7 @@ export type FlagConfig = z.infer<typeof FlagConfig>
  * Configuration for a flag action, which is executed when the action is performed.
  */
 export const ActionFlagConfig = z.object({
-  id: z.string().describe('Id of the flag.'),
+  id: CustomFlag,
   operation: z
     .enum(['add', 'remove'])
     .describe('Operation to perform on the flag.'),
