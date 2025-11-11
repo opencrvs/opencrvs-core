@@ -12,8 +12,8 @@ import { z } from 'zod'
 import { AddressField, NameField } from './FieldConfig'
 import { NonEmptyTextValue, TextValue } from './FieldValue'
 import {
-  AddressType,
-  StreetLevelDetailsUpdateValue
+  AddressFieldUpdateValue,
+  AddressFieldValue
 } from './CompositeFieldValue'
 
 /**
@@ -60,32 +60,23 @@ export type DynamicNameValue = ReturnType<typeof getDynamicNameValue>
  *    in the configuration (a common data integrity issue).
  */
 export function getDynamicAddressFieldValue(field: AddressField) {
-  const streetAddressConfig = field.configuration?.streetAddressForm
-  return z.object({
-    country: z.string(),
-    addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL]),
-    administrativeArea: z
-      .string()
-      .uuid()
-      .optional() /* Leaf level admin structure */,
-    streetLevelDetails: StreetLevelDetailsUpdateValue.refine((arg) => {
-      const submittedKeys = Object.keys(arg ?? {})
-      const configIds =
-        (streetAddressConfig && streetAddressConfig.map((a) => a.id)) ?? []
-      const invalidKeys = submittedKeys.filter(
-        (key) => !configIds.includes(key)
-      )
-      if (invalidKeys.length) {
-        // eslint-disable-next-line no-console
-        console.log(
-          'Invalid streetLevelDetails: unknown keys',
-          JSON.stringify(invalidKeys, null, 2)
-        )
-        return false
-      }
+  const schema = field.required ? AddressFieldValue : AddressFieldUpdateValue
+  const configIds =
+    field.configuration?.streetAddressForm?.map((a) => a.id) ?? []
 
-      return true
-    })
+  return schema.refine((arg) => {
+    // @todo - show required validation errors for street level fields like state/street
+    const submittedKeys = Object.keys(arg?.streetLevelDetails ?? {})
+    const invalidKeys = submittedKeys.filter((k) => !configIds.includes(k))
+    if (invalidKeys.length) {
+      // eslint-disable-next-line no-console
+      console.log(
+        'Invalid streetLevelDetails: unknown keys',
+        JSON.stringify(invalidKeys, null, 2)
+      )
+      return false
+    }
+    return true
   })
 }
 
