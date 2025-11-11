@@ -39,6 +39,7 @@ export const ActionFlag = z
 
 export type ActionFlag = z.infer<typeof ActionFlag>
 
+/** Custom flag identifier defined by the country config. These may not match any InherentFlags or ActionFlag patterns. */
 export const CustomFlag = z
   .string()
   // Don't allow any inherent flags to be used here
