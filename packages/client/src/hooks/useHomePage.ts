@@ -36,7 +36,7 @@ export const useHomePage = () => {
   const firstDashboard = window.config.DASHBOARDS?.at(0)?.id
 
   const getFirstValidTab = (group: NavigationConfig) => {
-    const firstTab = group.tabs.find((tab) => {
+    const firstTab = group.tabs.filter((tab) => {
       if (
         tab.name === WORKQUEUE_TABS.dashboard &&
         window.config.DASHBOARDS.length === 0
@@ -44,7 +44,7 @@ export const useHomePage = () => {
         return false
       }
       return true
-    })
+    }).at(0)
     return firstTab?.name
   }
 
