@@ -925,7 +925,7 @@ export function generateEventDocument({
 }): EventDocument {
   faker.seed(rng())
   return {
-    trackingId: faker.string.uuid(),
+    trackingId: faker.string.alphanumeric(6).toUpperCase(),
     type: configuration.id,
     actions: actions.map((action, i) =>
       generateActionDocument({
