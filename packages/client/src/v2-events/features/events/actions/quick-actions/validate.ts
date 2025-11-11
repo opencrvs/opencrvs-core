@@ -10,7 +10,7 @@
  */
 import { v4 as uuid } from 'uuid'
 import { ActionType } from '@opencrvs/commons/client'
-import { actionLabels } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { actionLabels } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { QuickActionConfig } from './useQuickActionModal'
 
 export const validate: QuickActionConfig = {

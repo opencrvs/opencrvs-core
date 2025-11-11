@@ -24,10 +24,7 @@ import {
 } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { ROUTES } from '@client/v2-events/routes'
-import {
-  actionLabels,
-  useUserAllowedActions
-} from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserAllowedActions } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useModal } from '../../../../hooks/useModal'
 import { useEvents } from '../../useEvents/useEvents'
 import { validate } from './validate'
