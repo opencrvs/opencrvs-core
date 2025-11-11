@@ -39,10 +39,20 @@ export const ActionFlag = z
 
 export type ActionFlag = z.infer<typeof ActionFlag>
 
-// @TODO: don't allow any inherent flags to be used here
-// The country config should not interfere with inherent flags
 export const CustomFlag = z
   .string()
+  // Don't allow any inherent flags to be used here
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .refine((val) => !Object.values(InherentFlags).includes(val as any), {
+    message: `Custom flag cannot be one of the inherent flags: ${Object.values(
+      InherentFlags
+    ).join(', ')}`
+  })
+  // Don't allow any ActionFlag patterns to be used here
+  .refine((val) => !ActionFlag.safeParse(val).success, {
+    message:
+      'Custom flag cannot match the ActionFlag pattern (ActionType:ActionStatus).'
+  })
   .describe('Custom flag identifier defined by the country config.')
 export type CustomFlag = z.infer<typeof CustomFlag>
 
