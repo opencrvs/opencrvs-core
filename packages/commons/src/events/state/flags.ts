@@ -17,7 +17,11 @@ import { ActionType, isMetaAction } from '../ActionType'
 import { EventStatus } from '../EventMetadata'
 import { InherentFlags, Flag, CustomFlag } from '../Flag'
 import { EventConfig } from '../EventConfig'
-import { aggregateActionDeclarations, getAcceptedActions } from '../utils'
+import {
+  aggregateActionDeclarations,
+  getAcceptedActions,
+  getActionConfig
+} from '../utils'
 import { formatISO, parseISO, isValid } from 'date-fns'
 import { EventDocument } from '../EventDocument'
 import { JSONSchema } from '../../conditionals/conditionals'
@@ -111,11 +115,7 @@ export function resolveEventCustomFlags(
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
   return actions.reduce((acc, action, idx) => {
-    const actionConfig = config.actions.find((a) => a.type === action.type)
-
-    if (!actionConfig) {
-      return acc
-    }
+    const actionConfig = getActionConfig(config, action)
 
     const eventUpToThisAction = {
       ...event,
@@ -126,23 +126,23 @@ export function resolveEventCustomFlags(
     const annotation = aggregateActionDeclarations(eventUpToThisAction)
     const form = { ...declaration, ...annotation }
 
-    const addedFlags = actionConfig.flags
+    const flagsWithMetConditions = actionConfig.flags.filter(
+      ({ conditional }) =>
+        // If conditional is not provided, the flag is resolved
+        conditional ? isFlagConditionMet(conditional, form, action) : true
+    )
+
+    const addedFlags = flagsWithMetConditions
       .filter(({ operation }) => operation === 'add')
-      .filter(({ conditional }) =>
-        isFlagConditionMet(conditional, form, action)
-      )
       .map(({ id }) => id)
 
-    const removedFlags = actionConfig.flags
+    const removedFlags = flagsWithMetConditions
       .filter(({ operation }) => operation === 'remove')
-      .filter(({ conditional }) =>
-        isFlagConditionMet(conditional, form, action)
-      )
       .map(({ id }) => id)
 
     // Add and remove flags
     const flags = [...acc, ...addedFlags].filter(
-      (flag) => !removedFlags.includes(flag)
+      (flagId) => !removedFlags.includes(flagId)
     )
 
     return uniq(flags)

@@ -56,7 +56,23 @@ const eventConfig: DeepPartial<EventConfig> = {
           conditional: not(user.hasRole('ADMIN'))
         }
       ]
-    }
+    },
+    {
+      type: ActionType.CUSTOM,
+      name: 'ADD_FLAG_ALWAYS',
+      flags: [
+        {
+          id: 'always-added-flag',
+          operation: 'add'
+        }
+      ]
+    },
+    {
+      type: ActionType.CUSTOM,
+      name: 'FOOBAR',
+      flags: []
+    },
+    { type: ActionType.PRINT_CERTIFICATE, flags: [] }
   ],
   declaration: {
     label: { id: '', defaultMessage: '', description: '' },
@@ -74,6 +90,42 @@ const eventConfig: DeepPartial<EventConfig> = {
 const now = new Date()
 
 describe('resolveEventCustomFlags()', () => {
+  test('should always add flag which does not have a conditional', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.CUSTOM,
+          name: 'ADD_FLAG_ALWAYS',
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual(['always-added-flag'])
+  })
+
+  test('should not add flag for custom action type which does not have a flag config', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.CUSTOM,
+          name: 'FOOBAR',
+          declaration: {},
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual([])
+  })
+
   test('should add flag when conditional is met', () => {
     const event: DeepPartial<EventDocument> = {
       actions: [
