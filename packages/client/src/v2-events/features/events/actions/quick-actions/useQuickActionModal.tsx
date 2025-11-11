@@ -167,6 +167,7 @@ export function useCustomActionModal(event: EventIndex) {
         config={{
           ...customActionConfigBase,
           label: actionConfig.label,
+          // @TODO: Use description from action config
           description: {
             id: 'custom.action.description',
             defaultMessage: 'Custom action description'

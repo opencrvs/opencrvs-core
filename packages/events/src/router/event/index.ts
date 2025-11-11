@@ -58,6 +58,7 @@ import { UserContext } from '../../context'
 import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
+import { customActionProcedures } from './actions/custom'
 
 export const eventRouter = router({
   config: router({
@@ -221,6 +222,7 @@ export const eventRouter = router({
     printCertificate: router(
       getDefaultActionProcedures(ActionType.PRINT_CERTIFICATE)
     ),
+    custom: router(customActionProcedures()),
     assignment: router({
       assign: publicProcedure
         .input(AssignActionInput)

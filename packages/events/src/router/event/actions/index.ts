@@ -31,7 +31,8 @@ import {
   RejectCorrectionActionInput,
   getPendingAction,
   ActionInputWithType,
-  EventConfig
+  EventConfig,
+  CustomActionInput
 } from '@opencrvs/commons/events'
 import {
   TokenUserType,
@@ -78,6 +79,10 @@ const defaultConfig = {
 } as const
 
 const ACTION_PROCEDURE_CONFIG = {
+  [ActionType.CUSTOM]: {
+    ...defaultConfig,
+    inputSchema: CustomActionInput
+  },
   [ActionType.NOTIFY]: {
     ...defaultConfig,
     inputSchema: NotifyActionInput,

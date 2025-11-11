@@ -231,7 +231,8 @@ export function useEvents() {
             })
           }
         },
-        unassign: useEventAction(trpc.event.actions.assignment.unassign)
+        unassign: useEventAction(trpc.event.actions.assignment.unassign),
+        custom: useEventAction(trpc.event.actions.custom.request)
       },
       duplicate: {
         markAsDuplicate: useEventAction(

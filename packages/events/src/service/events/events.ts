@@ -279,6 +279,8 @@ export function buildAction(
     case ActionType.DUPLICATE_DETECTED:
     case ActionType.MARK_AS_NOT_DUPLICATE:
     case ActionType.MARK_AS_DUPLICATE:
+    // TODO CIHAN: this should include name?
+    case ActionType.CUSTOM:
     case ActionType.REQUEST_CORRECTION: {
       return {
         ...commonAttributes

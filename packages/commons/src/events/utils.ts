@@ -104,8 +104,8 @@ export function getActionConfig(
   const { type } = action
 
   const actionConfig = config.actions.find((a) => {
-    if (a.type === ActionType.CUSTOM && 'name' in action) {
-      return a.name === action.name
+    if (a.type === ActionType.CUSTOM && 'customActionType' in action) {
+      return a.customActionType === action.customActionType
     }
     return a.type === type
   })

@@ -121,7 +121,9 @@ const ApproveCorrectionConfig = ActionConfigBase.extend(
 const CustomActionConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.CUSTOM),
-    name: z.string().describe('Name of the custom action.'),
+    customActionType: z
+      .string()
+      .describe('Type identifier of the custom action.'),
     /** Custom action form configuration supports a simple array of field configs, which should be rendered on the action modal. In the future, we might add support for pages etc. */
     form: z
       .array(FieldConfig)
