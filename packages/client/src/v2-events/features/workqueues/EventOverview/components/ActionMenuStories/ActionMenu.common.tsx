@@ -24,8 +24,7 @@ import {
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent,
-  UUID,
-  DisplayableAction,
+  UUID
   ClientSpecificAction,
   generateUuid,
   createPrng
