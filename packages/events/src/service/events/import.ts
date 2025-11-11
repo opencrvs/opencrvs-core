@@ -58,7 +58,5 @@ export async function bulkImportEvents(
     toIndex.push(createdEvent)
   }
 
-  if (toIndex.length > 0) {
-    await indexEventsInBulk(toIndex, eventConfigs)
-  }
+  return indexEventsInBulk(toIndex, eventConfigs)
 }
