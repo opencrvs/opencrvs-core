@@ -16,18 +16,13 @@ import {
   getDeclarationFields,
   areConditionsMet,
   getMixedPath,
-  Flag,
-  ActionFlag,
-  InherentFlags,
-  TranslationConfig
+  Flag
 } from '@opencrvs/commons/client'
 import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-/**
- * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
- */
+import { useFlagLabelsString } from '@client/v2-events/messages/flags'
 
 const messages = {
   assignedTo: {
@@ -117,34 +112,6 @@ const messages = {
 
 export const summaryMessages = messages
 
-const flagMessages = {
-  [InherentFlags.CORRECTION_REQUESTED]: {
-    id: 'flags.builtin.correction-requested.label',
-    defaultMessage: 'Correction requested',
-    description: 'Flag label for correction requested'
-  },
-  [InherentFlags.POTENTIAL_DUPLICATE]: {
-    id: 'flags.builtin.potential-duplicate.label',
-    defaultMessage: 'Potential duplicate',
-    description: 'Flag label for potential duplicate'
-  },
-  [InherentFlags.REJECTED]: {
-    id: 'flags.builtin.rejected.label',
-    defaultMessage: 'Rejected',
-    description: 'Flag label for rejected'
-  },
-  [InherentFlags.INCOMPLETE]: {
-    id: 'flags.builtin.incomplete.label',
-    defaultMessage: 'Incomplete',
-    description: 'Flag label for incomplete'
-  },
-  [InherentFlags.PENDING_CERTIFICATION]: {
-    id: 'flags.builtin.pending-certification.label',
-    defaultMessage: 'Pending certification',
-    description: 'Flag label for pending certification'
-  }
-} satisfies Record<InherentFlags, TranslationConfig>
-
 export function EventSummary({
   event,
   eventConfiguration,
@@ -158,6 +125,7 @@ export function EventSummary({
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
   const validationContext = useValidatorContext()
+  const flagLabels = useFlagLabelsString(eventConfiguration, flags)
   const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)
   const securedFields = declarationFields
@@ -209,14 +177,6 @@ export function EventSummary({
     }
   })
 
-  const flattenedFlags = flags
-    .filter((flag) => !ActionFlag.safeParse(flag).success)
-    .filter((flag) => flag !== InherentFlags.INCOMPLETE)
-    .map((flag) => {
-      return intl.formatMessage(flagMessages[flag as InherentFlags])
-    })
-    .join(', ')
-
   return (
     <>
       <Summary id="summary">
@@ -240,7 +200,7 @@ export function EventSummary({
           data-testid="flags"
           label={intl.formatMessage(messages.flags.label)}
           placeholder={intl.formatMessage(messages.flags.placeholder)}
-          value={flattenedFlags}
+          value={flagLabels}
         />
         <Summary.Row
           key="event"

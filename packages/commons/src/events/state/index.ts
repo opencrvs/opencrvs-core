@@ -30,7 +30,7 @@ import {
 } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
-import { getFlagsFromActions } from './flags'
+import { getEventFlags } from './flags'
 import { getUUID, UUID } from '../../uuid'
 import {
   DocumentPath,
@@ -191,13 +191,13 @@ export function extractPotentialDuplicatesFromActions(
  */
 export function getCurrentEventState(
   event: EventDocument,
-  /** @TODO: remove config parameter, it is only used by resolveDateOfEvent. See if it can be achieved in some other way. */
   config: EventConfig
 ): EventIndex {
   // Always work with sorted event actions
   const sortedActions = event.actions
     .slice()
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+
   const creationAction = sortedActions.find(
     (action) => action.type === ActionType.CREATE
   )
@@ -238,7 +238,7 @@ export function getCurrentEventState(
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),
     potentialDuplicates: extractPotentialDuplicatesFromActions(sortedActions),
-    flags: getFlagsFromActions(sortedActions)
+    flags: getEventFlags(event, config)
   })
 }
 

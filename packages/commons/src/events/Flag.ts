@@ -36,16 +36,35 @@ export const ActionFlag = z
     ),
     'Flag must be in the format ActionType:ActionStatus (lowerCase)'
   )
-export const Flag = ActionFlag.or(z.enum(InherentFlags))
 
 export type ActionFlag = z.infer<typeof ActionFlag>
+
+/** Custom flag identifier defined by the country config. These may not match any InherentFlags or ActionFlag patterns. */
+export const CustomFlag = z
+  .string()
+  // Don't allow any inherent flags to be used here
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .refine((val) => !Object.values(InherentFlags).includes(val as any), {
+    message: `Custom flag cannot be one of the inherent flags: ${Object.values(
+      InherentFlags
+    ).join(', ')}`
+  })
+  // Don't allow any ActionFlag patterns to be used here
+  .refine((val) => !ActionFlag.safeParse(val).success, {
+    message:
+      'Custom flag cannot match the ActionFlag pattern (ActionType:ActionStatus).'
+  })
+  .describe('Custom flag identifier defined by the country config.')
+export type CustomFlag = z.infer<typeof CustomFlag>
+
+export const Flag = ActionFlag.or(z.enum(InherentFlags)).or(CustomFlag)
 export type Flag = z.infer<typeof Flag>
 
 /**
  * Configuration of a custom flag that can be associated with a certain event type.
  */
 export const FlagConfig = z.object({
-  id: z.string().describe('Unique identifier of the flag.'),
+  id: CustomFlag,
   requiresAction: z
     .boolean()
     .describe(
@@ -60,7 +79,7 @@ export type FlagConfig = z.infer<typeof FlagConfig>
  * Configuration for a flag action, which is executed when the action is performed.
  */
 export const ActionFlagConfig = z.object({
-  id: z.string().describe('Id of the flag.'),
+  id: CustomFlag,
   operation: z
     .enum(['add', 'remove'])
     .describe('Operation to perform on the flag.'),

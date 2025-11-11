@@ -9,12 +9,23 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { uniq } from 'lodash'
 import { joinValues } from '../../utils'
 import { getStatusFromActions } from '.'
-import { Action, ActionStatus } from '../ActionDocument'
+import { Action, ActionStatus, EventState } from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
 import { EventStatus } from '../EventMetadata'
-import { InherentFlags, Flag } from '../Flag'
+import { InherentFlags, Flag, CustomFlag } from '../Flag'
+import { EventConfig } from '../EventConfig'
+import {
+  aggregateActionDeclarations,
+  getAcceptedActions,
+  getActionConfig
+} from '../utils'
+import { formatISO, parseISO, isValid } from 'date-fns'
+import { EventDocument } from '../EventDocument'
+import { JSONSchema } from '../../conditionals/conditionals'
+import { validate } from '../../conditionals/validate'
 
 function isPendingCertification(actions: Action[]) {
   if (getStatusFromActions(actions) !== EventStatus.enum.REGISTERED) {
@@ -70,8 +81,83 @@ function isPotentialDuplicate(actions: Action[]): boolean {
   }, false)
 }
 
-export function getFlagsFromActions(actions: Action[]): Flag[] {
-  const sortedActions = actions
+function isFlagConditionMet(
+  conditional: JSONSchema,
+  form: EventState,
+  action: Action
+) {
+  const now = isValid(parseISO(action.createdAt))
+    ? formatISO(parseISO(action.createdAt), { representation: 'date' })
+    : formatISO(new Date(), { representation: 'date' })
+
+  return validate(conditional, {
+    $form: form,
+    $now: now,
+    $online: true,
+    $user: {
+      sub: '',
+      exp: '',
+      role: action.createdByRole,
+      algorithm: '',
+      scope: [],
+      userType: action.createdByUserType
+    }
+  })
+}
+
+export function resolveEventCustomFlags(
+  event: EventDocument,
+  config: EventConfig
+): CustomFlag[] {
+  const acceptedActions = getAcceptedActions(event)
+  const actions = acceptedActions
+    .filter(({ type }) => !isMetaAction(type))
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+
+  return actions.reduce((acc, action, idx) => {
+    const actionConfig = getActionConfig(config, action)
+
+    if (!actionConfig) {
+      return acc
+    }
+
+    const eventUpToThisAction = {
+      ...event,
+      actions: actions.slice(0, idx + 1)
+    }
+
+    const declaration = aggregateActionDeclarations(eventUpToThisAction)
+    const annotation = aggregateActionDeclarations(eventUpToThisAction)
+    const form = { ...declaration, ...annotation }
+
+    const flagsWithMetConditions = actionConfig.flags.filter(
+      ({ conditional }) =>
+        // If conditional is not provided, the flag is resolved
+        conditional ? isFlagConditionMet(conditional, form, action) : true
+    )
+
+    const addedFlags = flagsWithMetConditions
+      .filter(({ operation }) => operation === 'add')
+      .map(({ id }) => id)
+
+    const removedFlags = flagsWithMetConditions
+      .filter(({ operation }) => operation === 'remove')
+      .map(({ id }) => id)
+
+    // Add and remove flags
+    const flags = [...acc, ...addedFlags].filter(
+      (flagId) => !removedFlags.includes(flagId)
+    )
+
+    return uniq(flags)
+  }, [])
+}
+
+export function getEventFlags(
+  event: EventDocument,
+  config: EventConfig
+): Flag[] {
+  const sortedActions = event.actions
     .filter(({ type }) => !isMetaAction(type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
@@ -90,7 +176,6 @@ export function getFlagsFromActions(actions: Action[]): Flag[] {
    *  - `ACTION:requested` : An action sent which is not yet accepted or rejected by country config.
    *  - `ACTION:rejected`  : An action which was rejected by country config.
    */
-
   const flags = Object.entries(actionStatus)
     .filter(([, status]) => status !== ActionStatus.Accepted)
     .map(([type, status]) => {
@@ -114,5 +199,5 @@ export function getFlagsFromActions(actions: Action[]): Flag[] {
     flags.push(InherentFlags.POTENTIAL_DUPLICATE)
   }
 
-  return flags
+  return [...flags, ...resolveEventCustomFlags(event, config)]
 }

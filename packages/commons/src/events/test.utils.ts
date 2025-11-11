@@ -923,7 +923,7 @@ export function generateEventDocument({
   defaults?: Partial<EventDocument>
 }): EventDocument {
   return {
-    trackingId: getUUID(),
+    trackingId: generateTrackingId(rng),
     type: configuration.id,
     actions: actions.map((action, i) =>
       generateActionDocument({

@@ -96,6 +96,23 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
   return []
 }
 
+// @TODO CIHAN: use this everywhere
+export function getActionConfig(
+  config: EventConfig,
+  action: ActionDocument
+): ActionConfig | undefined {
+  const { type } = action
+
+  const actionConfig = config.actions.find((a) => {
+    if (a.type === ActionType.CUSTOM && 'name' in action) {
+      return a.name === action.name
+    }
+    return a.type === type
+  })
+
+  return actionConfig
+}
+
 function getAllAnnotationFields(config: EventConfig): FieldConfig[] {
   return flattenDeep(config.actions.map(getActionAnnotationFields))
 }
