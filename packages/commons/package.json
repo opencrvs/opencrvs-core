@@ -64,7 +64,6 @@
   },
   "private": true,
   "dependencies": {
-    "@faker-js/faker": "^10.1.0",
     "@types/fhir": "^0.0.37",
     "@types/hapi__hapi": "^20.0.0",
     "@types/jest": "^26.0.14",

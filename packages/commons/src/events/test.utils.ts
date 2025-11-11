@@ -10,7 +10,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { merge, omitBy, isString, omit, isEmpty } from 'lodash'
-import { faker } from '@faker-js/faker'
 import { addDays } from 'date-fns'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID, UUID } from '../uuid'
@@ -923,9 +922,8 @@ export function generateEventDocument({
   rng?: () => number
   defaults?: Partial<EventDocument>
 }): EventDocument {
-  faker.seed(rng())
   return {
-    trackingId: faker.string.alphanumeric(6).toUpperCase(),
+    trackingId: generateTrackingId(rng),
     type: configuration.id,
     actions: actions.map((action, i) =>
       generateActionDocument({
