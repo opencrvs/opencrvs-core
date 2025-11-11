@@ -64,8 +64,8 @@ export function getDynamicAddressFieldValue(field: AddressField) {
   const configIds =
     field.configuration?.streetAddressForm?.map((a) => a.id) ?? []
 
+  // @todo - show required validation errors for street level fields like state/street
   return schema.refine((arg) => {
-    // @todo - show required validation errors for street level fields like state/street
     const submittedKeys = Object.keys(arg?.streetLevelDetails ?? {})
     const invalidKeys = submittedKeys.filter((k) => !configIds.includes(k))
     if (invalidKeys.length) {
