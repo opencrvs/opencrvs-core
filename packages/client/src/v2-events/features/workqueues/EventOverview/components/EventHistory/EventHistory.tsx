@@ -63,7 +63,7 @@ const TableDiv = styled.div`
 
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
-export const messages = defineMessages({
+const messages = defineMessages({
   timeFormat: {
     defaultMessage: 'MMMM dd, yyyy · hh.mm a',
     id: 'configuration.timeFormat',
@@ -305,7 +305,7 @@ function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
   )
 }
 
-export function EventHistorySkeleton() {
+function EventHistorySkeleton() {
   const intl = useIntl()
   return (
     <Content

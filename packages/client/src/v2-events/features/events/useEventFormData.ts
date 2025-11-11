@@ -68,23 +68,3 @@ export const useEventFormData = create<EventFormData>()((set, get) => {
     }
   }
 })
-/**
- * Based on https://github.com/pmndrs/zustand?tab=readme-ov-file#transient-updates-for-often-occurring-state-changes
- *
- * Access state through subscription-pattern to avoid re-renders on every state change
- */
-export const useSubscribeEventFormData = () => {
-  const stateFormRef = useRef(useEventFormData.getState().getFormValues())
-
-  useEffect(
-    () =>
-      useEventFormData.subscribe(
-        (state) => (stateFormRef.current = state.getFormValues())
-      ),
-    []
-  )
-
-  return {
-    formValues: stateFormRef.current
-  }
-}
