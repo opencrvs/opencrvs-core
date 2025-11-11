@@ -211,6 +211,12 @@ function getLeafAdministrativeLevel(
   return undefined
 }
 
+function getAdministrativeArea(value?: AddressFieldValue) {
+  return value?.addressType === AddressType.DOMESTIC
+    ? value.administrativeArea
+    : undefined
+}
+
 /**
  * AddressInput is a form component for capturing address details based on administrative structure.
  *
@@ -242,10 +248,7 @@ function AddressInput(props: Props) {
     (location) => location.locationType === 'ADMIN_STRUCTURE'
   )
 
-  const administrativeArea =
-    value?.addressType === AddressType.DOMESTIC
-      ? value.administrativeArea
-      : undefined
+  const administrativeArea = getAdministrativeArea(value)
 
   const resolveAdministrativeArea = (
     adminArea:
@@ -373,10 +376,7 @@ function AddressOutput({
     return ''
   }
 
-  const administrativeArea =
-    value.addressType === AddressType.DOMESTIC
-      ? value.administrativeArea
-      : undefined
+  const administrativeArea = getAdministrativeArea(value)
   const adminStructureLocations = locations.filter(
     (location) => location.locationType === LocationType.enum.ADMIN_STRUCTURE
   )
@@ -460,11 +460,7 @@ function toCertificateVariables(
   const stringifiedResult = stringifier(ALL_ADDRESS_FIELDS, value as EventState)
   const { streetLevelDetails } = value
 
-  const administrativeArea =
-    value.addressType === AddressType.DOMESTIC
-      ? value.administrativeArea
-      : undefined
-
+  const administrativeArea = getAdministrativeArea(value)
   if (value.addressType === AddressType.INTERNATIONAL) {
     return { ...stringifiedResult, streetLevelDetails }
   }
