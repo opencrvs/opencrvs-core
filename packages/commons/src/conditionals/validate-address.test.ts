@@ -11,7 +11,6 @@
 
 import { AddressType } from '../events/CompositeFieldValue'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
-import { UUID } from '../uuid'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { FieldType } from '../index'
 
@@ -28,9 +27,7 @@ const testCases = [
     address: {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      // @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
-      // @TODO:  Find a way to give out context aware mock values in the future.
-      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
       streetLevelDetails: {
         state: 'state',
         district2: 'district2'
