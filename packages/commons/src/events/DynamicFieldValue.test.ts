@@ -26,9 +26,8 @@ const AddressField = TENNIS_CLUB_DECLARATION_FORM.pages[0].fields.filter(
 )[0]
 
 describe('getDynamicNameValue', () => {
+  const schema = getDynamicNameValue(NameField)
   it('builds a schema with required firstname and surname', () => {
-    const schema = getDynamicNameValue(NameField)
-
     expect(() =>
       schema.parse({
         firstname: 'John',
@@ -41,24 +40,51 @@ describe('getDynamicNameValue', () => {
         firstname: '',
         surname: 'Doe'
       })
-    ).toThrow() // firstname is required
-  })
+    ).toThrow() // firstname can not be empty string
 
-  it('allows optional middlename', () => {
-    const schema = getDynamicNameValue(NameField)
     expect(() =>
       schema.parse({
         firstname: 'Jane',
+        surname: ''
+      })
+    ).toThrow() // surname can not be empty string
+  })
+
+  it('allows valid names', () => {
+    expect(() =>
+      schema.parse({
+        firstname: 'J',
+        surname: 'D'
+      })
+    ).not.toThrow() // minimal valid
+
+    expect(() =>
+      schema.parse({
+        firstname: 'Jane',
+        middlename: 'Muriel',
         surname: 'Doe'
       })
     ).not.toThrow()
   })
+
+  it('Does not allow partial name because of configuration', () => {
+    expect(() =>
+      schema.parse({
+        firstname: 'Jane'
+      })
+    ).toThrow()
+
+    expect(() =>
+      schema.parse({
+        surname: 'Jane'
+      })
+    ).toThrow()
+  })
 })
 
 describe('getDynamicAddressFieldValue', () => {
+  const schema = getDynamicAddressFieldValue(AddressField)
   it('accepts valid street keys', () => {
-    const schema = getDynamicAddressFieldValue(AddressField)
-
     expect(() =>
       schema.parse({
         country: 'BD',
@@ -69,7 +95,6 @@ describe('getDynamicAddressFieldValue', () => {
   })
 
   it('rejects invalid street keys', () => {
-    const schema = getDynamicAddressFieldValue(AddressField)
     expect(() =>
       schema.parse({
         country: 'BD',
