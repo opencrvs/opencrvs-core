@@ -117,6 +117,10 @@ export function resolveEventCustomFlags(
   return actions.reduce((acc, action, idx) => {
     const actionConfig = getActionConfig(config, action)
 
+    if (!actionConfig) {
+      return acc
+    }
+
     const eventUpToThisAction = {
       ...event,
       actions: actions.slice(0, idx + 1)

@@ -100,7 +100,7 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
 export function getActionConfig(
   config: EventConfig,
   action: ActionDocument
-): ActionConfig {
+): ActionConfig | undefined {
   const { type } = action
 
   const actionConfig = config.actions.find((a) => {
@@ -109,10 +109,6 @@ export function getActionConfig(
     }
     return a.type === type
   })
-
-  if (!actionConfig) {
-    throw new Error(`Action config for action type ${type} not found`)
-  }
 
   return actionConfig
 }
