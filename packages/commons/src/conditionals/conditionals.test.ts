@@ -204,39 +204,53 @@ describe('object combinator', () => {
     expect(
       validate(
         field('child.details').object({
-          dob: field('dob').isBefore().now()
+          data: field('data').isBefore().now()
         }),
         getFieldParams({
-          'child.details': new Date('2125-01-01').toISOString().split('T')[0]
+          'child.details': {
+            data: new Date('2125-01-01').toISOString().split('T')[0]
+          }
         })
       )
     ).toBe(false)
 
     expect(
       validate(
-        field('child.details').isBefore().now(),
+        field('child.details').object({
+          data: field('data').isBefore().now()
+        }),
         getFieldParams({
-          'child.details': new Date('2020-01-01').toISOString().split('T')[0]
+          'child.details': {
+            data: new Date('2020-01-01').toISOString().split('T')[0]
+          }
         })
       )
     ).toBe(true)
 
     expect(
       validate(
-        field('child.details').isEqualTo(field('random')),
+        field('child.details').object({
+          data: field('data').isEqualTo(field('random'))
+        }),
         getFieldParams({
           random: 'value',
-          'child.details': 'value1'
+          'child.details': {
+            data: 'value1'
+          }
         })
       )
     ).toBe(false)
 
     expect(
       validate(
-        field('child.details').isEqualTo(field('random')),
+        field('child.details').object({
+          data: field('data').isEqualTo(field('random'))
+        }),
         getFieldParams({
           random: 'value',
-          'child.details': 'value'
+          'child.details': {
+            data: 'value'
+          }
         })
       )
     ).toBe(true)
