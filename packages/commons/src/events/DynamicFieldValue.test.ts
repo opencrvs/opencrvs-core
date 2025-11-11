@@ -89,6 +89,7 @@ describe('getDynamicAddressFieldValue', () => {
       schema.parse({
         country: 'BD',
         addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
         streetLevelDetails: { street: '12', town: 'Baker St' }
       })
     ).not.toThrow()
