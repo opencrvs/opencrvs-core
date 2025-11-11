@@ -11,7 +11,10 @@
 import { z } from 'zod'
 import { AddressField, NameField } from './FieldConfig'
 import { NonEmptyTextValue, TextValue } from './FieldValue'
-import { AddressType, StreetLevelDetailsValue } from './CompositeFieldValue'
+import {
+  AddressType,
+  StreetLevelDetailsUpdateValue
+} from './CompositeFieldValue'
 
 /**
  * Dynamically builds a Zod schema for a "NAME" field based on its configuration.
@@ -65,7 +68,7 @@ export function getDynamicAddressFieldValue(field: AddressField) {
       .string()
       .uuid()
       .optional() /* Leaf level admin structure */,
-    streetLevelDetails: StreetLevelDetailsValue.refine((arg) => {
+    streetLevelDetails: StreetLevelDetailsUpdateValue.refine((arg) => {
       const submittedKeys = Object.keys(arg ?? {})
       const configIds =
         (streetAddressConfig && streetAddressConfig.map((a) => a.id)) ?? []

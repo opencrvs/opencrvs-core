@@ -51,11 +51,9 @@ export const NameFieldUpdateValue = z
 export type NameFieldValue = z.infer<typeof NameFieldValue>
 export type NameFieldUpdateValue = z.infer<typeof NameFieldUpdateValue>
 
-export const StreetLevelDetailsValue = z
-  .record(z.string(), z.string())
-  .optional()
+const StreetLevelDetailsValue = z.record(z.string(), z.string()).optional()
 
-const StreetLevelDetailsUpdateValue = z
+export const StreetLevelDetailsUpdateValue = z
   .record(z.string(), z.string().nullable())
   .nullish()
 
