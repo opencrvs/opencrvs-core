@@ -9,14 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuid } from 'uuid'
-import { EventStatus } from '@opencrvs/commons/client'
+import { ActionType, EventStatus } from '@opencrvs/commons/client'
+import { actionLabels } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { QuickActionConfig } from './useQuickActionModal'
 
 export const register: QuickActionConfig = {
-  description: {
-    id: 'review.register.description.complete',
-    defaultMessage:
-      "By clicking 'Confirm', you confirm that the information entered is correct and the event can be registered."
+  modal: {
+    label: actionLabels[ActionType.REGISTER],
+    description: {
+      id: 'review.register.description.complete',
+      defaultMessage:
+        "By clicking 'Confirm', you confirm that the information entered is correct and the event can be registered."
+    }
   },
   onConfirm: ({ event, actions, customActions }) => {
     if (event.status === EventStatus.enum.DECLARED) {

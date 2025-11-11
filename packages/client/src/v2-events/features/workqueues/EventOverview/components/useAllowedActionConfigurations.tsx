@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -27,7 +28,9 @@ import {
   Draft,
   isActionInScope,
   configurableEventScopeAllowed,
-  ITokenPayload
+  ITokenPayload,
+  ActionTypes,
+  CustomActionConfig
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -47,7 +50,10 @@ import { useOnlineStatus } from '@client/utils'
 import { UnassignModal } from '@client/v2-events/components/UnassignModal'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { useQuickActionModal } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
+import {
+  useCustomActionModal,
+  useQuickActionModal
+} from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
@@ -181,7 +187,7 @@ interface ActionConfig {
 export type ActionMenuActionType = WorkqueueActionType | ClientSpecificAction
 
 interface ActionMenuItem extends ActionConfig {
-  type: ActionMenuActionType
+  type: ActionMenuActionType | (typeof ActionTypes.enum)['CUSTOM']
 }
 
 /**
@@ -539,6 +545,33 @@ export function useUserAllowedActions(eventType: string) {
   }
 }
 
+function useCustomActionConfigs(event: EventIndex): {
+  customActionModal: React.ReactNode
+  customActionConfigs: ActionMenuItem[]
+} {
+  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { customActionModal, onCustomAction } = useCustomActionModal(event)
+
+  const customActionConfigs = useMemo(() => {
+    return eventConfiguration.actions
+      .filter(
+        (action): action is CustomActionConfig =>
+          action.type === ActionType.CUSTOM
+      )
+      .map((action) => ({
+        label: action.label,
+        icon: 'PencilLine' as const,
+        onClick: async (workqueue?: string) =>
+          onCustomAction(action, workqueue),
+        disabled: false,
+        hidden: false,
+        type: ActionType.CUSTOM
+      }))
+  }, [eventConfiguration, onCustomAction])
+
+  return { customActionModal, customActionConfigs }
+}
+
 /**
  *
  * NOTE: In principle, you should never add new business rules to the `useAction` hook alone. All the actions are validated by the server and their order is enforced.
@@ -569,10 +602,9 @@ export function useAllowedActionConfigurations(
   )
 
   const availableEventActions = getAvailableActionsForEvent(event)
-
   const openDraftAction = openDraft ? [openDraft.action.type] : []
 
-  const allowedWorkqueueConfigs: ActionMenuItem[] = [
+  const allowedActionConfigs: ActionMenuItem[] = [
     ...availableAssignmentActions,
     ...availableEventActions,
     ...openDraftAction
@@ -589,12 +621,19 @@ export function useAllowedActionConfigurations(
     .map((a) => ({ ...config[a], type: a }))
     .filter((a: ActionConfig) => !a.hidden)
 
+  const { customActionModal, customActionConfigs } =
+    useCustomActionConfigs(event)
+  const allActionConfigs = [...allowedActionConfigs, ...customActionConfigs]
+
   // Check if the user can perform any action other than ASSIGN, or UNASSIGN
-  const hasOnlyMetaActions = allowedWorkqueueConfigs.every(({ type }) =>
+  const hasOnlyMetaActions = allActionConfigs.every(({ type }) =>
     isMetaAction(type)
   )
 
   // If user has no other actions than assign or unassign, return no actions.
   // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
-  return [modals, hasOnlyMetaActions ? [] : allowedWorkqueueConfigs]
+  return [
+    [modals, customActionModal],
+    hasOnlyMetaActions ? [] : allActionConfigs
+  ]
 }

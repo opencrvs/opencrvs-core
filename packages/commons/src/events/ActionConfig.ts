@@ -29,6 +29,10 @@ export const DeclarationReviewConfig = z
 
 export const ActionConfigBase = z.object({
   label: TranslationConfig.describe('Human readable description of the action'),
+  // @TODO: remove optionality and take in to use as part of https://github.com/opencrvs/opencrvs-core/issues/10900
+  confirmationText: TranslationConfig.optional().describe(
+    'Text displayed on the confirmation'
+  ),
   flags: z
     .array(ActionFlagConfig)
     .optional()
@@ -126,6 +130,7 @@ const CustomActionConfig = ActionConfigBase.merge(
       )
   })
 )
+export type CustomActionConfig = z.infer<typeof CustomActionConfig>
 
 export const ActionConfig = z
   .discriminatedUnion('type', [

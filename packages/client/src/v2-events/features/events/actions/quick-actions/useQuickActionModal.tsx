@@ -17,7 +17,11 @@ import {
   PrimaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import { ActionType, EventIndex } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  CustomActionConfig,
+  EventIndex
+} from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { ROUTES } from '@client/v2-events/routes'
 import {
@@ -30,8 +34,15 @@ import { validate } from './validate'
 import { register } from './register'
 import { archive } from './archive'
 
-export interface QuickActionConfig {
+interface ModalConfig {
+  label: MessageDescriptor
   description: MessageDescriptor
+  confirmButtonType?: 'primary' | 'danger'
+  confirmButtonLabel?: MessageDescriptor
+}
+
+export interface QuickActionConfig {
+  modal: ModalConfig
   onConfirm: ({
     event,
     actions,
@@ -43,8 +54,6 @@ export interface QuickActionConfig {
     customActions: ReturnType<typeof useEvents>['customActions']
     isActionAllowed: (action: ActionType) => boolean
   }) => void | Promise<void>
-  confirmButtonType?: 'primary' | 'danger'
-  confirmButtonLabel?: MessageDescriptor
 }
 
 const quickActions = {
@@ -55,13 +64,12 @@ const quickActions = {
 
 function QuickActionModal({
   close,
-  actionType
+  config
 }: {
   close: (result: boolean) => void
-  actionType: keyof typeof quickActions
+  config: ModalConfig
 }) {
   const intl = useIntl()
-  const config = quickActions[actionType]
 
   const ConfirmButton =
     config.confirmButtonType === 'danger' ? DangerButton : PrimaryButton
@@ -88,10 +96,10 @@ function QuickActionModal({
       ]}
       autoHeight={true}
       handleClose={() => close(false)}
-      id={`quick-action-modal-${actionType}`}
+      id={`quick-action-modal-${config.label.id}`}
       responsive={true}
       show={true}
-      title={intl.formatMessage(actionLabels[actionType])}
+      title={intl.formatMessage(config.label)}
       width={800}
     >
       {intl.formatMessage(config.description)}
@@ -109,15 +117,16 @@ export function useQuickActionModal(event: EventIndex) {
     actionType: keyof typeof quickActions,
     workqueue?: string
   ) => {
+    const config = quickActions[actionType]
     const confirmed = await openModal<boolean>((close) => (
-      <QuickActionModal actionType={actionType} close={close} />
+      <QuickActionModal close={close} config={config.modal} />
     ))
 
     // On confirmed modal, we will:
     // - Execute the configured onConfirm() for the action
     // - Redirect the user to the workqueue they arrived from if provided, or the home page if not
     if (confirmed) {
-      void quickActions[actionType].onConfirm({
+      void config.onConfirm({
         event,
         actions,
         customActions,
@@ -132,5 +141,49 @@ export function useQuickActionModal(event: EventIndex) {
     }
   }
 
-  return { onQuickAction, quickActionModal }
+  return { quickActionModal, onQuickAction }
+}
+
+const customActionConfigBase: Partial<ModalConfig> = {
+  confirmButtonType: 'primary',
+  confirmButtonLabel: {
+    id: 'buttons.confirm',
+    defaultMessage: 'Confirm',
+    description: 'Confirm button text'
+  }
+}
+
+export function useCustomActionModal(event: EventIndex) {
+  const [customActionModal, openModal] = useModal()
+  const navigate = useNavigate()
+  const { actions, customActions } = useEvents()
+
+  const onCustomAction = async (
+    actionConfig: CustomActionConfig,
+    workqueue?: string
+  ) => {
+    const config: ModalConfig = {
+      ...customActionConfigBase,
+      label: actionConfig.label,
+      description: {
+        id: 'custom.action.description',
+        defaultMessage: 'Custom action description'
+      }
+    }
+    const confirmed = await openModal<boolean>((close) => (
+      <QuickActionModal close={close} config={config} />
+    ))
+
+    if (confirmed) {
+      // TODO CIHAN: send backend request
+
+      if (workqueue) {
+        navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
+      } else {
+        navigate(ROUTES.V2.buildPath({}))
+      }
+    }
+  }
+
+  return { customActionModal, onCustomAction }
 }

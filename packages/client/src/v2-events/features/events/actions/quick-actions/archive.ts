@@ -9,20 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuid } from 'uuid'
+import { ActionType } from '@opencrvs/commons/client'
+import { actionLabels } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { QuickActionConfig } from './useQuickActionModal'
 
 export const archive: QuickActionConfig = {
-  description: {
-    id: 'recordAudit.archive.confirmation.body',
-    defaultMessage:
-      'This will remove the declaration from the workqueue and change the status to Archive. To revert this change you will need to search for the declaration.',
-    description: 'Confirmation body for archiving a declaration'
-  },
-  confirmButtonType: 'danger',
-  confirmButtonLabel: {
-    id: 'buttons.archive',
-    defaultMessage: 'Archive',
-    description: 'Archive button text'
+  modal: {
+    label: actionLabels[ActionType.ARCHIVE],
+    description: {
+      id: 'recordAudit.archive.confirmation.body',
+      defaultMessage:
+        'This will remove the declaration from the workqueue and change the status to Archive. To revert this change you will need to search for the declaration.',
+      description: 'Confirmation body for archiving a declaration'
+    },
+    confirmButtonType: 'danger',
+    confirmButtonLabel: {
+      id: 'buttons.archive',
+      defaultMessage: 'Archive',
+      description: 'Archive button text'
+    }
   },
   onConfirm: ({ event, actions }) => {
     return actions.archive.mutate({
