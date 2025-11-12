@@ -22,9 +22,6 @@ import { getDefaultActionProcedures } from '@events/router/event/actions'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 
 export function customActionProcedures() {
-  // TODO CIHAN: add scopes for custom actions
-  // const requireScopesMiddleware = requiresAnyOfScopes([], [])
-
   return {
     ...getDefaultActionProcedures(ActionType.CUSTOM),
     request: systemProcedure
