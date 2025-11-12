@@ -87,7 +87,7 @@ export function Summary() {
   const intl = useIntl()
 
   const events = useEvents()
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const togglePrompt = () => setShowPrompt(!showPrompt)

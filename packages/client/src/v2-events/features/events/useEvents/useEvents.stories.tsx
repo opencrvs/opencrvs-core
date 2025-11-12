@@ -62,7 +62,7 @@ const router = {
         /*
          * Explicitly trigger the download of the event
          */
-        const event = getEvent.findFromCache(createdEvent.id)
+        const event = getEvent.useFindEventFromCache(createdEvent.id)
 
         /*
          * Explicitly call the hook to trigger draft fetching
@@ -72,7 +72,7 @@ const router = {
         queryClient.invalidateQueries({
           queryKey: trpcOptionsProxy.event.draft.list.queryKey()
         })
-        useDrafts().getRemoteDraftByEventId(createdEvent.id)
+        useDrafts().useGetRemoteDraftByEventId(createdEvent.id)
 
         return (
           <TRPCProvider>

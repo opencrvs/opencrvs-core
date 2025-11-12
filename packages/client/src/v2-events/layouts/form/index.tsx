@@ -37,7 +37,7 @@ export function FormLayout({
   const intl = useIntl()
   const { eventId } = useTypedParams(route)
   const events = useEvents()
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )

@@ -213,7 +213,7 @@ function ReviewDuplicate() {
   const navigate = useNavigate()
   const events = useEvents()
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
-  const { data: event } = events.getEvent.findFromCache(eventId)
+  const { data: event } = events.getEvent.useFindEventFromCache(eventId)
 
   useEffect(() => {
     if (!event) {

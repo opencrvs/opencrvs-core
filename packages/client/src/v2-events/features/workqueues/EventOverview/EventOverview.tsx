@@ -61,8 +61,8 @@ function EventOverviewFull({
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const validatorContext = useValidatorContext()
   const { status } = eventIndex
-  const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(eventIndex.id, {
+  const { useGetRemoteDraftByEventId } = useDrafts()
+  const draft = useGetRemoteDraftByEventId(eventIndex.id, {
     refetchOnMount: 'always'
   })
 
@@ -139,8 +139,8 @@ function EventOverviewProtected({
 }) {
   const { eventConfiguration } = useEventConfiguration(eventIndex.type)
   const { status } = eventIndex
-  const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(eventIndex.id)
+  const { useGetRemoteDraftByEventId } = useDrafts()
+  const draft = useGetRemoteDraftByEventId(eventIndex.id)
 
   const eventWithDrafts = draft
     ? deepDropNulls(
@@ -218,7 +218,7 @@ function EventOverviewContainer() {
   // Suspense query is not used here because we want to refetch when an event action is performed
   const getEventQuery = searchEventById.useQuery(params.eventId)
   const eventIndex = getEventQuery.data?.results[0]
-  const fullEvent = getEvent.findFromCache(params.eventId).data
+  const fullEvent = getEvent.useFindEventFromCache(params.eventId).data
 
   if (!eventIndex) {
     return

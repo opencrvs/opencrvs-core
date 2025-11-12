@@ -231,7 +231,7 @@ export function Review() {
   const navigate = useNavigate()
   const events = useEvents()
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.VALIDATE)
-  const event = events.getEvent.findFromCache(eventId).data
+  const event = events.getEvent.useFindEventFromCache(eventId).data
   useEffect(() => {
     if (!event) {
       // eslint-disable-next-line no-console

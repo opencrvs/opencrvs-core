@@ -116,7 +116,7 @@ function DeclarationActionComponent({
   event: EventDocument
 }>) {
   const eventId = event.id
-  const { setLocalDraft, getLocalDraftOrDefault, getRemoteDraftByEventId } =
+  const { setLocalDraft, getLocalDraftOrDefault, useGetRemoteDraftByEventId } =
     useDrafts()
 
   const { eventConfiguration: configuration } = useEventConfiguration(
@@ -125,7 +125,7 @@ function DeclarationActionComponent({
 
   useActionGuard(actionType, event, configuration)
 
-  const remoteDraft: Draft | undefined = getRemoteDraftByEventId(event.id)
+  const remoteDraft: Draft | undefined = useGetRemoteDraftByEventId(event.id)
 
   const activeRemoteDraft = remoteDraft
     ? findActiveDraftForEvent(event, remoteDraft)
@@ -288,7 +288,7 @@ function DeclarationActionContainer({
 
   const navigate = useNavigate()
   const { redirectToEventOverviewPage } = useToastAndRedirect()
-  const event = events.getEvent.findFromCache(eventId).data
+  const event = events.getEvent.useFindEventFromCache(eventId).data
 
   // Missing event should not happen in "regular" application flow.
   // 1. User clicks browser 'back' button after completing flow.

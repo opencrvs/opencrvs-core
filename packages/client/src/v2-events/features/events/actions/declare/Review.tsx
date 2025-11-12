@@ -61,7 +61,7 @@ export function Review() {
   const { closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 

@@ -50,7 +50,7 @@ export function Pages() {
   const events = useEvents()
   const { modal } = useEventFormNavigation()
 
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type

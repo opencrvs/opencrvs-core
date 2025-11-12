@@ -56,7 +56,7 @@ export function FormHeader({
   if (!eventId) {
     throw new Error('Event id is required')
   }
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )

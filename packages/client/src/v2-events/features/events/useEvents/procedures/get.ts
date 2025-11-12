@@ -181,11 +181,11 @@ export function useGetEventFromCache(id: UUID) {
 
 export function useGetEvent() {
   return {
-    findFromCache: useFindEventFromCache,
+    useFindEventFromCache,
     /*
      * This downloads the event document from the server without caching it
      */
-    viewEvent: useViewEvent,
-    getFromCache: useGetEventFromCache
+    useViewEvent,
+    useGetEventFromCache
   }
 }
