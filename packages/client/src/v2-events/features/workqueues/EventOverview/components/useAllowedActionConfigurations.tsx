@@ -51,8 +51,8 @@ import { UnassignModal } from '@client/v2-events/components/UnassignModal'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import {
-  useCustomActionModal,
-  useQuickActionModal
+  useQuickActionModal,
+  useCustomActionModal
 } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
 

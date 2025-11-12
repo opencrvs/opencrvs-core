@@ -11,6 +11,7 @@
 import React from 'react'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
+import { v4 as uuid } from 'uuid'
 import { ResponsiveModal } from '@opencrvs/components'
 import {
   DangerButton,
@@ -118,7 +119,7 @@ export function useQuickActionModal(event: EventIndex) {
     const config = quickActions[actionType]
     const label = actionLabels[actionType]
     const confirmed = await openModal<boolean>((close) => (
-      <QuickActionModal close={close} config={{ ...config.modal, label }} />
+      <QuickActionModal close={close} config={{ label, ...config.modal }} />
     ))
 
     // On confirmed modal, we will:
@@ -155,7 +156,7 @@ const customActionConfigBase: Partial<ModalConfig> = {
 export function useCustomActionModal(event: EventIndex) {
   const [customActionModal, openModal] = useModal()
   const navigate = useNavigate()
-  const { actions, customActions } = useEvents()
+  const { actions } = useEvents()
 
   const onCustomAction = async (
     actionConfig: CustomActionConfig,
@@ -177,7 +178,12 @@ export function useCustomActionModal(event: EventIndex) {
     ))
 
     if (confirmed) {
-      // TODO CIHAN: send backend request
+      void actions.custom.mutate({
+        eventId: event.id,
+        customActionType: actionConfig.customActionType,
+        declaration: event.declaration,
+        transactionId: uuid()
+      })
 
       if (workqueue) {
         navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
