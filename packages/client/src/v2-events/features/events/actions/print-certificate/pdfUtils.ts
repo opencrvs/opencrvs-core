@@ -680,12 +680,17 @@ export async function svgToPdfTemplate(
     'image/svg+xml'
   ).documentElement
 
+  const $sections = svgElement.querySelectorAll('[data-page]')
+  const sections = Array.from($sections)
+
   const widthValue = svgElement.getAttribute('width')
   const heightValue = svgElement.getAttribute('height')
 
   if (widthValue && heightValue) {
     const width = Number.parseInt(widthValue)
-    const height = Number.parseInt(heightValue)
+    const height = sections.length
+      ? Number.parseInt(heightValue) / $sections.length
+      : Number.parseInt(heightValue)
     pdfTemplate.definition.pageSize = {
       width,
       height
@@ -716,12 +721,27 @@ export async function svgToPdfTemplate(
     } as Content)
   }
 
-  pdfTemplate.definition.content = [
-    {
-      svg: svgWithInlineImages
-    },
-    ...absolutelyPositionedHTMLs
-  ]
+  if ($sections.length > 0) {
+    pdfTemplate.definition.content = [
+      sections.map(($section) => {
+        const $svgWrapper = document.createElement('svg')
+        ;[...svgElement.attributes].forEach((attr) => {
+          $svgWrapper.setAttribute(attr.name, attr.value)
+        })
+        $section.removeAttribute('transform')
+        $svgWrapper.appendChild($section.cloneNode(true))
+        return { svg: $svgWrapper.outerHTML }
+      }),
+      ...absolutelyPositionedHTMLs
+    ]
+  } else {
+    pdfTemplate.definition.content = [
+      {
+        svg: svgWithInlineImages
+      },
+      ...absolutelyPositionedHTMLs
+    ]
+  }
 
   return pdfTemplate
 }
