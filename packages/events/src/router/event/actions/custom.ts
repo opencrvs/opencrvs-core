@@ -57,7 +57,8 @@ export function customActionProcedures() {
           }
 
           return await next()
-        } catch (e) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (_e) {
           throw new TRPCError({ code: 'FORBIDDEN' })
         }
       })
