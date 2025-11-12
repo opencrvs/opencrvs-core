@@ -42,7 +42,7 @@ describe('event.actions.custom', () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
         `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
-        `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP}, customActionType=foobar]`
+        `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=foobar]`
       ])
 
       const event = await client.event.create(generator.event.create())
@@ -63,7 +63,7 @@ describe('event.actions.custom', () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
         `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
-        `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP}, customActionType=CONFIRM]`
+        `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=CONFIRM]`
       ])
 
       const event = await client.event.create(generator.event.create())

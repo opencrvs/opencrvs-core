@@ -8,12 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { TRPCError } from '@trpc/server'
 import {
   ActionType,
   ActionStatus,
   EventDocument,
   CustomActionInput
 } from '@opencrvs/commons/events'
+import { findScope, getScopes } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
@@ -21,17 +23,32 @@ import { getEventById, processAction } from '@events/service/events/events'
 import { getDefaultActionProcedures } from '@events/router/event/actions'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 
+function allowCustomAction(token: string, customActionType: string): boolean {
+  const foundScope = findScope(getScopes(token), 'record.custom-action')
+  if (!foundScope) {
+    return false
+  }
+
+  if (!foundScope.options.customActionType.includes(customActionType)) {
+    return false
+  }
+
+  return true
+}
+
 export function customActionProcedures() {
   return {
     ...getDefaultActionProcedures(ActionType.CUSTOM),
     request: systemProcedure
-      .use(async (opts) => {
-        // eslint-disable-next-line no-console
-        console.log('opts', opts)
-        return requiresAnyOfScopes([], [])(opts)
-      })
+      .use(requiresAnyOfScopes([], ['record.custom-action']))
       .input(CustomActionInput)
-      .use(middleware.eventTypeAuthorization)
+      .use(async ({ ctx, input, next }) => {
+        if (allowCustomAction(ctx.token, input.customActionType)) {
+          return next()
+        }
+
+        throw new TRPCError({ code: 'FORBIDDEN' })
+      })
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
       .output(EventDocument)
