@@ -11,7 +11,6 @@
 
 import {
   findScope,
-  getAuthorizedEventsFromScopes,
   parseConfigurableScope,
   parseLiteralScope,
   SCOPES
