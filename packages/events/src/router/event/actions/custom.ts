@@ -15,39 +15,51 @@ import {
   EventDocument,
   CustomActionInput
 } from '@opencrvs/commons/events'
-import { findScope, getScopes } from '@opencrvs/commons'
+import { getScopes, parseConfigurableScope } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
-import { requiresAnyOfScopes } from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
 import { getEventById, processAction } from '@events/service/events/events'
 import { getDefaultActionProcedures } from '@events/router/event/actions'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 
-function allowCustomAction(token: string, customActionType: string): boolean {
-  const foundScope = findScope(getScopes(token), 'record.custom-action')
-  if (!foundScope) {
-    return false
-  }
+function allowCustomAction(
+  token: string,
+  eventType: string,
+  customActionType: string
+) {
+  const userScopes = getScopes(token)
+  const parsedScopes = userScopes
+    .map(parseConfigurableScope)
+    .filter((s) => s !== undefined)
 
-  if (!foundScope.options.customActionType.includes(customActionType)) {
-    return false
-  }
+  const allowedScope = parsedScopes.find(
+    (s) =>
+      s.type === 'record.custom-action' &&
+      s.options.customActionType.includes(customActionType) &&
+      s.options.event.includes(eventType)
+  )
 
-  return true
+  return Boolean(allowedScope)
 }
 
 export function customActionProcedures() {
   return {
     ...getDefaultActionProcedures(ActionType.CUSTOM),
     request: systemProcedure
-      .use(requiresAnyOfScopes([], ['record.custom-action']))
       .input(CustomActionInput)
       .use(async ({ ctx, input, next }) => {
-        if (allowCustomAction(ctx.token, input.customActionType)) {
-          return next()
-        }
+        try {
+          const event = await getEventById(input.eventId)
+          if (
+            !allowCustomAction(ctx.token, event.type, input.customActionType)
+          ) {
+            throw new TRPCError({ code: 'FORBIDDEN' })
+          }
 
-        throw new TRPCError({ code: 'FORBIDDEN' })
+          return await next()
+        } catch (e) {
+          throw new TRPCError({ code: 'FORBIDDEN' })
+        }
       })
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
