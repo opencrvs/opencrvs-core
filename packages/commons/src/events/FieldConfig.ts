@@ -88,6 +88,8 @@ const requiredSchema = z
   .default(false)
   .optional()
 
+export type RequireConfig = z.infer<typeof requiredSchema>
+
 const BaseField = z
   .object({
     id: FieldId.describe('Unique identifier of the field.'),
