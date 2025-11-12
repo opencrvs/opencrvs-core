@@ -56,7 +56,7 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
     if (location.state?.forgottenItem) {
       sessionStorage.setItem('forgottenItem', location.state.forgottenItem)
     }
-  }, [location.state])
+  }, [location.state?.forgottenItem])
 
   const handleMobileChange = (value: string) => {
     setPhone(value)
