@@ -681,14 +681,12 @@ export async function svgToPdfTemplate(
   ).documentElement
 
   const $sections = svgElement.querySelectorAll('[data-page]')
-  const sections = Array.from($sections)
-
   const widthValue = svgElement.getAttribute('width')
   const heightValue = svgElement.getAttribute('height')
 
   if (widthValue && heightValue) {
     const width = Number.parseInt(widthValue)
-    const height = sections.length
+    const height = $sections.length
       ? Number.parseInt(heightValue) / $sections.length
       : Number.parseInt(heightValue)
     pdfTemplate.definition.pageSize = {
@@ -723,7 +721,7 @@ export async function svgToPdfTemplate(
 
   if ($sections.length > 0) {
     pdfTemplate.definition.content = [
-      sections.map(($section) => {
+      ...Array.from($sections).map(($section) => {
         const $svgWrapper = document.createElement('svg')
         ;[...svgElement.attributes].forEach((attr) => {
           $svgWrapper.setAttribute(attr.name, attr.value)
