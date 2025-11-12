@@ -23,12 +23,16 @@ import { getInMemoryEventConfigurations } from '@events/service/config/config'
 
 export function customActionProcedures() {
   // TODO CIHAN: add scopes for custom actions
-  const requireScopesMiddleware = requiresAnyOfScopes([], [])
+  // const requireScopesMiddleware = requiresAnyOfScopes([], [])
 
   return {
     ...getDefaultActionProcedures(ActionType.CUSTOM),
     request: systemProcedure
-      .use(requireScopesMiddleware)
+      .use(async (opts) => {
+        // eslint-disable-next-line no-console
+        console.log('opts', opts)
+        return requiresAnyOfScopes([], [])(opts)
+      })
       .input(CustomActionInput)
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)

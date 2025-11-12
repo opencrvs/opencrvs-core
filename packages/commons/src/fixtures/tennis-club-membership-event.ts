@@ -345,6 +345,17 @@ export const tennisClubMembershipEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
       }
+    },
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'CONFIRM',
+      label: {
+        id: 'event.tennis-club-membership.action.confirm.label',
+        defaultMessage: 'Confirm',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from'
+      },
+      form: []
     }
   ],
   advancedSearch: [

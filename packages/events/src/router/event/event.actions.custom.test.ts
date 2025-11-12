@@ -9,5 +9,75 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-// TODO CIHAN
-describe.todo('Custom action')
+import { TRPCError } from '@trpc/server'
+import { ActionType, getUUID, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons'
+import { setupTestCase } from '@events/tests/utils'
+import { createTestClient } from '@events/tests/utils'
+
+describe('event.actions.custom', () => {
+  describe('authorization', () => {
+    test('prevents forbidden access if missing required scope', async () => {
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [])
+
+      await expect(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        client.event.actions.custom.request({} as any)
+      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+    })
+
+    test('prevents forbidden access if user has custom action scope but for wrong event type', async () => {
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [
+        'record.custom-action[event=foobar, customActionType=attest]'
+      ])
+
+      await expect(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        client.event.actions.custom.request({} as any)
+      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+    })
+
+    test('prevents forbidden access if user has custom action scope but for wrong custom action type', async () => {
+      const { user, generator } = await setupTestCase()
+      const client = createTestClient(user, [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
+        `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP}, customActionType=foobar]`
+      ])
+
+      const event = await client.event.create(generator.event.create())
+
+      const payload = {
+        type: ActionType.CUSTOM,
+        eventId: event.id,
+        transactionId: getUUID(),
+        customActionType: 'CONFIRM'
+      }
+
+      await expect(
+        client.event.actions.custom.request(payload)
+      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+    })
+
+    test('allows access if user has custom action scope for correct event type and custom action type', async () => {
+      const { user, generator } = await setupTestCase()
+      const client = createTestClient(user, [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
+        `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP}, customActionType=CONFIRM]`
+      ])
+
+      const event = await client.event.create(generator.event.create())
+
+      const payload = {
+        type: ActionType.CUSTOM,
+        eventId: event.id,
+        transactionId: getUUID(),
+        customActionType: 'CONFIRM'
+      }
+
+      await expect(
+        client.event.actions.custom.request(payload)
+      ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+    })
+  })
+})
