@@ -54,6 +54,7 @@ import { ProtectedRoute } from '../../components/ProtectedRoute'
 import { UserAudit } from '../../views/UserAudit/UserAudit'
 import { SystemList } from '../../views/SysAdmin/Config/Systems/Systems'
 import AllUserEmail from '../../views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
+import { PerformanceDashboard } from '../features/performance/Dashboard'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
@@ -253,6 +254,14 @@ export const routesConfig = {
     {
       path: ROUTES.V2.SETTINGS.path,
       element: <SettingsPage />
+    },
+    {
+      path: ROUTES.V2.DASHBOARD.path,
+      element: (
+        <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
+          <PerformanceDashboard />
+        </ProtectedRoute>
+      )
     },
     /** LEGACY ROUTES
      * During regression testing QA discovered that we were still using old workqueues on some components.
