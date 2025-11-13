@@ -161,8 +161,12 @@ const PRIORITY_ORDER = [
  * meaning they lose in sorting priority.
  */
 function schemaPriority(schema: z.ZodTypeAny) {
-  const name = schema._def?.description // set by .describe()
-  const idx = PRIORITY_ORDER.indexOf(name)
+  const name = schema.description
+  if (!name) {
+    return 9999
+  } // handles undefined
+
+  const idx = PRIORITY_ORDER.indexOf(name as (typeof PRIORITY_ORDER)[number])
   return idx === -1 ? 9999 : idx
 }
 
