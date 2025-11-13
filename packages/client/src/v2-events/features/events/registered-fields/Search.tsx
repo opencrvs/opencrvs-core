@@ -21,15 +21,14 @@ import {
 } from '@opencrvs/commons/client'
 import {
   Button,
+  Dialog,
   IColor,
   Link,
   Loader,
-  ResponsiveModal,
   Stack,
   Text,
   TextInput
 } from '@opencrvs/components'
-import { SecondaryButton } from '@opencrvs/components/lib/buttons'
 import { useOnlineStatus } from '@client/utils'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { Http, Props } from './Http'
@@ -105,16 +104,16 @@ function ClearModal({
   const intl = useIntl()
 
   return (
-    <ResponsiveModal
-      autoHeight
-      preventClickOnParent
-      show
+    <Dialog
       actions={[
         <Button
-          key="cancel-btn"
-          id="cancel"
+          key="cancel_clear"
+          id="cancel_clear"
+          size="medium"
           type="tertiary"
-          onClick={() => close(false)}
+          onClick={() => {
+            close(false)
+          }}
         >
           {intl.formatMessage(
             configuration.indicators?.clearModal?.cancel ??
@@ -122,10 +121,13 @@ function ClearModal({
           )}
         </Button>,
         <Button
-          key="clear-btn"
-          id="clear"
-          type="positive"
-          onClick={() => close(true)}
+          key="confirm_clear"
+          id="confirm_clear"
+          size="medium"
+          type="negative"
+          onClick={() => {
+            close(true)
+          }}
         >
           {intl.formatMessage(
             configuration.indicators?.clearModal?.confirm ??
@@ -133,19 +135,20 @@ function ClearModal({
           )}
         </Button>
       ]}
-      handleClose={() => close(false)}
-      id="clearModal"
-      responsive={false}
+      isOpen={true}
       title={intl.formatMessage(
         configuration.indicators?.clearModal?.title ??
           defaultIndicators.clearModal.title
       )}
+      onClose={() => close(false)}
     >
-      {intl.formatMessage(
-        configuration.indicators?.clearModal?.description ??
-          defaultIndicators.clearModal.description
-      )}
-    </ResponsiveModal>
+      <Text color="grey500" element="p" variant="reg16">
+        {intl.formatMessage(
+          configuration.indicators?.clearModal?.description ??
+            defaultIndicators.clearModal.description
+        )}
+      </Text>
+    </Dialog>
   )
 }
 
@@ -378,16 +381,17 @@ function SearchInput({
           onChange={onHTTPChange}
         />
         {isEditable && (
-          <SecondaryButton
+          <Button
             disabled={!valid || !isOnline}
             size="large"
+            type="secondary"
             onClick={() => setButtonPressed(buttonPressed + 1)}
           >
             {intl.formatMessage(
               configuration.indicators?.confirmButton ||
                 defaultIndicators.confirmButton
             )}
-          </SecondaryButton>
+          </Button>
         )}
       </SearchInputWrapper>
       {message && (
@@ -395,7 +399,7 @@ function SearchInput({
           color={color}
           data-testid="search-input-error"
           element="span"
-          variant="reg16"
+          variant="bold16"
         >
           {message}
         </Text>

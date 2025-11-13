@@ -54,22 +54,26 @@ import { ProtectedRoute } from '../../components/ProtectedRoute'
 import { UserAudit } from '../../views/UserAudit/UserAudit'
 import { SystemList } from '../../views/SysAdmin/Config/Systems/Systems'
 import AllUserEmail from '../../views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
+import { PerformanceDashboard } from '../features/performance/Dashboard'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
 function PrefetchQueries() {
-  const workqueues = useWorkqueues()
+  const { prefetch } = useWorkqueues()
+
   useEffect(() => {
-    void queryClient.prefetchQuery({
-      queryKey: trpcOptionsProxy.locations.list.queryKey()
-    })
+    {
+      const { queryKey, queryFn } =
+        trpcOptionsProxy.locations.list.queryOptions()
 
-    function prefetch() {
-      void workqueues.prefetch()
+      // only fetch if we don't already have it cached
+      if (!queryClient.getQueryData(queryKey)) {
+        void queryClient.prefetchQuery({ queryKey, queryFn })
+      }
     }
-
-    prefetch()
-  }, [workqueues])
+    void prefetch()
+    // NOTE: Using anything else than prefetch will trigger load for each render. Destructure rather than passing entire object.
+  }, [prefetch])
 
   return null
 }
@@ -250,6 +254,14 @@ export const routesConfig = {
     {
       path: ROUTES.V2.SETTINGS.path,
       element: <SettingsPage />
+    },
+    {
+      path: ROUTES.V2.DASHBOARD.path,
+      element: (
+        <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
+          <PerformanceDashboard />
+        </ProtectedRoute>
+      )
     },
     /** LEGACY ROUTES
      * During regression testing QA discovered that we were still using old workqueues on some components.
