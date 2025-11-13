@@ -17,8 +17,7 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
 import { usePermissions } from '@client/hooks/useAuthorization'
-import { formatUrl } from '@client/navigation'
-import * as routes from '@client/navigation/routes'
+import { ROUTES } from '@client/v2-events/routes'
 
 /**
  * Based on packages/client/src/components/interface/Navigation.tsx
@@ -47,16 +46,11 @@ export function PerformanceNavigationGroup({
                     id={`navigation_dashboard_${config.id}`}
                     isSelected={currentWorkqueueSlug === 'dashboard'}
                     label={intl.formatMessage(config.title)}
-                    onClick={() =>
+                    onClick={() => {
                       navigate(
-                        formatUrl(routes.DASHBOARD, {
-                          id: config.id
-                        }),
-                        {
-                          state: { isNavigatedInsideApp: true }
-                        }
+                        `${ROUTES.V2.DASHBOARD.buildPath({ id: config.id })}`
                       )
-                    }
+                    }}
                   />
                 )
               })}
