@@ -31,7 +31,8 @@ import {
   DefaultAddressFieldValue,
   LocationType,
   ValidatorContext,
-  RequireConfig
+  RequireConfig,
+  DomesticAddressFieldValue
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -212,6 +213,12 @@ function getLeafAdministrativeLevel(
   return undefined
 }
 
+function getAdministrativeArea(value?: AddressFieldValue) {
+  return value?.addressType === AddressType.DOMESTIC
+    ? value.administrativeArea
+    : undefined
+}
+
 /**
  * AddressInput is a form component for capturing address details based on administrative structure.
  *
@@ -246,11 +253,11 @@ function AddressInput(props: Props) {
     (location) => location.locationType === 'ADMIN_STRUCTURE'
   )
 
-  const administrativeArea = value?.administrativeArea
+  const administrativeArea = getAdministrativeArea(value)
 
   const resolveAdministrativeArea = (
     adminArea:
-      | AddressFieldValue['administrativeArea']
+      | DomesticAddressFieldValue['administrativeArea']
       | DefaultAddressFieldValue['administrativeArea']
   ) => {
     if (!adminArea) {
@@ -275,7 +282,11 @@ function AddressInput(props: Props) {
   const resolvedAdministrativeArea =
     resolveAdministrativeArea(administrativeArea)
 
-  if (value) {
+  if (
+    value &&
+    value.addressType === AddressType.DOMESTIC &&
+    resolvedAdministrativeArea
+  ) {
     value.administrativeArea = resolvedAdministrativeArea
   }
 
@@ -372,7 +383,7 @@ function AddressOutput({
     return ''
   }
 
-  const administrativeArea = value.administrativeArea
+  const administrativeArea = getAdministrativeArea(value)
   const adminStructureLocations = locations.filter(
     (location) => location.locationType === LocationType.enum.ADMIN_STRUCTURE
   )
@@ -461,8 +472,9 @@ function toCertificateVariables(
   const { intl, locations, adminLevels } = context
   const stringifier = getFormDataStringifier(intl, locations)
   const stringifiedResult = stringifier(ALL_ADDRESS_FIELDS, value as EventState)
-  const { administrativeArea, streetLevelDetails } = value
+  const { streetLevelDetails } = value
 
+  const administrativeArea = getAdministrativeArea(value)
   if (value.addressType === AddressType.INTERNATIONAL) {
     return { ...stringifiedResult, streetLevelDetails }
   }
