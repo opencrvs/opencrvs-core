@@ -26886,6 +26886,7 @@ components:
             $ref: "#/components/schemas/FieldConfig"
       required:
         - label
+        - confirmationText
         - flags
         - type
         - customActionType
