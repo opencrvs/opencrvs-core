@@ -4,6 +4,14 @@
 
 ### Breaking changes
 
+- `QUERY_PARAM_READER` now returns picked params under a `data` object.
+  For example, `code` and `state` are now accessed via `data.code` and `data.state`.
+
+  Previously:
+  field(<page>.query-params).get('code')
+  Now:
+  field(<page>.query-params).get('data.code')
+
 - **Removed support for following scopes**
   - `NATLSYSADMIN`
   - `DECLARE`
