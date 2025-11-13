@@ -144,7 +144,6 @@ jobs:
         run: CI="" yarn install --frozen-lockfile
 
       - name: Build common package
-        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/commons')
         run: cd packages/commons && yarn build
 
       - name: Build components
