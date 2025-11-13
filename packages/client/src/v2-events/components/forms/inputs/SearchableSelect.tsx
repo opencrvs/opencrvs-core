@@ -280,6 +280,7 @@ export function SearchableSelect<T = string>({
       }}
       defaultOptions={options.slice(0, VISIBLE_OPTIONS_COUNT)}
       error={error}
+      id={`searchable-select-${id}`}
       innerProps={{ 'data-testid': dataTestId }}
       inputId={id}
       isDisabled={disabled}
