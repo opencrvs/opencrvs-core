@@ -216,9 +216,9 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
   return fn(base)
 }
 
-export function omitHiddenPaginatedFields(
+export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>(
   formConfig: FormConfig,
-  values: EventState,
+  values: T,
   validatorContext: ValidatorContext
 ) {
   const visibleFields = formConfig.pages
@@ -315,7 +315,7 @@ export function omitHiddenAnnotationFields(
 
   return omitHiddenFields(
     annotationFields,
-    { ...declaration, ...annotation },
+    { ...declaration, ...annotation } satisfies ActionUpdate,
     context
   )
 }
@@ -505,10 +505,10 @@ export function getPendingAction(actions: Action[]): ActionDocument {
 }
 
 export function getCompleteActionAnnotation(
-  annotation: EventState,
+  annotation: ActionUpdate,
   event: EventDocument,
   action: ActionDocument
-): EventState {
+): ActionUpdate {
   /*
    * When an action has an `originalActionId`, it means this action is linked
    * to another one (the "original" action).
@@ -536,11 +536,9 @@ export function getCompleteActionAnnotation(
   return deepMerge(annotation, action.annotation ?? {})
 }
 
-export function getCompleteActionDeclaration(
-  declaration: EventState,
-  event: EventDocument,
-  action: ActionDocument
-): EventState {
+export function getCompleteActionDeclaration<
+  T extends EventState | ActionUpdate
+>(declaration: T, event: EventDocument, action: ActionDocument): T {
   /*
    * When an action has an `originalActionId`, it means this action is linked
    * to another one (the "original" action).

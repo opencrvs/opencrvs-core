@@ -639,6 +639,7 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
     const [formData, setFormData] = React.useState<Record<string, FieldValue>>({
       'storybook.address': {
         country: 'FAR',
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
         addressType: 'DOMESTIC'
       }
     })

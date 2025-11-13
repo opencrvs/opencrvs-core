@@ -17,6 +17,7 @@ import {
   AddressType,
   createPrng,
   EventDocument,
+  EventState,
   generateActionDeclarationInput,
   getUUID
 } from '@opencrvs/commons'
@@ -188,13 +189,14 @@ test(`REQUEST_CORRECTION when mandatory field is invalid, conditional hidden fie
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'State',
+          district2: 'District2'
+        }
       }
     }
-  })
+  }) satisfies EventState
 
   await expect(
     client.event.actions.correction.request.request(data)
@@ -222,12 +224,13 @@ test(`REQUEST_CORRECTION Skips required field validation when they are condition
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'State',
+        district2: 'District2'
+      }
     }
-  }
+  } satisfies EventState
 
   const data = generator.event.actions.correction.request(event.id, {
     declaration: form
@@ -264,12 +267,13 @@ test(`REQUEST_CORRECTION Prevents adding birth date in future`, async () => {
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'State',
+        district2: 'District2'
+      }
     }
-  }
+  } satisfies EventState
 
   const payload = generator.event.actions.correction.request(event.id, {
     declaration: form
