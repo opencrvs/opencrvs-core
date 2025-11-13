@@ -19,27 +19,34 @@ const meta: Meta<typeof SearchableSelect> = {
 }
 
 export default meta
+const options = [
+  {
+    label: 'Option 1',
+    value: 'option1'
+  },
+  {
+    label: 'Option 2',
+    value: 'option2'
+  },
+  {
+    label: 'Option 3',
+    value: 'option3'
+  }
+]
 
-export const Default: StoryObj<typeof SearchableSelect> = {
+export const WithoutDefaultValue: StoryObj<typeof SearchableSelect> = {
   args: {
-    options: [
-      {
-        label: 'Option 1',
-        value: 'option1'
-      },
-      {
-        label: 'Option 2',
-        value: 'option2'
-      },
-      {
-        label: 'Option 3',
-        value: 'option3'
-      }
-    ]
+    options
+  }
+}
+export const WithDefaultValue: StoryObj<typeof SearchableSelect> = {
+  args: {
+    options,
+    value: options[1]
   }
 }
 
-export const InternalState: StoryObj<SearchableSelectProps> = {
+export const WithInternalState: StoryObj<SearchableSelectProps> = {
   args: {
     options: [
       {
@@ -54,10 +61,11 @@ export const InternalState: StoryObj<SearchableSelectProps> = {
         label: 'Option 3',
         value: 'option3'
       }
-    ]
+    ],
+    value: options[0]
   },
   render(args) {
-    const [value, setValue] = React.useState<Option | null>(null)
+    const [value, setValue] = React.useState<Option | null>(args.value)
     return (
       <SearchableSelect
         id={'123'}
