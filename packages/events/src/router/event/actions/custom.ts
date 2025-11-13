@@ -18,8 +18,11 @@ import {
 import { getScopes, parseConfigurableScope } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
-import { getEventById, processAction } from '@events/service/events/events'
-import { getDefaultActionProcedures } from '@events/router/event/actions'
+import { getEventById } from '@events/service/events/events'
+import {
+  defaultRequestHandler,
+  getDefaultActionProcedures
+} from '@events/router/event/actions'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 
 function allowCustomAction(
@@ -86,9 +89,10 @@ export function customActionProcedures() {
         const config = configs.find((c) => c.id === event.type)
 
         if (!config) {
-          throw new Error(
-            `Event configuration not found with type: ${event.type}`
-          )
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `Event configuration not found with type: ${event.type}`
+          })
         }
 
         const actionConfig = config.actions.find(
@@ -98,38 +102,20 @@ export function customActionProcedures() {
         )
 
         if (!actionConfig) {
-          throw new Error(
-            `Custom action configuration not found with name: ${input.customActionType}`
-          )
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `Custom action configuration not found with name: ${input.customActionType}`
+          })
         }
 
-        const updatedEvent = await processAction(
-          {
-            type: ActionType.CUSTOM,
-            customActionType: input.customActionType,
-            eventId: input.eventId,
-            transactionId: input.transactionId,
-            declaration: {}
-          },
-          {
-            event,
-            user,
-            token,
-            status: ActionStatus.Accepted,
-            configuration: config
-          }
+        return defaultRequestHandler(
+          input,
+          user,
+          token,
+          event,
+          config,
+          CustomActionInput
         )
-
-        // const declaredEvent = await defaultRequestHandler(
-        //   input,
-        //   user,
-        //   token,
-        //   event,
-        //   config,
-        //   CustomActionInput
-        // )
-
-        return updatedEvent
       })
   }
 }

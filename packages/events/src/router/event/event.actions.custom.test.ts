@@ -11,8 +11,14 @@
 
 import { TRPCError } from '@trpc/server'
 import { ActionType, getUUID, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons'
-import { setupTestCase } from '@events/tests/utils'
+import {
+  sanitizeForSnapshot,
+  setupTestCase,
+  UNSTABLE_EVENT_FIELDS
+} from '@events/tests/utils'
 import { createTestClient } from '@events/tests/utils'
+
+const CUSTOM_ACTION_TYPE = 'CONFIRM'
 
 async function initialiseTest(scopes: string[] = []) {
   const { user, generator } = await setupTestCase()
@@ -26,7 +32,7 @@ async function initialiseTest(scopes: string[] = []) {
     type: ActionType.CUSTOM,
     eventId: event.id,
     transactionId: getUUID(),
-    customActionType: 'CONFIRM'
+    customActionType: CUSTOM_ACTION_TYPE
   }
 
   return { client, payload }
@@ -43,7 +49,7 @@ describe('event.actions.custom', () => {
 
     test('prevents forbidden access if user has custom action scope but for wrong event type', async () => {
       const { client, payload } = await initialiseTest([
-        'record.custom-action[event=foobar,customActionType=CONFIRM]'
+        `record.custom-action[event=foobar,customActionType=${CUSTOM_ACTION_TYPE}]`
       ])
 
       await expect(
@@ -63,7 +69,7 @@ describe('event.actions.custom', () => {
 
     test('prevents forbidden access if user has two custom action scopes, but neither of them for correct event and action combination', async () => {
       const { client, payload } = await initialiseTest([
-        `record.custom-action[event=random-event,customActionType=CONFIRM]`,
+        `record.custom-action[event=random-event,customActionType=${CUSTOM_ACTION_TYPE}]`,
         `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=random-action]`
       ])
 
@@ -74,12 +80,41 @@ describe('event.actions.custom', () => {
 
     test('allows access if user has custom action scope for correct event type and custom action type', async () => {
       const { client, payload } = await initialiseTest([
-        `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=CONFIRM]`
+        `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=${CUSTOM_ACTION_TYPE}]`
       ])
 
       await expect(
         client.event.actions.custom.request(payload)
-      ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+      ).resolves.not.toThrow()
     })
   })
+
+  test('returns HTTP400 if trying to execute an action not defined in countryconfig', async () => {
+    const { client, payload } = await initialiseTest([
+      `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=INVALID_ACTION]`
+    ])
+
+    await expect(
+      client.event.actions.custom.request({
+        ...payload,
+        customActionType: 'INVALID_ACTION'
+      })
+    ).rejects.toMatchSnapshot()
+  })
+
+  test('successfully executes action', async () => {
+    const { client, payload } = await initialiseTest([
+      `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=${CUSTOM_ACTION_TYPE}]`
+    ])
+
+    await expect(
+      client.event.actions.custom.request(payload)
+    ).resolves.not.toThrow()
+
+    const event = await client.event.get(payload.eventId)
+
+    expect(sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
+  })
+
+  test.todo('ASYNC FLOW test cases')
 })

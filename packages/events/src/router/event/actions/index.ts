@@ -205,10 +205,12 @@ export async function defaultRequestHandler(
   })
 
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
+
   const eventActionToken = await getActionConfirmationToken(
     { eventId: input.eventId, actionId: requestedAction.id },
     token
   )
+
   const { responseStatus, responseBody: confirmationResponse } =
     await requestActionConfirmation(
       input.type,
