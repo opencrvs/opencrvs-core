@@ -16,6 +16,7 @@ import '@opencrvs/commons/monitoring'
 import { logger } from '@opencrvs/commons'
 import { appRouter } from './router/router'
 import { createContext } from './context'
+import { handleHealthCheckResponse } from './service/health'
 
 function stringifyRequest(req: IncomingMessage) {
   const url = new URL(req.url || '', `http://${req.headers.host}`)
@@ -63,6 +64,11 @@ export function server() {
     if (req.url === '/ping') {
       res.writeHead(200, { 'Content-Type': 'application/json' })
       res.end(JSON.stringify({ status: 'ok' }))
+      return
+    }
+
+    if (req.url === '/health/ready') {
+      void handleHealthCheckResponse(res)
       return
     }
 
