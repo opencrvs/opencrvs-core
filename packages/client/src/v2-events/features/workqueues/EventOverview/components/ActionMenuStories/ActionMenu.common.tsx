@@ -317,6 +317,14 @@ async function checkMenuItems(
   }
 }
 
+// We have configured a custom action to tennis club membership for testing purposes, but we dont want it to be in these tests
+const eventConfig = {
+  ...tennisClubMembershipEvent,
+  actions: tennisClubMembershipEvent.actions.filter(
+    (action) => action.type === ActionType.CUSTOM
+  )
+}
+
 export function createStoriesFromScenarios(
   scenarios: Scenario[],
   role: UserRoles
@@ -374,7 +382,7 @@ export function createStoriesFromScenarios(
            * Ensure record is "downloaded offline" in the user's browser
            */
           if (recordDownloaded) {
-            addLocalEventConfig(tennisClubMembershipEvent)
+            addLocalEventConfig(eventConfig)
             setEventData(event.id, event)
           }
         },
@@ -449,7 +457,7 @@ export function createdByOtherUserScenario({
       </React.Suspense>
     ),
     beforeEach: () => {
-      addLocalEventConfig(tennisClubMembershipEvent)
+      addLocalEventConfig(eventConfig)
       setEventData(event.id, event)
     },
     play: async () => {
