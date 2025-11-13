@@ -12,7 +12,7 @@
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import { UserOrSystem } from '@opencrvs/commons'
-import { router, publicProcedure } from '@events/router/trpc'
+import { router, userOnlyProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 import { getUserActions } from '@events/service/events/user/actions'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
@@ -23,7 +23,7 @@ import {
 import { userCanReadOtherUser } from '../middleware'
 
 export const userRouter = router({
-  get: publicProcedure
+  get: userOnlyProcedure
     .input(z.string())
     .output(UserOrSystem)
     .query(async ({ input, ctx }) => {
@@ -35,17 +35,17 @@ export const userRouter = router({
 
       return users[0]
     }),
-  list: publicProcedure
+  list: userOnlyProcedure
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))
     .query(async ({ input, ctx }) => getUsersById(input, ctx.token)),
-  actions: publicProcedure
+  actions: userOnlyProcedure
     .input(UserActionsQuery)
     .use(userCanReadOtherUser)
     .query(async ({ input }) => {
       return getUserActions(input)
     }),
-  migrateLegacyUsers: publicProcedure.mutation(async () => {
+  migrateLegacyUsers: userOnlyProcedure.mutation(async () => {
     const errors = await migrateLegacyUsers()
     const toReadable = (error: MigrationError) =>
       `${error.errorType}: ${JSON.stringify(error.meta)}`
