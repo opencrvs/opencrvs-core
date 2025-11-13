@@ -18,6 +18,25 @@ echo -e "\033[32m::::::::::::::::::::::::: PLEASE WAIT FOR THE LOGO ::::::::::::
 echo
 echo "Waiting till contry config server is running before seeding data." && wait-on -l tcp:3040
 echo
+
+for i in {1..5}; do
+  echo "Attempt $i: Restarting events service..."
+  sleep 5
+  
+  touch packages/events/src/server.ts
+  wait-on -l tcp:5555
+
+  if [ $? -eq 0 ]; then
+    echo "Events restarted successfully on attempt $i."
+    break
+  fi
+
+  if [ $i -lt 5 ]; then
+    echo "Attempt $i failed. Retrying in 5 seconds..."
+  fi
+done
+
+yarn db:clear:all
 yarn seed:dev
 echo -e "
 
