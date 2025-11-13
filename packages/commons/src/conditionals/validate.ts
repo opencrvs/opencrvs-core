@@ -19,7 +19,7 @@ import { ConditionalParameters, JSONSchema } from './conditionals'
 import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
-import { isNameFieldType, mapFieldTypeToZod } from '../events/FieldTypeMapping'
+import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import {
   DateValue,
   FieldUpdateValue,
@@ -297,23 +297,6 @@ export const errorMessages = {
     description: 'Error message when required field is missing',
     id: 'error.required'
   },
-  requiredName: {
-    firstname: {
-      defaultMessage: 'First name required',
-      description: 'Error message when first name is missing',
-      id: 'error.requiredName.firstname'
-    },
-    middlename: {
-      defaultMessage: 'Middle name required',
-      description: 'Error message when first name is missing',
-      id: 'error.requiredName.middlename'
-    },
-    surname: {
-      defaultMessage: 'Last name required',
-      description: 'Error message when first name is missing',
-      id: 'error.requiredName.surname'
-    }
-  },
   invalidInput: {
     defaultMessage: 'Invalid input',
     description: 'Error message when generic field is invalid',
@@ -465,38 +448,6 @@ export function validateFieldInput({
   }[]
 }
 
-/**
- * The default "required" validation rule does not account for missing required subfields
- * within composite fields. For instance, if "firstname" is configured as required but
- * left empty, an appropriate error message should be displayed for that subfield.
- */
-export function compositeRequireValidation(field: {
-  config: FieldConfig
-  value: FieldUpdateValue
-}) {
-  if (isNameFieldType(field)) {
-    const nameConfig = field.config.configuration?.name
-    if (!nameConfig) {
-      return []
-    }
-    for (const [namePart, config] of Object.entries(nameConfig)) {
-      if (
-        config.required &&
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        !(field.value && field.value[namePart as keyof typeof nameConfig])
-      ) {
-        return [
-          {
-            message:
-              errorMessages.requiredName[namePart as keyof typeof nameConfig]
-          }
-        ]
-      }
-    }
-  }
-  return []
-}
-
 export function runStructuralValidations({
   field,
   values,
@@ -540,11 +491,6 @@ export function runFieldValidations({
     return []
   }
 
-  const compositeRequireValidationResult = compositeRequireValidation({
-    config: field,
-    value: values[field.id]
-  })
-
   const conditionalParameters = {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
@@ -571,11 +517,7 @@ export function runFieldValidations({
   })
 
   // Assumes that custom validation errors are based on the field type, and extend the validation.
-  return [
-    ...compositeRequireValidationResult,
-    ...fieldValidationResult,
-    ...customValidationResults
-  ]
+  return [...fieldValidationResult, ...customValidationResults]
 }
 
 export function getValidatorsForField(
