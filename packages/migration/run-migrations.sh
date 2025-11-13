@@ -12,12 +12,13 @@ set -e # fail if any of the commands fails
 
 HEARTH_CONFIG=./build/dist/src/migrate-mongo-config-hearth.js
 : "${EVENTS_POSTGRES_URL:=postgres://events_migrator:migrator_password@localhost:5432/events}"
+: "${EVENTS_SUPERUSER_POSTGRES_URL:=postgres://postgres:postgres@localhost:5432/events}"
 OPENHIM_CONFIG=./build/dist/src/migrate-mongo-config-openhim.js
 APP_CONFIG=./build/dist/src/migrate-mongo-config-application-config.js
 USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js
 PERFORMANCE_CONFIG=./build/dist/src/migrate-mongo-config-performance.js
 
-SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_PATH=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 export NODE_OPTIONS=--dns-result-order=ipv4first
 
@@ -25,40 +26,62 @@ export NODE_OPTIONS=--dns-result-order=ipv4first
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $HEARTH_CONFIG
 yarn --cwd $SCRIPT_PATH migrate-mongo status --file $HEARTH_CONFIG
 
-# events migrations
+run_pg_migrations() {
+  local migrations_path="$1"
+  local database_url="$2"
+  local schema="$3"
+  local migrations_table="${4:-pgmigrations}"
+
+  local backup_path="$migrations_path/backup"
+
+  mkdir -p "$backup_path"
+
+  local files_to_migrate=$(ls -p "$migrations_path" | grep -v /)
+
+  # Backup originals
+  for migration_file in $files_to_migrate; do
+    echo "Creating backup for $migrations_path/$migration_file"
+    cp "$migrations_path/$migration_file" "$backup_path/$migration_file"
+  done
+
+  # envsubst replacements
+  for migration_file in $files_to_migrate; do
+    echo "Updating environment variables in $migrations_path/$migration_file"
+    envsubst <"$migrations_path/$migration_file" >"$migrations_path/$migration_file.tmp"
+    mv "$migrations_path/$migration_file.tmp" "$migrations_path/$migration_file"
+  done
+
+  # Run migrations
+  echo "Running migrations for schema '$schema' in $migrations_path"
+  DATABASE_URL="$database_url" \
+    yarn --cwd "$SCRIPT_PATH" node-pg-migrate up \
+    --schema="$schema" \
+    --migrations-dir="$migrations_path" \
+    --migrations-table="$migrations_table"
+
+  # Restore originals
+  for migration_file in $files_to_migrate; do
+    echo "Reverting original file $migrations_path/$migration_file"
+    mv "$backup_path/$migration_file" "$migrations_path/$migration_file"
+  done
+
+  rm -rf "$backup_path"
+}
+
+# Run events migrations
 export EVENTS_DB_USER="${EVENTS_DB_USER:-events_app}"
-MIGRATIONS_PATH=$SCRIPT_PATH/src/migrations/events
-BACKUP_PATH=$MIGRATIONS_PATH/backup
 
-mkdir -p $BACKUP_PATH
+# Run superuser events migrations
+run_pg_migrations \
+  "$SCRIPT_PATH/src/migrations/events-superuser" \
+  "$EVENTS_SUPERUSER_POSTGRES_URL" \
+  "app" \
+  "pgmigrations_superuser"
 
-FILES_TO_MIGRATE=$(ls -p $MIGRATIONS_PATH | grep -v /)
-
-# Creating a backup of the original files as they need to be
-# overwritten by the envsubst before running the migrations
-for migration_file in $FILES_TO_MIGRATE
-do
-  echo "Creating backup for $MIGRATIONS_PATH/$migration_file"
-  cp $MIGRATIONS_PATH/$migration_file $BACKUP_PATH/$migration_file
-done
-
-for migration_file in $FILES_TO_MIGRATE
-do
-  echo "Updating environment variables in $MIGRATIONS_PATH/$migration_file"
-  envsubst < $MIGRATIONS_PATH/$migration_file > $MIGRATIONS_PATH/$migration_file.tmp
-  mv $MIGRATIONS_PATH/$migration_file.tmp $MIGRATIONS_PATH/$migration_file
-done
-
-DATABASE_URL=${EVENTS_POSTGRES_URL} yarn --cwd $SCRIPT_PATH node-pg-migrate up --schema=app --migrations-dir=./src/migrations/events
-
-# Reverting to the original state after running the migrations
-for migration_file in $FILES_TO_MIGRATE
-do
-  echo "Reverting original file $MIGRATIONS_PATH/$migration_file"
-  mv $BACKUP_PATH/$migration_file $MIGRATIONS_PATH/$migration_file
-done
-
-rm -rf $BACKUP_PATH
+run_pg_migrations \
+  "$SCRIPT_PATH/src/migrations/events" \
+  "$EVENTS_POSTGRES_URL" \
+  "app"
 
 #openhim migrations
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $OPENHIM_CONFIG

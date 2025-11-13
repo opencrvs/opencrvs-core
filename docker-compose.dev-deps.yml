@@ -15,7 +15,7 @@ services:
       - './data/mongo:/data/db'
 
   postgres:
-    image: postgres:17.6
+    image: docker.io/chumaky/postgres_mongo_fdw:17.6_fdw5.5.2
     container_name: postgres
     restart: always
     environment:
