@@ -177,32 +177,37 @@ function schemaPriority(schema: z.ZodTypeAny) {
 export function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(
   schemas: T
 ) {
-  return z.custom<z.infer<T[number]>>((val) => {
-    const successful = schemas.filter((s) => s.safeParse(val).success)
-    if (successful.length === 1) {
-      return true
-    }
-    if (successful.length === 0) {
-      return false
-    }
-    // If multiple matched, pick the “best” one
-    // according to PRIORITY_ORDER.
-    //
-    // Example:
-    // data [
-    //   "2050-01-01",
-    //   "2050-01-01",
-    //   "2050-01-01"
-    // ]
-    // description [ "TextValue", "DateValue", "DateRangeFieldValue" ]
-    // best "DateRangeFieldValue"
-    //
-    // Here all three schemas think the value is valid,
-    // but "DateRangeFieldValue" wins because of its higher priority index.
-    successful.sort((a, b) => schemaPriority(a) - schemaPriority(b))
-    const best = successful[0]
-    return best.safeParse(val).success
-  })
+  return z
+    .custom<z.infer<T[number]>>((val) => {
+      const successful = schemas.filter((s) => s.safeParse(val).success)
+      if (successful.length === 1) {
+        return true
+      }
+      if (successful.length === 0) {
+        return false
+      }
+      // If multiple matched, pick the “best” one
+      // according to PRIORITY_ORDER.
+      //
+      // Example:
+      // data [
+      //   "2050-01-01",
+      //   "2050-01-01",
+      //   "2050-01-01"
+      // ]
+      // description [ "TextValue", "DateValue", "DateRangeFieldValue" ]
+      // best "DateRangeFieldValue"
+      //
+      // Here all three schemas think the value is valid,
+      // but "DateRangeFieldValue" wins because of its higher priority index.
+      successful.sort((a, b) => schemaPriority(a) - schemaPriority(b))
+      const best = successful[0]
+      return best.safeParse(val).success
+    })
+    .meta({
+      description:
+        'Value that matches exactly one of the possible schema types (TextValue, DateValue, DateRangeFieldValue). The best matching schema is chosen by priority.'
+    })
 }
 
 export type FieldUpdateValue =
