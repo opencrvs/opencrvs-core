@@ -37,7 +37,7 @@ import { RejectionState, Review } from './Review'
 
 const mockDeclaration = {
   'applicant.name': {
-    firstname: 'Changed',
+    firstname: 'John',
     surname: 'Doe'
   },
   'applicant.dob': '1990-01-01',
