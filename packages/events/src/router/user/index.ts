@@ -12,7 +12,7 @@
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import { UserOrSystem } from '@opencrvs/commons'
-import { router, userOnlyProcedure } from '@events/router/trpc'
+import { publicProcedure, router, userOnlyProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 import { getUserActions } from '@events/service/events/user/actions'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
@@ -45,7 +45,7 @@ export const userRouter = router({
     .query(async ({ input }) => {
       return getUserActions(input)
     }),
-  migrateLegacyUsers: userOnlyProcedure.mutation(async () => {
+  migrateLegacyUsers: publicProcedure.mutation(async () => {
     const errors = await migrateLegacyUsers()
     const toReadable = (error: MigrationError) =>
       `${error.errorType}: ${JSON.stringify(error.meta)}`
