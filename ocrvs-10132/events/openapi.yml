@@ -752,7 +752,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 24bca6b7-667e-42e1-a8f4-8c54c17b3b9f
+                transactionId: ecd71298-d71f-4a2d-a7ad-c6c21fc80e78
                 type: birth
       responses:
         "200":
@@ -1426,7 +1426,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: e6ffb53e-480b-4fcc-940d-854a8eb9019f
+                transactionId: 65f5e004-ee52-4dfc-9b2b-ea04aa3daa38
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -5683,6 +5683,9 @@ components:
             configuration:
               type: object
               properties:
+                use12HourFormat:
+                  type: boolean
+                  description: Whether to use 12-hour format
                 notice:
                   description: Text to display above the time input
                   allOf:
