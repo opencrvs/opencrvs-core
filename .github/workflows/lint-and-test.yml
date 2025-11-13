@@ -166,22 +166,11 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-    outputs:
-      chromatic_required: ${{ steps.detect-changes.outputs.chromatic_required }}
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Fetch history to compare PR changes against the base branch
-
-      - name: Detect changes in v2-events
-        id: detect-changes
-        run: |
-          if git diff --name-only origin/${{ github.base_ref }}..HEAD | grep -Eq 'packages/client/src/v2-events/|packages/commons/src/|packages/components/src/'; then
-            echo "chromatic_required=true" >> $GITHUB_OUTPUT
-          else
-            echo "chromatic_required=false" >> $GITHUB_OUTPUT
-          fi
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
@@ -288,7 +277,6 @@ jobs:
     name: Run chromatic visual tests
     needs: prepare-client-tests
     runs-on: ubuntu-24.04
-    if: needs.prepare-client-tests.outputs.chromatic_required == 'true'
 
     steps:
       - name: Download filesystem artifact
