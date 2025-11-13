@@ -129,7 +129,10 @@ const CustomActionConfig = ActionConfigBase.merge(
       .array(FieldConfig)
       .describe(
         'Form configuration for the custom action. The form configured here will be used on the custom action confirmation modal.'
-      )
+      ),
+    confirmationText: TranslationConfig.describe(
+      'Text displayed on the confirmation'
+    )
   })
 )
 export type CustomActionConfig = z.infer<typeof CustomActionConfig>
