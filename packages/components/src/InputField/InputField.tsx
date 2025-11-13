@@ -42,6 +42,7 @@ export interface IInputFieldProps {
   hideAsterisk?: boolean
   hideErrorLabel?: boolean
   hideInputHeader?: boolean
+  htmlFor?: string
 }
 
 export const InputField = (props: IInputFieldProps) => {
@@ -57,7 +58,8 @@ export const InputField = (props: IInputFieldProps) => {
     hideAsterisk,
     hideErrorLabel,
     hideInputHeader = false,
-    prefix
+    prefix,
+    htmlFor
   } = props
 
   const postfix = props.postfix as React.ReactNode | string
@@ -89,7 +91,9 @@ export const InputField = (props: IInputFieldProps) => {
               inputDescriptor={helperText}
               disabled={props.disabled}
               required={required}
-              htmlFor={id}
+              // Since input label does not actually wrap the input, we need to reference it.
+              // However, we cannot do it for all FieldTypes since not all of them are actual inputs.
+              htmlFor={htmlFor}
               hideAsterisk={hideAsterisk}
               tooltip={tooltip}
             >

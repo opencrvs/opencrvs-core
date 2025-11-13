@@ -9,13 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useMemo } from 'react'
-import { useSelector } from 'react-redux'
 import {
   Location,
   FieldPropsWithoutReferenceValue,
   LocationType
 } from '@opencrvs/commons/client'
-import { getAdminStructureLocations } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
@@ -23,8 +21,8 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { SearchableSelect } from '../../../components/forms/inputs/SearchableSelect'
 import { LocationSearch } from './LocationSearch'
 
-function useAdministrativeAreas(
-  searchableLocationTypes: LocationType[],
+function useAdministrativeArea(
+  searchableLocationType: LocationType,
   parentId?: string | null
 ) {
   const { getLocations } = useLocations()
@@ -37,7 +35,7 @@ function useAdministrativeAreas(
           return false
         }
 
-        if (!searchableLocationTypes.includes(location.locationType)) {
+        if (searchableLocationType !== location.locationType) {
           return false
         }
 
@@ -51,7 +49,7 @@ function useAdministrativeAreas(
         label: location.name,
         value: location.id
       }))
-  }, [searchableLocationTypes, allLocations, parentId])
+  }, [searchableLocationType, allLocations, parentId])
 }
 
 function AdministrativeAreaInput({
@@ -66,12 +64,10 @@ function AdministrativeAreaInput({
   value?: string | null
   disabled?: boolean
 }) {
-  const locationTypes = React.useMemo(
-    () => [LocationType.enum.ADMIN_STRUCTURE],
-    []
+  const options = useAdministrativeArea(
+    LocationType.enum.ADMIN_STRUCTURE,
+    partOf
   )
-
-  const options = useAdministrativeAreas(locationTypes, partOf)
 
   const selectedLocation = useMemo(
     () => options.find((o) => o.value === value) ?? null,

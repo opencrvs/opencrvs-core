@@ -11,7 +11,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fireEvent, fn, userEvent, within } from '@storybook/test'
+import { expect, fn, userEvent, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import {
@@ -22,7 +22,9 @@ import {
   alwaysTrue,
   FieldConfig,
   EventState,
-  generateTranslationConfig
+  generateTranslationConfig,
+  user,
+  UUID
 } from '@opencrvs/commons/client'
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -184,14 +186,14 @@ const fields = [
     id: 'applicant.country',
     type: FieldType.COUNTRY,
     label: generateTranslationConfig('Country'),
-    defaultValue: 'Bangladesh'
+    defaultValue: 'BGD'
   },
 
   {
     id: 'applicant.region',
     type: FieldType.ADMINISTRATIVE_AREA,
     label: generateTranslationConfig('Region'),
-    defaultValue: 'Dhaka',
+    defaultValue: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
     configuration: {
       partOf: { $declaration: 'country' },
       type: 'ADMIN_STRUCTURE'
@@ -217,6 +219,7 @@ const fields = [
     },
     defaultValue: {
       country: 'Bangladesh',
+      administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
       addressType: 'DOMESTIC'
     }
   },
@@ -411,11 +414,12 @@ const declaration = {
   'applicant.phone': '+8801712345678',
   'applicant.password': 'StrongPassword123!',
   'applicant.nationalId': '1234567890',
-  'applicant.country': 'Bangladesh',
-  'applicant.region': 'Dhaka',
+  'applicant.country': 'BGD',
+  'applicant.region': 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
   'applicant.address': {
-    country: 'Bangladesh',
-    addressType: 'DOMESTIC'
+    country: 'BGD',
+    addressType: 'DOMESTIC',
+    administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
   },
   'applicant.documents': [
     {
@@ -494,10 +498,15 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         ...(await canvas.findAllByRole('checkbox')),
         ...(await canvas.findAllByRole('radio'))
       ]
-      await expect(formFields).toHaveLength(31)
+
+      await expect(formFields).toHaveLength(29)
       for (const f of formFields) {
         await expect(f).toBeDisabled()
       }
+
+      // in react-select v5 literal inputs are not rendered when disabled, so we ensure the fields are there.
+      await canvas.findByLabelText('Region')
+      await canvas.findByLabelText('District *')
     })
   }
 }
@@ -544,11 +553,14 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         ...(await canvas.findAllByRole('checkbox')),
         ...(await canvas.findAllByRole('radio'))
       ]
-      await expect(formFields).toHaveLength(30)
+      await expect(formFields).toHaveLength(28)
 
       for (const f of formFields) {
         await expect(f).not.toBeDisabled()
       }
+
+      await canvas.findByLabelText('Region')
+      await canvas.findByLabelText('District *')
     })
   }
 }
@@ -608,7 +620,7 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
         ...(await canvas.findAllByRole('checkbox')),
         ...(await canvas.findAllByRole('radio'))
       ]
-      await expect(formFields).toHaveLength(30)
+      await expect(formFields).toHaveLength(28)
       for (const f of formFields) {
         const fieldToAvoid =
           f.getAttribute('data-testid') === 'number__applicant____age'
@@ -630,10 +642,15 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
         ...(await canvas.findAllByRole('checkbox')),
         ...(await canvas.findAllByRole('radio'))
       ]
-      await expect(formFields).toHaveLength(30)
+      await expect(formFields).toHaveLength(28)
       for (const f of formFields) {
         await expect(f).not.toBeDisabled()
       }
+
+      await expect(await canvas.findByLabelText('Region')).not.toBeDisabled()
+      await expect(
+        await canvas.findByLabelText('District *')
+      ).not.toBeDisabled()
     })
 
     await step('All form fields should be disabled again', async () => {
@@ -648,13 +665,17 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
         ...(await canvas.findAllByRole('radio'))
       ]
 
-      await expect(formFields).toHaveLength(30)
+      await expect(formFields).toHaveLength(28)
       for (const f of formFields) {
         const fieldToAvoid =
           f.getAttribute('data-testid') === 'number__applicant____age'
         if (!fieldToAvoid) {
           await expect(f).toBeDisabled()
         }
+
+        // in react-select v5 literal inputs are not rendered when disabled, so we ensure the fields are there.
+        await canvas.findByLabelText('Region')
+        await canvas.findByLabelText('District *')
       }
     })
   }
