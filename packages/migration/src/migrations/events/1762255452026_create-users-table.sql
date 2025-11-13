@@ -21,7 +21,7 @@ CREATE TABLE users(
   CONSTRAINT email_or_mobile_not_null CHECK (email IS NOT NULL OR mobile IS NOT NULL)
 );
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON users TO $ {EVENTS_DB_USER};
+GRANT SELECT, INSERT, UPDATE, DELETE ON users TO ${EVENTS_DB_USER};
 
 COMMENT ON COLUMN users.legacy_id IS 'References the user id from the legacy database.';
 
@@ -34,7 +34,7 @@ CREATE TABLE user_credentials(
   security_questions jsonb DEFAULT '{}' ::jsonb NOT NULL
 );
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON user_credentials TO $ {EVENTS_DB_USER};
+GRANT SELECT, INSERT, UPDATE, DELETE ON user_credentials TO ${EVENTS_DB_USER};
 
 -- Down Migration
 DROP TABLE IF EXISTS users;
