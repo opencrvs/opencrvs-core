@@ -17,15 +17,19 @@ export const DeclarationFormConfig = z
     label: TranslationConfig.describe('Human readable description of the form'),
     pages: z.array(FormPageConfig)
   })
-  .describe('Configuration for a declaration form')
+  .describe('Configuration of the declaration form.')
 
 export type DeclarationFormConfig = z.infer<typeof DeclarationFormConfig>
 export type DeclarationFormConfigInput = z.input<typeof DeclarationFormConfig>
 
-export const ActionFormConfig = z.object({
-  label: TranslationConfig.describe('Human readable description of the form'),
-  pages: z.array(PageConfig)
-})
+export const ActionFormConfig = z
+  .object({
+    label: TranslationConfig.describe('Human readable description of the form'),
+    pages: z.array(PageConfig)
+  })
+  .describe(
+    'Configuration of the form used for system actions beyond declaration, supporting a wider range of page types.'
+  )
 
 export type ActionFormConfig = z.infer<typeof ActionFormConfig>
 export type ActionFormConfigInput = z.input<typeof ActionFormConfig>

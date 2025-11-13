@@ -13,19 +13,22 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { userEvent, within, expect } from '@storybook/test'
+import { userEvent, within, expect, waitFor } from '@storybook/test'
 import {
   ActionType,
+  createPrng,
   EventIndex,
   eventQueryDataGenerator,
   EventStatus,
+  generateActionDocument,
   generateEventDocument,
   generateEventDraftDocument,
   generateWorkqueues,
   getCurrentEventState,
   InherentFlags,
   NameFieldValue,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  TestUserRole
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -311,10 +314,13 @@ export const WorkqueueCtaByStatusRejected: Story = {
 }
 
 function generateDraft() {
+  const rng = createPrng(9124)
+
   const createdEvent = {
     ...generateEventDocument({
+      rng,
       configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE]
+      actions: [{ type: ActionType.CREATE }]
     })
   }
 
@@ -323,6 +329,7 @@ function generateDraft() {
     draft: generateEventDraftDocument({
       eventId: createdEvent.id,
       actionType: ActionType.DECLARE,
+      rng,
       declaration: {
         'applicant.name': {
           firstname: faker.person.firstName(),
@@ -400,8 +407,28 @@ export const DraftPagination: Story = {
   }
 }
 
+const downloadEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    { type: ActionType.CREATE },
+    {
+      type: ActionType.DECLARE,
+      declarationOverrides: {
+        'applicant.name': {
+          firstname: 'Riku',
+          surname: 'Rouvila'
+        }
+      }
+    },
+    {
+      type: ActionType.ASSIGN
+    }
+  ]
+})
+
 export const PaginationAfterDownload: Story = {
   parameters: {
+    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
@@ -420,11 +447,26 @@ export const PaginationAfterDownload: Story = {
           })
         ],
         event: [
+          tRPCMsw.event.actions.assignment.assign.mutation(() => {
+            return {
+              ...downloadEvent,
+              actions: [
+                ...downloadEvent.actions,
+                generateActionDocument({
+                  configuration: tennisClubMembershipEvent,
+                  action: ActionType.ASSIGN
+                })
+              ]
+            }
+          }),
+          tRPCMsw.event.getDuplicates.query(() => {
+            return []
+          }),
           tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
+            return downloadEvent
           }),
           tRPCMsw.event.search.query((input) => {
-            const { actions, ...rest } = tennisClubMembershipEventDocument
+            const { actions, ...rest } = downloadEvent
 
             const eventDocumentWithoutAssign = {
               ...rest,

@@ -41,6 +41,7 @@ const duplicates = [
     trackingId: generateTrackingId(prng)
   }
 ]
+
 const overriddenEventConfig = {
   ...tennisClubMembershipEvent,
   declaration: defineDeclarationForm({
@@ -84,6 +85,32 @@ const overriddenEventConfig = {
     })
   })
 }
+
+const declarationObj = {
+  'applicant.name': {
+    firstname: 'Riku',
+    surname: 'Rouvila'
+  },
+  'applicant.dob': '2025-01-23',
+  'recommender.name': {
+    firstname: 'Euan',
+    surname: 'Millar'
+  },
+  'applicant.address': {
+    country: 'FAR',
+    addressType: 'DOMESTIC',
+    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+    district: '27160bbd-32d1-4625-812f-860226bfb92a',
+    urbanOrRural: 'URBAN',
+    town: 'Example Town',
+    residentialArea: 'Example Residential Area',
+    street: 'Example Street',
+    number: '55',
+    zipCode: '123456'
+  },
+  'recommender.none': true
+}
+
 const actions = [
   generateActionDocument({
     configuration: overriddenEventConfig,
@@ -93,30 +120,7 @@ const actions = [
     configuration: overriddenEventConfig,
     action: ActionType.DECLARE,
     defaults: {
-      declaration: {
-        'applicant.name': {
-          firstname: 'Riku',
-          surname: 'Rouvila'
-        },
-        'applicant.dob': '2025-01-23',
-        'recommender.name': {
-          firstname: 'Euan',
-          surname: 'Millar'
-        },
-        'applicant.address': {
-          country: 'FAR',
-          addressType: 'DOMESTIC',
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '27160bbd-32d1-4625-812f-860226bfb92a',
-          urbanOrRural: 'URBAN',
-          town: 'Example Town',
-          residentialArea: 'Example Residential Area',
-          street: 'Example Street',
-          number: '55',
-          zipCode: '123456'
-        },
-        'recommender.none': true
-      },
+      declaration: declarationObj,
       annotation: {
         'review.comment': 'asdasdasdasdasdasd'
       }
@@ -126,6 +130,7 @@ const actions = [
     configuration: overriddenEventConfig,
     action: ActionType.DUPLICATE_DETECTED,
     defaults: {
+      declaration: declarationObj, // Same as DECLARE action details
       content: {
         duplicates
       }

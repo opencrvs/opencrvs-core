@@ -81,6 +81,7 @@ const config = {
     }
   ],
   FEATURES: {
+    V2_EVENTS: false,
     DEATH_REGISTRATION: true,
     MARRIAGE_REGISTRATION: true,
     EXTERNAL_VALIDATION_WORKQUEUE: false,
@@ -192,8 +193,10 @@ Object.defineProperty(document, 'hidden', {
 
 const storageGetItemMock = vi.fn()
 const storageSetItemMock = vi.fn()
+const storageRemoveItemMock = vi.fn()
 storage.getItem = storageGetItemMock
 storage.setItem = storageSetItemMock
+storage.removeItem = storageRemoveItemMock
 
 /*
  * Console
@@ -248,6 +251,7 @@ beforeEach(() => {
   getItem.mockReturnValue(validToken)
   storageGetItemMock.mockReset()
   storageSetItemMock.mockReset()
+  storageRemoveItemMock.mockReset()
   warn.mockReset()
   error.mockReset()
   debug.mockReset()

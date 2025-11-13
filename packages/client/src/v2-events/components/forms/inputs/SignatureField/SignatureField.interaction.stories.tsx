@@ -109,7 +109,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 const createdEvent = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [{ type: ActionType.CREATE }]
 })
 
 export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {

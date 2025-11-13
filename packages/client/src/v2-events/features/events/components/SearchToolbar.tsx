@@ -12,11 +12,13 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { ClearText } from '@opencrvs/components/src/icons'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/src/Icon'
 import { ROUTES } from '@client/v2-events/routes'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
+import { getScope } from '@client/profile/profileSelectors'
 
 const SearchBox = styled.div`
   background: ${({ theme }) => theme.colors.grey100};
@@ -114,6 +116,13 @@ export const SearchToolbar = () => {
   const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined)
   const navigate = useNavigate()
   const location = useLocation()
+
+  const scopes = useSelector(getScope) ?? []
+
+  const hasSearchScope = scopes.some((scope) => scope.startsWith('search'))
+  if (!hasSearchScope) {
+    return null
+  }
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value)

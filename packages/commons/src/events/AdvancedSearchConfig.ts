@@ -11,6 +11,7 @@
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig, SelectOption, ValidationConfig } from './FieldConfig'
+import { FieldType } from './FieldType'
 import { FieldConditional } from './Conditional'
 import { FieldValue } from './FieldValue'
 
@@ -18,8 +19,39 @@ const MatchType = z.enum(['fuzzy', 'exact', 'range', 'within'])
 
 const BaseField = z.object({
   config: z.object({
-    type: MatchType.describe('Determines the type of field')
+    type: MatchType.describe(
+      'Determines the search type of field. How to match value.'
+    ),
+    searchFields: z
+      .array(z.string())
+      .optional()
+      .describe(
+        `
+      Defines multiple form fields that should be searched when this field has a value.
+      All specified fields will be combined using OR logic.
+
+      Example: { searchFields: ['mother.name', 'father.name', 'informant.name'] }
+      Will search all fields and return a record if any of the fields match the search value.     
+      `
+      )
   }),
+  type: z
+    .nativeEnum(FieldType)
+    .optional()
+    .describe(
+      `
+      Explicitly specify the field type for searchFields.
+      This is required when searchFields is defined, to show the correct control in the UI.
+        
+      Example: FieldType.NAME for name fields, FieldType.TEXT for text fields, FieldType.DATE for date fields, etc.
+      `
+    ),
+  label: TranslationConfig.optional().describe(
+    `
+      Explicitly specify the label for searchFields.
+      This is required when searchFields is defined.            
+      `
+  ),
   options: z.array(SelectOption).optional(),
   searchCriteriaLabelPrefix: TranslationConfig.optional().describe(
     `
@@ -64,7 +96,7 @@ const BaseField = z.object({
     .default([])
     .optional()
     .describe(
-      `In advanced search, we sometimes need to override the default field validations.`
+      `Option for overriding the field validations specifically for advanced search form.`
     )
 })
 
@@ -123,16 +155,34 @@ export const EventFieldConfigSchema = BaseField.extend({
   fieldType: z.literal('event')
 })
 
-export const SearchField = z.discriminatedUnion('fieldType', [
-  FieldConfigSchema,
-  EventFieldConfigSchema
-])
+export const AdvancedSearchField = z
+  .discriminatedUnion('fieldType', [FieldConfigSchema, EventFieldConfigSchema])
+  .superRefine((data, ctx) => {
+    if (data.config.searchFields && data.config.searchFields.length > 0) {
+      if (!data.label) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'label is required when config.searchFields is defined.',
+          path: ['label']
+        })
+      }
+      if (!data.type) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'type is required when config.searchFields is defined.',
+          path: ['type']
+        })
+      }
+    }
+  })
 
-export type SearchField = z.infer<typeof SearchField>
+export type AdvancedSearchField = z.infer<typeof AdvancedSearchField>
 
 export const AdvancedSearchConfig = z.object({
   title: TranslationConfig.describe('Advanced search tab title'),
-  fields: z.array(SearchField).describe('Advanced search fields.')
+  fields: z
+    .array(AdvancedSearchField)
+    .describe('Advanced search fields within the tab.')
 })
 
 export type AdvancedSearchConfig = z.infer<typeof AdvancedSearchConfig>

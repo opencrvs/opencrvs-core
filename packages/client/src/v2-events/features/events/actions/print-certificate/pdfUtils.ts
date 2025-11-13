@@ -22,7 +22,6 @@ import pdfMake from 'pdfmake/build/pdfmake'
 import { isEqual, isNil } from 'lodash'
 import {
   EventState,
-  User,
   LanguageConfig,
   EventConfig,
   getMixedPath,

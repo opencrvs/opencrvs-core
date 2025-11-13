@@ -13,7 +13,7 @@ import React, { useEffect } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
 import { useSelector } from 'react-redux'
-import { ActionType, LocationType, SCOPES } from '@opencrvs/commons/client'
+import { ActionType, SCOPES } from '@opencrvs/commons/client'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
@@ -44,49 +44,36 @@ import { AnnotationAction } from '@client/v2-events/features/events/components/A
 import { QuickSearchIndex } from '@client/v2-events/features/events/Search/QuickSearchIndex'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { SettingsPage } from '@client/v2-events/features/settings/Settings'
+import { TeamPage } from '@client/v2-events/features/team/Team'
+import { OrganisationPage } from '@client/v2-events/features/organisation/Organisation'
 import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { SearchLayout } from '../layouts/search'
 import { useWorkqueues } from '../hooks/useWorkqueue'
 import { ReviewDuplicateIndex } from '../features/events/actions/dedup/ReviewDuplicate'
 import { ProtectedRoute } from '../../components/ProtectedRoute'
-import { UserList } from '../../views/SysAdmin/Team/user/UserList'
 import { UserAudit } from '../../views/UserAudit/UserAudit'
-import { AdministrativeLevels } from '../../views/Organisation/AdministrativeLevels'
 import { SystemList } from '../../views/SysAdmin/Config/Systems/Systems'
 import AllUserEmail from '../../views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
+import { PerformanceDashboard } from '../features/performance/Dashboard'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
 function PrefetchQueries() {
-  const workqueues = useWorkqueues()
+  const { prefetch } = useWorkqueues()
+
   useEffect(() => {
-    void queryClient.prefetchQuery({
-      queryKey: trpcOptionsProxy.locations.list.queryKey()
-    })
+    {
+      const { queryKey, queryFn } =
+        trpcOptionsProxy.locations.list.queryOptions()
 
-    // Prefetch active health facility locations
-    void queryClient.prefetchQuery({
-      queryKey: trpcOptionsProxy.locations.list.queryKey({
-        isActive: true,
-        locationType: LocationType.Enum.HEALTH_FACILITY
-      })
-    })
-
-    // Prefetch locations for residential address locations
-    void queryClient.prefetchQuery({
-      queryKey: trpcOptionsProxy.locations.list.queryKey({
-        isActive: undefined,
-        locationType: undefined,
-        locationIds: undefined
-      })
-    })
-
-    function prefetch() {
-      void workqueues.prefetch()
+      // only fetch if we don't already have it cached
+      if (!queryClient.getQueryData(queryKey)) {
+        void queryClient.prefetchQuery({ queryKey, queryFn })
+      }
     }
-
-    prefetch()
-  }, [workqueues])
+    void prefetch()
+    // NOTE: Using anything else than prefetch will trigger load for each render. Destructure rather than passing entire object.
+  }, [prefetch])
 
   return null
 }
@@ -268,6 +255,14 @@ export const routesConfig = {
       path: ROUTES.V2.SETTINGS.path,
       element: <SettingsPage />
     },
+    {
+      path: ROUTES.V2.DASHBOARD.path,
+      element: (
+        <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
+          <PerformanceDashboard />
+        </ProtectedRoute>
+      )
+    },
     /** LEGACY ROUTES
      * During regression testing QA discovered that we were still using old workqueues on some components.
      *  New 'WorkqueueLayout' requires TRPCProvider so we need to wrap these legacy routes inside V2 for minimal risk.
@@ -282,9 +277,7 @@ export const routesConfig = {
             SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
           ]}
         >
-          <WorkqueueLayout>
-            <UserList hideNavigation={true} />
-          </WorkqueueLayout>
+          <TeamPage />
         </ProtectedRoute>
       )
     },
@@ -306,9 +299,7 @@ export const routesConfig = {
             SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
           ]}
         >
-          <WorkqueueLayout>
-            <AdministrativeLevels hideNavigation={true} />
-          </WorkqueueLayout>
+          <OrganisationPage />
         </ProtectedRoute>
       )
     },

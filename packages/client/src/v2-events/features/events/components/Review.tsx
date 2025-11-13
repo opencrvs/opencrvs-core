@@ -295,8 +295,9 @@ function FormReview({
   isReviewCorrection?: boolean
 }) {
   const intl = useIntl()
+
   const visiblePages = formConfig.pages.filter((page) =>
-    isPageVisible(page, form)
+    isPageVisible(page, form, validatorContext)
   )
 
   return (
@@ -325,16 +326,16 @@ function FormReview({
                 />
               )
 
-              const error = runFieldValidations({
+              const errors = runFieldValidations({
                 field,
                 values: form,
                 context: validatorContext
               })
 
               const errorDisplay =
-                error.errors.length > 0 ? (
+                errors.length > 0 ? (
                   <ValidationError key={field.id}>
-                    {intl.formatMessage(error.errors[0].message)}
+                    {intl.formatMessage(errors[0].message)}
                   </ValidationError>
                 ) : null
 

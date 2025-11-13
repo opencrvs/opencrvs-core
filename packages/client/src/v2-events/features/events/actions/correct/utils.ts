@@ -21,8 +21,17 @@ import {
   deepMerge,
   omitHiddenFields,
   getDeclarationFields,
-  EventConfig
+  EventConfig,
+  getDeclaration,
+  isFieldDisplayedOnReview,
+  getCurrentEventState,
+  ActionDocument,
+  getAcceptedActions
 } from '@opencrvs/commons/client'
+import {
+  EventHistoryActionDocument,
+  EventHistoryDocument
+} from './useActionForHistory'
 
 /**
  * Function we use for checking whether a field value has changed.
@@ -36,10 +45,6 @@ export function isEqualFieldValue<T extends FieldValue>(a: T, b: T) {
 
   return _.isEqual(a, b)
 }
-import {
-  EventHistoryActionDocument,
-  EventHistoryDocument
-} from './useActionForHistory'
 
 export function hasFieldChanged(
   f: FieldConfig,
@@ -97,16 +102,16 @@ function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
  * Compares annotations of a given field between the current action and the previous state.
  *
  * @param field Field configuration of a review form field
- * @param fullEvent Extended EventDocument with a possible synthetic `UPDATE` action
- * @param currentActionIndex Index of the action from the actions array of fullEvent to evaluate
+ * @param acceptedActions Array of accepted actions from the event history
+ * @param currentActionIndex Index of the action from the acceptedActions array to compare.
  * @returns An object containing:
  *  - currentAnnotations: aggregated annotations including the current action
  *  - previousAnnotations: aggregated annotations up to (but not including) the current action
  *  - valueHasChanged: boolean indicating whether the field's value changed between the two states
  */
-export function getAnnotationComparison(
+export function getAnnotationComparisonForField(
   field: FieldConfig,
-  fullEvent: EventHistoryDocument,
+  acceptedActions: EventHistoryActionDocument[],
   currentActionIndex: number,
   context: ValidatorContext
 ) {
@@ -118,11 +123,11 @@ export function getAnnotationComparison(
     }
   }
 
-  const eventUpToCurrentAction = fullEvent.actions.slice(
+  const eventUpToCurrentAction = acceptedActions.slice(
     0,
     currentActionIndex + 1
   )
-  const eventUpToPreviousAction = fullEvent.actions.slice(0, currentActionIndex)
+  const eventUpToPreviousAction = acceptedActions.slice(0, currentActionIndex)
 
   const currentAnnotations = aggregateAnnotations(eventUpToCurrentAction)
   const previousAnnotations = aggregateAnnotations(eventUpToPreviousAction)
@@ -135,4 +140,135 @@ export function getAnnotationComparison(
   )
 
   return { currentAnnotations, previousAnnotations, valueHasChanged }
+}
+
+function getReviewForm(configuration: EventConfig) {
+  return configuration.actions
+    .filter((action) => 'review' in action)
+    .map((action) => action.review)
+}
+
+export function getReviewFormFields(configuration: EventConfig) {
+  const reviewForms = getReviewForm(configuration)
+  return _.uniqBy(
+    reviewForms.flatMap((form) => form.fields),
+    (field) => field.id
+  )
+}
+
+function isFirstDeclareOrNotifyAction(
+  action: ActionDocument,
+  fullEvent: EventDocument
+) {
+  if (action.type !== ActionType.DECLARE && action.type !== ActionType.NOTIFY) {
+    return false
+  }
+  const acceptedActions = getAcceptedActions(fullEvent)
+  const firstDeclareOrNotifyAction = acceptedActions.find(
+    (a) => a.type === ActionType.DECLARE || a.type === ActionType.NOTIFY
+  )
+  return firstDeclareOrNotifyAction?.id === action.id
+}
+
+export function getDeclarationComparison(
+  fullEvent: EventDocument,
+  currentAction: ActionDocument,
+  validatorContext: ValidatorContext,
+  eventConfiguration: EventConfig
+) {
+  const acceptedActions = getAcceptedActions(fullEvent)
+  const currentActionIndex = acceptedActions.findIndex(
+    (a) => a.id === currentAction.id
+  )
+
+  const eventUpToCurrentAction = acceptedActions.slice(
+    0,
+    currentActionIndex + 1
+  )
+  const eventUpToPreviousAction = acceptedActions.slice(0, currentActionIndex)
+
+  if (
+    currentActionIndex < 0 ||
+    isFirstDeclareOrNotifyAction(currentAction, fullEvent)
+  ) {
+    return {
+      updatedValues: {},
+      oldValues: {},
+      valueHasChanged: false
+    }
+  }
+
+  const declarationConfig = getDeclaration(eventConfiguration)
+
+  const latestDeclaration = getCurrentEventState(
+    { ...fullEvent, actions: eventUpToCurrentAction },
+    eventConfiguration
+  ).declaration
+
+  const previousDeclaration = getCurrentEventState(
+    { ...fullEvent, actions: eventUpToPreviousAction },
+    eventConfiguration
+  ).declaration
+
+  const { updatedValues, oldValues } = declarationConfig.pages
+    .flatMap((page) =>
+      page.fields.filter((field) =>
+        isFieldDisplayedOnReview(field, latestDeclaration, validatorContext)
+      )
+    )
+    .reduce<{
+      updatedValues: Record<string, unknown>
+      oldValues: Record<string, unknown>
+    }>(
+      (acc, f) => {
+        if (
+          hasFieldChanged(
+            f,
+            latestDeclaration,
+            previousDeclaration,
+            validatorContext
+          )
+        ) {
+          acc.updatedValues[f.id] = latestDeclaration[f.id]
+          acc.oldValues[f.id] = previousDeclaration[f.id]
+        }
+        return acc
+      },
+      { updatedValues: {}, oldValues: {} }
+    )
+
+  return {
+    valueHasChanged: !_.isEmpty(updatedValues),
+    updatedValues,
+    oldValues
+  }
+}
+
+export function hasAnnotationChanged(
+  fullEvent: EventDocument,
+  currentAction: ActionDocument,
+  validatorContext: ValidatorContext,
+  eventConfiguration: EventConfig
+) {
+  if (isFirstDeclareOrNotifyAction(currentAction, fullEvent)) {
+    return false
+  }
+
+  const acceptedActions = getAcceptedActions(fullEvent)
+
+  const reviewFormFields = getReviewFormFields(eventConfiguration)
+
+  const index = acceptedActions.findIndex((a) => a.id === currentAction.id)
+
+  const changedAnnotationFields = reviewFormFields.filter(
+    (f) =>
+      getAnnotationComparisonForField(
+        f,
+        acceptedActions,
+        index,
+        validatorContext
+      ).valueHasChanged
+  )
+
+  return changedAnnotationFields.length > 0
 }

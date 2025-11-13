@@ -39,7 +39,6 @@ import {
   setEventData,
   addLocalEventConfig
 } from '@client/v2-events/features/events/useEvents/api'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ActionMenu } from '../ActionMenu'
 import { actionLabels } from '../useAllowedActionConfigurations'
 
@@ -223,13 +222,14 @@ function getUserIdByRole(role: UserRoles) {
 
 export function getMockEvent(
   actions: (keyof ReturnType<typeof getMockActions>)[],
-  role: UserRoles
+  role: UserRoles,
+  requested?: ActionType
 ): EventDocument {
   const userId = getUserIdByRole(role)
 
   return {
     type: TENNIS_CLUB_MEMBERSHIP,
-    id: 'b4c52c54-f6eb-45ee-be70-142838f8c8d4' as UUID,
+    id: getUUID(),
     createdAt: '2025-04-18T08:34:20.711Z',
     updatedAt: '2025-04-18T10:40:59.442Z',
     trackingId: '75HT9J',
@@ -242,6 +242,10 @@ export function getMockEvent(
           action === AssignmentStatus.ASSIGNED_TO_SELF
         ) {
           mockAction.assignedTo = userId
+        }
+
+        if (action === requested) {
+          mockAction.status = ActionStatus.Requested
         }
 
         return mockAction
@@ -288,6 +292,8 @@ export interface Scenario {
   name: string
   recordDownloaded: boolean
   actions: (keyof ReturnType<typeof getMockActions>)[]
+  /** Sets the given ActionType as `requested` to mock async flows */
+  requested?: ActionType
   expected: Partial<Record<DisplayableAction, AssertType>>
 }
 
@@ -318,7 +324,7 @@ export function createStoriesFromScenarios(
   role: UserRoles
 ): Record<string, StoryObj<typeof ActionMenu>> {
   return scenarios.reduce(
-    (acc, { name, actions, expected, recordDownloaded }) => {
+    (acc, { name, actions, expected, recordDownloaded, requested }) => {
       // Because Validate, Register and Review correction both have same message ('Review'),
       // We need to consider them as one
       const reviewLikeActions: (keyof typeof expected)[] = [
@@ -345,7 +351,7 @@ export function createStoriesFromScenarios(
         }
       }
 
-      const event = getMockEvent(actions, role)
+      const event = getMockEvent(actions, role, requested)
       acc[name] = {
         loaders: [
           async () => {
@@ -380,7 +386,7 @@ export function createStoriesFromScenarios(
                   ]
                 })),
                 tRPCMsw.event.get.query(() => {
-                  return tennisClubMembershipEventDocument
+                  return event
                 })
               ]
             }
@@ -459,7 +465,7 @@ export function createdByOtherUserScenario({
               results: [getCurrentEventState(event, tennisClubMembershipEvent)]
             })),
             tRPCMsw.event.get.query(() => {
-              return tennisClubMembershipEventDocument
+              return event
             })
           ]
         }

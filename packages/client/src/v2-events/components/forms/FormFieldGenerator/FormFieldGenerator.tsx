@@ -11,50 +11,26 @@
 
 import React, { useEffect } from 'react'
 
-import { Formik } from 'formik'
+import { Formik, FormikTouched } from 'formik'
 import { isEqual, noop } from 'lodash'
+import { useIntl } from 'react-intl'
 import {
   EventConfig,
   EventState,
   FieldConfig,
   FieldValue,
-  InteractiveFieldType,
-  isNonInteractiveFieldType,
   joinValues,
-  SystemVariables,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import {
-  FIELD_SEPARATOR,
-  handleDefaultValue
-} from '@client/v2-events/components/forms/utils'
+import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
-import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
+import { useDefaultValues } from '@client/v2-events/hooks/useDefaultValues'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
 } from './utils'
 import { FormSectionComponent } from './FormSectionComponent'
-
-function mapFieldsToValues(
-  fields: FieldConfig[],
-  systemVariables: SystemVariables
-) {
-  return fields
-    .filter(
-      (field): field is InteractiveFieldType =>
-        !isNonInteractiveFieldType(field)
-    )
-    .reduce((memo, field) => {
-      const fieldInitialValue = handleDefaultValue({
-        field,
-        systemVariables
-      })
-
-      return { ...memo, [field.id]: fieldInitialValue }
-    }, {})
-}
 
 export interface FormFieldGeneratorProps {
   /** form id */
@@ -92,9 +68,11 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     validatorContext
   }) => {
     const { setAllTouchedFields, touchedFields } = useEventFormData()
+    const intl = useIntl()
+    const defaultValues = useDefaultValues(fields)
 
     const updateTouchFields = (
-      touched: Record<string, boolean | undefined>
+      touched: FormikTouched<Record<string, boolean | undefined>>
     ) => {
       const newlyTouched =
         Object.keys(touched).length > 0 &&
@@ -126,11 +104,9 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     const formikOnChange = (values: EventState) =>
       onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
 
-    const systemVariables = useSystemVariables()
-
     const formikCompatibleInitialValues =
       makeFormFieldIdsFormikCompatible<FieldValue>({
-        ...mapFieldsToValues(fields, systemVariables),
+        ...defaultValues,
         ...initialValues
       })
 
@@ -140,10 +116,17 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         initialTouched={touchedFields}
         initialValues={formikCompatibleInitialValues}
         validate={(values) =>
-          getValidationErrorsForForm(
-            fields,
-            makeFormikFieldIdsOpenCRVSCompatible(values),
-            validatorContext
+          Object.fromEntries(
+            Object.entries(
+              getValidationErrorsForForm(
+                fields,
+                makeFormikFieldIdsOpenCRVSCompatible(values),
+                validatorContext
+              )
+            ).map(([fieldId, errors]) => [
+              fieldId,
+              errors?.[0]?.message && intl.formatMessage(errors[0].message)
+            ])
           )
         }
         validateOnMount={true}
@@ -165,10 +148,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
           return (
             <FormSectionComponent
               className={className}
-              // @TODO: Formik does not type errors well. Actual error message differs from the type.
-              // This was previously cast on FormSectionComponent level.
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              errors={formikProps.errors as any}
+              errors={formikProps.errors}
               eventConfig={eventConfig}
               fields={fields}
               fieldsToShowValidationErrors={fieldsToShowValidationErrors}
@@ -180,10 +160,8 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               resetForm={formikProps.resetForm}
               setAllTouchedFields={setAllTouchedFields}
               setErrors={formikProps.setErrors}
-              setFieldValue={formikProps.setFieldValue}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
-              systemVariables={systemVariables}
               touched={{ ...formikProps.touched, ...touchedFields }}
               validateAllFields={validateAllFields}
               validatorContext={validatorContext}

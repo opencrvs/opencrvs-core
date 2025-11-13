@@ -48,10 +48,6 @@ import { ActionMenu } from './components/ActionMenu'
 import { EventOverviewProvider } from './EventOverviewContext'
 
 /**
- * File is based on packages/client/src/views/RecordAudit/RecordAudit.tsx
- */
-
-/**
  * Renders the event overview page, including the event summary and history.
  */
 function EventOverviewFull({
@@ -122,7 +118,11 @@ function EventOverviewFull({
         eventConfiguration={eventConfiguration}
         flags={flags}
       />
-      <EventHistory fullEvent={event} validatorContext={validatorContext} />
+      <EventHistory
+        eventConfiguration={eventConfiguration}
+        fullEvent={event}
+        validatorContext={validatorContext}
+      />
     </Content>
   )
 }

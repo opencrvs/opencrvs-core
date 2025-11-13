@@ -35,7 +35,7 @@ const generator = testDataGenerator()
 
 const declareEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
 })
 
 const eventId = declareEventDocument.id
@@ -112,9 +112,9 @@ export const RemovingExistingFileSendsNull: Story = {
             return generateEventDocument({
               configuration: tennisClubMembershipEvent,
               actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
+                { type: ActionType.CREATE },
+                { type: ActionType.DECLARE },
+                { type: ActionType.VALIDATE }
               ]
             })
           })
@@ -229,9 +229,9 @@ export const RemovingExistingSignatureSendsNull: Story = {
             return generateEventDocument({
               configuration: tennisClubMembershipEvent,
               actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
+                { type: ActionType.CREATE },
+                { type: ActionType.DECLARE },
+                { type: ActionType.VALIDATE }
               ]
             })
           })
@@ -378,9 +378,9 @@ export const RemovingMultipleFilesDeletesAll: Story = {
             return generateEventDocument({
               configuration: multiFileConfig,
               actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
+                { type: ActionType.CREATE },
+                { type: ActionType.DECLARE },
+                { type: ActionType.VALIDATE }
               ]
             })
           })

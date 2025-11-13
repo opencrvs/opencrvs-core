@@ -10,7 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import superjson from 'superjson'
-import React, { Suspense } from 'react'
+import React from 'react'
 import { within } from '@storybook/testing-library'
 import { waitFor, expect } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
@@ -36,6 +36,7 @@ import {
 import { ROUTES } from '@client/v2-events/routes'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useDrafts } from '../../drafts/useDrafts'
+import { clearStorage } from '../../../../../.storybook/preview'
 import { useEvents } from './useEvents'
 
 const meta: Meta<unknown> = {
@@ -48,7 +49,7 @@ type Story = StoryObj<unknown>
 
 const createdEvent = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [{ type: ActionType.CREATE }]
 })
 
 const router = {
@@ -143,6 +144,7 @@ export const GetEventHook: Story = {
     actionType: ActionType.DECLARE
   },
   loaders: [
+    clearStorage,
     async () => {
       spies.draftList = 0
       spies.eventGet = 0

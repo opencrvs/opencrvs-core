@@ -42,10 +42,15 @@ import {
   TimeField,
   AlphaPrintButton,
   HttpField,
+  SearchField,
   ButtonField,
   LinkButtonField,
   VerificationStatus,
-  QueryParamReaderField
+  QueryParamReaderField,
+  QrReaderField,
+  IdReaderField,
+  LoaderField,
+  AgeField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -62,7 +67,8 @@ import {
   SelectDateRangeValue,
   TimeValue,
   ButtonFieldValue,
-  VerificationStatusValue
+  VerificationStatusValue,
+  AgeValue
 } from './FieldValue'
 
 import { FullDocumentPath } from '../documents'
@@ -76,7 +82,9 @@ import {
   NameFieldValue,
   NameFieldUpdateValue,
   HttpFieldUpdateValue,
-  QueryParamReaderFieldUpdateValue
+  QueryParamReaderFieldUpdateValue,
+  QrReaderFieldValue,
+  IdReaderFieldValue
 } from './CompositeFieldValue'
 
 /**
@@ -103,6 +111,9 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
   switch (type) {
     case FieldType.DATE:
       schema = DateValue
+      break
+    case FieldType.AGE:
+      schema = AgeValue
       break
     case FieldType.TIME:
       schema = TimeValue
@@ -133,6 +144,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.LINK_BUTTON:
     case FieldType.VERIFICATION_STATUS:
     case FieldType.ID:
+    case FieldType.LOADER:
       schema = required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
@@ -164,10 +176,17 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       schema = TextValue
       break
     case FieldType.HTTP:
+    case FieldType.SEARCH:
       schema = HttpFieldUpdateValue
       break
     case FieldType.QUERY_PARAM_READER:
       schema = QueryParamReaderFieldUpdateValue
+      break
+    case FieldType.QR_READER:
+      schema = QrReaderFieldValue
+      break
+    case FieldType.ID_READER:
+      schema = IdReaderFieldValue
       break
   }
 
@@ -208,6 +227,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.NUMBER:
     case FieldType.EMAIL:
     case FieldType.DATE:
+    case FieldType.AGE:
     case FieldType.TIME:
     case FieldType.CHECKBOX:
     case FieldType.DATE_RANGE:
@@ -218,10 +238,14 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.BUTTON:
     case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.HTTP:
+    case FieldType.SEARCH:
     case FieldType.LINK_BUTTON:
     case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
     case FieldType.VERIFICATION_STATUS:
+    case FieldType.QR_READER:
+    case FieldType.ID_READER:
+    case FieldType.LOADER:
       return null
     case FieldType.ADDRESS:
       return {
@@ -254,6 +278,13 @@ export const isDateFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: DateField } => {
   return field.config.type === FieldType.DATE
+}
+
+export const isAgeFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: AgeValue | undefined; config: AgeField } => {
+  return field.config.type === FieldType.AGE
 }
 
 export const isTimeFieldType = (field: {
@@ -440,7 +471,7 @@ export const isOfficeFieldType = (field: {
 export const isDataFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: undefined; config: DataField } => {
+}): field is { value: DataFieldValue; config: DataField } => {
   return field.config.type === FieldType.DATA
 }
 
@@ -463,6 +494,13 @@ export const isHttpFieldType = (field: {
   value: FieldValue
 }): field is { value: undefined; config: HttpField } => {
   return field.config.type === FieldType.HTTP
+}
+
+export const isSearchFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: SearchField } => {
+  return field.config.type === FieldType.SEARCH
 }
 
 export const isLinkButtonFieldType = (field: {
@@ -492,6 +530,27 @@ export const isQueryParamReaderFieldType = (field: {
   return field.config.type === FieldType.QUERY_PARAM_READER
 }
 
+export const isQrReaderFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: QrReaderField } => {
+  return field.config.type === FieldType.QR_READER
+}
+
+export const isIdReaderFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: IdReaderField } => {
+  return field.config.type === FieldType.ID_READER
+}
+
+export const isLoaderFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: LoaderField } => {
+  return field.config.type === FieldType.LOADER
+}
+
 export type NonInteractiveFieldType =
   | Divider
   | PageHeader
@@ -502,6 +561,7 @@ export type NonInteractiveFieldType =
   | HttpField
   | LinkButtonField
   | QueryParamReaderField
+  | LoaderField
 
 export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
 
@@ -517,6 +577,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.ALPHA_PRINT_BUTTON ||
     field.type === FieldType.HTTP ||
     field.type === FieldType.LINK_BUTTON ||
-    field.type === FieldType.QUERY_PARAM_READER
+    field.type === FieldType.QUERY_PARAM_READER ||
+    field.type === FieldType.LOADER
   )
 }

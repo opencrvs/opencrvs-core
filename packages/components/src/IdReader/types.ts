@@ -13,7 +13,7 @@
 export type Validator = (
   data: Parameters<Scan['onScan']>[0]
 ) => string | undefined
-interface QRReaderType {
+interface QrReaderType {
   validator?: Validator
   labels: {
     button: string
@@ -26,7 +26,7 @@ interface QRReaderType {
   }
 }
 
-export interface IDReaderProps {
+export interface IdReaderProps {
   dividerLabel: string
   manualInputInstructionLabel: string
   children: React.ReactNode
@@ -44,4 +44,4 @@ interface Scan {
   onError?: ErrorHandler
 }
 
-export interface ScannableQRReader extends QRReaderType, Scan {}
+export interface ScannableQrReader extends QrReaderType, Scan {}

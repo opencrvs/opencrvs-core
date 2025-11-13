@@ -9,19 +9,23 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { isEqual, take } from 'lodash'
 import {
   Action,
   ActionDocument,
   ActionType,
-  ActionTypes,
   DeclarationActionType,
   EventConfig,
   EventDocument,
+  getAcceptedActions,
   getCurrentEventState,
-  UUID
+  UUID,
+  ValidatorContext,
+  DeclarationActions,
+  ActionStatus,
+  getCompleteActionDeclaration,
+  getCompleteActionAnnotation
 } from '@opencrvs/commons/client'
-import { getPreviousDeclarationActionType } from '../../components/Action/utils'
+import { hasAnnotationChanged, getDeclarationComparison } from './utils'
 
 /**
  * Indicates that declaration action changed declaration content. Satisfies V1 spec.
@@ -46,47 +50,70 @@ export type EventHistoryDocument = Omit<EventDocument, 'actions'> & {
   actions: EventHistoryActionDocument[]
 }
 
-function getPreviousActions(arr: ActionDocument[], id: string) {
-  const index = arr.findIndex((item) => item.id === id)
-  return index === -1 ? arr : take(arr, index)
-}
 function hasDeclarationChanged(
-  actions: ActionDocument[],
-  action: Extract<Action, { type: DeclarationActionType }>
+  fullEvent: EventDocument,
+  action: Extract<Action, { type: DeclarationActionType }>,
+  validatorContext: ValidatorContext,
+  eventConfiguration: EventConfig
 ) {
-  const previousActions = getPreviousActions(actions, action.id)
-  const previousActionType = getPreviousDeclarationActionType(
-    previousActions,
-    action.type
+  const hasUpdatedDeclarationValues = getDeclarationComparison(
+    fullEvent,
+    action,
+    validatorContext,
+    eventConfiguration
+  ).valueHasChanged
+
+  const hasUpdatedAnnotationValues = hasAnnotationChanged(
+    fullEvent,
+    action,
+    validatorContext,
+    eventConfiguration
   )
-
-  const previousDeclarationAction = previousActionType
-    ? actions.find((act) => act.type === previousActionType)
-    : undefined
-
-  const currentActionHasUpdates = Object.keys(action.declaration).length > 0
-  const previousActionHasDeclaration = !!previousDeclarationAction?.declaration
-
-  const hasUpdatedDeclarationValues = Object.entries(action.declaration).some(
-    ([key, value]) => {
-      const prevValue = previousDeclarationAction?.declaration[key]
-      return !isEqual(prevValue, value)
-    }
-  )
-
-  const hasUpdatedAnnotationValues =
-    action.annotation &&
-    Object.entries(action.annotation).some(([key, value]) => {
-      const prevValue = previousDeclarationAction?.annotation?.[key]
-      return !isEqual(prevValue, value)
-    })
 
   const hasUpdatedValues =
     hasUpdatedDeclarationValues || hasUpdatedAnnotationValues
 
-  return (
-    currentActionHasUpdates && previousActionHasDeclaration && hasUpdatedValues
-  )
+  return hasUpdatedValues
+}
+
+function isDeclarationAction(
+  action: Action
+): action is Extract<Action, { type: DeclarationActionType }> {
+  return DeclarationActions.safeParse(action.type).success
+}
+
+/**
+ * Includes a request action, if the corresponding accepted action has different transactionId
+ * Merges declarations and annotations from the corresponding request action for an accepted action
+ * @param fullEvent - The full EventDocument containing an actions array to filter.
+ * @returns An array of actionDocument considered part of the event history.
+ */
+export function extractHistoryActions(
+  fullEvent: EventDocument
+): ActionDocument[] {
+  function isHistoryAction(a: Action): a is ActionDocument {
+    if (a.status === ActionStatus.Accepted) {
+      return true
+    }
+
+    if (a.status === ActionStatus.Requested) {
+      const immediatelyAcceptedAction = fullEvent.actions.find(
+        ({ originalActionId, transactionId }) =>
+          originalActionId === a.id && transactionId === a.transactionId
+      )
+      if (!immediatelyAcceptedAction) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  return fullEvent.actions.filter(isHistoryAction).map((action) => ({
+    ...action,
+    declaration: getCompleteActionDeclaration({}, fullEvent, action),
+    annotation: getCompleteActionAnnotation({}, fullEvent, action)
+  }))
 }
 
 /**
@@ -106,38 +133,44 @@ function hasDeclarationChanged(
  * const result = appendUpdateAction(actions);
  * // → [ { ...actions }, { ...synthetic UPDATE for a DECLARE action}, { ...original DECLARE action }, ... ]
  */
-export function expandWithUpdateActions(
-  actions: ActionDocument[]
+export function expandWithClientSpecificActions(
+  fullEvent: EventDocument,
+  validatorContext: ValidatorContext,
+  eventConfiguration: EventConfig
 ): EventHistoryActionDocument[] {
-  return actions.flatMap<EventHistoryActionDocument>((action) => {
-    if (
-      action.type === ActionTypes.enum.VALIDATE ||
-      action.type === ActionTypes.enum.REGISTER ||
-      action.type === ActionTypes.enum.DECLARE ||
-      action.type === ActionTypes.enum.NOTIFY
-    ) {
-      if (!hasDeclarationChanged(actions, action)) {
-        return [action]
+  return extractHistoryActions(fullEvent).flatMap<EventHistoryActionDocument>(
+    (action) => {
+      if (isDeclarationAction(action)) {
+        if (
+          !hasDeclarationChanged(
+            fullEvent,
+            action,
+            validatorContext,
+            eventConfiguration
+          )
+        ) {
+          return [action]
+        }
+
+        return [
+          {
+            ...action,
+            // Cast suffixed id as UUID to ensure uniqueness for synthetic UPDATE actions.
+            // We can't generate random UUIDs here, since components rely on stable IDs
+            // to find actions across renders.
+            id: `${action.id}-update` as UUID,
+            type: DECLARATION_ACTION_UPDATE
+          },
+          // Preserve the original action’s declaration.
+          // This is required so that when the synthetic UPDATE action is later stripped out,
+          // declaration changes can still be detected correctly in getCurrentEventState.
+          action
+        ]
       }
 
-      return [
-        {
-          ...action,
-          // Cast suffixed id as UUID to ensure uniqueness for synthetic UPDATE actions.
-          // We can't generate random UUIDs here, since components rely on stable IDs
-          // to find actions across renders.
-          id: `${action.id}-update` as UUID,
-          type: DECLARATION_ACTION_UPDATE
-        },
-        // Preserve the original action’s declaration.
-        // This is required so that when the synthetic UPDATE action is later stripped out,
-        // declaration changes can still be detected correctly in getCurrentEventState.
-        action
-      ]
+      return [action]
     }
-
-    return [action]
-  })
+  )
 }
 
 export function useActionForHistory() {

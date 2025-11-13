@@ -12,11 +12,11 @@ import React from 'react'
 
 import { Divider } from '../Divider'
 import { Text } from '../Text'
-import { IDReaderProps } from './types'
+import { IdReaderProps } from './types'
 import { Stack } from '../Stack'
 import { MainContainer, ReadersContainer } from './components'
 
-export const IDReader = (props: IDReaderProps) => {
+export const IdReader = (props: IdReaderProps) => {
   const { dividerLabel, manualInputInstructionLabel, children } = props
   return (
     <MainContainer>

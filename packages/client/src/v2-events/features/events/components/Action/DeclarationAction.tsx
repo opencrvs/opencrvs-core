@@ -37,6 +37,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useToastAndRedirect } from '@client/v2-events/features/events/useToastAndRedirect'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
 import { AvailableActionTypes, getPreviousDeclarationActionType } from './utils'
@@ -47,7 +48,8 @@ import { AvailableActionTypes, getPreviousDeclarationActionType } from './utils'
  * @param event Event document
  * @param configuration Event configuration
  *
- * Throws an error if the action is not allowed for the event or if the user does not have permission to perform the action.
+ * If the action is not allowed for the event, redirect the user to overview page.
+ * Or throws an error if the user does not have permission to perform the action.
  */
 function useActionGuard(
   actionType: AvailableActionTypes,
@@ -57,9 +59,32 @@ function useActionGuard(
   const eventState = getCurrentEventState(event, configuration)
   const availableActions = getAvailableActionsForEvent(eventState)
   const { isActionAllowed } = useUserAllowedActions(event.type)
-
+  const { redirectToEventOverviewPage } = useToastAndRedirect()
   // If the action is not available for the event, redirect to the overview page
   if (!availableActions.includes(actionType)) {
+    const isProd = import.meta.env.PROD
+
+    // Some Storybook tests expect the action guard to throw errors.
+    // In the actual app, we want explicit failures in development but silent handling in production.
+    // Storybook verifies behavior based on these development-mode failures.
+    const isStory = import.meta.env.STORYBOOK
+
+    if (isProd && !isStory) {
+      // In prod mode, show a toast explaining why the action is not available
+      // and then redirect to the overview page
+      return redirectToEventOverviewPage({
+        toastId: `${actionType}-no-available-for-${event.id}`,
+        message: {
+          id: 'event.action.notAvailableForEvent',
+          defaultMessage:
+            "The action you're trying to perform is not available for this event anymore.",
+          description:
+            'Shown when user tries to perform an action that is not available for the event'
+        },
+        eventId: event.id
+      })
+    }
+
     throw new Error(
       `Action ${actionType} not available for the event ${event.id} with status ${eventState.status} ${eventState.flags.length > 0 ? `(flags: ${eventState.flags.join(', ')})` : ''}`
     )
@@ -72,6 +97,7 @@ function useActionGuard(
     )
   }
 }
+
 /**
  * Creates a wrapper component for the declaration action.
  * Manages the state of the declaration action and its local draft.
@@ -83,32 +109,15 @@ function useActionGuard(
  */
 function DeclarationActionComponent({
   children,
-  actionType
+  actionType,
+  event
 }: PropsWithChildren<{
   actionType: AvailableActionTypes
+  event: EventDocument
 }>) {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
-
-  const events = useEvents()
-  const navigate = useNavigate()
+  const eventId = event.id
   const { setLocalDraft, getLocalDraftOrDefault, getRemoteDraftByEventId } =
     useDrafts()
-
-  const event = events.getEvent.findFromCache(eventId).data
-
-  useEffect(() => {
-    if (!event) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Event with id ${eventId} not found in cache. Redirecting to overview.`
-      )
-      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
-    }
-  }, [event, eventId, navigate])
-
-  if (!event) {
-    return <div />
-  }
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
@@ -263,4 +272,67 @@ function DeclarationActionComponent({
   return <NavigationStack>{children}</NavigationStack>
 }
 
-export const DeclarationAction = withSuspense(DeclarationActionComponent)
+/**
+ * Container for Declaration Action. Interacts with router state and cache.
+ * Having all the logic in single component breaks the rules of hooks.
+ *
+ */
+function DeclarationActionContainer({
+  children,
+  actionType
+}: PropsWithChildren<{
+  actionType: AvailableActionTypes
+}>) {
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
+  const events = useEvents()
+
+  const navigate = useNavigate()
+  const { redirectToEventOverviewPage } = useToastAndRedirect()
+  const event = events.getEvent.findFromCache(eventId).data
+
+  // Missing event should not happen in "regular" application flow.
+  // 1. User clicks browser 'back' button after completing flow.
+  // 2. User comes directly through the URL to the flow.
+  useEffect(() => {
+    if (!event) {
+      // eslint-disable-next-line no-console
+      console.warn(`Event with id ${eventId} not found in cache.`)
+
+      const reduxHistoryIndex = window.history.state?.idx
+      const appHasHistory =
+        typeof reduxHistoryIndex === 'number' && reduxHistoryIndex > 0
+
+      // As long as there is a page, go back to it.
+      if (appHasHistory) {
+        navigate(-1)
+
+        return
+      }
+
+      // Technically, user can end up within <NavigationStack> from any page. At least from workqueue and overview pages.
+      redirectToEventOverviewPage({
+        toastId: `${eventId}-not-found`,
+        message: {
+          id: 'event.not.downloaded',
+          defaultMessage:
+            'Please ensure the event is first assigned and downloaded to the browser.',
+          description:
+            'Shown when user tries to perform an action on event that is not available '
+        },
+        eventId
+      })
+    }
+  }, [event, eventId, redirectToEventOverviewPage, navigate])
+
+  if (!event) {
+    return <div />
+  }
+
+  return (
+    <DeclarationActionComponent actionType={actionType} event={event}>
+      {children}
+    </DeclarationActionComponent>
+  )
+}
+
+export const DeclarationAction = withSuspense(DeclarationActionContainer)

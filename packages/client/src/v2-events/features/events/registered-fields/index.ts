@@ -22,6 +22,7 @@ import { LocationSearch } from './LocationSearch'
 import { Name } from './Name'
 import { Number } from './Number'
 import { PageHeader } from './PageHeader'
+import { AgeField } from './AgeField'
 import { Paragraph } from './Paragraph'
 import { RadioGroup } from './RadioGroup'
 import { RegisteredFieldModule } from './RegisteredField'
@@ -30,6 +31,7 @@ import { SelectCountry } from './SelectCountry'
 import { SelectDateRangeField } from './SelectDateRangeField'
 import { Text } from './Text'
 import { TimeField } from './TimeField'
+import { Search } from './Search'
 import { AlphaPrintButton } from './AlphaPrintButton'
 import { LinkButton } from './LinkButton'
 import { VerificationStatus } from './VerificationStatus'
@@ -37,6 +39,7 @@ import { QueryParamReader } from './QueryParamReader'
 
 export * from './Address'
 export * from './AdministrativeArea'
+export * from './AgeField'
 export * from './BulletList'
 export * from './Button'
 export * from './Checkbox'
@@ -104,6 +107,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return Name
     case FieldType.SELECT_DATE_RANGE:
       return SelectDateRangeField
+    case FieldType.SEARCH:
+      return Search
     case FieldType.HTTP:
       return Http
     case FieldType.LINK_BUTTON:
@@ -112,6 +117,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return VerificationStatus
     case FieldType.QUERY_PARAM_READER:
       return QueryParamReader
+    case FieldType.AGE:
+      return AgeField
     default:
       return undefined
   }

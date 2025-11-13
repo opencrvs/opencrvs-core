@@ -62,7 +62,7 @@ export const AlphaPrintButton = {
     const intl = useIntl()
     const location = useLocation()
     const parts = location.pathname.split('/')
-    const eventId = parts[4]
+    const eventId = UUID.parse(parts[3])
     const { getEvent } = useEvents()
     const { certificateTemplates, language } = useAppConfig()
     const { getUser } = useUsers()
@@ -117,8 +117,6 @@ export const AlphaPrintButton = {
       language
     })
 
-    const alreadyPrinted = Boolean(value)
-
     const handlePrint = async () => {
       if (!certificateConfig || !language || !preparePdfCertificate) {
         return
@@ -141,7 +139,7 @@ export const AlphaPrintButton = {
 
     return (
       <Button
-        disabled={disabled || !certificateConfig || alreadyPrinted}
+        disabled={disabled || !certificateConfig}
         id={id}
         size="medium"
         type="secondary"

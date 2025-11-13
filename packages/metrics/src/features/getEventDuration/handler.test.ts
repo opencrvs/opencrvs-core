@@ -16,15 +16,11 @@ const readPoints = influx.query as jest.Mock
 
 describe('verify event duration handler', () => {
   let server: any
-  const token = jwt.sign(
-    { scope: ['declare'] },
-    readFileSync('./test/cert.key'),
-    {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:metrics-user'
-    }
-  )
+  const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:metrics-user'
+  })
 
   beforeEach(async () => {
     server = await createServer()

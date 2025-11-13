@@ -78,9 +78,7 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
                   fieldId: 'applicant.dob'
                 },
                 {
-                  fieldId: 'applicant'
-                },
-                {
+                  id: 'id',
                   label: {
                     defaultMessage: 'ID',
                     description: 'This is the label for the field',

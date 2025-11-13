@@ -424,7 +424,7 @@ function useViewableActionConfigurations(
       [ActionType.REQUEST_CORRECTION]: {
         label: actionLabels[ActionType.REQUEST_CORRECTION],
         icon: 'NotePencil' as const,
-        onClick: () => {
+        onClick: (workqueue?: string) => {
           const correctionPages = eventConfiguration.actions.find(
             (action) => action.type === ActionType.REQUEST_CORRECTION
           )?.correctionForm.pages
@@ -438,17 +438,23 @@ function useViewableActionConfigurations(
           // If no pages are configured, skip directly to review page
           if (correctionPages.length === 0) {
             navigate(
-              ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
+              ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
+                { eventId },
+                { workqueue }
+              )
             )
             return
           }
 
           // If pages are configured, navigate to first page
           navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
-              eventId,
-              pageId: correctionPages[0].id
-            })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
+              {
+                eventId,
+                pageId: correctionPages[0].id
+              },
+              { workqueue }
+            )
           )
         },
         disabled: !isDownloadedAndAssignedToUser || eventIsWaitingForCorrection,
@@ -457,12 +463,15 @@ function useViewableActionConfigurations(
       [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
         label: actionLabels[ClientSpecificAction.REVIEW_CORRECTION_REQUEST],
         icon: 'NotePencil' as const,
-        onClick: () => {
+        onClick: (workqueue?: string) => {
           clearEphemeralFormState()
           navigate(
-            ROUTES.V2.EVENTS.REVIEW_CORRECTION.REVIEW.buildPath({
-              eventId
-            })
+            ROUTES.V2.EVENTS.REVIEW_CORRECTION.REVIEW.buildPath(
+              {
+                eventId
+              },
+              { workqueue }
+            )
           )
         },
         disabled: !isDownloadedAndAssignedToUser,

@@ -18,15 +18,17 @@ import {
   tennisClubMembershipEvent,
   generateActionDocument,
   createPrng,
-  getRandomDatetime,
   UUID,
-  getAcceptedActions,
-  EventDocument
+  EventDocument,
+  generateEventDocument,
+  TestUserRole,
+  generateRandomDatetime
 } from '@opencrvs/commons/client'
 import {
   DECLARATION_ACTION_UPDATE,
-  expandWithUpdateActions
+  expandWithClientSpecificActions
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import { getTestValidatorContext } from '../../../../../../../../.storybook/decorators'
 import { EventHistoryDialog } from './EventHistoryDialog'
 
@@ -170,7 +172,7 @@ export const Read: Story = {
   }
 }
 
-const createActionCreatedAt = getRandomDatetime(
+const createActionCreatedAt = generateRandomDatetime(
   prng,
   new Date('2023-12-12'),
   new Date('2023-12-31')
@@ -269,8 +271,10 @@ export const Validated: Story = {
   }
 }
 
-const updateActionForValidate = expandWithUpdateActions(
-  eventWhenValidateUpdatesDeclaration.actions
+const updateActionForValidate = expandWithClientSpecificActions(
+  eventWhenValidateUpdatesDeclaration,
+  getTestValidatorContext(),
+  tennisClubMembershipEvent
 ).find((a) => a.type === DECLARATION_ACTION_UPDATE)
 
 export const ValidatedOnDeclarationUpdate: Story = {
@@ -802,8 +806,10 @@ const newFullEvent = {
   ]
 }
 
-const updateActions = expandWithUpdateActions(
-  getAcceptedActions(newFullEvent)
+const updateActions = expandWithClientSpecificActions(
+  newFullEvent,
+  getTestValidatorContext(),
+  tennisClubMembershipEvent
 ).filter((a) => a.type === DECLARATION_ACTION_UPDATE)
 
 export const DeclarationUpdateOnDeclare: Story = {
@@ -1021,8 +1027,10 @@ const eventWithNotifyActions = {
   ]
 } satisfies EventDocument
 
-const updateActionsForNotifyActions = expandWithUpdateActions(
-  getAcceptedActions(eventWithNotifyActions)
+const updateActionsForNotifyActions = expandWithClientSpecificActions(
+  eventWithNotifyActions,
+  getTestValidatorContext(),
+  tennisClubMembershipEvent
 ).filter((a) => a.type === DECLARATION_ACTION_UPDATE)
 
 export const DeclarationUpdateNotify: Story = {
@@ -1052,14 +1060,186 @@ export const Registered: Story = {
   }
 }
 
-const updateActionForRegister = expandWithUpdateActions(
-  eventWhenRegisterUpdatesDeclaration.actions
+const updateActionForRegister = expandWithClientSpecificActions(
+  eventWhenRegisterUpdatesDeclaration,
+  getTestValidatorContext(),
+  tennisClubMembershipEvent
 ).find((a) => a.type === DECLARATION_ACTION_UPDATE)
 
 export const RegisteredOnDeclarationUpdate: Story = {
   args: {
     fullEvent: eventWhenRegisterUpdatesDeclaration,
     action: updateActionForRegister
+  }
+}
+
+const generator = testDataGenerator()
+const notDuplicateUpdateEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    {
+      type: ActionType.CREATE,
+      user: {
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        id: generator.user.id.registrationAgent
+      }
+    },
+    {
+      type: ActionType.ASSIGN,
+      user: {
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        id: generator.user.id.registrationAgent,
+        assignedTo: generator.user.id.registrationAgent
+      }
+    },
+    {
+      type: ActionType.DECLARE,
+      user: {
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        id: generator.user.id.registrationAgent
+      },
+      declarationOverrides: {
+        'applicant.dob': '1999-11-11',
+        'applicant.name': {
+          surname: 'Drinkwater',
+          firstname: 'Danny',
+          middlename: ''
+        },
+        'senior-pass.id': '23213213',
+        'recommender.none': true,
+        'applicant.image.label': ''
+      }
+    },
+    {
+      type: ActionType.DUPLICATE_DETECTED,
+      user: {
+        role: TestUserRole.enum.REGISTRATION_AGENT,
+        id: generator.user.id.registrationAgent
+      },
+      declarationOverrides: {
+        'applicant.dob': '1999-11-11',
+        'applicant.name': {
+          surname: 'Drinkwater',
+          firstname: 'Danny',
+          middlename: ''
+        },
+        'senior-pass.id': '23213213',
+        'recommender.none': true,
+        'applicant.image.label': ''
+      }
+    },
+    {
+      type: ActionType.UNASSIGN
+    },
+    {
+      type: ActionType.ASSIGN,
+      user: {
+        assignedTo: generator.user.id.localRegistrar,
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: generator.user.id.localRegistrar
+      }
+    },
+    {
+      type: ActionType.MARK_AS_NOT_DUPLICATE,
+      user: {
+        assignedTo: generator.user.id.localRegistrar,
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: generator.user.id.localRegistrar
+      }
+    },
+    {
+      type: ActionType.DUPLICATE_DETECTED,
+      user: {
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: generator.user.id.localRegistrar
+      },
+      declarationOverrides: {
+        'applicant.dob': '1999-11-11',
+        'applicant.name': {
+          surname: 'Drinkwater',
+          firstname: 'Updated Danny', // updated when marked as not duplicate, should be visible in updated modal
+          middlename: ''
+        },
+        'senior-pass.id': '23213213',
+        'recommender.none': true,
+        'applicant.image.label': ''
+      }
+    },
+    {
+      type: ActionType.UNASSIGN
+    },
+    {
+      type: ActionType.ASSIGN,
+      user: {
+        assignedTo: generator.user.id.localRegistrar,
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: generator.user.id.localRegistrar
+      }
+    },
+    {
+      type: ActionType.VALIDATE,
+      user: {
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: generator.user.id.localRegistrar
+      },
+      declarationOverrides: {
+        'applicant.dob': '1999-11-11',
+        'applicant.name': {
+          surname: 'Drinkwater',
+          firstname: 'Updated Danny', // updated when marked as not duplicate, should be visible in updated modal
+          middlename: ''
+        },
+        'senior-pass.id': '23213213',
+        'recommender.none': true,
+        'applicant.image.label': ''
+      }
+    },
+    {
+      type: ActionType.UNASSIGN
+    },
+    {
+      type: ActionType.ASSIGN,
+      user: {
+        assignedTo: generator.user.id.localRegistrar,
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: generator.user.id.localRegistrar
+      }
+    },
+    {
+      type: ActionType.REGISTER,
+      user: {
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
+        id: generator.user.id.localRegistrar
+      },
+      declarationOverrides: {
+        'applicant.dob': '1999-11-11',
+        'applicant.name': {
+          surname: 'Drinkwater',
+          firstname: 'Danny',
+          middlename: ''
+        },
+        'senior-pass.id': '23213213',
+        'recommender.none': true,
+        'applicant.image.label': ''
+      }
+    },
+    {
+      type: ActionType.UNASSIGN
+    }
+  ]
+})
+
+const updateActionForNotDuplicateActions = expandWithClientSpecificActions(
+  notDuplicateUpdateEvent,
+  getTestValidatorContext(),
+  tennisClubMembershipEvent
+).find((a) => a.type === DECLARATION_ACTION_UPDATE)
+
+// Should see updated name in the modal
+export const NotDuplicateOnDeclarationUpdate: Story = {
+  args: {
+    fullEvent: notDuplicateUpdateEvent,
+    action: updateActionForNotDuplicateActions
   }
 }
 

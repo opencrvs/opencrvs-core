@@ -11,52 +11,39 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { graphql, HttpResponse } from 'msw'
 import { userEvent, within, expect, waitFor } from '@storybook/test'
+import { TRPCError } from '@trpc/server'
 import {
   ActionType,
   tennisClubMembershipEvent,
   generateEventDocument,
   getCurrentEventState,
   footballClubMembershipEvent,
-  FullDocumentPath,
+  TestUserRole,
   UUID,
-  User
+  generateEventDraftDocument
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
-import { testDataGenerator } from '@client/tests/test-data-generators'
-import { wrapHandlersWithSpies } from '@client/tests/v2-events/declaration.utils'
 import { ReviewIndex } from '../events/actions/declare/Review'
 
-const generator = testDataGenerator()
-
-const declareEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
-})
+function getDeclareEventDocument(id: UUID) {
+  return generateEventDocument({
+    configuration: tennisClubMembershipEvent,
+    actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }],
+    defaults: {
+      id
+    }
+  })
+}
 
 const meta: Meta<typeof ReviewIndex> = {
-  title: 'Outbox/Interaction',
-  beforeEach: () => {
-    useEventFormData.setState({
-      formValues: getCurrentEventState(
-        declareEventDocument,
-        tennisClubMembershipEvent
-      ).declaration
-    })
-  }
+  title: 'Outbox/Interaction'
 }
 
 export default meta
 
 const OUTBOX_FREEZE_TIME = 5 * 1000 // 5 seconds
-
-const createdEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
-})
 
 type Story = StoryObj<typeof ReviewIndex>
 const tRPCMsw = createTRPCMsw<AppRouter>({
@@ -68,63 +55,42 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const declarationTrpcMsw = {
-  events: wrapHandlersWithSpies([
-    {
-      name: 'event.create',
-      procedure: tRPCMsw.event.create.mutation,
-      handler: () => createdEventDocument
-    },
-    {
-      name: 'event.actions.declare.request',
-      procedure: tRPCMsw.event.actions.declare.request.mutation,
-      handler: async () => {
-        await new Promise((resolve) => setTimeout(resolve, OUTBOX_FREEZE_TIME))
-        return declareEventDocument
-      }
-    }
-  ])
-}
+const successfulMutationEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [{ type: ActionType.CREATE }]
+})
 
-const mockUser = generator.user.fieldAgent().v2
-
-export const Outbox: Story = {
-  loaders: [
-    async () => {
-      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
-
-      // Ensure state is stable before seeding the mutation cache
-      await new Promise((resolve) => setTimeout(resolve, 50))
-    }
-  ],
+export const SuccessfulMutation: Story = {
   parameters: {
+    userRole: TestUserRole.Enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: createdEventDocument.id
+        eventId: successfulMutationEvent.id
       })
     },
     chromatic: { disableSnapshot: true },
     offline: {
-      events: [createdEventDocument],
+      drafts: [
+        generateEventDraftDocument({
+          eventId: successfulMutationEvent.id,
+          actionType: ActionType.DECLARE
+        })
+      ],
+      events: [successfulMutationEvent],
       configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
     },
     msw: {
       handlers: {
-        events: [...declarationTrpcMsw.events.handlers],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent().v1
-              }
-            })
+        events: [
+          tRPCMsw.event.create.mutation(() => {
+            return successfulMutationEvent
           }),
-          tRPCMsw.user.list.query(() => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query(() => {
-            return mockUser
+          tRPCMsw.event.actions.declare.request.mutation(async () => {
+            await new Promise((resolve) =>
+              setTimeout(resolve, OUTBOX_FREEZE_TIME)
+            )
+            return getDeclareEventDocument(successfulMutationEvent.id)
           })
         ]
       }
@@ -146,7 +112,7 @@ export const Outbox: Story = {
 
       const searchResult = await canvas.findByTestId('search-result')
       const { firstname, surname } = getCurrentEventState(
-        declareEventDocument,
+        getDeclareEventDocument(successfulMutationEvent.id),
         tennisClubMembershipEvent
       ).declaration['applicant.name'] as {
         firstname: string
@@ -163,6 +129,175 @@ export const Outbox: Story = {
         },
         { timeout: OUTBOX_FREEZE_TIME + 1000 } // Allow some buffer for the freeze time
       )
+
+      const outboxButton2 = await canvas.findByTestId(
+        'navigation_workqueue_outbox'
+      )
+      await expect(outboxButton2).toHaveTextContent(/^Outbox$/)
+    })
+  }
+}
+
+const failedMutationEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [{ type: ActionType.CREATE }]
+})
+
+export const FailedMutation: Story = {
+  parameters: {
+    userRole: TestUserRole.Enum.FIELD_AGENT,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: failedMutationEvent.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    offline: {
+      drafts: [
+        generateEventDraftDocument({
+          eventId: failedMutationEvent.id,
+          actionType: ActionType.DECLARE
+        })
+      ],
+      events: [failedMutationEvent],
+      configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.create.mutation(() => {
+            return failedMutationEvent
+          }),
+          tRPCMsw.event.actions.declare.request.mutation(async () => {
+            await new Promise((resolve) =>
+              setTimeout(resolve, OUTBOX_FREEZE_TIME)
+            )
+            throw new TRPCError({
+              code: 'INTERNAL_SERVER_ERROR'
+            })
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('Send for review', async () => {
+      const submitButton = await canvas.findByText('Send for review')
+      await userEvent.click(submitButton)
+      const confirmButton = await canvas.findByText('Confirm')
+      await userEvent.click(confirmButton)
+      const outboxButton = await canvas.findByTestId(
+        'navigation_workqueue_outbox'
+      )
+      await expect(outboxButton).toHaveTextContent(/^Outbox1$/)
+
+      await userEvent.click(outboxButton)
+
+      const searchResult = await canvas.findByTestId('search-result')
+      const { firstname, surname } = getCurrentEventState(
+        getDeclareEventDocument(failedMutationEvent.id),
+        tennisClubMembershipEvent
+      ).declaration['applicant.name'] as {
+        firstname: string
+        surname: string
+      }
+
+      await expect(searchResult).toHaveTextContent(`${firstname} ${surname}`)
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, OUTBOX_FREEZE_TIME + 1000)
+      ) // Allow some buffer for the freeze time
+
+      const outboxButton2 = await canvas.findByTestId(
+        'navigation_workqueue_outbox'
+      )
+      await expect(outboxButton2).toHaveTextContent(/^Outbox1$/)
+    })
+  }
+}
+
+const failedMutationConflictEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [{ type: ActionType.CREATE }]
+})
+
+export const FailedMutationConflict: Story = {
+  parameters: {
+    userRole: TestUserRole.Enum.FIELD_AGENT,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: failedMutationConflictEvent.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    offline: {
+      drafts: [
+        generateEventDraftDocument({
+          eventId: failedMutationConflictEvent.id,
+          actionType: ActionType.DECLARE
+        })
+      ],
+      events: [failedMutationConflictEvent],
+      configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.create.mutation(() => {
+            return failedMutationConflictEvent
+          }),
+          tRPCMsw.event.actions.declare.request.mutation(async () => {
+            await new Promise((resolve) =>
+              setTimeout(resolve, OUTBOX_FREEZE_TIME)
+            )
+            throw new TRPCError({
+              code: 'CONFLICT'
+            })
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('Send for review', async () => {
+      const submitButton = await canvas.findByText('Send for review')
+      await userEvent.click(submitButton)
+      const confirmButton = await canvas.findByText('Confirm')
+      await userEvent.click(confirmButton)
+      const outboxButton = await canvas.findByTestId(
+        'navigation_workqueue_outbox'
+      )
+      await expect(outboxButton).toHaveTextContent(/^Outbox1$/)
+
+      await userEvent.click(outboxButton)
+
+      const searchResult = await canvas.findByTestId('search-result')
+      const { firstname, surname } = getCurrentEventState(
+        getDeclareEventDocument(failedMutationConflictEvent.id),
+        tennisClubMembershipEvent
+      ).declaration['applicant.name'] as {
+        firstname: string
+        surname: string
+      }
+
+      await expect(searchResult).toHaveTextContent(`${firstname} ${surname}`)
+
+      await waitFor(
+        async () => {
+          await expect(searchResult).not.toHaveTextContent(
+            `${firstname} ${surname}`
+          )
+        },
+        { timeout: OUTBOX_FREEZE_TIME + 2000 } // Allow some buffer for the freeze time
+      )
+
+      await expect(
+        await canvas.findByText("You've been unassigned from the event")
+      ).toBeVisible()
 
       const outboxButton2 = await canvas.findByTestId(
         'navigation_workqueue_outbox'

@@ -25,10 +25,16 @@ import {
 import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
 import { EmailAddress } from '@client/views/Settings/items/EmailAddress'
 
+const settingsTitle = {
+  id: 'home.header.settingsTitle',
+  defaultMessage: 'Settings',
+  description: 'settings title'
+}
+
 export function SettingsPage() {
   const intl = useIntl()
   return (
-    <WorkqueueLayout>
+    <WorkqueueLayout title={intl.formatMessage(settingsTitle)}>
       <Content
         showTitleOnMobile={true}
         title={intl.formatMessage(messages.settingsTitle)}

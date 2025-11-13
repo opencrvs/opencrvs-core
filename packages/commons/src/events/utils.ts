@@ -52,9 +52,13 @@ import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
-import { SelectDateRangeValue } from './FieldValue'
-import { subDays } from 'date-fns'
-import { ConditionalType } from './Conditional'
+import { DateValue, SelectDateRangeValue } from './FieldValue'
+import { subDays, subYears, format } from 'date-fns'
+
+export function ageToDate(age: number, asOfDate: DateValue) {
+  const date = new Date(asOfDate)
+  return DateValue.parse(format(subYears(date, age), 'yyyy-MM-dd'))
+}
 
 function isDeclarationActionConfig(
   action: ActionConfig
@@ -161,12 +165,16 @@ export function getActionReviewFields(
   return getActionReview(configuration, actionType).fields
 }
 
-export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
+export function isPageVisible(
+  page: PageConfig,
+  formValues: ActionUpdate,
+  context: ValidatorContext
+) {
   if (!page.conditional) {
     return true
   }
 
-  return isConditionMet(page.conditional, formValues)
+  return isConditionMet(page.conditional, formValues, context)
 }
 
 /**
@@ -213,24 +221,23 @@ export function omitHiddenPaginatedFields(
   values: EventState,
   validatorContext: ValidatorContext
 ) {
-  // If a page has a conditional, we set it as one of the field's conditionals with ConditionalType.SHOW
-  const fields = formConfig.pages.flatMap((p) =>
-    p.fields.map((f) => {
-      if (!p.conditional) {
-        return f
-      }
+  const visibleFields = formConfig.pages
+    .filter((p) => isPageVisible(p, values, validatorContext))
+    .flatMap((p) => p.fields)
 
-      return {
-        ...f,
-        conditionals: [
-          ...(f.conditionals ?? []),
-          { type: ConditionalType.SHOW, conditional: p.conditional }
-        ]
-      }
-    })
+  const hiddenFields = formConfig.pages
+    .filter((p) => !isPageVisible(p, values, validatorContext))
+    .flatMap((p) => p.fields)
+
+  const valuesExceptHiddenPage = omitBy(values, (_, fieldId) => {
+    return hiddenFields.some((f) => f.id === fieldId)
+  })
+
+  return omitHiddenFields(
+    visibleFields,
+    valuesExceptHiddenPage,
+    validatorContext
   )
-
-  return omitHiddenFields(fields, values, validatorContext)
 }
 
 /**
@@ -289,11 +296,12 @@ export function isVerificationPage(
 
 export function getVisibleVerificationPageIds(
   pages: PageConfig[],
-  annotation: ActionUpdate
+  annotation: ActionUpdate,
+  context: ValidatorContext
 ): string[] {
   return pages
     .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, annotation))
+    .filter((page) => isPageVisible(page, annotation, context))
     .map((page) => page.id)
 }
 

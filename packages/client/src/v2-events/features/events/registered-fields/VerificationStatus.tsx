@@ -26,6 +26,8 @@ import {
   VerificationStatusValue
 } from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
+import { messages as idVerificationMessages } from '@client/i18n/messages/views/id-verification'
+import { buttonMessages } from '@client/i18n/messages'
 
 const StyledIcon = styled(Icon)`
   margin-right: 4px;
@@ -62,6 +64,14 @@ const ICON_FOR_STATUS = {
   pending: 'CircleWavyQuestion'
 } as const satisfies Record<string, keyof typeof SupportedIcons>
 
+const messages = {
+  verified: idVerificationMessages.verified,
+  authenticated: idVerificationMessages.authenticated,
+  failed: idVerificationMessages.failedFetchIdDetails,
+  pending: idVerificationMessages.failed,
+  actions: idVerificationMessages.actions
+}
+
 function Input({
   id,
   configuration,
@@ -75,6 +85,10 @@ function Input({
 }) {
   const intl = useIntl()
   const [modal, openModal] = useModal()
+  if (!value) {
+    return null
+  }
+
   const handleReset = async () => {
     const confirm = await openModal((close) => (
       <ResponsiveModal
@@ -88,7 +102,7 @@ function Input({
             type="tertiary"
             onClick={() => close(false)}
           >
-            {`TODO: Cancel`}
+            {intl.formatMessage(buttonMessages.cancel)}
           </Button>,
           <Button
             key="confirm-btn"
@@ -96,24 +110,20 @@ function Input({
             type="negative"
             onClick={() => close(true)}
           >
-            {`TODO: Continue`}
+            {intl.formatMessage(buttonMessages.continueButton)}
           </Button>
         ]}
         handleClose={() => close(false)}
         id="assignment"
         responsive={false}
-        title="@TODO: Title!"
+        title={intl.formatMessage(messages[value].resetConfirmation.title)}
       >
-        {`TODO: Description`}
+        {intl.formatMessage(messages[value].resetConfirmation.description)}
       </ResponsiveModal>
     ))
     if (confirm) {
       onReset()
     }
-  }
-
-  if (!value) {
-    return null
   }
 
   return (
@@ -149,8 +159,12 @@ function Input({
           {intl.formatMessage(configuration.description, { value })}
         </Text>
       </Banner.Body>
-      {/* TODO: Revoke button */}
-      <button style={{ display: 'none' }} onClick={handleReset} />
+      <Banner.Footer justifyContent="flex-end">
+        <Button type="secondary" onClick={handleReset}>
+          {intl.formatMessage(messages.actions.revoke)}
+        </Button>
+      </Banner.Footer>
+
       {modal}
     </Banner.Container>
   )

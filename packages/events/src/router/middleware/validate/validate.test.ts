@@ -21,7 +21,7 @@ import { getFieldErrors } from './index'
 export const testContext = {
   user: {
     sub: 'user_12345',
-    scope: ['declare'],
+    scope: [],
     role: TestUserRole.Enum.LOCAL_REGISTRAR,
     exp: '1678890000',
     algorithm: 'RS256',

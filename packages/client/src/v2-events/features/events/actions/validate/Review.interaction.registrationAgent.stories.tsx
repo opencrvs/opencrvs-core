@@ -31,7 +31,7 @@ const generator = testDataGenerator()
 
 const declareEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
 })
 
 const tRPCMsw = createTRPCMsw<AppRouter>({

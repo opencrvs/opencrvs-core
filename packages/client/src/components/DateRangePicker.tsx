@@ -497,16 +497,21 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           </LabelContainer>
           <NavigatorContainer>
             <CircleButton
+              data-testid={`${id}-prev`}
               id={`${id}-prev`}
               onClick={() => onNavigateDate(subYears(date, 1))}
             >
               <ChevronLeft />
             </CircleButton>
-            <YearLabelContainer id={`${id}-year-label`}>
+            <YearLabelContainer
+              id={`${id}-year-label`}
+              data-testid={`${id}-year-label`}
+            >
               {format(date, 'yyyy')}
             </YearLabelContainer>
             <CircleButton
               id={`${id}-next`}
+              data-testid={`${id}-next`}
               onClick={() => {
                 const nextDate = addYears(date, 1)
                 const finalDateNavigateTo = isAfter(nextDate, todaysDate)
@@ -526,6 +531,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
             return (
               <MonthButton
                 id={`${id}-${month.toLowerCase()}`}
+                data-testid={`${id}-${month.toLowerCase()}`}
                 key={index}
                 disabled={
                   (minDate && isBefore(monthDate, minDate)) ||
@@ -590,6 +596,9 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
       isSameMonth(endDateFromProps, item.endDate)
   )
 
+  // Mobile view: "From" and "To" dates are selected separately.
+  // On desktop, both dates are picked together, but on mobile the "To" date
+  // is chosen only after selecting the "From" date.
   const routes: ROUTES = {
     [PRESET]: {
       renderComponent: () => (
@@ -643,7 +652,9 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
             setModalVisible(false)
             props.closeModalFromHOC && props.closeModalFromHOC()
           }}
-          minDate={addDays(startDate, 1)}
+          // If the user picked August 2025 as the start month, then the earliest month allowed for the “To” date should also be August 2025.
+          // To include that same month in the picker, we set minDate to one day before the start date.
+          minDate={subDays(startDate, 1)}
           maxDate={todaysDate}
           hideSelectedMonthOnLabel
         />
@@ -702,14 +713,19 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                   }}
                 />
               )}
+              {/* Desktop view for date range picker */}
+              {/* From date */}
               <MonthSelector
                 date={startDateNav}
                 onNavigateDate={setStartDateNav}
                 label={intl.formatMessage(constantsMessages.from)}
                 selectedDate={startDate}
                 onSelectDate={setStartDate}
-                maxDate={subDays(endDate, 1)}
+                // If the user picked August 2025 as the end month, then the latest month allowed for the “From” date should also be August 2025.
+                // To include that same month in the picker, we set maxDate to the same day as the end date.
+                maxDate={endDate}
               />
+              {/* To date */}
               <MonthSelector
                 date={endDateNav}
                 onNavigateDate={setEndDateNav}
@@ -717,6 +733,9 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 selectedDate={endDate}
                 onSelectDate={setEndDate}
                 maxDate={todaysDate}
+                // If the user picked August 2025 as the start month, then the earliest month allowed for the “To” date should also be August 2025.
+                // To include that same month in the picker, we set minDate to one day before the start date.
+                minDate={subDays(startDate, 1)}
               />
             </ModalBody>
             <ModalBodyMobile id="picker-modal-mobile">

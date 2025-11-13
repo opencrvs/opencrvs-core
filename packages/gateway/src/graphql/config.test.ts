@@ -163,7 +163,7 @@ describe('Test apollo server config', () => {
   it('throws authentication error when the token holder has different scope', async () => {
     const userWithDifferentScope = cloneDeep(mockUser)
     userWithDifferentScope.status = 'active'
-    userWithDifferentScope.scope = ['declare']
+    userWithDifferentScope.scope = []
 
     fetch.mockResponseOnce(JSON.stringify(userWithDifferentScope), {
       status: 200

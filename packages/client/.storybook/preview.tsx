@@ -22,6 +22,7 @@ import { useApolloClient } from '@client/utils/apolloClient'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { Provider, useSelector } from 'react-redux'
+import { clear } from 'idb-keyval'
 import {
   createMemoryRouter,
   Outlet,
@@ -139,7 +140,26 @@ export const parameters = {
   layout: 'fullscreen',
   mockingDate: new Date(2025, 7, 12),
   msw: {
-    handlers: handlers
+    handlers
+  },
+  viewport: {
+    viewports: {
+      mobile: {
+        name: 'Mobile',
+        styles: {
+          width: '375px',
+          height: '667px'
+        }
+      },
+      tablet: {
+        name: 'Tablet',
+        styles: {
+          width: '768px',
+          height: '1024px'
+        }
+      }
+    },
+    defaultViewport: 'responsive'
   }
 }
 
@@ -148,11 +168,8 @@ const generator = testDataGenerator()
 /*
  * Clear all indexedDB databases before each story
  */
-async function clearStorage() {
-  const databases = await window.indexedDB.databases()
-  for (const db of databases) {
-    window.indexedDB.deleteDatabase(db.name!)
-  }
+export async function clearStorage() {
+  clear()
 }
 
 clearStorage()
