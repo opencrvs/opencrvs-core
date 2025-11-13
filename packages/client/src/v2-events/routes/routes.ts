@@ -118,6 +118,9 @@ export const ROUTES = {
           REVIEW_CORRECTION: correctionReviewRoutes
         }
       ),
+      DASHBOARD: route('performance/dashboard/:id', {
+        params: { id: string().defined() }
+      }),
       WORKQUEUES: workqueueRoutes,
       ADVANCED_SEARCH: route('advanced-search'),
       SEARCH_RESULT: route('search-result/:eventType', {

@@ -415,7 +415,8 @@ const declaration = {
   'applicant.region': 'Dhaka',
   'applicant.address': {
     country: 'Bangladesh',
-    addressType: 'DOMESTIC'
+    addressType: 'DOMESTIC',
+    administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a'
   },
   'applicant.documents': [
     {
@@ -494,7 +495,7 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         ...(await canvas.findAllByRole('checkbox')),
         ...(await canvas.findAllByRole('radio'))
       ]
-      await expect(formFields).toHaveLength(31)
+      await expect(formFields).toHaveLength(32)
       for (const f of formFields) {
         await expect(f).toBeDisabled()
       }
@@ -544,7 +545,7 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         ...(await canvas.findAllByRole('checkbox')),
         ...(await canvas.findAllByRole('radio'))
       ]
-      await expect(formFields).toHaveLength(30)
+      await expect(formFields).toHaveLength(31)
 
       for (const f of formFields) {
         await expect(f).not.toBeDisabled()
@@ -608,7 +609,7 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
         ...(await canvas.findAllByRole('checkbox')),
         ...(await canvas.findAllByRole('radio'))
       ]
-      await expect(formFields).toHaveLength(30)
+      await expect(formFields).toHaveLength(31)
       for (const f of formFields) {
         const fieldToAvoid =
           f.getAttribute('data-testid') === 'number__applicant____age'
@@ -630,7 +631,7 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
         ...(await canvas.findAllByRole('checkbox')),
         ...(await canvas.findAllByRole('radio'))
       ]
-      await expect(formFields).toHaveLength(30)
+      await expect(formFields).toHaveLength(31)
       for (const f of formFields) {
         await expect(f).not.toBeDisabled()
       }
@@ -648,7 +649,7 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
         ...(await canvas.findAllByRole('radio'))
       ]
 
-      await expect(formFields).toHaveLength(30)
+      await expect(formFields).toHaveLength(31)
       for (const f of formFields) {
         const fieldToAvoid =
           f.getAttribute('data-testid') === 'number__applicant____age'
