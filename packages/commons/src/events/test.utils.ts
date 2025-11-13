@@ -19,7 +19,8 @@ import {
   ActionStatus,
   EventState,
   PrintCertificateAction,
-  DuplicateDetectedAction
+  DuplicateDetectedAction,
+  ActionUpdate
 } from './ActionDocument'
 import {
   ApproveCorrectionActionInput,
@@ -209,7 +210,9 @@ function mapFieldTypeToMockValue(
           residentialArea: 'Example Residential Area',
           street: 'Example Street',
           number: '55',
-          zipCode: '123456'
+          zipCode: '123456',
+          state: 'Example State',
+          district2: 'Example District 2'
         }
       }
     case FieldType.DATE:
@@ -257,7 +260,7 @@ function mapFieldTypeToMockValue(
 export function fieldConfigsToActionPayload(
   fields: FieldConfig[],
   rng: () => number
-): EventState {
+): ActionUpdate {
   return fields.reduce(
     (acc, field, i) => ({
       ...acc,
@@ -271,8 +274,8 @@ export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType,
   rng: () => number,
-  overrides?: Partial<EventState>
-): EventState {
+  overrides?: ActionUpdate
+): ActionUpdate {
   const parsed = DeclarationUpdateActions.safeParse(action)
 
   if (isEmpty(overrides) && typeof overrides === 'object') {
@@ -785,7 +788,7 @@ export function generateActionDocument<T extends ActionType>({
   action: T
   rng?: () => number
   defaults?: Partial<Extract<ActionDocument, { type: T }>>
-  declarationOverrides?: Partial<EventState>
+  declarationOverrides?: ActionUpdate
 }): ActionDocument {
   const actionBase = {
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
@@ -912,7 +915,7 @@ export function generateEventDocument({
     /**
      * Overrides for default event state per action
      */
-    declarationOverrides?: Partial<EventState>
+    declarationOverrides?: ActionUpdate
     user?: Partial<{
       signature: string
       primaryOfficeId: UUID
@@ -970,8 +973,8 @@ export function generateEventDraftDocument({
   eventId: UUID
   actionType: ActionType
   rng?: () => number
-  declaration?: EventState
-  annotation?: EventState
+  declaration?: ActionUpdate
+  annotation?: ActionUpdate
 }): Draft {
   const action = generateActionDocument({
     configuration: tennisClubMembershipEvent,

@@ -8,12 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { uniq, isString, get, uniqBy, mergeWith } from 'lodash'
+import { uniq, isString, get, mergeWith } from 'lodash'
 import { v4 as uuid } from 'uuid'
 import {
-  User,
   ActionDocument,
-  EventConfig,
   EventIndex,
   FieldValue,
   FieldType,
@@ -22,7 +20,6 @@ import {
   mapFieldTypeToZod,
   isFieldValueWithoutTemplates,
   compositeFieldTypes,
-  getDeclarationFields,
   SystemVariables,
   Scope,
   ActionScopes,
@@ -31,7 +28,10 @@ import {
   UUID,
   SystemRole,
   Location,
-  UserOrSystem
+  UserOrSystem,
+  InteractiveFieldType,
+  FieldConfig,
+  TextField
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -96,6 +96,10 @@ export function createTemporaryId() {
   return `tmp-${uuid()}` as UUID
 }
 
+function isTextField(field: FieldConfig): field is TextField {
+  return field.type === FieldType.TEXT
+}
+
 /**
  *
  * @param fieldType: The type of the field.
@@ -106,12 +110,12 @@ export function createTemporaryId() {
  * @returns Resolves template variables in the default value and returns the resolved value.
  */
 export function replacePlaceholders({
-  fieldType,
+  field,
   currentValue,
   defaultValue,
   systemVariables
 }: {
-  fieldType: FieldType
+  field: InteractiveFieldType
   currentValue?: FieldValue
   defaultValue?: FieldConfigDefaultValue
   systemVariables: SystemVariables
@@ -130,7 +134,7 @@ export function replacePlaceholders({
 
   if (isTemplateVariable(defaultValue)) {
     const resolvedValue = get(systemVariables, defaultValue)
-    const validator = mapFieldTypeToZod(fieldType)
+    const validator = mapFieldTypeToZod(field)
 
     const parsedValue = validator.safeParse(resolvedValue)
 
@@ -142,7 +146,7 @@ export function replacePlaceholders({
   }
 
   if (
-    compositeFieldTypes.some((ft) => ft === fieldType) &&
+    compositeFieldTypes.some((ft) => ft === field.type) &&
     typeof defaultValue === 'object'
   ) {
     /**
@@ -153,10 +157,10 @@ export function replacePlaceholders({
 
     // @TODO: This resolves template variables in the first level of the object. In the future, we might need to extend it to arbitrary depth.
     for (const [key, val] of Object.entries(result)) {
-      if (isTemplateVariable(val)) {
+      if (isTemplateVariable(val) && isTextField(field)) {
         const resolvedValue = get(systemVariables, val)
         // For now, we only support resolving template variables for text fields.
-        const validator = mapFieldTypeToZod(FieldType.TEXT)
+        const validator = mapFieldTypeToZod(field)
         const parsedValue = validator.safeParse(resolvedValue)
         if (parsedValue.success && parsedValue.data) {
           result[key] = resolvedValue
@@ -166,19 +170,19 @@ export function replacePlaceholders({
       }
     }
 
-    const resultValidator = mapFieldTypeToZod(fieldType)
+    const resultValidator = mapFieldTypeToZod(field)
     const parsedResult = resultValidator.safeParse(result)
     if (parsedResult.success) {
       return result as FieldValue
     }
     throw new Error(
-      `Could not resolve ${fieldType}: ${JSON.stringify(
+      `Could not resolve ${field.type}: ${JSON.stringify(
         defaultValue
       )}. Error: ${parsedResult.error}`
     )
   }
   throw new Error(
-    `Could not resolve ${fieldType}: ${JSON.stringify(defaultValue)}`
+    `Could not resolve ${field.type}: ${JSON.stringify(defaultValue)}`
   )
 }
 
