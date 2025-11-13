@@ -12,7 +12,7 @@ import { omit } from 'lodash'
 import { EventDocument, getUUID, TokenWithBearer } from '@opencrvs/commons'
 import { upsertEventWithActions } from '@events/storage/postgres/events/import'
 import { getInMemoryEventConfigurations } from '../config/config'
-import { indexEventsInBulk } from '../indexing/indexing'
+import { indexEventsInBulk, type BulkResponse } from '../indexing/indexing'
 
 function mapEventActions(actions: EventDocument['actions']) {
   return actions.map(({ type, ...action }) => ({
@@ -38,7 +38,7 @@ function mapEventActions(actions: EventDocument['actions']) {
 export async function bulkImportEvents(
   events: EventDocument[],
   token: TokenWithBearer
-) {
+): Promise<BulkResponse> {
   const toIndex = []
 
   const eventConfigs = await getInMemoryEventConfigurations(token)
