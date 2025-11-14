@@ -53,7 +53,7 @@ function createSpy<Args extends unknown[], Result>(
  *
  * @returns handlers with spy methods
  */
-export function wrapHandlersWithSpies<
+function wrapHandlersWithSpies<
   Handlers extends {
     name: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

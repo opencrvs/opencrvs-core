@@ -222,6 +222,7 @@ const SearchResponse = HttpFieldValue.extend({
 
 function SearchInput({
   onChange,
+  form,
   configuration,
   value
 }: Omit<Props, 'configuration'> & {
@@ -311,11 +312,9 @@ function SearchInput({
         color: 'red'
       }
     }
-    if (!httpState?.error && httpState?.data) {
+    if (!httpState?.error && httpState?.data && 'total' in httpState.data) {
       const total =
-        'total' in httpState.data && typeof httpState.data.total === 'number'
-          ? httpState.data.total
-          : 0
+        typeof httpState.data.total === 'number' ? httpState.data.total : 0
 
       if (total > 0) {
         return {
@@ -341,7 +340,7 @@ function SearchInput({
   const { message, color = 'grey600' } = getMessages()
 
   const isEditable =
-    !httpState || !!httpState.error || httpState.data?.total == 0
+    !httpState || !!httpState.error || !((httpState.data?.total ?? 0) > 0)
 
   return (
     <Stack alignItems="flex-start" direction="column" gap={8}>
@@ -378,6 +377,7 @@ function SearchInput({
               offset: configuration.offset
             }
           }}
+          form={form}
           parentValue={buttonPressed}
           onChange={onHTTPChange}
         />

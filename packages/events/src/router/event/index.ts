@@ -344,7 +344,7 @@ export const eventRouter = router({
       }
     })
     .input(z.array(EventDocument))
-    .output(z.void())
+    .output(z.any())
     .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token)),
   reindex: systemProcedure
     .input(z.void())

@@ -18,7 +18,8 @@ import {
   getUUID,
   SCOPES,
   TENNIS_CLUB_MEMBERSHIP,
-  createPrng
+  createPrng,
+  AddressType
 } from '@opencrvs/commons'
 import {
   createSystemTestClient,
@@ -124,7 +125,10 @@ describe('event.actions.notify', () => {
       transactionId: getUUID(),
       annotation: {},
       declaration: {
-        'applicant.name': { firstname: 999999, surname: '999999' }
+        'applicant.name': {
+          firstname: 999999,
+          surname: '999999'
+        }
       }
     }
 
@@ -357,5 +361,83 @@ describe('event.actions.notify', () => {
         annotation: {}
       })
     ).rejects.toMatchSnapshot()
+  })
+
+  test('Can not create a record with partial address when addressType is missing', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+
+    await expect(
+      client.event.actions.notify.request({
+        eventId: event.id,
+        transactionId: generateUuid(),
+        type: 'NOTIFY',
+        declaration: {
+          'applicant.address': {
+            country: 'FAR'
+          }
+        },
+        annotation: {}
+      })
+    ).rejects.toMatchSnapshot()
+  })
+
+  test('Can create a record with partial address', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+
+    const response = await client.event.actions.notify.request({
+      eventId: event.id,
+      transactionId: generateUuid(),
+      type: 'NOTIFY',
+      declaration: {
+        'applicant.address': {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC
+        }
+      },
+      annotation: {}
+    })
+
+    const activeActions = getAcceptedActions(response)
+    expect(
+      activeActions.find((action) => action.type === ActionType.NOTIFY)
+        ?.declaration
+    ).toMatchSnapshot()
+
+    expect(
+      activeActions.find((action) => action.type === ActionType.UNASSIGN)
+    ).toBeDefined()
+  })
+
+  test('Can create a record with mixed address', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+
+    const response = await client.event.actions.notify.request({
+      eventId: event.id,
+      transactionId: generateUuid(),
+      type: 'NOTIFY',
+      declaration: {
+        'applicant.address': {
+          country: 'FAR',
+          addressType: AddressType.INTERNATIONAL,
+          administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a' // it goes away when AddressFieldValue parses it
+        }
+      },
+      annotation: {}
+    })
+    const activeActions = getAcceptedActions(response)
+    expect(
+      activeActions.find((action) => action.type === ActionType.NOTIFY)
+        ?.declaration
+    ).toMatchSnapshot()
+
+    expect(
+      activeActions.find((action) => action.type === ActionType.UNASSIGN)
+    ).toBeDefined()
   })
 })
