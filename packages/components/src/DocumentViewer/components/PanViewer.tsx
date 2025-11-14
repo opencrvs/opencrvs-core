@@ -42,6 +42,19 @@ const PanViewer: React.FC<IProps> = ({ image, zoom, rotation }) => {
   const [dx] = useState(0)
   const [dy] = useState(0)
 
+  const isPdf = image.toLowerCase().endsWith('.pdf')
+
+  React.useEffect(() => {
+    if (isPdf) {
+      fetch(image)
+        .then((res) => res.blob())
+        .then((blob) => {
+          const blobUrl = URL.createObjectURL(blob)
+          window.open(blobUrl, '_blank')
+        })
+    }
+  }, [image, isPdf])
+
   return (
     <React.Fragment>
       <StyledReactPanZoom
@@ -51,11 +64,17 @@ const PanViewer: React.FC<IProps> = ({ image, zoom, rotation }) => {
         rotation={rotation}
         key={dx}
       >
-        <img
-          src={image}
-          alt="Supporting Document"
-          style={{ transform: `rotate(${rotation}deg)` }}
-        />
+        {!isPdf ? (
+          <img
+            src={image}
+            alt="Supporting Document"
+            style={{ transform: `rotate(${rotation}deg)` }}
+          />
+        ) : (
+          <div style={{ color: '#999', fontSize: '14px' }}>
+            PDF opened in a new tab
+          </div>
+        )}
       </StyledReactPanZoom>
     </React.Fragment>
   )
