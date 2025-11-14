@@ -37,7 +37,10 @@ export const ActionConfigBase = z.object({
     .array(ActionFlagConfig)
     .optional()
     .default([])
-    .describe('Flag actions which are executed when the action is performed.')
+    .describe('Flag actions which are executed when the action is performed.'),
+  auditHistoryLabel: TranslationConfig.describe(
+    'The label to show in audit history for this action. For example "Approved".'
+  ).optional()
 })
 
 const DeclarationActionBase = ActionConfigBase.extend({
@@ -132,9 +135,6 @@ const CustomActionConfig = ActionConfigBase.merge(
       ),
     confirmationText: TranslationConfig.describe(
       'Text displayed on the confirmation'
-    ),
-    auditHistoryLabel: TranslationConfig.describe(
-      'The label to show in audit history for this action. For example "Approved".'
     )
   })
 )
