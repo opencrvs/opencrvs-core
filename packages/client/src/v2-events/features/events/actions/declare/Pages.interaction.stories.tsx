@@ -404,11 +404,11 @@ export const CanSubmitValidlyFilledForm: Story = {
       await userEvent.click(country)
       await selectEvent.select(country, 'Bangladesh')
 
-      const province = await canvas.findByTestId('location__province')
+      const province = await canvas.findByLabelText(/Province/i)
       await userEvent.click(province)
       await selectEvent.select(province, 'Central')
 
-      const district = await canvas.findByTestId('location__district')
+      const district = await canvas.findByLabelText(/District/i)
       await userEvent.click(district)
       await selectEvent.select(district, 'Ibombo')
 
