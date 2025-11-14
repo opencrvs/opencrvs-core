@@ -180,6 +180,7 @@ function mapFieldTypeToElasticsearch(
           option: { type: 'keyword' }
         }
       }
+    case FieldType.SEARCH:
     case FieldType.ID_READER:
     case FieldType.QR_READER:
     case FieldType.HTTP:
@@ -331,6 +332,7 @@ type _Combine<
 
 type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
+export type BulkResponse = estypes.BulkResponse
 
 export async function indexEventsInBulk(
   batch: EventDocument[],

@@ -36,7 +36,7 @@ export const NavigationHistoryProvider = ({ children }: PropsWithChildren) => {
   )
 }
 
-function useNavigationHistory() {
+export function useNavigationHistory() {
   return useContext(NavigationContext)
 }
 

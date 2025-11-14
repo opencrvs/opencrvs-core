@@ -294,7 +294,12 @@ const userSchema = new Schema({
   username: { type: String, required: true },
   identifiers: [IdentifierSchema],
   email: { type: String },
-  emailForNotification: { type: String, unique: true, sparse: true },
+  emailForNotification: {
+    type: String,
+    unique: true,
+    sparse: true,
+    lowercase: true
+  },
   mobile: { type: String, unique: true, sparse: true },
   fullHonorificName: { type: String },
   passwordHash: { type: String, required: true },

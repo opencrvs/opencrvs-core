@@ -11,7 +11,7 @@
 import { getTokenPayload } from '@metrics/utils/authUtils'
 
 const token =
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NDE1NzY5NjUsImV4cCI6MTU3MzExMjk2NSwiYXVkIjoiIiwic3ViIjoiMSIsInNjb3BlIjoiWydwZXJmb3JtYW5jZSddIn0.huK3iFFi01xkwHvQZQAOnScrz0rJ50EsxpZA3a1Ynao'
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NDE1NzY5NjUsImV4cCI6MTU3MzExMjk2NSwiYXVkIjoiIiwic3ViIjoiMSIsInNjb3BlIjoiW10ifQ.lVMrmq_kSt1XyjUx52iMaSHDMO0VeMIz0QbzEeEUcPo'
 
 describe('authUtils', () => {
   it('getTokenPayload should return the right payload', () => {
@@ -21,7 +21,7 @@ describe('authUtils', () => {
       exp: 1573112965,
       aud: '',
       sub: '1',
-      scope: "['performance']"
+      scope: '[]'
     }
     expect(getTokenPayload(token)).toEqual(response)
   })

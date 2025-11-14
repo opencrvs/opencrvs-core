@@ -54,7 +54,6 @@ import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
 import { DateValue, SelectDateRangeValue } from './FieldValue'
 import { subDays, subYears, format } from 'date-fns'
-import { ConditionalType } from './Conditional'
 
 export function ageToDate(age: number, asOfDate: DateValue) {
   const date = new Date(asOfDate)
@@ -217,29 +216,28 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
   return fn(base)
 }
 
-export function omitHiddenPaginatedFields(
+export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>(
   formConfig: FormConfig,
-  values: EventState,
+  values: T,
   validatorContext: ValidatorContext
 ) {
-  // If a page has a conditional, we set it as one of the field's conditionals with ConditionalType.SHOW
-  const fields = formConfig.pages.flatMap((p) =>
-    p.fields.map((f) => {
-      if (!p.conditional) {
-        return f
-      }
+  const visibleFields = formConfig.pages
+    .filter((p) => isPageVisible(p, values, validatorContext))
+    .flatMap((p) => p.fields)
 
-      return {
-        ...f,
-        conditionals: [
-          ...(f.conditionals ?? []),
-          { type: ConditionalType.SHOW, conditional: p.conditional }
-        ]
-      }
-    })
+  const hiddenFields = formConfig.pages
+    .filter((p) => !isPageVisible(p, values, validatorContext))
+    .flatMap((p) => p.fields)
+
+  const valuesExceptHiddenPage = omitBy(values, (_, fieldId) => {
+    return hiddenFields.some((f) => f.id === fieldId)
+  })
+
+  return omitHiddenFields(
+    visibleFields,
+    valuesExceptHiddenPage,
+    validatorContext
   )
-
-  return omitHiddenFields(fields, values, validatorContext)
 }
 
 /**
@@ -317,7 +315,7 @@ export function omitHiddenAnnotationFields(
 
   return omitHiddenFields(
     annotationFields,
-    { ...declaration, ...annotation },
+    { ...declaration, ...annotation } satisfies ActionUpdate,
     context
   )
 }
@@ -507,10 +505,10 @@ export function getPendingAction(actions: Action[]): ActionDocument {
 }
 
 export function getCompleteActionAnnotation(
-  annotation: EventState,
+  annotation: ActionUpdate,
   event: EventDocument,
   action: ActionDocument
-): EventState {
+): ActionUpdate {
   /*
    * When an action has an `originalActionId`, it means this action is linked
    * to another one (the "original" action).
@@ -538,11 +536,9 @@ export function getCompleteActionAnnotation(
   return deepMerge(annotation, action.annotation ?? {})
 }
 
-export function getCompleteActionDeclaration(
-  declaration: EventState,
-  event: EventDocument,
-  action: ActionDocument
-): EventState {
+export function getCompleteActionDeclaration<
+  T extends EventState | ActionUpdate
+>(declaration: T, event: EventDocument, action: ActionDocument): T {
   /*
    * When an action has an `originalActionId`, it means this action is linked
    * to another one (the "original" action).

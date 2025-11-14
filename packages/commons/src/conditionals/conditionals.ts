@@ -65,7 +65,7 @@ export type EventConditionalParameters = CommonConditionalParameters & {
 
 export type FormConditionalParameters = CommonConditionalParameters & {
   $form: EventState | Record<string, unknown>
-  $locations?: Array<{ id: UUID }>
+  $leafAdminStructureLocationIds?: Array<{ id: UUID }>
 }
 
 export type ConditionalParameters =
@@ -394,6 +394,12 @@ export function createFieldConditionals(fieldId: string) {
         $$subfield: fieldPath.split('.')
       }
     },
+    getByPath(fieldPath: string[]) {
+      return {
+        ...this,
+        $$subfield: fieldPath
+      }
+    },
     asDob() {
       return this.get('dob')
     },
@@ -587,23 +593,36 @@ export function createFieldConditionals(fieldId: string) {
       })
     },
     isValidAdministrativeLeafLevel() {
+      const baseCondition = {
+        type: 'object',
+        properties: {
+          administrativeArea: {
+            type: 'string',
+            isLeafLevelLocation: true
+          }
+        },
+        description:
+          'The provided administrative value should have a value corresponding to the required lowest administrative level when addressType is DOMESTIC'
+      }
+
+      const conditional = {
+        if: {
+          type: 'object',
+          properties: {
+            addressType: { const: 'DOMESTIC' }
+          }
+        },
+        then: {
+          ...baseCondition,
+          required: ['administrativeArea']
+        },
+        else: baseCondition
+      }
+
       return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: wrapToPath(
-            {
-              type: 'object',
-              properties: {
-                administrativeArea: {
-                  type: 'string',
-                  isLeafLevelLocation: true
-                }
-              },
-              description:
-                'The provided administrative value should have a value corresponding to the required lowest administrative level'
-            },
-            this.$$subfield
-          )
+          [fieldId]: wrapToPath(conditional, this.$$subfield)
         }
       })
     },

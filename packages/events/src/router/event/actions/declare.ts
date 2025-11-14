@@ -100,8 +100,8 @@ export function declareActionProcedures() {
               type: ActionType.DUPLICATE_DETECTED,
               transactionId: input.transactionId,
               eventId: input.eventId,
-              declaration: input.declaration,
-              annotation: input.annotation,
+              declaration: {},
+              annotation: {},
               content: {
                 duplicates: duplicates.map(({ event: { id, trackingId } }) => ({
                   id,

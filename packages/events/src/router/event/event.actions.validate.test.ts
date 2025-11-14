@@ -22,7 +22,8 @@ import {
   generateActionDuplicateDeclarationInput,
   getCurrentEventState,
   getUUID,
-  NameFieldValue
+  NameFieldValue,
+  ActionUpdate
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -122,15 +123,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
         firstname: 'John',
         surname: 'Doe'
       },
-      'recommender.none': true,
-      'applicant.address': {
-        country: 'FAR',
-        addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
-      }
+      'recommender.none': true
     }
   })
 
@@ -170,12 +163,12 @@ test('Skips required field validation when they are conditionally hidden', async
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        state: 'State',
+        district2: 'District2'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const declaration = generator.event.actions.validate(event.id, {
     declaration: form
@@ -226,12 +219,12 @@ test('Prevents adding birth date in future', async () => {
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        state: 'State',
+        district2: 'District2'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   await expect(
     client.event.actions.validate.request(

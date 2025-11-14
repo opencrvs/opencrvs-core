@@ -24,7 +24,6 @@ import {
   ActionType,
   EventConfig,
   EventDocument,
-  getAcceptedActions,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
@@ -36,9 +35,10 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import {
-  expandWithUpdateActions,
+  expandWithClientSpecificActions,
   EventHistoryActionDocument,
-  useActionForHistory
+  useActionForHistory,
+  extractHistoryActions
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import {
@@ -344,17 +344,18 @@ export function EventHistory({
   const { getActionTypeForHistory } = useActionForHistory()
   const { getActionCreator } = useActionCreator()
 
-  const history = getAcceptedActions(fullEvent)
+  const history = extractHistoryActions(fullEvent)
 
-  const historyWithUpdatedActions = expandWithUpdateActions(
+  const historyWithClientSpecificActions = expandWithClientSpecificActions(
     fullEvent,
     validatorContext,
     eventConfiguration
   )
 
-  const visibleHistoryWithUpdatedActions = historyWithUpdatedActions.filter(
-    ({ type }) => type !== ActionType.CREATE
-  )
+  const visibleHistoryWithClientSpecificActions =
+    historyWithClientSpecificActions.filter(
+      ({ type }) => type !== ActionType.CREATE
+    )
 
   const onHistoryRowClick = (
     action: EventHistoryActionDocument,
@@ -371,11 +372,11 @@ export function EventHistory({
     ))
   }
 
-  const historyRows = visibleHistoryWithUpdatedActions
+  const historyRows = visibleHistoryWithClientSpecificActions
     .map((x) => {
       if (x.type === ActionType.REQUEST_CORRECTION) {
         const immediateApprovedCorrection =
-          visibleHistoryWithUpdatedActions.find(
+          visibleHistoryWithClientSpecificActions.find(
             (h) =>
               h.type === ActionType.APPROVE_CORRECTION &&
               (h.requestId === x.id || h.requestId === x.originalActionId) &&
@@ -418,7 +419,8 @@ export function EventHistory({
             onClick={() => onHistoryRowClick(action, actionCreatorName)}
           >
             {intl.formatMessage(eventHistoryStatusMessage, {
-              status: getActionTypeForHistory(history, action)
+              action: getActionTypeForHistory(history, action),
+              status: action.status
             })}
           </Link>
         ),
@@ -478,12 +480,12 @@ export function EventHistory({
           noResultText=""
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
         />
-        {visibleHistoryWithUpdatedActions.length >
+        {visibleHistoryWithClientSpecificActions.length >
           DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
           <Pagination
             currentPage={currentPageNumber}
             totalPages={Math.ceil(
-              visibleHistoryWithUpdatedActions.length /
+              visibleHistoryWithClientSpecificActions.length /
                 DEFAULT_HISTORY_RECORD_PAGE_SIZE
             )}
             onPageChange={(page) => setCurrentPageNumber(page)}
