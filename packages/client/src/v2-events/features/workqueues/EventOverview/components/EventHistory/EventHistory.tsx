@@ -21,8 +21,7 @@ import { Table } from '@opencrvs/components/lib/Table'
 import {
   ActionType,
   EventDocument,
-  getActionConfig,
-  ValidatorContext
+  getActionConfig
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
