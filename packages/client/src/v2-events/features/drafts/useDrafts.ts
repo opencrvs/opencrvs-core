@@ -238,6 +238,7 @@ export function useDrafts() {
         status: localDraft.action.status
       })
     },
+    isLocalDraftSubmitted: createDraft.isSuccess,
     getAllRemoteDrafts,
     getRemoteDraftByEventId: function useDraftList(
       eventId: string,
