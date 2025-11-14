@@ -1,6 +1,14 @@
 # Changelog
 
-## 1.9.1 Release Candidate
+## 2.0.0 Release Candidate
+
+### New features
+
+#### HTTP Input
+
+HTTP input now accepts `field('..')` references in the HTTP body definition.
+
+## 1.9.1
 
 ### Breaking changes
 

@@ -1174,6 +1174,19 @@ describe('"event" conditionals', () => {
 
 describe('"valid name" conditionals', () => {
   describe('Valid names', () => {
+    it('should pass for empty string', () => {
+      const validName = ''
+      const params = {
+        $form: { 'child.firstName': validName },
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $locations: [],
+        $online: false
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
+    })
+
     it('should pass for a single-word name', () => {
       const validName = 'John'
       const params = {
@@ -1729,7 +1742,7 @@ describe('Subfield nesting', () => {
           $online: false
         }
       )
-    ).toBe(false)
+    ).toBe(true)
     expect(
       validate(
         or(
@@ -1763,7 +1776,7 @@ describe('Subfield nesting', () => {
           $online: false
         }
       )
-    ).toBe(false)
+    ).toBe(true)
     expect(
       validate(
         and(
