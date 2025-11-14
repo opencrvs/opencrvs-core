@@ -26884,6 +26884,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - confirmationText
@@ -26891,6 +26895,7 @@ components:
         - type
         - customActionType
         - form
+        - auditHistoryLabel
       additionalProperties: false
     error.UNAUTHORIZED:
       title: Authorization not provided error (401)
