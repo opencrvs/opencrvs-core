@@ -15372,6 +15372,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: READ
@@ -22886,6 +22890,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         deduplication:
           type: object
           properties:
@@ -23079,6 +23087,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         deduplication:
           type: object
           properties:
@@ -23134,6 +23146,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: REJECT
@@ -23175,6 +23191,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: ARCHIVE
@@ -23216,6 +23236,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         deduplication:
           type: object
           properties:
@@ -23271,6 +23295,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: DELETE
@@ -23312,6 +23340,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: PRINT_CERTIFICATE
@@ -23463,6 +23495,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: REQUEST_CORRECTION
@@ -23578,6 +23614,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: REJECT_CORRECTION
@@ -23619,6 +23659,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: APPROVE_CORRECTION
@@ -23660,6 +23704,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: CUSTOM
@@ -23672,10 +23720,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - confirmationText
@@ -23683,7 +23727,6 @@ components:
         - type
         - customActionType
         - form
-        - auditHistoryLabel
       additionalProperties: false
     EventDocumentOutput:
       type: object
