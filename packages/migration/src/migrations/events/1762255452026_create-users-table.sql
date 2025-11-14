@@ -37,5 +37,7 @@ CREATE TABLE user_credentials(
 GRANT SELECT, INSERT, UPDATE, DELETE ON user_credentials TO ${EVENTS_DB_USER};
 
 -- Down Migration
-DROP TABLE IF EXISTS users;
+DROP TABLE user_credentials;
+
+DROP TABLE users;
 
