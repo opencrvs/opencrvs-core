@@ -20,10 +20,7 @@ import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
   ActionType,
-  ActionTypes,
   EventDocument,
-  getAcceptedActions,
-  getActionConfig,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
