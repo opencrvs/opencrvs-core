@@ -581,7 +581,6 @@ export function createFieldConditionals(fieldId: string) {
           [fieldId]: wrapToPath(
             {
               type: 'string',
-              minLength: 1,
               pattern:
                 "^[\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*( [\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*)*$",
               description:
