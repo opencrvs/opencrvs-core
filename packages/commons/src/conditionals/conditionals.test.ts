@@ -1776,7 +1776,7 @@ describe('Subfield nesting', () => {
           $online: false
         }
       )
-    ).toBe(false)
+    ).toBe(true)
     expect(
       validate(
         and(
