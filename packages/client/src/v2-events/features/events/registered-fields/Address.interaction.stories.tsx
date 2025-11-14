@@ -318,12 +318,13 @@ export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
         await expect(canvas.queryByTestId('text__district')).toBeNull()
 
         // Select a province
-        const province = await canvas.findByTestId('location__province')
+        const province = await canvas.findByLabelText(/Province/i)
+        selectEvent.openMenu(province)
         await userEvent.click(province)
         await selectEvent.select(province, 'Central')
 
         // Verify that `District` becomes visible
-        const district = await canvas.findByTestId('location__district')
+        const district = await canvas.findByLabelText(/District/i)
         await expect(district).toBeInTheDocument()
 
         // Select a district
@@ -498,12 +499,12 @@ export const AddressFieldInteractionDomesticToInternational: StoryObj<
         await expect(canvas.queryByTestId('text__district')).toBeNull()
 
         // Select a province
-        const province = await canvas.findByTestId('location__province')
+        const province = await canvas.findByLabelText(/Province/i)
         await userEvent.click(province)
         await selectEvent.select(province, 'Central')
 
         // Verify that `District` becomes visible
-        const district = await canvas.findByTestId('location__district')
+        const district = await canvas.findByLabelText(/District/i)
         await expect(district).toBeInTheDocument()
       }
     )
@@ -557,15 +558,15 @@ export const AddressFieldInteractionDomesticToInternational: StoryObj<
       'Admin structure dropdowns are shown gradually as the inputs are filled',
       async () => {
         // Verify that `District` select is not visible initially
-        await expect(canvas.queryByTestId('text__district')).toBeNull()
+        await expect(canvas.queryByLabelText(/District/i)).toBeNull()
 
         // Select a province
-        const province = await canvas.findByTestId('location__province')
+        const province = await canvas.findByLabelText(/Province/i)
         await userEvent.click(province)
         await selectEvent.select(province, 'Central')
 
         // Verify that `District` becomes visible
-        const district = await canvas.findByTestId('location__district')
+        const district = await canvas.findByLabelText(/District/i)
         await expect(district).toBeInTheDocument()
 
         // Select a district
@@ -735,11 +736,11 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
     const canvas = within(canvasElement)
 
     await step('Fill up Domestic Address', async () => {
-      const province = await canvas.findByTestId('location__province')
+      const province = await canvas.findByLabelText(/Province/i)
       await userEvent.click(province)
       await selectEvent.select(province, 'Central')
 
-      const district = await canvas.findByTestId('location__district')
+      const district = await canvas.findByLabelText(/District/i)
       await userEvent.click(district)
       await selectEvent.select(district, 'Ibombo')
 
