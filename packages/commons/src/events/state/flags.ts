@@ -107,7 +107,7 @@ function isFlagConditionMet(
 
 export function resolveEventCustomFlags(
   event: EventDocument,
-  config: EventConfig
+  eventConfiguration: EventConfig
 ): CustomFlag[] {
   const acceptedActions = getAcceptedActions(event)
   const actions = acceptedActions
@@ -115,7 +115,12 @@ export function resolveEventCustomFlags(
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
   return actions.reduce((acc, action, idx) => {
-    const actionConfig = getActionConfig(config, action)
+    const actionConfig = getActionConfig({
+      eventConfiguration,
+      actionType: action.type,
+      customActionType:
+        'customActionType' in action ? action.customActionType : undefined
+    })
 
     if (!actionConfig) {
       return acc

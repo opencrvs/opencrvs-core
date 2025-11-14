@@ -20,8 +20,10 @@ import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
   ActionType,
+  ActionTypes,
   EventDocument,
   getAcceptedActions,
+  getActionConfig,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
@@ -398,16 +400,28 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     .map((action) => {
       const { name: actionCreatorName } = getActionCreator(action)
 
+      const actionConfig = getActionConfig({
+        eventConfiguration,
+        actionType: action.type as ActionType,
+        customActionType:
+          'customActionType' in action ? action.customActionType : undefined
+      })
+
+      let label =
+        actionConfig && actionConfig.auditHistoryLabel
+          ? intl.formatMessage(actionConfig.auditHistoryLabel)
+          : intl.formatMessage(eventHistoryStatusMessage, {
+              action: getActionTypeForHistory(history, action),
+              status: action.status
+            })
+
       return {
         action: (
           <Link
             font="bold14"
             onClick={() => onHistoryRowClick(action, actionCreatorName)}
           >
-            {intl.formatMessage(eventHistoryStatusMessage, {
-              action: getActionTypeForHistory(history, action),
-              status: action.status
-            })}
+            {label}
           </Link>
         ),
         date: format(
