@@ -178,31 +178,34 @@ export function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(
   schemas: T
 ) {
   return z
-    .custom<z.infer<T[number]>>((val) => {
+    .any()
+    .superRefine((val, ctx) => {
       const successful = schemas.filter((s) => s.safeParse(val).success)
+
       if (successful.length === 1) {
-        return true
+        return
       }
+
       if (successful.length === 0) {
-        return false
+        ctx.addIssue({
+          code: 'invalid_type',
+          expected: 'custom',
+          message: 'Value does not match any schema'
+        })
+        return
       }
-      // If multiple matched, pick the “best” one
-      // according to PRIORITY_ORDER.
-      //
-      // Example:
-      // data [
-      //   "2050-01-01",
-      //   "2050-01-01",
-      //   "2050-01-01"
-      // ]
-      // description [ "TextValue", "DateValue", "DateRangeFieldValue" ]
-      // best "DateRangeFieldValue"
-      //
-      // Here all three schemas think the value is valid,
-      // but "DateRangeFieldValue" wins because of its higher priority index.
+
+      // Multiple matches, pick the best according to PRIORITY_ORDER
       successful.sort((a, b) => schemaPriority(a) - schemaPriority(b))
       const best = successful[0]
-      return best.safeParse(val).success
+
+      if (!best.safeParse(val).success) {
+        ctx.addIssue({
+          expected: 'custom',
+          code: 'invalid_type',
+          message: 'Value did not match the best schema'
+        })
+      }
     })
     .meta({
       description:
