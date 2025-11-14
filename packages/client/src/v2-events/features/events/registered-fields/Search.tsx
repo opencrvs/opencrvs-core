@@ -222,6 +222,7 @@ const SearchResponse = HttpFieldValue.extend({
 
 function SearchInput({
   onChange,
+  form,
   configuration,
   value
 }: Omit<Props, 'configuration'> & {
@@ -377,6 +378,7 @@ function SearchInput({
               offset: configuration.offset
             }
           }}
+          form={form}
           parentValue={buttonPressed}
           onChange={onHTTPChange}
         />
