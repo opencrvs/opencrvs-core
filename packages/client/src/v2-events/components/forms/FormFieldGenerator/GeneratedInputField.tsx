@@ -43,8 +43,6 @@ import {
   isNumberFieldType,
   isEmailFieldType,
   isDataFieldType,
-  EventConfig,
-  getDeclarationFields,
   isNameFieldType,
   isPhoneFieldType,
   isIdFieldType,
@@ -574,7 +572,7 @@ export const GeneratedInputField = React.memo(
         partOfRef && makeFormikFieldIdsOpenCRVSCompatible(form)[partOfRef]
 
       return (
-        <InputField {...inputFieldProps}>
+        <InputField {...inputFieldProps} htmlFor={fieldDefinition.id}>
           <AdministrativeArea.Input
             {...field.config}
             disabled={disabled}
