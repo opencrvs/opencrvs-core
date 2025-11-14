@@ -19,17 +19,7 @@ exports[`event.actions.notify > Can create a record with partial address 1`] = `
 }
 `;
 
-exports[`event.actions.notify > Can not create a record with partial address when addressType is missing 1`] = `[TRPCError: [{"message":"Invalid input","id":"applicant.address","value":{"country":"FAR"}}]]`;
-
-exports[`event.actions.notify > Can not create a record with wrong address 1`] = `
-{
-  "applicant.address": {
-    "addressType": "INTERNATIONAL",
-    "administrativeArea": "27160bbd-32d1-4625-812f-860226bfb92a",
-    "country": "FAR",
-  },
-}
-`;
+exports[`event.actions.notify > Can not create a record with partial address when addressType is missing 1`] = `[TRPCError: [{"message":"Required","id":"applicant.address","value":{"country":"FAR"}}]]`;
 
 exports[`event.actions.notify > NOTIFY action fails if payload includes field that is not in the declaration 1`] = `[TRPCError: [{"message":"Unexpected field","id":"foo.bar","value":"hello"}]]`;
 
