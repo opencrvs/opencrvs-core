@@ -70,22 +70,26 @@ import {
   VerificationStatusValue,
   AgeValue
 } from './FieldValue'
-
 import { FullDocumentPath } from '../documents'
-
 import {
   AddressFieldValue,
-  AddressFieldUpdateValue,
   FileFieldValue,
   FileFieldWithOptionValue,
   AddressType,
   NameFieldValue,
-  NameFieldUpdateValue,
   HttpFieldUpdateValue,
   QueryParamReaderFieldUpdateValue,
   QrReaderFieldValue,
-  IdReaderFieldValue
+  IdReaderFieldValue,
+  NameFieldUpdateValue
 } from './CompositeFieldValue'
+import {
+  getDynamicNameValue,
+  DynamicNameValue,
+  DynamicAddressFieldValue,
+  getDynamicAddressFieldValue
+} from './DynamicFieldValue'
+import { ActionType } from './ActionType'
 
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
@@ -106,9 +110,18 @@ type NullishFieldValueSchema = z.ZodOptional<
  * Mapping of field types to Zod schema.
  * Useful for building dynamic validations against FieldConfig
  */
-export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
-  let schema: FieldUpdateValueSchema | NullishFieldValueSchema
-  switch (type) {
+/**
+ * Mapping of field types to Zod schema.
+ * Useful for building dynamic validations against FieldConfig
+ */
+export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
+  let schema:
+    | FieldUpdateValueSchema
+    | NullishFieldValueSchema
+    | DynamicNameValue
+    | DynamicAddressFieldValue
+
+  switch (field.type) {
     case FieldType.DATE:
       schema = DateValue
       break
@@ -145,7 +158,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.VERIFICATION_STATUS:
     case FieldType.ID:
     case FieldType.LOADER:
-      schema = required ? NonEmptyTextValue : TextValue
+      schema = field.required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
       schema = NumberFieldValue
@@ -161,13 +174,16 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       schema = FileFieldWithOptionValue
       break
     case FieldType.ADDRESS:
-      schema = AddressFieldUpdateValue
+      schema = getDynamicAddressFieldValue(field)
       break
     case FieldType.DATA:
       schema = DataFieldValue
       break
     case FieldType.NAME:
-      schema = required ? NameFieldValue : NameFieldUpdateValue
+      schema =
+        actionType === ActionType.NOTIFY
+          ? NameFieldUpdateValue
+          : getDynamicNameValue(field)
       break
     case FieldType.BUTTON:
       schema = ButtonFieldValue
@@ -190,20 +206,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       break
   }
 
-  return required ? schema : schema.nullish()
-}
-
-export function createValidationSchema(config: FieldConfig[]) {
-  const shape: Record<
-    string,
-    NullishFieldValueSchema | FieldUpdateValueSchema
-  > = {}
-
-  for (const field of config) {
-    shape[field.id] = mapFieldTypeToZod(field.type, !!field.required)
-  }
-
-  return z.object(shape)
+  return field.required ? schema : schema.nullish()
 }
 
 /**

@@ -7,8 +7,10 @@ exports[`Action updates > partial declaration update accounts for conditional fi
     "administrativeArea": "27160bbd-32d1-4625-812f-860226bfb92a",
     "country": "FAR",
     "streetLevelDetails": {
+      "district2": "Example District 2",
       "number": "55",
       "residentialArea": "Example Residential Area",
+      "state": "Example State",
       "street": "Example Street",
       "town": "Example Town",
       "zipCode": "123456",
@@ -81,8 +83,10 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
           "administrativeArea": "27160bbd-32d1-4625-812f-860226bfb92a",
           "country": "FAR",
           "streetLevelDetails": {
+            "district2": "Example District 2",
             "number": "55",
             "residentialArea": "Example Residential Area",
+            "state": "Example State",
             "street": "Example Street",
             "town": "Example Town",
             "zipCode": "123456",
@@ -162,8 +166,10 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
           "administrativeArea": "27160bbd-32d1-4625-812f-860226bfb92a",
           "country": "FAR",
           "streetLevelDetails": {
+            "district2": "Example District 2",
             "number": "55",
             "residentialArea": "Example Residential Area",
+            "state": "Example State",
             "street": "Example Street",
             "town": "Example Town",
             "zipCode": "123456",
@@ -243,8 +249,10 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
           "administrativeArea": "27160bbd-32d1-4625-812f-860226bfb92a",
           "country": "FAR",
           "streetLevelDetails": {
+            "district2": "Example District 2",
             "number": "55",
             "residentialArea": "Example Residential Area",
+            "state": "Example State",
             "street": "Example Street",
             "town": "Example Town",
             "zipCode": "123456",

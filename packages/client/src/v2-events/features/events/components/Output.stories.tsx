@@ -11,7 +11,11 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import React from 'react'
-import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  FieldType,
+  FieldValue,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { Output } from './Output'
@@ -309,12 +313,14 @@ export const DataOutput: Story = {
       }
     },
     value: {
-      'applicant.name': {
-        firstname: 'John',
-        surname: 'Malkovich'
-      },
-      ['static.text']: 'Some static text here',
-      ['some-other-static-data']: 'Some other static text here'
-    }
+      data: {
+        'applicant.name': {
+          firstname: 'John',
+          surname: 'Malkovich'
+        },
+        ['static.text']: 'Some static text here',
+        ['some-other-static-data']: 'Some other static text here'
+      }
+    } satisfies FieldValue
   }
 }

@@ -208,7 +208,7 @@ function DataInput({
       return { ...acc, [f.config.id]: f.value }
     }, {})
 
-    onChange(value)
+    onChange({ data: value })
   }, [id, formData, onChange, fields])
 
   return (
@@ -246,7 +246,7 @@ function getDataOutputEntry(
   if ('id' in dataEntryConfig) {
     const { id, label } = dataEntryConfig
 
-    if (!Boolean(value[id])) {
+    if (!Boolean(value.data[id])) {
       return null
     }
 
@@ -254,14 +254,17 @@ function getDataOutputEntry(
       id,
       label,
       valueDisplay: (
-        <Output field={{ type: FieldType.TEXT, id, label }} value={value[id]} />
+        <Output
+          field={{ type: FieldType.TEXT, id, label }}
+          value={value.data[id]}
+        />
       )
     }
   }
 
   const { fieldId } = dataEntryConfig
 
-  if (!Boolean(value[fieldId])) {
+  if (!Boolean(value.data[fieldId])) {
     return null
   }
 
@@ -275,7 +278,7 @@ function getDataOutputEntry(
     id: fieldId,
     label: referencedFieldConfig.label,
     valueDisplay: (
-      <Output field={referencedFieldConfig} value={value[fieldId]} />
+      <Output field={referencedFieldConfig} value={value.data[fieldId]} />
     )
   }
 }

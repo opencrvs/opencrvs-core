@@ -333,6 +333,7 @@ type _Combine<
 
 type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
+export type BulkResponse = estypes.BulkResponse
 
 export async function indexEventsInBulk(
   batch: EventDocument[],
