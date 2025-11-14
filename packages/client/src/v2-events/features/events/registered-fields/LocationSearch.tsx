@@ -65,6 +65,9 @@ function useAdministrativeAreas(
   }, [searchableResource, allLocations])
 }
 
+/**
+ * @deprecated -- Use/replace with SearchableSelect 1.10 onwards.
+ */
 function LocationSearchInput({
   onChange,
   value,
