@@ -11,6 +11,8 @@
 import * as React from 'react'
 import { useState } from 'react'
 import ReactPanZoom from './PanDraggable'
+import { Button } from '../../Button'
+import { Icon } from '../../Icon'
 import styled from 'styled-components'
 
 const StyledReactPanZoom = styled(ReactPanZoom)<{
@@ -42,18 +44,18 @@ const PanViewer: React.FC<IProps> = ({ image, zoom, rotation }) => {
   const [dx] = useState(0)
   const [dy] = useState(0)
 
-  const isPdf = image.toLowerCase().endsWith('.pdf')
+  const isPdf = image.endsWith('.pdf')
 
-  React.useEffect(() => {
-    if (isPdf) {
-      fetch(image)
-        .then((res) => res.blob())
-        .then((blob) => {
-          const blobUrl = URL.createObjectURL(blob)
-          window.open(blobUrl, '_blank')
-        })
+  const handleOpenPdf = async () => {
+    try {
+      const res = await fetch(image, { cache: 'default' })
+      const blob = await res.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      window.open(blobUrl, '_blank')
+    } catch (err) {
+      console.error('Failed to open PDF', err)
     }
-  }, [image, isPdf])
+  }
 
   return (
     <React.Fragment>
@@ -71,9 +73,17 @@ const PanViewer: React.FC<IProps> = ({ image, zoom, rotation }) => {
             style={{ transform: `rotate(${rotation}deg)` }}
           />
         ) : (
-          <div style={{ color: '#999', fontSize: '14px' }}>
-            PDF opened in a new tab
-          </div>
+          <Button
+            id="preview_close"
+            aria-label="Preview PDF1970
+             in new tab"
+            size="medium"
+            type="positive"
+            onClick={handleOpenPdf}
+          >
+            Open PDF in a new tab
+            <Icon name="ArrowSquareOut" size="medium" />
+          </Button>
         )}
       </StyledReactPanZoom>
     </React.Fragment>
