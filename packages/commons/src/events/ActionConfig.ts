@@ -132,6 +132,9 @@ const CustomActionConfig = ActionConfigBase.merge(
       ),
     confirmationText: TranslationConfig.describe(
       'Text displayed on the confirmation'
+    ),
+    auditHistoryLabel: TranslationConfig.describe(
+      'The label to show in audit history for this action. For example "Approved".'
     )
   })
 )
