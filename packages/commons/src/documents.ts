@@ -14,7 +14,7 @@ import { extendZodWithOpenApi } from 'zod-openapi'
 extendZodWithOpenApi(z)
 
 export const MINIO_REGEX =
-  /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|png|jpeg|pdf|svg)(\?.*)?$/i
+  /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|png|jpeg|svg)(\?.*)?$/i
 
 export function isBase64FileString(str: string) {
   if (str === '' || str.trim() === '') {
