@@ -43,6 +43,15 @@ function LinkButtonInput({
     }
   }, [isLocalDraftSubmitted, url])
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    try {
+      submitLocalDraft()
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Error submitting local draft:', err)
+    }
+  }
   return (
     <Button
       fullWidth
@@ -52,10 +61,7 @@ function LinkButtonInput({
       id={id}
       size="large"
       type="secondary"
-      onClick={(e) => {
-        e.preventDefault()
-        submitLocalDraft()
-      }}
+      onClick={handleClick}
     >
       {configuration.icon && (
         <Icon
