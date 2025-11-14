@@ -25,7 +25,7 @@ import {
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { TabSearch } from './TabSearch'
 import {
-  checkScopeForEventSearch,
+  useEventSearchScope,
   parseFieldSearchParams,
   deserializeSearchParams
 } from './utils'
@@ -55,6 +55,7 @@ export function AdvancedSearch() {
     deserializeSearchParams(location.search)
   )
 
+  const checkScopeForEventSearch = useEventSearchScope()
   const advancedSearchEvents = allEvents.filter(
     (event) =>
       event.advancedSearch.length > 0 && checkScopeForEventSearch(event.id)
@@ -89,6 +90,16 @@ export function AdvancedSearch() {
 
   const [activeTabId, setActiveTabId] = useState<string>(selectedTabId)
 
+  const handleFormChange = useCallback(
+    (updatedForm: Record<string, FieldValue>) => {
+      setFormValuesByTabId((prev) => ({
+        ...prev,
+        [activeTabId]: updatedForm
+      }))
+    },
+    [activeTabId]
+  )
+
   const currentEvent = allEvents.find((e) => e.id === activeTabId)
   if (!currentEvent) {
     return null
@@ -100,16 +111,6 @@ export function AdvancedSearch() {
   const handleTabClick = (tabId: string) => {
     setActiveTabId(tabId)
   }
-
-  const handleFormChange = useCallback(
-    (updatedForm: Record<string, FieldValue>) => {
-      setFormValuesByTabId((prev) => ({
-        ...prev,
-        [activeTabId]: updatedForm
-      }))
-    },
-    [activeTabId]
-  )
 
   return (
     <Content

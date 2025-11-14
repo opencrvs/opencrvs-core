@@ -71,7 +71,7 @@ export function Review() {
 
   const registerMutation = events.actions.register
 
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
 
   const previousAnnotation = getActionAnnotation({
     event,

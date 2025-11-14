@@ -12,20 +12,14 @@
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import {
-  ActionDocument,
-  deepDropNulls,
-  Draft,
-  UUID
-} from '@opencrvs/commons/client'
+import { deepDropNulls, Draft, UUID } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import {
   clearPendingDraftCreationRequests,
   findLocalEventDocument,
   refetchDraftsList,
   refetchAllSearchQueries,
-  setDraftData,
-  updateLocalEventIndex
+  setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   createEventActionMutationFn,
@@ -182,7 +176,7 @@ export function useDrafts() {
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
 
-  function getAllRemoteDrafts(
+  function useRemoteDrafts(
     additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
   ): Draft[] {
     // Skip the queryFn defined by tRPC and use the one defined above
@@ -238,12 +232,12 @@ export function useDrafts() {
         status: localDraft.action.status
       })
     },
-    getAllRemoteDrafts,
-    getRemoteDraftByEventId: function useDraftList(
+    useRemoteDrafts,
+    useGetRemoteDraftByEventId: (
       eventId: string,
       additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
-    ): Draft | undefined {
-      const eventDrafts = getAllRemoteDrafts(additionalOptions).filter(
+    ): Draft | undefined => {
+      const eventDrafts = useRemoteDrafts(additionalOptions).filter(
         (draft) => draft.eventId === eventId
       )
 

@@ -135,6 +135,9 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         {(formikProps) => {
           const { touched } = formikProps
 
+          // Because react Hook "useEffect" cannot be called inside a callback,
+          // we disable the rule for this line
+          // eslint-disable-next-line react-hooks/rules-of-hooks
           useEffect(() => {
             /**
              * Because 'enableReinitialize' prop is set to 'true' above, whenever initialValue changes,

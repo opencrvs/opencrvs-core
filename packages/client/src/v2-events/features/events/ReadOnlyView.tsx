@@ -36,7 +36,7 @@ import { removeCachedFiles } from '../files/cache'
 function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
-  const event = events.getEvent.viewEvent(eventId)
+  const event = events.getEvent.useViewEvent(eventId)
   const validatorContext = useValidatorContext()
 
   const maybeAuth = useAuthentication()
@@ -45,8 +45,8 @@ function ReadonlyView() {
     'Authentication is not available but is required'
   )
 
-  const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(event.id)
+  const { useGetRemoteDraftByEventId } = useDrafts()
+  const draft = useGetRemoteDraftByEventId(event.id)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )

@@ -63,11 +63,11 @@ function NumberInput({ value, disabled, ...props }: NumberInputProps) {
 export const Number = {
   Input: NumberInput,
   Output: ({ value, config }: { value?: number; config: NumberField }) => {
+    const intl = useIntl()
     if (value === undefined) {
       return null
     }
 
-    const intl = useIntl()
     const prefix = config.configuration?.prefix
     const postfix = config.configuration?.postfix
     return (

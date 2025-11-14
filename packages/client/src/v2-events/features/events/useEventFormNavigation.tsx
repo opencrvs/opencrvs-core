@@ -55,8 +55,8 @@ export function useEventFormNavigation() {
   const navigate = useNavigate()
 
   const events = useEvents()
-  const { getAllRemoteDrafts } = useDrafts()
-  const remoteDrafts = getAllRemoteDrafts()
+  const { useRemoteDrafts } = useDrafts()
+  const remoteDrafts = useRemoteDrafts()
   const deleteEvent = events.deleteEvent.useMutation()
 
   const { setLocalDraft } = useDrafts()

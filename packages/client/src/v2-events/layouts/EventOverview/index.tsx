@@ -40,8 +40,8 @@ export function EventOverviewLayout({
 }) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
   const { searchEventById } = useEvents()
-  const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(eventId)
+  const { useGetRemoteDraftByEventId } = useDrafts()
+  const draft = useGetRemoteDraftByEventId(eventId)
 
   const eventResults = searchEventById.useSuspenseQuery(eventId)
 

@@ -236,7 +236,7 @@ export function ReviewCorrection({
   )
 
   const events = useEvents()
-  const event = events.getEvent.getFromCache(eventId)
+  const event = events.getEvent.useGetEventFromCache(eventId)
   const { isActionAllowed } = useUserAllowedActions(event.type)
   const [modal, openModal] = useModal()
   const navigate = useNavigate()

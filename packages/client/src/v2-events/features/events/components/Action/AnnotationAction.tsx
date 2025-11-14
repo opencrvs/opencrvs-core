@@ -44,11 +44,11 @@ function AnnotationActionComponent({ children, actionType }: Props) {
 
   const { getEvent } = useEvents()
 
-  const { setLocalDraft, getLocalDraftOrDefault, getRemoteDraftByEventId } =
+  const { setLocalDraft, getLocalDraftOrDefault, useGetRemoteDraftByEventId } =
     useDrafts()
 
-  const event = getEvent.getFromCache(params.eventId)
-  const remoteDraft = getRemoteDraftByEventId(event.id)
+  const event = getEvent.useGetEventFromCache(params.eventId)
+  const remoteDraft = useGetRemoteDraftByEventId(event.id)
 
   const activeRemoteDraft = remoteDraft
     ? findActiveDraftForEvent(event, remoteDraft)

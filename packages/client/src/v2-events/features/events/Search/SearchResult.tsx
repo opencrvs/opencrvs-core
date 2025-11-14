@@ -233,9 +233,9 @@ export const SearchResultComponent = ({
     )
   }
   const { getOutbox } = useEvents()
-  const { getAllRemoteDrafts } = useDrafts()
+  const { useRemoteDrafts } = useDrafts()
   const outbox = getOutbox()
-  const drafts = getAllRemoteDrafts()
+  const drafts = useRemoteDrafts()
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]

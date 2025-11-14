@@ -744,15 +744,18 @@ export function buildQuickSearchQuery(
 /**
  * @returns a boolean indicating whether the current user has the scope to search for an event
  */
-export function checkScopeForEventSearch(eventId: string) {
+export function useEventSearchScope() {
   const scopes = useSelector(getScope)
-  const searchScopes = findScope(scopes ?? [], 'search')
+  const checkScopeForEventSearch = (eventId: string) => {
+    const searchScopes = findScope(scopes ?? [], 'search')
 
-  const isEventSearchAllowed =
-    searchScopes &&
-    Object.keys(searchScopes.options).some((id) => eventId === id)
+    const isEventSearchAllowed =
+      searchScopes &&
+      Object.keys(searchScopes.options).some((id) => eventId === id)
 
-  return isEventSearchAllowed
+    return isEventSearchAllowed
+  }
+  return checkScopeForEventSearch
 }
 
 function serializeValue(value: unknown) {

@@ -162,7 +162,7 @@ export function Review() {
   const [modal, openModal] = useModal()
 
   const { getEvent, onlineActions } = useEvents()
-  const fullEvent = getEvent.getFromCache(eventId)
+  const fullEvent = getEvent.useGetEventFromCache(eventId)
 
   const actions = getAcceptedActions(fullEvent)
   const userIds = getUserIdsFromActions(actions, [SystemRole.enum.HEALTH])
