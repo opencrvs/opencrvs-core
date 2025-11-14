@@ -66,7 +66,11 @@ export function getDynamicAddressFieldValue(field: AddressField) {
 
   // @todo - show required validation errors for street level fields like state/street
   return schema.refine((arg) => {
-    const submittedKeys = Object.keys(arg?.streetLevelDetails ?? {})
+    if (!arg) {
+      return true
+    }
+
+    const submittedKeys = Object.keys(arg.streetLevelDetails ?? {})
     const invalidKeys = submittedKeys.filter((k) => !configIds.includes(k))
     if (invalidKeys.length) {
       // eslint-disable-next-line no-console
@@ -76,6 +80,7 @@ export function getDynamicAddressFieldValue(field: AddressField) {
       )
       return false
     }
+
     return true
   })
 }
