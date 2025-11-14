@@ -702,6 +702,7 @@ export const GeneratedInputField = React.memo(
             field.config.configuration,
             form
           )}
+          form={form}
           parentValue={form[field.config.configuration.trigger.$$field]}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
@@ -713,6 +714,7 @@ export const GeneratedInputField = React.memo(
           <Search.Input
             key={fieldDefinition.id}
             configuration={field.config.configuration}
+            form={form}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
