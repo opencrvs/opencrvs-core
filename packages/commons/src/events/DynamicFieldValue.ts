@@ -66,6 +66,7 @@ export function getDynamicAddressFieldValue(field: AddressField) {
 
   // @todo - show required validation errors for street level fields like state/street
   return schema.refine((arg) => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!arg) {
       return true
     }
