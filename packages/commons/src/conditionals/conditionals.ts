@@ -578,7 +578,7 @@ export function createFieldConditionals(fieldId: string) {
       return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: wrapToPath(
+          [fieldId]: wrapToPathOptional(
             {
               type: 'string',
               pattern:
