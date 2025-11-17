@@ -106,7 +106,7 @@ function isFlagConditionMet(
 }
 
 /**
- * This function resolves custom flags for an event based on its actions and event configuration.
+ * This function resolves custom flags for an event based on its actions.
  * Flags are not stored to the event state or any database directly, instead they are always computed/evaluated from the event actions.
  *
  * Processes accepted actions in chronological order, evaluating flag conditions
