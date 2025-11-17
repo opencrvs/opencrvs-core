@@ -26,11 +26,6 @@ const tennisClubMembershipEventWithCustomAction = {
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
       },
-      confirmationText: {
-        id: 'event.tennis-club-membership.action.confirm.confirmationText',
-        defaultMessage: 'Some confirmation text',
-        description: 'This is the confirmation text for the confirm action'
-      },
       // @TODO: once action conditionals are implemented, add some conditional here?
       form: [],
       flags: []
