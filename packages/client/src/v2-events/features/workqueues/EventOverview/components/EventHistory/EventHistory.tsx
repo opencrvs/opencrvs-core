@@ -44,10 +44,13 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { UserAvatar } from './UserAvatar'
-import {
-  EventHistoryDialog,
-  eventHistoryStatusMessage
-} from './EventHistoryDialog/EventHistoryDialog'
+import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
+
+const eventHistoryStatusMessage = {
+  id: 'events.history.status',
+  defaultMessage:
+    '{status, select, Requested {Waiting for external validation} other {{action, select, CREATE {Draft} NOTIFY {Sent incomplete} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} UPDATE {Updated} other {Unknown}}}}'
+}
 
 const LargeGreyedInfo = styled.div`
   height: 231px;
@@ -344,7 +347,8 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
   const onHistoryRowClick = (
     action: EventHistoryActionDocument,
-    userName: string
+    userName: string,
+    title: string
   ) => {
     void openModal<void>((close) => (
       <EventHistoryDialog
@@ -353,6 +357,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         fullEvent={fullEvent}
         userName={userName}
         validatorContext={validatorContext}
+        title={title}
       />
     ))
   }
@@ -405,7 +410,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       })
 
       // If a audit history label is configured in action config, use that!
-      const label =
+      const title =
         actionConfig && actionConfig.auditHistoryLabel
           ? intl.formatMessage(actionConfig.auditHistoryLabel)
           : intl.formatMessage(eventHistoryStatusMessage, {
@@ -417,9 +422,9 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         action: (
           <Link
             font="bold14"
-            onClick={() => onHistoryRowClick(action, actionCreatorName)}
+            onClick={() => onHistoryRowClick(action, actionCreatorName, title)}
           >
-            {label}
+            {title}
           </Link>
         ),
         date: format(

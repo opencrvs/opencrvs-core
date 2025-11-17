@@ -22,17 +22,8 @@ import {
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
-import {
-  EventHistoryActionDocument,
-  useActionForHistory
-} from '@client/v2-events/features/events/actions/correct/useActionForHistory'
+import { EventHistoryActionDocument } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { ActionTypeSpecificContent } from './components'
-
-export const eventHistoryStatusMessage = {
-  id: 'events.history.status',
-  defaultMessage:
-    '{status, select, Requested {Waiting for external validation} other {{action, select, CREATE {Draft} NOTIFY {Sent incomplete} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} UPDATE {Updated} other {Unknown}}}}'
-}
 
 const messages = defineMessages({
   'event.history.modal.timeFormat': {
@@ -112,22 +103,18 @@ export function EventHistoryDialog({
   userName,
   close,
   fullEvent,
-  validatorContext
+  validatorContext,
+  title
 }: {
   action: EventHistoryActionDocument
   userName: string
   close: () => void
   fullEvent: EventDocument
   validatorContext: ValidatorContext
+  title: string
 }) {
   const intl = useIntl()
-  const { getActionTypeForHistory } = useActionForHistory()
   const history = getAcceptedActions(fullEvent)
-  const title = intl.formatMessage(eventHistoryStatusMessage, {
-    action: getActionTypeForHistory(history, action),
-    status: action.status
-  })
-
   const comments = prepareComments(action)
   const reason = prepareReason(action)
   const duplicateOf = prepareDuplicateOf(action, history)

@@ -146,6 +146,7 @@ type Story = StoryObj<typeof EventHistoryDialog>
 export const Created: Story = {
   args: {
     ...argbase,
+    title: 'Created',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -157,6 +158,7 @@ export const Created: Story = {
 export const Notified: Story = {
   args: {
     ...argbase,
+    title: 'Notified',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -168,6 +170,7 @@ export const Notified: Story = {
 export const Read: Story = {
   args: {
     ...argbase,
+    title: 'Viewed',
     action: { ...argbase.action, id: generateUuid(prng), type: ActionType.READ }
   }
 }
@@ -236,6 +239,7 @@ const eventWhenDeclareUpdatesDeclaration = {
 export const Declared: Story = {
   args: {
     ...argbase,
+    title: 'Declared',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -246,6 +250,7 @@ export const Declared: Story = {
 
 export const DeclaredOnDeclarationUpdate: Story = {
   args: {
+    title: 'Declared',
     fullEvent: eventWhenDeclareUpdatesDeclaration,
     action: declareAction
   }
@@ -263,6 +268,7 @@ const eventWhenValidateUpdatesDeclaration = {
 export const Validated: Story = {
   args: {
     ...argbase,
+    title: 'Validated',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -279,6 +285,7 @@ const updateActionForValidate = expandWithClientSpecificActions(
 
 export const ValidatedOnDeclarationUpdate: Story = {
   args: {
+    title: 'Validated',
     fullEvent: eventWhenValidateUpdatesDeclaration,
     action: updateActionForValidate
   }
@@ -815,6 +822,7 @@ const updateActions = expandWithClientSpecificActions(
 export const DeclarationUpdateOnDeclare: Story = {
   args: {
     fullEvent: newFullEvent,
+    title: 'Updated',
     action: updateActions[0]
   }
 }
@@ -822,6 +830,7 @@ export const DeclarationUpdateOnDeclare: Story = {
 export const DeclarationUpdateOnValidate: Story = {
   args: {
     fullEvent: newFullEvent,
+    title: 'Updated',
     action: updateActions[1]
   }
 }
@@ -829,6 +838,7 @@ export const DeclarationUpdateOnValidate: Story = {
 export const DeclarationUpdateOnSecondValidate: Story = {
   args: {
     fullEvent: newFullEvent,
+    title: 'Updated',
     action: updateActions[2]
   }
 }
@@ -836,6 +846,7 @@ export const DeclarationUpdateOnSecondValidate: Story = {
 export const DeclarationUpdateOnRegister: Story = {
   args: {
     fullEvent: newFullEvent,
+    title: 'Updated',
     action: updateActions[3]
   }
 }
@@ -1036,6 +1047,7 @@ const updateActionsForNotifyActions = expandWithClientSpecificActions(
 export const DeclarationUpdateNotify: Story = {
   args: {
     fullEvent: eventWithNotifyActions,
+    title: 'Updated',
     action: updateActionsForNotifyActions[0]
   }
 }
@@ -1052,6 +1064,7 @@ const eventWhenRegisterUpdatesDeclaration = {
 export const Registered: Story = {
   args: {
     ...argbase,
+    title: 'Registered',
     action: {
       ...argbase.action,
       id: eventWhenRegisterUpdatesDeclaration.id,
@@ -1068,6 +1081,7 @@ const updateActionForRegister = expandWithClientSpecificActions(
 
 export const RegisteredOnDeclarationUpdate: Story = {
   args: {
+    title: 'Registered',
     fullEvent: eventWhenRegisterUpdatesDeclaration,
     action: updateActionForRegister
   }
