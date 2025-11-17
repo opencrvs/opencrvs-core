@@ -340,6 +340,7 @@ function zodToIntlErrorMap(
 
   switch (issue.code) {
     case 'too_small': {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (issue.message === undefined) {
         return createIntlError(requiredMessage)
       }
