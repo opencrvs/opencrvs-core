@@ -1174,6 +1174,24 @@ describe('"event" conditionals', () => {
 
 describe('"valid name" conditionals', () => {
   describe('Valid names', () => {
+    it('Only firstname and surname', () => {
+      const params = {
+        $form: { 'child.firstname': 'Mike', 'child.surname': 'Ross' },
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $locations: [],
+        $online: false
+      }
+      expect(
+        validate(
+          and(
+            field('child').get('firstname').isValidEnglishName(),
+            field('child').get('middlename').isValidEnglishName(),
+            field('child').get('surname').isValidEnglishName()
+          ),
+          params
+        )
+      ).toBe(true)
+    })
     it('should pass for empty string', () => {
       const validName = ''
       const params = {
