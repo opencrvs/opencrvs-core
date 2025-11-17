@@ -578,10 +578,9 @@ export function createFieldConditionals(fieldId: string) {
       return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: wrapToPath(
+          [fieldId]: wrapToPathOptional(
             {
               type: 'string',
-              minLength: 1,
               pattern:
                 "^[\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*( [\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*)*$",
               description:
