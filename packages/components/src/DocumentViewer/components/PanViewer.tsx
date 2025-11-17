@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
+import { useIntl } from 'react-intl'
 import { useState } from 'react'
 import ReactPanZoom from './PanDraggable'
 import { Button } from '../../Button'
@@ -41,6 +42,7 @@ interface IProps {
 }
 
 const PanViewer: React.FC<IProps> = ({ image, zoom, rotation }) => {
+  const intl = useIntl()
   const [dx] = useState(0)
   const [dy] = useState(0)
 
@@ -81,7 +83,11 @@ const PanViewer: React.FC<IProps> = ({ image, zoom, rotation }) => {
             type="positive"
             onClick={handleOpenPdf}
           >
-            Open PDF in a new tab
+            {intl.formatMessage({
+              id: 'review.panViewer.openPDF',
+              defaultMessage: 'Open PDF in a new tab',
+              description: 'Label for open PDF button'
+            })}
             <Icon name="ArrowSquareOut" size="medium" />
           </Button>
         )}
