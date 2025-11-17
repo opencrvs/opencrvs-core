@@ -147,11 +147,7 @@ function jsonFieldPath(field: FieldReference) {
   return [field.$$field, ...field.$$subfield].join('/')
 }
 
-function wrapToPath(
-  condition: Record<string, unknown>,
-  path: string[],
-  optional?: boolean
-) {
+function wrapToPath(condition: Record<string, unknown>, path: string[]) {
   if (path.length === 0) {
     return condition
   }
@@ -161,7 +157,7 @@ function wrapToPath(
       properties: {
         [part]: conditionNow
       },
-      required: optional ? [] : [part]
+      required: [part]
     }
   }, condition)
 }
@@ -582,7 +578,7 @@ export function createFieldConditionals(fieldId: string) {
       return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: wrapToPath(
+          [fieldId]: wrapToPathOptional(
             {
               type: 'string',
               pattern:
@@ -590,8 +586,7 @@ export function createFieldConditionals(fieldId: string) {
               description:
                 "Name must contain only letters, numbers, and allowed special characters ('.-). No double spaces."
             },
-            this.$$subfield,
-            true
+            this.$$subfield
           )
         }
       })
