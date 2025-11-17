@@ -35,7 +35,7 @@ import { archive } from './archive'
 
 interface ModalConfig {
   label?: MessageDescriptor
-  description: MessageDescriptor
+  description?: MessageDescriptor
   confirmButtonType?: 'primary' | 'danger'
   confirmButtonLabel?: MessageDescriptor
 }
@@ -101,7 +101,7 @@ function QuickActionModal({
       title={intl.formatMessage(config.label)}
       width={800}
     >
-      {intl.formatMessage(config.description)}
+      {config.description ? intl.formatMessage(config.description) : null}
     </ResponsiveModal>
   )
 }
@@ -168,7 +168,7 @@ export function useCustomActionModal(event: EventIndex) {
         config={{
           ...customActionConfigBase,
           label: actionConfig.label,
-          description: actionConfig.confirmationText
+          description: actionConfig.supportingCopy
         }}
       />
     ))
