@@ -57,7 +57,7 @@ type DeclarationProps =
  */
 export function Pages({
   form,
-  showReviewButton,
+  showReviewButton = true,
   formPages,
   onPageChange,
   onSubmit,

@@ -183,7 +183,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         key="back_to_review"
         onClick={this.gotoReviewPage}
       >
-        {intl.formatMessage(registerMessages.backToReviewButton)}
+        {intl.formatMessage(registerMessages.goToReviewButton)}
       </SecondaryButton>
     )
 
