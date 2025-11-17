@@ -105,6 +105,22 @@ function isFlagConditionMet(
   })
 }
 
+/**
+ * This function resolves custom flags for an event based on its actions and event configuration.
+ * Flags are not stored to the event state or any database directly, instead they are always computed/evaluated from the event actions.
+ *
+ * Processes accepted actions in chronological order, evaluating flag conditions
+ * at each action step. Flags can be added or removed based on action configurations
+ * and conditional logic. Duplicate flags are filtered out.
+ *
+ * @param event - The event document containing actions and metadata
+ * @param eventConfiguration - The configuration object for the event type defining action rules and flag behaviors
+ * @returns An array of unique custom flag IDs that apply to the event after processing all non-meta actions
+ *
+ * @example
+ * const flags = resolveEventCustomFlags(eventDoc, config);
+ * // Returns: ['flag-1', 'flag-3']
+ */
 export function resolveEventCustomFlags(
   event: EventDocument,
   eventConfiguration: EventConfig
