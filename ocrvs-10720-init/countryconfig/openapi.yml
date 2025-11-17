@@ -2763,9 +2763,6 @@ components:
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
-        confirmationText:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
         flags:
           description: Flag actions which are executed when the action is performed.
           default: []
@@ -2793,6 +2790,9 @@ components:
         auditHistoryLabel:
           description: The label to show in audit history for this action. For example
             "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
@@ -10279,9 +10279,6 @@ components:
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
-        confirmationText:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
         flags:
           description: Flag actions which are executed when the action is performed.
           default: []
@@ -10309,6 +10306,9 @@ components:
         auditHistoryLabel:
           description: The label to show in audit history for this action. For example
             "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
         deduplication:
           type: object
@@ -10476,9 +10476,6 @@ components:
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
-        confirmationText:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
         flags:
           description: Flag actions which are executed when the action is performed.
           default: []
@@ -10506,6 +10503,9 @@ components:
         auditHistoryLabel:
           description: The label to show in audit history for this action. For example
             "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
         deduplication:
           type: object
@@ -10535,9 +10535,6 @@ components:
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
-        confirmationText:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
         flags:
           description: Flag actions which are executed when the action is performed.
           default: []
@@ -10565,6 +10562,9 @@ components:
         auditHistoryLabel:
           description: The label to show in audit history for this action. For example
             "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
@@ -10580,9 +10580,6 @@ components:
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
-        confirmationText:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
         flags:
           description: Flag actions which are executed when the action is performed.
           default: []
@@ -10610,6 +10607,9 @@ components:
         auditHistoryLabel:
           description: The label to show in audit history for this action. For example
             "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
@@ -10625,9 +10625,6 @@ components:
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
-        confirmationText:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
         flags:
           description: Flag actions which are executed when the action is performed.
           default: []
@@ -10655,6 +10652,9 @@ components:
         auditHistoryLabel:
           description: The label to show in audit history for this action. For example
             "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
         deduplication:
           type: object
@@ -10684,9 +10684,6 @@ components:
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
-        confirmationText:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
         flags:
           description: Flag actions which are executed when the action is performed.
           default: []
@@ -10714,6 +10711,9 @@ components:
         auditHistoryLabel:
           description: The label to show in audit history for this action. For example
             "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
@@ -10729,9 +10729,6 @@ components:
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
-        confirmationText:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
         flags:
           description: Flag actions which are executed when the action is performed.
           default: []
@@ -10759,6 +10756,9 @@ components:
         auditHistoryLabel:
           description: The label to show in audit history for this action. For example
             "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
@@ -10884,9 +10884,6 @@ components:
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
-        confirmationText:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
         flags:
           description: Flag actions which are executed when the action is performed.
           default: []
@@ -10914,6 +10911,9 @@ components:
         auditHistoryLabel:
           description: The label to show in audit history for this action. For example
             "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
@@ -11003,9 +11003,6 @@ components:
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
-        confirmationText:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
         flags:
           description: Flag actions which are executed when the action is performed.
           default: []
@@ -11033,6 +11030,9 @@ components:
         auditHistoryLabel:
           description: The label to show in audit history for this action. For example
             "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
@@ -11048,9 +11048,6 @@ components:
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
-        confirmationText:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
         flags:
           description: Flag actions which are executed when the action is performed.
           default: []
@@ -11078,6 +11075,9 @@ components:
         auditHistoryLabel:
           description: The label to show in audit history for this action. For example
             "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
@@ -11093,9 +11093,6 @@ components:
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
-        confirmationText:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
         flags:
           description: Flag actions which are executed when the action is performed.
           default: []
@@ -11124,6 +11121,9 @@ components:
           description: The label to show in audit history for this action. For example
             "Approved".
           $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: CUSTOM
@@ -11138,7 +11138,6 @@ components:
             $ref: "#/components/schemas/FieldConfig"
       required:
         - label
-        - confirmationText
         - flags
         - type
         - customActionType
