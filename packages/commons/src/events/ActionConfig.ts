@@ -29,10 +29,6 @@ export const DeclarationReviewConfig = z
 
 export const ActionConfigBase = z.object({
   label: TranslationConfig.describe('Human readable description of the action'),
-  // @TODO: remove optionality and take in to use as part of https://github.com/opencrvs/opencrvs-core/issues/10900
-  confirmationText: TranslationConfig.optional().describe(
-    'Text displayed on the confirmation'
-  ),
   flags: z
     .array(ActionFlagConfig)
     .optional()
@@ -40,7 +36,10 @@ export const ActionConfigBase = z.object({
     .describe('Flag actions which are executed when the action is performed.'),
   auditHistoryLabel: TranslationConfig.describe(
     'The label to show in audit history for this action. For example "Approved".'
-  ).optional()
+  ).optional(),
+  supportingCopy: TranslationConfig.optional().describe(
+    'Text displayed on the confirmation'
+  )
 })
 
 const DeclarationActionBase = ActionConfigBase.extend({
@@ -132,10 +131,7 @@ const CustomActionConfig = ActionConfigBase.merge(
       .array(FieldConfig)
       .describe(
         'Form configuration for the custom action. The form configured here will be used on the custom action confirmation modal.'
-      ),
-    confirmationText: TranslationConfig.describe(
-      'Text displayed on the confirmation'
-    )
+      )
   })
 )
 export type CustomActionConfig = z.infer<typeof CustomActionConfig>
