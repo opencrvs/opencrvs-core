@@ -20,7 +20,6 @@ import {
 import { env } from '@events/environment'
 import { ensureIndexExists, indexEventsInBulk } from '../indexing/indexing'
 import { getEventConfigurations } from '../config/config'
-
 import { getInMemoryEventConfigurations } from '../config/config'
 
 async function reindexSearch(token: TokenWithBearer) {
@@ -68,17 +67,24 @@ export async function reindex(token: TokenWithBearer) {
     await ensureIndexExists(configuration, { overwrite: true })
   }
 
-  const objStream = Readable.from(streamEventDocuments())
+  // Source: async iterator -> readable
+  const sourceStream = Readable.from(streamEventDocuments())
 
-  // Stream to reindex endpoint in country config. PassThrough forks the stream.
+  // Tee stream: single pipe from source, then fork
+  const teeStream = new PassThrough({ objectMode: true })
+  sourceStream.pipe(teeStream)
+
+  // Stream to reindex endpoint in country config
   const eventDocumentStreamForCountryConfig = new PassThrough({
     objectMode: true
   })
-  objStream.pipe(eventDocumentStreamForCountryConfig)
 
   // Stream to ES indexing
   const eventDocumentStreamForSearch = new PassThrough({ objectMode: true })
-  objStream.pipe(eventDocumentStreamForSearch)
+
+  // Fork from tee
+  teeStream.pipe(eventDocumentStreamForCountryConfig)
+  teeStream.pipe(eventDocumentStreamForSearch)
 
   const searchIndexingStream = await reindexSearch(token)
   const searchIndexingPromise = new Promise((resolve, reject) => {
@@ -88,31 +94,46 @@ export async function reindex(token: TokenWithBearer) {
       .on('error', reject)
   })
 
-  const countryConfigIndexingPromise = fetch(
-    new URL('/reindex', env.COUNTRY_CONFIG_URL),
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      },
-      // Converts object stream to JSON string stream so that it can
-      // be sent to the country config reindex endpoint
-      body: new JsonStreamStringify(eventDocumentStreamForCountryConfig)
-    }
-  ).then((response) => {
-    if (!response.ok && response.status === 404) {
-      logger.warn(
-        `Country config reindex endpoint not found: ${env.COUNTRY_CONFIG_URL}`
-      )
-      return
-    }
-    if (!response.ok) {
-      throw new Error(
-        `Failed to reindex country config: ${response.status} ${response.statusText}`
-      )
-    }
+  const url = new URL('/reindex', env.COUNTRY_CONFIG_URL)
+
+  const countryConfigIndexingPromise = fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    },
+    // Converts object stream to JSON string stream so that it can
+    // be sent to the country config reindex endpoint
+    body: new JsonStreamStringify(eventDocumentStreamForCountryConfig)
   })
+    .then((response) => {
+      if (!response.ok && response.status === 404) {
+        logger.warn(
+          `Country config reindex endpoint not found: ${env.COUNTRY_CONFIG_URL}`
+        )
+        return
+      }
+      if (!response.ok) {
+        throw new Error(
+          `Failed to reindex country config: ${response.status} ${response.statusText}`
+        )
+      }
+    })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .catch((err: any) => {
+      logger.error(
+        {
+          message: err?.message,
+          stack: err?.stack,
+          code: err?.code,
+          errno: err?.errno,
+          type: err?.type,
+          url: url.toString()
+        },
+        'Country config reindex request failed'
+      )
+      throw err
+    })
 
   return Promise.all([searchIndexingPromise, countryConfigIndexingPromise])
 }
