@@ -10,6 +10,7 @@ CREATE FOREIGN TABLE legacy_users(
   salt text,
   role text,
   "primaryOfficeId" text,
+  "practitionerId" text,
   status text,
   "securityQuestionAnswers" json,
   "avatar.data" text
