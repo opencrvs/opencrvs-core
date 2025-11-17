@@ -146,7 +146,7 @@ type Story = StoryObj<typeof EventHistoryDialog>
 export const Created: Story = {
   args: {
     ...argbase,
-    title: 'Created',
+    title: 'Draft',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -239,7 +239,7 @@ const eventWhenDeclareUpdatesDeclaration = {
 export const Declared: Story = {
   args: {
     ...argbase,
-    title: 'Declared',
+    title: 'Sent for review',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -250,7 +250,7 @@ export const Declared: Story = {
 
 export const DeclaredOnDeclarationUpdate: Story = {
   args: {
-    title: 'Declared',
+    title: 'Sent for review',
     fullEvent: eventWhenDeclareUpdatesDeclaration,
     action: declareAction
   }
@@ -285,7 +285,7 @@ const updateActionForValidate = expandWithClientSpecificActions(
 
 export const ValidatedOnDeclarationUpdate: Story = {
   args: {
-    title: 'Validated',
+    title: 'Updated',
     fullEvent: eventWhenValidateUpdatesDeclaration,
     action: updateActionForValidate
   }
@@ -1081,7 +1081,7 @@ const updateActionForRegister = expandWithClientSpecificActions(
 
 export const RegisteredOnDeclarationUpdate: Story = {
   args: {
-    title: 'Registered',
+    title: 'Updated',
     fullEvent: eventWhenRegisterUpdatesDeclaration,
     action: updateActionForRegister
   }
@@ -1252,6 +1252,7 @@ const updateActionForNotDuplicateActions = expandWithClientSpecificActions(
 // Should see updated name in the modal
 export const NotDuplicateOnDeclarationUpdate: Story = {
   args: {
+    title: 'Updated',
     fullEvent: notDuplicateUpdateEvent,
     action: updateActionForNotDuplicateActions
   }
@@ -1260,6 +1261,7 @@ export const NotDuplicateOnDeclarationUpdate: Story = {
 export const Rejected: Story = {
   args: {
     ...argbase,
+    title: 'Rejected',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1274,6 +1276,7 @@ export const Rejected: Story = {
 export const Archived: Story = {
   args: {
     ...argbase,
+    title: 'Archived',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1288,6 +1291,7 @@ export const Archived: Story = {
 export const MarkedAsDuplicate: Story = {
   args: {
     ...argbase,
+    title: 'Archived',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1302,6 +1306,7 @@ export const MarkedAsDuplicate: Story = {
 export const Certified: Story = {
   args: {
     ...argbase,
+    title: 'Certified',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1352,6 +1357,7 @@ export const Certified: Story = {
 export const CertifiedBySomeoneElse: Story = {
   args: {
     ...argbase,
+    title: 'Certified',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1408,6 +1414,7 @@ export const CertifiedBySomeoneElse: Story = {
 export const RequestCorrection: Story = {
   args: {
     ...argbase,
+    title: 'Correction requested',
     action: requestCorrectionAction,
     fullEvent: {
       id: getUUID(),
@@ -1448,6 +1455,7 @@ export const RequestCorrection: Story = {
 export const UpdateAction: Story = {
   args: {
     ...argbase,
+    title: 'Updated',
     action: updateAction,
     fullEvent: {
       id: getUUID(),
@@ -1489,6 +1497,7 @@ export const UpdateAction: Story = {
 export const RecordCorrected: Story = {
   args: {
     ...argbase,
+    title: 'Record corrected',
     action: {
       ...requestCorrectionAction,
       annotation: {
@@ -1550,6 +1559,7 @@ export const RecordCorrected: Story = {
 export const RejectCorrection: Story = {
   args: {
     ...argbase,
+    title: 'Correction rejected',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1562,6 +1572,7 @@ export const RejectCorrection: Story = {
 export const ApproveCorrection: Story = {
   args: {
     ...argbase,
+    title: 'Correction approved',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1573,6 +1584,7 @@ export const ApproveCorrection: Story = {
 export const Assigned: Story = {
   args: {
     ...argbase,
+    title: 'Assigned',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1585,6 +1597,7 @@ export const Assigned: Story = {
 export const Unassigned: Story = {
   args: {
     ...argbase,
+    title: 'Unassigned',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
