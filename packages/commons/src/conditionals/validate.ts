@@ -340,10 +340,11 @@ function zodToIntlErrorMap(
 
   switch (issue.code) {
     case 'too_small': {
-      if (value === '') {
+      if (issue.message === undefined) {
         return createIntlError(requiredMessage)
       }
-      return createIntlError(errorMessages.invalidInput)
+
+      break
     }
 
     case 'invalid_type': {
