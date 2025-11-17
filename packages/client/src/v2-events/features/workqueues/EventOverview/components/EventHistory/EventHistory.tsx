@@ -355,9 +355,9 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         action={action}
         close={close}
         fullEvent={fullEvent}
+        title={title}
         userName={userName}
         validatorContext={validatorContext}
-        title={title}
       />
     ))
   }
