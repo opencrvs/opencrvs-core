@@ -197,8 +197,6 @@ export function allowCustomAction(
     .map(parseConfigurableScope)
     .filter((s) => s !== undefined)
 
-  console.log('parsedScopes', JSON.stringify(parsedScopes, null, 2))
-
   const allowedScope = parsedScopes.find(
     (s) =>
       s.type === 'record.custom-action' &&

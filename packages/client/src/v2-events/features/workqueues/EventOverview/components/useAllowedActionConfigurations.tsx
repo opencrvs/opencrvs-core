@@ -568,8 +568,6 @@ function useCustomActionConfigs(event: EventIndex): {
           action.customActionType
         )
 
-        console.log({ actionType: action.customActionType, isAllowed })
-
         if (!isAllowed) {
           return null
         }
