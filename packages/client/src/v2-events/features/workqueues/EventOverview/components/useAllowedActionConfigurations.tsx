@@ -30,7 +30,8 @@ import {
   configurableEventScopeAllowed,
   ITokenPayload,
   ActionTypes,
-  CustomActionConfig
+  CustomActionConfig,
+  hasScope
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -55,6 +56,7 @@ import {
   useCustomActionModal
 } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
+import { getToken } from '@client/utils/authUtils'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -549,6 +551,14 @@ function useCustomActionConfigs(event: EventIndex): {
   customActionModal: React.ReactNode
   customActionConfigs: ActionMenuItem[]
 } {
+  const token = getToken()
+  const userCanDoCustomAction = hasScope(token, 'record.custom-action')
+  if (!userCanDoCustomAction) {
+    return {
+      customActionModal: null,
+      customActionConfigs: []
+    }
+  }
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(event)
 
