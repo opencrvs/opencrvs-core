@@ -8,6 +8,12 @@
 
 HTTP input now accepts `field('..')` references in the HTTP body definition.
 
+## 1.9.2
+
+### Bug fixes
+
+- Fixes an issue where `event.hasAction` was not working in form configurations
+
 ## 1.9.1
 
 ### Breaking changes
