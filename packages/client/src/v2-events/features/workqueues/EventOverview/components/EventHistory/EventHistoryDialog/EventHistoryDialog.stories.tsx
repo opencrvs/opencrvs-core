@@ -158,7 +158,7 @@ export const Created: Story = {
 export const Notified: Story = {
   args: {
     ...argbase,
-    title: 'Notified',
+    title: 'Sent incomplete',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
