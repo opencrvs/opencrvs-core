@@ -49,7 +49,7 @@ do
   mv $MIGRATIONS_PATH/$migration_file.tmp $MIGRATIONS_PATH/$migration_file
 done
 
-DATABASE_URL=${EVENTS_POSTGRES_URL} yarn --cwd $SCRIPT_PATH node-pg-migrate up --schema=app --migrations-dir=./src/migrations/events
+DATABASE_URL=${EVENTS_POSTGRES_URL} yarn --cwd $SCRIPT_PATH node-pg-migrate up --single-transaction false --schema=app --migrations-dir=./src/migrations/events
 
 # Reverting to the original state after running the migrations
 for migration_file in $FILES_TO_MIGRATE
