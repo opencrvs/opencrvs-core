@@ -31,7 +31,7 @@ import {
   ITokenPayload,
   ActionTypes,
   CustomActionConfig,
-  hasScope
+  allowCustomAction
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -552,13 +552,6 @@ function useCustomActionConfigs(event: EventIndex): {
   customActionConfigs: ActionMenuItem[]
 } {
   const token = getToken()
-  const userCanDoCustomAction = hasScope(token, 'record.custom-action')
-  if (!userCanDoCustomAction) {
-    return {
-      customActionModal: null,
-      customActionConfigs: []
-    }
-  }
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(event)
 
@@ -568,15 +561,30 @@ function useCustomActionConfigs(event: EventIndex): {
         (action): action is CustomActionConfig =>
           action.type === ActionType.CUSTOM
       )
-      .map((action) => ({
-        label: action.label,
-        icon: 'PencilLine' as const,
-        onClick: async (workqueue?: string) =>
-          onCustomAction(action, workqueue),
-        disabled: false,
-        hidden: false,
-        type: ActionType.CUSTOM
-      }))
+      .map((action) => {
+        const isAllowed = allowCustomAction(
+          token,
+          event.type,
+          action.customActionType
+        )
+
+        console.log({ actionType: action.customActionType, isAllowed })
+
+        if (!isAllowed) {
+          return null
+        }
+
+        return {
+          label: action.label,
+          icon: 'PencilLine',
+          onClick: async (workqueue?: string) =>
+            onCustomAction(action, workqueue),
+          disabled: false,
+          hidden: false,
+          type: ActionType.CUSTOM
+        }
+      })
+      .filter((x) => Boolean(x)) as ActionMenuItem[]
   }, [eventConfiguration, onCustomAction])
 
   return { customActionModal, customActionConfigs }
