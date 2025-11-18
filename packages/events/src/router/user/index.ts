@@ -12,14 +12,10 @@
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import { UserOrSystem } from '@opencrvs/commons'
-import { publicProcedure, router, userOnlyProcedure } from '@events/router/trpc'
+import { router, userOnlyProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 import { getUserActions } from '@events/service/events/user/actions'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
-import {
-  migrateLegacyUsers,
-  MigrationError
-} from '@events/service/users/migrate-legacy-users'
 import { userCanReadOtherUser } from '../middleware'
 
 export const userRouter = router({
@@ -44,16 +40,5 @@ export const userRouter = router({
     .use(userCanReadOtherUser)
     .query(async ({ input }) => {
       return getUserActions(input)
-    }),
-  migrateLegacyUsers: publicProcedure.mutation(async () => {
-    const errors = await migrateLegacyUsers()
-    const toReadable = (error: MigrationError) =>
-      `${error.errorType}: ${JSON.stringify(error.meta)}`
-    if (errors.length > 0) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: errors.map(toReadable).join('\n')
-      })
-    }
-  })
+    })
 })

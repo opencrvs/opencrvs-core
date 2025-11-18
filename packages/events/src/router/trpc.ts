@@ -56,6 +56,7 @@ const authedProcedure = t.procedure.use(async (opts) => {
   })
 })
 
+/** @knipignore */
 export const publicProcedure = t.procedure
 
 /**
