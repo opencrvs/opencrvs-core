@@ -36,8 +36,7 @@ run_pg_migrations() {
 
   mkdir -p "$backup_path"
 
-  local files_to_migrate
-  files_to_migrate=$(ls -p "$migrations_path" | grep -v /)
+  local files_to_migrate=$(ls -p "$migrations_path" | grep -v /)
 
   # --- define cleanup function ---
   restore_backups() {
@@ -79,7 +78,6 @@ run_pg_migrations() {
   restore_backups
 }
 
-# Run events migrations
 export EVENTS_DB_USER="${EVENTS_DB_USER:-events_app}"
 
 # Run superuser events migrations
@@ -89,6 +87,7 @@ run_pg_migrations \
   "app" \
   "pgmigrations_superuser"
 
+# Run events migrations
 run_pg_migrations \
   "$SCRIPT_PATH/src/migrations/events" \
   "$EVENTS_POSTGRES_URL" \
