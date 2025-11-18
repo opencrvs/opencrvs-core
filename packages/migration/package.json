@@ -23,7 +23,8 @@
     "status:application-config": "migrate-mongo status -f ./src/migrate-mongo-config-application-config.js",
     "lint": "eslint -c eslint.config.cjs --max-warnings=0",
     "test:compilation": "tsc --noEmit",
-    "build": "rimraf build && tsc"
+    "test": "yarn test:compilation",
+    "build": "rimraf build && tsc --noCheck"
   },
   "dependencies": {
     "@elastic/elasticsearch": "8.13.1",
