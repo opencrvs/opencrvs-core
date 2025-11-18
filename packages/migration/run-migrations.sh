@@ -36,22 +36,37 @@ run_pg_migrations() {
 
   mkdir -p "$backup_path"
 
-  local files_to_migrate=$(ls -p "$migrations_path" | grep -v /)
+  local files_to_migrate
+  files_to_migrate=$(ls -p "$migrations_path" | grep -v /)
 
-  # Backup originals
+  # --- define cleanup function ---
+  restore_backups() {
+    echo "Restoring original migration files in $migrations_path"
+    for migration_file in $files_to_migrate; do
+      if [ -f "$backup_path/$migration_file" ]; then
+        mv "$backup_path/$migration_file" "$migrations_path/$migration_file"
+      fi
+    done
+    rm -rf "$backup_path"
+  }
+
+  # Always run restore_backups when the function exits
+  trap restore_backups EXIT
+
+  # --- Backup originals ---
   for migration_file in $files_to_migrate; do
     echo "Creating backup for $migrations_path/$migration_file"
     cp "$migrations_path/$migration_file" "$backup_path/$migration_file"
   done
 
-  # envsubst replacements
+  # --- envsubst ---
   for migration_file in $files_to_migrate; do
     echo "Updating environment variables in $migrations_path/$migration_file"
     envsubst <"$migrations_path/$migration_file" >"$migrations_path/$migration_file.tmp"
     mv "$migrations_path/$migration_file.tmp" "$migrations_path/$migration_file"
   done
 
-  # Run migrations
+  # --- Run migrations ---
   echo "Running migrations for schema '$schema' in $migrations_path"
   DATABASE_URL="$database_url" \
     yarn --cwd "$SCRIPT_PATH" node-pg-migrate up \
@@ -59,13 +74,9 @@ run_pg_migrations() {
     --migrations-dir="$migrations_path" \
     --migrations-table="$migrations_table"
 
-  # Restore originals
-  for migration_file in $files_to_migrate; do
-    echo "Reverting original file $migrations_path/$migration_file"
-    mv "$backup_path/$migration_file" "$migrations_path/$migration_file"
-  done
-
-  rm -rf "$backup_path"
+  # If migration succeeds, remove trap before exit so cleanup still happens normally
+  trap - EXIT
+  restore_backups
 }
 
 # Run events migrations
