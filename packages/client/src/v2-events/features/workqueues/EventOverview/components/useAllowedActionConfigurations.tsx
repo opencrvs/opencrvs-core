@@ -561,7 +561,7 @@ function useCustomActionConfigs(event: EventIndex): {
         (action): action is CustomActionConfig =>
           action.type === ActionType.CUSTOM
       )
-      .map((action) => {
+      .map<ActionMenuItem | null>((action) => {
         const isAllowed = allowCustomAction(
           token,
           event.type,
@@ -582,8 +582,8 @@ function useCustomActionConfigs(event: EventIndex): {
           type: ActionType.CUSTOM
         }
       })
-      .filter((x) => Boolean(x)) as ActionMenuItem[]
-  }, [eventConfiguration, onCustomAction])
+      .filter((x): x is ActionMenuItem => Boolean(x))
+  }, [event.type, eventConfiguration.actions, onCustomAction, token])
 
   return { customActionModal, customActionConfigs }
 }
