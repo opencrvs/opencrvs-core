@@ -13,9 +13,9 @@ import {
   ActionType,
   ActionStatus,
   EventDocument,
+  allowCustomAction,
   CustomActionInput
 } from '@opencrvs/commons/events'
-import { getScopes, parseConfigurableScope } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
 import { getEventById } from '@events/service/events/events'
@@ -24,26 +24,6 @@ import {
   getDefaultActionProcedures
 } from '@events/router/event/actions'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
-
-function allowCustomAction(
-  token: string,
-  eventType: string,
-  customActionType: string
-) {
-  const userScopes = getScopes(token)
-  const parsedScopes = userScopes
-    .map(parseConfigurableScope)
-    .filter((s) => s !== undefined)
-
-  const allowedScope = parsedScopes.find(
-    (s) =>
-      s.type === 'record.custom-action' &&
-      s.options.customActionType.includes(customActionType) &&
-      s.options.event.includes(eventType)
-  )
-
-  return Boolean(allowedScope)
-}
 
 export function customActionProcedures() {
   return {
