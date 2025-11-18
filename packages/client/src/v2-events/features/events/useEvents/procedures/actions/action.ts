@@ -123,6 +123,17 @@ function getCleanedDeclarationDiff({
   )
 }
 
+setMutationDefaults(trpcOptionsProxy.event.actions.custom.request, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.custom.request
+  ),
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEvent,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.CUSTOM }
+})
+
 setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.declare.request

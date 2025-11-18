@@ -13,10 +13,12 @@ import { EventStatus } from '@opencrvs/commons/client'
 import { QuickActionConfig } from './useQuickActionModal'
 
 export const register: QuickActionConfig = {
-  description: {
-    id: 'review.register.description.complete',
-    defaultMessage:
-      "By clicking 'Confirm', you confirm that the information entered is correct and the event can be registered."
+  modal: {
+    description: {
+      id: 'review.register.description.complete',
+      defaultMessage:
+        "By clicking 'Confirm', you confirm that the information entered is correct and the event can be registered."
+    }
   },
   onConfirm: ({ event, actions, customActions }) => {
     if (event.status === EventStatus.enum.DECLARED) {

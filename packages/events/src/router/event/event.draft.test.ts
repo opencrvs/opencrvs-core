@@ -75,7 +75,7 @@ test('Throws error when creating a draft for invalid action', async () => {
       transactionId: 'trnx-id'
     })
   ).rejects.toThrow(
-    "Action 'REGISTER' cannot be performed on an event in 'CREATED' state with [] flags. Available actions: READ, DECLARE, NOTIFY, DELETE"
+    "Action 'REGISTER' cannot be performed on an event in 'CREATED' state with [] flags. Available actions: READ, DECLARE, NOTIFY, DELETE, CUSTOM"
   )
 })
 

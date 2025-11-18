@@ -287,8 +287,7 @@ export const RecordScopeType = z.enum([
   'record.registered.print-certified-copies',
   'record.registered.request-correction',
   'record.registered.correct',
-  'record.unassign-others',
-  'record.custom-action'
+  'record.unassign-others'
 ])
 export type RecordScopeType = z.infer<typeof RecordScopeType>
 
@@ -304,12 +303,27 @@ export const RecordScope = z
   )
 export type RecordScope = z.infer<typeof RecordScope>
 
+export const CustomActionScope = z.object({
+  type: z.literal('record.custom-action'),
+  options: z.object({
+    event: z
+      .array(z.string())
+      .describe('Allowed event type, e.g. birth, death'),
+    customActionType: z
+      .array(z.string())
+      .describe('Allowed custom action types')
+  })
+})
+
+export type CustomActionScope = z.infer<typeof CustomActionScope>
+
 const ConfigurableRawScopes = z.discriminatedUnion('type', [
   SearchScope,
   CreateUserScope,
   EditUserScope,
   WorkqueueScope,
-  RecordScope
+  RecordScope,
+  CustomActionScope
 ])
 
 type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>

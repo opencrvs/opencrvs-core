@@ -59,7 +59,7 @@ const eventConfig: DeepPartial<EventConfig> = {
     },
     {
       type: ActionType.CUSTOM,
-      name: 'ADD_FLAG_ALWAYS',
+      customActionType: 'ADD_FLAG_ALWAYS',
       flags: [
         {
           id: 'always-added-flag',
@@ -69,7 +69,7 @@ const eventConfig: DeepPartial<EventConfig> = {
     },
     {
       type: ActionType.CUSTOM,
-      name: 'FOOBAR',
+      customActionType: 'FOOBAR',
       flags: []
     },
     { type: ActionType.PRINT_CERTIFICATE, flags: [] }
@@ -95,7 +95,7 @@ describe('resolveEventCustomFlags()', () => {
       actions: [
         {
           type: ActionType.CUSTOM,
-          name: 'ADD_FLAG_ALWAYS',
+          customActionType: 'ADD_FLAG_ALWAYS',
           declaration: {},
           createdAt: formatISO(now),
           status: ActionStatus.Accepted
@@ -113,7 +113,7 @@ describe('resolveEventCustomFlags()', () => {
       actions: [
         {
           type: ActionType.CUSTOM,
-          name: 'FOOBAR',
+          customActionType: 'FOOBAR',
           declaration: {},
           createdAt: formatISO(now),
           status: ActionStatus.Accepted

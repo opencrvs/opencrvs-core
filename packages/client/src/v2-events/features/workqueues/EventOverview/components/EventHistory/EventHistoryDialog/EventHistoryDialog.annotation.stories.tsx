@@ -130,6 +130,7 @@ export default meta
 type Story = StoryObj<typeof EventHistoryDialog>
 export const AnnotationUpdateOnValidate: Story = {
   args: {
+    title: 'Updated',
     fullEvent: annotationUpdateOnValidateEvent,
     action: updateActionForValidate
   }
@@ -215,6 +216,7 @@ const updateActionForRegister = expandWithClientSpecificActions(
 
 export const AnnotationUpdateOnRegister: Story = {
   args: {
+    title: 'Updated',
     fullEvent: annotationUpdateOnRegisterEvent,
     action: updateActionForRegister
   }

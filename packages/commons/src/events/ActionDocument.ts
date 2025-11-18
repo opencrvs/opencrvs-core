@@ -249,7 +249,7 @@ const ReadAction = ActionBase.extend(
 const CustomAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.CUSTOM),
-    name: z.string()
+    customActionType: z.string()
   })
 )
 

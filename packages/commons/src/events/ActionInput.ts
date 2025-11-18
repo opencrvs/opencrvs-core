@@ -215,6 +215,14 @@ export type ReadActionInput = z.infer<typeof ReadActionInput>
 export const DeleteActionInput = z.object({ eventId: UUID })
 export type DeleteActionInput = z.infer<typeof DeleteActionInput>
 
+export const CustomActionInput = BaseActionInput.extend(
+  z.object({
+    type: z.literal(ActionType.CUSTOM).default(ActionType.CUSTOM),
+    customActionType: z.string().describe('Name of the custom action.')
+  }).shape
+)
+export type CustomActionInput = z.infer<typeof CustomActionInput>
+
 /**
  * ActionInput types are used to validate the input data for the action.
  * In our use case, we use it directly with TRPC to validate the input data for the action.
@@ -253,7 +261,8 @@ export const ActionInput = z
     ApproveCorrectionActionInput.meta({
       id: 'ApproveCorrectionActionInput'
     }),
-    ReadActionInput.meta({ id: 'ReadActionInput' })
+    ReadActionInput.meta({ id: 'ReadActionInput' }),
+    CustomActionInput.meta({ id: 'CustomActionInput' })
   ])
   .meta({
     id: 'ActionInput'

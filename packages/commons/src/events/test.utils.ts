@@ -809,7 +809,11 @@ export function generateActionDocument<T extends ActionType>({
 
   switch (action) {
     case ActionType.CUSTOM:
-      return { ...actionBase, type: action, name: 'ATTESTATION' }
+      return {
+        ...actionBase,
+        type: action,
+        customActionType: 'CUSTOM_ACTION_TYPE'
+      }
     case ActionType.READ:
       return { ...actionBase, type: action }
     case ActionType.MARK_AS_NOT_DUPLICATE:

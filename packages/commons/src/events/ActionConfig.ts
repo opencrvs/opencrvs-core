@@ -33,7 +33,13 @@ export const ActionConfigBase = z.object({
     .array(ActionFlagConfig)
     .optional()
     .default([])
-    .describe('Flag actions which are executed when the action is performed.')
+    .describe('Flag actions which are executed when the action is performed.'),
+  auditHistoryLabel: TranslationConfig.describe(
+    'The label to show in audit history for this action. For example "Approved".'
+  ).optional(),
+  supportingCopy: TranslationConfig.optional().describe(
+    'Text displayed on the confirmation'
+  )
 })
 
 const DeclarationActionBase = ActionConfigBase.extend({
@@ -117,7 +123,9 @@ const ApproveCorrectionConfig = ActionConfigBase.extend(
 const CustomActionConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.CUSTOM),
-    name: z.string().describe('Name of the custom action.'),
+    customActionType: z
+      .string()
+      .describe('Type identifier of the custom action.'),
     /** Custom action form configuration supports a simple array of field configs, which should be rendered on the action modal. In the future, we might add support for pages etc. */
     form: z
       .array(FieldConfig)
@@ -126,6 +134,7 @@ const CustomActionConfig = ActionConfigBase.merge(
       )
   })
 )
+export type CustomActionConfig = z.infer<typeof CustomActionConfig>
 
 export const ActionConfig = z
   .discriminatedUnion('type', [

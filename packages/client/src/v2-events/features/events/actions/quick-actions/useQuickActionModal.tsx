@@ -11,27 +11,37 @@
 import React from 'react'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
+import { v4 as uuid } from 'uuid'
 import { ResponsiveModal } from '@opencrvs/components'
 import {
   DangerButton,
   PrimaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import { ActionType, EventIndex } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  CustomActionConfig,
+  EventIndex
+} from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { ROUTES } from '@client/v2-events/routes'
-import {
-  actionLabels,
-  useUserAllowedActions
-} from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserAllowedActions } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useModal } from '../../../../hooks/useModal'
 import { useEvents } from '../../useEvents/useEvents'
+import { actionLabels } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { validate } from './validate'
 import { register } from './register'
 import { archive } from './archive'
 
+interface ModalConfig {
+  label?: MessageDescriptor
+  description?: MessageDescriptor
+  confirmButtonType?: 'primary' | 'danger'
+  confirmButtonLabel?: MessageDescriptor
+}
+
 export interface QuickActionConfig {
-  description: MessageDescriptor
+  modal: ModalConfig
   onConfirm: ({
     event,
     actions,
@@ -43,8 +53,6 @@ export interface QuickActionConfig {
     customActions: ReturnType<typeof useEvents>['customActions']
     isActionAllowed: (action: ActionType) => boolean
   }) => void | Promise<void>
-  confirmButtonType?: 'primary' | 'danger'
-  confirmButtonLabel?: MessageDescriptor
 }
 
 const quickActions = {
@@ -55,13 +63,12 @@ const quickActions = {
 
 function QuickActionModal({
   close,
-  actionType
+  config
 }: {
   close: (result: boolean) => void
-  actionType: keyof typeof quickActions
+  config: ModalConfig & { label: MessageDescriptor }
 }) {
   const intl = useIntl()
-  const config = quickActions[actionType]
 
   const ConfirmButton =
     config.confirmButtonType === 'danger' ? DangerButton : PrimaryButton
@@ -88,13 +95,13 @@ function QuickActionModal({
       ]}
       autoHeight={true}
       handleClose={() => close(false)}
-      id={`quick-action-modal-${actionType}`}
+      id={`quick-action-modal-${config.label.id}`}
       responsive={true}
       show={true}
-      title={intl.formatMessage(actionLabels[actionType])}
+      title={intl.formatMessage(config.label)}
       width={800}
     >
-      {intl.formatMessage(config.description)}
+      {config.description ? intl.formatMessage(config.description) : null}
     </ResponsiveModal>
   )
 }
@@ -109,15 +116,17 @@ export function useQuickActionModal(event: EventIndex) {
     actionType: keyof typeof quickActions,
     workqueue?: string
   ) => {
+    const config = quickActions[actionType]
+    const label = actionLabels[actionType]
     const confirmed = await openModal<boolean>((close) => (
-      <QuickActionModal actionType={actionType} close={close} />
+      <QuickActionModal close={close} config={{ label, ...config.modal }} />
     ))
 
     // On confirmed modal, we will:
     // - Execute the configured onConfirm() for the action
     // - Redirect the user to the workqueue they arrived from if provided, or the home page if not
     if (confirmed) {
-      void quickActions[actionType].onConfirm({
+      void config.onConfirm({
         event,
         actions,
         customActions,
@@ -132,5 +141,53 @@ export function useQuickActionModal(event: EventIndex) {
     }
   }
 
-  return { onQuickAction, quickActionModal }
+  return { quickActionModal, onQuickAction }
+}
+
+const customActionConfigBase: Partial<ModalConfig> = {
+  confirmButtonType: 'primary',
+  confirmButtonLabel: {
+    id: 'buttons.confirm',
+    defaultMessage: 'Confirm',
+    description: 'Confirm button text'
+  }
+}
+
+export function useCustomActionModal(event: EventIndex) {
+  const [customActionModal, openModal] = useModal()
+  const navigate = useNavigate()
+  const { actions } = useEvents()
+
+  const onCustomAction = async (
+    actionConfig: CustomActionConfig,
+    workqueue?: string
+  ) => {
+    const confirmed = await openModal<boolean>((close) => (
+      <QuickActionModal
+        close={close}
+        config={{
+          ...customActionConfigBase,
+          label: actionConfig.label,
+          description: actionConfig.supportingCopy
+        }}
+      />
+    ))
+
+    if (confirmed) {
+      void actions.custom.mutate({
+        eventId: event.id,
+        customActionType: actionConfig.customActionType,
+        declaration: event.declaration,
+        transactionId: uuid()
+      })
+
+      if (workqueue) {
+        navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
+      } else {
+        navigate(ROUTES.V2.buildPath({}))
+      }
+    }
+  }
+
+  return { customActionModal, onCustomAction }
 }

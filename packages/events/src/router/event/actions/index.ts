@@ -31,7 +31,8 @@ import {
   RejectCorrectionActionInput,
   getPendingAction,
   ActionInputWithType,
-  EventConfig
+  EventConfig,
+  CustomActionInput
 } from '@opencrvs/commons/events'
 import {
   TokenUserType,
@@ -78,6 +79,10 @@ const defaultConfig = {
 } as const
 
 const ACTION_PROCEDURE_CONFIG = {
+  [ActionType.CUSTOM]: {
+    ...defaultConfig,
+    inputSchema: CustomActionInput
+  },
   [ActionType.NOTIFY]: {
     ...defaultConfig,
     inputSchema: NotifyActionInput,
@@ -200,10 +205,12 @@ export async function defaultRequestHandler(
   })
 
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
+
   const eventActionToken = await getActionConfirmationToken(
     { eventId: input.eventId, actionId: requestedAction.id },
     token
   )
+
   const { responseStatus, responseBody: confirmationResponse } =
     await requestActionConfirmation(
       input.type,

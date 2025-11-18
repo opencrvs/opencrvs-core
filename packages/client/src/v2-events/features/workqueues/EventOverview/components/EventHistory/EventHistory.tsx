@@ -21,8 +21,7 @@ import { Table } from '@opencrvs/components/lib/Table'
 import {
   ActionType,
   EventDocument,
-  getAcceptedActions,
-  ValidatorContext
+  getActionConfig
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -45,10 +44,13 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { UserAvatar } from './UserAvatar'
-import {
-  EventHistoryDialog,
-  eventHistoryStatusMessage
-} from './EventHistoryDialog/EventHistoryDialog'
+import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
+
+const eventHistoryStatusMessage = {
+  id: 'events.history.status',
+  defaultMessage:
+    '{status, select, Requested {Waiting for external validation} other {{action, select, CREATE {Draft} NOTIFY {Notified} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} UPDATE {Updated} other {Unknown}}}}'
+}
 
 const LargeGreyedInfo = styled.div`
   height: 231px;
@@ -345,13 +347,15 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
   const onHistoryRowClick = (
     action: EventHistoryActionDocument,
-    userName: string
+    userName: string,
+    title: string
   ) => {
     void openModal<void>((close) => (
       <EventHistoryDialog
         action={action}
         close={close}
         fullEvent={fullEvent}
+        title={title}
         userName={userName}
         validatorContext={validatorContext}
       />
@@ -398,16 +402,29 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     .map((action) => {
       const { name: actionCreatorName } = getActionCreator(action)
 
+      const actionConfig = getActionConfig({
+        eventConfiguration,
+        actionType: action.type as ActionType,
+        customActionType:
+          'customActionType' in action ? action.customActionType : undefined
+      })
+
+      // If a audit history label is configured in action config, use that!
+      const title =
+        actionConfig && actionConfig.auditHistoryLabel
+          ? intl.formatMessage(actionConfig.auditHistoryLabel)
+          : intl.formatMessage(eventHistoryStatusMessage, {
+              action: getActionTypeForHistory(history, action),
+              status: action.status
+            })
+
       return {
         action: (
           <Link
             font="bold14"
-            onClick={() => onHistoryRowClick(action, actionCreatorName)}
+            onClick={() => onHistoryRowClick(action, actionCreatorName, title)}
           >
-            {intl.formatMessage(eventHistoryStatusMessage, {
-              action: getActionTypeForHistory(history, action),
-              status: action.status
-            })}
+            {title}
           </Link>
         ),
         date: format(
