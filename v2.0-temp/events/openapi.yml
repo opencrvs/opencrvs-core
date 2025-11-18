@@ -571,6 +571,7 @@ paths:
                               - REQUEST_CORRECTION
                               - APPROVE_CORRECTION
                               - REJECT_CORRECTION
+                              - CUSTOM
                         required:
                           - id
                           - transactionId
@@ -2740,7 +2741,7 @@ components:
         type:
           type: string
           const: CUSTOM
-        name:
+        customActionType:
           type: string
       required:
         - id
@@ -2752,7 +2753,7 @@ components:
         - declaration
         - status
         - type
-        - name
+        - customActionType
     EventConfig:
       type: object
       properties:
@@ -3522,6 +3523,13 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: READ
@@ -10699,6 +10707,13 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
+          $ref: "#/components/schemas/TranslationConfig"
         deduplication:
           type: object
           properties:
@@ -10889,6 +10904,13 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
+          $ref: "#/components/schemas/TranslationConfig"
         deduplication:
           type: object
           properties:
@@ -10941,6 +10963,13 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: REJECT
@@ -10979,6 +11008,13 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: ARCHIVE
@@ -11017,6 +11053,13 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
+          $ref: "#/components/schemas/TranslationConfig"
         deduplication:
           type: object
           properties:
@@ -11069,6 +11112,13 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: DELETE
@@ -11107,6 +11157,13 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: PRINT_CERTIFICATE
@@ -11255,6 +11312,13 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: REQUEST_CORRECTION
@@ -11367,6 +11431,13 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: REJECT_CORRECTION
@@ -11405,6 +11476,13 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: APPROVE_CORRECTION
@@ -11443,11 +11521,18 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
+          $ref: "#/components/schemas/TranslationConfig"
         type:
           type: string
           const: CUSTOM
-        name:
-          description: Name of the custom action.
+        customActionType:
+          description: Type identifier of the custom action.
           type: string
         form:
           description: Form configuration for the custom action. The form configured here
@@ -11459,7 +11544,7 @@ components:
         - label
         - flags
         - type
-        - name
+        - customActionType
         - form
       additionalProperties: false
     error.UNAUTHORIZED:
@@ -11652,6 +11737,7 @@ components:
                       - REQUEST_CORRECTION
                       - APPROVE_CORRECTION
                       - REJECT_CORRECTION
+                      - CUSTOM
                 required:
                   - id
                   - transactionId
@@ -14528,7 +14614,7 @@ components:
         type:
           type: string
           const: CUSTOM
-        name:
+        customActionType:
           type: string
       required:
         - id
@@ -14540,7 +14626,7 @@ components:
         - declaration
         - status
         - type
-        - name
+        - customActionType
       additionalProperties: false
   securitySchemes:
     Authorization:
