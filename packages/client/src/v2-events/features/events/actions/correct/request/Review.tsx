@@ -42,9 +42,9 @@ export function Review() {
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
-  const validatorContext = useValidatorContext()
 
   const event = events.getEvent.getFromCache(eventId)
+  const validatorContext = useValidatorContext(event)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type

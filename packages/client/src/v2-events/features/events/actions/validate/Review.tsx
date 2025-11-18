@@ -58,9 +58,9 @@ export function Review() {
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { closeActionView } = useEventFormNavigation()
-  const validatorContext = useValidatorContext()
 
   const event = events.getEvent.findFromCache(eventId).data
+  const validatorContext = useValidatorContext(event)
 
   useEffect(() => {
     if (!event) {
