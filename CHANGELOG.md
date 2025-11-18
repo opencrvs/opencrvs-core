@@ -37,6 +37,8 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
   - `RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES`
   - `PROFILE_UPDATE`
 
+- Updated countryconfig repository clone branch from `master` to `develop` for setup script.
+
 ## [1.9.0](https://github.com/opencrvs/opencrvs-core/compare/v1.8.1...v1.9.0)
 
 ### Breaking changes
