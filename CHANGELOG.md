@@ -12,7 +12,7 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 
 ### Bug fixes
 
-- Fixes an issue where `event.hasAction` was not working in form configurations
+- Fixes an issue where `event.hasAction` was not working in form configurations [#11074](https://github.com/opencrvs/opencrvs-core/issues/11074)
 
 ## 1.9.1
 
