@@ -575,7 +575,7 @@ function useCustomActionConfigs(
       .filter((action) =>
         allowCustomAction(token, event.type, action.customActionType)
       )
-      .map<ActionMenuItem>((action) => ({
+      .map((action) => ({
         label: action.label,
         icon: 'PencilLine',
         onClick: async (workqueue?: string) =>
