@@ -31,6 +31,9 @@ exports[`event.actions.custom > Asynchronous confirmation flow > should save act
       "type": "ASSIGN",
     },
     {
+      "annotation": {
+        "notes": "Confirmed membership",
+      },
       "createdAt": "[sanitized]",
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
@@ -180,6 +183,9 @@ exports[`event.actions.custom > successfully executes action 1`] = `
       "type": "ASSIGN",
     },
     {
+      "annotation": {
+        "notes": "Confirmed membership",
+      },
       "createdAt": "[sanitized]",
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",

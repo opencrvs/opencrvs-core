@@ -43,7 +43,10 @@ async function initialiseTest(scopes: string[] = []) {
     type: ActionType.CUSTOM,
     eventId: event.id,
     transactionId: getUUID(),
-    customActionType: CUSTOM_ACTION_TYPE
+    customActionType: CUSTOM_ACTION_TYPE,
+    annotation: {
+      notes: 'Confirmed membership'
+    }
   }
 
   return { client, payload, generator, user }
