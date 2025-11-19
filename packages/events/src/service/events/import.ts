@@ -28,10 +28,11 @@ function mapEventActions(actions: EventDocument['actions']) {
     registrationNumber: (action as any).registrationNumber ?? undefined,
     assignedTo: (action as any).assignedTo ?? undefined,
     requestId: (action as any).requestId ?? undefined,
-    /* eslint-enable @typescript-eslint/no-explicit-any */
     createdAtLocation: action.createdAtLocation ?? null,
     originalActionId: action.originalActionId ?? null,
-    createdBySignature: action.createdBySignature ?? null
+    createdBySignature: action.createdBySignature ?? null,
+    customActionType: (action as any).customActionType ?? null
+    /* eslint-enable @typescript-eslint/no-explicit-any */
   }))
 }
 
