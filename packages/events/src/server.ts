@@ -18,6 +18,8 @@ import { appRouter } from './router/router'
 import { createContext } from './context'
 import { handleHealthCheckResponse } from './service/health'
 
+// misc change
+
 function stringifyRequest(req: IncomingMessage) {
   const url = new URL(req.url || '', `http://${req.headers.host}`)
   return `'${req.method} ${url.pathname}'`
