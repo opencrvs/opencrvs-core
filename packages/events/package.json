@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon -r tsconfig-paths/register src/index.ts",
-    "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
+    "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register --inspect=0.0.0.0:9229 build/dist/src/index.js",
     "test": "yarn test:compilation && vitest run",
     "test:watch": "vitest",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
