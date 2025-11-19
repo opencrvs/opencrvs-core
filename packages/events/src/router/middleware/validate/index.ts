@@ -43,7 +43,8 @@ import {
   omitHiddenPaginatedFields,
   runFieldValidations,
   runStructuralValidations,
-  ValidatorContext
+  ValidatorContext,
+  CustomActionConfig
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -195,6 +196,18 @@ function validateDeclarationUpdateAction({
   return [...declarationErrors, ...annotationErrors]
 }
 
+function findCustomActionFields(eventConfig: EventConfig): FieldConfig[] {
+  const customActions = eventConfig.actions.filter(
+    (action): action is CustomActionConfig => action.type === ActionType.CUSTOM
+  ) satisfies CustomActionConfig[]
+
+  if (!customActions.length) {
+    return []
+  }
+
+  return customActions.flatMap((action) => action.form)
+}
+
 function validateActionAnnotation({
   eventConfig,
   actionType,
@@ -219,9 +232,11 @@ function validateActionAnnotation({
   const formFields = pages.flatMap(({ fields }) =>
     fields.flatMap((field) => field)
   )
+  const customActionFields = findCustomActionFields(eventConfig)
 
   const errors = [
     ...getFieldErrors(formFields, annotation, context, declaration),
+    ...getFieldErrors(customActionFields, annotation, context, declaration),
     ...getVerificationPageErrors(visibleVerificationPageIds, annotation)
   ]
 
