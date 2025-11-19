@@ -495,7 +495,7 @@ export type ParsedScopes = NonNullable<
 export type RawScopes = z.infer<typeof LiteralScopes> | (string & {})
 
 // for backwards compatibility
-export type Scope = RawScopes
+export type Scope = RawScopes | ConfigurableScopeType
 
 export const ActionScopes = z.union([
   DeclareScopes,

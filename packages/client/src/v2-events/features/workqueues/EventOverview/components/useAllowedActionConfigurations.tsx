@@ -30,7 +30,8 @@ import {
   configurableEventScopeAllowed,
   ITokenPayload,
   ActionTypes,
-  CustomActionConfig
+  CustomActionConfig,
+  allowCustomAction
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -55,6 +56,7 @@ import {
   useCustomActionModal
 } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
+import { getToken } from '@client/utils/authUtils'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -552,6 +554,7 @@ function useCustomActionConfigs(
   customActionModal: React.ReactNode
   customActionConfigs: ActionMenuItem[]
 } {
+  const token = getToken()
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(event)
 
@@ -569,6 +572,9 @@ function useCustomActionConfigs(
         (action): action is CustomActionConfig =>
           action.type === ActionType.CUSTOM
       )
+      .filter((action) =>
+        allowCustomAction(token, event.type, action.customActionType)
+      )
       .map((action) => ({
         label: action.label,
         icon: 'PencilLine' as const,
@@ -578,7 +584,13 @@ function useCustomActionConfigs(
         hidden: false,
         type: ActionType.CUSTOM
       }))
-  }, [eventConfiguration, onCustomAction, isDownloadedAndAssignedToUser])
+  }, [
+    event.type,
+    eventConfiguration.actions,
+    onCustomAction,
+    token,
+    isDownloadedAndAssignedToUser
+  ])
 
   return { customActionModal, customActionConfigs }
 }

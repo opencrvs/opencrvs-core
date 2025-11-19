@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { getScopes, parseConfigurableScope } from '../../authentication'
 import {
   ActionType,
   DisplayableAction,
@@ -184,4 +185,24 @@ export function getAvailableActionsForEvent(
     getAvailableActionsWithoutFlagFilters(event.status, event.flags),
     event.flags
   )
+}
+
+export function allowCustomAction(
+  token: string,
+  eventType: string,
+  customActionType: string
+) {
+  const userScopes = getScopes(token)
+  const parsedScopes = userScopes
+    .map(parseConfigurableScope)
+    .filter((s) => s !== undefined)
+
+  const allowedScope = parsedScopes.find(
+    (s) =>
+      s.type === 'record.custom-action' &&
+      s.options.customActionType.includes(customActionType) &&
+      s.options.event.includes(eventType)
+  )
+
+  return Boolean(allowedScope)
 }
