@@ -217,7 +217,7 @@ export function Review() {
         previousFormValues={previousFormValues}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
-        validatorContext={{ ...validatorContext, event }}
+        validatorContext={validatorContext}
         onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       >

@@ -39,8 +39,8 @@ export function Pages() {
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { getFormValues, setFormValues } = useEventFormData()
   const formValues = getFormValues()
-  const validatorContext = useValidatorContext()
   const event = events.getEvent.getFromCache(eventId)
+  const validatorContext = useValidatorContext(event)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
@@ -109,7 +109,7 @@ export function Pages() {
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}
-        validatorContext={{ ...validatorContext, event }}
+        validatorContext={validatorContext}
         onPageChange={(nextPageId: string) =>
           navigate(
             ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath(

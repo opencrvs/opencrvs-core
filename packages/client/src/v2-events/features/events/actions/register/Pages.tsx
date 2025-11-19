@@ -86,7 +86,7 @@ export function Pages() {
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}
-        validatorContext={{ ...validatorContext, event }}
+        validatorContext={validatorContext}
         onPageChange={(nextPageId: string) =>
           navigate(
             ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath(
