@@ -32,6 +32,8 @@ import { env } from '@events/environment'
 let inMemoryEventConfigurations: EventConfig[] | null = null
 let inMemoryWorkqueueConfigurations: WorkqueueConfig[] | null = null
 
+const envIsProduction = false
+
 export async function getEventConfigurations(token: TokenWithBearer) {
   const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {
     headers: {
@@ -51,7 +53,8 @@ export async function getEventConfigurations(token: TokenWithBearer) {
  * @returns in-memory event configurations when running in production-like environment.
  */
 export async function getInMemoryEventConfigurations(token: TokenWithBearer) {
-  if (!env.isProduction) {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (!envIsProduction) {
     logger.info(
       `Running in ${process.env.NODE_ENV} mode. Fetching event configurations from API`
     )
@@ -116,7 +119,8 @@ async function getWorkqueueConfigurations(token: TokenWithBearer) {
 export async function getInMemoryWorkqueueConfigurations(
   token: TokenWithBearer
 ) {
-  if (!env.isProduction) {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (!envIsProduction) {
     logger.info(
       `Running in ${process.env.NODE_ENV} mode. Fetching workqueue configurations from API`
     )
