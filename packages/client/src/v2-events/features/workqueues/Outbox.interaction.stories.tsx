@@ -11,7 +11,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { graphql, HttpResponse } from 'msw'
 import { userEvent, within, expect, waitFor } from '@storybook/test'
 import { TRPCError } from '@trpc/server'
 import {
@@ -20,42 +19,31 @@ import {
   generateEventDocument,
   getCurrentEventState,
   footballClubMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  UUID,
+  generateEventDraftDocument
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { AppRouter } from '@client/v2-events/trpc'
-import { testDataGenerator } from '@client/tests/test-data-generators'
-import { wrapHandlersWithSpies } from '@client/tests/v2-events/declaration.utils'
 import { ReviewIndex } from '../events/actions/declare/Review'
 
-const generator = testDataGenerator()
-
-const declareEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
-})
+function getDeclareEventDocument(id: UUID) {
+  return generateEventDocument({
+    configuration: tennisClubMembershipEvent,
+    actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }],
+    defaults: {
+      id
+    }
+  })
+}
 
 const meta: Meta<typeof ReviewIndex> = {
-  title: 'Outbox/Interaction',
-  beforeEach: () => {
-    useEventFormData.setState({
-      formValues: getCurrentEventState(
-        declareEventDocument,
-        tennisClubMembershipEvent
-      ).declaration
-    })
-  }
+  title: 'Outbox/Interaction'
 }
 
 export default meta
 
 const OUTBOX_FREEZE_TIME = 5 * 1000 // 5 seconds
-
-const createdEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [{ type: ActionType.CREATE }]
-})
 
 type Story = StoryObj<typeof ReviewIndex>
 const tRPCMsw = createTRPCMsw<AppRouter>({
@@ -67,43 +55,44 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const declarationTrpcMsw = {
-  events: wrapHandlersWithSpies([
-    {
-      name: 'event.create',
-      procedure: tRPCMsw.event.create.mutation,
-      handler: () => createdEventDocument
-    },
-    {
-      name: 'event.actions.declare.request',
-      procedure: tRPCMsw.event.actions.declare.request.mutation,
-      handler: async () => {
-        await new Promise((resolve) => setTimeout(resolve, OUTBOX_FREEZE_TIME))
-        return declareEventDocument
-      }
-    }
-  ])
-}
-
-const mockUser = generator.user.fieldAgent().v2
+const successfulMutationEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [{ type: ActionType.CREATE }]
+})
 
 export const SuccessfulMutation: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT,
+    userRole: TestUserRole.enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: createdEventDocument.id
+        eventId: successfulMutationEvent.id
       })
     },
     chromatic: { disableSnapshot: true },
     offline: {
-      events: [createdEventDocument],
+      drafts: [
+        generateEventDraftDocument({
+          eventId: successfulMutationEvent.id,
+          actionType: ActionType.DECLARE
+        })
+      ],
+      events: [successfulMutationEvent],
       configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
     },
     msw: {
       handlers: {
-        events: [...declarationTrpcMsw.events.handlers]
+        events: [
+          tRPCMsw.event.create.mutation(() => {
+            return successfulMutationEvent
+          }),
+          tRPCMsw.event.actions.declare.request.mutation(async () => {
+            await new Promise((resolve) =>
+              setTimeout(resolve, OUTBOX_FREEZE_TIME)
+            )
+            return getDeclareEventDocument(successfulMutationEvent.id)
+          })
+        ]
       }
     }
   },
@@ -123,7 +112,7 @@ export const SuccessfulMutation: Story = {
 
       const searchResult = await canvas.findByTestId('search-result')
       const { firstname, surname } = getCurrentEventState(
-        declareEventDocument,
+        getDeclareEventDocument(successfulMutationEvent.id),
         tennisClubMembershipEvent
       ).declaration['applicant.name'] as {
         firstname: string
@@ -149,43 +138,46 @@ export const SuccessfulMutation: Story = {
   }
 }
 
-const declarationTrpcMswFail = {
-  events: wrapHandlersWithSpies([
-    {
-      name: 'event.create',
-      procedure: tRPCMsw.event.create.mutation,
-      handler: () => createdEventDocument
-    },
-    {
-      name: 'event.actions.declare.request',
-      procedure: tRPCMsw.event.actions.declare.request.mutation,
-      handler: async () => {
-        await new Promise((resolve) => setTimeout(resolve, OUTBOX_FREEZE_TIME))
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR'
-        })
-      }
-    }
-  ])
-}
+const failedMutationEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [{ type: ActionType.CREATE }]
+})
 
 export const FailedMutation: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT,
+    userRole: TestUserRole.enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: createdEventDocument.id
+        eventId: failedMutationEvent.id
       })
     },
     chromatic: { disableSnapshot: true },
     offline: {
-      events: [createdEventDocument],
+      drafts: [
+        generateEventDraftDocument({
+          eventId: failedMutationEvent.id,
+          actionType: ActionType.DECLARE
+        })
+      ],
+      events: [failedMutationEvent],
       configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
     },
     msw: {
       handlers: {
-        events: [...declarationTrpcMswFail.events.handlers]
+        events: [
+          tRPCMsw.event.create.mutation(() => {
+            return failedMutationEvent
+          }),
+          tRPCMsw.event.actions.declare.request.mutation(async () => {
+            await new Promise((resolve) =>
+              setTimeout(resolve, OUTBOX_FREEZE_TIME)
+            )
+            throw new TRPCError({
+              code: 'INTERNAL_SERVER_ERROR'
+            })
+          })
+        ]
       }
     }
   },
@@ -205,7 +197,7 @@ export const FailedMutation: Story = {
 
       const searchResult = await canvas.findByTestId('search-result')
       const { firstname, surname } = getCurrentEventState(
-        declareEventDocument,
+        getDeclareEventDocument(failedMutationEvent.id),
         tennisClubMembershipEvent
       ).declaration['applicant.name'] as {
         firstname: string
@@ -226,43 +218,46 @@ export const FailedMutation: Story = {
   }
 }
 
-const declarationTrpcMswConflict = {
-  events: wrapHandlersWithSpies([
-    {
-      name: 'event.create',
-      procedure: tRPCMsw.event.create.mutation,
-      handler: () => createdEventDocument
-    },
-    {
-      name: 'event.actions.declare.request',
-      procedure: tRPCMsw.event.actions.declare.request.mutation,
-      handler: async () => {
-        await new Promise((resolve) => setTimeout(resolve, OUTBOX_FREEZE_TIME))
-        throw new TRPCError({
-          code: 'CONFLICT'
-        })
-      }
-    }
-  ])
-}
+const failedMutationConflictEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [{ type: ActionType.CREATE }]
+})
 
 export const FailedMutationConflict: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT,
+    userRole: TestUserRole.enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: createdEventDocument.id
+        eventId: failedMutationConflictEvent.id
       })
     },
     chromatic: { disableSnapshot: true },
     offline: {
-      events: [createdEventDocument],
+      drafts: [
+        generateEventDraftDocument({
+          eventId: failedMutationConflictEvent.id,
+          actionType: ActionType.DECLARE
+        })
+      ],
+      events: [failedMutationConflictEvent],
       configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
     },
     msw: {
       handlers: {
-        events: [...declarationTrpcMswConflict.events.handlers]
+        events: [
+          tRPCMsw.event.create.mutation(() => {
+            return failedMutationConflictEvent
+          }),
+          tRPCMsw.event.actions.declare.request.mutation(async () => {
+            await new Promise((resolve) =>
+              setTimeout(resolve, OUTBOX_FREEZE_TIME)
+            )
+            throw new TRPCError({
+              code: 'CONFLICT'
+            })
+          })
+        ]
       }
     }
   },
@@ -282,7 +277,7 @@ export const FailedMutationConflict: Story = {
 
       const searchResult = await canvas.findByTestId('search-result')
       const { firstname, surname } = getCurrentEventState(
-        declareEventDocument,
+        getDeclareEventDocument(failedMutationConflictEvent.id),
         tennisClubMembershipEvent
       ).declaration['applicant.name'] as {
         firstname: string
@@ -297,7 +292,7 @@ export const FailedMutationConflict: Story = {
             `${firstname} ${surname}`
           )
         },
-        { timeout: OUTBOX_FREEZE_TIME + 1000 } // Allow some buffer for the freeze time
+        { timeout: OUTBOX_FREEZE_TIME + 2000 } // Allow some buffer for the freeze time
       )
 
       await expect(

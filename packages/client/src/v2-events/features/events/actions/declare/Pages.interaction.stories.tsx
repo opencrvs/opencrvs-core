@@ -17,6 +17,7 @@ import {
   ActionStatus,
   ActionType,
   Draft,
+  generateEventDocument,
   generateWorkqueues,
   getCurrentEventState,
   tennisClubMembershipEvent,
@@ -403,11 +404,11 @@ export const CanSubmitValidlyFilledForm: Story = {
       await userEvent.click(country)
       await selectEvent.select(country, 'Bangladesh')
 
-      const province = await canvas.findByTestId('location__province')
+      const province = await canvas.findByLabelText(/Province/i)
       await userEvent.click(province)
       await selectEvent.select(province, 'Central')
 
-      const district = await canvas.findByTestId('location__district')
+      const district = await canvas.findByLabelText(/District/i)
       await userEvent.click(district)
       await selectEvent.select(district, 'Ibombo')
 
@@ -437,7 +438,10 @@ export const CanSubmitValidlyFilledForm: Story = {
       'Verify that register button is enabled and that no validation errors are shown',
       async () => {
         await expect(canvas.queryByText('Required')).not.toBeInTheDocument()
-        await expect(await canvas.findByText('Register')).toBeEnabled()
+        const registerButton = await canvas.findByText('Register')
+        await expect(registerButton).toBeEnabled()
+        await userEvent.click(registerButton)
+        await userEvent.click(await canvas.findByTestId('confirm_Declare'))
       }
     )
   },
@@ -454,6 +458,64 @@ export const CanSubmitValidlyFilledForm: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return undeclaredDraftEvent
+          }),
+          tRPCMsw.event.actions.declare.request.mutation(async (payload) => {
+            await expect(payload.declaration).not.toHaveProperty(
+              'recommender.name'
+            )
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [
+                { type: ActionType.CREATE },
+                { type: ActionType.DECLARE }
+              ]
+            })
+          }),
+          tRPCMsw.event.actions.validate.request.mutation(async (payload) => {
+            await expect(payload.declaration).not.toHaveProperty(
+              'recommender.name'
+            )
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [
+                { type: ActionType.CREATE },
+                { type: ActionType.DECLARE },
+                { type: ActionType.VALIDATE }
+              ]
+            })
+          }),
+          tRPCMsw.event.actions.register.request.mutation(async (payload) => {
+            await expect(payload.declaration).not.toHaveProperty(
+              'recommender.name'
+            )
+            return generateEventDocument({
+              configuration: tennisClubMembershipEvent,
+              actions: [
+                { type: ActionType.CREATE },
+                { type: ActionType.DECLARE },
+                { type: ActionType.VALIDATE },
+                { type: ActionType.REGISTER }
+              ]
+            })
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return {
+              results: [
+                getCurrentEventState(
+                  generateEventDocument({
+                    configuration: tennisClubMembershipEvent,
+                    actions: [
+                      { type: ActionType.CREATE },
+                      { type: ActionType.DECLARE },
+                      { type: ActionType.VALIDATE },
+                      { type: ActionType.REGISTER }
+                    ]
+                  }),
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
           })
         ]
       }

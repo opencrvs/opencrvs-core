@@ -14,7 +14,6 @@ import React, { useEffect, useState } from 'react'
 import { fn } from '@storybook/test'
 import styled from 'styled-components'
 import QRCode from 'qrcode'
-import { config } from 'localforage'
 import {
   ConditionalType,
   field,
@@ -213,7 +212,7 @@ export const WithQrReader: StoryObj<Args> = {
             fields={fieldsWithQrReader}
             id="id-form"
             validatorContext={getTestValidatorContext(
-              TestUserRole.Enum.LOCAL_REGISTRAR
+              TestUserRole.enum.LOCAL_REGISTRAR
             )}
             onChange={onChange}
           />
@@ -244,7 +243,7 @@ export const WithQrReaderAndLinkButton: StoryObj<Args> = {
             fields={fieldsWithQrReaderAndLinkButton}
             id="id-form"
             validatorContext={getTestValidatorContext(
-              TestUserRole.Enum.LOCAL_REGISTRAR
+              TestUserRole.enum.LOCAL_REGISTRAR
             )}
             onChange={onChange}
           />

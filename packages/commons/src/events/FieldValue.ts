@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import {
   AddressFieldValue,
   AddressFieldUpdateValue,
@@ -18,8 +18,6 @@ import {
   NameFieldUpdateValue,
   HttpFieldUpdateValue,
   HttpFieldValue,
-  StreetLevelDetailsValue,
-  StreetLevelDetailsUpdateValue,
   QueryParamReaderFieldValue,
   QueryParamReaderFieldUpdateValue,
   QrReaderFieldValue,
@@ -41,10 +39,7 @@ import {
 export const TextValue = z.string()
 export const NonEmptyTextValue = TextValue.min(1)
 
-export const DateValue = z
-  .string()
-  .date()
-  .describe('Date in the format YYYY-MM-DD')
+export const DateValue = z.iso.date().describe('Date in the format YYYY-MM-DD')
 
 export type DateValue = z.infer<typeof DateValue>
 
@@ -57,7 +52,7 @@ export const AgeUpdateValue = AgeValue.optional().nullable()
 
 export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
 
-export const DatetimeValue = z.string().datetime()
+export const DatetimeValue = z.iso.datetime()
 
 export const SelectDateRangeValue = z.enum([
   'last7Days',
@@ -79,7 +74,7 @@ export const DateRangeFieldValue = z
 export type DateRangeFieldValue = z.infer<typeof DateRangeFieldValue>
 export type SelectDateRangeValue = z.infer<typeof SelectDateRangeValue>
 
-export const EmailValue = z.string().email()
+export const EmailValue = z.email()
 
 export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
@@ -102,15 +97,11 @@ export type VerificationStatusValue = z.infer<typeof VerificationStatusValue>
 // We need to create a separate union of all field types excluding the DataFieldValue,
 // because otherwise the DataFieldValue would need to refer to itself.
 const FieldValuesWithoutDataField = z.union([
-  /**
-   * Street level is our first dynamic record. In the future we might extend it to include any dynamic (sub)field.
-   */
-  StreetLevelDetailsValue,
+  AddressFieldValue,
   TextValue,
   DateValue,
   AgeValue,
   TimeValue,
-  AddressFieldValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
   CheckboxFieldValue,
@@ -126,39 +117,138 @@ const FieldValuesWithoutDataField = z.union([
   QrReaderFieldValue,
   IdReaderFieldValue
 ])
+type FieldValuesWithoutDataField = z.infer<typeof FieldValuesWithoutDataField>
 
 // As data field value can refer to other field values, it can contain any other field value types
 export const DataFieldValue = z
-  .record(z.string(), FieldValuesWithoutDataField)
+  .object({
+    data: z.record(z.string(), FieldValuesWithoutDataField)
+  })
   .nullish()
 export type DataFieldValue = z.infer<typeof DataFieldValue>
 
-export const FieldValue = z.union([FieldValuesWithoutDataField, DataFieldValue])
-export type FieldValue = z.infer<typeof FieldValue>
-
-export const FieldUpdateValue = z.union([
-  /**
-   * Street level is our first dynamic record. In the future we might extend it to include any dynamic (sub)field.
-   */
-  StreetLevelDetailsUpdateValue,
-  TextValue,
-  DateValue,
-  TimeValue,
-  AgeUpdateValue,
-  AddressFieldUpdateValue,
-  DateRangeFieldValue,
-  SelectDateRangeValue,
-  CheckboxFieldValue,
-  NumberFieldValue,
-  FileFieldValue,
-  FileFieldWithOptionValue,
-  DataFieldValue,
-  NameFieldUpdateValue,
-  HttpFieldUpdateValue,
-  QueryParamReaderFieldUpdateValue
+export type FieldValue = FieldValuesWithoutDataField | DataFieldValue
+export const FieldValue: z.ZodType<FieldValue> = z.union([
+  FieldValuesWithoutDataField,
+  DataFieldValue
 ])
 
-export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
+// Priority order for schema matching.
+// When multiple schemas pass validation (safeParse succeeds),
+// we’ll pick the one that appears *earlier* in this list.
+//
+// Example: if both TextValue and DateValue succeed for "2050-01-01",
+// we choose "TextValue" because it's higher priority here.
+const PRIORITY_ORDER = [
+  'NameFieldUpdateValue',
+  'DateRangeFieldValue',
+  'DateValue',
+  'TextValue',
+  'TimeValue',
+  'AgeUpdateValue',
+  'AddressFieldUpdateValue',
+  'SelectDateRangeValue',
+  'CheckboxFieldValue',
+  'NumberFieldValue',
+  'FileFieldValue',
+  'FileFieldWithOptionValue',
+  'DataFieldValue'
+] as const
+
+/**
+ * Returns numeric priority index for a schema based on PRIORITY_ORDER.
+ * Unknown or unlisted schemas (e.g. HttpFieldUpdateValue) get a large number (9999),
+ * meaning they lose in sorting priority.
+ */
+function schemaPriority(schema: z.ZodTypeAny) {
+  const name = schema.description
+  if (!name) {
+    return 9999
+  } // handles undefined
+
+  const idx = PRIORITY_ORDER.indexOf(name as (typeof PRIORITY_ORDER)[number])
+  return idx === -1 ? 9999 : idx
+}
+
+// Custom union helper for Zod.
+// Unlike z.union(), this allows us to detect overlapping schemas
+// (e.g. when multiple schemas return success=true for the same input)
+// and deterministically pick the "most specific" one.
+export function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(
+  schemas: T
+) {
+  return z
+    .any()
+    .superRefine((val, ctx) => {
+      const successful = schemas.filter((s) => s.safeParse(val).success)
+
+      if (successful.length === 1) {
+        return
+      }
+
+      if (successful.length === 0) {
+        ctx.addIssue({
+          code: 'invalid_type',
+          expected: 'custom',
+          message: 'Value does not match any schema'
+        })
+        return
+      }
+
+      // Multiple matches, pick the best according to PRIORITY_ORDER
+      successful.sort((a, b) => schemaPriority(a) - schemaPriority(b))
+      const best = successful[0]
+
+      if (!best.safeParse(val).success) {
+        ctx.addIssue({
+          expected: 'custom',
+          code: 'invalid_type',
+          message: 'Value did not match the best schema'
+        })
+      }
+    })
+    .meta({
+      description:
+        'Value that matches exactly one of the possible schema types (TextValue, DateValue, DateRangeFieldValue). The best matching schema is chosen by priority.'
+    })
+}
+
+export type FieldUpdateValue =
+  | z.infer<typeof TextValue>
+  | z.infer<typeof DateValue>
+  | z.infer<typeof TimeValue>
+  | z.infer<typeof AgeUpdateValue>
+  | z.infer<typeof AddressFieldUpdateValue>
+  | z.infer<typeof DateRangeFieldValue>
+  | z.infer<typeof SelectDateRangeValue>
+  | z.infer<typeof CheckboxFieldValue>
+  | z.infer<typeof NumberFieldValue>
+  | z.infer<typeof FileFieldValue>
+  | z.infer<typeof FileFieldWithOptionValue>
+  | z.infer<typeof DataFieldValue>
+  | z.infer<typeof NameFieldUpdateValue>
+  | z.infer<typeof HttpFieldUpdateValue>
+  | z.infer<typeof QueryParamReaderFieldUpdateValue>
+
+// All schemas are tagged using .describe() so we can identify them later
+// inside safeUnion(). The tag name should match PRIORITY_ORDER.
+export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
+  TextValue.describe('TextValue'),
+  DateValue.describe('DateValue'),
+  TimeValue.describe('TimeValue'),
+  AgeUpdateValue.describe('AgeUpdateValue'),
+  AddressFieldUpdateValue.describe('AddressFieldUpdateValue'),
+  DateRangeFieldValue.describe('DateRangeFieldValue'),
+  SelectDateRangeValue.describe('SelectDateRangeValue'),
+  CheckboxFieldValue.describe('CheckboxFieldValue'),
+  NumberFieldValue.describe('NumberFieldValue'),
+  FileFieldValue.describe('FileFieldValue'),
+  FileFieldWithOptionValue.describe('FileFieldWithOptionValue'),
+  DataFieldValue.describe('DataFieldValue'),
+  NameFieldUpdateValue.describe('NameFieldUpdateValue'),
+  HttpFieldUpdateValue.describe('HttpFieldUpdateValue'),
+  QueryParamReaderFieldUpdateValue.describe('QueryParamReaderFieldUpdateValue')
+])
 
 /**
  * NOTE: This is an exception. We need schema as a type in order to generate schema dynamically.
@@ -195,5 +285,7 @@ export type FieldUpdateValueSchema =
   | typeof ButtonFieldValue
   | typeof QrReaderFieldValue
   | typeof IdReaderFieldValue
+  | typeof DateValue
+  | typeof EmailValue
   | z.ZodString
   | z.ZodBoolean

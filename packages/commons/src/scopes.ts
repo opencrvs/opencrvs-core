@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { SearchScopeAccessLevels } from './events'
 
 export const SCOPES = {
@@ -303,12 +303,27 @@ export const RecordScope = z
   )
 export type RecordScope = z.infer<typeof RecordScope>
 
+export const CustomActionScope = z.object({
+  type: z.literal('record.custom-action'),
+  options: z.object({
+    event: z
+      .array(z.string())
+      .describe('Allowed event type, e.g. birth, death'),
+    customActionType: z
+      .array(z.string())
+      .describe('Allowed custom action types')
+  })
+})
+
+export type CustomActionScope = z.infer<typeof CustomActionScope>
+
 const ConfigurableRawScopes = z.discriminatedUnion('type', [
   SearchScope,
   CreateUserScope,
   EditUserScope,
   WorkqueueScope,
-  RecordScope
+  RecordScope,
+  CustomActionScope
 ])
 
 type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
@@ -476,6 +491,7 @@ export const scopes: Scope[] = Object.values(SCOPES)
 export type ParsedScopes = NonNullable<
   ReturnType<typeof parseConfigurableScope>
 >
+
 export type RawScopes = z.infer<typeof LiteralScopes> | (string & {})
 
 // for backwards compatibility

@@ -10,7 +10,7 @@
  */
 
 import { type estypes } from '@elastic/elasticsearch'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
@@ -137,6 +137,7 @@ function mapFieldTypeToElasticsearch(
       } satisfies {
         [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
       }
+
       return {
         type: 'object',
         properties: addressProperties
@@ -180,6 +181,7 @@ function mapFieldTypeToElasticsearch(
           option: { type: 'keyword' }
         }
       }
+    case FieldType.SEARCH:
     case FieldType.ID_READER:
     case FieldType.QR_READER:
     case FieldType.HTTP:
@@ -331,6 +333,7 @@ type _Combine<
 
 type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
+export type BulkResponse = estypes.BulkResponse
 
 export async function indexEventsInBulk(
   batch: EventDocument[],
@@ -393,10 +396,12 @@ export async function getIndexedEvents(
               { term: { status: EventStatus.enum.CREATED } },
               { term: { createdBy: userId } }
             ],
+
             should: undefined
           }
         }
       ],
+
       minimum_should_match: 1
     }
   } satisfies estypes.QueryDslQueryContainer

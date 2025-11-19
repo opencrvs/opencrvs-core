@@ -15,7 +15,8 @@ import { getUUID, UUID } from '../../uuid'
 import { ActionStatus, EventState } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { AddressType } from '../CompositeFieldValue'
-import { EventStatus, InherentFlags } from '../EventMetadata'
+import { EventStatus } from '../EventMetadata'
+import { InherentFlags } from '../Flag'
 import {
   generateActionDocument,
   generateEventDocument,
@@ -191,7 +192,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-01-01T00:00:00.000Z',
         createdBy: 'user1',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAtLocation: 'location1' as UUID,
         createdBySignature: '/ocrvs/signature.png',
         createdByRole: 'FIELD_AGENT'
@@ -206,7 +207,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Requested,
         createdAt: '2023-02-01T00:00:00.000Z',
         createdBy: 'user1',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAtLocation: 'location1' as UUID,
         createdBySignature: '/ocrvs/signature.png',
         createdByRole: 'FIELD_AGENT'
@@ -221,7 +222,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-03-01T00:00:00.000Z',
         createdBy: 'computer1',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAtLocation: 'location2' as UUID,
         createdBySignature: '/ocrvs/signature-2.png',
         createdByRole: '3RD_PARTY_API',
@@ -236,7 +237,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-04-01T00:00:00.000Z',
         createdBy: 'user2',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAtLocation: 'location3' as UUID,
         createdBySignature: '/ocrvs/signature-2.png',
         createdByRole: 'REGISTRATION_AGENT'
@@ -250,7 +251,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Requested,
         createdAt: '2023-05-01T00:00:00.000Z',
         createdBy: 'user3',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAtLocation: 'location4' as UUID,
         createdByRole: 'LOCAL_REGISTRAR',
         createdBySignature: '/ocrvs/signature-3.png'
@@ -264,7 +265,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-06-01T00:00:00.000Z',
         createdBy: 'computer2',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAtLocation: 'location5' as UUID,
         createdBySignature: '/ocrvs/signature-4.png',
         createdByRole: '3RD_PARTY_API',
@@ -346,7 +347,7 @@ describe('getCurrentEventState()', () => {
       defaults: {
         status: ActionStatus.Accepted,
         createdAt: '2023-01-01T00:00:00.000Z',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdBy: 'user1',
         createdBySignature: '/ocrvs/signature.png',
         createdAtLocation: 'location1' as UUID,
@@ -361,7 +362,7 @@ describe('getCurrentEventState()', () => {
       defaults: {
         status: ActionStatus.Accepted,
         createdAt: '2023-02-01T00:00:00.000Z',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdBy: 'user1',
         createdBySignature: '/ocrvs/signature.png',
         createdAtLocation: 'location1' as UUID,
@@ -375,7 +376,7 @@ describe('getCurrentEventState()', () => {
       defaults: {
         status: ActionStatus.Accepted,
         createdAt: '2023-04-01T00:00:00.000Z',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdBySignature: '/ocrvs/signature-2.png',
         createdBy: 'user2',
         createdAtLocation: 'location3' as UUID,
@@ -389,7 +390,7 @@ describe('getCurrentEventState()', () => {
       defaults: {
         status: ActionStatus.Accepted,
         createdAt: '2023-05-01T00:00:00.000Z',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdBy: 'user3',
         createdBySignature: '/ocrvs/signature-3.png',
         createdAtLocation: 'location4' as UUID,
@@ -530,7 +531,7 @@ describe('getCurrentEventState()', () => {
           configuration: tennisClubMembershipEvent,
           action: ActionType.DECLARE,
           defaults: {
-            createdByRole: TestUserRole.Enum.FIELD_AGENT,
+            createdByRole: TestUserRole.enum.FIELD_AGENT,
             declaration: {
               'applicant.dob': '2025-07-22',
               'applicant.name': {
@@ -754,7 +755,7 @@ describe('correction requests', () => {
             createdAt: '2025-01-23T02:21:38.343Z',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
             id: '63d19916-dcc8-4cf2-8161-eab9989765e8' as UUID,
@@ -772,7 +773,7 @@ describe('correction requests', () => {
             type: 'DECLARE',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdAt: '2025-01-23T02:21:39.161Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
@@ -785,7 +786,7 @@ describe('correction requests', () => {
             type: 'REGISTER',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdAt: '2025-01-23T02:21:40.182Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
@@ -801,7 +802,7 @@ describe('correction requests', () => {
               }
             },
             type: 'REQUEST_CORRECTION',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdAt: '2025-01-23T02:21:41.206Z',
@@ -838,7 +839,7 @@ describe('correction requests', () => {
             createdAt: '2025-01-23T02:21:38.343Z',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
             id: '63d19916-dcc8-4cf2-8161-eab9989765e8' as UUID,
@@ -857,7 +858,7 @@ describe('correction requests', () => {
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdBySignature: '/ocrvs/signature.png',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdAt: '2025-01-23T02:21:39.161Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             id: 'eb4c18e5-93bc-42f6-b110-909815f6a7c8' as UUID,
@@ -870,7 +871,7 @@ describe('correction requests', () => {
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdBySignature: '/ocrvs/signature.png',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdAt: '2025-01-23T02:21:40.182Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             id: 'bec6b33a-7a5f-4acd-9638-9e77db1800e2' as UUID,
@@ -888,7 +889,7 @@ describe('correction requests', () => {
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdBySignature: '/ocrvs/signature.png',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdAt: '2025-01-23T02:21:41.206Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             id: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d' as UUID,
@@ -901,7 +902,7 @@ describe('correction requests', () => {
             type: 'APPROVE_CORRECTION',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdBySignature: '/ocrvs/signature.png',
             createdAt: '2025-01-23T02:21:42.230Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
@@ -1058,5 +1059,76 @@ describe('deepDropNulls()', () => {
     expect(deepDropNulls(false)).toBe(false)
     expect(deepDropNulls(null)).toBe(null)
     expect(deepDropNulls(undefined)).toBe(undefined)
+  })
+})
+
+function reorderEventActionDates(
+  event: EventDocument,
+  baseDate: string = '2025-02-06T03:36:00.000Z'
+): EventDocument {
+  const order = ['CREATE', 'DECLARE', 'REGISTER', 'REQUEST_CORRECTION']
+
+  // Sort actions based on logical order
+  const sortedActions = [...event.actions].sort(
+    (a, b) => order.indexOf(a.type) - order.indexOf(b.type)
+  )
+
+  // Generate new actions with updated timestamps
+  const base = new Date(baseDate)
+  const updatedActions = sortedActions.map((action, i) => {
+    const newDate = new Date(base)
+    newDate.setDate(base.getDate() + i)
+    return {
+      ...action,
+      createdAt: newDate.toISOString()
+    }
+  })
+
+  // Return a new document with updated actions
+  return {
+    ...event,
+    actions: updatedActions
+  } satisfies EventDocument
+}
+
+describe('test status of a record when actions are not in order', () => {
+  it('take REGISTER action as the status of a record', () => {
+    const event = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.REGISTER },
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.REQUEST_CORRECTION
+        }
+      ]
+    })
+
+    const orderedEvent = reorderEventActionDates(event)
+
+    expect(
+      getCurrentEventState(orderedEvent, tennisClubMembershipEvent).status
+    ).toBe(EventStatus.enum.REGISTERED)
+  })
+
+  it('take DECLARE action as the status of a record', () => {
+    const event = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.CREATE }
+      ]
+    })
+
+    const orderedEvent = reorderEventActionDates(event)
+
+    expect(
+      getCurrentEventState(orderedEvent, tennisClubMembershipEvent).status
+    ).toBe(EventStatus.enum.DECLARED)
   })
 })

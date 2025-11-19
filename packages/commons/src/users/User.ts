@@ -10,7 +10,7 @@
  */
 
 import { FullDocumentPath } from '../documents'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { UUID } from '../uuid'
 import { TokenUserType } from '../authentication'
 

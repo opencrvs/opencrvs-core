@@ -14,20 +14,18 @@ import styled from 'styled-components'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import { Divider } from '@opencrvs/components/lib/Divider'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
   ActionType,
-  EventConfig,
   EventDocument,
-  getAcceptedActions,
-  ValidatorContext
+  getActionConfig
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import * as routes from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
@@ -36,20 +34,23 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import {
-  expandWithUpdateActions,
+  expandWithClientSpecificActions,
   EventHistoryActionDocument,
-  useActionForHistory
+  useActionForHistory,
+  extractHistoryActions
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
-import {
-  EventHistoryDialog,
-  eventHistoryStatusMessage
-} from './EventHistoryDialog/EventHistoryDialog'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { UserAvatar } from './UserAvatar'
+import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
 
-/**
- * Based on packages/client/src/views/RecordAudit/History.tsx
- */
+const eventHistoryStatusMessage = {
+  id: 'events.history.status',
+  defaultMessage:
+    '{status, select, Requested {Waiting for external validation} other {{action, select, CREATE {Draft} NOTIFY {Notified} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} UPDATE {Updated} other {Unknown}}}}'
+}
 
 const LargeGreyedInfo = styled.div`
   height: 231px;
@@ -101,10 +102,10 @@ const messages = defineMessages({
     description: 'Date Label',
     id: 'constants.label.date'
   },
-  history: {
-    defaultMessage: 'History',
-    description: 'History heading',
-    id: 'constants.history'
+  audit: {
+    defaultMessage: 'Audit',
+    description: 'Audit heading',
+    id: 'constants.audit'
   },
   labelRole: {
     defaultMessage: 'Role',
@@ -117,10 +118,6 @@ const messages = defineMessages({
     id: 'constants.location'
   }
 })
-
-const Header = styled(Text)`
-  margin-bottom: 20px;
-`
 
 const SystemName = styled.div`
   display: flex;
@@ -310,72 +307,66 @@ function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
   )
 }
 
-export function EventHistorySkeleton() {
+function EventHistorySkeleton() {
   const intl = useIntl()
   return (
-    <>
-      <Divider />
-      <Stack alignItems="stretch" direction="column" gap={16}>
-        <Text color="copy" element="h3" variant="h3">
-          {intl.formatMessage(messages.history)}
-        </Text>
-        <LargeGreyedInfo />
-      </Stack>
-    </>
+    <Content
+      size={ContentSize.LARGE}
+      title={intl.formatMessage(messages.audit)}
+    >
+      <LargeGreyedInfo />
+    </Content>
   )
 }
 
 /**
  *  Renders the event history table. Used for audit trail.
  */
-export function EventHistory({
-  fullEvent,
-  validatorContext,
-  eventConfiguration
-}: {
-  fullEvent: EventDocument
-  validatorContext: ValidatorContext
-  eventConfiguration: EventConfig
-}) {
+function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
+  const validatorContext = useValidatorContext()
+  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
   const intl = useIntl()
   const [modal, openModal] = useModal()
   const { getActionTypeForHistory } = useActionForHistory()
   const { getActionCreator } = useActionCreator()
 
-  const history = getAcceptedActions(fullEvent)
+  const history = extractHistoryActions(fullEvent)
 
-  const historyWithUpdatedActions = expandWithUpdateActions(
+  const historyWithClientSpecificActions = expandWithClientSpecificActions(
     fullEvent,
     validatorContext,
     eventConfiguration
   )
 
-  const visibleHistoryWithUpdatedActions = historyWithUpdatedActions.filter(
-    ({ type }) => type !== ActionType.CREATE
-  )
+  const visibleHistoryWithClientSpecificActions =
+    historyWithClientSpecificActions.filter(
+      ({ type }) => type !== ActionType.CREATE
+    )
 
   const onHistoryRowClick = (
     action: EventHistoryActionDocument,
-    userName: string
+    userName: string,
+    title: string
   ) => {
     void openModal<void>((close) => (
       <EventHistoryDialog
         action={action}
         close={close}
         fullEvent={fullEvent}
+        title={title}
         userName={userName}
         validatorContext={validatorContext}
       />
     ))
   }
 
-  const historyRows = visibleHistoryWithUpdatedActions
+  const historyRows = visibleHistoryWithClientSpecificActions
     .map((x) => {
       if (x.type === ActionType.REQUEST_CORRECTION) {
         const immediateApprovedCorrection =
-          visibleHistoryWithUpdatedActions.find(
+          visibleHistoryWithClientSpecificActions.find(
             (h) =>
               h.type === ActionType.APPROVE_CORRECTION &&
               (h.requestId === x.id || h.requestId === x.originalActionId) &&
@@ -411,15 +402,29 @@ export function EventHistory({
     .map((action) => {
       const { name: actionCreatorName } = getActionCreator(action)
 
+      const actionConfig = getActionConfig({
+        eventConfiguration,
+        actionType: action.type as ActionType,
+        customActionType:
+          'customActionType' in action ? action.customActionType : undefined
+      })
+
+      // If a audit history label is configured in action config, use that!
+      const title =
+        actionConfig && actionConfig.auditHistoryLabel
+          ? intl.formatMessage(actionConfig.auditHistoryLabel)
+          : intl.formatMessage(eventHistoryStatusMessage, {
+              action: getActionTypeForHistory(history, action),
+              status: action.status
+            })
+
       return {
         action: (
           <Link
             font="bold14"
-            onClick={() => onHistoryRowClick(action, actionCreatorName)}
+            onClick={() => onHistoryRowClick(action, actionCreatorName, title)}
           >
-            {intl.formatMessage(eventHistoryStatusMessage, {
-              status: getActionTypeForHistory(history, action)
-            })}
+            {title}
           </Link>
         ),
         date: format(
@@ -463,11 +468,10 @@ export function EventHistory({
   ]
 
   return (
-    <>
-      <Divider />
-      <Header color="copy" element="h3" variant="h3">
-        {intl.formatMessage(messages.history)}
-      </Header>
+    <Content
+      size={ContentSize.LARGE}
+      title={intl.formatMessage(messages.audit)}
+    >
       <TableDiv>
         <Table
           highlightRowOnMouseOver
@@ -478,12 +482,12 @@ export function EventHistory({
           noResultText=""
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
         />
-        {visibleHistoryWithUpdatedActions.length >
+        {visibleHistoryWithClientSpecificActions.length >
           DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
           <Pagination
             currentPage={currentPageNumber}
             totalPages={Math.ceil(
-              visibleHistoryWithUpdatedActions.length /
+              visibleHistoryWithClientSpecificActions.length /
                 DEFAULT_HISTORY_RECORD_PAGE_SIZE
             )}
             onPageChange={(page) => setCurrentPageNumber(page)}
@@ -491,6 +495,18 @@ export function EventHistory({
         )}
       </TableDiv>
       {modal}
-    </>
+    </Content>
   )
+}
+
+export function EventHistoryIndex() {
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.AUDIT)
+  const { getEvent } = useEvents()
+  const fullEvent = getEvent.findFromCache(eventId).data
+
+  if (!fullEvent) {
+    return <EventHistorySkeleton />
+  }
+
+  return <EventHistory fullEvent={fullEvent} />
 }

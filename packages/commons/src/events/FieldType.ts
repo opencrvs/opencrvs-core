@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 export const FieldType = {
   NAME: 'NAME',
@@ -42,6 +42,7 @@ export const FieldType = {
   SIGNATURE: 'SIGNATURE',
   DATA: 'DATA',
   BUTTON: 'BUTTON',
+  SEARCH: 'SEARCH',
   ALPHA_PRINT_BUTTON: 'ALPHA_PRINT_BUTTON',
   HTTP: 'HTTP',
   LINK_BUTTON: 'LINK_BUTTON',

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 /**
  * Translations from country-config for specific language.
@@ -19,7 +19,7 @@ export const LanguageConfig = z.object({
   /**
    * client.csv contents
    */
-  messages: z.record(z.string())
+  messages: z.record(z.string(), z.string())
 })
 
 export type LanguageConfig = z.infer<typeof LanguageConfig>

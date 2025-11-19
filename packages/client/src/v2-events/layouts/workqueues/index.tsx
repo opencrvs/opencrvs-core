@@ -25,6 +25,7 @@ import { useAllWorkqueueConfigurations } from '@client/v2-events/features/events
 import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { emptyMessage } from '@client/v2-events/utils'
+import { constantsMessages } from '@client/i18n/messages/constants'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
 
@@ -71,6 +72,10 @@ export function WorkqueueLayout({
   const workqueues = useAllWorkqueueConfigurations()
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
 
+  const scopes = useSelector(getScope) ?? []
+
+  const hasSearchScope = scopes.some((scope) => scope.startsWith('search'))
+
   return (
     <Frame
       header={
@@ -79,13 +84,15 @@ export function WorkqueueLayout({
           desktopRight={<ProfileMenu key="profileMenu" />}
           mobileLeft={<Hamburger />}
           mobileRight={
-            <Button
-              aria-label="Go to search"
-              type={'icon'}
-              onClick={() => navigate(ROUTES.V2.SEARCH.buildPath({}))}
-            >
-              <Icon color="primary" name="MagnifyingGlass" size="medium" />
-            </Button>
+            hasSearchScope && (
+              <Button
+                aria-label="Go to search"
+                type={'icon'}
+                onClick={() => navigate(ROUTES.V2.SEARCH.buildPath({}))}
+              >
+                <Icon color="primary" name="MagnifyingGlass" size="medium" />
+              </Button>
+            )
           }
           mobileTitle={
             title ?? intl.formatMessage(workqueueConfig?.name ?? emptyMessage)
@@ -93,7 +100,9 @@ export function WorkqueueLayout({
         />
       }
       navigation={<Sidebar key={workqueueSlug} />}
-      skipToContentText="skip"
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       {children}
     </Frame>

@@ -16,14 +16,12 @@ import React from 'react'
 import superjson from 'superjson'
 import { noop } from 'lodash'
 import {
-  ActionType,
   AddressFieldValue,
   AddressType,
   ConditionalType,
   defineDeclarationForm,
   field,
   FieldType,
-  generateEventDocument,
   generateTranslationConfig,
   TENNIS_CLUB_DECLARATION_FORM,
   tennisClubMembershipEvent
@@ -31,7 +29,6 @@ import {
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { RejectionState, Review } from './Review'
 
@@ -44,14 +41,16 @@ const mockDeclaration = {
   'applicant.address': {
     country: 'FAR',
     addressType: AddressType.DOMESTIC,
-    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-    district: '27160bbd-32d1-4625-812f-860226bfb92a',
-    street: '123 Tennis Club Avenue',
-    number: '123',
-    zipCode: 'Z12345',
-    urbanOrRural: 'URBAN' as const,
-    town: 'Tennisville',
-    residentialArea: 'Example Residential Area'
+    administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+    streetLevelDetails: {
+      town: 'Example Town',
+      residentialArea: 'Example Residential Area',
+      street: 'Example Street',
+      number: '55',
+      zipCode: '123456',
+      state: 'Example State',
+      district2: 'Example District 2'
+    }
   },
   'recommender.none': true
 }
@@ -510,45 +509,5 @@ export const RejectModalInteraction: StoryObj<typeof Review.Body> = {
         {modal}
       </>
     )
-  }
-}
-
-const declareEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [{ type: ActionType.CREATE }, { type: ActionType.DECLARE }]
-})
-
-const eventDocumentWithoutSurname = {
-  ...declareEventDocument,
-  actions: declareEventDocument.actions.map((action) => {
-    if (action.type !== ActionType.DECLARE || action.status !== 'Accepted') {
-      return action
-    }
-
-    return {
-      ...action,
-      declaration: {
-        ...action.declaration,
-        'applicant.name': {
-          firstname: 'John',
-          surname: ''
-        }
-      }
-    }
-  })
-}
-
-export const ReviewWithIncompleteName: Story = {
-  name: 'Review with incomplete name',
-  parameters: {
-    offline: {
-      events: [eventDocumentWithoutSurname]
-    },
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-        eventId: eventDocumentWithoutSurname.id
-      })
-    }
   }
 }

@@ -21,8 +21,6 @@ import { router as correctionReviewRouter } from '@client/v2-events/features/eve
 import * as Declare from '@client/v2-events/features/events/actions/declare'
 import { DeleteEventIndex } from '@client/v2-events/features/events/actions/delete'
 import * as PrintCertificate from '@client/v2-events/features/events/actions/print-certificate'
-import * as Register from '@client/v2-events/features/events/actions/register'
-import * as Validate from '@client/v2-events/features/events/actions/validate'
 import {
   AdvancedSearch,
   SearchResult
@@ -54,22 +52,27 @@ import { ProtectedRoute } from '../../components/ProtectedRoute'
 import { UserAudit } from '../../views/UserAudit/UserAudit'
 import { SystemList } from '../../views/SysAdmin/Config/Systems/Systems'
 import AllUserEmail from '../../views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
+import { EventHistoryIndex } from '../features/workqueues/EventOverview/components/EventHistory'
+import { PerformanceDashboard } from '../features/performance/Dashboard'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
 function PrefetchQueries() {
-  const workqueues = useWorkqueues()
+  const { prefetch } = useWorkqueues()
+
   useEffect(() => {
-    void queryClient.prefetchQuery({
-      queryKey: trpcOptionsProxy.locations.list.queryKey()
-    })
+    {
+      const { queryKey, queryFn } =
+        trpcOptionsProxy.locations.list.queryOptions()
 
-    function prefetch() {
-      void workqueues.prefetch()
+      // only fetch if we don't already have it cached
+      if (!queryClient.getQueryData(queryKey)) {
+        void queryClient.prefetchQuery({ queryKey, queryFn })
+      }
     }
-
-    prefetch()
-  }, [workqueues])
+    void prefetch()
+    // NOTE: Using anything else than prefetch will trigger load for each render. Destructure rather than passing entire object.
+  }, [prefetch])
 
   return null
 }
@@ -110,16 +113,26 @@ export const routesConfig = {
     },
     workqueueRouter,
     {
-      path: ROUTES.V2.EVENTS.VIEW.path,
-      element: <ReadonlyViewIndex />
-    },
-    {
-      path: ROUTES.V2.EVENTS.OVERVIEW.path,
+      path: ROUTES.V2.EVENTS.EVENT.path,
       element: (
         <EventOverviewLayout>
-          <EventOverviewIndex />
+          <Outlet />
         </EventOverviewLayout>
-      )
+      ),
+      children: [
+        {
+          index: true,
+          element: <EventOverviewIndex />
+        },
+        {
+          path: ROUTES.V2.EVENTS.EVENT.RECORD.path,
+          element: <ReadonlyViewIndex />
+        },
+        {
+          path: ROUTES.V2.EVENTS.EVENT.AUDIT.path,
+          element: <EventHistoryIndex />
+        }
+      ]
     },
     {
       path: ROUTES.V2.EVENTS.CREATE.path,
@@ -151,52 +164,8 @@ export const routesConfig = {
         }
       ]
     },
-    {
-      path: ROUTES.V2.EVENTS.VALIDATE.path,
-      element: (
-        <DeclarationAction actionType={ActionType.VALIDATE}>
-          <Outlet />
-        </DeclarationAction>
-      ),
-      children: [
-        {
-          index: true,
-          element: <Validate.Pages />
-        },
-        {
-          path: ROUTES.V2.EVENTS.VALIDATE.PAGES.path,
-          element: <Validate.Pages />
-        },
-        {
-          path: ROUTES.V2.EVENTS.VALIDATE.REVIEW.path,
-          element: <Validate.Review />
-        }
-      ]
-    },
     correctionRequestRouter,
     correctionReviewRouter,
-    {
-      path: ROUTES.V2.EVENTS.REGISTER.path,
-      element: (
-        <DeclarationAction actionType={ActionType.REGISTER}>
-          <Outlet />
-        </DeclarationAction>
-      ),
-      children: [
-        {
-          index: true,
-          element: <Register.Pages />
-        },
-        {
-          path: ROUTES.V2.EVENTS.REGISTER.PAGES.path,
-          element: <Register.Pages />
-        },
-        {
-          path: ROUTES.V2.EVENTS.REGISTER.REVIEW.path,
-          element: <Register.Review />
-        }
-      ]
-    },
     {
       path: ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.path,
       element: <ReviewDuplicateIndex />
@@ -250,6 +219,14 @@ export const routesConfig = {
     {
       path: ROUTES.V2.SETTINGS.path,
       element: <SettingsPage />
+    },
+    {
+      path: ROUTES.V2.DASHBOARD.path,
+      element: (
+        <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
+          <PerformanceDashboard />
+        </ProtectedRoute>
+      )
     },
     /** LEGACY ROUTES
      * During regression testing QA discovered that we were still using old workqueues on some components.

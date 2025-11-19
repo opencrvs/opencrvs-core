@@ -1,8 +1,24 @@
 # Changelog
 
+## 2.0.0 Release Candidate
+
+### New features
+
+#### HTTP Input
+
+HTTP input now accepts `field('..')` references in the HTTP body definition.
+
 ## 1.9.1
 
 ### Breaking changes
+
+- `QUERY_PARAM_READER` now returns picked params under a `data` object.
+  For example, `code` and `state` are now accessed via `data.code` and `data.state`.
+
+  Previously:
+  field(<page>.query-params).get('code')
+  Now:
+  field(<page>.query-params).get('data.code')
 
 - **Removed support for following scopes**
   - `NATLSYSADMIN`
@@ -21,9 +37,276 @@
   - `RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES`
   - `PROFILE_UPDATE`
 
-## 1.9.0 Release candidate
+## [1.9.0](https://github.com/opencrvs/opencrvs-core/compare/v1.8.1...v1.9.0)
+
+### Breaking changes
+
+- Dashboard configuration through **Metabase** has been fully migrated to **countryconfig**, and the standalone dashboard package has been removed.
+  For details on configuring dashboards and information about the latest updates, refer to the [ANALYTICS.md](https://github.com/opencrvs/opencrvs-countryconfig/blob/v1.9.0/ANALYTICS.md) documentation.
 
 ### New features
+
+#### Events V2
+
+We are excited to announce a major overhaul of our events system: **Events V2**.
+This is a complete rewrite that introduces a new level of flexibility and configurability to how life events are defined and managed across the system.
+
+The new Events V2 architecture is built around a set of core concepts designed to make event management more powerful and customizable.
+
+##### Events
+
+An **Event** represents a life event (or any kind of event), such as a birth or a marriage.
+Each event is defined by a configuration that specifies the sequence of **Actions** required to register it.
+
+##### Actions
+
+###### Declaration Actions
+
+Declaration actions are used to modify an event’s declaration.
+These actions must be executed in a defined order and cannot be skipped.
+
+1. **DECLARE**
+2. **VALIDATE**
+3. **REGISTER**
+
+Each action must be accepted by **countryconfig** before the next one can be performed.
+
+###### Rejecting and Archiving
+
+After declaration, instead of proceeding with registration, an event may be either **rejected** or **archived**.
+
+If **deduplication** is enabled for an action, performing that action may trigger a **DUPLICATE_DETECTED** action if duplicates are found.
+When this occurs, two additional actions become available:
+
+- **MARK_AS_DUPLICATE** – archives the event.
+- **MARK_AS_NOT_DUPLICATE** – resumes the normal action flow.
+
+If an event is rejected by a user, the preceding action must be repeated before continuing.
+
+###### Actions Before Declaration
+
+1. **NOTIFY** – a partial version of the `DECLARE` action.
+2. **DELETE** – an event can be deleted only if no declaration action has yet been performed.
+
+###### Actions After Registration
+
+Once an event has been registered, a certificate may be printed.
+If a correction is required due to an error in the registered declaration, a correction workflow must be initiated.
+
+1. **PRINT_CERTIFICATE**
+2. **REQUEST_CORRECTION**
+3. **REJECT_CORRECTION**
+4. **APPROVE_CORRECTION**
+
+###### General / Meta Actions
+
+1. **READ** – appended to the action trail whenever a complete event record is retrieved.
+2. **ASSIGN** – required before any action can be performed. By default, the user is automatically unassigned after completing an action.
+3. **UNASSIGN** – triggered either automatically by the system or manually by a user (if the record is assigned to themselves or if the user has the appropriate permission).
+
+##### Forms, Pages, and Fields
+
+Event data is collected through **Forms**, which come in two types:
+
+- **Declaration Form** – collects data about the event itself
+- **Action Form** – collects data specific to a particular action, also known as annotation data in the system
+
+Forms are composed of **Pages**, and pages are composed of **Fields**.
+Fields can be shown, hidden, or enabled dynamically based on the values of other fields, allowing for a responsive and intuitive user experience.
+
+To simplify configuration, we’ve introduced a set of helper functions:
+
+```ts
+defineDeclarationForm()
+defineActionForm()
+definePage()
+defineFormPage()
+```
+
+All of these are available in a **type-safe** manner via the new `@opencrvs/toolkit` npm package.
+
+##### Conditionals & Validation
+
+Validation has been significantly improved through the adoption of **AJV** and **JSON Schema**, providing standardized, robust, and extensible validation.
+
+The `field` function (exported from `@opencrvs/toolkit`) includes a set of helpers for defining complex validation rules and conditional logic.
+
+##### Available helpers include:
+
+- **Boolean connectors**: `and`, `or`, `not`
+- **Basic conditions**: `alwaysTrue`, `never`
+- **Comparisons**: `isAfter`, `isBefore`, `isGreaterThan`, `isLessThan`, `isBetween`, `isEqualTo`
+- **Field state checks**: `isFalsy`, `isUndefined`, `inArray`, `matches` (regex patterns)
+- **Age-specific helpers**: `asAge`, `asDob` (to compare age or date of birth)
+- **Nested fields**:
+
+  ```ts
+  field('parent.field.name').get('nested.field').isTruthy()
+  ```
+
+The `user` object, also exported from `@opencrvs/toolkit`, includes helpers for user-based conditions such as:
+
+```ts
+user.hasScope()
+user.hasRole()
+user.isOnline()
+```
+
+These conditions can control:
+
+- `SHOW` – whether a component is visible
+- `ENABLE` – whether a component is interactive
+- `DISPLAY_ON_REVIEW` – whether a field appears on review pages
+
+They can also be used to validate form data dynamically based on the current form state or user context.
+
+#### Drafts
+
+The new **Drafts** feature allows users to save progress on an event that has not yet been registered.
+Drafts act as temporary storage for an action and are visible only to the user who created them.
+
+#### Advanced Search
+
+Advanced search is now configurable through the `EventConfig.advancedSearch` property, allowing different sections of an advanced search form to be defined.
+
+You can search across:
+
+- **Declaration Fields** – using the same `field` function from declaration forms with helpers such as `range`, `exact`, `fuzzy`, and `within`
+- **Event Metadata** – using the `event` function to search against metadata such as:
+
+  - `trackingId`
+  - `status`
+  - `legalStatuses.REGISTERED.acceptedAt`
+  - `legalStatuses.REGISTERED.createdAtLocation`
+  - `updatedAt`
+
+More details about the metadata fields are available in `packages/commons/src/events/EventMetadata.ts`.
+
+#### Deduplication
+
+Event deduplication is now configurable **per action** via the `EventConfig.actions[].deduplication` property.
+Helpers for defining deduplication logic—such as `and`, `or`, `not`, and `field`—are available from `@opencrvs/toolkit/events/deduplication`.
+
+The `field` helper can reference declaration form fields and be combined with:
+
+```ts
+strictMatches()
+fuzzyMatches()
+dateRangeMatches()
+```
+
+to define precise deduplication rules.
+
+#### Greater Control over Actions
+
+Each action now progresses through three possible states: **`requested`**, **`accepted`**, and **`rejected`**.
+When a user performs an action, it is first marked as **`requested`** and forwarded to **countryconfig** via the `/trigger/events/{event}/actions/{action}` route, with the complete event details included in the payload.
+
+Countryconfig has full control over how the action is processed and may choose to **accept** or **reject** the action either **synchronously** or **asynchronously**.
+
+By hooking into these action trigger routes, countryconfig can also:
+
+- Send customized **Notifications**
+- Access the full event data at the time an action is performed
+
+#### Configurable Workqueues
+
+Workqueues can now be configured from countryconfig using the `defineWorkqueues` function from `@opencrvs/toolkit/events`.
+This enables the creation of role- or workflow-specific queues without requiring code changes in core.
+
+- The **`actions`** property is used to define the default actions displayed for records within a workqueue.
+- The **`query`** property is used to determine which events are included in the workqueue.
+- The **`workqueue[id=workqueue-one|workqueue-two]`** scope is used to control the visibility of workqueues for particular roles.
+
+Details on the available configuration options can be found in the `WorkqueueConfig.ts` file.
+
+#### Event Overview
+
+The configuration of the event overview page (formerly known as _Record Audit_) has been made customizable through the `EventConfig.summary` property.
+The record details displayed on this page can be referenced directly from the declaration form or defined as custom fields that combine multiple form values. If some value contains PII data, they can optionally be hidden via the `secured` flag so that the data will only be visible once the record is assigned to the user.
+
+#### Quick Search
+
+The dropdown previously available in the search bar has been removed.
+Any search performed through the **Quick Search** bar is now executed against common record properties such as names, tracking ID, and registration number by default, providing a more streamlined and consistent search experience.
+
+#### Certificate Template Variables
+
+The following variables are available for use within certificate templates:
+
+- **`$declaration`** – Contains the latest raw declaration form data. Typically used with the `$lookup` Handlebars helper to resolve values into human-readable text.
+- **`$metadata`** – Contains the `EventMetadata` object. Commonly used with the `$lookup` helper for resolving metadata fields into readable values.
+- **`$review`** – A boolean flag indicating whether the certificate is being rendered in review mode.
+- **`$references`** – Contains reference data for locations and users, accessible via `{{ $references.locations }}` and `{{ $references.users }}`.
+  This is useful when manually resolving values from `$declaration`, `$metadata` or `action`.
+
+##### Handlebars Helpers
+
+The following helpers are supported within certificate templates:
+
+- **`$lookup`** – Resolves values from `$declaration`, `$metadata`, or `action` data into a human-readable format.
+- **`$intl`** – Dynamically constructs a translation key by joining multiple string parts.
+  Example:
+
+  ```hbs
+  {{$intl 'constants.greeting' (lookup $declaration 'child.name')}}
+  ```
+
+- **`$intlWithParams`** – Enables dynamic translations with parameters.
+  Takes a translation ID as the first argument, followed by parameter name–value pairs.
+  Example:
+
+  ```hbs
+  {{$intlWithParams
+    'constants.greeting'
+    'name'
+    (lookup $declaration 'child.name')
+  }}
+  ```
+
+- **`$actions`** – Resolves all actions for a specified action type.
+  Example:
+
+  ```hbs
+  {{$actions 'PRINT_CERTIFICATE'}}
+  ```
+
+- **`$action`** – Retrieves the latest action data for a specific action type.
+  Example:
+
+  ```hbs
+  {{$action 'PRINT_CERTIFICATE'}}
+  ```
+
+- **`ifCond`** – Compares two values (`v1` and `v2`) using the specified operator and conditionally renders a block based on the result.
+  **Supported operators:**
+
+  - `'==='` – strict equality
+  - `'!=='` – strict inequality
+  - `'<'`, `'<='`, `'>'`, `'>='` – numeric or string comparisons
+  - `'&&'` – both values must be truthy
+  - `'||'` – at least one value must be truthy
+
+  **Usage example:**
+
+  ```hbs
+  {{#ifCond value1 '===' value2}}
+    ...
+  {{/ifCond}}
+  ```
+
+- **`$or`** – Returns the first truthy value among the provided arguments.
+- **`$json`** – Converts any value to its JSON string representation (useful for debugging).
+
+Besides the ones introduced above, all built-in [Handlebars helpers](https://handlebarsjs.com/guide/builtin-helpers.html) are available.
+
+Custom helpers can also be added by exposing functions from this [file](https://github.com/opencrvs/opencrvs-countryconfig/blob/develop/src/form/common/certificate/handlebars/helpers.ts#L0-L1).
+
+---
+
+To see Events V2 in action, check out the example configurations in the **countryconfig** repository.
+
+---
 
 - **Redis password support with authorization and authentication** [#9338](https://github.com/opencrvs/opencrvs-core/pull/9338). By default password is disabled for local development environment and enabled on server environments.
 - **Switch back to default redis image** [#10173](https://github.com/opencrvs/opencrvs-core/issues/10173)

@@ -83,8 +83,7 @@ export const tennisClubMembershipEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.validate.label'
-      },
-      review: TENNIS_CLUB_DECLARATION_REVIEW
+      }
     },
     {
       type: ActionType.REGISTER,
@@ -93,8 +92,7 @@ export const tennisClubMembershipEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.register.label'
-      },
-      review: TENNIS_CLUB_DECLARATION_REVIEW
+      }
     },
     {
       type: ActionType.REQUEST_CORRECTION,

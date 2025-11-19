@@ -15,18 +15,18 @@ import {
   WorkqueueActionsWithDefault,
   isMetaAction,
   getOrThrow,
-  ActionType
+  ActionTypes
 } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 import { useAuthentication } from '@client/utils/userUtils'
-import {
-  ActionMenuActionType,
-  useAllowedActionConfigurations
-} from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useAllowedActionConfigurations } from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { withSuspense } from '../../../components/withSuspense'
 
 // Actions which should never be shown as a CTA
-const EXCLUDED_ACTIONS: ActionMenuActionType[] = [ActionType.ARCHIVE]
+const EXCLUDED_ACTIONS: string[] = [
+  ActionTypes.enum.ARCHIVE,
+  ActionTypes.enum.CUSTOM
+]
 
 /**
  * @returns next available action cta based on the given event.
@@ -63,9 +63,13 @@ function ActionCtaComponent({
     <Button
       disabled={'disabled' in config && Boolean(config.disabled)}
       type="primary"
-      onClick={async () => config.onClick(redirectParam)}
+      onClick={async () =>
+        config.onCtaClick
+          ? config.onCtaClick(redirectParam)
+          : config.onClick(redirectParam)
+      }
     >
-      {intl.formatMessage(config.label)}
+      {intl.formatMessage(config.ctaLabel || config.label)}
     </Button>
   )
 }

@@ -107,7 +107,7 @@ export const FileInputWithOptionTest: StoryObj<
             ]}
             id="my-form"
             validatorContext={getTestValidatorContext(
-              TestUserRole.Enum.LOCAL_REGISTRAR
+              TestUserRole.enum.LOCAL_REGISTRAR
             )}
             onChange={(data) => {
               meta.args?.onChange(data) ?? noop()
@@ -210,7 +210,7 @@ export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
             ]}
             id="my-form"
             validatorContext={getTestValidatorContext(
-              TestUserRole.Enum.LOCAL_REGISTRAR
+              TestUserRole.enum.LOCAL_REGISTRAR
             )}
             onChange={(data) => {
               meta.args?.onChange(data) ?? noop()
@@ -224,8 +224,10 @@ export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
+    await canvas.findByText('Upload your captured photo')
+
     const fileInput = await canvas.findByRole('button', {
-      name: 'Upload'
+      name: /upload/i
     })
 
     const input = canvasElement.querySelector(

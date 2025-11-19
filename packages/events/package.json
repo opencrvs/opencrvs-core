@@ -23,6 +23,7 @@
     "@trpc/server": "11.4.3",
     "@types/luxon": "^3.6.2",
     "@types/pg": "^8.15.4",
+    "@types/pg-cursor": "^2.7.2",
     "app-module-path": "^2.2.0",
     "envalid": "^8.0.0",
     "json-stream-stringify": "^3.1.6",
@@ -36,11 +37,10 @@
     "pg-cursor": "^2.15.3",
     "pg-query-stream": "^4.10.0",
     "superjson": "1.9.0-0",
-    "trpc-to-openapi": "^2.1.5",
+    "trpc-to-openapi": "^3.1.0",
     "tsconfig-paths": "^3.13.0",
-    "zod": "^3.23.8",
-    "@types/pg-cursor": "^2.7.2",
-    "zod-openapi": "^4.2.4"
+    "zod": "^4.1.12",
+    "zod-openapi": "^5.4.3"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.7",

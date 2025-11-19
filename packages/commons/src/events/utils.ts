@@ -24,12 +24,7 @@ import {
   orderBy,
   isEqual
 } from 'lodash'
-import {
-  ActionType,
-  DeclarationActionType,
-  DeclarationActions,
-  writeActions
-} from './ActionType'
+import { ActionType, DeclarationActionType, writeActions } from './ActionType'
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import {
@@ -54,17 +49,10 @@ import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
 import { DateValue, SelectDateRangeValue } from './FieldValue'
 import { subDays, subYears, format } from 'date-fns'
-import { ConditionalType } from './Conditional'
 
 export function ageToDate(age: number, asOfDate: DateValue) {
   const date = new Date(asOfDate)
   return DateValue.parse(format(subYears(date, age), 'yyyy-MM-dd'))
-}
-
-function isDeclarationActionConfig(
-  action: ActionConfig
-): action is DeclarationActionConfig {
-  return DeclarationActions.safeParse(action.type).success
 }
 
 export function getDeclarationFields(
@@ -101,11 +89,31 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
     return actionConfig.printForm.pages.flatMap(({ fields }) => fields)
   }
 
-  if (isDeclarationActionConfig(actionConfig)) {
+  if ('review' in actionConfig) {
     return actionConfig.review.fields
   }
 
   return []
+}
+
+// @TODO CIHAN: use this everywhere
+export function getActionConfig({
+  eventConfiguration,
+  actionType,
+  customActionType
+}: {
+  eventConfiguration: EventConfig
+  actionType: ActionType
+  customActionType?: string
+}): ActionConfig | undefined {
+  const actionConfig = eventConfiguration.actions.find((a) => {
+    if (a.type === ActionType.CUSTOM && customActionType) {
+      return a.customActionType === customActionType
+    }
+    return a.type === actionType
+  })
+
+  return actionConfig
 }
 
 function getAllAnnotationFields(config: EventConfig): FieldConfig[] {
@@ -153,17 +161,22 @@ export function getActionReview(
     (a): a is DeclarationActionConfig => a.type === actionType
   )
 
-  return getOrThrow(
-    actionConfig.review,
-    `No review config found for ${actionType}`
-  )
+  if ('review' in actionConfig) {
+    return actionConfig.review
+  }
+
+  return undefined
 }
 
 export function getActionReviewFields(
   configuration: EventConfig,
   actionType: DeclarationActionType
 ) {
-  return getActionReview(configuration, actionType).fields
+  const review = getActionReview(configuration, actionType)
+  if (!review) {
+    return []
+  }
+  return review.fields
 }
 
 export function isPageVisible(
@@ -217,29 +230,28 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
   return fn(base)
 }
 
-export function omitHiddenPaginatedFields(
+export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>(
   formConfig: FormConfig,
-  values: EventState,
+  values: T,
   validatorContext: ValidatorContext
 ) {
-  // If a page has a conditional, we set it as one of the field's conditionals with ConditionalType.SHOW
-  const fields = formConfig.pages.flatMap((p) =>
-    p.fields.map((f) => {
-      if (!p.conditional) {
-        return f
-      }
+  const visibleFields = formConfig.pages
+    .filter((p) => isPageVisible(p, values, validatorContext))
+    .flatMap((p) => p.fields)
 
-      return {
-        ...f,
-        conditionals: [
-          ...(f.conditionals ?? []),
-          { type: ConditionalType.SHOW, conditional: p.conditional }
-        ]
-      }
-    })
+  const hiddenFields = formConfig.pages
+    .filter((p) => !isPageVisible(p, values, validatorContext))
+    .flatMap((p) => p.fields)
+
+  const valuesExceptHiddenPage = omitBy(values, (_, fieldId) => {
+    return hiddenFields.some((f) => f.id === fieldId)
+  })
+
+  return omitHiddenFields(
+    visibleFields,
+    valuesExceptHiddenPage,
+    validatorContext
   )
-
-  return omitHiddenFields(fields, values, validatorContext)
 }
 
 /**
@@ -281,7 +293,7 @@ export function createEmptyDraft(
       declaration: {},
       annotation: {},
       createdAt: new Date().toISOString(),
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdBy: '@todo',
       status: ActionStatus.Accepted,
       transactionId: '@todo',
@@ -317,7 +329,7 @@ export function omitHiddenAnnotationFields(
 
   return omitHiddenFields(
     annotationFields,
-    { ...declaration, ...annotation },
+    { ...declaration, ...annotation } satisfies ActionUpdate,
     context
   )
 }
@@ -507,10 +519,10 @@ export function getPendingAction(actions: Action[]): ActionDocument {
 }
 
 export function getCompleteActionAnnotation(
-  annotation: EventState,
+  annotation: ActionUpdate,
   event: EventDocument,
   action: ActionDocument
-): EventState {
+): ActionUpdate {
   /*
    * When an action has an `originalActionId`, it means this action is linked
    * to another one (the "original" action).
@@ -538,11 +550,9 @@ export function getCompleteActionAnnotation(
   return deepMerge(annotation, action.annotation ?? {})
 }
 
-export function getCompleteActionDeclaration(
-  declaration: EventState,
-  event: EventDocument,
-  action: ActionDocument
-): EventState {
+export function getCompleteActionDeclaration<
+  T extends EventState | ActionUpdate
+>(declaration: T, event: EventDocument, action: ActionDocument): T {
   /*
    * When an action has an `originalActionId`, it means this action is linked
    * to another one (the "original" action).

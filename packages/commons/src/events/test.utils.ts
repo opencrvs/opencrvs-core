@@ -19,7 +19,8 @@ import {
   ActionStatus,
   EventState,
   PrintCertificateAction,
-  DuplicateDetectedAction
+  DuplicateDetectedAction,
+  ActionUpdate
 } from './ActionDocument'
 import {
   ApproveCorrectionActionInput,
@@ -65,7 +66,7 @@ import {
 } from './CompositeFieldValue'
 import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { FullDocumentPath } from '../documents'
 
 /**
@@ -209,7 +210,9 @@ function mapFieldTypeToMockValue(
           residentialArea: 'Example Residential Area',
           street: 'Example Street',
           number: '55',
-          zipCode: '123456'
+          zipCode: '123456',
+          state: 'Example State',
+          district2: 'Example District 2'
         }
       }
     case FieldType.DATE:
@@ -237,6 +240,7 @@ function mapFieldTypeToMockValue(
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue
+    case FieldType.SEARCH:
     case FieldType.HTTP:
       return {
         error: null,
@@ -253,10 +257,10 @@ function mapFieldTypeToMockValue(
   }
 }
 
-function fieldConfigsToActionPayload(
+export function fieldConfigsToActionPayload(
   fields: FieldConfig[],
   rng: () => number
-): EventState {
+): ActionUpdate {
   return fields.reduce(
     (acc, field, i) => ({
       ...acc,
@@ -270,8 +274,8 @@ export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType,
   rng: () => number,
-  overrides?: Partial<EventState>
-): EventState {
+  overrides?: ActionUpdate
+): ActionUpdate {
   const parsed = DeclarationUpdateActions.safeParse(action)
 
   if (isEmpty(overrides) && typeof overrides === 'object') {
@@ -379,8 +383,7 @@ export function eventPayloadGenerator(
         omitFields = []
       }: {
         eventId: UUID
-        actionType: Draft['action']['type']
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        actionType: Draft['action']['type'] // eslint-disable-next-line @typescript-eslint/no-explicit-any
         annotation?: Record<string, any>
         omitFields?: string[] // list of declaration fields to exclude
       },
@@ -415,7 +418,7 @@ export function eventPayloadGenerator(
           },
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
-          createdByUserType: TokenUserType.Enum.user,
+          createdByUserType: TokenUserType.enum.user,
           createdByRole: '@todo'
         }
       }
@@ -509,7 +512,6 @@ export function eventPayloadGenerator(
             ActionType.VALIDATE,
             rng
           ),
-        duplicates: [],
         eventId,
         ...input
       }),
@@ -548,7 +550,6 @@ export function eventPayloadGenerator(
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
         annotation: {},
-        duplicates: [],
         eventId,
         content: {
           reason: `${ActionType.ARCHIVE}`
@@ -570,7 +571,6 @@ export function eventPayloadGenerator(
         annotation:
           input.annotation ??
           generateActionAnnotationInput(configuration, ActionType.REJECT, rng),
-        duplicates: [],
         eventId,
         content: { reason: `${ActionType.REJECT}` },
         ...input
@@ -784,15 +784,15 @@ export function generateActionDocument<T extends ActionType>({
   action: T
   rng?: () => number
   defaults?: Partial<Extract<ActionDocument, { type: T }>>
-  declarationOverrides?: Partial<EventState>
+  declarationOverrides?: ActionUpdate
 }): ActionDocument {
   const actionBase = {
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
     createdBy: generateUuid(rng),
-    createdByUserType: TokenUserType.Enum.user,
-    createdByRole: TestUserRole.Enum.FIELD_AGENT,
+    createdByUserType: TokenUserType.enum.user,
+    createdByRole: TestUserRole.enum.FIELD_AGENT,
     id: getUUID(),
     createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     declaration: generateActionDeclarationInput(
@@ -808,6 +808,12 @@ export function generateActionDocument<T extends ActionType>({
   } satisfies ActionBase
 
   switch (action) {
+    case ActionType.CUSTOM:
+      return {
+        ...actionBase,
+        type: action,
+        customActionType: 'CUSTOM_ACTION_TYPE'
+      }
     case ActionType.READ:
       return { ...actionBase, type: action }
     case ActionType.MARK_AS_NOT_DUPLICATE:
@@ -911,7 +917,7 @@ export function generateEventDocument({
     /**
      * Overrides for default event state per action
      */
-    declarationOverrides?: Partial<EventState>
+    declarationOverrides?: ActionUpdate
     user?: Partial<{
       signature: string
       primaryOfficeId: UUID
@@ -924,7 +930,7 @@ export function generateEventDocument({
   defaults?: Partial<EventDocument>
 }): EventDocument {
   return {
-    trackingId: getUUID(),
+    trackingId: generateTrackingId(rng),
     type: configuration.id,
     actions: actions.map((action, i) =>
       generateActionDocument({
@@ -969,8 +975,8 @@ export function generateEventDraftDocument({
   eventId: UUID
   actionType: ActionType
   rng?: () => number
-  declaration?: EventState
-  annotation?: EventState
+  declaration?: ActionUpdate
+  annotation?: ActionUpdate
 }): Draft {
   const action = generateActionDocument({
     configuration: tennisClubMembershipEvent,

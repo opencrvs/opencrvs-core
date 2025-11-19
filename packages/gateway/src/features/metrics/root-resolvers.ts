@@ -300,8 +300,8 @@ export const resolvers: GQLResolver = {
           actionTypes: ActionTypes.exclude([
             ActionTypes.enum.DELETE,
             ActionTypes.enum.CREATE,
-            ActionTypes.Enum.DUPLICATE_DETECTED,
-            ActionTypes.Enum.NOTIFY
+            ActionTypes.enum.DUPLICATE_DETECTED,
+            ActionTypes.enum.NOTIFY
           ]).options
         },
         { ...authHeader }

@@ -29,7 +29,7 @@ import { testDataGenerator } from '@client/tests/test-data-generators'
 import { getTestValidatorContext } from '../../../../../../.storybook/decorators'
 import {
   DECLARATION_ACTION_UPDATE,
-  expandWithUpdateActions
+  expandWithClientSpecificActions
 } from './useActionForHistory'
 
 const DECLARATION_ACTION_DETAILS = {
@@ -100,11 +100,12 @@ const eventCreatedByRegAgent = generateEventDocument({
 
 describe('useActionForHistory', () => {
   it('should not add synthetic UPDATE action if declaration did not change', () => {
-    const updateActionForEventCreatedByRegAgent = expandWithUpdateActions(
-      eventCreatedByRegAgent,
-      getTestValidatorContext(),
-      tennisClubMembershipEvent
-    ).find((a) => a.type === DECLARATION_ACTION_UPDATE)
+    const updateActionForEventCreatedByRegAgent =
+      expandWithClientSpecificActions(
+        eventCreatedByRegAgent,
+        getTestValidatorContext(),
+        tennisClubMembershipEvent
+      ).find((a) => a.type === DECLARATION_ACTION_UPDATE)
 
     expect(updateActionForEventCreatedByRegAgent).toBeUndefined()
   })
@@ -119,7 +120,7 @@ describe('useActionForHistory', () => {
       new Date('2024-04-01')
     ),
     createdBy: generator.user.id.localRegistrar,
-    createdByRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
     createdAtLocation: generator.user.localRegistrar().v2.primaryOfficeId
   } satisfies Partial<ActionDocument>
 
@@ -198,7 +199,7 @@ describe('useActionForHistory', () => {
       createdAt: actionDefaults.createdAt
     }
 
-    const updateAction = expandWithUpdateActions(
+    const updateAction = expandWithClientSpecificActions(
       annotationUpdateOnValidateEvent,
       getTestValidatorContext(),
       tennisClubMembershipEvent

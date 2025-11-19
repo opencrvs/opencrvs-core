@@ -11,17 +11,19 @@
 
 import React, { useRef } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { isEqual } from 'lodash'
+import { get, isEqual } from 'lodash'
 import {
   FieldValue,
   getMixedPath,
   HttpField,
   HttpFieldValue,
+  isFieldReference,
   isTemplateVariable,
   SystemVariables
 } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
+import { parseFieldReferenceToValue } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 
 async function fetchWithTimeout(
   input: RequestInfo | URL,
@@ -53,7 +55,8 @@ interface HttpError extends Error {
 
 async function fetchHttpFieldValue(
   cfg: Omit<HttpField['configuration'], 'trigger'>,
-  systemVariables: SystemVariables
+  systemVariables: SystemVariables,
+  form: Record<string, FieldValue>
 ) {
   const baseUrl = window.location.origin
   const url = new URL(cfg.url, baseUrl)
@@ -66,9 +69,14 @@ async function fetchHttpFieldValue(
 
   if (cfg.body) {
     for (const [k, v] of Object.entries(cfg.body)) {
-      cfg.body[k] = isTemplateVariable(v)
-        ? (getMixedPath(systemVariables, v) ?? v)
-        : v
+      if (isTemplateVariable(v)) {
+        cfg.body[k] = getMixedPath(systemVariables, v)
+      }
+
+      if (isFieldReference(v)) {
+        cfg.body[k] = parseFieldReferenceToValue(v, form)
+      }
+      cfg.body[k] = v
     }
   }
 
@@ -93,21 +101,21 @@ async function fetchHttpFieldValue(
   return res.json()
 }
 
-function HttpInput({
-  parentValue,
-  configuration,
-  onChange
-}: {
+export interface Props {
   parentValue?: FieldValue
   configuration: Omit<HttpField['configuration'], 'trigger'>
+  form: Record<string, FieldValue>
   onChange: (val: HttpFieldValue) => void
-}) {
+}
+
+function HttpInput({ parentValue, configuration, form, onChange }: Props) {
   const systemVariables = useSystemVariables()
   const firstRunRef = useRef(true)
   const prevParentRef = useRef<FieldValue | undefined>(undefined)
 
   const mutation = useMutation<unknown, HttpError>({
-    mutationFn: async () => fetchHttpFieldValue(configuration, systemVariables),
+    mutationFn: async () =>
+      fetchHttpFieldValue(configuration, systemVariables, form),
     onMutate: () => {
       onChange({ loading: true, error: null, data: null })
     },

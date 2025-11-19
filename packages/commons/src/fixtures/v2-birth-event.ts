@@ -177,13 +177,11 @@ export const v2BirthEvent = defineConfig({
     },
     {
       type: ActionType.VALIDATE,
-      label: generateTranslationConfig('Validate'),
-      review: BIRTH_DECLARATION_REVIEW
+      label: generateTranslationConfig('Validate')
     },
     {
       type: ActionType.REGISTER,
-      label: generateTranslationConfig('Register'),
-      review: BIRTH_DECLARATION_REVIEW
+      label: generateTranslationConfig('Register')
     }
   ],
   advancedSearch: []

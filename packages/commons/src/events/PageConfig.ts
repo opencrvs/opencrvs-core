@@ -8,12 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { FieldConfig } from './FieldConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from './Conditional'
-import { extendZodWithOpenApi } from 'zod-openapi'
-extendZodWithOpenApi(z)
 
 export const PageTypes = z.enum(['FORM', 'VERIFICATION'])
 export type PageType = z.infer<typeof PageTypes>
@@ -27,9 +25,9 @@ const PageConfigBase = z
       'Page will be shown if condition is met. If conditional is not defined, the page will be always shown.'
     )
   })
-  .openapi({
+  .meta({
     description: 'Form page configuration',
-    ref: 'FormPageConfig'
+    id: 'FormPageConfig'
   })
 
 export const FormPageConfig = PageConfigBase.extend({
@@ -51,9 +49,9 @@ export const VerificationActionConfig = z
     })
   })
   .describe('Actions available on the verification page')
-  .openapi({
+  .meta({
     description: 'Verification action configuration',
-    ref: 'VerificationActionConfig'
+    id: 'VerificationActionConfig'
   })
 
 export const VerificationPageConfig = FormPageConfig.extend({
@@ -62,11 +60,10 @@ export const VerificationPageConfig = FormPageConfig.extend({
 })
 export type VerificationPageConfig = z.infer<typeof VerificationPageConfig>
 
-type AllPageConfig = typeof VerificationPageConfig | typeof FormPageConfig
 export const PageConfig = z.discriminatedUnion('type', [
   FormPageConfig,
   VerificationPageConfig
-]) as unknown as z.ZodDiscriminatedUnion<'type', AllPageConfig[]>
+])
 
 export type PageConfig = z.infer<typeof PageConfig>
 export type PageConfigInput = z.input<typeof PageConfig>

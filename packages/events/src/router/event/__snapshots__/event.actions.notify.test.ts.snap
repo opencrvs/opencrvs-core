@@ -1,29 +1,45 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`event.actions.notify > Can create a record with mixed address 1`] = `
+{
+  "applicant.address": {
+    "addressType": "INTERNATIONAL",
+    "administrativeArea": "27160bbd-32d1-4625-812f-860226bfb92a",
+    "country": "FAR",
+  },
+}
+`;
+
+exports[`event.actions.notify > Can create a record with partial address 1`] = `
+{
+  "applicant.address": {
+    "addressType": "DOMESTIC",
+    "country": "FAR",
+  },
+}
+`;
+
+exports[`event.actions.notify > Can not create a record with partial address when addressType is missing 1`] = `[TRPCError: [{"message":"Required","id":"applicant.address","value":{"country":"FAR"}}]]`;
+
 exports[`event.actions.notify > NOTIFY action fails if payload includes field that is not in the declaration 1`] = `[TRPCError: [{"message":"Unexpected field","id":"foo.bar","value":"hello"}]]`;
 
 exports[`event.actions.notify > NOTIFY action fails if payload includes field with unexpected type 1`] = `[TRPCError: [{"message":"Invalid input","id":"applicant.name","value":{"firstname":999999,"surname":"999999"}}]]`;
 
-exports[`event.actions.notify > System client receives error for malformed input 1`] = `[TRPCError: [{"message":"Unexpected field","id":"foo.bar","value":"this should cause an error"},{"message":"Invalid input","id":"applicant.name","value":{"surname":"surnameoftheperson"}}]]`;
-
-exports[`event.actions.notify > allows sending partial payload as NOTIFY action 1`] = `
-{
-  "applicant.dob": "2025-05-16",
-  "applicant.firstname": "John",
-}
-`;
+exports[`event.actions.notify > System client receives error for malformed input 1`] = `[TRPCError: [{"message":"Unexpected field","id":"foo.bar","value":"this should cause an error"}]]`;
 
 exports[`event.actions.notify > system user > should require createdAtLocation for system user 1`] = `[TRPCError: createdAtLocation is required and must be a valid office id]`;
 
 exports[`event.actions.notify > system user > should require createdAtLocation for system user 2`] = `
 [TRPCError: [
   {
-    "validation": "uuid",
-    "code": "invalid_string",
-    "message": "Invalid uuid",
+    "origin": "string",
+    "code": "invalid_format",
+    "format": "uuid",
+    "pattern": "/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/",
     "path": [
       "createdAtLocation"
-    ]
+    ],
+    "message": "Invalid UUID"
   }
 ]]
 `;

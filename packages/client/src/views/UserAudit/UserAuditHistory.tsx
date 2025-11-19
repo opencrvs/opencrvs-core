@@ -289,7 +289,7 @@ function UserAuditHistoryComponent(props: Props) {
               onClick={() =>
                 userAuditItem.isV2
                   ? navigate(
-                      ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+                      ROUTES.V2.EVENTS.EVENT.buildPath({
                         eventId: userAuditItem.data.compositionId as UUID
                       })
                     )

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig, SelectOption, ValidationConfig } from './FieldConfig'
 import { FieldType } from './FieldType'
@@ -75,7 +75,6 @@ const BaseField = z.object({
   ),
   conditionals: z
     .array(FieldConditional)
-    .default([])
     .optional()
     .describe(
       `
@@ -93,7 +92,6 @@ const BaseField = z.object({
     ),
   validations: z
     .array(ValidationConfig)
-    .default([])
     .optional()
     .describe(
       `Option for overriding the field validations specifically for advanced search form.`
@@ -155,7 +153,7 @@ export const EventFieldConfigSchema = BaseField.extend({
   fieldType: z.literal('event')
 })
 
-export const SearchField = z
+export const AdvancedSearchField = z
   .discriminatedUnion('fieldType', [FieldConfigSchema, EventFieldConfigSchema])
   .superRefine((data, ctx) => {
     if (data.config.searchFields && data.config.searchFields.length > 0) {
@@ -176,12 +174,12 @@ export const SearchField = z
     }
   })
 
-export type SearchField = z.infer<typeof SearchField>
+export type AdvancedSearchField = z.infer<typeof AdvancedSearchField>
 
 export const AdvancedSearchConfig = z.object({
   title: TranslationConfig.describe('Advanced search tab title'),
   fields: z
-    .array(SearchField)
+    .array(AdvancedSearchField)
     .describe('Advanced search fields within the tab.')
 })
 

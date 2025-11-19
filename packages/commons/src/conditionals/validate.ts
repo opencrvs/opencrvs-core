@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,7 +12,8 @@
 
 import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
-import { ErrorMapCtx, z, ZodIssueOptionalMessage } from 'zod'
+import * as z from 'zod/v4'
+import { $ZodIssue } from 'zod/v4/core'
 import { formatISO, isAfter, isBefore } from 'date-fns'
 
 import { ConditionalParameters, JSONSchema } from './conditionals'
@@ -29,6 +31,7 @@ import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
 import { ageToDate } from '../events/utils'
+import { ActionType } from '../client'
 
 const ajv = new Ajv({
   $data: true,
@@ -151,7 +154,17 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
     )
   }
   const result = validator(data) as boolean
+  return result
+}
 
+/*
+ * This is for validating arbitrary JSON data against a JSON schema outside of the context of a form.
+ * It is used for instance when an input component wants to validate something internally as per user
+ * configured rules (e.g. Search field).
+ */
+export function validateValue(schema: JSONSchema, data: unknown) {
+  const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
+  const result = validator(data) as boolean
   return result
 }
 
@@ -165,14 +178,15 @@ export function isOnline() {
 
 export function isConditionMet(
   conditional: JSONSchema,
-  values: Record<string, FieldValue>,
+  values: EventState | ActionUpdate,
   context: ValidatorContext
 ) {
   return validate(conditional, {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
     $online: isOnline(),
-    $user: context.user
+    $user: context.user,
+    $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? []
   })
 }
 
@@ -222,7 +236,8 @@ function isFieldConditionMet(
     $form: form,
     $now: formatISO(new Date(), { representation: 'date' }),
     $online: isOnline(),
-    $user: context.user
+    $user: context.user,
+    $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? []
   })
 
   return validConditionals.includes(conditionalType)
@@ -230,7 +245,7 @@ function isFieldConditionMet(
 
 export function isFieldVisible(
   field: FieldConfig,
-  form: ActionUpdate | EventState,
+  form: Partial<ActionUpdate | EventState>,
   context: ValidatorContext
 ) {
   return isFieldConditionMet(field, form, ConditionalType.SHOW, context)
@@ -312,28 +327,22 @@ function createIntlError(message: TranslationConfig) {
  * Form error message definitions for Zod validation errors.
  * Overrides zod internal type error messages (string) to match the OpenCRVS error messages (TranslationConfig).
  */
+// In modern Zod, the `issue` parameter is always `z.ZodIssue`.
 function zodToIntlErrorMap(
-  issue: ZodIssueOptionalMessage,
-  _ctx: ErrorMapCtx,
+  issue: $ZodIssue,
+  value: unknown,
   field: FieldConfig
 ) {
   const requiredMessage: TranslationConfig =
     field.required && typeof field.required === 'object'
       ? field.required.message
       : errorMessages.requiredField
-  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+
   switch (issue.code) {
-    case 'invalid_string': {
-      if (_ctx.data === '') {
+    case 'too_small': {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (issue.message === undefined) {
         return createIntlError(requiredMessage)
-      }
-
-      if (issue.validation === 'date') {
-        return createIntlError(errorMessages.invalidDate)
-      }
-
-      if (issue.validation === 'email') {
-        return createIntlError(errorMessages.invalidEmail)
       }
 
       break
@@ -341,34 +350,44 @@ function zodToIntlErrorMap(
 
     case 'invalid_type': {
       if (
-        issue.expected !== issue.received &&
-        (issue.received === 'undefined' || issue.received === 'null')
+        issue.hasOwnProperty('input') &&
+        (issue.input === undefined || issue.input === null)
       ) {
         return createIntlError(requiredMessage)
       }
-
-      break
+      return createIntlError(errorMessages.invalidInput)
     }
-    case 'too_small': {
-      if (issue.message === undefined) {
-        return createIntlError(requiredMessage)
-      }
 
-      break
-    }
     case 'invalid_union': {
-      for (const { issues } of issue.unionErrors) {
-        for (const e of issues) {
-          if (
-            zodToIntlErrorMap(e, _ctx, field).message.message.id !==
-            'error.required'
-          ) {
+      for (const unionError of issue.errors) {
+        for (const e of unionError) {
+          const intlErr = zodToIntlErrorMap(e, value, field)
+          if (intlErr.message.message.id !== 'error.required') {
             return createIntlError(errorMessages.invalidInput)
           }
         }
       }
       return createIntlError(requiredMessage)
     }
+    case 'invalid_format':
+      if (value === '') {
+        return createIntlError(requiredMessage)
+      }
+      if (issue.format === 'date-time' || issue.format === 'date') {
+        return createIntlError(errorMessages.invalidDate)
+      }
+      if (issue.format === 'email') {
+        return createIntlError(errorMessages.invalidEmail)
+      }
+      return createIntlError(errorMessages.invalidInput)
+    case 'custom':
+    case 'unrecognized_keys':
+    case 'invalid_value':
+    case 'invalid_key':
+    case 'too_big':
+    case 'not_multiple_of':
+    case 'invalid_element':
+      return createIntlError(errorMessages.invalidInput)
   }
 
   return createIntlError(errorMessages.invalidInput)
@@ -413,16 +432,18 @@ function runCustomFieldValidations({
  */
 export function validateFieldInput({
   field,
-  value
+  value,
+  actionType
 }: {
   field: FieldConfig
   value: FieldUpdateValue
+  actionType?: ActionType
 }) {
-  const zodType = mapFieldTypeToZod(field.type, !!field.required)
+  const zodType = mapFieldTypeToZod(field, actionType)
 
   const rawError = zodType.safeParse(value, {
     // @ts-expect-error
-    errorMap: (issue, _ctx) => zodToIntlErrorMap(issue, _ctx, field)
+    error: (issue) => zodToIntlErrorMap(issue, value, field)
   })
 
   // We have overridden the standard error messages
@@ -435,11 +456,13 @@ export function validateFieldInput({
 export function runStructuralValidations({
   field,
   values,
-  context
+  context,
+  actionType
 }: {
   field: FieldConfig
   values: ActionUpdate
   context: ValidatorContext
+  actionType?: ActionType
 }) {
   if (
     !isFieldVisible(field, values, context) ||
@@ -450,7 +473,8 @@ export function runStructuralValidations({
 
   const fieldValidationResult = validateFieldInput({
     field,
-    value: values[field.id]
+    value: values[field.id],
+    actionType
   })
 
   return fieldValidationResult
@@ -479,7 +503,6 @@ export function runFieldValidations({
      * In real use cases, there can be hundreds of thousands of locations.
      * Make sure that the context contains only the locations that are needed for validation.
      * E.g. if the user is a leaf admin, only the leaf locations under their admin structure are needed.
-     *
      * Loading few megabytes of locations to memory just for validation is not efficient and will choke the application.
      */
     $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? [],
@@ -509,7 +532,6 @@ export function getValidatorsForField(
     .map(({ validator, message }) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const jsonSchema = validator as any
-
       /*
        * It’s possible the validator is an or(...) / and(...) / similar combinator.
        * From these it's tricky to extract field-specific validation:

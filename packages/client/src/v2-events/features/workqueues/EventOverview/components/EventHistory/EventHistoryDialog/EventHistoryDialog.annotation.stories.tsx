@@ -25,7 +25,7 @@ import {
   generateTrackingId
 } from '@opencrvs/commons/client'
 import { getTestValidatorContext } from '../../../../../../../../.storybook/decorators'
-import { expandWithUpdateActions } from '../../../../../events/actions/correct/useActionForHistory'
+import { expandWithClientSpecificActions } from '../../../../../events/actions/correct/useActionForHistory'
 import { DECLARATION_ACTION_UPDATE } from '../../../../../events/registered-fields'
 import { testDataGenerator } from '../../../../../../../tests/test-data-generators'
 import { EventHistoryDialog } from './EventHistoryDialog'
@@ -42,8 +42,9 @@ const actionDefaults = {
     new Date('2024-04-01')
   ),
   createdBy: generator.user.id.localRegistrar,
-  createdByRole: TestUserRole.Enum.LOCAL_REGISTRAR,
-  createdAtLocation: generator.user.localRegistrar().v2.primaryOfficeId
+  createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
+  createdAtLocation: generator.user.localRegistrar().v2.primaryOfficeId,
+  transactionId: getUUID()
 } satisfies Partial<ActionDocument>
 
 const annotationUpdateOnValidateEvent = {
@@ -119,7 +120,7 @@ const meta: Meta<typeof EventHistoryDialog> = {
   }
 }
 
-const updateActionForValidate = expandWithUpdateActions(
+const updateActionForValidate = expandWithClientSpecificActions(
   annotationUpdateOnValidateEvent,
   getTestValidatorContext(),
   tennisClubMembershipEvent
@@ -129,6 +130,7 @@ export default meta
 type Story = StoryObj<typeof EventHistoryDialog>
 export const AnnotationUpdateOnValidate: Story = {
   args: {
+    title: 'Updated',
     fullEvent: annotationUpdateOnValidateEvent,
     action: updateActionForValidate
   }
@@ -206,7 +208,7 @@ const annotationUpdateOnRegisterEvent = {
   createdAt: actionDefaults.createdAt
 }
 
-const updateActionForRegister = expandWithUpdateActions(
+const updateActionForRegister = expandWithClientSpecificActions(
   annotationUpdateOnRegisterEvent,
   getTestValidatorContext(),
   tennisClubMembershipEvent
@@ -214,6 +216,7 @@ const updateActionForRegister = expandWithUpdateActions(
 
 export const AnnotationUpdateOnRegister: Story = {
   args: {
+    title: 'Updated',
     fullEvent: annotationUpdateOnRegisterEvent,
     action: updateActionForRegister
   }
