@@ -577,7 +577,7 @@ function useCustomActionConfigs(
       )
       .map((action) => ({
         label: action.label,
-        icon: 'PencilLine',
+        icon: 'PencilLine' as const,
         onClick: async (workqueue?: string) =>
           onCustomAction(action, workqueue),
         disabled: !isDownloadedAndAssignedToUser,
