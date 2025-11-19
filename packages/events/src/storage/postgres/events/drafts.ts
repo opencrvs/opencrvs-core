@@ -11,13 +11,18 @@
 
 import { sql } from 'kysely'
 import * as z from 'zod/v4'
-import { ActionStatus, Draft, TokenUserType, UUID } from '@opencrvs/commons'
+import {
+  ActionStatus,
+  ActionType,
+  Draft,
+  TokenUserType,
+  UUID
+} from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import {
   EventActionDrafts,
   NewEventActionDrafts
 } from './schema/app/EventActionDrafts'
-import ActionType from './schema/app/ActionType'
 
 function toDraftDocument(draft: EventActionDrafts): Draft {
   return Draft.parse({
