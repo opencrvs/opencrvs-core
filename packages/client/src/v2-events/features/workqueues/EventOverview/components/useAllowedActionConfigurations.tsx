@@ -547,13 +547,24 @@ export function useUserAllowedActions(eventType: string) {
   }
 }
 
-function useCustomActionConfigs(event: EventIndex): {
+function useCustomActionConfigs(
+  event: EventIndex,
+  authentication: ITokenPayload
+): {
   customActionModal: React.ReactNode
   customActionConfigs: ActionMenuItem[]
 } {
   const token = getToken()
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(event)
+
+  // @TODO: Could we share these with the useViewableActionConfigurations() function?
+  const { findFromCache } = useEvents().getEvent
+  const isDownloaded = Boolean(findFromCache(event.id).data)
+  const assignmentStatus = getAssignmentStatus(event, authentication.sub)
+
+  const isDownloadedAndAssignedToUser =
+    assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
   const customActionConfigs = useMemo(() => {
     return eventConfiguration.actions
@@ -577,13 +588,19 @@ function useCustomActionConfigs(event: EventIndex): {
           icon: 'PencilLine',
           onClick: async (workqueue?: string) =>
             onCustomAction(action, workqueue),
-          disabled: false,
+          disabled: !isDownloadedAndAssignedToUser,
           hidden: false,
           type: ActionType.CUSTOM
         }
       })
       .filter((x): x is ActionMenuItem => Boolean(x))
-  }, [event.type, eventConfiguration.actions, onCustomAction, token])
+  }, [
+    event.type,
+    eventConfiguration.actions,
+    onCustomAction,
+    token,
+    isDownloadedAndAssignedToUser
+  ])
 
   return { customActionModal, customActionConfigs }
 }
@@ -637,8 +654,10 @@ export function useAllowedActionConfigurations(
     .map((a) => ({ ...config[a], type: a }))
     .filter((a: ActionConfig) => !a.hidden)
 
-  const { customActionModal, customActionConfigs } =
-    useCustomActionConfigs(event)
+  const { customActionModal, customActionConfigs } = useCustomActionConfigs(
+    event,
+    authentication
+  )
   const allActionConfigs = [...allowedActionConfigs, ...customActionConfigs]
 
   // Check if the user can perform any action other than ASSIGN, or UNASSIGN
