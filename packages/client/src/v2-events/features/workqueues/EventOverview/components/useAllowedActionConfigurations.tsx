@@ -572,28 +572,18 @@ function useCustomActionConfigs(
         (action): action is CustomActionConfig =>
           action.type === ActionType.CUSTOM
       )
-      .map<ActionMenuItem | null>((action) => {
-        const isAllowed = allowCustomAction(
-          token,
-          event.type,
-          action.customActionType
-        )
-
-        if (!isAllowed) {
-          return null
-        }
-
-        return {
-          label: action.label,
-          icon: 'PencilLine',
-          onClick: async (workqueue?: string) =>
-            onCustomAction(action, workqueue),
-          disabled: !isDownloadedAndAssignedToUser,
-          hidden: false,
-          type: ActionType.CUSTOM
-        }
-      })
-      .filter((x): x is ActionMenuItem => Boolean(x))
+      .filter((action) =>
+        allowCustomAction(token, event.type, action.customActionType)
+      )
+      .map<ActionMenuItem>((action) => ({
+        label: action.label,
+        icon: 'PencilLine',
+        onClick: async (workqueue?: string) =>
+          onCustomAction(action, workqueue),
+        disabled: !isDownloadedAndAssignedToUser,
+        hidden: false,
+        type: ActionType.CUSTOM
+      }))
   }, [
     event.type,
     eventConfiguration.actions,
