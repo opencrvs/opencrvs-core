@@ -14,6 +14,7 @@ import { http, HttpResponse } from 'msw'
 import {
   ActionStatus,
   ActionType,
+  createPrng,
   EventDocument,
   EventIndex,
   generateEventDocument,
@@ -43,14 +44,18 @@ const postHandler = http.post(
 )
 
 let event: EventDocument
+let rngNumber = 949
 
 beforeEach(async () => {
   mswServer.use(postHandler)
   spy.mockReset()
   const { user, eventsDb } = await setupTestCase()
+  const rng = createPrng(rngNumber)
+  rngNumber++
 
   event = generateEventDocument({
     configuration: tennisClubMembershipEvent,
+    rng,
     actions: [
       { type: ActionType.CREATE, user },
       { type: ActionType.DECLARE, user }
@@ -59,6 +64,7 @@ beforeEach(async () => {
 
   const draftDocument = generateEventDocument({
     configuration: tennisClubMembershipEvent,
+    rng,
     actions: [{ type: ActionType.CREATE, user }]
   })
 

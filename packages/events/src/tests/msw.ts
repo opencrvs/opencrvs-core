@@ -14,6 +14,25 @@ import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { ActionType } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
+const tennisClubMembershipEventWithCustomAction = {
+  ...tennisClubMembershipEvent,
+  actions: tennisClubMembershipEvent.actions.concat([
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'CONFIRM',
+      label: {
+        id: 'event.tennis-club-membership.action.confirm.label',
+        defaultMessage: 'Confirm',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from'
+      },
+      // @TODO: once action conditionals are implemented, add some conditional here?
+      form: [],
+      flags: []
+    }
+  ])
+}
+
 const handlers = [
   http.post<PathParams<never>, { filenames: string[] }>(
     `${env.DOCUMENTS_URL}/presigned-urls`,
@@ -28,8 +47,11 @@ const handlers = [
   ),
   http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
     return HttpResponse.json([
-      tennisClubMembershipEvent,
-      { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+      tennisClubMembershipEventWithCustomAction,
+      {
+        ...tennisClubMembershipEventWithCustomAction,
+        id: 'tennis-club-membership_premium'
+      }
     ])
   }),
   // event.delete.test.ts

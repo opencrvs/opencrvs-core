@@ -121,8 +121,8 @@ const correctionDraftAgeToDob = {
     status: ActionStatus.Accepted,
     transactionId: generateUuid(prng),
     createdBy: generateUuid(prng),
-    createdByUserType: TokenUserType.Enum.user,
-    createdByRole: TestUserRole.Enum.FIELD_AGENT,
+    createdByUserType: TokenUserType.enum.user,
+    createdByRole: TestUserRole.enum.FIELD_AGENT,
     type: ActionType.REQUEST_CORRECTION,
     declaration: {
       'applicant.age': 18,
@@ -174,8 +174,8 @@ const correctionDraftDobToAge = {
     status: ActionStatus.Accepted,
     transactionId: generateUuid(prng),
     createdBy: generateUuid(prng),
-    createdByUserType: TokenUserType.Enum.user,
-    createdByRole: TestUserRole.Enum.FIELD_AGENT,
+    createdByUserType: TokenUserType.enum.user,
+    createdByRole: TestUserRole.enum.FIELD_AGENT,
     type: ActionType.REQUEST_CORRECTION,
     declaration: {
       'applicant.age': 25,

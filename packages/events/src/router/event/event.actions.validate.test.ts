@@ -591,8 +591,8 @@ test('Event status changes after validation action is accepted', async () => {
     })
   ])
 
-  expect(statusAfterDeclareAction).toBe(EventStatus.Enum.DECLARED)
-  expect(statusAfterValidateAction).toBe(EventStatus.Enum.VALIDATED)
+  expect(statusAfterDeclareAction).toBe(EventStatus.enum.DECLARED)
+  expect(statusAfterValidateAction).toBe(EventStatus.enum.VALIDATED)
 })
 
 test('Event status does not change if validation action is rejected', async () => {

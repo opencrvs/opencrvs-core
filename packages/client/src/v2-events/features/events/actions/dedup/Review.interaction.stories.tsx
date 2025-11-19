@@ -12,7 +12,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { AppRouter } from '@events/router'
-import { userEvent, within } from '@storybook/test'
+import { userEvent, within, expect } from '@storybook/test'
 import {
   ActionType,
   createPrng,
@@ -121,7 +121,7 @@ const mockDuplicateEvent = {
   updatedAt: new Date(Date.now()).toISOString()
 }
 
-export const MarkAsNotDuplucateAndRegister: Story = {
+export const MarkAsNotDuplicateAndRegister: Story = {
   parameters: {
     mockingDate: new Date(),
     reactRouter: {
@@ -154,6 +154,7 @@ export const MarkAsNotDuplucateAndRegister: Story = {
           name: /Not a duplicate/i
         })
       )
+
       await userEvent.click(
         await canvas.findByRole('button', {
           name: /Confirm/i
@@ -161,19 +162,8 @@ export const MarkAsNotDuplucateAndRegister: Story = {
       )
     })
 
-    await step(' Register', async () => {
-      await userEvent.click(
-        await canvas.findByRole('button', {
-          name: /Register/i
-        })
-      )
-      const confirmModal = within(await canvas.findByRole('dialog'))
-
-      await userEvent.click(
-        await confirmModal.findByRole('button', {
-          name: /Register/i
-        })
-      )
-    })
+    await expect(
+      await canvas.findByRole('button', { name: /Action/i })
+    ).toBeVisible()
   }
 }

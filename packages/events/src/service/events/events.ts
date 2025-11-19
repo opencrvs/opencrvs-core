@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { NoResultError } from 'kysely'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TokenUserType, TokenWithBearer, UUID } from '@opencrvs/commons'
 import {
   ActionInputWithType,
@@ -115,6 +115,7 @@ export async function throwConflictIfActionNotAllowed(
     eventType: event.type,
     token
   })
+
   const eventIndex = getCurrentEventState(event, eventConfig)
 
   const allowedActions: DisplayableAction[] =
@@ -268,6 +269,9 @@ export function buildAction(
         requestId: input.requestId
       }
     }
+    case ActionType.CUSTOM: {
+      return { ...commonAttributes, customActionType: input.customActionType }
+    }
     case ActionType.REJECT:
     case ActionType.ARCHIVE:
     case ActionType.PRINT_CERTIFICATE:
@@ -280,9 +284,7 @@ export function buildAction(
     case ActionType.MARK_AS_NOT_DUPLICATE:
     case ActionType.MARK_AS_DUPLICATE:
     case ActionType.REQUEST_CORRECTION: {
-      return {
-        ...commonAttributes
-      }
+      return commonAttributes
     }
   }
 }

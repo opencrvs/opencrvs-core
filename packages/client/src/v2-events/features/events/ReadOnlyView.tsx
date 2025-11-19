@@ -14,7 +14,6 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { noop } from 'lodash'
 import {
   ActionType,
-  getActionReview,
   applyDraftToEventIndex,
   getDeclaration,
   getOrThrow,
@@ -24,7 +23,6 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
-import { FormLayout } from '@client/v2-events/layouts'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -34,7 +32,7 @@ import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { removeCachedFiles } from '../files/cache'
 
 function ReadonlyView() {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.RECORD)
   const events = useEvents()
   const event = events.getEvent.viewEvent(eventId)
   const validatorContext = useValidatorContext()
@@ -64,7 +62,14 @@ function ReadonlyView() {
     authentication.sub
   )
 
-  const { title, fields } = getActionReview(configuration, ActionType.READ)
+  const actionConfiguration = configuration.actions.find(
+    (a) => a.type === ActionType.READ
+  )
+  if (!actionConfiguration) {
+    throw new Error('Action configuration not found')
+  }
+
+  const { title, fields } = actionConfiguration.review
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const formConfig = getDeclaration(configuration)
@@ -81,19 +86,15 @@ function ReadonlyView() {
   }, [event, assignmentStatus])
 
   return (
-    <FormLayout route={ROUTES.V2.EVENTS.DECLARE}>
-      <ReviewComponent.Body
-        readonlyMode
-        form={eventStateWithDraft.declaration}
-        formConfig={formConfig}
-        reviewFields={fields}
-        title={formatMessage(title, eventStateWithDraft.declaration)}
-        validatorContext={validatorContext}
-        onEdit={noop}
-      >
-        <></>
-      </ReviewComponent.Body>
-    </FormLayout>
+    <ReviewComponent.Body
+      readonlyMode
+      form={eventStateWithDraft.declaration}
+      formConfig={formConfig}
+      reviewFields={fields}
+      title={formatMessage(title, eventStateWithDraft.declaration)}
+      validatorContext={validatorContext}
+      onEdit={noop}
+    />
   )
 }
 

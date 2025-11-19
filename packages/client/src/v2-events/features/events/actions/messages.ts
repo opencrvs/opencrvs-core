@@ -109,6 +109,7 @@ const confirmModalMessages = {
     }
   }
 }
+
 const registerMessages = {
   title: {
     id: 'review.register.title',

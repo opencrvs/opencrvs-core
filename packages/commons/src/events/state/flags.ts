@@ -9,11 +9,23 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { uniq } from 'lodash'
 import { joinValues } from '../../utils'
 import { getStatusFromActions } from '.'
-import { Action, ActionStatus } from '../ActionDocument'
+import { Action, ActionStatus, EventState } from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
-import { InherentFlags, EventStatus, Flag } from '../EventMetadata'
+import { EventStatus } from '../EventMetadata'
+import { InherentFlags, Flag, CustomFlag } from '../Flag'
+import { EventConfig } from '../EventConfig'
+import {
+  aggregateActionDeclarations,
+  getAcceptedActions,
+  getActionConfig
+} from '../utils'
+import { formatISO, parseISO, isValid } from 'date-fns'
+import { EventDocument } from '../EventDocument'
+import { JSONSchema } from '../../conditionals/conditionals'
+import { validate } from '../../conditionals/validate'
 
 function isPendingCertification(actions: Action[]) {
   if (getStatusFromActions(actions) !== EventStatus.enum.REGISTERED) {
@@ -69,8 +81,104 @@ function isPotentialDuplicate(actions: Action[]): boolean {
   }, false)
 }
 
-export function getFlagsFromActions(actions: Action[]): Flag[] {
-  const sortedActions = actions
+function isFlagConditionMet(
+  conditional: JSONSchema,
+  form: EventState,
+  action: Action
+) {
+  const now = isValid(parseISO(action.createdAt))
+    ? formatISO(parseISO(action.createdAt), { representation: 'date' })
+    : formatISO(new Date(), { representation: 'date' })
+
+  return validate(conditional, {
+    $form: form,
+    $now: now,
+    $online: true,
+    $user: {
+      sub: '',
+      exp: '',
+      role: action.createdByRole,
+      algorithm: '',
+      scope: [],
+      userType: action.createdByUserType
+    }
+  })
+}
+
+/**
+ * This function resolves custom flags for an event based on its actions.
+ * Flags are not stored to the event state or any database directly, instead they are always computed/evaluated from the event actions.
+ *
+ * Processes accepted actions in chronological order, evaluating flag conditions
+ * at each action step. Flags can be added or removed based on action configurations
+ * and conditional logic. Duplicate flags are filtered out.
+ *
+ * @param event - The event document containing actions and metadata
+ * @param eventConfiguration - The configuration object for the event type defining action rules and flag behaviors
+ * @returns An array of unique custom flag IDs that apply to the event after processing all non-meta actions
+ *
+ * @example
+ * const flags = resolveEventCustomFlags(eventDoc, config);
+ * // Returns: ['flag-1', 'flag-3']
+ */
+export function resolveEventCustomFlags(
+  event: EventDocument,
+  eventConfiguration: EventConfig
+): CustomFlag[] {
+  const acceptedActions = getAcceptedActions(event)
+  const actions = acceptedActions
+    .filter(({ type }) => !isMetaAction(type))
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+
+  return actions.reduce((acc, action, idx) => {
+    const actionConfig = getActionConfig({
+      eventConfiguration,
+      actionType: action.type,
+      customActionType:
+        'customActionType' in action ? action.customActionType : undefined
+    })
+
+    if (!actionConfig) {
+      return acc
+    }
+
+    const eventUpToThisAction = {
+      ...event,
+      actions: actions.slice(0, idx + 1)
+    }
+
+    const declaration = aggregateActionDeclarations(eventUpToThisAction)
+    const annotation = aggregateActionDeclarations(eventUpToThisAction)
+    const form = { ...declaration, ...annotation }
+
+    const flagsWithMetConditions = actionConfig.flags.filter(
+      ({ conditional }) =>
+        // If conditional is not provided, the flag is resolved
+        conditional ? isFlagConditionMet(conditional, form, action) : true
+    )
+
+    const addedFlags = flagsWithMetConditions
+      .filter(({ operation }) => operation === 'add')
+      .map(({ id }) => id)
+
+    const removedFlags = flagsWithMetConditions
+      .filter(({ operation }) => operation === 'remove')
+      .map(({ id }) => id)
+
+    // Add and remove flags
+    const flags = [...acc, ...addedFlags].filter(
+      (flagId) => !removedFlags.includes(flagId)
+    )
+
+    return uniq(flags)
+  }, [])
+}
+
+export function getEventFlags(
+  event: EventDocument,
+  config: EventConfig
+): Flag[] {
+  const sortedActions = event.actions
     .filter(({ type }) => !isMetaAction(type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
@@ -89,7 +197,6 @@ export function getFlagsFromActions(actions: Action[]): Flag[] {
    *  - `ACTION:requested` : An action sent which is not yet accepted or rejected by country config.
    *  - `ACTION:rejected`  : An action which was rejected by country config.
    */
-
   const flags = Object.entries(actionStatus)
     .filter(([, status]) => status !== ActionStatus.Accepted)
     .map(([type, status]) => {
@@ -113,5 +220,5 @@ export function getFlagsFromActions(actions: Action[]): Flag[] {
     flags.push(InherentFlags.POTENTIAL_DUPLICATE)
   }
 
-  return flags
+  return [...flags, ...resolveEventCustomFlags(event, config)]
 }

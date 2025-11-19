@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import {
   findScope,
@@ -51,6 +51,7 @@ export const workqueueRouter = router({
         string,
         SearchScopeAccessLevels
       >
+
       return getEventCount(
         input,
         await getInMemoryEventConfigurations(ctx.token),

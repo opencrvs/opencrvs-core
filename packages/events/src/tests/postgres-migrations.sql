@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
--- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
+-- Dumped from database version 17.6 (Debian 17.6-2.pgdg13+1)
+-- Dumped by pg_dump version 17.6 (Debian 17.6-2.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -38,34 +38,6 @@ CREATE TYPE app.action_status AS ENUM (
 
 
 ALTER TYPE app.action_status OWNER TO events_migrator;
-
---
--- Name: action_type; Type: TYPE; Schema: app; Owner: events_migrator
---
-
-CREATE TYPE app.action_type AS ENUM (
-    'CREATE',
-    'NOTIFY',
-    'DECLARE',
-    'VALIDATE',
-    'REGISTER',
-    'DUPLICATE_DETECTED',
-    'REJECT',
-    'MARK_AS_DUPLICATE',
-    'ARCHIVE',
-    'PRINT_CERTIFICATE',
-    'REQUEST_CORRECTION',
-    'CORRECT',
-    'REJECT_CORRECTION',
-    'APPROVE_CORRECTION',
-    'READ',
-    'ASSIGN',
-    'UNASSIGN',
-    'MARK_AS_NOT_DUPLICATE'
-);
-
-
-ALTER TYPE app.action_type OWNER TO events_migrator;
 
 --
 -- Name: location_type; Type: TYPE; Schema: app; Owner: events_migrator
@@ -104,7 +76,7 @@ CREATE TABLE app.event_action_drafts (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     transaction_id text NOT NULL,
     event_id uuid NOT NULL,
-    action_type app.action_type NOT NULL,
+    action_type text NOT NULL,
     declaration jsonb DEFAULT '{}'::jsonb NOT NULL,
     annotation jsonb,
     created_by text NOT NULL,
@@ -130,7 +102,7 @@ COMMENT ON TABLE app.event_action_drafts IS 'Stores user-specific drafts of even
 --
 
 CREATE TABLE app.event_actions (
-    action_type app.action_type NOT NULL,
+    action_type text NOT NULL,
     annotation jsonb,
     assigned_to text,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
@@ -148,7 +120,8 @@ CREATE TABLE app.event_actions (
     status app.action_status NOT NULL,
     transaction_id text NOT NULL,
     content jsonb,
-    CONSTRAINT event_actions_check CHECK ((((action_type = 'ASSIGN'::app.action_type) AND (assigned_to IS NOT NULL)) OR ((action_type = 'UNASSIGN'::app.action_type) AND (assigned_to IS NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Accepted'::app.action_status) AND (registration_number IS NOT NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Requested'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Rejected'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REJECT'::app.action_type) AND ((content -> 'reason'::text) IS NOT NULL) AND ((content ->> 'reason'::text) <> ''::text)) OR ((action_type = 'REJECT_CORRECTION'::app.action_type) AND (request_id IS NOT NULL)) OR ((action_type = 'APPROVE_CORRECTION'::app.action_type) AND (request_id IS NOT NULL)) OR (action_type <> ALL (ARRAY['ASSIGN'::app.action_type, 'UNASSIGN'::app.action_type, 'REGISTER'::app.action_type, 'REJECT'::app.action_type, 'REJECT_CORRECTION'::app.action_type, 'APPROVE_CORRECTION'::app.action_type]))))
+    custom_action_type text,
+    CONSTRAINT event_actions_check CHECK ((((action_type = 'ASSIGN'::text) AND (assigned_to IS NOT NULL)) OR ((action_type = 'UNASSIGN'::text) AND (assigned_to IS NULL)) OR ((action_type = 'REGISTER'::text) AND (status = 'Accepted'::app.action_status) AND (registration_number IS NOT NULL)) OR ((action_type = 'REGISTER'::text) AND (status = 'Requested'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REGISTER'::text) AND (status = 'Rejected'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REJECT'::text) AND ((content -> 'reason'::text) IS NOT NULL) AND ((content ->> 'reason'::text) <> ''::text)) OR ((action_type = 'REJECT_CORRECTION'::text) AND (request_id IS NOT NULL)) OR ((action_type = 'APPROVE_CORRECTION'::text) AND (request_id IS NOT NULL)) OR ((action_type = 'CUSTOM'::text) AND (custom_action_type IS NOT NULL)) OR (action_type <> ALL (ARRAY['ASSIGN'::text, 'UNASSIGN'::text, 'REGISTER'::text, 'REJECT'::text, 'REJECT_CORRECTION'::text, 'APPROVE_CORRECTION'::text]))))
 );
 
 
@@ -332,6 +305,41 @@ ALTER TABLE ONLY app.pgmigrations
 
 
 --
+-- Name: idx_action_created_by; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_action_created_by ON app.event_actions USING btree (created_by);
+
+
+--
+-- Name: idx_event_tracking_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_event_tracking_id ON app.events USING btree (tracking_id);
+
+
+--
+-- Name: idx_locations_active; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_locations_active ON app.locations USING btree (id, name, parent_id, valid_until, location_type) WHERE (deleted_at IS NULL);
+
+
+--
+-- Name: idx_locations_parent_type; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_locations_parent_type ON app.locations USING btree (parent_id, location_type);
+
+
+--
+-- Name: idx_locations_valid_until; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_locations_valid_until ON app.locations USING btree (valid_until);
+
+
+--
 -- Name: event_action_drafts event_action_drafts_created_at_location_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -417,3 +425,4 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 --
 -- PostgreSQL database dump complete
 --
+

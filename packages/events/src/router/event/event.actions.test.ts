@@ -761,7 +761,7 @@ describe('Conditionals based on user role', () => {
 
       const event = await userClient.event.create(generator.event.create())
 
-      if (u.role === TestUserRole.Enum.FIELD_AGENT) {
+      if (u.role === TestUserRole.enum.FIELD_AGENT) {
         await expect(
           userClient.event.actions.declare.request(
             generator.event.actions.declare(event.id, {
@@ -794,11 +794,11 @@ describe('Conditionals based on user role', () => {
       name: [
         {
           use: 'en',
-          family: TestUserRole.Enum.FIELD_AGENT,
+          family: TestUserRole.enum.FIELD_AGENT,
           given: ['John']
         }
       ],
-      role: TestUserRole.Enum.FIELD_AGENT
+      role: TestUserRole.enum.FIELD_AGENT
     })
 
     const declarationPayload = deepMerge(baseDeclarationWithoutAddress, {
@@ -831,11 +831,11 @@ describe('Conditionals based on user role', () => {
       name: [
         {
           use: 'en',
-          family: TestUserRole.Enum.REGISTRATION_AGENT,
+          family: TestUserRole.enum.REGISTRATION_AGENT,
           given: ['Jane']
         }
       ],
-      role: TestUserRole.Enum.FIELD_AGENT
+      role: TestUserRole.enum.FIELD_AGENT
     })
 
     const registrationAgentClient = createTestClient(registrationAgent, [

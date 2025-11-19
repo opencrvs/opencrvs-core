@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import {
   AddressFieldValue,
   AddressFieldUpdateValue,
@@ -39,10 +39,7 @@ import {
 export const TextValue = z.string()
 export const NonEmptyTextValue = TextValue.min(1)
 
-export const DateValue = z
-  .string()
-  .date()
-  .describe('Date in the format YYYY-MM-DD')
+export const DateValue = z.iso.date().describe('Date in the format YYYY-MM-DD')
 
 export type DateValue = z.infer<typeof DateValue>
 
@@ -55,7 +52,7 @@ export const AgeUpdateValue = AgeValue.optional().nullable()
 
 export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
 
-export const DatetimeValue = z.string().datetime()
+export const DatetimeValue = z.iso.datetime()
 
 export const SelectDateRangeValue = z.enum([
   'last7Days',
@@ -77,7 +74,7 @@ export const DateRangeFieldValue = z
 export type DateRangeFieldValue = z.infer<typeof DateRangeFieldValue>
 export type SelectDateRangeValue = z.infer<typeof SelectDateRangeValue>
 
-export const EmailValue = z.string().email()
+export const EmailValue = z.email()
 
 export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
@@ -164,8 +161,12 @@ const PRIORITY_ORDER = [
  * meaning they lose in sorting priority.
  */
 function schemaPriority(schema: z.ZodTypeAny) {
-  const name = schema._def?.description // set by .describe()
-  const idx = PRIORITY_ORDER.indexOf(name)
+  const name = schema.description
+  if (!name) {
+    return 9999
+  } // handles undefined
+
+  const idx = PRIORITY_ORDER.indexOf(name as (typeof PRIORITY_ORDER)[number])
   return idx === -1 ? 9999 : idx
 }
 
@@ -176,32 +177,40 @@ function schemaPriority(schema: z.ZodTypeAny) {
 export function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(
   schemas: T
 ) {
-  return z.custom<z.infer<T[number]>>((val) => {
-    const successful = schemas.filter((s) => s.safeParse(val).success)
-    if (successful.length === 1) {
-      return true
-    }
-    if (successful.length === 0) {
-      return false
-    }
-    // If multiple matched, pick the “best” one
-    // according to PRIORITY_ORDER.
-    //
-    // Example:
-    // data [
-    //   "2050-01-01",
-    //   "2050-01-01",
-    //   "2050-01-01"
-    // ]
-    // description [ "TextValue", "DateValue", "DateRangeFieldValue" ]
-    // best "DateRangeFieldValue"
-    //
-    // Here all three schemas think the value is valid,
-    // but "DateRangeFieldValue" wins because of its higher priority index.
-    successful.sort((a, b) => schemaPriority(a) - schemaPriority(b))
-    const best = successful[0]
-    return best.safeParse(val).success
-  })
+  return z
+    .any()
+    .superRefine((val, ctx) => {
+      const successful = schemas.filter((s) => s.safeParse(val).success)
+
+      if (successful.length === 1) {
+        return
+      }
+
+      if (successful.length === 0) {
+        ctx.addIssue({
+          code: 'invalid_type',
+          expected: 'custom',
+          message: 'Value does not match any schema'
+        })
+        return
+      }
+
+      // Multiple matches, pick the best according to PRIORITY_ORDER
+      successful.sort((a, b) => schemaPriority(a) - schemaPriority(b))
+      const best = successful[0]
+
+      if (!best.safeParse(val).success) {
+        ctx.addIssue({
+          expected: 'custom',
+          code: 'invalid_type',
+          message: 'Value did not match the best schema'
+        })
+      }
+    })
+    .meta({
+      description:
+        'Value that matches exactly one of the possible schema types (TextValue, DateValue, DateRangeFieldValue). The best matching schema is chosen by priority.'
+    })
 }
 
 export type FieldUpdateValue =
@@ -276,5 +285,7 @@ export type FieldUpdateValueSchema =
   | typeof ButtonFieldValue
   | typeof QrReaderFieldValue
   | typeof IdReaderFieldValue
+  | typeof DateValue
+  | typeof EmailValue
   | z.ZodString
   | z.ZodBoolean

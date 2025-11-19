@@ -10,14 +10,17 @@
  */
 
 import React from 'react'
+import { useIntl } from 'react-intl'
 import { AppBar, Frame } from '@opencrvs/components'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
+import { constantsMessages } from '@client/i18n/messages/constants'
 import { Sidebar } from '../sidebar/Sidebar'
 import { DesktopCenter } from '../workqueues'
 
 export function SearchLayout({ children }: { children: React.ReactNode }) {
+  const intl = useIntl()
   return (
     <Frame
       header={
@@ -29,7 +32,9 @@ export function SearchLayout({ children }: { children: React.ReactNode }) {
         />
       }
       navigation={<Sidebar key={'search-result'} />}
-      skipToContentText="skip"
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       {children}
     </Frame>

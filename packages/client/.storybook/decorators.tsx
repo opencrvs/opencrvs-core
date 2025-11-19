@@ -41,7 +41,7 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
 > = {
       parameters: {
         layout: 'centered',
-        userRole: TestUserRole.Enum.REGISTRATION_AGENT
+        userRole: TestUserRole.enum.REGISTRATION_AGENT
       }
     }
  */
@@ -60,11 +60,11 @@ export const withValidatorContext: Decorator = (Story, context) => {
 export function getTestValidatorContext(userRole?: TestUserRole) {
   let token
 
-  if (userRole === TestUserRole.Enum.FIELD_AGENT) {
+  if (userRole === TestUserRole.enum.FIELD_AGENT) {
     token = generator.user.token.fieldAgent
-  } else if (userRole === TestUserRole.Enum.LOCAL_SYSTEM_ADMIN) {
+  } else if (userRole === TestUserRole.enum.LOCAL_SYSTEM_ADMIN) {
     token = generator.user.token.localSystemAdmin
-  } else if (userRole === TestUserRole.Enum.REGISTRATION_AGENT) {
+  } else if (userRole === TestUserRole.enum.REGISTRATION_AGENT) {
     token = generator.user.token.registrationAgent
   } else {
     token = generator.user.token.localRegistrar
