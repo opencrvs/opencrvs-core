@@ -12,6 +12,8 @@
 import * as z from 'zod/v4'
 import { SearchScopeAccessLevels } from './events'
 
+// misc change
+
 export const SCOPES = {
   // TODO v1.8 legacy scopes
   BYPASSRATELIMIT: 'bypassratelimit',
