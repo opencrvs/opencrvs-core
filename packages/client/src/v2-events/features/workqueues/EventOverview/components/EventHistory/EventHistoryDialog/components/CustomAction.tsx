@@ -37,7 +37,7 @@ function prepareContent(
       (f) =>
         isFieldVisible(f, annotation ?? {}, validatorContext) &&
         annotation?.[f.id] != null &&
-        annotation?.[f.id] !== ''
+        annotation[f.id] !== ''
     )
     .map((field) => {
       const value = (
