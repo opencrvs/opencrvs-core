@@ -18,6 +18,7 @@ import {
   PrimaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
+import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import {
   ActionType,
   CustomActionConfig,
@@ -98,7 +99,7 @@ function QuickActionModal({
   )
 
   return (
-    <ResponsiveModal
+    <Dialog
       actions={[
         <TertiaryButton
           key="cancel"
@@ -118,13 +119,10 @@ function QuickActionModal({
           )}
         </ConfirmButton>
       ]}
-      autoHeight={true}
-      handleClose={() => close(false)}
       id={`quick-action-modal-${config.label.id}`}
-      responsive={true}
-      show={true}
+      isOpen={true}
       title={intl.formatMessage(config.label)}
-      width={800}
+      onClose={() => close(false)}
     >
       <FormFieldGenerator
         fields={config.fields ?? []}
@@ -133,7 +131,7 @@ function QuickActionModal({
         onChange={handleChange}
       />
       {config.description ? intl.formatMessage(config.description) : null}
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 
