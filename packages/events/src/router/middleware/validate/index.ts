@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import {
   MiddlewareFunction,
   TRPCError
@@ -63,7 +62,7 @@ export function getFieldErrors(
   fields: FieldConfig[],
   data: ActionUpdate,
   context: ValidatorContext,
-  declaration: EventState = {}
+  declaration: EventState | ActionUpdate = {}
 ) {
   const visibleFields = fields.filter((field) =>
     isFieldVisible(field, { ...data, ...declaration }, context)
@@ -232,15 +231,28 @@ function validateActionAnnotation({
   const formFields = pages.flatMap(({ fields }) =>
     fields.flatMap((field) => field)
   )
-  const customActionFields = findCustomActionFields(eventConfig)
 
   const errors = [
     ...getFieldErrors(formFields, annotation, context, declaration),
-    ...getFieldErrors(customActionFields, annotation, context, declaration),
     ...getVerificationPageErrors(visibleVerificationPageIds, annotation)
   ]
 
   return errors
+}
+
+function validateCustomAction({
+  eventConfig,
+  annotation = {},
+  declaration = {},
+  context
+}: {
+  eventConfig: EventConfig
+  annotation?: ActionUpdate
+  declaration: ActionUpdate
+  context: ValidatorContext
+}) {
+  const customActionFields = findCustomActionFields(eventConfig)
+  return getFieldErrors(customActionFields, annotation, context, declaration)
 }
 
 function validateNotifyAction({
@@ -407,6 +419,18 @@ export const validateAction: MiddlewareFunction<
     actionType === ActionType.REJECT_CORRECTION
   ) {
     throwIfRequestActionNotFound(event, input)
+  }
+
+  if (actionType === ActionType.CUSTOM) {
+    const errors = validateCustomAction({
+      eventConfig,
+      annotation: input.annotation,
+      declaration: input.declaration,
+      context
+    })
+
+    throwWhenNotEmpty(errors)
+    return next()
   }
 
   const declarationUpdateAction = DeclarationUpdateActions.safeParse(actionType)
