@@ -15,7 +15,7 @@
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.router.json",
     "build:clean": "rm -rf build",
     "generate-db-types": "kanel && prettier src/storage/postgres/events/schema --write",
-    "generate-db-schema": "docker run --rm postgres:17.6 pg_dump postgres://events_migrator:migrator_password@host.docker.internal:5432/events -s > src/tests/postgres-migrations.sql"
+    "generate-db-schema": "docker run --rm postgres:17.6 pg_dump postgres://events_migrator:migrator_password@host.docker.internal:5432/events -s > src/tests/postgres-migrations.sql --exclude-schema=analytics"
   },
   "dependencies": {
     "@elastic/elasticsearch": "8.16.2",
