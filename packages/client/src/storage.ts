@@ -25,7 +25,10 @@ const STORE_NAME = 'keyvaluepairs'
 let store = createStore(DATABASE_NAME, STORE_NAME)
 
 function configStorage() {
-  store = createStore(DATABASE_NAME, STORE_NAME)
+  if (!store) {
+    store = createStore(DATABASE_NAME, STORE_NAME)
+  }
+
   validateApplicationVersion()
 }
 
