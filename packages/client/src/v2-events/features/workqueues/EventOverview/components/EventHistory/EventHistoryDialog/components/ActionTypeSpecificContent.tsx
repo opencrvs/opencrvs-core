@@ -22,6 +22,7 @@ import {
 import { RequestCorrection } from './RequestCorrection'
 import { PrintCertificate } from './PrintCertificate'
 import { DeclarationUpdate } from './DeclarationUpdate'
+import { CustomActionDialog } from './CustomAction'
 
 const SyntheticDeclarationActionTypes = z.enum([DECLARATION_ACTION_UPDATE])
 
@@ -63,6 +64,16 @@ export function ActionTypeSpecificContent({
   if (type === ActionType.PRINT_CERTIFICATE) {
     return (
       <PrintCertificate
+        action={action}
+        event={fullEvent}
+        validatorContext={validatorContext}
+      />
+    )
+  }
+
+  if (type === ActionType.CUSTOM) {
+    return (
+      <CustomActionDialog
         action={action}
         event={fullEvent}
         validatorContext={validatorContext}

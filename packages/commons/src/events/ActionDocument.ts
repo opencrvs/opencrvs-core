@@ -252,6 +252,7 @@ const CustomAction = ActionBase.merge(
     customActionType: z.string()
   })
 )
+export type CustomAction = z.infer<typeof CustomAction>
 
 export const ActionDocument = z
   .discriminatedUnion('type', [

@@ -68,7 +68,8 @@ import {
   TimeValue,
   ButtonFieldValue,
   VerificationStatusValue,
-  AgeValue
+  AgeValue,
+  FieldUpdateValue
 } from './FieldValue'
 import { FullDocumentPath } from '../documents'
 import {
@@ -271,35 +272,35 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
 
 export const isParagraphFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: Paragraph } => {
   return field.config.type === FieldType.PARAGRAPH
 }
 
 export const isDateFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: DateField } => {
   return field.config.type === FieldType.DATE
 }
 
 export const isAgeFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: AgeValue | undefined; config: AgeField } => {
   return field.config.type === FieldType.AGE
 }
 
 export const isTimeFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: TimeField } => {
   return field.config.type === FieldType.TIME
 }
 
 export const isDateRangeFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is {
   value: DateRangeFieldValue
   config: DateRangeField
@@ -309,84 +310,84 @@ export const isDateRangeFieldType = (field: {
 
 export const isSelectDateRangeFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: SelectDateRangeValue; config: SelectDateRangeField } => {
   return field.config.type === FieldType.SELECT_DATE_RANGE
 }
 
 export const isPageHeaderFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: PageHeader } => {
   return field.config.type === FieldType.PAGE_HEADER
 }
 
 export const isTextFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: TextField } => {
   return field.config.type === FieldType.TEXT
 }
 
 export const isNumberFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: number; config: NumberField } => {
   return field.config.type === FieldType.NUMBER
 }
 
 export const isNameFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: NameFieldValue; config: NameField } => {
   return field.config.type === FieldType.NAME
 }
 
 export const isPhoneFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: PhoneField } => {
   return field.config.type === FieldType.PHONE
 }
 
 export const isIdFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: IdField } => {
   return field.config.type === FieldType.ID
 }
 
 export const isTextAreaFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: TextAreaField } => {
   return field.config.type === FieldType.TEXTAREA
 }
 
 export const isSignatureFieldType = (field: {
   config: FieldConfig
-  value: FieldValue | undefined
+  value: FieldValue | FieldUpdateValue | undefined
 }): field is { value: FileFieldValue | undefined; config: SignatureField } => {
   return field.config.type === FieldType.SIGNATURE
 }
 
 export const isEmailFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: EmailField } => {
   return field.config.type === FieldType.EMAIL
 }
 
 export const isFileFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: FileFieldValue; config: File } => {
   return field.config.type === FieldType.FILE
 }
 
 export const isFileFieldWithOptionType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is {
   value: FileFieldWithOptionValue
   config: FileUploadWithOptions
@@ -396,126 +397,126 @@ export const isFileFieldWithOptionType = (field: {
 
 export const isBulletListFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: BulletList } => {
   return field.config.type === FieldType.BULLET_LIST
 }
 
 export const isSelectFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: SelectField } => {
   return field.config.type === FieldType.SELECT
 }
 
 export const isAddressFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: AddressFieldValue; config: AddressField } => {
   return field.config.type === FieldType.ADDRESS
 }
 
 export const isCountryFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: Country } => {
   return field.config.type === FieldType.COUNTRY
 }
 
 export const isCheckboxFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: boolean; config: Checkbox } => {
   return field.config.type === FieldType.CHECKBOX
 }
 
 export const isRadioGroupFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: RadioGroup } => {
   return field.config.type === FieldType.RADIO_GROUP
 }
 
 export const isLocationFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: LocationInput } => {
   return field.config.type === FieldType.LOCATION
 }
 
 export const isDividerFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: Divider } => {
   return field.config.type === FieldType.DIVIDER
 }
 
 export const isAdministrativeAreaFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: AdministrativeArea } => {
   return field.config.type === FieldType.ADMINISTRATIVE_AREA
 }
 
 export const isFacilityFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: Facility } => {
   return field.config.type === FieldType.FACILITY
 }
 
 export const isOfficeFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: Office } => {
   return field.config.type === FieldType.OFFICE
 }
 
 export const isDataFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: DataFieldValue; config: DataField } => {
   return field.config.type === FieldType.DATA
 }
 
 export const isButtonFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: ButtonField } => {
   return field.config.type === FieldType.BUTTON
 }
 
 export const isPrintButtonFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: AlphaPrintButton } => {
   return field.config.type === FieldType.ALPHA_PRINT_BUTTON
 }
 
 export const isHttpFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: HttpField } => {
   return field.config.type === FieldType.HTTP
 }
 
 export const isSearchFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: SearchField } => {
   return field.config.type === FieldType.SEARCH
 }
 
 export const isLinkButtonFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: LinkButtonField } => {
   return field.config.type === FieldType.LINK_BUTTON
 }
 
 export const isVerificationStatusType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is {
   value: VerificationStatusValue | undefined
   config: VerificationStatus
@@ -525,7 +526,7 @@ export const isVerificationStatusType = (field: {
 
 export const isQueryParamReaderFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is {
   value: undefined
   config: QueryParamReaderField
@@ -535,21 +536,21 @@ export const isQueryParamReaderFieldType = (field: {
 
 export const isQrReaderFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: QrReaderField } => {
   return field.config.type === FieldType.QR_READER
 }
 
 export const isIdReaderFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: IdReaderField } => {
   return field.config.type === FieldType.ID_READER
 }
 
 export const isLoaderFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: LoaderField } => {
   return field.config.type === FieldType.LOADER
 }

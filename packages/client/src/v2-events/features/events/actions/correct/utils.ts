@@ -26,7 +26,8 @@ import {
   isFieldDisplayedOnReview,
   getCurrentEventState,
   ActionDocument,
-  getAcceptedActions
+  getAcceptedActions,
+  FieldUpdateValue
 } from '@opencrvs/commons/client'
 import {
   EventHistoryActionDocument,
@@ -38,7 +39,10 @@ import {
  * For objects we need to ignore undefined values since the form might create them.
  * @returns whether the two field values are equal when ignoring undefined values
  */
-export function isEqualFieldValue<T extends FieldValue>(a: T, b: T) {
+export function isEqualFieldValue<T extends FieldValue | FieldUpdateValue>(
+  a: T,
+  b: T
+) {
   if (typeof a === 'object' && typeof b === 'object') {
     return _.isEqual(_.omitBy(a, _.isUndefined), _.omitBy(b, _.isUndefined))
   }
