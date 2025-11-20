@@ -43,7 +43,11 @@ import {
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID, UUID } from '../uuid'
-import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
+import {
+  ActionConfig,
+  CustomActionConfig,
+  DeclarationActionConfig
+} from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
@@ -67,6 +71,18 @@ export function getDeclarationPages(configuration: EventConfig) {
 
 export function getDeclaration(configuration: EventConfig) {
   return configuration.declaration
+}
+
+export function getCustomActionFields(eventConfig: EventConfig): FieldConfig[] {
+  const customActions = eventConfig.actions.filter(
+    (action): action is CustomActionConfig => action.type === ActionType.CUSTOM
+  ) satisfies CustomActionConfig[]
+
+  if (!customActions.length) {
+    return []
+  }
+
+  return customActions.flatMap((action) => action.form)
 }
 
 export function getPrintCertificatePages(configuration: EventConfig) {
