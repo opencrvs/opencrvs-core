@@ -29,7 +29,7 @@ WebFont.load({
   }
 })
 
-storage.configStorage('OpenCRVS')
+storage.configStorage()
 
 const { store } = createStore()
 
