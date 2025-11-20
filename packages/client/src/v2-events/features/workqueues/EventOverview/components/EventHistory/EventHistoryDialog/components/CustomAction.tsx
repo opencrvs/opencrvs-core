@@ -33,7 +33,12 @@ function prepareContent(
   const intl = useIntl()
   const annotation = action.annotation
   return customActionFields
-    .filter((f) => isFieldVisible(f, action.annotation ?? {}, validatorContext))
+    .filter(
+      (f) =>
+        isFieldVisible(f, annotation ?? {}, validatorContext) &&
+        annotation?.[f.id] != null &&
+        annotation?.[f.id] !== ''
+    )
     .map((field) => {
       const value = (
         <Output
@@ -69,6 +74,12 @@ export function CustomActionDialog({
   }
   const { eventConfiguration } = useEventConfiguration(event.type)
   const customActionFields = getCustomActionFields(eventConfiguration)
+  const content = prepareContent(
+    originalAction,
+    customActionFields,
+    eventConfiguration,
+    validatorContext
+  )
 
   return (
     <Table
@@ -84,12 +95,7 @@ export function CustomActionDialog({
           key: 'value'
         }
       ]}
-      content={prepareContent(
-        originalAction,
-        customActionFields,
-        eventConfiguration,
-        validatorContext
-      )}
+      content={content}
       hideTableHeader={true}
     />
   )
