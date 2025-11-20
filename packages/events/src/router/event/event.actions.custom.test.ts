@@ -130,6 +130,47 @@ describe('event.actions.custom', () => {
     expect(sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
   })
 
+  test('test non required field', async () => {
+    const { client, payload } = await initialiseTest([
+      `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=${CUSTOM_ACTION_TYPE}]`
+    ])
+
+    const customPayload = {
+      ...payload,
+      annotation: {
+        ...payload.annotation,
+        'non-required-field': 'some-value'
+      }
+    }
+
+    await expect(
+      client.event.actions.custom.request(customPayload)
+    ).resolves.not.toThrow()
+
+    const event = await client.event.get(customPayload.eventId)
+
+    expect(sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
+  })
+
+  // @todo - un-skip after implementing validation for error field input
+  test.skip('test with an error field', async () => {
+    const { client, payload } = await initialiseTest([
+      `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=${CUSTOM_ACTION_TYPE}]`
+    ])
+
+    const customPayload = {
+      ...payload,
+      annotation: {
+        ...payload.annotation,
+        'error-field': 'some-value'
+      }
+    }
+
+    await expect(
+      client.event.actions.custom.request(customPayload)
+    ).rejects.toThrow()
+  })
+
   describe('Asynchronous confirmation flow', () => {
     function mockNotifyApi(status: number) {
       return mswServer.use(

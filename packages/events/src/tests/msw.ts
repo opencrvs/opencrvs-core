@@ -37,6 +37,16 @@ const tennisClubMembershipEventWithCustomAction = {
             description: 'This is the label for the field for a custom action',
             id: 'event.birth.custom.action.approve.field.notes.label'
           }
+        },
+        {
+          id: 'non-required-field',
+          type: 'TEXTAREA',
+          required: false,
+          label: {
+            defaultMessage: 'Test field',
+            description: 'This is the label for the field for a custom action',
+            id: 'event.birth.custom.action.approve.test-field.notes.label'
+          }
         }
       ],
       flags: []
