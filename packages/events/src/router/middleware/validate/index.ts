@@ -62,7 +62,7 @@ export function getFieldErrors(
   fields: FieldConfig[],
   data: ActionUpdate,
   context: ValidatorContext,
-  declaration: EventState | ActionUpdate = {}
+  declaration: EventState = {}
 ) {
   const visibleFields = fields.filter((field) =>
     isFieldVisible(field, { ...data, ...declaration }, context)
@@ -243,16 +243,14 @@ function validateActionAnnotation({
 function validateCustomAction({
   eventConfig,
   annotation = {},
-  declaration = {},
   context
 }: {
   eventConfig: EventConfig
   annotation?: ActionUpdate
-  declaration: ActionUpdate
   context: ValidatorContext
 }) {
   const customActionFields = findCustomActionFields(eventConfig)
-  return getFieldErrors(customActionFields, annotation, context, declaration)
+  return getFieldErrors(customActionFields, annotation, context, {})
 }
 
 function validateNotifyAction({
@@ -425,7 +423,6 @@ export const validateAction: MiddlewareFunction<
     const errors = validateCustomAction({
       eventConfig,
       annotation: input.annotation,
-      declaration: input.declaration,
       context
     })
 
