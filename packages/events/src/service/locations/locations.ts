@@ -19,7 +19,15 @@ import * as config from '@events/service/config/config'
  */
 
 export async function setLocations(locations: Location[]) {
-  return locationsRepo.setLocations(
+  /** Inserting data on both administrative areas and other locations will be intermediary step to allow development against develop, without causing interruptions to other environments */
+  /** we will clear locations from administrative areas.  */
+  const administrativeAreas = locations.filter(
+    (loc) => loc.locationType === LocationType.enum.ADMIN_STRUCTURE
+  )
+
+  await locationsRepo.addAdministrativeAreas(administrativeAreas)
+
+  await locationsRepo.setLocations(
     locations.map(({ id, name, parentId, validUntil, locationType }) => ({
       id,
       name,
@@ -34,7 +42,6 @@ export async function setLocations(locations: Location[]) {
  * Syncs locations from V1 to V2 database.
  * @param incomingLocations - Locations to be set
  */
-
 export async function syncLocations() {
   const locations = await config.getLocations()
   return setLocations(locations)
