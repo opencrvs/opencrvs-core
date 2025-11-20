@@ -22,9 +22,10 @@ const STORE_NAME = 'keyvaluepairs'
  *
  * There is no guarantee that application root is executed before other files that might use storage (e.g. useDrafts).
  */
-const store = createStore(DATABASE_NAME, STORE_NAME)
+let store = createStore(DATABASE_NAME, STORE_NAME)
 
 function configStorage() {
+  store = createStore(DATABASE_NAME, STORE_NAME)
   validateApplicationVersion()
 }
 
