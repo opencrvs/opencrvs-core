@@ -7,6 +7,7 @@ module.exports = {
     connectionString: 'postgres://events_app:app_password@localhost:5432/events'
   },
   preDeleteOutputFolder: true,
+  schemas: ['app'],
   outputPath: './src/storage/postgres/events/schema',
   customTypeMap: {
     'pg_catalog.uuid': {
