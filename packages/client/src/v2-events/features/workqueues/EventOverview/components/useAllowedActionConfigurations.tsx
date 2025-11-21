@@ -610,6 +610,11 @@ export function useAllowedActionConfigurations(
 ): [React.ReactNode, ActionMenuItem[]] {
   const { isActionAllowed } = useUserAllowedActions(event.type)
   const drafts = useDrafts()
+  const isPending = event.flags.some((flag) => flag.endsWith(':requested'))
+
+  if (isPending) {
+    return [null, []]
+  }
 
   const openDraft = drafts
     .getAllRemoteDrafts()
@@ -650,6 +655,7 @@ export function useAllowedActionConfigurations(
     event,
     authentication
   )
+
   const allActionConfigs = [...allowedActionConfigs, ...customActionConfigs]
 
   // Check if the user can perform any action other than ASSIGN, or UNASSIGN
