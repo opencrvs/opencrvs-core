@@ -17,7 +17,7 @@ import { Locations, NewLocations } from './schema/app/Locations'
 
 const INSERT_MAX_CHUNK_SIZE = 10000
 
-export async function addLocations(locations: NewLocations[]) {
+async function addLocations(locations: NewLocations[]) {
   const db = getClient()
 
   // Insert new locations in chunks to avoid exceeding max query size

@@ -93,7 +93,7 @@ test('Creates multiple locations', async () => {
 })
 
 test('seeding locations is additive, not destructive', async () => {
-  const { user, generator, locations } = await setupTestCase()
+  const { user, generator } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
   const initialLocations = await dataSeedingClient.locations.list()
@@ -164,12 +164,7 @@ test('administrative areas are seeded on both tables', async () => {
 
 /** Intermediary test until we clean up locations table */
 test('parent id is a duplicate of administrative area id in locations', async () => {
-  const {
-    user,
-    generator,
-    locations: initialLocations,
-    eventsDb
-  } = await setupTestCase()
+  const { user, eventsDb } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
   const locationRng = createPrng(123142)
