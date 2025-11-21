@@ -310,6 +310,8 @@ function useViewableActionConfigurations(
       : actionLabels[ActionType.VALIDATE]
   }
 
+  // @TODO CIHAN: we probs need to add conditional checks here too!
+
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
@@ -577,9 +579,6 @@ function useCustomActionConfigs(
           !isDownloadedAndAssignedToUser ||
           !isActionEnabled(action, event, validatorContext)
 
-        console.log('disabledd')
-        console.log(disabled)
-
         return {
           label: action.label,
           icon: 'PencilLine' as const,
@@ -590,7 +589,13 @@ function useCustomActionConfigs(
           type: ActionType.CUSTOM
         }
       })
-  }, [eventConfiguration, onCustomAction, isDownloadedAndAssignedToUser])
+  }, [
+    eventConfiguration,
+    onCustomAction,
+    isDownloadedAndAssignedToUser,
+    event,
+    validatorContext
+  ])
 
   return { customActionModal, customActionConfigs }
 }
