@@ -32,6 +32,7 @@ export async function setLocations(locations: Location[]) {
       id,
       name,
       parentId,
+      administrativeAreaId: parentId,
       validUntil: validUntil ? new Date(validUntil).toISOString() : null,
       locationType
     }))

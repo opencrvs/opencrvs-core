@@ -13,4 +13,115 @@ exports[`Prevents sending empty payload 1`] = `
 ]]
 `;
 
+exports[`parent id is a duplicate of administrative area id in locations 1`] = `
+{
+  "adminAreas": [
+    {
+      "id": "27160bbd-32d1-4625-812f-860226bfb92a",
+      "name": "Location name 0",
+      "parentId": null,
+      "validUntil": null,
+    },
+    {
+      "id": "6ba32aee-f566-4993-972f-5989eb23b915",
+      "name": "Location name 2",
+      "parentId": null,
+      "validUntil": null,
+    },
+    {
+      "id": "25bb4f42-d1c1-478f-b001-2def8aa07f2a",
+      "name": "Location name 3",
+      "parentId": null,
+      "validUntil": null,
+    },
+    {
+      "id": "fb2e5318-be7e-4499-a61a-9563b9c4c630",
+      "name": "Parent Admin Area",
+      "parentId": null,
+      "validUntil": null,
+    },
+    {
+      "id": "19c6cd18-0ebf-4c76-a428-dd1dee88ca28",
+      "name": "Child Admin Area",
+      "parentId": "fb2e5318-be7e-4499-a61a-9563b9c4c630",
+      "validUntil": null,
+    },
+  ],
+  "locations": [
+    {
+      "administrativeAreaId": null,
+      "id": "27160bbd-32d1-4625-812f-860226bfb92a",
+      "locationType": "ADMIN_STRUCTURE",
+      "name": "Location name 0",
+      "parentId": null,
+      "validUntil": null,
+    },
+    {
+      "administrativeAreaId": null,
+      "id": "fe99b4fc-5c4f-4a2d-a9ff-27ffad4a5c8b",
+      "locationType": "HEALTH_FACILITY",
+      "name": "Location name 1",
+      "parentId": null,
+      "validUntil": null,
+    },
+    {
+      "administrativeAreaId": null,
+      "id": "6ba32aee-f566-4993-972f-5989eb23b915",
+      "locationType": "ADMIN_STRUCTURE",
+      "name": "Location name 2",
+      "parentId": null,
+      "validUntil": null,
+    },
+    {
+      "administrativeAreaId": null,
+      "id": "25bb4f42-d1c1-478f-b001-2def8aa07f2a",
+      "locationType": "ADMIN_STRUCTURE",
+      "name": "Location name 3",
+      "parentId": null,
+      "validUntil": null,
+    },
+    {
+      "administrativeAreaId": null,
+      "id": "94230bc4-dc41-4ef4-a3e4-577305ad7fd3",
+      "locationType": "CRVS_OFFICE",
+      "name": "Location name 4",
+      "parentId": null,
+      "validUntil": null,
+    },
+    {
+      "administrativeAreaId": null,
+      "id": "fb2e5318-be7e-4499-a61a-9563b9c4c630",
+      "locationType": "ADMIN_STRUCTURE",
+      "name": "Parent Admin Area",
+      "parentId": null,
+      "validUntil": null,
+    },
+    {
+      "administrativeAreaId": "fb2e5318-be7e-4499-a61a-9563b9c4c630",
+      "id": "19c6cd18-0ebf-4c76-a428-dd1dee88ca28",
+      "locationType": "ADMIN_STRUCTURE",
+      "name": "Child Admin Area",
+      "parentId": "fb2e5318-be7e-4499-a61a-9563b9c4c630",
+      "validUntil": null,
+    },
+    {
+      "administrativeAreaId": "fb2e5318-be7e-4499-a61a-9563b9c4c630",
+      "id": "37a431bf-5859-47d1-aa6b-1d6fbe8d6775",
+      "locationType": "HEALTH_FACILITY",
+      "name": "Child Health Facility",
+      "parentId": "fb2e5318-be7e-4499-a61a-9563b9c4c630",
+      "validUntil": null,
+    },
+    {
+      "administrativeAreaId": "fb2e5318-be7e-4499-a61a-9563b9c4c630",
+      "id": "0fb0a169-9f0a-46b2-a51d-888c4d220ddb",
+      "locationType": "CRVS_OFFICE",
+      "name": "Child CRVS Office",
+      "parentId": "fb2e5318-be7e-4499-a61a-9563b9c4c630",
+      "validUntil": null,
+    },
+  ],
+}
+`;
+
 exports[`prevents forbidden access if missing required scope 1`] = `[TRPCError: FORBIDDEN]`;

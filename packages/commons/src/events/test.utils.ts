@@ -91,7 +91,7 @@ export const TestUserRole = z.enum([
 
 export type TestUserRole = z.infer<typeof TestUserRole>
 
-function pickRandom<T>(rng: () => number, items: T[]): T {
+export function pickRandom<T>(rng: () => number, items: T[]): T {
   return items[Math.floor(rng() * items.length)]
 }
 
