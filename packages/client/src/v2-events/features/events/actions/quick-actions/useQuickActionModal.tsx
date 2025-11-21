@@ -12,13 +12,12 @@ import React from 'react'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
-import { ResponsiveModal } from '@opencrvs/components'
+import { Dialog, Text } from '@opencrvs/components'
 import {
   DangerButton,
   PrimaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import {
   ActionType,
   CustomActionConfig,
@@ -138,7 +137,9 @@ function QuickActionModal({
         validatorContext={validatorContext}
         onChange={handleChange}
       />
-      {config.description ? intl.formatMessage(config.description) : null}
+      <Text color="grey500" element="p" variant="reg16">
+        {config.description ? intl.formatMessage(config.description) : null}
+      </Text>
     </Dialog>
   )
 }
