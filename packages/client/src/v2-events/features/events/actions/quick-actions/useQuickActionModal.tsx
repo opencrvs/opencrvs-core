@@ -68,11 +68,18 @@ const quickActions = {
   [ActionType.ARCHIVE]: archive
 } as const satisfies Partial<Record<ActionType, QuickActionConfig>>
 
+interface ModalResult {
+  /** Whether the modal was confirmed/accepted or not */
+  result: boolean
+  /** The values entered in the modal form, if any */
+  values?: Record<string, FieldUpdateValue>
+}
+
 function QuickActionModal({
   close,
   config
 }: {
-  close: (result: Record<string, FieldUpdateValue> | false) => void
+  close: (result: ModalResult) => void
   config: ModalConfig & { label: MessageDescriptor }
 }) {
   const intl = useIntl()
@@ -83,6 +90,7 @@ function QuickActionModal({
 
   const ConfirmButton =
     config.confirmButtonType === 'danger' ? DangerButton : PrimaryButton
+
   const handleChange = (values: Record<string, FieldUpdateValue>) => {
     setModalValues((prev) => ({
       ...prev,
@@ -104,7 +112,7 @@ function QuickActionModal({
         <TertiaryButton
           key="cancel"
           id="cancel-btn"
-          onClick={() => close(false)}
+          onClick={() => close({ result: false })}
         >
           {intl.formatMessage(buttonMessages.cancel)}
         </TertiaryButton>,
@@ -112,7 +120,7 @@ function QuickActionModal({
           key="confirm"
           disabled={errorsOnField.length > 0}
           id="confirm-btn"
-          onClick={() => close(modalValues)}
+          onClick={() => close({ result: true, values: modalValues })}
         >
           {intl.formatMessage(
             config.confirmButtonLabel || buttonMessages.confirm
@@ -122,7 +130,7 @@ function QuickActionModal({
       id={`quick-action-modal-${config.label.id}`}
       isOpen={true}
       title={intl.formatMessage(config.label)}
-      onClose={() => close(false)}
+      onClose={() => close({ result: false })}
     >
       <FormFieldGenerator
         fields={config.fields ?? []}
@@ -191,27 +199,25 @@ export function useCustomActionModal(event: EventIndex) {
     actionConfig: CustomActionConfig,
     workqueue?: string
   ) => {
-    const result = await openModal<Record<string, FieldUpdateValue> | false>(
-      (close) => (
-        <QuickActionModal
-          close={close}
-          config={{
-            ...customActionConfigBase,
-            label: actionConfig.label,
-            description: actionConfig.supportingCopy,
-            fields: actionConfig.form
-          }}
-        />
-      )
-    )
+    const modalResult = await openModal<ModalResult>((close) => (
+      <QuickActionModal
+        close={close}
+        config={{
+          ...customActionConfigBase,
+          label: actionConfig.label,
+          description: actionConfig.supportingCopy,
+          fields: actionConfig.form
+        }}
+      />
+    ))
 
-    if (result) {
+    if (modalResult.result) {
       void actions.custom.mutate({
         eventId: event.id,
         customActionType: actionConfig.customActionType,
         declaration: event.declaration,
         transactionId: uuid(),
-        annotation: result
+        annotation: modalResult.values
       })
 
       if (workqueue) {

@@ -16,7 +16,6 @@ import {
   isMetaAction,
   EventDocument,
   ActionType,
-  FieldValue,
   ValidatorContext,
   deepMerge,
   omitHiddenFields,
@@ -29,20 +28,14 @@ import {
   getAcceptedActions,
   FieldUpdateValue
 } from '@opencrvs/commons/client'
-import {
-  EventHistoryActionDocument,
-  EventHistoryDocument
-} from './useActionForHistory'
+import { EventHistoryActionDocument } from './useActionForHistory'
 
 /**
  * Function we use for checking whether a field value has changed.
  * For objects we need to ignore undefined values since the form might create them.
  * @returns whether the two field values are equal when ignoring undefined values
  */
-export function isEqualFieldValue<T extends FieldValue | FieldUpdateValue>(
-  a: T,
-  b: T
-) {
+export function isEqualFieldValue<T extends FieldUpdateValue>(a: T, b: T) {
   if (typeof a === 'object' && typeof b === 'object') {
     return _.isEqual(_.omitBy(a, _.isUndefined), _.omitBy(b, _.isUndefined))
   }
