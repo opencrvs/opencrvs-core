@@ -45,7 +45,8 @@ import { EventDocument } from './EventDocument'
 import { getUUID, UUID } from '../uuid'
 import {
   ActionConfig,
-  CustomActionConfig,
+  actionConfigTypes,
+  ActionConfigTypes,
   DeclarationActionConfig
 } from './ActionConfig'
 import { FormConfig } from './FormConfig'
@@ -73,16 +74,50 @@ export function getDeclaration(configuration: EventConfig) {
   return configuration.declaration
 }
 
-export function getCustomActionFields(eventConfig: EventConfig): FieldConfig[] {
-  const customActions = eventConfig.actions.filter(
-    (action): action is CustomActionConfig => action.type === ActionType.CUSTOM
-  ) satisfies CustomActionConfig[]
+export function isActionConfigType(
+  type: ActionType
+): type is ActionConfigTypes {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return actionConfigTypes.has(type as any)
+}
 
-  if (!customActions.length) {
+// @TODO CIHAN: use this everywhere
+export function getActionConfig<T extends ActionConfigTypes>({
+  eventConfiguration,
+  actionType,
+  customActionType
+}: {
+  eventConfiguration: EventConfig
+  actionType: T
+  customActionType?: string
+}): Extract<ActionConfig, { type: T }> | undefined {
+  const actionConfig = eventConfiguration.actions.find(
+    (a): a is Extract<ActionConfig, { type: T }> => {
+      if (a.type === ActionType.CUSTOM && customActionType) {
+        return a.customActionType === customActionType
+      }
+      return a.type === actionType
+    }
+  )
+
+  return actionConfig
+}
+
+export function getCustomActionFields(
+  eventConfiguration: EventConfig,
+  customActionType: string
+): FieldConfig[] {
+  const customAction = getActionConfig({
+    eventConfiguration,
+    customActionType,
+    actionType: ActionType.CUSTOM
+  })
+
+  if (!customAction) {
     return []
   }
 
-  return customActions.flatMap((action) => action.form)
+  return customAction.form
 }
 
 export function getPrintCertificatePages(configuration: EventConfig) {
@@ -110,26 +145,6 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
   }
 
   return []
-}
-
-// @TODO CIHAN: use this everywhere
-export function getActionConfig({
-  eventConfiguration,
-  actionType,
-  customActionType
-}: {
-  eventConfiguration: EventConfig
-  actionType: ActionType
-  customActionType?: string
-}): ActionConfig | undefined {
-  const actionConfig = eventConfiguration.actions.find((a) => {
-    if (a.type === ActionType.CUSTOM && customActionType) {
-      return a.customActionType === customActionType
-    }
-    return a.type === actionType
-  })
-
-  return actionConfig
 }
 
 function getAllAnnotationFields(config: EventConfig): FieldConfig[] {

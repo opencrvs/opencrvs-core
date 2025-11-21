@@ -231,13 +231,18 @@ function validateActionAnnotation({
 function validateCustomAction({
   eventConfig,
   annotation = {},
-  context
+  context,
+  customActionType
 }: {
   eventConfig: EventConfig
   annotation?: ActionUpdate
   context: ValidatorContext
+  customActionType: string
 }) {
-  const customActionFields = getCustomActionFields(eventConfig)
+  const customActionFields = getCustomActionFields(
+    eventConfig,
+    customActionType
+  )
   return getFieldErrors(customActionFields, annotation, context, {})
 }
 
@@ -411,7 +416,8 @@ export const validateAction: MiddlewareFunction<
     const errors = validateCustomAction({
       eventConfig,
       annotation: input.annotation,
-      context
+      context,
+      customActionType: input.customActionType
     })
 
     throwWhenNotEmpty(errors)

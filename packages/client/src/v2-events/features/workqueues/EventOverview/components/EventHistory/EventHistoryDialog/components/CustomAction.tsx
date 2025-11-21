@@ -73,7 +73,10 @@ export function CustomActionContent({
     throw new Error('Original action not found. This should never happen.')
   }
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const customActionFields = getCustomActionFields(eventConfiguration)
+  const customActionFields = getCustomActionFields(
+    eventConfiguration,
+    action.customActionType
+  )
   const content = prepareContent(
     originalAction,
     customActionFields,

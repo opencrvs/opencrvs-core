@@ -19,7 +19,10 @@ import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
+  ActionConfigTypes,
   ActionType,
+  isActionConfigType,
+  ActionConfig,
   EventDocument,
   getActionConfig
 } from '@opencrvs/commons/client'
@@ -37,6 +40,7 @@ import {
   expandWithClientSpecificActions,
   EventHistoryActionDocument,
   useActionForHistory,
+  DECLARATION_ACTION_UPDATE,
   extractHistoryActions
 } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
@@ -319,6 +323,12 @@ function EventHistorySkeleton() {
   )
 }
 
+function isNotUpdateAction(
+  type: EventHistoryActionDocument['type']
+): type is Exclude<ActionType, 'DELETE'> {
+  return type !== DECLARATION_ACTION_UPDATE
+}
+
 /**
  *  Renders the event history table. Used for audit trail.
  */
@@ -402,12 +412,16 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
     .map((action) => {
       const { name: actionCreatorName } = getActionCreator(action)
 
-      const actionConfig = getActionConfig({
-        eventConfiguration,
-        actionType: action.type as ActionType,
-        customActionType:
-          'customActionType' in action ? action.customActionType : undefined
-      })
+      // Only configurable action types should call getActionConfig
+      let actionConfig
+      if (isNotUpdateAction(action.type) && isActionConfigType(action.type)) {
+        actionConfig = getActionConfig({
+          eventConfiguration,
+          actionType: action.type,
+          customActionType:
+            'customActionType' in action ? action.customActionType : undefined
+        })
+      }
 
       // If a audit history label is configured in action config, use that!
       const title =
