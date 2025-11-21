@@ -192,6 +192,13 @@ function getMockActions(createdBy: string) {
       createdBy,
       id: generateUuid(rng),
       type: ActionType.MARK_AS_NOT_DUPLICATE
+    },
+    [ActionType.CUSTOM]: {
+      ...actionProps,
+      customActionType: 'Approve',
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.CUSTOM
     }
   }
 }
@@ -273,6 +280,7 @@ export const enum AssertType {
 type ActionLabel =
   | (typeof actionLabels)[keyof typeof actionLabels]['defaultMessage']
   | 'Review'
+  | 'Confirm'
 
 export const getHiddenActions = () =>
   Object.values(ActionTypes.enum).reduce(
