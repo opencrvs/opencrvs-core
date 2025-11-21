@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createStore, get, set, del } from 'idb-keyval'
+import { createStore, get, set, del, entries, clear } from 'idb-keyval'
 import { validateApplicationVersion } from '@client/utils'
 
 const DATABASE_NAME = 'OpenCRVS'
@@ -50,8 +50,13 @@ async function removeItem(key: string) {
   return await del(key, store)
 }
 
+async function clearStorage() {
+  return clear(store)
+}
+
 export const storage = {
   configStorage,
+  clearStorage,
   getItem,
   setItem,
   removeItem
