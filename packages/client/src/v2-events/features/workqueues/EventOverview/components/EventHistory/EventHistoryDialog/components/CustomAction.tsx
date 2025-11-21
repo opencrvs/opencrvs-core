@@ -55,7 +55,7 @@ function prepareContent(
     })
 }
 
-export function CustomActionDialog({
+export function CustomActionContent({
   event,
   action,
   validatorContext
