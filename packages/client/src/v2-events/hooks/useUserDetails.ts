@@ -10,13 +10,15 @@
  */
 
 import { useSelector } from 'react-redux'
-import { getLocations } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getUsersFullName } from '../utils'
+import { useLocations } from './useLocations'
 
 export function useUserDetails() {
   const userDetails = useSelector(getUserDetails)
-  const locations = useSelector(getLocations)
+
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
 
   const normalizedName =
     userDetails &&
@@ -31,12 +33,16 @@ export function useUserDetails() {
   const primaryOfficeId = userDetails?.primaryOffice.id
 
   if (primaryOfficeId) {
-    const primaryOfficeLocation = locations[primaryOfficeId]
+    const primaryOfficeLocation = locations.find(
+      ({ id }) => id === primaryOfficeId
+    )
 
-    const districtId = primaryOfficeLocation?.partOf.split('/')[1]
-    const district = districtId ? locations[districtId] : undefined
+    const districtId = primaryOfficeLocation?.parentId?.split('/')[1]
+    const district = districtId
+      ? locations.find(({ id }) => id === districtId)
+      : undefined
 
-    const provinceId = district?.partOf.split('/')[1]
+    const provinceId = district?.parentId?.split('/')[1]
 
     return {
       name,
