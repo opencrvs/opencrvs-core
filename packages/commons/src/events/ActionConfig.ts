@@ -15,6 +15,7 @@ import { FieldConfig } from './FieldConfig'
 import { ActionFormConfig } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 import { ActionFlagConfig } from './Flag'
+import { ActionConditional } from './Conditional'
 
 export const DeclarationReviewConfig = z
   .object({
@@ -39,7 +40,11 @@ export const ActionConfigBase = z.object({
   ).optional(),
   supportingCopy: TranslationConfig.optional().describe(
     'Text displayed on the confirmation'
-  )
+  ),
+  conditionals: z
+    .array(ActionConditional)
+    .optional()
+    .describe('Conditionals which can disable or hide actions.')
 })
 
 const DeclarationActionBase = ActionConfigBase.extend({
@@ -51,7 +56,11 @@ const ReadActionConfig = ActionConfigBase.extend(
     type: z.literal(ActionType.READ),
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page for read-only view.'
-    )
+    ),
+    conditionals: z
+      .never()
+      .optional()
+      .describe('Read-action can not be disabled or hidden with conditionals.')
   }).shape
 )
 

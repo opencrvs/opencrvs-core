@@ -554,8 +554,6 @@ function useCustomActionConfigs(
 } {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(event)
-
-  // @TODO: Could we share these with the useViewableActionConfigurations() function?
   const { findFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(findFromCache(event.id).data)
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
@@ -569,15 +567,20 @@ function useCustomActionConfigs(
         (action): action is CustomActionConfig =>
           action.type === ActionType.CUSTOM
       )
-      .map((action) => ({
-        label: action.label,
-        icon: 'PencilLine' as const,
-        onClick: async (workqueue?: string) =>
-          onCustomAction(action, workqueue),
-        disabled: !isDownloadedAndAssignedToUser,
-        hidden: false,
-        type: ActionType.CUSTOM
-      }))
+      .map((action) => {
+        // @TODO: add conditional for hiding
+        // @TODO: add conditional for disabling
+
+        return {
+          label: action.label,
+          icon: 'PencilLine' as const,
+          onClick: async (workqueue?: string) =>
+            onCustomAction(action, workqueue),
+          disabled: !isDownloadedAndAssignedToUser,
+          hidden: false,
+          type: ActionType.CUSTOM
+        }
+      })
   }, [eventConfiguration, onCustomAction, isDownloadedAndAssignedToUser])
 
   return { customActionModal, customActionConfigs }
