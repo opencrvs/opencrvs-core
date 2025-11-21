@@ -344,6 +344,7 @@ export function getDefaultActionProcedures(
       .input(actionConfig.inputSchema.strict())
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
+      .use(middleware.validateActionConditionsAreMet)
       .use(middleware.validateAction)
       .use(middleware.detectDuplicate)
       .use(middleware.requireLocationForSystemUserAction)

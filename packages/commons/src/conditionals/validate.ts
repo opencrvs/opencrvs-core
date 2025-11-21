@@ -31,7 +31,7 @@ import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
 import { ageToDate } from '../events/utils'
-import { ActionType } from '../client'
+import { ActionConfig, ActionType, EventIndex } from '../client'
 
 const ajv = new Ajv({
   $data: true,
@@ -179,7 +179,9 @@ export function isOnline() {
 export function isConditionMet(
   conditional: JSONSchema,
   values: EventState | ActionUpdate,
-  context: ValidatorContext
+  context: ValidatorContext,
+  // @TODO: should this be non-optional
+  event?: EventIndex
 ) {
   return validate(conditional, {
     $form: values,
@@ -273,6 +275,53 @@ export function isFieldDisplayedOnReview(
   return (
     isFieldVisible(field, form, context) &&
     isFieldConditionMet(field, form, ConditionalType.DISPLAY_ON_REVIEW, context)
+  )
+}
+
+function isActionConditionMet(
+  actionConfig: ActionConfig,
+  event: EventIndex,
+  context: ValidatorContext,
+  conditionalType: ConditionalType
+) {
+  if (!actionConfig.conditionals) {
+    return true
+  }
+
+  const rule = actionConfig.conditionals.find(
+    (conditional) => conditional.type === conditionalType
+  )
+
+  if (!rule) {
+    return true
+  }
+
+  return isConditionMet(rule.conditional, event.declaration, context, event)
+}
+
+export function isActionEnabled(
+  actionConfig: ActionConfig,
+  event: EventIndex,
+  context: ValidatorContext
+) {
+  return isActionConditionMet(
+    actionConfig,
+    event,
+    context,
+    ConditionalType.ENABLE
+  )
+}
+
+export function isActionAvailable(
+  actionConfig: ActionConfig,
+  event: EventIndex,
+  context: ValidatorContext
+) {
+  return isActionConditionMet(
+    actionConfig,
+    event,
+    context,
+    ConditionalType.SHOW
   )
 }
 

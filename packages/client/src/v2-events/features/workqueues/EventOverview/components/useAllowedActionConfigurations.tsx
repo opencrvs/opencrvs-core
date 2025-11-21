@@ -30,7 +30,8 @@ import {
   configurableEventScopeAllowed,
   ITokenPayload,
   ActionTypes,
-  CustomActionConfig
+  CustomActionConfig,
+  isActionEnabled
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -55,6 +56,7 @@ import {
   useCustomActionModal
 } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -552,6 +554,7 @@ function useCustomActionConfigs(
   customActionModal: React.ReactNode
   customActionConfigs: ActionMenuItem[]
 } {
+  const validatorContext = useValidatorContext()
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(event)
   const { findFromCache } = useEvents().getEvent
@@ -569,14 +572,20 @@ function useCustomActionConfigs(
       )
       .map((action) => {
         // @TODO: add conditional for hiding
-        // @TODO: add conditional for disabling
+
+        const disabled =
+          !isDownloadedAndAssignedToUser ||
+          !isActionEnabled(action, event, validatorContext)
+
+        console.log('disabledd')
+        console.log(disabled)
 
         return {
           label: action.label,
           icon: 'PencilLine' as const,
           onClick: async (workqueue?: string) =>
             onCustomAction(action, workqueue),
-          disabled: !isDownloadedAndAssignedToUser,
+          disabled,
           hidden: false,
           type: ActionType.CUSTOM
         }
