@@ -552,6 +552,20 @@ function useCustomActionConfigs(
   customActionModal: React.ReactNode
   customActionConfigs: ActionMenuItem[]
 } {
+  const scopes = useSelector(getScope) ?? []
+  const hasCustomActionScope = configurableEventScopeAllowed(
+    scopes,
+    ['record.custom-action'],
+    event.type
+  )
+
+  if (!hasCustomActionScope) {
+    return {
+      customActionModal: null,
+      customActionConfigs: []
+    }
+  }
+
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(event)
 
