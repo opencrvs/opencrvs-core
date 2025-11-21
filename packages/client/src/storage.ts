@@ -8,17 +8,37 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createStore, get, set, del, UseStore } from 'idb-keyval'
+import { createStore, get, set, del, entries, clear } from 'idb-keyval'
 import { validateApplicationVersion } from '@client/utils'
 
-let store: UseStore | undefined
-function configStorage(dbName: string) {
-  store = createStore(dbName, 'keyvaluepairs')
+const DATABASE_NAME = 'OpenCRVS'
+const STORE_NAME = 'keyvaluepairs'
+
+/**
+ * Create store when module is first loaded.
+ *
+ * Previously store was created on-demand, initiated at application root. (index.tsx).
+ * However, files are executed during import. React renders after everything is imported.
+ *
+ * There is no guarantee that application root is executed before other files that might use storage (e.g. useDrafts).
+ */
+let store = createStore(DATABASE_NAME, STORE_NAME)
+
+function configStorage() {
+  if (!store) {
+    store = createStore(DATABASE_NAME, STORE_NAME)
+  }
 
   validateApplicationVersion()
 }
 
 async function getItem<T = string>(key: string): Promise<T | null> {
+  if (!store) {
+    // eslint-disable-next-line no-console
+    console.error('IDB store not initialized before getItem:', key)
+    return null
+  }
+
   return (await get<T>(key, store)) || null
 }
 
@@ -30,8 +50,13 @@ async function removeItem(key: string) {
   return await del(key, store)
 }
 
+async function clearStorage() {
+  return clear(store)
+}
+
 export const storage = {
   configStorage,
+  clearStorage,
   getItem,
   setItem,
   removeItem
