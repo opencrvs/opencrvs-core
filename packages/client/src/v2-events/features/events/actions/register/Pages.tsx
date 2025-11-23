@@ -39,10 +39,10 @@ export function Pages() {
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const navigate = useNavigate()
   const drafts = useDrafts()
-  const validatorContext = useValidatorContext()
 
   const { modal, closeActionView } = useEventFormNavigation()
   const event = events.getEvent.getFromCache(eventId)
+  const validatorContext = useValidatorContext(event)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )

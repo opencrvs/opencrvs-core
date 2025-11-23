@@ -55,13 +55,13 @@ export function Review() {
   const drafts = useDrafts()
   const navigate = useNavigate()
 
-  const validatorContext = useValidatorContext()
   const [modal, openModal] = useModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const { closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
   const event = events.getEvent.getFromCache(eventId)
+  const validatorContext = useValidatorContext(event)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 

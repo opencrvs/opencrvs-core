@@ -29,6 +29,7 @@ import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
 import { ageToDate } from '../events/utils'
+import { EventDocument } from '../client'
 
 const ajv = new Ajv({
   $data: true,
@@ -172,7 +173,8 @@ export function isConditionMet(
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
     $online: isOnline(),
-    $user: context.user
+    $user: context.user,
+    $event: context.event
   })
 }
 
@@ -202,6 +204,7 @@ export function areConditionsMet(
 export type ValidatorContext = {
   user?: ITokenPayload
   leafAdminStructureLocationIds?: Array<{ id: UUID }>
+  event?: EventDocument
 }
 
 function isFieldConditionMet(
@@ -222,7 +225,8 @@ function isFieldConditionMet(
     $form: form,
     $now: formatISO(new Date(), { representation: 'date' }),
     $online: isOnline(),
-    $user: context.user
+    $user: context.user,
+    $event: context.event
   })
 
   return validConditionals.includes(conditionalType)

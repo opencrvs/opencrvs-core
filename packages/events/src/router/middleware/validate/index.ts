@@ -361,7 +361,7 @@ export const validateAction: MiddlewareFunction<
     token: ctx.token
   })
 
-  const context = await getValidatorContext(ctx.token)
+  const context = { ...(await getValidatorContext(ctx.token)), event }
 
   const declaration = getCurrentEventState(event, eventConfig).declaration
 
