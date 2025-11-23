@@ -82,11 +82,15 @@ export const usePrintableCertificate = ({
     event,
     eventConfiguration
   )
+
+  /// We should take into account if template used was v1 version of the same certificate
+  const normalizeId = (id?: string) => id?.replace(/^v2\./, '') ?? ''
+
   const copiesPrintedForTemplate = event.actions.filter(
     (action) =>
       action.type === ActionType.PRINT_CERTIFICATE &&
-      (action as PrintCertificateAction).content?.templateId ===
-        certificateConfig?.id
+      normalizeId((action as PrintCertificateAction).content?.templateId) ===
+        normalizeId(certificateConfig?.id)
   ).length
 
   const modifiedMetadata = {
