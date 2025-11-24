@@ -80,7 +80,7 @@ function Input({
 }: {
   id: string
   configuration: VerificationStatusField['configuration']
-  value: VerificationStatusValue | undefined
+  value: VerificationStatusValue | undefined | ''
   onReset: () => void
 }) {
   const intl = useIntl()
@@ -177,10 +177,12 @@ function Output({
 }: {
   id: string
   configuration: VerificationStatusField['configuration']
-  value: VerificationStatusValue
+  value: VerificationStatusValue | ''
 }) {
   const intl = useIntl()
-
+  if (!value) {
+    return null
+  }
   return (
     <Stack alignItems="flex-start" direction="column">
       <Pill
