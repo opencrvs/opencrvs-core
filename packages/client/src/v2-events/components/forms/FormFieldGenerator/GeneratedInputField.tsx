@@ -745,7 +745,7 @@ export const GeneratedInputField = React.memo(
                   name: makeFormFieldIdFormikCompatible(parentField.$$field),
                   value: undefined
                 })),
-                { name: fieldDefinition.id, value: null }
+                { name: fieldDefinition.id, value: '' }
               ])
             } else if (fieldDefinition.parent) {
               onBatchFieldValueChange([
@@ -755,7 +755,7 @@ export const GeneratedInputField = React.memo(
                   ),
                   value: undefined
                 },
-                { name: fieldDefinition.id, value: null }
+                { name: fieldDefinition.id, value: '' }
               ])
             }
           }}
