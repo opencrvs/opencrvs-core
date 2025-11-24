@@ -78,24 +78,6 @@ export const tennisClubMembershipEvent = defineConfig({
       review: TENNIS_CLUB_DECLARATION_REVIEW
     },
     {
-      type: ActionType.CUSTOM,
-      customActionType: 'CONFIRM_SENIOR_MEMBERSHIP',
-      label: {
-        id: 'event.tennis-club-membership.action.confirm.label',
-        defaultMessage: 'Confirm senior membership',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from'
-      },
-      conditionals: [
-        {
-          type: ConditionalType.SHOW,
-          conditional: field('applicant.dob').isBefore().date('1950-01-01')
-        }
-      ],
-      form: [],
-      flags: []
-    },
-    {
       type: ActionType.VALIDATE,
       label: {
         defaultMessage: 'Validate',
