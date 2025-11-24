@@ -47,7 +47,8 @@ const DialogContainer = styled.div<{ variant?: 'small' | 'large' }>`
         max-width: 90%;
       `
       : `
-        height: 80vh;
+        min-height: 118px;
+        height: auto;
         width: 80%;
             @media (max-width: 768px) and (orientation: portrait) {
              width: 100%;
@@ -84,6 +85,7 @@ const DialogContent = styled.div`
 
 const DialogFooter = styled.div`
   padding: 24px 32px;
+  align-items: center;
   display: flex;
   gap: 8px;
   justify-content: flex-end;

@@ -117,6 +117,7 @@ function QuickActionModal({
         </TertiaryButton>,
         <ConfirmButton
           key="confirm"
+          bg={'primaryBlue'}
           disabled={errorsOnField.length > 0}
           id="confirm-btn"
           onClick={() => close({ result: true, values: modalValues })}
@@ -129,6 +130,7 @@ function QuickActionModal({
       id={`quick-action-modal-${config.label.id}`}
       isOpen={true}
       title={intl.formatMessage(config.label)}
+      variant={'large'}
       onClose={() => close({ result: false })}
     >
       <FormFieldGenerator
