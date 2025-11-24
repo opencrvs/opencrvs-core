@@ -14,12 +14,14 @@ import {
   ActionType,
   generateActionDocument,
   tennisClubMembershipEvent,
+  v2BirthEvent,
   TestUserRole,
   TokenUserType,
   generateUuid,
   createPrng,
   Draft,
-  EventState
+  EventState,
+  UUID
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { router } from './router'
@@ -200,6 +202,76 @@ export const SummaryChangingAgeToDob: Story = {
       },
       initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({
         eventId: eventCorrectionDobToAge.id
+      })
+    }
+  }
+}
+
+const eventCorrectionAddress = {
+  trackingId: generateUuid(prng),
+  type: v2BirthEvent.id,
+  id: generateUuid(prng),
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  actions: [
+    generateActionDocument({
+      configuration: v2BirthEvent,
+      action: ActionType.CREATE
+    }),
+    generateActionDocument({
+      configuration: v2BirthEvent,
+      action: ActionType.DECLARE
+    }),
+    generateActionDocument({
+      configuration: v2BirthEvent,
+      action: ActionType.VALIDATE
+    }),
+    generateActionDocument({
+      configuration: v2BirthEvent,
+      action: ActionType.REGISTER
+    })
+  ]
+}
+
+const correctionDraftAddress = {
+  id: generateUuid(prng),
+  transactionId: generateUuid(prng),
+  action: {
+    createdAt: new Date(Date.now()).toISOString(),
+    status: ActionStatus.Accepted,
+    transactionId: generateUuid(prng),
+    createdBy: generateUuid(prng),
+    createdByUserType: TokenUserType.enum.user,
+    createdByRole: TestUserRole.enum.FIELD_AGENT,
+    type: ActionType.REQUEST_CORRECTION,
+    declaration: {
+      'child.placeOfBirth': 'PRIVATE_HOME',
+      'child.birthLocation.privateHome': {
+        country: 'FAR',
+        addressType: 'DOMESTIC' as const,
+        administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+      }
+    },
+    annotation: {}
+  },
+  createdAt: new Date(Date.now()).toISOString(),
+  eventId: eventCorrectionAddress.id
+} satisfies Draft
+
+export const SummaryChangingAddress: Story = {
+  parameters: {
+    mockingDate: new Date(),
+    offline: {
+      drafts: [correctionDraftAddress],
+      events: [eventCorrectionAddress]
+    },
+    reactRouter: {
+      router: {
+        path: '/',
+        children: [router]
+      },
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({
+        eventId: eventCorrectionAddress.id
       })
     }
   }

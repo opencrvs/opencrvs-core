@@ -45,7 +45,8 @@ import {
   tennisClubMembershipEvent,
   TestUserRole,
   TokenUserType,
-  UUID
+  UUID,
+  v2BirthEvent
 } from '@opencrvs/commons/client'
 import {
   tennisClubMembershipEventDocument,
@@ -258,7 +259,7 @@ const preview: Preview = {
        */
 
       const offlineConfigs: Array<EventConfig> = options.parameters?.offline
-        ?.configs ?? [tennisClubMembershipEvent]
+        ?.configs ?? [tennisClubMembershipEvent, v2BirthEvent]
 
       offlineConfigs.forEach((config) => {
         addLocalEventConfig(config)

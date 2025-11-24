@@ -19,6 +19,7 @@ import { BIRTH_EVENT } from '../events/Constants'
 import { ActionType } from '../events/ActionType'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { createFieldConditionals } from '../conditionals/conditionals'
+import { field } from '../client'
 
 function generateTranslationConfig(message: string): TranslationConfig {
   return {
@@ -48,6 +49,61 @@ const child = defineFormPage({
       secured: true,
       validation: [],
       label: generateTranslationConfig('Date of birth')
+    },
+    {
+      id: 'child.placeOfBirth',
+      analytics: true,
+      type: FieldType.SELECT,
+      required: true,
+      secured: true,
+      label: {
+        defaultMessage: 'Place of delivery',
+        description: 'This is the label for the field',
+        id: 'event.birth.action.declare.form.section.child.field.placeOfBirth.label'
+      },
+      options: [
+        {
+          value: 'child.placeOfBirth-SELECT-2',
+          label: generateTranslationConfig('Health Institution')
+        },
+        {
+          value: 'PRIVATE_HOME',
+          label: generateTranslationConfig('Residential address')
+        }
+      ]
+    },
+    {
+      id: 'child.birthLocation',
+      analytics: true,
+      type: 'FACILITY',
+      required: true,
+      secured: true,
+      label: generateTranslationConfig('Health Institution'),
+      conditionals: [
+        {
+          type: 'SHOW',
+          conditional: field('child.placeOfBirth').isEqualTo(
+            'child.placeOfBirth-SELECT-2'
+          )
+        }
+      ]
+    },
+    {
+      id: 'child.birthLocation.privateHome',
+      analytics: true,
+      type: FieldType.ADDRESS,
+      secured: true,
+      hideLabel: true,
+      label: generateTranslationConfig("Child's address"),
+      conditionals: [
+        {
+          type: 'SHOW',
+          conditional: field('child.placeOfBirth').isEqualTo('PRIVATE_HOME')
+        }
+      ],
+      configuration: {
+        streetAddressForm: []
+      }
     }
   ]
 })
