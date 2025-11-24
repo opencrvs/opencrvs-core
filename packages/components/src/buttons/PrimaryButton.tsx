@@ -10,9 +10,9 @@
  */
 import styled from 'styled-components'
 import { Button } from './Button'
-import { ITheme } from 'src/theme'
+import { ITheme } from '../theme'
 
-interface PrimaryButtonProps {
+export interface PrimaryButtonProps {
   bg?: keyof ITheme['colors']
 }
 
