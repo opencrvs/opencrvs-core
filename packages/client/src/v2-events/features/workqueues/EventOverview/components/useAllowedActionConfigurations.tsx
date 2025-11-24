@@ -608,13 +608,14 @@ export function useAllowedActionConfigurations(
   event: EventIndex,
   authentication: ITokenPayload
 ): [React.ReactNode, ActionMenuItem[]] {
-  const { isActionAllowed } = useUserAllowedActions(event.type)
-  const drafts = useDrafts()
   const isPending = event.flags.some((flag) => flag.endsWith(':requested'))
 
   if (isPending) {
     return [null, []]
   }
+
+  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const drafts = useDrafts()
 
   const openDraft = drafts
     .getAllRemoteDrafts()
