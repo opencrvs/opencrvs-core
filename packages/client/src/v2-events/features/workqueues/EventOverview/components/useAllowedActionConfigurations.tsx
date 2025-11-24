@@ -31,7 +31,8 @@ import {
   ITokenPayload,
   ActionTypes,
   CustomActionConfig,
-  isActionEnabled
+  isActionEnabled,
+  isActionAvailable
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -573,7 +574,9 @@ function useCustomActionConfigs(
           action.type === ActionType.CUSTOM
       )
       .map((action) => {
-        // @TODO: add conditional for hiding
+        const hidden =
+          !isDownloadedAndAssignedToUser ||
+          !isActionAvailable(action, event, validatorContext)
 
         const disabled =
           !isDownloadedAndAssignedToUser ||
@@ -585,7 +588,7 @@ function useCustomActionConfigs(
           onClick: async (workqueue?: string) =>
             onCustomAction(action, workqueue),
           disabled,
-          hidden: false,
+          hidden,
           type: ActionType.CUSTOM
         }
       })
