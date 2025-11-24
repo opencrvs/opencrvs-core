@@ -10,51 +10,55 @@
  */
 
 import { useSelector } from 'react-redux'
+import { LocationType } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { getUsersFullName } from '../utils'
+import { getOfflineData } from '@client/offline/selectors'
+import { getAdminLevelHierarchy, getUsersFullName } from '../utils'
 import { useLocations } from './useLocations'
+import { useUsers } from './useUsers'
 
 export function useUserDetails() {
-  const userDetails = useSelector(getUserDetails)
+  const { config } = useSelector(getOfflineData)
+  const appConfigAdminLevels = config.ADMIN_STRUCTURE
+
+  const loggedInUser = useSelector(getUserDetails)
+  const { getUser } = useUsers()
+  const [user] = getUser.useSuspenseQuery(loggedInUser?.id ?? '')
 
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
 
-  const normalizedName =
-    userDetails &&
-    userDetails.name.map((n) => ({
-      use: n.use ?? 'official',
-      family: n.familyName ?? '',
-      given: n.firstNames ? [n.firstNames] : []
-    }))
+  const name = getUsersFullName(user.name, 'en')
 
-  const name = normalizedName ? getUsersFullName(normalizedName, 'en') : ''
+  if (user.primaryOfficeId) {
+    const primaryOfficeLocation = locations.get(user.primaryOfficeId)
 
-  const primaryOfficeId = userDetails?.primaryOffice.id
-
-  if (primaryOfficeId) {
-    const primaryOfficeLocation = locations.find(
-      ({ id }) => id === primaryOfficeId
+    const adminStructureLocations = new Map(
+      [...locations].filter(
+        ([, location]) =>
+          location.locationType === LocationType.enum.ADMIN_STRUCTURE
+      )
     )
 
-    const districtId = primaryOfficeLocation?.parentId?.split('/')[1]
-    const district = districtId
-      ? locations.find(({ id }) => id === districtId)
-      : undefined
+    const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
 
-    const provinceId = district?.parentId?.split('/')[1]
-
+    const adminLevels = getAdminLevelHierarchy(
+      primaryOfficeLocation?.parentId ?? undefined,
+      adminStructureLocations,
+      adminLevelIds
+    )
     return {
       name,
-      role: userDetails.role.id,
-      district: districtId ?? '',
-      province: provinceId ?? ''
+      role: user.role,
+      district: '',
+      province: '',
+      ...adminLevels
     }
   }
 
   return {
     name,
-    role: userDetails?.role.id,
+    role: user.role,
     district: '',
     province: ''
   }

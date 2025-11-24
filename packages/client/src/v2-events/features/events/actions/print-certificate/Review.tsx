@@ -171,7 +171,7 @@ export function Review() {
   const [users] = getUsers.useSuspenseQuery(userIds)
 
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
 
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(

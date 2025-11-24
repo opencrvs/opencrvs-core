@@ -150,7 +150,7 @@ export function EventOverviewLayout({
   const { getUser } = useUsers()
   const users = getUser.getAllCached()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
 
   const eventResults = searchEventById.useSuspenseQuery(eventId)
 

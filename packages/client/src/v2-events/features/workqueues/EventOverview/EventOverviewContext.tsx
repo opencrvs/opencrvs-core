@@ -10,11 +10,11 @@
  */
 
 import React, { createContext, useContext } from 'react'
-import { Location, User } from '@opencrvs/commons/client'
+import { Location, User, UUID } from '@opencrvs/commons/client'
 
 const EventOverviewContext = createContext<{
   findUser: (id: string) => User | undefined
-  getLocation: (id: string) => Location | undefined
+  getLocation: (id: UUID) => Location | undefined
 } | null>(null)
 
 /**
@@ -27,14 +27,14 @@ export const EventOverviewProvider = ({
 }: {
   children: React.ReactNode
   users: User[]
-  locations: Location[]
+  locations: Map<UUID, Location>
 }) => {
   const findUser = (id: string) => {
     return users.find((u) => u.id === id)
   }
 
-  const getLocation = (id: string) => {
-    return locations.find((location) => location.id === id)
+  const getLocation = (id: UUID) => {
+    return locations.get(id)
   }
 
   return (

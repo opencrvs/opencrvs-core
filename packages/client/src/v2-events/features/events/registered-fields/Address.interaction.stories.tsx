@@ -646,7 +646,7 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
     const [resolvedAddress, setResolvedAddress] =
       React.useState<ResolvedAddress>()
     const { getLocations } = useLocations()
-    const [locations] = getLocations.useSuspenseQuery()
+    const locations = getLocations.useSuspenseQuery()
     const { config: appConfig } = useSelector(getOfflineData)
 
     const adminLevels = appConfig.ADMIN_STRUCTURE

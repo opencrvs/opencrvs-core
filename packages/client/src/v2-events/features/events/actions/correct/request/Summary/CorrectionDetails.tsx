@@ -28,6 +28,7 @@ import {
   RequestedCorrectionAction,
   TranslationConfig,
   User,
+  UUID,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment, Link } from '@opencrvs/components'
@@ -80,13 +81,13 @@ const Label = styled.label`
 function getRequestActionDetails(
   correctionRequestAction: Action,
   users: User[],
-  locations: Location[],
+  locations: Map<UUID, Location>,
   intl: IntlShape
 ): CorrectionDetail[] {
   const user = users.find((u) => u.id === correctionRequestAction.createdBy)
   const location =
     correctionRequestAction.createdAtLocation &&
-    locations.find(({ id }) => id === correctionRequestAction.createdAtLocation)
+    locations.get(correctionRequestAction.createdAtLocation)
   return [
     {
       label: messages.correctionSubmittedBy,
@@ -115,7 +116,7 @@ function buildCorrectionDetails(
   form: EventState,
   intl: IntlShape,
   users: User[],
-  locations: Location[],
+  locations: Map<UUID, Location>,
   validatorContext: ValidatorContext,
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
@@ -212,7 +213,7 @@ export function CorrectionDetails({
   const users = getUser.getAllCached()
 
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
 
   const correctionFormPages =
     eventConfiguration.actions.find(
