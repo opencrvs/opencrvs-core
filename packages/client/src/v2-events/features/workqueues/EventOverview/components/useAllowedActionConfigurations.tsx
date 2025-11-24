@@ -574,9 +574,7 @@ function useCustomActionConfigs(
           action.type === ActionType.CUSTOM
       )
       .map((action) => {
-        const hidden =
-          !isDownloadedAndAssignedToUser ||
-          !isActionAvailable(action, event, validatorContext)
+        const hidden = !isActionAvailable(action, event, validatorContext)
 
         const disabled =
           !isDownloadedAndAssignedToUser ||
@@ -650,13 +648,16 @@ export function useAllowedActionConfigurations(
     .filter((action) => isActionAllowed(action))
     // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
     .map((a) => ({ ...config[a], type: a }))
-    .filter((a: ActionConfig) => !a.hidden)
 
   const { customActionModal, customActionConfigs } = useCustomActionConfigs(
     event,
     authentication
   )
-  const allActionConfigs = [...allowedActionConfigs, ...customActionConfigs]
+
+  const allActionConfigs = [
+    ...allowedActionConfigs,
+    ...customActionConfigs
+  ].filter((a: ActionConfig) => !a.hidden)
 
   // Check if the user can perform any action other than ASSIGN, or UNASSIGN
   const hasOnlyMetaActions = allActionConfigs.every(({ type }) =>
