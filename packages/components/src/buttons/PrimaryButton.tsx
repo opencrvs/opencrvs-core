@@ -12,6 +12,7 @@ import styled from 'styled-components'
 import { Button } from './Button'
 import { ITheme } from '../theme'
 
+/** @knipignore */
 export interface PrimaryButtonProps {
   bg?: keyof ITheme['colors']
 }
