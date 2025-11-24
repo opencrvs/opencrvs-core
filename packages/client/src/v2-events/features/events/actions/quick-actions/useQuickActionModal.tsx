@@ -131,6 +131,7 @@ function QuickActionModal({
       isOpen={true}
       title={intl.formatMessage(config.label)}
       variant={'large'}
+      width={898}
       onClose={() => close({ result: false })}
     >
       <FormFieldGenerator
