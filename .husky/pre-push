@@ -1,0 +1,19 @@
+#!/bin/sh
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+pattern='^[a-z][a-z0-9\/\-]{1,29}$'
+
+if [[ ! "$branch" =~ $pattern ]]; then
+  echo """
+  ❌ Invalid branch name: '$branch'
+  ➡️  Branch names must match regex: $pattern
+      - Start with a lowercase letter
+      - Can contain lowercase letters, numbers, and hyphens
+      - Length between 2 and 30 characters
+      - Slashes '/' are allowed for hierarchical branch names
+    Example: ocrvs-12345, feature-login, fix-bug123, refactor-api
+    """
+  exit 1
+fi
+
+exit 0
