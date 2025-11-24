@@ -85,21 +85,9 @@ const RegisterConfig = DeclarationActionBase.extend(
   }).shape
 )
 
-const RejectDeclarationConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.REJECT)
-  }).shape
-)
-
 const ArchiveConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.ARCHIVE)
-  }).shape
-)
-
-const DeleteConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.DELETE)
   }).shape
 )
 
@@ -114,18 +102,6 @@ const RequestCorrectionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REQUEST_CORRECTION),
     correctionForm: ActionFormConfig
-  }).shape
-)
-
-const RejectCorrectionConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.REJECT_CORRECTION)
-  }).shape
-)
-
-const ApproveCorrectionConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.APPROVE_CORRECTION)
   }).shape
 )
 
@@ -154,18 +130,12 @@ export const ActionConfig = z
     ReadActionConfig.meta({ id: 'ReadActionConfig' }),
     DeclareConfig.meta({ id: 'DeclareActionConfig' }),
     ValidateConfig.meta({ id: 'ValidateActionConfig' }),
-    RejectDeclarationConfig.meta({ id: 'RejectDeclarationActionConfig' }),
     ArchiveConfig.meta({ id: 'ArchiveActionConfig' }),
     RegisterConfig.meta({ id: 'RegisterActionConfig' }),
-    DeleteConfig.meta({ id: 'DeleteActionConfig' }),
     PrintCertificateActionConfig.meta({
       id: 'PrintCertificateActionConfig'
     }),
     RequestCorrectionConfig.meta({ id: 'RequestCorrectionActionConfig' }),
-    RejectCorrectionConfig.meta({ id: 'RejectCorrectionActionConfig' }),
-    ApproveCorrectionConfig.meta({
-      id: 'ApproveCorrectionActionConfig'
-    }),
     CustomActionConfig.meta({ id: 'CustomActionConfig' })
   ])
   .describe(

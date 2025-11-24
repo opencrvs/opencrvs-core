@@ -323,15 +323,6 @@ export const footballClubMembershipEvent = defineConfig({
       }
     },
     {
-      type: ActionType.APPROVE_CORRECTION,
-      label: {
-        defaultMessage: 'Approve correction',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.football-club-membership.action.correction.approve.label'
-      }
-    },
-    {
       type: ActionType.PRINT_CERTIFICATE,
       label: {
         id: 'event.football-club-membership.action.collect-certificate.label',
@@ -346,15 +337,6 @@ export const footballClubMembershipEvent = defineConfig({
       label: {
         id: 'event.football-club-membership.action.archive.label',
         defaultMessage: 'Archive',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from'
-      }
-    },
-    {
-      type: ActionType.REJECT,
-      label: {
-        id: 'event.football-club-membership.action.reject.label',
-        defaultMessage: 'Reject',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
       }
