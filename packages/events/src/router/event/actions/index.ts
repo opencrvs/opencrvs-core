@@ -194,7 +194,12 @@ export async function defaultRequestHandler(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   actionConfirmationResponseSchema?: z.ZodObject<any>
 ) {
-  await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
+  await throwConflictIfActionNotAllowed(
+    input.eventId,
+    input.type,
+    token,
+    'customActionType' in input ? input.customActionType : undefined
+  )
 
   const eventWithRequestedAction = await addAction(input, {
     event,
@@ -344,7 +349,6 @@ export function getDefaultActionProcedures(
       .input(actionConfig.inputSchema.strict())
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
-      .use(middleware.validateActionConditionsAreMet)
       .use(middleware.validateAction)
       .use(middleware.detectDuplicate)
       .use(middleware.requireLocationForSystemUserAction)

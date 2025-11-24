@@ -21,11 +21,12 @@ import {
   TENNIS_CLUB_DECLARATION_FORM,
   TENNIS_CLUB_DECLARATION_REVIEW
 } from './forms'
-import { Clause, EventConfig } from '../events'
+import { Clause, ConditionalType, EventConfig } from '../events'
 import { and, field as dedupField } from '../events/deduplication'
 
 export const tennisClubMembershipEvent = defineConfig({
   id: TENNIS_CLUB_MEMBERSHIP,
+  declaration: TENNIS_CLUB_DECLARATION_FORM,
   label: {
     defaultMessage: 'Tennis club membership application',
     description: 'This is what this event is referred as in the system',
@@ -75,6 +76,24 @@ export const tennisClubMembershipEvent = defineConfig({
         id: 'event.tennis-club-membership.action.declare.label'
       },
       review: TENNIS_CLUB_DECLARATION_REVIEW
+    },
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'CONFIRM_SENIOR_MEMBERSHIP',
+      label: {
+        id: 'event.tennis-club-membership.action.confirm.label',
+        defaultMessage: 'Confirm senior membership',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from'
+      },
+      conditionals: [
+        {
+          type: ConditionalType.SHOW,
+          conditional: field('applicant.dob').isBefore().date('1950-01-01')
+        }
+      ],
+      form: [],
+      flags: []
     },
     {
       type: ActionType.VALIDATE,
@@ -381,8 +400,7 @@ export const tennisClubMembershipEvent = defineConfig({
       },
       fields: [field('recommender.name').fuzzy()]
     }
-  ],
-  declaration: TENNIS_CLUB_DECLARATION_FORM
+  ]
 })
 
 /** @knipignore */

@@ -43,8 +43,7 @@ import {
   omitHiddenPaginatedFields,
   runFieldValidations,
   runStructuralValidations,
-  ValidatorContext,
-  getActionConfig
+  ValidatorContext
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -58,7 +57,6 @@ import {
   getVerificationPageErrors,
   throwWhenNotEmpty
 } from './utils'
-import { isActionAvailable, isActionEnabled } from '@opencrvs/commons/client'
 
 export function getFieldErrors(
   fields: FieldConfig[],
@@ -465,55 +463,6 @@ export const requireLocationForSystemUserAction: MiddlewareFunction<
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'createdAtLocation must be an office location'
-    })
-  }
-
-  return next()
-}
-
-/**
- * Ensure that any conditionals configured on the event are met, and allow the event to be executed.
- * This includes both conditionals of type ConditionalType.SHOW and ConditionalType.ENABLED.
- * */
-export const validateActionConditionsAreMet: MiddlewareFunction<
-  TrpcContext,
-  OpenApiMeta,
-  TrpcContext,
-  TrpcContext,
-  ActionInputWithType
-> = async ({ input, next, ctx }) => {
-  const actionType = input.type
-  const event = await getEventById(input.eventId)
-
-  const eventConfiguration = await getEventConfigurationById({
-    eventType: event.type,
-    token: ctx.token
-  })
-
-  const actionConfig = getActionConfig({
-    actionType,
-    eventConfiguration,
-    customActionType:
-      'customActionType' in input ? input.customActionType : undefined
-  })
-
-  if (!actionConfig) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: `Action type '${actionType}' is not supported for event type ${event.type}`
-    })
-  }
-
-  const eventIndex = getCurrentEventState(event, eventConfiguration)
-  const context = await getValidatorContext(ctx.token)
-
-  const actionIsEnabled = isActionEnabled(actionConfig, eventIndex, context)
-  const actionIsAvailable = isActionAvailable(actionConfig, eventIndex, context)
-
-  if (!actionIsEnabled || !actionIsAvailable) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: `Conditions for action: ${actionType} were not met, action cannot be performed`
     })
   }
 

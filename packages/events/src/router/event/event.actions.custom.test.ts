@@ -13,6 +13,7 @@ import { TRPCError } from '@trpc/server'
 import { HttpResponse, http } from 'msw'
 import {
   ActionType,
+  AddressType,
   getOrThrow,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP
@@ -29,15 +30,60 @@ import {
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 
-const CUSTOM_ACTION_TYPE = 'CONFIRM'
+const CUSTOM_ACTION_TYPE = 'CONFIRM_SENIOR_MEMBERSHIP'
 
-async function initialiseTest(scopes: string[] = []) {
+async function initialiseTest(scopes: string[] = [], useSeniorDob = true) {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
+    `record.declare[event=${TENNIS_CLUB_MEMBERSHIP}]`,
     ...scopes
   ])
+
   const event = await client.event.create(generator.event.create())
+
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
+  const dobDetails = useSeniorDob
+    ? {
+        // Use applicant.dob before 1950 to meet the condition for the custom action
+        'applicant.dob': '1949-05-10',
+        'senior-pass.id': 'SP-123456',
+        'senior-pass.recommender': false
+      }
+    : { 'applicant.dob': '1960-05-10' }
+
+  const declarationInput = generator.event.actions.declare(event.id, {
+    declaration: {
+      ...dobDetails,
+      'applicant.dobUnknown': false,
+      'applicant.name': {
+        firstname: 'John',
+        surname: 'Doe'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(declarationInput)
+  await client.event.actions.assignment.assign(assignmentInput)
 
   const payload = {
     type: ActionType.CUSTOM,
@@ -100,7 +146,7 @@ describe('event.actions.custom', () => {
     })
   })
 
-  test('returns HTTP400 if trying to execute an action not defined in countryconfig', async () => {
+  test('returns HTTP409 if trying to execute an action not defined in countryconfig', async () => {
     const { client, payload } = await initialiseTest([
       `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=INVALID_ACTION]`
     ])
@@ -111,6 +157,23 @@ describe('event.actions.custom', () => {
         customActionType: 'INVALID_ACTION'
       })
     ).rejects.toMatchSnapshot()
+  })
+
+  test('returns HTTP409 if trying to execute an action where the condition is not met', async () => {
+    const { client, payload } = await initialiseTest(
+      [
+        `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=${CUSTOM_ACTION_TYPE}]`
+      ],
+      false
+    )
+
+    await expect(
+      client.event.actions.custom.request(payload)
+    ).rejects.toMatchSnapshot()
+
+    const event = await client.event.get(payload.eventId)
+
+    expect(sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
   })
 
   test('successfully executes action', async () => {

@@ -96,7 +96,6 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
   return []
 }
 
-// @TODO CIHAN: use this everywhere
 export function getActionConfig({
   eventConfiguration,
   actionType,
@@ -106,14 +105,27 @@ export function getActionConfig({
   actionType: ActionType
   customActionType?: string
 }): ActionConfig | undefined {
-  const actionConfig = eventConfiguration.actions.find((a) => {
+  return eventConfiguration.actions.find((a) => {
+    // We can have multiple custom actions configured, we specify the custom action with 'customActionType'
     if (a.type === ActionType.CUSTOM && customActionType) {
       return a.customActionType === customActionType
     }
+
+    // Notify uses the declare action config
+    if (actionType === ActionType.NOTIFY) {
+      return a.type === ActionType.DECLARE
+    }
+
+    // For correction approval/rejection, we use the correction request action config
+    if (
+      actionType === ActionType.APPROVE_CORRECTION ||
+      actionType === ActionType.REJECT_CORRECTION
+    ) {
+      return a.type === ActionType.REQUEST_CORRECTION
+    }
+
     return a.type === actionType
   })
-
-  return actionConfig
 }
 
 function getAllAnnotationFields(config: EventConfig): FieldConfig[] {

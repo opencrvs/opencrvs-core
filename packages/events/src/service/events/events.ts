@@ -28,10 +28,13 @@ import {
   FieldUpdateValue,
   FileFieldValue,
   getAcceptedActions,
+  getActionConfig,
   getAvailableActionsForEvent,
   getCurrentEventState,
   getDeclarationFields,
   getStatusFromActions,
+  isActionAvailable,
+  isActionEnabled,
   isWriteAction
 } from '@opencrvs/commons/events'
 import { TrpcUserContext } from '@events/context'
@@ -44,6 +47,7 @@ import {
 import { indexEvent } from '@events/service/indexing/indexing'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import * as eventsRepo from '@events/storage/postgres/events/events'
+import { getValidatorContext } from '@events/router/middleware/validate/utils'
 
 export class EventNotFoundError extends TRPCError {
   constructor(id: string) {
@@ -105,18 +109,26 @@ async function deleteEventAttachments(
   }
 }
 
+/**
+ * Ensure that an action is allowed depending on the current event state. This does two checks:
+ * 1. Check that the action is allowed in the current event status and flags
+ * 2. Check that any conditionals defined for the action are met
+ *
+ * If any of the checks fail, a tRPC HTTP 409 Conflict error is thrown.
+ */
 export async function throwConflictIfActionNotAllowed(
   eventId: UUID,
   actionType: ActionType,
-  token: TokenWithBearer
+  token: TokenWithBearer,
+  customActionType?: string
 ) {
   const event = await getEventById(eventId)
-  const eventConfig = await getEventConfigurationById({
+  const eventConfiguration = await getEventConfigurationById({
     eventType: event.type,
     token
   })
 
-  const eventIndex = getCurrentEventState(event, eventConfig)
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
 
   const allowedActions: DisplayableAction[] =
     getAvailableActionsForEvent(eventIndex)
@@ -127,6 +139,30 @@ export async function throwConflictIfActionNotAllowed(
       message: `Action '${actionType}' cannot be performed on an event in '${eventIndex.status}' state with [${eventIndex.flags.join(', ')}] flags. Available actions: ${allowedActions.join(', ')}.`
     })
   }
+
+  const actionConfig = getActionConfig({
+    actionType,
+    eventConfiguration,
+    customActionType
+  })
+
+  // If no action config found, we are executing an action which does not have conditionals
+  if (!actionConfig) {
+    return
+  }
+
+  const context = await getValidatorContext(token)
+  const actionIsEnabled = isActionEnabled(actionConfig, eventIndex, context)
+  const actionIsAvailable = isActionAvailable(actionConfig, eventIndex, context)
+
+  if (!actionIsEnabled || !actionIsAvailable) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `Conditions for action: ${actionType} were not met, action cannot be performed`
+    })
+  }
+
+  return
 }
 
 export async function deleteEvent(
