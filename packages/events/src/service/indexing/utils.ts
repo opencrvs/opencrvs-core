@@ -15,6 +15,7 @@ import {
   AddressType,
   EventConfig,
   EventIndex,
+  FieldType,
   FieldValue,
   getDeclarationFieldById,
   isNameFieldType,
@@ -94,6 +95,69 @@ function stripIndexFieldsFromValue(
   }
 
   return value
+}
+
+export function getEventIndexWithoutLocationHierarchy(
+  eventConfig: EventConfig,
+  event: EventIndex
+) {
+  const takeLast = (v: any) => (Array.isArray(v) ? v[v.length - 1] : v)
+
+  // Normalize top-level locations
+  event.createdAtLocation = takeLast(event.createdAtLocation)
+  event.updatedAtLocation = takeLast(event.updatedAtLocation)
+
+  if (event.legalStatuses.DECLARED) {
+    event.legalStatuses.DECLARED.createdAtLocation = takeLast(
+      event.legalStatuses.DECLARED.createdAtLocation
+    )
+  }
+
+  if (event.legalStatuses.REGISTERED) {
+    event.legalStatuses.REGISTERED.createdAtLocation = takeLast(
+      event.legalStatuses.REGISTERED.createdAtLocation
+    )
+  }
+
+  // Pre-calc field configs by id for O(1) lookup
+  const fieldConfigs = Object.fromEntries(
+    eventConfig.declaration.pages.flatMap((p) => p.fields).map((f) => [f.id, f])
+  )
+
+  const LocationFieldTypes: FieldType[] = [
+    FieldType.ADDRESS,
+    FieldType.LOCATION,
+    FieldType.DIVIDER,
+    FieldType.ADMINISTRATIVE_AREA,
+    FieldType.FACILITY,
+    FieldType.OFFICE
+  ]
+
+  // Process declaration fields
+  for (const [key, value] of Object.entries(event.declaration)) {
+    const fieldConfig = fieldConfigs[key]
+    if (!fieldConfig) {
+      continue
+    }
+    if (!LocationFieldTypes.includes(fieldConfig.type)) {
+      continue
+    }
+
+    if (fieldConfig.type === FieldType.ADDRESS) {
+      const parsed = AddressFieldValue.safeParse(value)
+      if (parsed.success && parsed.data.addressType === AddressType.DOMESTIC) {
+        const address = parsed.data
+        address.administrativeArea = takeLast(address.administrativeArea)
+        event.declaration[key] = address
+        continue
+      }
+    }
+
+    // All other types just take the last value
+    event.declaration[key] = takeLast(value)
+  }
+
+  return event
 }
 
 export function decodeEventIndex(

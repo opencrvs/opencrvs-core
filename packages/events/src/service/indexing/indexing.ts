@@ -42,6 +42,7 @@ import {
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
+  getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
   removeSecuredFields
 } from './utils'
@@ -478,7 +479,13 @@ export async function findRecordsByQuery(
     .map((eventIndex) => {
       const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
       const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
-      return removeSecuredFields(eventConfig, decodedEventIndex)
+      const eventIndexWithoutLocationHierarchy =
+        getEventIndexWithoutLocationHierarchy(eventConfig, decodedEventIndex)
+
+      return removeSecuredFields(
+        eventConfig,
+        eventIndexWithoutLocationHierarchy
+      )
     })
 
   return { results: events, total: valueFromTotal(response.hits.total) }
