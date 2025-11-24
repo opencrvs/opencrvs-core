@@ -129,6 +129,27 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
                 description: 'Status description when the informant is failed'
               }
             }
+          },
+          {
+            id: 'storybook.empty',
+            type: FieldType.VERIFICATION_STATUS,
+            label: {
+              id: 'storybook.empty',
+              defaultMessage: 'This should not render',
+              description: 'The title for the status field label'
+            },
+            configuration: {
+              status: {
+                id: 'storybook.failed.failed',
+                defaultMessage: 'Failed',
+                description: 'Status text when the informant is failed'
+              },
+              description: {
+                id: 'storybook.failed.failed.description',
+                defaultMessage: 'ID verification failed',
+                description: 'Status description when the informant is failed'
+              }
+            }
           }
         ]}
         id="my-form"
@@ -136,7 +157,8 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
           'storybook.pending': 'pending',
           'storybook.verified': 'verified',
           'storybook.authenticated': 'authenticated',
-          'storybook.failed': 'failed'
+          'storybook.failed': 'failed',
+          'storybook.empty': ''
         }}
         validatorContext={getTestValidatorContext(
           TestUserRole.Enum.LOCAL_REGISTRAR
