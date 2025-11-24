@@ -21,7 +21,7 @@ import {
   TENNIS_CLUB_DECLARATION_FORM,
   TENNIS_CLUB_DECLARATION_REVIEW
 } from './forms'
-import { Clause, ConditionalType, EventConfig } from '../events'
+import { Clause, EventConfig } from '../events'
 import { and, field as dedupField } from '../events/deduplication'
 
 export const tennisClubMembershipEvent = defineConfig({
