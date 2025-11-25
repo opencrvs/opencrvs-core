@@ -41,10 +41,16 @@ export const router = t.router
 
 const authedProcedure = t.procedure.use(async (opts) => {
   const { token, user } = opts.ctx
-  if (!token || !user) {
+  if (!token) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
       message: 'Authorization token is missing'
+    })
+  }
+  if (!user) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Authentication failed'
     })
   }
   return opts.next({

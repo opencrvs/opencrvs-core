@@ -163,13 +163,10 @@ async function resolveUserDetails(
 
 export async function createContext({ req }: { req: IncomingMessage }) {
   const normalizedHeaders = normalizeHeaders(req.headers)
-  let token: TokenWithBearer
+  const token = TokenWithBearer.safeParse(normalizedHeaders.authorization).data
 
-  try {
-    token = TokenWithBearer.parse(normalizedHeaders.authorization)
-    const user = await resolveUserDetails(token)
-    return { token, user }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_) {}
-  return {}
+  return {
+    token,
+    user: token && (await resolveUserDetails(token).catch(() => undefined))
+  }
 }
