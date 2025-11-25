@@ -33,8 +33,7 @@ import {
   CustomActionConfig,
   isActionEnabled,
   isActionVisible,
-  getActionConfig,
-  ConfigurableActionType
+  getActionConfig
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -588,12 +587,6 @@ function useCustomActionConfigs(
   return { customActionModal, customActionConfigs }
 }
 
-function isConfigurableActionType(
-  actionType: ActionMenuActionType | 'CUSTOM'
-): actionType is Exclude<ConfigurableActionType, 'READ'> {
-  return ConfigurableActionType.safeParse(actionType).success
-}
-
 /** Actions might have configured SHOW or ENABLE conditionals. Let's apply their effects here. */
 function applyActionConditionalEffects(
   event: EventIndex,
@@ -601,15 +594,10 @@ function applyActionConditionalEffects(
 ) {
   const validatorContext = useValidatorContext()
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const actionType = action.type
-
-  if (!isConfigurableActionType(actionType)) {
-    return action
-  }
 
   const actionConfig = getActionConfig({
     eventConfiguration,
-    actionType,
+    actionType: action.type as ActionType,
     customActionType:
       'customActionType' in action ? action.customActionType : undefined
   })
