@@ -60,13 +60,13 @@ const authedProcedure = t.procedure.use(async (opts) => {
 export const publicProcedure = t.procedure
 
 /**
- * System procedures are available to both system (API key) users and
+ * Procedures that are available to both system (API key) users and
  * human users depending on the scopes they have
  */
 export const userAndSystemProcedure = authedProcedure
 
 /**
- * Public procedures are only available to human users
+ * Procedures that are only available to human users
  * and will throw an error if a system user tries to access them
  */
 export const userOnlyProcedure = authedProcedure.use(async (opts) => {
