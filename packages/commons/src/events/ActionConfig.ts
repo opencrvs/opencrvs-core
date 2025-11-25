@@ -166,6 +166,20 @@ export const ActionConfig = z
 
 export type ActionConfig = z.infer<typeof ActionConfig>
 
+// Build a runtime set directly from the schema
+export const actionConfigTypes: Set<ActionConfigTypes> = new Set(
+  ActionConfig.options.map((opt) => opt.shape.type.value)
+)
+/**
+ * Action types that come specifically from the country configuration.
+ *
+ * These are not the same as the broader workflow `action.type` values.
+ * `ActionConfigTypes` includes only the action kinds that can be defined
+ * in the country configuration (e.g. DECLARE, VALIDATE, CUSTOM), and
+ * excludes workflow-only types such as CREATE or NOTIFY.
+ */
+export type ActionConfigTypes = ActionConfig['type']
+
 export const DeclarationActionConfig = z.discriminatedUnion('type', [
   DeclareConfig,
   ValidateConfig,

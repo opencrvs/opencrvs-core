@@ -552,6 +552,7 @@ function useCustomActionConfigs(
   customActionModal: React.ReactNode
   customActionConfigs: ActionMenuItem[]
 } {
+  const scopes = useSelector(getScope) ?? []
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(event)
 
@@ -580,6 +581,19 @@ function useCustomActionConfigs(
       }))
   }, [eventConfiguration, onCustomAction, isDownloadedAndAssignedToUser])
 
+  const hasCustomActionScope = configurableEventScopeAllowed(
+    scopes,
+    ['record.custom-action'],
+    event.type
+  )
+
+  if (!hasCustomActionScope) {
+    return {
+      customActionModal: null,
+      customActionConfigs: []
+    }
+  }
+
   return { customActionModal, customActionConfigs }
 }
 
@@ -594,6 +608,7 @@ export function useAllowedActionConfigurations(
   event: EventIndex,
   authentication: ITokenPayload
 ): [React.ReactNode, ActionMenuItem[]] {
+  const isPending = event.flags.some((flag) => flag.endsWith(':requested'))
   const { isActionAllowed } = useUserAllowedActions(event.type)
   const drafts = useDrafts()
 
@@ -636,12 +651,17 @@ export function useAllowedActionConfigurations(
     event,
     authentication
   )
+
   const allActionConfigs = [...allowedActionConfigs, ...customActionConfigs]
 
   // Check if the user can perform any action other than ASSIGN, or UNASSIGN
   const hasOnlyMetaActions = allActionConfigs.every(({ type }) =>
     isMetaAction(type)
   )
+
+  if (isPending) {
+    return [null, []]
+  }
 
   // If user has no other actions than assign or unassign, return no actions.
   // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
