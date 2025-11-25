@@ -64,6 +64,7 @@ export function CustomActionContent({
   action: CustomAction
   validatorContext: ValidatorContext
 }) {
+  const { eventConfiguration } = useEventConfiguration(event.type)
   const originalAction =
     event.actions.find(
       (a): a is CustomAction => a.id === action.originalActionId
@@ -72,7 +73,6 @@ export function CustomActionContent({
   if (!originalAction) {
     throw new Error('Original action not found. This should never happen.')
   }
-  const { eventConfiguration } = useEventConfiguration(event.type)
   const customActionFields = getCustomActionFields(
     eventConfiguration,
     action.customActionType
