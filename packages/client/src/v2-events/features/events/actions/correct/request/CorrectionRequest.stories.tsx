@@ -14,7 +14,7 @@ import {
   ActionType,
   generateActionDocument,
   tennisClubMembershipEvent,
-  v2BirthEvent,
+  ChildOnboardingEvent,
   TestUserRole,
   TokenUserType,
   generateUuid,
@@ -209,25 +209,25 @@ export const SummaryChangingAgeToDob: Story = {
 
 const eventCorrectionAddress = {
   trackingId: generateUuid(prng),
-  type: v2BirthEvent.id,
+  type: ChildOnboardingEvent.id,
   id: generateUuid(prng),
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   actions: [
     generateActionDocument({
-      configuration: v2BirthEvent,
+      configuration: ChildOnboardingEvent,
       action: ActionType.CREATE
     }),
     generateActionDocument({
-      configuration: v2BirthEvent,
+      configuration: ChildOnboardingEvent,
       action: ActionType.DECLARE
     }),
     generateActionDocument({
-      configuration: v2BirthEvent,
+      configuration: ChildOnboardingEvent,
       action: ActionType.VALIDATE
     }),
     generateActionDocument({
-      configuration: v2BirthEvent,
+      configuration: ChildOnboardingEvent,
       action: ActionType.REGISTER
     })
   ]
