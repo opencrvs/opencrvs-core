@@ -33,7 +33,9 @@ import {
   CustomActionConfig,
   isActionEnabled,
   isActionVisible,
-  getActionConfig
+  getActionConfig,
+  ValidatorContext,
+  EventConfig
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -588,13 +590,17 @@ function useCustomActionConfigs(
 }
 
 /** Actions might have configured SHOW or ENABLE conditionals. Let's apply their effects here. */
-function applyActionConditionalEffects(
-  event: EventIndex,
+function applyActionConditionalEffects({
+  event,
+  action,
+  validatorContext,
+  eventConfiguration
+}: {
+  event: EventIndex
   action: ActionMenuItem
-) {
-  const validatorContext = useValidatorContext()
-  const { eventConfiguration } = useEventConfiguration(event.type)
-
+  validatorContext: ValidatorContext
+  eventConfiguration: EventConfig
+}) {
   const actionConfig = getActionConfig({
     eventConfiguration,
     actionType: action.type as ActionType,
@@ -629,6 +635,8 @@ export function useAllowedActionConfigurations(
 ): [React.ReactNode, ActionMenuItem[]] {
   const { isActionAllowed } = useUserAllowedActions(event.type)
   const drafts = useDrafts()
+  const validatorContext = useValidatorContext()
+  const { eventConfiguration } = useEventConfiguration(event.type)
 
   const openDraft = drafts
     .getAllRemoteDrafts()
@@ -670,7 +678,14 @@ export function useAllowedActionConfigurations(
   )
 
   const allActionConfigs = [...allowedActionConfigs, ...customActionConfigs]
-    .map((action) => applyActionConditionalEffects(event, action))
+    .map((action) =>
+      applyActionConditionalEffects({
+        event,
+        action,
+        validatorContext,
+        eventConfiguration
+      })
+    )
     .filter((a: ActionConfig) => !a.hidden)
 
   // Check if the user can perform any action other than ASSIGN, or UNASSIGN
