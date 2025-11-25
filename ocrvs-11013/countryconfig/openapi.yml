@@ -2750,9 +2750,6 @@ components:
     ReadActionConfig:
       type: object
       properties:
-        type:
-          type: string
-          const: READ
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
@@ -2790,6 +2787,9 @@ components:
         conditionals:
           description: Read-action can not be disabled or hidden with conditionals.
           not: {}
+        type:
+          type: string
+          const: READ
         review:
           description: Configuration of the review page for read-only view.
           type: object
@@ -2807,9 +2807,9 @@ components:
             - fields
           additionalProperties: false
       required:
-        - type
         - label
         - flags
+        - type
         - review
       additionalProperties: false
     FieldConfig:
@@ -10269,9 +10269,6 @@ components:
     DeclareActionConfig:
       type: object
       properties:
-        type:
-          type: string
-          const: DECLARE
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
@@ -10352,6 +10349,9 @@ components:
             - label
             - query
           additionalProperties: false
+        type:
+          type: string
+          const: DECLARE
         review:
           description: Configuration of the review page fields.
           type: object
@@ -10369,9 +10369,9 @@ components:
             - fields
           additionalProperties: false
       required:
-        - type
         - label
         - flags
+        - type
         - review
       additionalProperties: false
     Clause:
@@ -10498,9 +10498,6 @@ components:
     ValidateActionConfig:
       type: object
       properties:
-        type:
-          type: string
-          const: VALIDATE
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
@@ -10581,17 +10578,17 @@ components:
             - label
             - query
           additionalProperties: false
+        type:
+          type: string
+          const: VALIDATE
       required:
-        - type
         - label
         - flags
+        - type
       additionalProperties: false
     RegisterActionConfig:
       type: object
       properties:
-        type:
-          type: string
-          const: REGISTER
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
@@ -10672,17 +10669,17 @@ components:
             - label
             - query
           additionalProperties: false
+        type:
+          type: string
+          const: REGISTER
       required:
-        - type
         - label
         - flags
+        - type
       additionalProperties: false
     PrintCertificateActionConfig:
       type: object
       properties:
-        type:
-          type: string
-          const: PRINT_CERTIFICATE
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
@@ -10749,6 +10746,9 @@ components:
                   - conditional
                 additionalProperties: false
             type: object
+        type:
+          type: string
+          const: PRINT_CERTIFICATE
         printForm:
           description: Configuration of the form used for system actions beyond
             declaration, supporting a wider range of page types.
@@ -10823,9 +10823,9 @@ components:
             - pages
           additionalProperties: false
       required:
-        - type
         - label
         - flags
+        - type
         - printForm
       additionalProperties: false
     VerificationActionConfig:
@@ -10867,9 +10867,6 @@ components:
     RequestCorrectionActionConfig:
       type: object
       properties:
-        type:
-          type: string
-          const: REQUEST_CORRECTION
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
@@ -10936,6 +10933,9 @@ components:
                   - conditional
                 additionalProperties: false
             type: object
+        type:
+          type: string
+          const: REQUEST_CORRECTION
         correctionForm:
           description: Configuration of the form used for system actions beyond
             declaration, supporting a wider range of page types.
@@ -11010,17 +11010,14 @@ components:
             - pages
           additionalProperties: false
       required:
-        - type
         - label
         - flags
+        - type
         - correctionForm
       additionalProperties: false
     CustomActionConfig:
       type: object
       properties:
-        type:
-          type: string
-          const: CUSTOM
         label:
           description: Human readable description of the action
           $ref: "#/components/schemas/TranslationConfig"
@@ -11087,6 +11084,9 @@ components:
                   - conditional
                 additionalProperties: false
             type: object
+        type:
+          type: string
+          const: CUSTOM
         customActionType:
           description: Type identifier of the custom action.
           type: string
@@ -11097,9 +11097,9 @@ components:
           items:
             $ref: "#/components/schemas/FieldConfig"
       required:
-        - type
         - label
         - flags
+        - type
         - customActionType
         - form
       additionalProperties: false
