@@ -22,6 +22,10 @@ export interface IDialogProps {
   children?: React.ReactNode
   actions: JSX.Element[]
   onClose?: () => void
+  /**
+   * Width of the dialog in pixels (for large variant).
+   */
+  width?: number
   variant?: 'small' | 'large'
 }
 
@@ -38,17 +42,21 @@ const DialogWrapper = styled.div`
   z-index: 100;
 `
 
-const DialogContainer = styled.div<{ variant?: 'small' | 'large' }>`
+const DialogContainer = styled.div<{
+  variant?: 'small' | 'large'
+  width?: number
+}>`
   position: relative;
-  ${({ variant }) =>
+  ${({ variant, width }) =>
     variant === 'small'
       ? `
         width: 480px;
         max-width: 90%;
       `
       : `
-        height: 80vh;
-        width: 80%;
+        min-height: 118px;
+        height: auto;
+        width: ${width ? `${width}px` : '80%'};
             @media (max-width: 768px) and (orientation: portrait) {
              width: 100%;
              height: 100%;
@@ -84,6 +92,7 @@ const DialogContent = styled.div`
 
 const DialogFooter = styled.div`
   padding: 24px 32px;
+  align-items: center;
   display: flex;
   gap: 8px;
   justify-content: flex-end;
@@ -98,6 +107,7 @@ export function Dialog({
   children,
   actions,
   variant = 'small',
+  width,
   titleIcon
 }: IDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
@@ -124,7 +134,12 @@ export function Dialog({
     <>
       {isOpen && (
         <DialogWrapper onClick={handleClickOutside}>
-          <DialogContainer id={id} variant={variant} ref={dialogRef}>
+          <DialogContainer
+            id={id}
+            width={width}
+            variant={variant}
+            ref={dialogRef}
+          >
             <DialogHeader>
               <DialogTitle>
                 {titleIcon}
