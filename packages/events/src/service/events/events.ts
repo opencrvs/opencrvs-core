@@ -33,7 +33,7 @@ import {
   getCurrentEventState,
   getDeclarationFields,
   getStatusFromActions,
-  isActionAvailable,
+  isActionVisible,
   isActionEnabled,
   isWriteAction
 } from '@opencrvs/commons/events'
@@ -153,7 +153,7 @@ export async function throwConflictIfActionNotAllowed(
 
   const context = await getValidatorContext(token)
   const actionIsEnabled = isActionEnabled(actionConfig, eventIndex, context)
-  const actionIsAvailable = isActionAvailable(actionConfig, eventIndex, context)
+  const actionIsAvailable = isActionVisible(actionConfig, eventIndex, context)
 
   if (!actionIsEnabled || !actionIsAvailable) {
     throw new TRPCError({

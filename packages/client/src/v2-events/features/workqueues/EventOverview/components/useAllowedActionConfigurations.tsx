@@ -32,7 +32,7 @@ import {
   ActionTypes,
   CustomActionConfig,
   isActionEnabled,
-  isActionAvailable,
+  isActionVisible,
   getActionConfig,
   ConfigurableActionType
 } from '@opencrvs/commons/client'
@@ -313,8 +313,6 @@ function useViewableActionConfigurations(
       ? actionLabels[ActionType.REGISTER]
       : actionLabels[ActionType.VALIDATE]
   }
-
-  // @TODO CIHAN: we probs need to add conditional checks here too!
 
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
@@ -627,7 +625,7 @@ function applyActionConditionalEffects(
     return action
   }
 
-  const hidden = !isActionAvailable(actionConfig, event, validatorContext)
+  const hidden = !isActionVisible(actionConfig, event, validatorContext)
   const disabled = !isActionEnabled(actionConfig, event, validatorContext)
 
   return {

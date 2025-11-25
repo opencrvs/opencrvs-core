@@ -312,7 +312,7 @@ export function isActionEnabled(
   )
 }
 
-export function isActionAvailable(
+export function isActionVisible(
   actionConfig: ActionConfig,
   event: EventIndex,
   context: ValidatorContext
@@ -322,6 +322,17 @@ export function isActionAvailable(
     event,
     context,
     ConditionalType.SHOW
+  )
+}
+
+export function isActionAvailable(
+  actionConfig: ActionConfig,
+  event: EventIndex,
+  context: ValidatorContext
+) {
+  return (
+    isActionVisible(actionConfig, event, context) &&
+    isActionEnabled(actionConfig, event, context)
   )
 }
 
