@@ -28,7 +28,20 @@ export const DeclarationReviewConfig = z
     'Configuration of the declaration review page for collecting event-related metadata.'
   )
 
+export const ConfigurableActionType = z.enum([
+  ActionType.READ,
+  ActionType.DECLARE,
+  ActionType.VALIDATE,
+  ActionType.REGISTER,
+  ActionType.PRINT_CERTIFICATE,
+  ActionType.REQUEST_CORRECTION,
+  ActionType.CUSTOM
+])
+
+export type ConfigurableActionType = z.infer<typeof ConfigurableActionType>
+
 export const ActionConfigBase = z.object({
+  type: ConfigurableActionType.describe('Type of the action.'),
   label: TranslationConfig.describe('Human readable description of the action'),
   flags: z
     .array(ActionFlagConfig)
@@ -85,12 +98,6 @@ const RegisterConfig = DeclarationActionBase.extend(
   }).shape
 )
 
-const ArchiveConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.ARCHIVE)
-  }).shape
-)
-
 const PrintCertificateActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.PRINT_CERTIFICATE),
@@ -130,7 +137,6 @@ export const ActionConfig = z
     ReadActionConfig.meta({ id: 'ReadActionConfig' }),
     DeclareConfig.meta({ id: 'DeclareActionConfig' }),
     ValidateConfig.meta({ id: 'ValidateActionConfig' }),
-    ArchiveConfig.meta({ id: 'ArchiveActionConfig' }),
     RegisterConfig.meta({ id: 'RegisterActionConfig' }),
     PrintCertificateActionConfig.meta({
       id: 'PrintCertificateActionConfig'

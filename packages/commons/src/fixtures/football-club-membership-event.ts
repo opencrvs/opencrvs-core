@@ -331,15 +331,6 @@ export const footballClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from'
       },
       printForm: PRINT_CERTIFICATE_FORM
-    },
-    {
-      type: ActionType.ARCHIVE,
-      label: {
-        id: 'event.football-club-membership.action.archive.label',
-        defaultMessage: 'Archive',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from'
-      }
     }
   ],
   advancedSearch: [

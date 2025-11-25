@@ -59,15 +59,6 @@ export const tennisClubMembershipEvent = defineConfig({
   },
   actions: [
     {
-      type: ActionType.READ,
-      label: {
-        id: 'event.tennis-club-membership.action.read.label',
-        defaultMessage: 'Read',
-        description: 'Title of the read only page'
-      },
-      review: TENNIS_CLUB_DECLARATION_REVIEW
-    },
-    {
       type: ActionType.DECLARE,
       label: {
         defaultMessage: 'Send an application',
@@ -319,15 +310,6 @@ export const tennisClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from'
       },
       printForm: PRINT_CERTIFICATE_FORM
-    },
-    {
-      type: ActionType.ARCHIVE,
-      label: {
-        id: 'event.tennis-club-membership.action.archive.label',
-        defaultMessage: 'Archive',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from'
-      }
     }
   ],
   advancedSearch: [

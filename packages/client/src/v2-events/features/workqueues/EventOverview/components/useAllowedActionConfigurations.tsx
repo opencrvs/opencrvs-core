@@ -32,7 +32,9 @@ import {
   ActionTypes,
   CustomActionConfig,
   isActionEnabled,
-  isActionAvailable
+  isActionAvailable,
+  getActionConfig,
+  ConfigurableActionType
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -185,6 +187,7 @@ interface ActionConfig {
   ctaLabel?: TranslationConfig
   disabled?: boolean
   hidden?: boolean
+  customActionType?: string
 }
 
 type ActionMenuActionType = WorkqueueActionType | ClientSpecificAction
@@ -573,23 +576,16 @@ function useCustomActionConfigs(
         (action): action is CustomActionConfig =>
           action.type === ActionType.CUSTOM
       )
-      .map((action) => {
-        const hidden = !isActionAvailable(action, event, validatorContext)
-
-        const disabled =
-          !isDownloadedAndAssignedToUser ||
-          !isActionEnabled(action, event, validatorContext)
-
-        return {
-          label: action.label,
-          icon: 'PencilLine' as const,
-          onClick: async (workqueue?: string) =>
-            onCustomAction(action, workqueue),
-          disabled,
-          hidden,
-          type: ActionType.CUSTOM
-        }
-      })
+      .map((action) => ({
+        label: action.label,
+        icon: 'PencilLine' as const,
+        onClick: async (workqueue?: string) =>
+          onCustomAction(action, workqueue),
+        disabled: !isDownloadedAndAssignedToUser,
+        hidden: false,
+        type: ActionType.CUSTOM,
+        customActionType: action.customActionType
+      }))
   }, [
     eventConfiguration,
     onCustomAction,
@@ -599,6 +595,46 @@ function useCustomActionConfigs(
   ])
 
   return { customActionModal, customActionConfigs }
+}
+
+function isConfigurableActionType(
+  actionType: ActionMenuActionType | 'CUSTOM'
+): actionType is Exclude<ConfigurableActionType, 'READ'> {
+  return ConfigurableActionType.safeParse(actionType).success
+}
+
+/** Actions might have configured SHOW or ENABLE conditionals. Let's apply their effects here. */
+function applyActionConditionalEffects(
+  event: EventIndex,
+  action: ActionMenuItem
+) {
+  const validatorContext = useValidatorContext()
+  const { eventConfiguration } = useEventConfiguration(event.type)
+  const actionType = action.type
+
+  if (!isConfigurableActionType(actionType)) {
+    return action
+  }
+
+  const actionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: actionType,
+    customActionType:
+      'customActionType' in action ? action.customActionType : undefined
+  })
+
+  if (!actionConfig || !actionConfig.conditionals) {
+    return action
+  }
+
+  const hidden = !isActionAvailable(actionConfig, event, validatorContext)
+  const disabled = !isActionEnabled(actionConfig, event, validatorContext)
+
+  return {
+    ...action,
+    hidden: action.hidden || hidden,
+    disabled: action.disabled || disabled
+  }
 }
 
 /**
@@ -654,10 +690,9 @@ export function useAllowedActionConfigurations(
     authentication
   )
 
-  const allActionConfigs = [
-    ...allowedActionConfigs,
-    ...customActionConfigs
-  ].filter((a: ActionConfig) => !a.hidden)
+  const allActionConfigs = [...allowedActionConfigs, ...customActionConfigs]
+    .map((action) => applyActionConditionalEffects(event, action))
+    .filter((a: ActionConfig) => !a.hidden)
 
   // Check if the user can perform any action other than ASSIGN, or UNASSIGN
   const hasOnlyMetaActions = allActionConfigs.every(({ type }) =>
