@@ -59,6 +59,15 @@ export const tennisClubMembershipEvent = defineConfig({
   },
   actions: [
     {
+      type: ActionType.READ,
+      label: {
+        id: 'event.tennis-club-membership.action.read.label',
+        defaultMessage: 'Read',
+        description: 'Title of the read only page'
+      },
+      review: TENNIS_CLUB_DECLARATION_REVIEW
+    },
+    {
       type: ActionType.DECLARE,
       label: {
         defaultMessage: 'Send an application',

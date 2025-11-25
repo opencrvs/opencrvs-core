@@ -28,20 +28,7 @@ export const DeclarationReviewConfig = z
     'Configuration of the declaration review page for collecting event-related metadata.'
   )
 
-export const ConfigurableActionType = z.enum([
-  ActionType.READ,
-  ActionType.DECLARE,
-  ActionType.VALIDATE,
-  ActionType.REGISTER,
-  ActionType.PRINT_CERTIFICATE,
-  ActionType.REQUEST_CORRECTION,
-  ActionType.CUSTOM
-])
-
-export type ConfigurableActionType = z.infer<typeof ConfigurableActionType>
-
 export const ActionConfigBase = z.object({
-  type: ConfigurableActionType.describe('Type of the action.'),
   label: TranslationConfig.describe('Human readable description of the action'),
   flags: z
     .array(ActionFlagConfig)
