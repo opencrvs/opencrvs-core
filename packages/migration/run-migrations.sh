@@ -24,7 +24,6 @@ export NODE_OPTIONS=--dns-result-order=ipv4first
 
 # hearth migrations
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $HEARTH_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $HEARTH_CONFIG
 
 run_pg_migrations() {
   local migrations_path="$1"
@@ -98,16 +97,12 @@ run_pg_migrations \
 
 #openhim migrations
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $OPENHIM_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $OPENHIM_CONFIG
 
 # Application Config migration
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $APP_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $APP_CONFIG
 
 # User mgnt migration
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $USER_MGNT_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $USER_MGNT_CONFIG
 
 # performance migration
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $PERFORMANCE_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $PERFORMANCE_CONFIG
