@@ -8,6 +8,12 @@
 
 HTTP input now accepts `field('..')` references in the HTTP body definition.
 
+### Improvements
+
+- Refactor the tRPC context to allow defining public procedures that don't require authentication.
+- Remove legacy mongo migration status outputs and skip typecheck which reduced the migration service startup time by 66%.
+- The postgres migration files now get restored to their original state (i.e. without the environment variables being replaced) regardless of the migration passing or not
+
 ## 1.9.1
 
 ### Breaking changes
