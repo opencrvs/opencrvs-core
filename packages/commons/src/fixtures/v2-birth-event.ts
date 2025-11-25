@@ -19,7 +19,7 @@ import { BIRTH_EVENT } from '../events/Constants'
 import { ActionType } from '../events/ActionType'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { createFieldConditionals } from '../conditionals/conditionals'
-import { field } from '../client'
+import { field } from '../events/field'
 
 function generateTranslationConfig(message: string): TranslationConfig {
   return {
