@@ -558,7 +558,6 @@ function useCustomActionConfigs(
   customActionModal: React.ReactNode
   customActionConfigs: ActionMenuItem[]
 } {
-  const validatorContext = useValidatorContext()
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(event)
   const { findFromCache } = useEvents().getEvent
@@ -584,13 +583,7 @@ function useCustomActionConfigs(
         type: ActionType.CUSTOM,
         customActionType: action.customActionType
       }))
-  }, [
-    eventConfiguration,
-    onCustomAction,
-    isDownloadedAndAssignedToUser,
-    event,
-    validatorContext
-  ])
+  }, [eventConfiguration, onCustomAction, isDownloadedAndAssignedToUser])
 
   return { customActionModal, customActionConfigs }
 }
