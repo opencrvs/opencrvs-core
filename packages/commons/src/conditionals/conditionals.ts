@@ -68,10 +68,15 @@ export type FormConditionalParameters = CommonConditionalParameters & {
   $leafAdminStructureLocationIds?: Array<{ id: UUID }>
 }
 
+export type FlagConditionalParameters = CommonConditionalParameters & {
+  $flag: string | string[]
+}
+
 export type ConditionalParameters =
   | UserConditionalParameters
   | EventConditionalParameters
   | FormConditionalParameters
+  | FlagConditionalParameters
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
@@ -325,6 +330,19 @@ function defineComparison(
       )
     },
     required: [field.$$field]
+  })
+}
+
+export function createFlagConditionals(flag: string) {
+  return defineConditional({
+    type: 'object',
+    properties: {
+      $flag: {
+        type: 'string',
+        const: flag
+      }
+    },
+    required: ['$flag']
   })
 }
 

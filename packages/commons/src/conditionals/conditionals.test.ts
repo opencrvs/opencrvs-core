@@ -18,7 +18,8 @@ import {
   ConditionalParameters,
   UserConditionalParameters,
   EventConditionalParameters,
-  FormConditionalParameters
+  FormConditionalParameters,
+  FlagConditionalParameters
 } from './conditionals'
 import { formatISO } from 'date-fns'
 import { SCOPES } from '../scopes'
@@ -28,6 +29,8 @@ import { field } from '../events/field'
 import { event } from '../events/event'
 import { TokenUserType } from '../authentication'
 import { UUID } from '../uuid'
+import { InherentFlags } from '../client'
+import { flag } from '../events/flag-conditional'
 
 /*  eslint-disable max-lines */
 
@@ -1015,6 +1018,21 @@ describe('"user" conditionals', () => {
   it('validates "user.hasRole" conditional', () => {
     expect(validate(user.hasRole('LOCAL_REGISTRAR'), userParams)).toBe(true)
     expect(validate(user.hasRole('FAKE_ROLE'), offlineUserParams)).toBe(false)
+  })
+})
+
+describe('"flag" conditionals', () => {
+  const flagParams = {
+    $flag: InherentFlags.CORRECTION_REQUESTED,
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $online: true
+  } satisfies FlagConditionalParameters
+
+  it('validates "flag " conditional', () => {
+    expect(validate(flag(InherentFlags.INCOMPLETE), flagParams)).toBe(false)
+    expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), flagParams)).toBe(
+      true
+    )
   })
 })
 
