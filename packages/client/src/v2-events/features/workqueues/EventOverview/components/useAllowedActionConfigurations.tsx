@@ -609,7 +609,7 @@ function applyActionConditionalEffects(
 
   const actionConfig = getActionConfig({
     eventConfiguration,
-    actionType: actionType,
+    actionType,
     customActionType:
       'customActionType' in action ? action.customActionType : undefined
   })
