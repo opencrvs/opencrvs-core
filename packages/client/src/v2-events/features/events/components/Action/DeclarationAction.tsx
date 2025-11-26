@@ -40,7 +40,7 @@ import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Eve
 import { useToastAndRedirect } from '@client/v2-events/features/events/useToastAndRedirect'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
-import { AvailableActionTypes, getPreviousDeclarationActionType } from './utils'
+import { AvailableActionTypes } from './utils'
 
 /**
  *
@@ -216,33 +216,6 @@ function DeclarationActionComponent({
     })
   }, [mergedDraft, event, actionType])
 
-  const previousActionAnnotation = useMemo(() => {
-    const previousActionType = getPreviousDeclarationActionType(
-      event.actions,
-      actionType
-    )
-
-    if (!previousActionType) {
-      return {}
-    }
-
-    const prevActionAnnotation = getActionAnnotation({
-      event,
-      actionType: previousActionType
-    })
-
-    // If we found annotation data from the previous action, use that.
-    if (Object.keys(prevActionAnnotation).length) {
-      return prevActionAnnotation
-    }
-
-    // As a fallback, lets see if there is a notify action annotation and use that.
-    return getActionAnnotation({
-      event,
-      actionType: ActionType.NOTIFY
-    })
-  }, [event, actionType])
-
   useEffect(() => {
     // Use the form values from the zustand state, so that filled form state is not lost
     // If user e.g. enters the 'screen lock' flow while filling form.
@@ -255,7 +228,7 @@ function DeclarationActionComponent({
     setFormValues(initialFormValues)
 
     const initialAnnotation = deepMerge(
-      deepMerge(currentAnnotation || {}, previousActionAnnotation),
+      currentAnnotation || {},
       actionAnnotation
     )
 
