@@ -32,7 +32,28 @@ const tennisClubMembershipEventWithCustomAction = {
           conditional: field('applicant.dob').isBefore().date('1950-01-01')
         }
       ],
-      form: [],
+      form: [
+        {
+          id: 'notes',
+          type: 'TEXTAREA',
+          required: true,
+          label: {
+            defaultMessage: 'Notes',
+            description: 'This is the label for the field for a custom action',
+            id: 'event.birth.custom.action.approve.field.notes.label'
+          }
+        },
+        {
+          id: 'non-required-field',
+          type: 'TEXTAREA',
+          required: false,
+          label: {
+            defaultMessage: 'Test field',
+            description: 'This is the label for the field for a custom action',
+            id: 'event.birth.custom.action.approve.test-field.notes.label'
+          }
+        }
+      ],
       flags: []
     }
   ])

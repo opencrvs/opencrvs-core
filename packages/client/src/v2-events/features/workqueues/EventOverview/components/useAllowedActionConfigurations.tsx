@@ -33,7 +33,9 @@ import {
   CustomActionConfig,
   isActionEnabled,
   isActionVisible,
-  getActionConfig
+  getActionConfig,
+  ValidatorContext,
+  EventConfig
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -557,6 +559,7 @@ function useCustomActionConfigs(
   customActionModal: React.ReactNode
   customActionConfigs: ActionMenuItem[]
 } {
+  const scopes = useSelector(getScope) ?? []
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(event)
   const { findFromCache } = useEvents().getEvent
@@ -584,17 +587,34 @@ function useCustomActionConfigs(
       }))
   }, [eventConfiguration, onCustomAction, isDownloadedAndAssignedToUser])
 
+  const hasCustomActionScope = configurableEventScopeAllowed(
+    scopes,
+    ['record.custom-action'],
+    event.type
+  )
+
+  if (!hasCustomActionScope) {
+    return {
+      customActionModal: null,
+      customActionConfigs: []
+    }
+  }
+
   return { customActionModal, customActionConfigs }
 }
 
 /** Actions might have configured SHOW or ENABLE conditionals. Let's apply their effects here. */
-function applyActionConditionalEffects(
-  event: EventIndex,
+function applyActionConditionalEffects({
+  event,
+  action,
+  validatorContext,
+  eventConfiguration
+}: {
+  event: EventIndex
   action: ActionMenuItem
-) {
-  const validatorContext = useValidatorContext()
-  const { eventConfiguration } = useEventConfiguration(event.type)
-
+  validatorContext: ValidatorContext
+  eventConfiguration: EventConfig
+}) {
   const actionConfig = getActionConfig({
     eventConfiguration,
     actionType: action.type as ActionType,
@@ -627,8 +647,11 @@ export function useAllowedActionConfigurations(
   event: EventIndex,
   authentication: ITokenPayload
 ): [React.ReactNode, ActionMenuItem[]] {
+  const isPending = event.flags.some((flag) => flag.endsWith(':requested'))
   const { isActionAllowed } = useUserAllowedActions(event.type)
   const drafts = useDrafts()
+  const validatorContext = useValidatorContext()
+  const { eventConfiguration } = useEventConfiguration(event.type)
 
   const openDraft = drafts
     .getAllRemoteDrafts()
@@ -670,13 +693,24 @@ export function useAllowedActionConfigurations(
   )
 
   const allActionConfigs = [...allowedActionConfigs, ...customActionConfigs]
-    .map((action) => applyActionConditionalEffects(event, action))
+    .map((action) =>
+      applyActionConditionalEffects({
+        event,
+        action,
+        validatorContext,
+        eventConfiguration
+      })
+    )
     .filter((a: ActionConfig) => !a.hidden)
 
   // Check if the user can perform any action other than ASSIGN, or UNASSIGN
   const hasOnlyMetaActions = allActionConfigs.every(({ type }) =>
     isMetaAction(type)
   )
+
+  if (isPending) {
+    return [null, []]
+  }
 
   // If user has no other actions than assign or unassign, return no actions.
   // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.

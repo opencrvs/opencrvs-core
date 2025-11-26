@@ -20,7 +20,8 @@ import { EventConfig } from '../EventConfig'
 import {
   aggregateActionDeclarations,
   getAcceptedActions,
-  getActionConfig
+  getActionConfig,
+  isActionConfigType
 } from '../utils'
 import { formatISO, parseISO, isValid } from 'date-fns'
 import { EventDocument } from '../EventDocument'
@@ -131,12 +132,15 @@ export function resolveEventCustomFlags(
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
   return actions.reduce((acc, action, idx) => {
-    const actionConfig = getActionConfig({
-      eventConfiguration,
-      actionType: action.type,
-      customActionType:
-        'customActionType' in action ? action.customActionType : undefined
-    })
+    let actionConfig
+    if (isActionConfigType(action.type)) {
+      actionConfig = getActionConfig({
+        eventConfiguration,
+        actionType: action.type,
+        customActionType:
+          'customActionType' in action ? action.customActionType : undefined
+      })
+    }
 
     if (!actionConfig) {
       return acc

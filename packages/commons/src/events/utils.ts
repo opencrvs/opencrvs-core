@@ -43,7 +43,12 @@ import {
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID, UUID } from '../uuid'
-import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
+import {
+  ActionConfig,
+  actionConfigTypes,
+  ActionConfigTypes,
+  DeclarationActionConfig
+} from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
@@ -69,31 +74,11 @@ export function getDeclaration(configuration: EventConfig) {
   return configuration.declaration
 }
 
-export function getPrintCertificatePages(configuration: EventConfig) {
-  const action = configuration.actions.find(
-    (a) => a.type === ActionType.PRINT_CERTIFICATE
-  )
-
-  return getOrThrow(
-    action?.printForm.pages,
-    `${ActionType.PRINT_CERTIFICATE} action does not have print form set.`
-  )
-}
-
-export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
-  if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
-    return actionConfig.correctionForm.pages.flatMap(({ fields }) => fields)
-  }
-
-  if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
-    return actionConfig.printForm.pages.flatMap(({ fields }) => fields)
-  }
-
-  if ('review' in actionConfig) {
-    return actionConfig.review.fields
-  }
-
-  return []
+export function isActionConfigType(
+  type: ActionType
+): type is ActionConfigTypes {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return actionConfigTypes.has(type as any)
 }
 
 export function getActionConfig({
@@ -126,6 +111,50 @@ export function getActionConfig({
 
     return a.type === actionType
   })
+}
+
+export function getCustomActionFields(
+  eventConfiguration: EventConfig,
+  customActionType: string
+): FieldConfig[] {
+  const actionConfig = getActionConfig({
+    eventConfiguration,
+    customActionType,
+    actionType: ActionType.CUSTOM
+  })
+
+  if (!actionConfig || !('form' in actionConfig)) {
+    return []
+  }
+
+  return actionConfig.form
+}
+
+export function getPrintCertificatePages(configuration: EventConfig) {
+  const action = configuration.actions.find(
+    (a) => a.type === ActionType.PRINT_CERTIFICATE
+  )
+
+  return getOrThrow(
+    action?.printForm.pages,
+    `${ActionType.PRINT_CERTIFICATE} action does not have print form set.`
+  )
+}
+
+export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
+  if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
+    return actionConfig.correctionForm.pages.flatMap(({ fields }) => fields)
+  }
+
+  if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
+    return actionConfig.printForm.pages.flatMap(({ fields }) => fields)
+  }
+
+  if ('review' in actionConfig) {
+    return actionConfig.review.fields
+  }
+
+  return []
 }
 
 function getAllAnnotationFields(config: EventConfig): FieldConfig[] {

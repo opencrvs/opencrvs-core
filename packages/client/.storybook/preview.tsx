@@ -40,6 +40,7 @@ import {
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import {
+  ActionType,
   Draft,
   EventDocument,
   tennisClubMembershipEvent,
@@ -174,6 +175,36 @@ export async function clearStorage() {
 
 clearStorage()
 
+const tennisClubMembershipEventWithCustomAction = {
+  ...tennisClubMembershipEvent,
+  actions: tennisClubMembershipEvent.actions.concat([
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'CONFIRM',
+      label: {
+        id: 'event.tennis-club-membership.action.confirm.label',
+        defaultMessage: 'Confirm',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from'
+      },
+      // @TODO: once action conditionals are implemented, add some conditional here?
+      form: [
+        {
+          id: 'notes',
+          type: 'TEXTAREA',
+          required: true,
+          label: {
+            defaultMessage: 'Notes',
+            description: 'This is the label for the field for a custom action',
+            id: 'event.birth.custom.action.approve.field.notes.label'
+          }
+        }
+      ],
+      flags: []
+    }
+  ])
+}
+
 const preview: Preview = {
   loaders: [
     mswLoader,
@@ -258,7 +289,7 @@ const preview: Preview = {
        */
 
       const offlineConfigs: Array<EventConfig> = options.parameters?.offline
-        ?.configs ?? [tennisClubMembershipEvent]
+        ?.configs ?? [tennisClubMembershipEventWithCustomAction]
 
       offlineConfigs.forEach((config) => {
         addLocalEventConfig(config)

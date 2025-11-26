@@ -12,7 +12,7 @@ import React from 'react'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
-import { ResponsiveModal } from '@opencrvs/components'
+import { Dialog, Text } from '@opencrvs/components'
 import {
   DangerButton,
   PrimaryButton,
@@ -21,10 +21,15 @@ import {
 import {
   ActionType,
   CustomActionConfig,
-  EventIndex
+  EventIndex,
+  FieldConfig,
+  FieldUpdateValue,
+  runFieldValidations
 } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { ROUTES } from '@client/v2-events/routes'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useUserAllowedActions } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useModal } from '../../../../hooks/useModal'
 import { useEvents } from '../../useEvents/useEvents'
@@ -38,6 +43,7 @@ interface ModalConfig {
   description?: MessageDescriptor
   confirmButtonType?: 'primary' | 'danger'
   confirmButtonLabel?: MessageDescriptor
+  fields?: FieldConfig[]
 }
 
 export interface QuickActionConfig {
@@ -61,48 +67,83 @@ const quickActions = {
   [ActionType.ARCHIVE]: archive
 } as const satisfies Partial<Record<ActionType, QuickActionConfig>>
 
+interface ModalResult {
+  /** Whether the modal was confirmed/accepted or not */
+  result: boolean
+  /** The values entered in the modal form, if any */
+  values?: Record<string, FieldUpdateValue>
+}
+
 function QuickActionModal({
   close,
   config
 }: {
-  close: (result: boolean) => void
+  close: (result: ModalResult) => void
   config: ModalConfig & { label: MessageDescriptor }
 }) {
   const intl = useIntl()
+  const validatorContext = useValidatorContext()
+  const [modalValues, setModalValues] = React.useState<
+    Record<string, FieldUpdateValue>
+  >({})
 
   const ConfirmButton =
     config.confirmButtonType === 'danger' ? DangerButton : PrimaryButton
 
+  const handleChange = (values: Record<string, FieldUpdateValue>) => {
+    setModalValues((prev) => ({
+      ...prev,
+      ...values
+    }))
+  }
+
+  const errorsOnField = (config.fields ?? []).flatMap((field) =>
+    runFieldValidations({
+      field,
+      values: modalValues,
+      context: validatorContext
+    })
+  )
+
   return (
-    <ResponsiveModal
+    <Dialog
       actions={[
         <TertiaryButton
           key="cancel"
           id="cancel-btn"
-          onClick={() => close(false)}
+          onClick={() => close({ result: false })}
         >
           {intl.formatMessage(buttonMessages.cancel)}
         </TertiaryButton>,
         <ConfirmButton
           key="confirm"
+          bg={'primaryBlue'}
+          disabled={errorsOnField.length > 0}
           id="confirm-btn"
-          onClick={() => close(true)}
+          onClick={() => close({ result: true, values: modalValues })}
         >
           {intl.formatMessage(
             config.confirmButtonLabel || buttonMessages.confirm
           )}
         </ConfirmButton>
       ]}
-      autoHeight={true}
-      handleClose={() => close(false)}
       id={`quick-action-modal-${config.label.id}`}
-      responsive={true}
-      show={true}
+      isOpen={true}
       title={intl.formatMessage(config.label)}
-      width={800}
+      variant={'large'}
+      width={898}
+      onClose={() => close({ result: false })}
     >
-      {config.description ? intl.formatMessage(config.description) : null}
-    </ResponsiveModal>
+      <FormFieldGenerator
+        fields={config.fields ?? []}
+        id={'quick-action-modal-form'}
+        validatorContext={validatorContext}
+        onChange={handleChange}
+      />
+      <Text color="grey500" element="p" variant="reg16">
+        {config.description ? intl.formatMessage(config.description) : null}
+      </Text>
+    </Dialog>
   )
 }
 
@@ -118,7 +159,7 @@ export function useQuickActionModal(event: EventIndex) {
   ) => {
     const config = quickActions[actionType]
     const label = actionLabels[actionType]
-    const confirmed = await openModal<boolean>((close) => (
+    const confirmed = await openModal((close) => (
       <QuickActionModal close={close} config={{ label, ...config.modal }} />
     ))
 
@@ -162,23 +203,25 @@ export function useCustomActionModal(event: EventIndex) {
     actionConfig: CustomActionConfig,
     workqueue?: string
   ) => {
-    const confirmed = await openModal<boolean>((close) => (
+    const modalResult = await openModal<ModalResult>((close) => (
       <QuickActionModal
         close={close}
         config={{
           ...customActionConfigBase,
           label: actionConfig.label,
-          description: actionConfig.supportingCopy
+          description: actionConfig.supportingCopy,
+          fields: actionConfig.form
         }}
       />
     ))
 
-    if (confirmed) {
+    if (modalResult.result) {
       void actions.custom.mutate({
         eventId: event.id,
         customActionType: actionConfig.customActionType,
         declaration: event.declaration,
-        transactionId: uuid()
+        transactionId: uuid(),
+        annotation: modalResult.values
       })
 
       if (workqueue) {
