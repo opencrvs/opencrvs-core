@@ -27,10 +27,8 @@ import { actionLabels } from '@client/v2-events/features/workqueues/EventOvervie
 function useDeclarationActions(event: EventIndex) {
   const drafts = useDrafts()
   const intl = useIntl()
-  const { closeActionView, deleteDeclaration } = useEventFormNavigation()
-  const [{ workqueue: slug }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.DECLARE.REVIEW
-  )
+  const { closeActionView, modal, deleteDeclaration } = useEventFormNavigation()
+
   const { isActionAllowed } = useUserAllowedActions(event.type)
   const eventId = event.id
 
@@ -43,6 +41,7 @@ function useDeclarationActions(event: EventIndex) {
       icon: 'PencilLine' as const,
       label: intl.formatMessage(actionLabels[ActionType.REGISTER]),
       onClick: () => {
+        // eslint-disable-next-line no-console
         console.log('TODO CIHAN')
       },
       hidden: !isActionAllowed(ActionType.REGISTER),
@@ -53,6 +52,7 @@ function useDeclarationActions(event: EventIndex) {
       icon: 'PencilLine' as const,
       label: intl.formatMessage(actionLabels[ActionType.DECLARE]),
       onClick: () => {
+        // eslint-disable-next-line no-console
         console.log('TODO CIHAN')
       },
       hidden: !isActionAllowed(ActionType.DECLARE),
@@ -67,6 +67,7 @@ function useDeclarationActions(event: EventIndex) {
         description: 'Notify action label'
       }),
       onClick: () => {
+        // eslint-disable-next-line no-console
         console.log('TODO CIHAN')
       },
       hidden: !isActionAllowed(ActionType.NOTIFY),
@@ -76,16 +77,15 @@ function useDeclarationActions(event: EventIndex) {
     {
       icon: 'FloppyDisk' as const,
       label: intl.formatMessage(formHeaderMessages.saveExitButton),
-      onClick: () => {
-        drafts.submitLocalDraft()
-        closeActionView(slug)
-      },
+      onClick: () => drafts.submitLocalDraft(),
       hidden: false
     },
     {
       icon: 'Trash' as const,
       label: intl.formatMessage(formHeaderMessages.deleteDeclaration),
-      onClick: onDelete,
+      onClick: () => {
+        const res = onDelete()
+      },
       hidden: false
     }
   ].filter((a) => !a.hidden)
@@ -93,6 +93,7 @@ function useDeclarationActions(event: EventIndex) {
 
 export function DeclareActionMenu({ event }: { event: EventIndex }) {
   const intl = useIntl()
+  const { closeActionView, modal } = useEventFormNavigation()
   const declarationActions = useDeclarationActions(event)
 
   return (
@@ -116,7 +117,7 @@ export function DeclareActionMenu({ event }: { event: EventIndex }) {
           ))}
         </DropdownMenu.Content>
       </DropdownMenu>
-      {/* {modals} */}
+      {modal}
     </>
   )
 }
