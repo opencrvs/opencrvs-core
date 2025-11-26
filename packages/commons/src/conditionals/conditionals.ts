@@ -353,13 +353,13 @@ export function flag(flagvalue: string) {
 }
 
 /** Check if an event flag is present */
-export function status(status: EventStatus) {
+export function status(statusValue: EventStatus) {
   return defineConditional({
     type: 'object',
     properties: {
       $status: {
         type: 'string',
-        const: status
+        const: statusValue
       }
     },
     required: ['$status']
