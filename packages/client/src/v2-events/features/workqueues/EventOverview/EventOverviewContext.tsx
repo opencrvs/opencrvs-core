@@ -10,13 +10,14 @@
  */
 
 import React, { createContext, useContext } from 'react'
-import { User } from '@opencrvs/commons/client'
+import { EventIndex, User } from '@opencrvs/commons/client'
 import { ILocation } from '@client/offline/reducer'
 import { IndexMap } from '@client/utils'
 
 const EventOverviewContext = createContext<{
   findUser: (id: string) => User | undefined
   getLocation: (id: string) => ILocation | undefined
+  event: EventIndex
 } | null>(null)
 
 /**
@@ -25,11 +26,13 @@ const EventOverviewContext = createContext<{
 export const EventOverviewProvider = ({
   children,
   locations,
-  users
+  users,
+  event
 }: {
   children: React.ReactNode
   users: User[]
   locations: IndexMap<ILocation>
+  event: EventIndex
 }) => {
   const findUser = (id: string) => {
     return users.find((u) => u.id === id)
@@ -40,7 +43,7 @@ export const EventOverviewProvider = ({
   }
 
   return (
-    <EventOverviewContext.Provider value={{ findUser, getLocation }}>
+    <EventOverviewContext.Provider value={{ findUser, getLocation, event }}>
       {children}
     </EventOverviewContext.Provider>
   )
