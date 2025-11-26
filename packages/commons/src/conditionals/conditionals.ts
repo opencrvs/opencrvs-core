@@ -16,7 +16,7 @@ import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { userSerializer } from '../events/serializers/user/serializer'
 import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
-import { EventStatus } from 'src/client'
+import { EventStatus } from '../events/EventMetadata'
 
 /* eslint-disable max-lines */
 
