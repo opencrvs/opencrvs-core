@@ -83,6 +83,11 @@ export EVENTS_DB_USER="${EVENTS_DB_USER:-events_app}"
 export EVENTS_MIGRATION_USER="${EVENTS_MIGRATION_USER:-events_migrator}"
 export MONGO_HOST="${MONGO_HOST:-mongo1}"
 export MONGO_PORT="${MONGO_PORT:-27017}"
+if [ -n "$MONGO_REPLICA_SET" ]; then
+  export MONGO_REPLICA_SET_OPTION=", replica_set '$MONGO_REPLICA_SET'"
+else
+  export MONGO_REPLICA_SET_OPTION=""
+fi
 
 # Run superuser events migrations
 run_pg_migrations \
