@@ -26,7 +26,7 @@ import { useDefaultValues } from '@client/v2-events/hooks/useDefaultValues'
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
-import { AvailableActionTypes } from './Action/utils'
+import { AvailableActionTypes } from './Action/DeclarationAction'
 
 interface PagesProps {
   form: EventState

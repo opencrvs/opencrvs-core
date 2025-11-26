@@ -40,7 +40,17 @@ import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Eve
 import { useToastAndRedirect } from '@client/v2-events/features/events/useToastAndRedirect'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
-import { AvailableActionTypes } from './utils'
+
+export type AvailableActionTypes = Extract<
+  ActionType,
+  | 'NOTIFY'
+  | 'DECLARE'
+  | 'VALIDATE'
+  | 'REGISTER'
+  | 'REQUEST_CORRECTION'
+  | 'APPROVE_CORRECTION'
+  | 'REJECT_CORRECTION'
+>
 
 /**
  *
