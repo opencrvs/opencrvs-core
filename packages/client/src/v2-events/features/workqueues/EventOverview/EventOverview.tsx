@@ -38,6 +38,7 @@ import { useAuthentication } from '@client/utils/userUtils'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { EventSummary } from './components/EventSummary'
+import { useEventOverviewContext } from './EventOverviewContext'
 
 /**
  * Renders the event overview page which shows a summary of the event.
@@ -156,7 +157,7 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
 
 function EventOverviewContainer() {
   const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
-  const { searchEventById } = useEvents()
+  const { event } = useEventOverviewContext()
   const { getEvent } = useEvents()
   const maybeAuth = useAuthentication()
   const authentication = getOrThrow(
@@ -164,24 +165,17 @@ function EventOverviewContainer() {
     'Authentication is not available but is required'
   )
 
-  // Suspense query is not used here because we want to refetch when an event action is performed
-  const getEventQuery = searchEventById.useQuery(params.eventId)
-  const eventIndex = getEventQuery.data?.results[0]
   const fullEvent = getEvent.findFromCache(params.eventId).data
-
-  if (!eventIndex) {
-    return
-  }
-  const assignmentStatus = getAssignmentStatus(eventIndex, authentication.sub)
+  const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
   const shouldShowFullOverview =
     fullEvent && assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
 
   return (
     <>
-      {eventIndex.potentialDuplicates.length > 0 && (
+      {event.potentialDuplicates.length > 0 && (
         <DuplicateWarning
-          duplicateTrackingIds={eventIndex.potentialDuplicates.map(
+          duplicateTrackingIds={event.potentialDuplicates.map(
             ({ trackingId }) => trackingId
           )}
         />
@@ -189,11 +183,7 @@ function EventOverviewContainer() {
       {shouldShowFullOverview ? (
         <EventOverviewFull event={fullEvent} />
       ) : (
-        <EventOverviewProtected
-          eventIndex={eventIndex}
-          // @TODO: Is this needed after new event overview UI?
-          // onAction={getEventQuery.refetch}
-        />
+        <EventOverviewProtected eventIndex={event} />
       )}
     </>
   )

@@ -151,18 +151,16 @@ export function EventOverviewLayout({
   const { getUser } = useUsers()
   const users = getUser.getAllCached()
   const locations = useSelector(getLocations)
-
-  const eventResults = searchEventById.useSuspenseQuery(eventId)
-
   const navigate = useNavigate()
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
 
-  if (eventResults.total === 0) {
-    throw new Error(`Event details with id ${eventId} not found`)
-  }
+  const getEventQuery = searchEventById.useQuery(eventId)
+  const event = getEventQuery.data?.results[0]
 
-  const event = eventResults.results[0]
+  if (!event) {
+    throw new Error(`Event with id ${eventId} not found`)
+  }
 
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndexWithDraftApplied = draft
@@ -192,7 +190,7 @@ export function EventOverviewLayout({
           }
           desktopRight={
             <Stack>
-              <ActionMenu eventId={eventId} />
+              <ActionMenu eventId={eventId} onAction={getEventQuery.refetch} />
               <DownloadButton
                 key={`DownloadButton-${eventId}`}
                 event={eventIndexWithDraftApplied}
@@ -237,7 +235,7 @@ export function EventOverviewLayout({
         constantsMessages.skipToMainContent
       )}
     >
-      <EventOverviewProvider locations={locations} users={users}>
+      <EventOverviewProvider event={event} locations={locations} users={users}>
         {children}
       </EventOverviewProvider>
     </Frame>

@@ -59,9 +59,11 @@ export function ActionMenu({
   const assignedToUser = getUser.useQuery(eventState.assignedTo || '', {
     enabled: !!eventState.assignedTo
   }).data
+
   const assignedUserFullName = assignedToUser
     ? getUsersFullName(assignedToUser.name, intl.locale)
     : ''
+
   const assignedOffice = assignedToUser?.primaryOfficeId || ''
   const assignedOfficeName =
     locations.find((l) => l.id === assignedOffice)?.name || ''
