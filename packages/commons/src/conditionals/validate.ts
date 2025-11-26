@@ -181,14 +181,16 @@ export function isConditionMet(
   values: EventState | ActionUpdate,
   context: ValidatorContext,
   // @TODO: should this be non-optional
-  event?: EventIndex
+  eventIndex?: EventIndex
 ) {
   return validate(conditional, {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
     $online: isOnline(),
     $user: context.user,
-    $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? []
+    $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? [],
+    $flags: eventIndex?.flags ?? [],
+    $status: eventIndex?.status
   })
 }
 
@@ -208,10 +210,11 @@ function getConditionalActionsForField(
 export function areConditionsMet(
   conditions: FieldConditional[],
   values: Record<string, FieldValue>,
-  context: ValidatorContext
+  context: ValidatorContext,
+  event: EventIndex
 ) {
   return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values, context)
+    isConditionMet(condition.conditional, values, context, event)
   )
 }
 
