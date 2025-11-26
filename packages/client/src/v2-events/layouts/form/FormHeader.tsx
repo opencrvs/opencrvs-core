@@ -32,6 +32,11 @@ export const messages = defineMessages({
     id: 'buttons.exit',
     defaultMessage: 'Exit',
     description: 'The label for the exit button'
+  },
+  deleteDeclaration: {
+    id: 'buttons.deleteDeclaration',
+    defaultMessage: 'Delete declaration',
+    description: 'The label for the delete declaration button'
   }
 })
 

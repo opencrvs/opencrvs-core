@@ -150,7 +150,7 @@ export function Review() {
 
   return (
     <FormLayout
-      actionComponent={<DeclareActionMenu />}
+      actionComponent={<DeclareActionMenu event={currentEventState} />}
       route={ROUTES.V2.EVENTS.DECLARE}
     >
       <ReviewComponent.Body
