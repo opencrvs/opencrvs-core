@@ -30,7 +30,12 @@ import {
   configurableEventScopeAllowed,
   ITokenPayload,
   ActionTypes,
-  CustomActionConfig
+  CustomActionConfig,
+  isActionEnabled,
+  isActionVisible,
+  getActionConfig,
+  ValidatorContext,
+  EventConfig
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -55,6 +60,7 @@ import {
   useCustomActionModal
 } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -182,6 +188,7 @@ interface ActionConfig {
   ctaLabel?: TranslationConfig
   disabled?: boolean
   hidden?: boolean
+  customActionType?: string
 }
 
 type ActionMenuActionType = WorkqueueActionType | ClientSpecificAction
@@ -555,8 +562,6 @@ function useCustomActionConfigs(
   const scopes = useSelector(getScope) ?? []
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(event)
-
-  // @TODO: Could we share these with the useViewableActionConfigurations() function?
   const { findFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(findFromCache(event.id).data)
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
@@ -577,7 +582,8 @@ function useCustomActionConfigs(
           onCustomAction(action, workqueue),
         disabled: !isDownloadedAndAssignedToUser,
         hidden: false,
-        type: ActionType.CUSTOM
+        type: ActionType.CUSTOM,
+        customActionType: action.customActionType
       }))
   }, [eventConfiguration, onCustomAction, isDownloadedAndAssignedToUser])
 
@@ -597,6 +603,39 @@ function useCustomActionConfigs(
   return { customActionModal, customActionConfigs }
 }
 
+/** Actions might have configured SHOW or ENABLE conditionals. Let's apply their effects here. */
+function applyActionConditionalEffects({
+  event,
+  action,
+  validatorContext,
+  eventConfiguration
+}: {
+  event: EventIndex
+  action: ActionMenuItem
+  validatorContext: ValidatorContext
+  eventConfiguration: EventConfig
+}) {
+  const actionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: action.type as ActionType,
+    customActionType:
+      'customActionType' in action ? action.customActionType : undefined
+  })
+
+  if (!actionConfig || !actionConfig.conditionals) {
+    return action
+  }
+
+  const hidden = !isActionVisible(actionConfig, event, validatorContext)
+  const disabled = !isActionEnabled(actionConfig, event, validatorContext)
+
+  return {
+    ...action,
+    hidden: action.hidden || hidden,
+    disabled: action.disabled || disabled
+  }
+}
+
 /**
  *
  * NOTE: In principle, you should never add new business rules to the `useAction` hook alone. All the actions are validated by the server and their order is enforced.
@@ -611,6 +650,8 @@ export function useAllowedActionConfigurations(
   const isPending = event.flags.some((flag) => flag.endsWith(':requested'))
   const { isActionAllowed } = useUserAllowedActions(event.type)
   const drafts = useDrafts()
+  const validatorContext = useValidatorContext()
+  const { eventConfiguration } = useEventConfiguration(event.type)
 
   const openDraft = drafts
     .getAllRemoteDrafts()
@@ -645,7 +686,6 @@ export function useAllowedActionConfigurations(
     .filter((action) => isActionAllowed(action))
     // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
     .map((a) => ({ ...config[a], type: a }))
-    .filter((a: ActionConfig) => !a.hidden)
 
   const { customActionModal, customActionConfigs } = useCustomActionConfigs(
     event,
@@ -653,6 +693,15 @@ export function useAllowedActionConfigurations(
   )
 
   const allActionConfigs = [...allowedActionConfigs, ...customActionConfigs]
+    .map((action) =>
+      applyActionConditionalEffects({
+        event,
+        action,
+        validatorContext,
+        eventConfiguration
+      })
+    )
+    .filter((a: ActionConfig) => !a.hidden)
 
   // Check if the user can perform any action other than ASSIGN, or UNASSIGN
   const hasOnlyMetaActions = allActionConfigs.every(({ type }) =>

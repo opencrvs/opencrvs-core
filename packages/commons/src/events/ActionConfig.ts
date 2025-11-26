@@ -15,6 +15,7 @@ import { FieldConfig } from './FieldConfig'
 import { ActionFormConfig } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 import { ActionFlagConfig } from './Flag'
+import { ActionConditional } from './Conditional'
 
 export const DeclarationReviewConfig = z
   .object({
@@ -39,7 +40,11 @@ export const ActionConfigBase = z.object({
   ).optional(),
   supportingCopy: TranslationConfig.optional().describe(
     'Text displayed on the confirmation'
-  )
+  ),
+  conditionals: z
+    .array(ActionConditional)
+    .optional()
+    .describe('Conditionals which can disable or hide actions.')
 })
 
 const DeclarationActionBase = ActionConfigBase.extend({
@@ -51,7 +56,11 @@ const ReadActionConfig = ActionConfigBase.extend(
     type: z.literal(ActionType.READ),
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page for read-only view.'
-    )
+    ),
+    conditionals: z
+      .never()
+      .optional()
+      .describe('Read-action can not be disabled or hidden with conditionals.')
   }).shape
 )
 
@@ -76,24 +85,6 @@ const RegisterConfig = DeclarationActionBase.extend(
   }).shape
 )
 
-const RejectDeclarationConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.REJECT)
-  }).shape
-)
-
-const ArchiveConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.ARCHIVE)
-  }).shape
-)
-
-const DeleteConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.DELETE)
-  }).shape
-)
-
 const PrintCertificateActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.PRINT_CERTIFICATE),
@@ -105,18 +96,6 @@ const RequestCorrectionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REQUEST_CORRECTION),
     correctionForm: ActionFormConfig
-  }).shape
-)
-
-const RejectCorrectionConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.REJECT_CORRECTION)
-  }).shape
-)
-
-const ApproveCorrectionConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.APPROVE_CORRECTION)
   }).shape
 )
 
@@ -145,18 +124,11 @@ export const ActionConfig = z
     ReadActionConfig.meta({ id: 'ReadActionConfig' }),
     DeclareConfig.meta({ id: 'DeclareActionConfig' }),
     ValidateConfig.meta({ id: 'ValidateActionConfig' }),
-    RejectDeclarationConfig.meta({ id: 'RejectDeclarationActionConfig' }),
-    ArchiveConfig.meta({ id: 'ArchiveActionConfig' }),
     RegisterConfig.meta({ id: 'RegisterActionConfig' }),
-    DeleteConfig.meta({ id: 'DeleteActionConfig' }),
     PrintCertificateActionConfig.meta({
       id: 'PrintCertificateActionConfig'
     }),
     RequestCorrectionConfig.meta({ id: 'RequestCorrectionActionConfig' }),
-    RejectCorrectionConfig.meta({ id: 'RejectCorrectionActionConfig' }),
-    ApproveCorrectionConfig.meta({
-      id: 'ApproveCorrectionActionConfig'
-    }),
     CustomActionConfig.meta({ id: 'CustomActionConfig' })
   ])
   .describe(

@@ -81,43 +81,53 @@ export function isActionConfigType(
   return actionConfigTypes.has(type as any)
 }
 
-// @TODO CIHAN: use this everywhere
-export function getActionConfig<T extends ActionConfigTypes>({
+export function getActionConfig({
   eventConfiguration,
   actionType,
   customActionType
 }: {
   eventConfiguration: EventConfig
-  actionType: T
+  actionType: ActionType
   customActionType?: string
-}): Extract<ActionConfig, { type: T }> | undefined {
-  const actionConfig = eventConfiguration.actions.find(
-    (a): a is Extract<ActionConfig, { type: T }> => {
-      if (a.type === ActionType.CUSTOM && customActionType) {
-        return a.customActionType === customActionType
-      }
-      return a.type === actionType
+}): ActionConfig | undefined {
+  return eventConfiguration.actions.find((a) => {
+    // We can have multiple custom actions configured, we specify the custom action with 'customActionType'
+    if (a.type === ActionType.CUSTOM && customActionType) {
+      return a.customActionType === customActionType
     }
-  )
 
-  return actionConfig
+    // Notify uses the declare action config
+    if (actionType === ActionType.NOTIFY) {
+      return a.type === ActionType.DECLARE
+    }
+
+    // For correction approval/rejection, we use the correction request action config
+    if (
+      actionType === ActionType.APPROVE_CORRECTION ||
+      actionType === ActionType.REJECT_CORRECTION
+    ) {
+      return a.type === ActionType.REQUEST_CORRECTION
+    }
+
+    return a.type === actionType
+  })
 }
 
 export function getCustomActionFields(
   eventConfiguration: EventConfig,
   customActionType: string
 ): FieldConfig[] {
-  const customAction = getActionConfig({
+  const actionConfig = getActionConfig({
     eventConfiguration,
     customActionType,
     actionType: ActionType.CUSTOM
   })
 
-  if (!customAction) {
+  if (!actionConfig || !('form' in actionConfig)) {
     return []
   }
 
-  return customAction.form
+  return actionConfig.form
 }
 
 export function getPrintCertificatePages(configuration: EventConfig) {
