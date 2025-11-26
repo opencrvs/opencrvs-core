@@ -32,7 +32,6 @@ import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -40,6 +39,7 @@ import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Eve
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useRejectionModal } from '../reject/useRejectionModal'
 import { useReviewActionConfig } from './useReviewActionConfig'
+import { DeclareActionMenu } from './DeclareActionMenu'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
@@ -47,7 +47,6 @@ export function Review() {
     ROUTES.V2.EVENTS.DECLARE.REVIEW
   )
   const events = useEvents()
-  const drafts = useDrafts()
   const navigate = useNavigate()
   const { rejectionModal, handleRejection } = useRejectionModal(eventId)
 
@@ -151,13 +150,8 @@ export function Review() {
 
   return (
     <FormLayout
+      actionComponent={<DeclareActionMenu />}
       route={ROUTES.V2.EVENTS.DECLARE}
-      onSaveAndExit={async () =>
-        handleSaveAndExit(() => {
-          drafts.submitLocalDraft()
-          closeActionView(slug)
-        })
-      }
     >
       <ReviewComponent.Body
         annotation={annotation}
@@ -169,7 +163,7 @@ export function Review() {
         onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       >
-        <ReviewComponent.Actions
+        {/* <ReviewComponent.Actions
           canSendIncomplete={isActionAllowed(ActionType.NOTIFY)}
           icon={reviewActionConfiguration.icon}
           incomplete={reviewActionConfiguration.incomplete}
@@ -182,7 +176,7 @@ export function Review() {
               ? async () => handleRejection(() => closeActionView(slug))
               : undefined
           }
-        />
+        /> */}
       </ReviewComponent.Body>
       {modal}
       {rejectionModal}

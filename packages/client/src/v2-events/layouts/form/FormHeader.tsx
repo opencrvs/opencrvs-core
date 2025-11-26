@@ -22,7 +22,7 @@ import { useEventFormNavigation } from '@client/v2-events//features/events/useEv
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { AllowedRouteWithEventId } from './utils'
 
-const messages = defineMessages({
+export const messages = defineMessages({
   saveExitButton: {
     id: 'buttons.saveExit',
     defaultMessage: 'Save & Exit',
@@ -39,12 +39,14 @@ export function FormHeader({
   label,
   onSaveAndExit,
   route,
-  appbarIcon
+  appbarIcon,
+  actionComponent
 }: {
   label: string
   onSaveAndExit?: () => void
   route: AllowedRouteWithEventId
   appbarIcon?: React.ReactNode
+  actionComponent?: React.ReactNode
 }) {
   const intl = useIntl()
   const { modal, exit, closeActionView, deleteDeclaration } =
@@ -80,61 +82,67 @@ export function FormHeader({
       ]
     : []
 
+  const getActionComponent = () => {
+    if (onSaveAndExit) {
+      return (
+        <>
+          <Button
+            disabled={false}
+            id="save-exit-btn"
+            size="small"
+            type="primary"
+            onClick={onSaveAndExit}
+          >
+            <Icon name="FloppyDisk" />
+            {intl.formatMessage(messages.saveExitButton)}
+          </Button>
+
+          <Button
+            data-testid="exit-button"
+            size="small"
+            type="secondary"
+            onClick={onExit}
+          >
+            <Icon name="X" />
+            {intl.formatMessage(messages.exitButton)}
+          </Button>
+          {menuItems.length > 0 && (
+            <ToggleMenu
+              id="event-menu"
+              menuItems={menuItems}
+              toggleButton={
+                <Icon
+                  color="primary"
+                  data-testid="event-menu-toggle-button-image"
+                  name="DotsThreeVertical"
+                  size="large"
+                />
+              }
+            />
+          )}
+        </>
+      )
+    }
+
+    return (
+      <>
+        {actionComponent}
+        <Button
+          data-testid="exit-button"
+          size="small"
+          type="icon"
+          onClick={() => closeActionView()}
+        >
+          <Icon name="X" />
+        </Button>
+      </>
+    )
+  }
+
   return (
     <AppBar
       desktopLeft={appbarIcon}
-      desktopRight={
-        <>
-          {onSaveAndExit ? (
-            <>
-              <Button
-                disabled={false}
-                id="save-exit-btn"
-                size="small"
-                type="primary"
-                onClick={onSaveAndExit}
-              >
-                <Icon name="FloppyDisk" />
-                {intl.formatMessage(messages.saveExitButton)}
-              </Button>
-
-              <Button
-                data-testid="exit-button"
-                size="small"
-                type="secondary"
-                onClick={onExit}
-              >
-                <Icon name="X" />
-                {intl.formatMessage(messages.exitButton)}
-              </Button>
-              {menuItems.length > 0 && (
-                <ToggleMenu
-                  id="event-menu"
-                  menuItems={menuItems}
-                  toggleButton={
-                    <Icon
-                      color="primary"
-                      data-testid="event-menu-toggle-button-image"
-                      name="DotsThreeVertical"
-                      size="large"
-                    />
-                  }
-                />
-              )}
-            </>
-          ) : (
-            <Button
-              data-testid="exit-button"
-              size="small"
-              type="icon"
-              onClick={() => closeActionView()}
-            >
-              <Icon name="X" />
-            </Button>
-          )}
-          {modal}
-        </>
-      }
+      desktopRight={getActionComponent()}
       desktopTitle={label}
       mobileLeft={appbarIcon}
       mobileRight={
