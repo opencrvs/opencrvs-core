@@ -26,50 +26,52 @@ export NODE_OPTIONS=--dns-result-order=ipv4first
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $HEARTH_CONFIG
 
 run_pg_migrations() {
-  local migrations_path="$1"
+  MIGRATIONS_PATH="$1"
   local database_url="$2"
   local schema="$3"
   local migrations_table="${4:-pgmigrations}"
 
-  local backup_path="$migrations_path/backup"
+  BACKUP_PATH="$MIGRATIONS_PATH/backup"
 
-  mkdir -p "$backup_path"
+  mkdir -p "$BACKUP_PATH"
 
-  local files_to_migrate=$(ls -p "$migrations_path" | grep -v /)
+  FILES_TO_MIGRATE=$(ls -p "$MIGRATIONS_PATH" | grep -v /)
 
   # --- define cleanup function ---
+  # As this function is being called via 'trap', the variables
+  # used inside need to be global
   restore_backups() {
-    echo "Restoring original migration files in $migrations_path"
-    for migration_file in $files_to_migrate; do
-      if [ -f "$backup_path/$migration_file" ]; then
-        mv "$backup_path/$migration_file" "$migrations_path/$migration_file"
+    echo "Restoring original migration files in $MIGRATIONS_PATH"
+    for migration_file in $FILES_TO_MIGRATE; do
+      if [ -f "$BACKUP_PATH/$migration_file" ]; then
+        mv "$BACKUP_PATH/$migration_file" "$MIGRATIONS_PATH/$migration_file"
       fi
     done
-    rm -rf "$backup_path"
+    rm -rf "$BACKUP_PATH"
   }
 
   # Always run restore_backups when the function exits
   trap restore_backups EXIT
 
   # --- Backup originals ---
-  for migration_file in $files_to_migrate; do
-    echo "Creating backup for $migrations_path/$migration_file"
-    cp "$migrations_path/$migration_file" "$backup_path/$migration_file"
+  for migration_file in $FILES_TO_MIGRATE; do
+    echo "Creating backup for $MIGRATIONS_PATH/$migration_file"
+    cp "$MIGRATIONS_PATH/$migration_file" "$BACKUP_PATH/$migration_file"
   done
 
   # --- envsubst ---
-  for migration_file in $files_to_migrate; do
-    echo "Updating environment variables in $migrations_path/$migration_file"
-    envsubst <"$migrations_path/$migration_file" >"$migrations_path/$migration_file.tmp"
-    mv "$migrations_path/$migration_file.tmp" "$migrations_path/$migration_file"
+  for migration_file in $FILES_TO_MIGRATE; do
+    echo "Updating environment variables in $MIGRATIONS_PATH/$migration_file"
+    envsubst <"$MIGRATIONS_PATH/$migration_file" >"$MIGRATIONS_PATH/$migration_file.tmp"
+    mv "$MIGRATIONS_PATH/$migration_file.tmp" "$MIGRATIONS_PATH/$migration_file"
   done
 
   # --- Run migrations ---
-  echo "Running migrations for schema '$schema' in $migrations_path"
+  echo "Running migrations for schema '$schema' in $MIGRATIONS_PATH"
   DATABASE_URL="$database_url" \
     yarn --cwd "$SCRIPT_PATH" node-pg-migrate up \
     --schema="$schema" \
-    --migrations-dir="$migrations_path" \
+    --migrations-dir="$MIGRATIONS_PATH" \
     --migrations-table="$migrations_table"
 
   # If migration succeeds, remove trap before exit so cleanup still happens normally
