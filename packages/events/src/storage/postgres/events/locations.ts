@@ -256,7 +256,7 @@ export async function isLocationUnderJurisdiction({
   return !!result.rows[0].isChild
 }
 
-export type LocationHierarchyRow = {
+type LocationHierarchyRow = {
   id: string
   name: string
   parent_id: string | null

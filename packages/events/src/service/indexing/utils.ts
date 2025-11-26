@@ -141,9 +141,8 @@ export function getEventIndexWithoutLocationHierarchy(
     }
 
     if (fieldConfig.type === FieldType.ADDRESS) {
-      const parsed = AddressFieldValue.safeParse(value)
-      if (parsed.success && parsed.data.addressType === AddressType.DOMESTIC) {
-        const address = parsed.data
+      const address = value as AddressFieldValue
+      if (address.addressType === AddressType.DOMESTIC) {
         address.administrativeArea = takeLast(address.administrativeArea)
         event.declaration[key] = address
         continue
@@ -178,6 +177,7 @@ export async function getEventIndexWithLocationHierarchy(
     )
     return locationHierarchyCache.get(locationId) || [locationId]
   }
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const tempEvent = { ...event, declaration: { ...event.declaration } } as any
   // Normalize top-level locations
   tempEvent.createdAtLocation = await buildFullLocationHierarchy(
@@ -216,6 +216,7 @@ export async function getEventIndexWithLocationHierarchy(
     if (fieldConfig.type === FieldType.ADDRESS) {
       const parsed = AddressFieldValue.safeParse(value)
       if (parsed.success && parsed.data.addressType === AddressType.DOMESTIC) {
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         const address: Record<string, any> = parsed.data
         address.administrativeArea = await buildFullLocationHierarchy(
           address.administrativeArea
