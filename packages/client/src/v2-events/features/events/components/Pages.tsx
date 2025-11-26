@@ -44,13 +44,8 @@ interface PagesProps {
 }
 
 type DeclarationProps =
-  | {
-      actionType: AvailableActionTypes
-      declaration?: undefined
-    }
-  | {
-      declaration: EventState
-    }
+  | { actionType: AvailableActionTypes; declaration?: undefined }
+  | { declaration: EventState }
 /**
  *
  * Reusable component for rendering a form with pagination. Used by different action forms
