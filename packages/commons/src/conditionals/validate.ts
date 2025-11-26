@@ -189,7 +189,7 @@ export function isConditionMet(
     $online: isOnline(),
     $user: context.user,
     $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? [],
-    $flag: eventIndex?.flags ?? []
+    $flags: eventIndex?.flags ?? []
   })
 }
 

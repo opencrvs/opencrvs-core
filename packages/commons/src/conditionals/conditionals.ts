@@ -69,7 +69,7 @@ export type FormConditionalParameters = CommonConditionalParameters & {
 }
 
 export type FlagConditionalParameters = CommonConditionalParameters & {
-  $flag: string | string[]
+  $flags: string[]
 }
 
 export type ConditionalParameters =
@@ -333,16 +333,20 @@ function defineComparison(
   })
 }
 
-export function createFlagConditionals(flag: string) {
+/** Check if an event flag is present */
+export function flag(flagvalue: string) {
   return defineConditional({
     type: 'object',
     properties: {
-      $flag: {
-        type: 'string',
-        const: flag
+      $flags: {
+        type: 'array',
+        contains: {
+          type: 'string',
+          const: flagvalue
+        }
       }
     },
-    required: ['$flag']
+    required: ['$flags']
   })
 }
 

@@ -19,7 +19,8 @@ import {
   UserConditionalParameters,
   EventConditionalParameters,
   FormConditionalParameters,
-  FlagConditionalParameters
+  FlagConditionalParameters,
+  flag
 } from './conditionals'
 import { formatISO } from 'date-fns'
 import { SCOPES } from '../scopes'
@@ -30,7 +31,6 @@ import { event } from '../events/event'
 import { TokenUserType } from '../authentication'
 import { UUID } from '../uuid'
 import { InherentFlags } from '../client'
-import { flag } from '../events/flag-conditional'
 
 /*  eslint-disable max-lines */
 
@@ -1023,12 +1023,12 @@ describe('"user" conditionals', () => {
 
 describe('"flag" conditionals', () => {
   const flagParams = {
-    $flag: InherentFlags.CORRECTION_REQUESTED,
+    $flags: [InherentFlags.CORRECTION_REQUESTED],
     $now: formatISO(new Date(), { representation: 'date' }),
     $online: true
   } satisfies FlagConditionalParameters
 
-  it('validates "flag " conditional', () => {
+  it('validates "flag()" conditional', () => {
     expect(validate(flag(InherentFlags.INCOMPLETE), flagParams)).toBe(false)
     expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), flagParams)).toBe(
       true
