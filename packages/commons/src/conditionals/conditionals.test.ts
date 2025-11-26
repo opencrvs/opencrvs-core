@@ -19,8 +19,9 @@ import {
   UserConditionalParameters,
   EventConditionalParameters,
   FormConditionalParameters,
-  FlagConditionalParameters,
-  flag
+  EventStateConditionalParameters,
+  flag,
+  status
 } from './conditionals'
 import { formatISO } from 'date-fns'
 import { SCOPES } from '../scopes'
@@ -30,7 +31,7 @@ import { field } from '../events/field'
 import { event } from '../events/event'
 import { TokenUserType } from '../authentication'
 import { UUID } from '../uuid'
-import { InherentFlags } from '../client'
+import { EventStatus, InherentFlags } from '../client'
 
 /*  eslint-disable max-lines */
 
@@ -1022,17 +1023,69 @@ describe('"user" conditionals', () => {
 })
 
 describe('"flag" conditionals', () => {
-  const flagParams = {
-    $flags: [InherentFlags.CORRECTION_REQUESTED],
-    $now: formatISO(new Date(), { representation: 'date' }),
-    $online: true
-  } satisfies FlagConditionalParameters
-
   it('validates "flag()" conditional', () => {
-    expect(validate(flag(InherentFlags.INCOMPLETE), flagParams)).toBe(false)
-    expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), flagParams)).toBe(
+    const params = {
+      $flags: [InherentFlags.CORRECTION_REQUESTED],
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    } satisfies EventStateConditionalParameters
+
+    expect(validate(flag(InherentFlags.INCOMPLETE), params)).toBe(false)
+    expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
       true
     )
+  })
+
+  it('validation fails if flags array is empty', () => {
+    const params = {
+      $flags: [],
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    } satisfies EventStateConditionalParameters
+
+    expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
+      false
+    )
+  })
+
+  it('validation fails if params dont include flags', () => {
+    const params = {
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    }
+
+    // @ts-expect-error testing missing flags param
+    expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
+      false
+    )
+  })
+})
+
+describe('"status" conditionals', () => {
+  it('validates "status()" conditional', () => {
+    const params = {
+      $flags: [],
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    } satisfies EventStateConditionalParameters
+
+    expect(validate(status('VALIDATED'), params)).toBe(false)
+    expect(validate(status('REGISTERED'), params)).toBe(true)
+  })
+
+  it('validation fails if params dont include status', () => {
+    const params = {
+      $flags: [],
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    }
+
+    // @ts-expect-error testing missing status param
+    expect(validate(status('REGISTERED'), params)).toBe(false)
   })
 })
 
