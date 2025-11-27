@@ -106,6 +106,11 @@ function getAvailableAssignmentActions(
 }
 
 export const actionLabels = {
+  [ActionType.NOTIFY]: {
+    defaultMessage: 'Notify',
+    description: 'Notify action label',
+    id: 'actions.notify'
+  },
   [ActionType.ASSIGN]: {
     defaultMessage: 'Assign',
     description: `Label for the ${ActionType.ASSIGN} action in the action menu`,
