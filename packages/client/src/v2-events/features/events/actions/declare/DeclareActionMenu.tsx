@@ -12,16 +12,23 @@ import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { v4 as uuid } from 'uuid'
+import { useSelector } from 'react-redux'
 import {
-  EventIndex,
   ActionType,
   getDeclaration,
-  EventStatus
+  EventStatus,
+  EventDocument,
+  getCurrentEventState,
+  TokenUserType,
+  UUID,
+  isActionAvailable,
+  getActionConfig
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { Icon } from '@opencrvs/components'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -40,10 +47,10 @@ import { useRejectionModal } from '../reject/useRejectionModal'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
-function useDeclarationActions(event: EventIndex) {
+function useDeclarationActions(event: EventDocument) {
+  const eventType = event.type
   const drafts = useDrafts()
   const { closeActionView, deleteDeclaration } = useEventFormNavigation()
-  const eventType = event.type
   const { eventConfiguration } = useEventConfiguration(eventType)
   const formConfig = getDeclaration(eventConfiguration)
   const validatorContext = useValidatorContext()
@@ -56,8 +63,8 @@ function useDeclarationActions(event: EventIndex) {
     ROUTES.V2.EVENTS.DECLARE.REVIEW
   )
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
-
   const events = useEvents()
+  const userDetails = useSelector(getUserDetails)
 
   const mutateFns = {
     [ActionType.NOTIFY]: events.actions.notify.mutate,
@@ -129,6 +136,59 @@ function useDeclarationActions(event: EventIndex) {
     }
   }
 
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
+
+  /** Logic to check whether  */
+  function isValidateAfterDeclarePossible() {
+    if (!userDetails) {
+      return false
+    }
+
+    const eventAfterDeclare = {
+      ...event,
+      actions: event.actions.concat({
+        type: ActionType.DECLARE,
+        id: 'placeholder' as UUID,
+        transactionId: 'placeholder' as UUID,
+        createdByUserType: TokenUserType.enum.user,
+        createdByRole: userDetails.role.id,
+        declaration,
+        annotation,
+        createdAt: new Date().toISOString(),
+        createdBy: userDetails.id,
+        originalActionId: null,
+        status: 'Accepted',
+        createdBySignature: undefined,
+        createdAtLocation: userDetails.primaryOffice.id as UUID
+      })
+    }
+
+    const eventIndexAfterDeclare = getCurrentEventState(
+      eventAfterDeclare,
+      eventConfiguration
+    )
+
+    const actionConfig = getActionConfig({
+      eventConfiguration,
+      actionType: ActionType.VALIDATE
+    })
+
+    if (!actionConfig) {
+      return false
+    }
+
+    const validateIsAvailable = isActionAvailable(
+      actionConfig,
+      eventIndexAfterDeclare,
+      validatorContext
+    )
+
+    return validateIsAvailable
+  }
+
+  console.log('IS IT POSSIBLE')
+  isValidateAfterDeclarePossible()
+
   return {
     modals: [modal, rejectionModal, saveAndExitModal],
     actions: [
@@ -145,8 +205,9 @@ function useDeclarationActions(event: EventIndex) {
         label: actionLabels[ActionType.VALIDATE],
         onClick: async () => handleDeclaration(ActionType.VALIDATE),
         hidden: !isActionAllowed(ActionType.VALIDATE),
-        // @TODO: disabled if flags block?
-        disabled: reviewActionConfiguration.incomplete
+        disabled:
+          reviewActionConfiguration.incomplete ||
+          !isValidateAfterDeclarePossible()
       },
       {
         icon: 'UploadSimple' as const,
@@ -168,7 +229,7 @@ function useDeclarationActions(event: EventIndex) {
         onClick: () => {
           // @TODO CIHAN:
         },
-        hidden: event.status !== EventStatus.enum.NOTIFIED
+        hidden: eventIndex.status !== EventStatus.enum.NOTIFIED
       },
       {
         icon: 'FloppyDisk' as const,
@@ -190,7 +251,7 @@ function useDeclarationActions(event: EventIndex) {
   }
 }
 
-export function DeclareActionMenu({ event }: { event: EventIndex }) {
+export function DeclareActionMenu({ event }: { event: EventDocument }) {
   const intl = useIntl()
   const { modals, actions } = useDeclarationActions(event)
 

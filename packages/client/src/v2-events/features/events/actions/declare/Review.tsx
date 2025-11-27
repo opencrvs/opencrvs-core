@@ -15,11 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import {
-  ActionType,
-  getCurrentEventState,
-  getDeclaration
-} from '@opencrvs/commons/client'
+import { ActionType, getDeclaration } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
@@ -53,8 +49,6 @@ export function Review() {
   const event = events.getEvent.getFromCache(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
-
-  const currentEventState = getCurrentEventState(event, config)
 
   const formConfig = getDeclaration(config)
 
@@ -105,7 +99,7 @@ export function Review() {
 
   return (
     <FormLayout
-      actionComponent={<DeclareActionMenu event={currentEventState} />}
+      actionComponent={<DeclareActionMenu event={event} />}
       route={ROUTES.V2.EVENTS.DECLARE}
     >
       <ReviewComponent.Body
