@@ -38,7 +38,7 @@ import type {
   GQLQuery
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { orderBy } from 'lodash'
-import { parse } from 'query-string'
+import { parse } from 'qs'
 import React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import ReactTooltip from 'react-tooltip'

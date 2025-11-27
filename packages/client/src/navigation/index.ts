@@ -34,7 +34,7 @@ import { EventType } from '@client/utils/gateway'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 
-import { stringify } from 'query-string'
+import { stringify } from 'qs'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 

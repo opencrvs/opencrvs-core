@@ -42,7 +42,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { parse } from 'query-string'
+import { parse } from 'qs'
 import {
   injectIntl,
   useIntl,

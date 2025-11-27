@@ -25,7 +25,7 @@ import {
   IS_LEAF_LEVEL_LOCATION
 } from '@client/views/SysAdmin/Performance/queries'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { stringify, parse } from 'query-string'
+import { stringify, parse } from 'qs'
 import { GraphQLError } from 'graphql'
 import { vi } from 'vitest'
 import { formatUrl } from '@client/navigation'

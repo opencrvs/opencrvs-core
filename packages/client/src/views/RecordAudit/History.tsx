@@ -44,7 +44,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { useNavigate } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
-import { stringify } from 'query-string'
+import { stringify } from 'qs'
 import { SystemRole } from '@opencrvs/commons/client'
 
 const TableDiv = styled.div`

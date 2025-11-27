@@ -10,7 +10,7 @@
  */
 /* eslint-disable max-lines */
 import { isArray, isNil, isPlainObject, isString } from 'lodash'
-import { parse as parseQuery, stringify } from 'query-string'
+import { parse as parseQuery, stringify } from 'qs'
 import { useSelector } from 'react-redux'
 import {
   EventConfig,

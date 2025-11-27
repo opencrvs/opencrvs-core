@@ -43,7 +43,7 @@ import {
   RouteComponentProps,
   withRouter
 } from '@client/components/WithRouterProps'
-import { parse, stringify } from 'query-string'
+import { parse, stringify } from 'qs'
 import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
 
