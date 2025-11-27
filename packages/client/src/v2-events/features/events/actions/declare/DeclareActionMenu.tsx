@@ -139,6 +139,7 @@ function useDeclarationActions(event: EventDocument) {
   const eventIndex = getCurrentEventState(event, eventConfiguration)
 
   /** Logic to check whether  */
+  // @TODO: do the same for validate+reg?
   function isValidateAfterDeclarePossible() {
     if (!userDetails) {
       return false
@@ -223,9 +224,8 @@ function useDeclarationActions(event: EventDocument) {
       {
         icon: 'FileX' as const,
         label: actionLabels[ActionType.REJECT],
-        onClick: () => {
-          // @TODO CIHAN:
-        },
+        // @TODO: ensure this works
+        onClick: async () => handleRejection(() => closeActionView(slug)),
         hidden: eventIndex.status !== EventStatus.enum.NOTIFIED
       },
       {

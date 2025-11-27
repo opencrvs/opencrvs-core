@@ -26,10 +26,8 @@ import { Review as ReviewComponent } from '@client/v2-events/features/events/com
 import { FormLayout } from '@client/v2-events/layouts'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { useRejectionModal } from '../reject/useRejectionModal'
 import { DeclareActionMenu } from './DeclareActionMenu'
 
 export function Review() {
@@ -39,19 +37,12 @@ export function Review() {
   )
   const events = useEvents()
   const navigate = useNavigate()
-  const { rejectionModal, handleRejection } = useRejectionModal(eventId)
-
   const validatorContext = useValidatorContext()
   const [modal, openModal] = useModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
-  const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
-
   const event = events.getEvent.getFromCache(eventId)
-
   const { eventConfiguration: config } = useEventConfiguration(event.type)
-
   const formConfig = getDeclaration(config)
-
   const actionConfiguration = config.actions.find(
     (a) => a.type === ActionType.DECLARE
   )
@@ -60,7 +51,6 @@ export function Review() {
   }
 
   const reviewConfig = actionConfiguration.review
-
   const form = useEventFormData((state) => state.getFormValues())
 
   const { setAnnotation, getAnnotation } = useActionAnnotation()
@@ -113,8 +103,6 @@ export function Review() {
         onEdit={handleEdit}
       />
       {modal}
-      {rejectionModal}
-      {saveAndExitModal}
     </FormLayout>
   )
 }
