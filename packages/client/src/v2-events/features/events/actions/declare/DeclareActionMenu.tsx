@@ -186,9 +186,6 @@ function useDeclarationActions(event: EventDocument) {
     return validateIsAvailable
   }
 
-  console.log('IS IT POSSIBLE')
-  isValidateAfterDeclarePossible()
-
   return {
     modals: [modal, rejectionModal, saveAndExitModal],
     actions: [
