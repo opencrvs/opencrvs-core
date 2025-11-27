@@ -11,6 +11,7 @@
 import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
+import { v4 as uuid } from 'uuid'
 import {
   EventIndex,
   ActionType,
@@ -20,9 +21,8 @@ import {
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import { useModal } from '@client/v2-events/hooks/useModal'
-import { useRejectionModal } from '../reject/useRejectionModal'
 import { Icon } from '@opencrvs/components'
+import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { messages } from '@client/i18n/messages/views/action'
@@ -32,13 +32,13 @@ import { messages as formHeaderMessages } from '@client/v2-events/layouts/form/F
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { actionLabels } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { useEventConfiguration } from '../../useEventConfiguration'
-import { useEventFormData } from '../../useEventFormData'
-import { useActionAnnotation } from '../../useActionAnnotation'
-import { useReviewActionConfig } from './useReviewActionConfig'
 import { Review } from '@client/v2-events/features/events/components/Review'
-import { v4 as uuid } from 'uuid'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
+import { useActionAnnotation } from '../../useActionAnnotation'
+import { useEventFormData } from '../../useEventFormData'
+import { useRejectionModal } from '../reject/useRejectionModal'
+import { useEventConfiguration } from '../../useEventConfiguration'
+import { useReviewActionConfig } from './useReviewActionConfig'
 
 function useDeclarationActions(event: EventIndex) {
   const drafts = useDrafts()
@@ -135,7 +135,7 @@ function useDeclarationActions(event: EventIndex) {
       {
         icon: 'Check' as const,
         label: actionLabels[ActionType.REGISTER],
-        onClick: () => handleDeclaration(ActionType.REGISTER),
+        onClick: async () => handleDeclaration(ActionType.REGISTER),
         hidden: !isActionAllowed(ActionType.REGISTER),
         // @TODO: disabled if flags block?
         disabled: reviewActionConfiguration.incomplete
@@ -143,7 +143,7 @@ function useDeclarationActions(event: EventIndex) {
       {
         icon: 'PaperPlaneTilt' as const,
         label: actionLabels[ActionType.VALIDATE],
-        onClick: () => handleDeclaration(ActionType.VALIDATE),
+        onClick: async () => handleDeclaration(ActionType.VALIDATE),
         hidden: !isActionAllowed(ActionType.VALIDATE),
         // @TODO: disabled if flags block?
         disabled: reviewActionConfiguration.incomplete
@@ -151,14 +151,14 @@ function useDeclarationActions(event: EventIndex) {
       {
         icon: 'UploadSimple' as const,
         label: actionLabels[ActionType.DECLARE],
-        onClick: () => handleDeclaration(ActionType.DECLARE),
+        onClick: async () => handleDeclaration(ActionType.DECLARE),
         hidden: !isActionAllowed(ActionType.DECLARE),
         disabled: reviewActionConfiguration.incomplete
       },
       {
         icon: 'UploadSimple' as const,
         label: actionLabels[ActionType.NOTIFY],
-        onClick: () => handleDeclaration(ActionType.NOTIFY),
+        onClick: async () => handleDeclaration(ActionType.NOTIFY),
         hidden: !isActionAllowed(ActionType.NOTIFY),
         disabled: false
       },
@@ -173,7 +173,7 @@ function useDeclarationActions(event: EventIndex) {
       {
         icon: 'FloppyDisk' as const,
         label: formHeaderMessages.saveExitButton,
-        onClick: () =>
+        onClick: async () =>
           handleSaveAndExit(() => {
             drafts.submitLocalDraft()
             closeActionView(slug)
@@ -210,8 +210,8 @@ export function DeclareActionMenu({ event }: { event: EventIndex }) {
           {actions.map(({ onClick, icon, label, disabled }, index) => (
             <DropdownMenu.Item
               key={index}
-              onClick={onClick}
               disabled={disabled}
+              onClick={onClick}
             >
               <Icon color="currentColor" name={icon} size="small" />
               {intl.formatMessage(label)}
