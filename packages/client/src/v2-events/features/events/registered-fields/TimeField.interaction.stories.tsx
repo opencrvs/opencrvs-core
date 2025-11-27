@@ -199,7 +199,7 @@ export const TimeInput12HourDisplay: StoryObj<typeof FormFieldGenerator> = {
     })
 
     await step('Verify output is in 24-hour format', async () => {
-      const outputDisplay = await canvas.findByTestId('time-output-12h')
+      const outputDisplay = await canvas.findByTestId('time-output-24h')
       await expect(outputDisplay).toBeInTheDocument()
       await expect(outputDisplay).toHaveTextContent('2:30')
     })
@@ -231,7 +231,7 @@ export const TimeInput12HourDisplay: StoryObj<typeof FormFieldGenerator> = {
             setFormData(data)
           }}
         />
-        <OutputDisplay data-testid="time-output-12h">
+        <OutputDisplay data-testid="time-output-24h">
           {'Output (always 24-hour): '}
           {formData['storybook.time'] || 'No value'}
         </OutputDisplay>

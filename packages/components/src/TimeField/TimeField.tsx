@@ -49,7 +49,7 @@ export type ITimeFieldProps = IProps &
 function get24HourNormalisedFormat(time: TimeAs12Hours): string {
   let hours = parseInt(time.hh, 10)
 
-  const ampmTime = time as TimeAs12Hours
+  const ampmTime = time
   if (ampmTime.amPm === 'PM' && hours !== 12) {
     hours += 12
   } else if (ampmTime.amPm === 'AM' && hours === 12) {
