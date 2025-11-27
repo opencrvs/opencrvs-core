@@ -24,6 +24,13 @@ export type SystemVariables = {
     province: string
     district: string
   }
+  $window: {
+    location: {
+      href: string
+      pathname: string
+      hostname: string
+    }
+  }
 }
 
 /**
