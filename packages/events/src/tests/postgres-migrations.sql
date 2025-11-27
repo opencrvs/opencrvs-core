@@ -2,8 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict 0xhO22jk9bW8TOx2Vvu73Q7xfgHu6lzomC8V4CKI61PEGomVuFjrzLTWboRlaH5
-
 -- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
 -- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
 
@@ -36,7 +34,7 @@ CREATE EXTENSION IF NOT EXISTS mongo_fdw WITH SCHEMA app;
 
 
 --
--- Name: EXTENSION mongo_fdw; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION mongo_fdw; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION mongo_fdw IS 'foreign data wrapper for MongoDB access';
@@ -115,6 +113,23 @@ CREATE USER MAPPING FOR events_migrator SERVER mongo;
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: administrative_areas; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.administrative_areas (
+    id uuid NOT NULL,
+    name text NOT NULL,
+    parent_id uuid,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    deleted_at timestamp with time zone,
+    valid_until timestamp with time zone
+);
+
+
+ALTER TABLE app.administrative_areas OWNER TO events_migrator;
 
 --
 -- Name: event_action_drafts; Type: TABLE; Schema: app; Owner: events_migrator
@@ -271,7 +286,8 @@ CREATE TABLE app.locations (
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     deleted_at timestamp with time zone,
     location_type app.location_type,
-    valid_until timestamp with time zone
+    valid_until timestamp with time zone,
+    administrative_area_id uuid
 );
 
 
@@ -378,6 +394,14 @@ COMMENT ON COLUMN app.users.legacy_id IS 'References the user id from the legacy
 --
 
 ALTER TABLE ONLY app.pgmigrations ALTER COLUMN id SET DEFAULT nextval('app.pgmigrations_id_seq'::regclass);
+
+
+--
+-- Name: administrative_areas administrative_areas_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.administrative_areas
+    ADD CONSTRAINT administrative_areas_pkey PRIMARY KEY (id);
 
 
 --
@@ -544,6 +568,14 @@ CREATE INDEX idx_locations_valid_until ON app.locations USING btree (valid_until
 
 
 --
+-- Name: administrative_areas administrative_areas_parent_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.administrative_areas
+    ADD CONSTRAINT administrative_areas_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES app.administrative_areas(id);
+
+
+--
 -- Name: event_action_drafts event_action_drafts_created_at_location_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -584,6 +616,14 @@ ALTER TABLE ONLY app.event_actions
 
 
 --
+-- Name: locations locations_administrative_area_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.locations
+    ADD CONSTRAINT locations_administrative_area_id_fkey FOREIGN KEY (administrative_area_id) REFERENCES app.administrative_areas(id);
+
+
+--
 -- Name: locations locations_parent_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -619,6 +659,13 @@ GRANT USAGE ON SCHEMA app TO events_app;
 --
 
 GRANT ALL ON FOREIGN SERVER mongo TO events_migrator;
+
+
+--
+-- Name: TABLE administrative_areas; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.administrative_areas TO events_app;
 
 
 --
@@ -666,6 +713,4 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.users TO events_app;
 --
 -- PostgreSQL database dump complete
 --
-
-\unrestrict 0xhO22jk9bW8TOx2Vvu73Q7xfgHu6lzomC8V4CKI61PEGomVuFjrzLTWboRlaH5
 

@@ -17,9 +17,10 @@ import {
   EventConfig,
   Location,
   LocationType,
-  generateUuid
+  generateUuid,
+  pickRandom
 } from '@opencrvs/commons'
-import { addLocations } from '@events/storage/postgres/events/locations'
+import { setLocations } from '../service/locations/locations'
 
 interface Name {
   use: string
@@ -67,7 +68,7 @@ export function payloadGenerator(
           name: `Location name ${i}`,
           parentId: null,
           validUntil: null,
-          locationType: LocationType.enum.ADMIN_STRUCTURE
+          locationType: pickRandom(prng, LocationType.options)
         })) as Location[]
       }
 
@@ -99,7 +100,7 @@ export function seeder() {
     }
   }
   const seedLocations = async (locations: Location[]) =>
-    addLocations(
+    setLocations(
       locations.map((location) => ({
         ...location,
         validUntil: location.validUntil ? location.validUntil : null

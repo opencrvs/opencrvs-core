@@ -8,6 +8,8 @@
   "scripts": {
     "start": "yarn build && ./run-migrations.sh",
     "revert": "./revert-migrations.sh",
+    "rollback:events": "DATABASE_URL=postgres://events_migrator:migrator_password@localhost:5432/events node-pg-migrate down --schema=app --migrations-dir=./src/migrations/events",
+    "migrate:events": "DATABASE_URL=postgres://events_migrator:migrator_password@localhost:5432/events node-pg-migrate up --schema=app --migrations-dir=./src/migrations/events",
     "start:prod": "NODE_ENV=production ./run-migrations.sh",
     "create:hearth": "./create-mongo-migrations.sh hearth",
     "create:events": "DATABASE_URL=postgres://events_migrator:migrator_password@localhost:5432/events yarn node-pg-migrate create --migrations-dir=./src/migrations/events --migration-file-language=sql",

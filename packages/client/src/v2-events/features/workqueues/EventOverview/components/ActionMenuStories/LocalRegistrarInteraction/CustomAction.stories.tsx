@@ -16,17 +16,17 @@ import {
   baseMeta,
   getHiddenActions,
   createStoriesFromScenarios,
+  AssertType,
   Scenario,
-  UserRoles,
-  AssertType
+  UserRoles
 } from '../ActionMenu.common'
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/LocalRegistrar/Archived'
+  title: 'ActionMenu/LocalRegistrar/CustomAction'
 } as Meta<typeof ActionMenu>
 
-const archivedScenariosForLocalRegistrar: Scenario[] = [
+const customActionScenariosForLocalRegistrar: Scenario[] = [
   {
     name: 'Unassigned',
     recordDownloaded: false,
@@ -34,15 +34,38 @@ const archivedScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.ARCHIVE,
+      ActionType.VALIDATE,
+      ActionType.CUSTOM,
       ActionType.UNASSIGN
     ],
     expected: {
       ...getHiddenActions(),
-      // @TODO - decide whether to keep/remove them after conditionals are implemented
       ['Assign']: AssertType.ENABLED,
-      ['Unassign']: AssertType.ENABLED,
+      ['Register']: AssertType.DISABLED,
+      ['Archive']: AssertType.DISABLED,
+      ['Reject']: AssertType.DISABLED,
       ['Confirm']: AssertType.DISABLED
+    }
+  },
+  {
+    name: 'AssignedToSelf',
+    recordDownloaded: true,
+    actions: [
+      ActionType.CREATE,
+      AssignmentStatus.ASSIGNED_TO_SELF,
+      ActionType.DECLARE,
+      ActionType.VALIDATE,
+      ActionType.CUSTOM,
+      ActionType.UNASSIGN,
+      AssignmentStatus.ASSIGNED_TO_SELF
+    ],
+    expected: {
+      ...getHiddenActions(),
+      ['Unassign']: AssertType.ENABLED,
+      ['Register']: AssertType.ENABLED,
+      ['Archive']: AssertType.ENABLED,
+      ['Reject']: AssertType.ENABLED,
+      ['Confirm']: AssertType.ENABLED
     }
   },
   {
@@ -52,24 +75,27 @@ const archivedScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.ARCHIVE,
+      ActionType.VALIDATE,
+      ActionType.CUSTOM,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
       ...getHiddenActions(),
-      // @TODO - decide whether to keep/remove them after conditionals are implemented
-      ['Assign']: AssertType.ENABLED,
       ['Unassign']: AssertType.ENABLED,
+      ['Register']: AssertType.DISABLED,
+      ['Archive']: AssertType.DISABLED,
+      ['Reject']: AssertType.DISABLED,
       ['Confirm']: AssertType.DISABLED
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
-  archivedScenariosForLocalRegistrar,
+  customActionScenariosForLocalRegistrar,
   UserRoles.LOCAL_REGISTRAR
 )
 
 export const Unassigned = stories['Unassigned']
+export const AssignedToSelf = stories['AssignedToSelf']
 export const AssignedToOthers = stories['AssignedToOthers']
