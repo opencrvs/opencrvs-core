@@ -25,7 +25,9 @@ import {
   TestUserRole,
   user,
   not,
-  EventDocument
+  EventDocument,
+  FieldConditional,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -55,16 +57,6 @@ const meta: Meta<typeof FormFieldGenerator> = {
     )
   ],
   parameters: {
-    reactRouter: {
-      router: {
-        path: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-          eventId: tennisClubMembershipEventDocument.id
-        })
-      },
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
-      })
-    },
     msw: {
       handlers: {
         event: [
@@ -82,45 +74,61 @@ export default meta
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
+function createAlphaPrintButtonStoryParameters(
+  conditional: FieldConditional,
+  validatorContext: ValidatorContext
+) {
+  return {
+    reactRouter: {
+      router: {
+        path: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+          eventId: tennisClubMembershipEventDocument.id
+        }),
+        element: (
+          <StyledFormFieldGenerator
+            fields={[
+              {
+                id: 'storybook.name',
+                type: FieldType.ALPHA_PRINT_BUTTON,
+                label: {
+                  id: 'storybook.name.label',
+                  defaultMessage: 'Name',
+                  description: 'The title for the name input'
+                },
+                configuration: {
+                  template: 'simple-certificate'
+                },
+                conditionals: [conditional]
+              }
+            ]}
+            id="my-form"
+            validatorContext={validatorContext}
+            onChange={() => noop()}
+          />
+        )
+      },
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
+    }
+  }
+}
 
 export const WithEnableCondition: StoryObj<{}> = {
-  render: () => (
-    <StyledFormFieldGenerator
-      fields={[
-        {
-          id: 'storybook.name',
-          type: FieldType.ALPHA_PRINT_BUTTON,
-          label: {
-            id: 'storybook.name.label',
-            defaultMessage: 'Name',
-            description: 'The title for the name input'
-          },
-          configuration: {
-            template: 'simple-certificate'
-          },
-          conditionals: [
-            {
-              type: ConditionalType.ENABLE,
-              conditional: and(
-                user.hasRole(TestUserRole.Enum.LOCAL_REGISTRAR),
-                not(event.hasAction(ActionType.DECLARE))
-              )
-            }
-          ]
-        }
-      ]}
-      id="my-form"
-      validatorContext={getTestValidatorContext(
-        TestUserRole.Enum.LOCAL_REGISTRAR,
-        {
-          ...tennisClubMembershipEventDocument,
-          actions: tennisClubMembershipEventDocument.actions.filter(
-            (action) => action.type === ActionType.CREATE
-          )
-        }
-      )}
-      onChange={() => noop()}
-    />
+  parameters: createAlphaPrintButtonStoryParameters(
+    {
+      type: ConditionalType.ENABLE,
+      conditional: and(
+        user.hasRole(TestUserRole.Enum.LOCAL_REGISTRAR),
+        not(event.hasAction(ActionType.DECLARE))
+      )
+    },
+    getTestValidatorContext(TestUserRole.Enum.LOCAL_REGISTRAR, {
+      ...tennisClubMembershipEventDocument,
+      actions: tennisClubMembershipEventDocument.actions.filter(
+        (action) => action.type === ActionType.CREATE
+      )
+    })
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -131,38 +139,18 @@ export const WithEnableCondition: StoryObj<{}> = {
 }
 
 export const WithDisableCondition: StoryObj<{}> = {
-  render: () => (
-    <StyledFormFieldGenerator
-      fields={[
-        {
-          id: 'storybook.name',
-          type: FieldType.ALPHA_PRINT_BUTTON,
-          label: {
-            id: 'storybook.name.label',
-            defaultMessage: 'Name',
-            description: 'The title for the name input'
-          },
-          configuration: {
-            template: 'simple-certificate'
-          },
-          conditionals: [
-            {
-              type: ConditionalType.ENABLE,
-              conditional: and(
-                user.hasRole(TestUserRole.Enum.LOCAL_REGISTRAR),
-                not(event.hasAction(ActionType.DECLARE))
-              )
-            }
-          ]
-        }
-      ]}
-      id="my-form"
-      validatorContext={getTestValidatorContext(
-        TestUserRole.Enum.LOCAL_REGISTRAR,
-        tennisClubMembershipEventDocument
-      )}
-      onChange={() => noop()}
-    />
+  parameters: createAlphaPrintButtonStoryParameters(
+    {
+      type: ConditionalType.ENABLE,
+      conditional: and(
+        user.hasRole(TestUserRole.Enum.LOCAL_REGISTRAR),
+        not(event.hasAction(ActionType.DECLARE))
+      )
+    },
+    getTestValidatorContext(
+      TestUserRole.Enum.LOCAL_REGISTRAR,
+      tennisClubMembershipEventDocument
+    )
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
