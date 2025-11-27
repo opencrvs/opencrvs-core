@@ -3468,14 +3468,9 @@ components:
         - $ref: "#/components/schemas/ReadActionConfig"
         - $ref: "#/components/schemas/DeclareActionConfig"
         - $ref: "#/components/schemas/ValidateActionConfig"
-        - $ref: "#/components/schemas/RejectDeclarationActionConfig"
-        - $ref: "#/components/schemas/ArchiveActionConfig"
         - $ref: "#/components/schemas/RegisterActionConfig"
-        - $ref: "#/components/schemas/DeleteActionConfig"
         - $ref: "#/components/schemas/PrintCertificateActionConfig"
         - $ref: "#/components/schemas/RequestCorrectionActionConfig"
-        - $ref: "#/components/schemas/RejectCorrectionActionConfig"
-        - $ref: "#/components/schemas/ApproveCorrectionActionConfig"
         - $ref: "#/components/schemas/CustomActionConfig"
       type: object
       discriminator:
@@ -3484,14 +3479,9 @@ components:
           READ: "#/components/schemas/ReadActionConfig"
           DECLARE: "#/components/schemas/DeclareActionConfig"
           VALIDATE: "#/components/schemas/ValidateActionConfig"
-          REJECT: "#/components/schemas/RejectDeclarationActionConfig"
-          ARCHIVE: "#/components/schemas/ArchiveActionConfig"
           REGISTER: "#/components/schemas/RegisterActionConfig"
-          DELETE: "#/components/schemas/DeleteActionConfig"
           PRINT_CERTIFICATE: "#/components/schemas/PrintCertificateActionConfig"
           REQUEST_CORRECTION: "#/components/schemas/RequestCorrectionActionConfig"
-          REJECT_CORRECTION: "#/components/schemas/RejectCorrectionActionConfig"
-          APPROVE_CORRECTION: "#/components/schemas/ApproveCorrectionActionConfig"
           CUSTOM: "#/components/schemas/CustomActionConfig"
     ReadActionConfig:
       type: object
@@ -3530,6 +3520,9 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
+        conditionals:
+          description: Read-action can not be disabled or hidden with conditionals.
+          not: {}
         type:
           type: string
           const: READ
@@ -10714,6 +10707,38 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            oneOf:
+              - description: If 'SHOW' conditional is defined, the component is shown to the
+                  user only if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: SHOW
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+              - description: If 'ENABLE' conditional is defined, the component is enabled only
+                  if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: ENABLE
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+            type: object
         deduplication:
           type: object
           properties:
@@ -10911,6 +10936,38 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            oneOf:
+              - description: If 'SHOW' conditional is defined, the component is shown to the
+                  user only if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: SHOW
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+              - description: If 'ENABLE' conditional is defined, the component is enabled only
+                  if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: ENABLE
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+            type: object
         deduplication:
           type: object
           properties:
@@ -10928,96 +10985,6 @@ components:
         type:
           type: string
           const: VALIDATE
-      required:
-        - label
-        - flags
-        - type
-      additionalProperties: false
-    RejectDeclarationActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
-        flags:
-          description: Flag actions which are executed when the action is performed.
-          default: []
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                description: Custom flag identifier defined by the country config.
-                type: string
-              operation:
-                description: Operation to perform on the flag.
-                type: string
-                enum:
-                  - add
-                  - remove
-              conditional:
-                description: When conditional is met, the operation is performed on the flag. If
-                  not provided, the operation is performed unconditionally.
-                $ref: "#/components/schemas/Conditional"
-            required:
-              - id
-              - operation
-            additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
-        type:
-          type: string
-          const: REJECT
-      required:
-        - label
-        - flags
-        - type
-      additionalProperties: false
-    ArchiveActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
-        flags:
-          description: Flag actions which are executed when the action is performed.
-          default: []
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                description: Custom flag identifier defined by the country config.
-                type: string
-              operation:
-                description: Operation to perform on the flag.
-                type: string
-                enum:
-                  - add
-                  - remove
-              conditional:
-                description: When conditional is met, the operation is performed on the flag. If
-                  not provided, the operation is performed unconditionally.
-                $ref: "#/components/schemas/Conditional"
-            required:
-              - id
-              - operation
-            additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
-        type:
-          type: string
-          const: ARCHIVE
       required:
         - label
         - flags
@@ -11060,6 +11027,38 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            oneOf:
+              - description: If 'SHOW' conditional is defined, the component is shown to the
+                  user only if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: SHOW
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+              - description: If 'ENABLE' conditional is defined, the component is enabled only
+                  if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: ENABLE
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+            type: object
         deduplication:
           type: object
           properties:
@@ -11077,51 +11076,6 @@ components:
         type:
           type: string
           const: REGISTER
-      required:
-        - label
-        - flags
-        - type
-      additionalProperties: false
-    DeleteActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
-        flags:
-          description: Flag actions which are executed when the action is performed.
-          default: []
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                description: Custom flag identifier defined by the country config.
-                type: string
-              operation:
-                description: Operation to perform on the flag.
-                type: string
-                enum:
-                  - add
-                  - remove
-              conditional:
-                description: When conditional is met, the operation is performed on the flag. If
-                  not provided, the operation is performed unconditionally.
-                $ref: "#/components/schemas/Conditional"
-            required:
-              - id
-              - operation
-            additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
-        type:
-          type: string
-          const: DELETE
       required:
         - label
         - flags
@@ -11164,6 +11118,38 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            oneOf:
+              - description: If 'SHOW' conditional is defined, the component is shown to the
+                  user only if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: SHOW
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+              - description: If 'ENABLE' conditional is defined, the component is enabled only
+                  if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: ENABLE
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+            type: object
         type:
           type: string
           const: PRINT_CERTIFICATE
@@ -11319,6 +11305,38 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            oneOf:
+              - description: If 'SHOW' conditional is defined, the component is shown to the
+                  user only if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: SHOW
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+              - description: If 'ENABLE' conditional is defined, the component is enabled only
+                  if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: ENABLE
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+            type: object
         type:
           type: string
           const: REQUEST_CORRECTION
@@ -11401,96 +11419,6 @@ components:
         - type
         - correctionForm
       additionalProperties: false
-    RejectCorrectionActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
-        flags:
-          description: Flag actions which are executed when the action is performed.
-          default: []
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                description: Custom flag identifier defined by the country config.
-                type: string
-              operation:
-                description: Operation to perform on the flag.
-                type: string
-                enum:
-                  - add
-                  - remove
-              conditional:
-                description: When conditional is met, the operation is performed on the flag. If
-                  not provided, the operation is performed unconditionally.
-                $ref: "#/components/schemas/Conditional"
-            required:
-              - id
-              - operation
-            additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
-        type:
-          type: string
-          const: REJECT_CORRECTION
-      required:
-        - label
-        - flags
-        - type
-      additionalProperties: false
-    ApproveCorrectionActionConfig:
-      type: object
-      properties:
-        label:
-          description: Human readable description of the action
-          $ref: "#/components/schemas/TranslationConfig"
-        flags:
-          description: Flag actions which are executed when the action is performed.
-          default: []
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                description: Custom flag identifier defined by the country config.
-                type: string
-              operation:
-                description: Operation to perform on the flag.
-                type: string
-                enum:
-                  - add
-                  - remove
-              conditional:
-                description: When conditional is met, the operation is performed on the flag. If
-                  not provided, the operation is performed unconditionally.
-                $ref: "#/components/schemas/Conditional"
-            required:
-              - id
-              - operation
-            additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
-        supportingCopy:
-          description: Text displayed on the confirmation
-          $ref: "#/components/schemas/TranslationConfig"
-        type:
-          type: string
-          const: APPROVE_CORRECTION
-      required:
-        - label
-        - flags
-        - type
-      additionalProperties: false
     CustomActionConfig:
       type: object
       properties:
@@ -11528,6 +11456,38 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            oneOf:
+              - description: If 'SHOW' conditional is defined, the component is shown to the
+                  user only if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: SHOW
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+              - description: If 'ENABLE' conditional is defined, the component is enabled only
+                  if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: ENABLE
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+            type: object
         type:
           type: string
           const: CUSTOM
