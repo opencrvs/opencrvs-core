@@ -136,7 +136,7 @@ export function FormHeader({
           data-testid="exit-button"
           size="small"
           type="icon"
-          onClick={() =>
+          onClick={async () =>
             isUndeclaredDraft(eventIndex.status) ? onExit() : closeActionView()
           }
         >
