@@ -2,8 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.6 (Debian 17.6-2.pgdg13+1)
--- Dumped by pg_dump version 17.6 (Debian 17.6-2.pgdg13+1)
+\restrict 9RTZOz3x1UD5aymjXBZySEQbfcO0giqUhoAabzKUhQGevRCu90TPBfGJy4jDAfl
+
+-- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
+-- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -176,7 +178,8 @@ CREATE TABLE app.locations (
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     deleted_at timestamp with time zone,
     location_type app.location_type,
-    valid_until timestamp with time zone
+    valid_until timestamp with time zone,
+    external_id text
 );
 
 
@@ -286,6 +289,14 @@ ALTER TABLE ONLY app.events
 
 ALTER TABLE ONLY app.events
     ADD CONSTRAINT events_transaction_id_event_type_key UNIQUE (transaction_id, event_type);
+
+
+--
+-- Name: locations locations_external_id_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.locations
+    ADD CONSTRAINT locations_external_id_key UNIQUE (external_id);
 
 
 --
@@ -425,4 +436,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 --
 -- PostgreSQL database dump complete
 --
+
+\unrestrict 9RTZOz3x1UD5aymjXBZySEQbfcO0giqUhoAabzKUhQGevRCu90TPBfGJy4jDAfl
 

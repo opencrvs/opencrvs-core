@@ -127,6 +127,7 @@ export const getRoutes = () => {
       }
     },
     catchAllProxy.auth,
+    catchAllProxy.createLocations,
     authProxy.token,
     rateLimitedAuthProxy.authenticate,
     rateLimitedAuthProxy.authenticateSuperUser,

@@ -49,6 +49,7 @@ export async function getLocations(params?: {
   locationType?: LocationType
   locationIds?: UUID[]
   isActive?: boolean
+  externalId?: string
 }) {
   const locations = await locationsRepo.getLocations(params)
 
