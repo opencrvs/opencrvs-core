@@ -25,11 +25,7 @@ export type SystemVariables = {
     district: string
   }
   $window: {
-    location: {
-      href: string
-      pathname: string
-      hostname: string
-    }
+    location: Pick<Location, 'href' | 'pathname' | 'hostname'>
   }
 }
 
