@@ -15,7 +15,6 @@ import {
   parseLiteralScope,
   SCOPES
 } from './scopes'
-import * as qs from 'qs'
 import { decodeScope, encodeScope, v1ScopeToV2Scope } from './scopes-v2'
 
 describe('findScope()', () => {
