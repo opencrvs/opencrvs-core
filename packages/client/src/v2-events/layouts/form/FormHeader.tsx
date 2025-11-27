@@ -73,6 +73,7 @@ export function FormHeader({
     await exit(eventIndex)
   }, [eventIndex, exit])
 
+  // @TODO CIHAN: Can we delete this whole thing?
   const onDelete = useCallback(async () => {
     await deleteDeclaration(eventId)
   }, [eventId, deleteDeclaration])
@@ -125,6 +126,7 @@ export function FormHeader({
               }
             />
           )}
+          {modal}
         </>
       )
     }

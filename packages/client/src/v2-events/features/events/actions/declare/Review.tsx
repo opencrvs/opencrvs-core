@@ -17,10 +17,8 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
-  EventStatus,
   getCurrentEventState,
-  getDeclaration,
-  InherentFlags
+  getDeclaration
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -78,17 +76,6 @@ export function Review() {
   const { setAnnotation, getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
 
-  const { isActionAllowed } = useUserAllowedActions(event.type)
-
-  const reviewActionConfiguration = useReviewActionConfig({
-    eventType: event.type,
-    formConfig,
-    declaration: form,
-    annotation,
-    reviewFields: reviewConfig.fields,
-    validatorContext
-  })
-
   async function handleEdit({
     pageId,
     fieldId,
@@ -118,34 +105,6 @@ export function Review() {
     }
 
     return
-  }
-
-  async function handleDeclaration() {
-    const confirmedDeclaration = await openModal<boolean | null>((close) => {
-      if (reviewActionConfiguration.messages.modal === undefined) {
-        // eslint-disable-next-line no-console
-        console.error(
-          'Tried to render declare modal without message definitions.'
-        )
-        return null
-      }
-
-      return (
-        <ReviewComponent.ActionModal.Accept
-          action="Declare"
-          close={close}
-          copy={{
-            ...reviewActionConfiguration.messages.modal,
-            eventLabel: config.label
-          }}
-        />
-      )
-    })
-
-    if (confirmedDeclaration) {
-      reviewActionConfiguration.onConfirm(eventId)
-      closeActionView(slug)
-    }
   }
 
   return (

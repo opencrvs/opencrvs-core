@@ -38,6 +38,7 @@ import { useActionAnnotation } from '../../useActionAnnotation'
 import { useReviewActionConfig } from './useReviewActionConfig'
 import { Review } from '@client/v2-events/features/events/components/Review'
 import { v4 as uuid } from 'uuid'
+import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 
 function useDeclarationActions(event: EventIndex) {
   const drafts = useDrafts()
@@ -55,6 +56,7 @@ function useDeclarationActions(event: EventIndex) {
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.DECLARE.REVIEW
   )
+  const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
   const events = useEvents()
 
@@ -129,7 +131,7 @@ function useDeclarationActions(event: EventIndex) {
   }
 
   return {
-    modals: [modal, rejectionModal],
+    modals: [modal, rejectionModal, saveAndExitModal],
     actions: [
       {
         icon: 'PencilLine' as const,
@@ -144,6 +146,7 @@ function useDeclarationActions(event: EventIndex) {
         label: intl.formatMessage(actionLabels[ActionType.VALIDATE]),
         onClick: () => handleDeclaration(ActionType.VALIDATE),
         hidden: !isActionAllowed(ActionType.VALIDATE),
+        // @TODO: disabled if flags block?
         disabled: reviewActionConfiguration.incomplete
       },
       {
@@ -156,10 +159,7 @@ function useDeclarationActions(event: EventIndex) {
       {
         icon: 'PencilLine' as const,
         label: intl.formatMessage(actionLabels[ActionType.NOTIFY]),
-        onClick: () => {
-          // eslint-disable-next-line no-console
-          console.log('TODO CIHAN')
-        },
+        onClick: () => handleDeclaration(ActionType.NOTIFY),
         hidden: !isActionAllowed(ActionType.NOTIFY),
         disabled: false
       },
@@ -174,11 +174,11 @@ function useDeclarationActions(event: EventIndex) {
       {
         icon: 'FloppyDisk' as const,
         label: intl.formatMessage(formHeaderMessages.saveExitButton),
-        // @TODO: add redirect
-        onClick: () => {
-          drafts.submitLocalDraft()
-          closeActionView(slug)
-        },
+        onClick: () =>
+          handleSaveAndExit(() => {
+            drafts.submitLocalDraft()
+            closeActionView(slug)
+          }),
         hidden: false
       },
       {
