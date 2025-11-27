@@ -2,8 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.6 (Debian 17.6-2.pgdg13+1)
--- Dumped by pg_dump version 17.6 (Debian 17.6-2.pgdg13+1)
+\restrict 0xhO22jk9bW8TOx2Vvu73Q7xfgHu6lzomC8V4CKI61PEGomVuFjrzLTWboRlaH5
+
+-- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
+-- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -25,6 +27,20 @@ CREATE SCHEMA app;
 
 
 ALTER SCHEMA app OWNER TO events_migrator;
+
+--
+-- Name: mongo_fdw; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS mongo_fdw WITH SCHEMA app;
+
+
+--
+-- Name: EXTENSION mongo_fdw; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION mongo_fdw IS 'foreign data wrapper for MongoDB access';
+
 
 --
 -- Name: action_status; Type: TYPE; Schema: app; Owner: events_migrator
@@ -53,6 +69,19 @@ CREATE TYPE app.location_type AS ENUM (
 ALTER TYPE app.location_type OWNER TO events_migrator;
 
 --
+-- Name: status_type; Type: TYPE; Schema: app; Owner: events_migrator
+--
+
+CREATE TYPE app.status_type AS ENUM (
+    'pending',
+    'active',
+    'deactivated'
+);
+
+
+ALTER TYPE app.status_type OWNER TO events_migrator;
+
+--
 -- Name: user_type; Type: TYPE; Schema: app; Owner: events_migrator
 --
 
@@ -63,6 +92,25 @@ CREATE TYPE app.user_type AS ENUM (
 
 
 ALTER TYPE app.user_type OWNER TO events_migrator;
+
+--
+-- Name: mongo; Type: SERVER; Schema: -; Owner: postgres
+--
+
+CREATE SERVER mongo FOREIGN DATA WRAPPER mongo_fdw OPTIONS (
+    address 'mongo1',
+    port '27017'
+);
+
+
+ALTER SERVER mongo OWNER TO postgres;
+
+--
+-- Name: USER MAPPING events_migrator SERVER mongo; Type: USER MAPPING; Schema: -; Owner: postgres
+--
+
+CREATE USER MAPPING FOR events_migrator SERVER mongo;
+
 
 SET default_tablespace = '';
 
@@ -165,6 +213,53 @@ COMMENT ON TABLE app.events IS 'Stores life events associated with individuals, 
 
 
 --
+-- Name: legacy_practitioners; Type: FOREIGN TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE FOREIGN TABLE app.legacy_practitioners (
+    _id name,
+    id text,
+    extension json
+)
+SERVER mongo
+OPTIONS (
+    collection 'Practitioner',
+    database 'hearth-dev'
+);
+
+
+ALTER FOREIGN TABLE app.legacy_practitioners OWNER TO events_migrator;
+
+--
+-- Name: legacy_users; Type: FOREIGN TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE FOREIGN TABLE app.legacy_users (
+    _id name,
+    name json,
+    username text,
+    "emailForNotification" text,
+    mobile text,
+    "fullHonorificName" text,
+    "passwordHash" text,
+    salt text,
+    role text,
+    "primaryOfficeId" text,
+    "practitionerId" text,
+    status text,
+    "securityQuestionAnswers" json,
+    "avatar.data" text
+)
+SERVER mongo
+OPTIONS (
+    collection 'users',
+    database 'user-mgnt'
+);
+
+
+ALTER FOREIGN TABLE app.legacy_users OWNER TO events_migrator;
+
+--
 -- Name: locations; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -215,6 +310,67 @@ ALTER SEQUENCE app.pgmigrations_id_seq OWNER TO events_migrator;
 --
 
 ALTER SEQUENCE app.pgmigrations_id_seq OWNED BY app.pgmigrations.id;
+
+
+--
+-- Name: pgmigrations_superuser_id_seq; Type: SEQUENCE; Schema: app; Owner: postgres
+--
+
+CREATE SEQUENCE app.pgmigrations_superuser_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE app.pgmigrations_superuser_id_seq OWNER TO postgres;
+
+--
+-- Name: user_credentials; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.user_credentials (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    username text NOT NULL,
+    password_hash text NOT NULL,
+    salt text NOT NULL,
+    security_questions jsonb DEFAULT '{}'::jsonb NOT NULL
+);
+
+
+ALTER TABLE app.user_credentials OWNER TO events_migrator;
+
+--
+-- Name: users; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.users (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    legacy_id text,
+    firstname text,
+    surname text,
+    full_honorific_name text,
+    role text NOT NULL,
+    status app.status_type NOT NULL,
+    email text,
+    mobile text,
+    signature_path text,
+    profile_image_path text,
+    office_id uuid NOT NULL,
+    CONSTRAINT email_or_mobile_not_null CHECK (((email IS NOT NULL) OR (mobile IS NOT NULL)))
+);
+
+
+ALTER TABLE app.users OWNER TO events_migrator;
+
+--
+-- Name: COLUMN users.legacy_id; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.users.legacy_id IS 'References the user id from the legacy database.';
 
 
 --
@@ -305,6 +461,54 @@ ALTER TABLE ONLY app.pgmigrations
 
 
 --
+-- Name: user_credentials user_credentials_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.user_credentials
+    ADD CONSTRAINT user_credentials_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_credentials user_credentials_username_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.user_credentials
+    ADD CONSTRAINT user_credentials_username_key UNIQUE (username);
+
+
+--
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
+
+
+--
+-- Name: users users_legacy_id_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.users
+    ADD CONSTRAINT users_legacy_id_key UNIQUE (legacy_id);
+
+
+--
+-- Name: users users_mobile_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.users
+    ADD CONSTRAINT users_mobile_key UNIQUE (mobile);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: idx_action_created_by; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
@@ -388,10 +592,33 @@ ALTER TABLE ONLY app.locations
 
 
 --
+-- Name: user_credentials user_credentials_user_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.user_credentials
+    ADD CONSTRAINT user_credentials_user_id_fkey FOREIGN KEY (user_id) REFERENCES app.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: users users_office_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.users
+    ADD CONSTRAINT users_office_id_fkey FOREIGN KEY (office_id) REFERENCES app.locations(id);
+
+
+--
 -- Name: SCHEMA app; Type: ACL; Schema: -; Owner: events_migrator
 --
 
 GRANT USAGE ON SCHEMA app TO events_app;
+
+
+--
+-- Name: FOREIGN SERVER mongo; Type: ACL; Schema: -; Owner: postgres
+--
+
+GRANT ALL ON FOREIGN SERVER mongo TO events_migrator;
 
 
 --
@@ -423,6 +650,22 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 
 
 --
+-- Name: TABLE user_credentials; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.user_credentials TO events_app;
+
+
+--
+-- Name: TABLE users; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.users TO events_app;
+
+
+--
 -- PostgreSQL database dump complete
 --
+
+\unrestrict 0xhO22jk9bW8TOx2Vvu73Q7xfgHu6lzomC8V4CKI61PEGomVuFjrzLTWboRlaH5
 
