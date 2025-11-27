@@ -31,7 +31,7 @@ import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
 import { ageToDate } from '../events/utils'
-import { ActionType } from '../client'
+import { ActionConfig, ActionType, EventIndex } from '../client'
 
 const ajv = new Ajv({
   $data: true,
@@ -179,14 +179,18 @@ export function isOnline() {
 export function isConditionMet(
   conditional: JSONSchema,
   values: EventState | ActionUpdate,
-  context: ValidatorContext
+  context: ValidatorContext,
+  // @TODO: should this be non-optional
+  eventIndex?: EventIndex
 ) {
   return validate(conditional, {
     $form: values,
     $now: formatISO(new Date(), { representation: 'date' }),
     $online: isOnline(),
     $user: context.user,
-    $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? []
+    $leafAdminStructureLocationIds: context.leafAdminStructureLocationIds ?? [],
+    $flags: eventIndex?.flags ?? [],
+    $status: eventIndex?.status
   })
 }
 
@@ -206,10 +210,11 @@ function getConditionalActionsForField(
 export function areConditionsMet(
   conditions: FieldConditional[],
   values: Record<string, FieldValue>,
-  context: ValidatorContext
+  context: ValidatorContext,
+  event: EventIndex
 ) {
   return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values, context)
+    isConditionMet(condition.conditional, values, context, event)
   )
 }
 
@@ -273,6 +278,64 @@ export function isFieldDisplayedOnReview(
   return (
     isFieldVisible(field, form, context) &&
     isFieldConditionMet(field, form, ConditionalType.DISPLAY_ON_REVIEW, context)
+  )
+}
+
+function isActionConditionMet(
+  actionConfig: ActionConfig,
+  event: EventIndex,
+  context: ValidatorContext,
+  conditionalType: ConditionalType
+) {
+  if (!actionConfig.conditionals) {
+    return true
+  }
+
+  const rule = actionConfig.conditionals.find(
+    (conditional) => conditional.type === conditionalType
+  )
+
+  if (!rule) {
+    return true
+  }
+
+  return isConditionMet(rule.conditional, event.declaration, context, event)
+}
+
+export function isActionEnabled(
+  actionConfig: ActionConfig,
+  event: EventIndex,
+  context: ValidatorContext
+) {
+  return isActionConditionMet(
+    actionConfig,
+    event,
+    context,
+    ConditionalType.ENABLE
+  )
+}
+
+export function isActionVisible(
+  actionConfig: ActionConfig,
+  event: EventIndex,
+  context: ValidatorContext
+) {
+  return isActionConditionMet(
+    actionConfig,
+    event,
+    context,
+    ConditionalType.SHOW
+  )
+}
+
+export function isActionAvailable(
+  actionConfig: ActionConfig,
+  event: EventIndex,
+  context: ValidatorContext
+) {
+  return (
+    isActionVisible(actionConfig, event, context) &&
+    isActionEnabled(actionConfig, event, context)
   )
 }
 

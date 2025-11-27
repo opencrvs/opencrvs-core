@@ -17,7 +17,7 @@ import { Locations, NewLocations } from './schema/app/Locations'
 
 const INSERT_MAX_CHUNK_SIZE = 10000
 
-export async function addLocations(locations: NewLocations[]) {
+async function addLocations(locations: NewLocations[]) {
   const db = getClient()
 
   // Insert new locations in chunks to avoid exceeding max query size
@@ -40,6 +40,7 @@ export async function addLocations(locations: NewLocations[]) {
              ELSE locations.name
            END`,
           parentId: (eb) => eb.ref('excluded.parentId'),
+          administrativeAreaId: (eb) => eb.ref('excluded.administrativeAreaId'),
           locationType: (eb) => eb.ref('excluded.locationType'),
           updatedAt: () => sql`now()`,
           validUntil: () =>
@@ -47,6 +48,51 @@ export async function addLocations(locations: NewLocations[]) {
              WHEN excluded.valid_until IS NOT NULL
              THEN excluded.valid_until
              ELSE locations.valid_until
+           END`,
+          deletedAt: null
+        })
+      )
+      .execute()
+  }
+}
+
+export async function addAdministrativeAreas(administrativeAreas: Location[]) {
+  const db = getClient()
+
+  // Insert new locations in chunks to avoid exceeding max query size
+  for (const [index, batch] of chunk(
+    administrativeAreas,
+    INSERT_MAX_CHUNK_SIZE
+  ).entries()) {
+    logger.info(
+      `Processing ${Math.min((index + 1) * INSERT_MAX_CHUNK_SIZE, administrativeAreas.length)}/${administrativeAreas.length} administrative areas`
+    )
+    await db
+      .insertInto('administrativeAreas')
+      .values(
+        batch.map((loc) => ({
+          id: loc.id,
+          name: loc.name,
+          parentId: loc.parentId,
+          validUntil: loc.validUntil,
+          deletedAt: null
+        }))
+      )
+      .onConflict((oc) =>
+        oc.column('id').doUpdateSet({
+          name: () =>
+            sql`CASE
+             WHEN excluded.name IS NOT NULL
+             THEN excluded.name
+             ELSE administrative_areas.name
+           END`,
+          parentId: (eb) => eb.ref('excluded.parentId'),
+          updatedAt: () => sql`now()`,
+          validUntil: () =>
+            sql`CASE
+             WHEN excluded.valid_until IS NOT NULL
+             THEN excluded.valid_until
+             ELSE administrative_areas.valid_until
            END`,
           deletedAt: null
         })

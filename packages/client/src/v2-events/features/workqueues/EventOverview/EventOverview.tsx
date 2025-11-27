@@ -93,7 +93,7 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
       <EventSummary
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
-        flags={flags}
+        eventIndex={eventIndex}
       />
     </Content>
   )
@@ -148,7 +148,7 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
         hideSecuredFields
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
-        flags={flags}
+        eventIndex={eventIndex}
       />
     </Content>
   )
