@@ -73,7 +73,6 @@ export function FormHeader({
     await exit(eventIndex)
   }, [eventIndex, exit])
 
-  // @TODO CIHAN: Can we delete this whole thing?
   const onDelete = useCallback(async () => {
     await deleteDeclaration(eventId)
   }, [eventId, deleteDeclaration])
@@ -126,7 +125,6 @@ export function FormHeader({
               }
             />
           )}
-          {modal}
         </>
       )
     }
@@ -138,7 +136,9 @@ export function FormHeader({
           data-testid="exit-button"
           size="small"
           type="icon"
-          onClick={() => closeActionView()}
+          onClick={() =>
+            isUndeclaredDraft(eventIndex.status) ? onExit() : closeActionView()
+          }
         >
           <Icon name="X" />
         </Button>
@@ -147,54 +147,60 @@ export function FormHeader({
   }
 
   return (
-    <AppBar
-      desktopLeft={appbarIcon}
-      desktopRight={getActionComponent()}
-      desktopTitle={label}
-      mobileLeft={appbarIcon}
-      mobileRight={
-        <>
-          {onSaveAndExit ? (
-            <>
+    <>
+      <AppBar
+        desktopLeft={appbarIcon}
+        desktopRight={getActionComponent()}
+        desktopTitle={label}
+        mobileLeft={appbarIcon}
+        mobileRight={
+          <>
+            {onSaveAndExit ? (
+              <>
+                <Button
+                  disabled={false}
+                  size="small"
+                  type="icon"
+                  onClick={onSaveAndExit}
+                >
+                  <Icon name="FloppyDisk" />
+                </Button>
+                <Button size="small" type="icon" onClick={onExit}>
+                  <Icon name="X" />
+                </Button>
+                <ToggleMenu
+                  id={'event-menu'}
+                  menuItems={[
+                    {
+                      label: 'Delete declaration',
+                      icon: <Icon name="Trash" />,
+                      handler: onDelete
+                    }
+                  ]}
+                  toggleButton={
+                    <Icon
+                      color="primary"
+                      data-testid="event-menu-toggle-button-image"
+                      name="DotsThreeVertical"
+                      size="large"
+                    />
+                  }
+                />
+              </>
+            ) : (
               <Button
-                disabled={false}
                 size="small"
                 type="icon"
-                onClick={onSaveAndExit}
+                onClick={() => closeActionView()}
               >
-                <Icon name="FloppyDisk" />
-              </Button>
-              <Button size="small" type="icon" onClick={onExit}>
                 <Icon name="X" />
               </Button>
-              <ToggleMenu
-                id={'event-menu'}
-                menuItems={[
-                  {
-                    label: 'Delete declaration',
-                    icon: <Icon name="Trash" />,
-                    handler: onDelete
-                  }
-                ]}
-                toggleButton={
-                  <Icon
-                    color="primary"
-                    data-testid="event-menu-toggle-button-image"
-                    name="DotsThreeVertical"
-                    size="large"
-                  />
-                }
-              />
-            </>
-          ) : (
-            <Button size="small" type="icon" onClick={() => closeActionView()}>
-              <Icon name="X" />
-            </Button>
-          )}
-          {modal}
-        </>
-      }
-      mobileTitle={label}
-    />
+            )}
+          </>
+        }
+        mobileTitle={label}
+      />
+      {modal}
+    </>
   )
 }

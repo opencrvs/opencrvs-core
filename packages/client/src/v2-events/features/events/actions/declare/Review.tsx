@@ -23,7 +23,6 @@ import {
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
-import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
@@ -33,10 +32,8 @@ import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/fo
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useRejectionModal } from '../reject/useRejectionModal'
-import { useReviewActionConfig } from './useReviewActionConfig'
 import { DeclareActionMenu } from './DeclareActionMenu'
 
 export function Review() {
@@ -51,7 +48,6 @@ export function Review() {
   const validatorContext = useValidatorContext()
   const [modal, openModal] = useModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
-  const { closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
   const event = events.getEvent.getFromCache(eventId)
@@ -121,22 +117,7 @@ export function Review() {
         validatorContext={validatorContext}
         onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
-      >
-        {/* <ReviewComponent.Actions
-          canSendIncomplete={isActionAllowed(ActionType.NOTIFY)}
-          icon={reviewActionConfiguration.icon}
-          incomplete={reviewActionConfiguration.incomplete}
-          messages={reviewActionConfiguration.messages}
-          primaryButtonType={reviewActionConfiguration.buttonType}
-          onConfirm={handleDeclaration}
-          onReject={
-            currentEventState.status === EventStatus.enum.NOTIFIED &&
-            !currentEventState.flags.includes(InherentFlags.REJECTED)
-              ? async () => handleRejection(() => closeActionView(slug))
-              : undefined
-          }
-        /> */}
-      </ReviewComponent.Body>
+      />
       {modal}
       {rejectionModal}
       {saveAndExitModal}

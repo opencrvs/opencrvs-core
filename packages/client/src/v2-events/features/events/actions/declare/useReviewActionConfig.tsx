@@ -8,8 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { v4 as uuid } from 'uuid'
 import {
   EventState,
   DeclarationFormConfig,
@@ -17,7 +15,6 @@ import {
   ActionType,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { reviewMessages } from '@client/v2-events/features/events/actions/messages'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
@@ -37,7 +34,6 @@ export function useReviewActionConfig({
   eventType: string
   validatorContext: ValidatorContext
 }) {
-  const events = useEvents()
   const { isActionAllowed } = useUserAllowedActions(eventType)
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
@@ -54,72 +50,35 @@ export function useReviewActionConfig({
 
   if (incomplete && userMayNotify && userMayDeclare) {
     return {
-      buttonType: 'primary',
       incomplete,
-      onConfirm: (eventId: string) => {
-        events.actions.notify.mutate({
-          eventId,
-          declaration,
-          annotation,
-          transactionId: uuid()
-        })
-      },
-      messages: reviewMessages.incomplete.declare,
-      icon: 'UploadSimple'
+      messages: reviewMessages.incomplete.declare
     } as const
   }
 
   if (userMayRegister) {
     return {
-      buttonType: 'positive' as const,
       incomplete,
-      onConfirm: (eventId: string) =>
-        events.customActions.registerOnDeclare.mutate({
-          eventId,
-          declaration,
-          transactionId: uuid(),
-          annotation
-        }),
       messages: incomplete
         ? reviewMessages.incomplete.register
-        : reviewMessages.complete.register,
-      icon: 'Check'
+        : reviewMessages.complete.register
     } as const
   }
 
   if (userMayValidate) {
     return {
-      buttonType: 'positive',
       incomplete,
-      onConfirm: (eventId: string) =>
-        events.customActions.validateOnDeclare.mutate({
-          eventId,
-          declaration,
-          transactionId: uuid(),
-          annotation
-        }),
       messages: incomplete
         ? reviewMessages.incomplete.validate
-        : reviewMessages.complete.validate,
-      icon: 'PaperPlaneTilt'
+        : reviewMessages.complete.validate
     } as const
   }
 
   if (userMayDeclare) {
     return {
-      buttonType: 'positive',
       incomplete,
-      onConfirm: (eventId: string) =>
-        events.actions.declare.mutate({
-          eventId,
-          declaration,
-          annotation,
-          transactionId: uuid()
-        }),
       messages: incomplete
         ? reviewMessages.incomplete.declare
-        : reviewMessages.complete.declare,
-      icon: 'UploadSimple'
+        : reviewMessages.complete.declare
     } as const
   }
 

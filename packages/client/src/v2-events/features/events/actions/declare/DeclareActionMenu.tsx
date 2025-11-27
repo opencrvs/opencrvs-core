@@ -42,7 +42,6 @@ import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitMod
 
 function useDeclarationActions(event: EventIndex) {
   const drafts = useDrafts()
-  const intl = useIntl()
   const { closeActionView, deleteDeclaration } = useEventFormNavigation()
   const eventType = event.type
   const { eventConfiguration } = useEventConfiguration(eventType)
@@ -134,38 +133,38 @@ function useDeclarationActions(event: EventIndex) {
     modals: [modal, rejectionModal, saveAndExitModal],
     actions: [
       {
-        icon: 'PencilLine' as const,
-        label: intl.formatMessage(actionLabels[ActionType.REGISTER]),
+        icon: 'Check' as const,
+        label: actionLabels[ActionType.REGISTER],
         onClick: () => handleDeclaration(ActionType.REGISTER),
         hidden: !isActionAllowed(ActionType.REGISTER),
         // @TODO: disabled if flags block?
         disabled: reviewActionConfiguration.incomplete
       },
       {
-        icon: 'PencilLine' as const,
-        label: intl.formatMessage(actionLabels[ActionType.VALIDATE]),
+        icon: 'PaperPlaneTilt' as const,
+        label: actionLabels[ActionType.VALIDATE],
         onClick: () => handleDeclaration(ActionType.VALIDATE),
         hidden: !isActionAllowed(ActionType.VALIDATE),
         // @TODO: disabled if flags block?
         disabled: reviewActionConfiguration.incomplete
       },
       {
-        icon: 'PencilLine' as const,
-        label: intl.formatMessage(actionLabels[ActionType.DECLARE]),
+        icon: 'UploadSimple' as const,
+        label: actionLabels[ActionType.DECLARE],
         onClick: () => handleDeclaration(ActionType.DECLARE),
         hidden: !isActionAllowed(ActionType.DECLARE),
         disabled: reviewActionConfiguration.incomplete
       },
       {
-        icon: 'PencilLine' as const,
-        label: intl.formatMessage(actionLabels[ActionType.NOTIFY]),
+        icon: 'UploadSimple' as const,
+        label: actionLabels[ActionType.NOTIFY],
         onClick: () => handleDeclaration(ActionType.NOTIFY),
         hidden: !isActionAllowed(ActionType.NOTIFY),
         disabled: false
       },
       {
         icon: 'FileX' as const,
-        label: intl.formatMessage(actionLabels[ActionType.REJECT]),
+        label: actionLabels[ActionType.REJECT],
         onClick: () => {
           // @TODO CIHAN:
         },
@@ -173,7 +172,7 @@ function useDeclarationActions(event: EventIndex) {
       },
       {
         icon: 'FloppyDisk' as const,
-        label: intl.formatMessage(formHeaderMessages.saveExitButton),
+        label: formHeaderMessages.saveExitButton,
         onClick: () =>
           handleSaveAndExit(() => {
             drafts.submitLocalDraft()
@@ -183,7 +182,7 @@ function useDeclarationActions(event: EventIndex) {
       },
       {
         icon: 'Trash' as const,
-        label: intl.formatMessage(formHeaderMessages.deleteDeclaration),
+        label: formHeaderMessages.deleteDeclaration,
         onClick: () => onDelete,
         hidden: false
       }
@@ -193,8 +192,6 @@ function useDeclarationActions(event: EventIndex) {
 
 export function DeclareActionMenu({ event }: { event: EventIndex }) {
   const intl = useIntl()
-
-  const { closeActionView, modal } = useEventFormNavigation()
   const { modals, actions } = useDeclarationActions(event)
 
   return (
@@ -217,7 +214,7 @@ export function DeclareActionMenu({ event }: { event: EventIndex }) {
               disabled={disabled}
             >
               <Icon color="currentColor" name={icon} size="small" />
-              {label}
+              {intl.formatMessage(label)}
             </DropdownMenu.Item>
           ))}
         </DropdownMenu.Content>
