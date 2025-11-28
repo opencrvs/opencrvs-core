@@ -83,9 +83,9 @@ export EVENTS_DB_USER="${EVENTS_DB_USER:-events_app}"
 export EVENTS_MIGRATION_USER="${EVENTS_MIGRATION_USER:-events_migrator}"
 
 if [ -n "$MONGO_REPLICA_SET" ]; then
-  export MONGO_SERVER_OPTIONS="OPTIONS( address '${MONGO_HOST:-mongo1}', port '${MONGO_PORT:-27017}', replica_set '$MONGO_REPLICA_SET')"
+  export MONGO_SERVER_OPTIONS="OPTIONS( address '${MONGO_HOST:-mongo1}', port '${MONGO_PORT:-27017}', replica_set '$MONGO_REPLICA_SET', authentication_database 'admin')"
 else
-  export MONGO_SERVER_OPTIONS="OPTIONS( address '${MONGO_HOST:-mongo1}', port '${MONGO_PORT:-27017}')"
+  export MONGO_SERVER_OPTIONS="OPTIONS( address '${MONGO_HOST:-mongo1}', port '${MONGO_PORT:-27017}', authentication_database 'admin')"
 fi
 
 if [ -n "$MONGO_USERNAME" ] && [ -n "$MONGO_PASSWORD" ]; then
