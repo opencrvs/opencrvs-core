@@ -106,10 +106,12 @@
     "react-router-dom": "^6.28.1",
     "react-router-typesafe-routes": "1.2.2",
     "react-select": "^5.10.2",
+    "react-signature-canvas": "^1.0.7",
     "react-stickynode": "^2.0.1",
     "react-tooltip": "^4.2.21",
     "react-transition-group": "^4.2.1",
     "react-window": "^2.2.3",
+    "recharts": "^2.15.3",
     "redux": "^4.0.4",
     "redux-loop": "^5.0.0",
     "redux-sentry-middleware": "^0.2.0",
@@ -128,7 +130,7 @@
     "workbox-routing": "^7.0.0",
     "workbox-strategies": "^7.0.0",
     "xregexp": "^4.2.0",
-    "zod": "^3.25.48",
+    "zod": "^4.1.13",
     "zustand": "^5.0.2"
   },
   "devDependencies": {

@@ -97,7 +97,9 @@ export async function reindex(token: TokenWithBearer) {
       },
       // Converts object stream to JSON string stream so that it can
       // be sent to the country config reindex endpoint
-      body: new JsonStreamStringify(eventDocumentStreamForCountryConfig)
+      body: new JsonStreamStringify(
+        eventDocumentStreamForCountryConfig
+      ) as unknown as ReadableStream
     }
   ).then((response) => {
     if (!response.ok && response.status === 404) {

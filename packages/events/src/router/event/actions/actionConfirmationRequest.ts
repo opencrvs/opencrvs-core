@@ -82,7 +82,9 @@ export async function requestActionConfirmation(
 
     return {
       responseStatus,
-      responseBody: await res.json().catch(() => undefined)
+      responseBody: (await res.json().catch(() => undefined)) as
+        | Record<string, unknown>
+        | undefined
     }
   } catch (error) {
     logger.error(error)
