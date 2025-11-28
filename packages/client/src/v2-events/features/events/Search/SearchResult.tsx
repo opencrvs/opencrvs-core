@@ -66,6 +66,36 @@ const COLUMNS = {
   NONE: 'none'
 } as const
 
+const TIME_COLUMNS: Array<(typeof COLUMNS)[keyof typeof COLUMNS]> = [
+  COLUMNS.LAST_UPDATED,
+  COLUMNS.SENT_FOR_REVIEW,
+  COLUMNS.SENT_FOR_APPROVAL,
+  COLUMNS.REGISTERED,
+  COLUMNS.SENT_FOR_VALIDATION
+]
+
+export function sortEventsForWorkqueue(
+  data: any[],
+  sortedCol: (typeof COLUMNS)[keyof typeof COLUMNS],
+  sortOrder: (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
+) {
+  if (TIME_COLUMNS.includes(sortedCol)) {
+    return [...data].sort((a, b) => {
+      const aValue = a[sortedCol]
+      const bValue = b[sortedCol]
+
+      const aTime = aValue ? new Date(aValue as string).getTime() : 0
+      const bTime = bValue ? new Date(bValue as string).getTime() : 0
+
+      return sortOrder === SORT_ORDER.ASCENDING
+        ? aTime - bTime // earliest to latest
+        : bTime - aTime // latest to earliest
+    })
+  }
+
+  return orderBy(data, sortedCol, sortOrder)
+}
+
 interface Column {
   label?: string
   width: number
@@ -435,7 +465,10 @@ export const SearchResultComponent = ({
     return { ...event, title, useFallbackTitle }
   })
 
-  const sortedResult = orderBy(dataWithTitle, sortedCol, sortOrder)
+  
+
+  const sortedResult = sortEventsForWorkqueue(dataWithTitle, sortedCol, sortOrder)
+
 
   const rows = mapEventsToResultRows(sortedResult)
 
@@ -508,3 +541,4 @@ export const SearchResultComponent = ({
     </WithTestId>
   )
 }
+
