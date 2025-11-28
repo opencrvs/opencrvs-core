@@ -10,6 +10,10 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 
 ## 1.9.2
 
+### New features
+
+- Toolkit now exports `window().location.get` to country config that can be used as a template variable e.g. in HttpField request body.
+
 ### Bug fixes
 
 - Fixes an issue where `event.hasAction` was not working in form configurations [#11074](https://github.com/opencrvs/opencrvs-core/issues/11074)
