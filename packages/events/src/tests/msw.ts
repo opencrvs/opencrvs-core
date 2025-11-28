@@ -11,7 +11,7 @@
 import { http, HttpResponse, PathParams } from 'msw'
 import { setupServer } from 'msw/node'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { ActionType } from '@opencrvs/commons'
+import { ActionType, ConditionalType, field } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
 const tennisClubMembershipEventWithCustomAction = {
@@ -19,15 +19,41 @@ const tennisClubMembershipEventWithCustomAction = {
   actions: tennisClubMembershipEvent.actions.concat([
     {
       type: ActionType.CUSTOM,
-      customActionType: 'CONFIRM',
+      customActionType: 'CONFIRM_SENIOR_MEMBERSHIP',
       label: {
         id: 'event.tennis-club-membership.action.confirm.label',
-        defaultMessage: 'Confirm',
+        defaultMessage: 'Confirm senior membership',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
       },
-      // @TODO: once action conditionals are implemented, add some conditional here?
-      form: [],
+      conditionals: [
+        {
+          type: ConditionalType.SHOW,
+          conditional: field('applicant.dob').isBefore().date('1950-01-01')
+        }
+      ],
+      form: [
+        {
+          id: 'notes',
+          type: 'TEXTAREA',
+          required: true,
+          label: {
+            defaultMessage: 'Notes',
+            description: 'This is the label for the field for a custom action',
+            id: 'event.birth.custom.action.approve.field.notes.label'
+          }
+        },
+        {
+          id: 'non-required-field',
+          type: 'TEXTAREA',
+          required: false,
+          label: {
+            defaultMessage: 'Test field',
+            description: 'This is the label for the field for a custom action',
+            id: 'event.birth.custom.action.approve.test-field.notes.label'
+          }
+        }
+      ],
       flags: []
     }
   ])

@@ -904,6 +904,7 @@ test('Returns correctly based on registration location even when a parent locati
   const locationRng = createPrng(842)
   const parentLocation = {
     ...generator.locations.set(1, locationRng)[0],
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
     name: 'Parent location'
   }
 

@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 9RTZOz3x1UD5aymjXBZySEQbfcO0giqUhoAabzKUhQGevRCu90TPBfGJy4jDAfl
+\restrict UETTfaWWE6hmDZY9ujM3LlliXuHPuLpcPRqmCRInoBDnT3NJ3aeHP9Ug7gFdmAJ
 
 -- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
 -- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
@@ -69,6 +69,23 @@ ALTER TYPE app.user_type OWNER TO events_migrator;
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: administrative_areas; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.administrative_areas (
+    id uuid NOT NULL,
+    name text NOT NULL,
+    parent_id uuid,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    deleted_at timestamp with time zone,
+    valid_until timestamp with time zone
+);
+
+
+ALTER TABLE app.administrative_areas OWNER TO events_migrator;
 
 --
 -- Name: event_action_drafts; Type: TABLE; Schema: app; Owner: events_migrator
@@ -179,6 +196,7 @@ CREATE TABLE app.locations (
     deleted_at timestamp with time zone,
     location_type app.location_type,
     valid_until timestamp with time zone,
+    administrative_area_id uuid,
     external_id text
 );
 
@@ -225,6 +243,14 @@ ALTER SEQUENCE app.pgmigrations_id_seq OWNED BY app.pgmigrations.id;
 --
 
 ALTER TABLE ONLY app.pgmigrations ALTER COLUMN id SET DEFAULT nextval('app.pgmigrations_id_seq'::regclass);
+
+
+--
+-- Name: administrative_areas administrative_areas_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.administrative_areas
+    ADD CONSTRAINT administrative_areas_pkey PRIMARY KEY (id);
 
 
 --
@@ -351,6 +377,14 @@ CREATE INDEX idx_locations_valid_until ON app.locations USING btree (valid_until
 
 
 --
+-- Name: administrative_areas administrative_areas_parent_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.administrative_areas
+    ADD CONSTRAINT administrative_areas_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES app.administrative_areas(id);
+
+
+--
 -- Name: event_action_drafts event_action_drafts_created_at_location_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -391,6 +425,14 @@ ALTER TABLE ONLY app.event_actions
 
 
 --
+-- Name: locations locations_administrative_area_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.locations
+    ADD CONSTRAINT locations_administrative_area_id_fkey FOREIGN KEY (administrative_area_id) REFERENCES app.administrative_areas(id);
+
+
+--
 -- Name: locations locations_parent_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -403,6 +445,13 @@ ALTER TABLE ONLY app.locations
 --
 
 GRANT USAGE ON SCHEMA app TO events_app;
+
+
+--
+-- Name: TABLE administrative_areas; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.administrative_areas TO events_app;
 
 
 --
@@ -437,5 +486,5 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 9RTZOz3x1UD5aymjXBZySEQbfcO0giqUhoAabzKUhQGevRCu90TPBfGJy4jDAfl
+\unrestrict UETTfaWWE6hmDZY9ujM3LlliXuHPuLpcPRqmCRInoBDnT3NJ3aeHP9Ug7gFdmAJ
 
