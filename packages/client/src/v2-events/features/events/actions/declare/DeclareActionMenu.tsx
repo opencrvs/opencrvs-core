@@ -47,6 +47,16 @@ import { useRejectionModal } from '../reject/useRejectionModal'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
+/**
+ * Declaration actions contain actions available on the review page of the declare flow. This can include:
+ *   - Notify (incomplete records)
+ *   - Declare (non-incomplete records)
+ *   - Validate (aka. 'direct validation', which means declare+validate actions)
+ *   - Register (aka. 'direct registration', which means declare+validate+register actions)
+ *   - Reject (only available for previously notified events)
+ *   - Save and exit
+ *   - Delete declaration
+ */
 function useDeclarationActions(event: EventDocument) {
   const eventType = event.type
   const drafts = useDrafts()
@@ -117,6 +127,7 @@ function useDeclarationActions(event: EventDocument) {
           close={close}
           copy={{
             // @TODO: make these configurable in action config?
+            // Will be implemented as part of https://github.com/opencrvs/opencrvs-core/issues/10900
             ...reviewActionConfiguration.messages.modal,
             onConfirm: actionLabels[actionType],
             eventLabel: eventConfiguration.label
@@ -241,7 +252,6 @@ function useDeclarationActions(event: EventDocument) {
         label: actionLabels[ActionType.REGISTER],
         onClick: async () => handleDeclaration(ActionType.REGISTER),
         hidden: !isActionAllowed(ActionType.REGISTER),
-        // @TODO: disabled if flags block?
         disabled:
           reviewActionConfiguration.incomplete ||
           !isDirectActionPossible(ActionType.REGISTER)
@@ -296,6 +306,10 @@ function useDeclarationActions(event: EventDocument) {
   }
 }
 
+/**
+ * Menu component available on the declaration review page.
+ * We have tried to contain all logic to which actions are available in the declaration in this component.
+ * */
 export function DeclareActionMenu({ event }: { event: EventDocument }) {
   const intl = useIntl()
   const { modals, actions } = useDeclarationActions(event)
