@@ -138,9 +138,14 @@ function useDeclarationActions(event: EventDocument) {
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
 
-  /** Logic to check whether  */
-  // @TODO: do the same for validate+reg?
-  function isValidateAfterDeclarePossible() {
+  /**
+   * Logic to check whether direct declare + validate or declare + validate + register is possible.
+   * We do this by 'looking in to the future' by applying the would-be actions to the event,
+   * and checking if the validate and register actions are still allowed.
+   */
+  function isDirectActionPossible(
+    actionType: typeof ActionType.VALIDATE | typeof ActionType.REGISTER
+  ) {
     if (!userDetails) {
       return false
     }
@@ -169,22 +174,63 @@ function useDeclarationActions(event: EventDocument) {
       eventConfiguration
     )
 
-    const actionConfig = getActionConfig({
+    const validateActionConfig = getActionConfig({
       eventConfiguration,
       actionType: ActionType.VALIDATE
     })
 
-    if (!actionConfig) {
+    if (!validateActionConfig) {
       return false
     }
 
     const validateIsAvailable = isActionAvailable(
-      actionConfig,
+      validateActionConfig,
       eventIndexAfterDeclare,
       validatorContext
     )
 
-    return validateIsAvailable
+    if (actionType === ActionType.VALIDATE) {
+      return validateIsAvailable
+    }
+
+    const eventAfterValidate = {
+      ...eventAfterDeclare,
+      actions: eventAfterDeclare.actions.concat({
+        type: ActionType.VALIDATE,
+        id: 'placeholder' as UUID,
+        transactionId: 'placeholder' as UUID,
+        createdByUserType: TokenUserType.enum.user,
+        createdByRole: userDetails.role.id,
+        declaration,
+        annotation,
+        createdAt: new Date().toISOString(),
+        createdBy: userDetails.id,
+        originalActionId: null,
+        status: 'Accepted',
+        createdBySignature: undefined,
+        createdAtLocation: userDetails.primaryOffice.id as UUID
+      })
+    }
+
+    const registerActionConfig = getActionConfig({
+      eventConfiguration,
+      actionType: ActionType.REGISTER
+    })
+
+    if (!registerActionConfig) {
+      return false
+    }
+
+    const eventIndexAfterValidate = getCurrentEventState(
+      eventAfterValidate,
+      eventConfiguration
+    )
+
+    return isActionAvailable(
+      registerActionConfig,
+      eventIndexAfterValidate,
+      validatorContext
+    )
   }
 
   return {
@@ -196,7 +242,9 @@ function useDeclarationActions(event: EventDocument) {
         onClick: async () => handleDeclaration(ActionType.REGISTER),
         hidden: !isActionAllowed(ActionType.REGISTER),
         // @TODO: disabled if flags block?
-        disabled: reviewActionConfiguration.incomplete
+        disabled:
+          reviewActionConfiguration.incomplete ||
+          !isDirectActionPossible(ActionType.REGISTER)
       },
       {
         icon: 'PaperPlaneTilt' as const,
@@ -205,7 +253,7 @@ function useDeclarationActions(event: EventDocument) {
         hidden: !isActionAllowed(ActionType.VALIDATE),
         disabled:
           reviewActionConfiguration.incomplete ||
-          !isValidateAfterDeclarePossible()
+          !isDirectActionPossible(ActionType.VALIDATE)
       },
       {
         icon: 'UploadSimple' as const,
