@@ -21,7 +21,7 @@ import { buttonMessages } from '@client/i18n/messages'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Success, Error } from '@opencrvs/components/lib/icons'
-import { IQuery } from '@opencrvs/client/src/forms'
+import { IQuery } from '@client/forms'
 import { useOnlineStatus } from '@client/utils'
 
 interface IFetchButtonProps<T = unknown> {

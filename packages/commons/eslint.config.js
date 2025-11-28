@@ -22,7 +22,7 @@ module.exports = defineConfig([
     languageOptions: {
       sourceType: 'commonjs',
       parserOptions: {
-        project: [path.resolve(__dirname, './tsconfig.json')]
+        projectService: true
       }
     },
     settings: {
@@ -32,7 +32,10 @@ module.exports = defineConfig([
         }
       }
     },
-    files: ['./src/**/*.ts']
+    files: ['./src/**/*.ts'],
+    rules: {
+      'import/no-relative-parent-imports': 'off'
+    }
   },
   ...eventsConfig
 ])

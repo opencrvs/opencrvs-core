@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Readable, Transform, PassThrough } from 'node:stream'
-import fetch from 'node-fetch'
 import { JsonStreamStringify } from 'json-stream-stringify'
 import { EventDocument } from '@opencrvs/commons/events'
 import { logger, TokenWithBearer } from '@opencrvs/commons'
@@ -98,7 +97,9 @@ export async function reindex(token: TokenWithBearer) {
       },
       // Converts object stream to JSON string stream so that it can
       // be sent to the country config reindex endpoint
-      body: new JsonStreamStringify(eventDocumentStreamForCountryConfig)
+      body: new JsonStreamStringify(
+        eventDocumentStreamForCountryConfig
+      ) as unknown as ReadableStream
     }
   ).then((response) => {
     if (!response.ok && response.status === 404) {

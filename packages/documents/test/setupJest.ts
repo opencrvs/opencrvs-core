@@ -11,7 +11,8 @@
 import { join } from 'path'
 import * as fetch from 'jest-fetch-mock'
 
-jest.setMock('node-fetch', { default: fetch })
+// @ts-ignore
+globalThis.fetch = fetch
 jest.mock('@documents/minio/client', () => ({
   __esModule: true,
   defaultMinioBucketExists: jest.fn(),

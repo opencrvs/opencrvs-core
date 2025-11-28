@@ -11,7 +11,7 @@
 import { createServer } from '@workflow/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { server as mswServer } from '@test/setupServer'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 import {
@@ -51,21 +51,21 @@ describe('Validate record endpoint', () => {
 
     // Gets record by id via getRecordById endpoint
     mswServer.use(
-      rest.get(
+      http.get(
         'http://localhost:9090/records/7c3af302-08c9-41af-8701-92de9a71a3e4',
-        (_, res, ctx) => {
+        () => {
           if (!calledOnce) {
             calledOnce = true
-            return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
+            return HttpResponse.json(READY_FOR_REVIEW_BIRTH_RECORD)
           }
-          return res(ctx.json(VALIDATED_BIRTH_RECORD))
+          return HttpResponse.json(VALIDATED_BIRTH_RECORD)
         }
       )
     )
 
     // Mock response from hearth
     mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+      http.post('http://localhost:3447/fhir', () => {
         const responseBundle: TransactionResponse = {
           resourceType: 'Bundle',
           type: 'batch-response',
@@ -79,7 +79,7 @@ describe('Validate record endpoint', () => {
             }
           ]
         }
-        return res(ctx.json(responseBundle))
+        return HttpResponse.json(responseBundle)
       })
     )
 
@@ -90,20 +90,20 @@ describe('Validate record endpoint', () => {
       // ?grant_type=urn:opencrvs:oauth:grant-type:token-exchange&subject_token=${token}&subject_token_type=urn:ietf:params:oauth:token-type:access_token
       // &requested_token_type=urn:opencrvs:oauth:token-type:single_record_token&record_id=${recordId}
 
-      rest.post(`http://localhost:4040/token`, (_, res, ctx) => {
-        return res(
-          ctx.json({
-            access_token: 'some-token'
-          })
-        )
+      http.post(`http://localhost:4040/token`, () => {
+        return HttpResponse.json({
+          access_token: 'some-token'
+        })
       })
     )
 
     // mock country config event action hook returning a basic 200
     mswServer.use(
-      rest.post(
+      http.post(
         'http://localhost:3040/events/BIRTH/actions/sent-for-approval',
-        (_, res, ctx) => res(ctx.status(200))
+        () => {
+          return HttpResponse.json(null, { status: 200 })
+        }
       )
     )
 

@@ -11,7 +11,6 @@
 import { UUID } from '@opencrvs/commons'
 import { SavedLocation } from '@opencrvs/commons/types'
 import { APPLICATION_CONFIG_URL } from '@user-mgnt/constants'
-import fetch from 'node-fetch'
 
 const FETCH_ALL_LOCATION_CHILDREN = (id: UUID) =>
   new URL(`/locations/${id}/children`, APPLICATION_CONFIG_URL)

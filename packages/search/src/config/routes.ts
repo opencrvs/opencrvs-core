@@ -54,7 +54,6 @@ export const getRoutes = () => {
       handler: async (request: any, h: any) => {
         try {
           const res = await client.ping(undefined, { meta: true })
-
           logger.info(res)
           return {
             success: res?.meta?.connection?.status === 'alive'

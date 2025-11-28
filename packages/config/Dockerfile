@@ -3,10 +3,13 @@ FROM ghcr.io/opencrvs/ocrvs-base:${BRANCH}
 
 USER node
 
-WORKDIR /app/packages/config
+WORKDIR /app
 COPY --chown=node:node packages/config/*.json /app/packages/config/
-RUN yarn install --frozen-lockfile
-COPY --chown=node:node packages/config /app/packages/config
-RUN yarn build
+RUN pnpm fetch --filter ./packages/config... 
+RUN pnpm install -r --offline --filter ./packages/config...
 
-CMD [ "yarn", "start" ]
+WORKDIR /app/packages/config
+COPY --chown=node:node packages/config /app/packages/config
+RUN pnpm build
+
+CMD [ "pnpm", "start" ]

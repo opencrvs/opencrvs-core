@@ -43,8 +43,8 @@ import {
   HOME,
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
   DRAFT_MARRIAGE_FORM_PAGE
-} from '@opencrvs/client/src/navigation/routes'
-import { IFormData } from '@opencrvs/client/src/forms'
+} from '@client/navigation/routes'
+import { IFormData } from '@client/forms'
 import { SCOPES } from '@opencrvs/commons/client'
 import { EventType, RegStatus } from '@client/utils/gateway'
 import { draftToGqlTransformer } from '@client/transformer'

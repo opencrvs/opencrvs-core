@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
 import { env } from './environment'
 import { z } from 'zod'
 import { parseGQLResponse, raise, delay } from './utils'
@@ -209,7 +208,11 @@ async function userAlreadyExists(
   })
   const parsedSearchResponse = parseGQLResponse<{
     searchUsers: { totalItems?: number }
-  }>(await searchResponse.json())
+  }>(
+    (await searchResponse.json()) as {
+      data: { searchUsers: { totalItems?: number } }
+    }
+  )
   return Boolean(parsedSearchResponse.searchUsers.totalItems)
 }
 
@@ -230,7 +233,7 @@ async function getOfficeIdFromIdentifier(identifier: string) {
     )
     throw new Error('Error fetching location')
   }
-  const locationBundle: fhir3.Bundle<fhir3.Location> = await response.json()
+  const locationBundle = (await response.json()) as fhir3.Bundle<fhir3.Location>
 
   return locationBundle.entry?.[0]?.resource?.id
 }
@@ -305,7 +308,13 @@ export async function seedUsers(token: string) {
         console.log('Trying again for time: ', tryNumber)
       }
       res = await callCreateUserMutation(token, userPayload)
-      jsonRes = await res.json()
+      jsonRes = (await res.json()) as {
+        data?: { createOrUpdateUser: { username: string } }
+        errors: Array<{
+          message: string
+          extensions?: { code: string }
+        }>
+      }
     } while (
       tryNumber < MAX_RETRY &&
       'errors' in jsonRes &&

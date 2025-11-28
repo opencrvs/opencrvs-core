@@ -15,7 +15,6 @@ import {
   ISearchResponse
 } from '@search/elasticsearch/client'
 
-import fetch from 'node-fetch'
 import {
   searchForBirthDuplicates,
   searchForDeathDuplicates
@@ -268,7 +267,7 @@ export async function getUser(
       Authorization: authHeader
     }
   })
-  return await res.json()
+  return (await res.json()) as IUserModelData
 }
 
 function getPreviousStatus(body: BirthDocument) {

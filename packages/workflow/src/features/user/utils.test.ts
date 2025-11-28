@@ -16,47 +16,40 @@ import {
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 
-import * as fetchAny from 'jest-fetch-mock'
 import { Practitioner } from '@opencrvs/commons/types'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { server as mswServer } from '@test/setupServer'
 import { USER_MANAGEMENT_URL } from '@workflow/__mocks__/constants'
-
-const fetch = fetchAny as any
 
 describe('Verify getLoggedInPractitionerResource', () => {
   it('Returns Location properly', async () => {
     mswServer.use(
-      rest.post('http://localhost:3030/getUser', (_, res, ctx) =>
-        res(
-          ctx.json({
-            practitionerId: '1234'
-          })
-        )
+      http.post('http://localhost:3030/getUser', () =>
+        HttpResponse.json({
+          practitionerId: '1234'
+        })
       )
     )
 
     mswServer.use(
-      rest.get(`http://localhost:3447/fhir/Practitioner/1234`, (_, res, ctx) =>
-        res(
-          ctx.json({
-            resourceType: 'Practitioner',
-            identifier: [
-              { use: 'official', system: 'mobile', value: '01711111111' }
-            ],
-            telecom: [{ system: 'phone', value: '01711111111' }],
-            name: [
-              { use: 'en', family: ['Al Hasan'], given: ['Shakib'] },
-              { use: 'bn', family: [''], given: [''] }
-            ],
-            gender: 'male',
-            meta: {
-              lastUpdated: '2018-11-25T17:31:08.062+00:00',
-              versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
-            },
-            id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
-          })
-        )
+      http.get(`http://localhost:3447/fhir/Practitioner/1234`, () =>
+        HttpResponse.json({
+          resourceType: 'Practitioner',
+          identifier: [
+            { use: 'official', system: 'mobile', value: '01711111111' }
+          ],
+          telecom: [{ system: 'phone', value: '01711111111' }],
+          name: [
+            { use: 'en', family: ['Al Hasan'], given: ['Shakib'] },
+            { use: 'bn', family: [''], given: [''] }
+          ],
+          gender: 'male',
+          meta: {
+            lastUpdated: '2018-11-25T17:31:08.062+00:00',
+            versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
+          },
+          id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
+        })
       )
     )
 
@@ -84,14 +77,13 @@ describe('Verify getLoggedInPractitionerResource', () => {
     })
   })
   it('Throws error when partitioner resource is not there', async () => {
-    fetch.mockResponses(
-      [
-        JSON.stringify({
-          mobile: '+880711111111'
-        }),
-        { status: 200 }
-      ],
-      [{}, { status: 401 }]
+    mswServer.use(
+      http.get(
+        'http://localhost:3447/fhir/Practitioner/:practitionerId',
+        () => {
+          return HttpResponse.json(null, { status: 401 })
+        }
+      )
     )
     const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
       subject: '5bdc55ece42c82de9a529c36',
@@ -105,8 +97,8 @@ describe('Verify getLoggedInPractitionerResource', () => {
 describe('Verify getUser', () => {
   it('get user mobile throw an error in case of an bad response', async () => {
     mswServer.use(
-      rest.post(`${USER_MANAGEMENT_URL}getUser`, (_, res, ctx) =>
-        res(ctx.status(401))
+      http.post(`${USER_MANAGEMENT_URL}getUser`, () =>
+        HttpResponse.json(null, { status: 401 })
       )
     )
 

@@ -44,7 +44,7 @@ cd opencrvs-countryconfig
 echo
 echo -e "\033[32m:::::::::::::::::: Installing some Node dependencies ::::::::::::::::::\033[0m"
 echo
-yarn install
+pnpm install
 echo
 echo -e "\033[32m::::::::::::::::::::::: Starting OpenCRVS Core :::::::::::::::::::::::\033[0m"
 echo
@@ -65,4 +65,4 @@ echo -e "\033[32m::::::::::::::::::::: Starting Farajaland Config Server :::::::
 echo
 cd $PATH_TO_OPEN_CRVS_CORE_DIRECTORY
 cd ../opencrvs-countryconfig
-yarn start
+pnpm start

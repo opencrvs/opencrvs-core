@@ -11,7 +11,6 @@
 import * as Hapi from '@hapi/hapi'
 import { env } from '@config/environment'
 import { defaultQueries } from './defaultQueries'
-import fetch from 'node-fetch'
 
 export default async function getDashboardQueries(
   request: Hapi.Request,
