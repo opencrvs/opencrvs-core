@@ -250,10 +250,12 @@ export async function seedUsers(token: string) {
       continue
     }
 
+    const externalId = officeIdentifier.split('_').at(-1)
+
     const url = new URL('events', env.GATEWAY_HOST).toString()
     const client = createClient(url, `Bearer ${token}`)
     const [primaryOffice] = await client.locations.list.query({
-      externalId: officeIdentifier
+      externalId
     })
 
     const userPayload = {
