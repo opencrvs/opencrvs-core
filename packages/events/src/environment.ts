@@ -30,6 +30,6 @@ export const env = cleanEnv(process.env, {
   CONFIG_URL: url({ devDefault: 'http://localhost:2021' }),
   GATEWAY_URL: url({
     devDefault: 'http://localhost:7070',
-    default: 'https://gateway.vc.opencrvs.dev'
+    default: 'https://gateway.vc.e2e-k8s.opencrvs.dev'
   })
 })
