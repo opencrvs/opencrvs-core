@@ -38,7 +38,7 @@ export function ActionMenu({
   const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
   const { getUser } = useUsers()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
   const { searchEventById } = useEvents()
 
   const maybeAuth = useAuthentication()
@@ -62,9 +62,9 @@ export function ActionMenu({
   const assignedUserFullName = assignedToUser
     ? getUsersFullName(assignedToUser.name, intl.locale)
     : ''
-  const assignedOffice = assignedToUser?.primaryOfficeId || ''
+  const assignedOffice = assignedToUser?.primaryOfficeId
   const assignedOfficeName =
-    locations.find((l) => l.id === assignedOffice)?.name || ''
+    (assignedOffice && locations.get(assignedOffice)?.name) || ''
 
   const [modals, actionMenuItems] = useAllowedActionConfigurations(
     eventState,

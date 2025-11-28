@@ -24,7 +24,8 @@ import {
   LanguageConfig,
   Location,
   PrintCertificateAction,
-  UserOrSystem
+  UserOrSystem,
+  UUID
 } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
@@ -71,7 +72,7 @@ export const usePrintableCertificate = ({
 }: {
   event: EventDocument
   config: EventConfig
-  locations: Location[]
+  locations: Map<UUID, Location>
   users: UserOrSystem[]
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig

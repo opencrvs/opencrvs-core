@@ -14,7 +14,8 @@ import {
   EventState,
   FieldConfig,
   FieldValue,
-  Location
+  Location,
+  UUID
 } from '@opencrvs/commons/client'
 import { getRegisteredFieldByFieldConfig } from '@client/v2-events/features/events/registered-fields'
 import { AdminStructureItem } from '@client/utils/referenceApi'
@@ -58,7 +59,7 @@ function formDataStringifierFactory(stringifier: FieldStringifier) {
  */
 export const getFormDataStringifier = (
   intl: IntlShape,
-  locations: Location[],
+  locations: Map<UUID, Location>,
   adminLevels?: AdminStructureItem[]
 ) => {
   const stringifier = (fieldConfig: FieldConfig, value: FieldValue) => {
@@ -91,7 +92,7 @@ export const getFormDataStringifier = (
 export function useFormDataStringifier() {
   const intl = useIntl()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
   const { config } = useSelector(getOfflineData)
   const adminLevels = config.ADMIN_STRUCTURE
 
