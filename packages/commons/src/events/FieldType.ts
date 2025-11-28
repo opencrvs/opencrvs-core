@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 export const FieldType = {
   NAME: 'NAME',
@@ -21,6 +21,7 @@ export const FieldType = {
   TEXTAREA: 'TEXTAREA',
   EMAIL: 'EMAIL',
   DATE: 'DATE',
+  AGE: 'AGE',
   DATE_RANGE: 'DATE_RANGE', // // Internal use, only for search functionality
   SELECT_DATE_RANGE: 'SELECT_DATE_RANGE', // Internal use, only for search functionality
   TIME: 'TIME',
@@ -41,7 +42,15 @@ export const FieldType = {
   SIGNATURE: 'SIGNATURE',
   DATA: 'DATA',
   BUTTON: 'BUTTON',
-  HTTP: 'HTTP'
+  SEARCH: 'SEARCH',
+  ALPHA_PRINT_BUTTON: 'ALPHA_PRINT_BUTTON',
+  HTTP: 'HTTP',
+  LINK_BUTTON: 'LINK_BUTTON',
+  VERIFICATION_STATUS: 'VERIFICATION_STATUS',
+  QUERY_PARAM_READER: 'QUERY_PARAM_READER',
+  QR_READER: 'QR_READER',
+  ID_READER: 'ID_READER',
+  LOADER: 'LOADER'
 } as const
 
 /**
@@ -63,5 +72,19 @@ export const compositeFieldTypes = [
   FieldType.DATE_RANGE,
   FieldType.ADDRESS,
   FieldType.FILE_WITH_OPTIONS,
-  FieldType.FILE
+  FieldType.FILE,
+  FieldType.ID_READER,
+  FieldType.DATA
+]
+
+export const FieldTypesToHideInReview = [
+  FieldType.BULLET_LIST,
+  FieldType.DIVIDER,
+  FieldType.PAGE_HEADER,
+  FieldType.PARAGRAPH,
+  FieldType.ID_READER,
+  FieldType.LOADER,
+  FieldType.HTTP,
+  FieldType.QUERY_PARAM_READER,
+  FieldType.DATA
 ]

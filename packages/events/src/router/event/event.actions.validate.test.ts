@@ -22,7 +22,8 @@ import {
   generateActionDuplicateDeclarationInput,
   getCurrentEventState,
   getUUID,
-  NameFieldValue
+  NameFieldValue,
+  ActionUpdate
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -122,15 +123,7 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
         firstname: 'John',
         surname: 'Doe'
       },
-      'recommender.none': true,
-      'applicant.address': {
-        country: 'FAR',
-        addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
-      }
+      'recommender.none': true
     }
   })
 
@@ -170,12 +163,12 @@ test('Skips required field validation when they are conditionally hidden', async
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        state: 'State',
+        district2: 'District2'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   const declaration = generator.event.actions.validate(event.id, {
     declaration: form
@@ -226,12 +219,12 @@ test('Prevents adding birth date in future', async () => {
     'applicant.address': {
       country: 'FAR',
       addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
+      streetLevelDetails: {
+        state: 'State',
+        district2: 'District2'
+      }
     }
-  }
+  } satisfies ActionUpdate
 
   await expect(
     client.event.actions.validate.request(
@@ -264,10 +257,9 @@ test('validation prevents including hidden fields', async () => {
       ...generateActionDeclarationInput(
         tennisClubMembershipEvent,
         ActionType.VALIDATE,
-        () => 0.1,
-        { locations: [] }
+        () => 0.1
       ),
-      'recommender.firstname': 'this should not be here'
+      'recommender.name': { firstname: 'John', surname: 'Doe' }
     }
   })
 
@@ -473,7 +465,7 @@ test('deduplication check is skipped if the event has been marked as not duplica
   })
 })
 
-test('deduplication check is not skipped if the event has been marked as not duplicate but data has changed', async () => {
+test('deduplication and annotation check is not skipped if the event has been marked as not duplicate but data has changed', async () => {
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
       return HttpResponse.json([
@@ -537,6 +529,16 @@ test('deduplication check is not skipped if the event has been marked as not dup
     })
   )
 
+  const lastWriteAction = stillDeclaredEvent.actions.at(-2)
+  if (!lastWriteAction) {
+    throw new Error('No action found')
+  }
+
+  expect(lastWriteAction.type).toBe(ActionType.DUPLICATE_DETECTED)
+  expect(lastWriteAction).toHaveProperty('annotation')
+  // @ts-expect-error - type not narrowed for duplicate action
+  expect(lastWriteAction.annotation).toBeDefined()
+
   expect(
     getCurrentEventState(stillDeclaredEvent, tennisClubMembershipEvent)
   ).toMatchObject({
@@ -589,8 +591,8 @@ test('Event status changes after validation action is accepted', async () => {
     })
   ])
 
-  expect(statusAfterDeclareAction).toBe(EventStatus.Enum.DECLARED)
-  expect(statusAfterValidateAction).toBe(EventStatus.Enum.VALIDATED)
+  expect(statusAfterDeclareAction).toBe(EventStatus.enum.DECLARED)
+  expect(statusAfterValidateAction).toBe(EventStatus.enum.VALIDATED)
 })
 
 test('Event status does not change if validation action is rejected', async () => {

@@ -49,6 +49,22 @@ export function generateElasticsearchQuery(
   queryInput: ClauseOutput,
   eventConfig: EventConfig
 ): elasticsearch.estypes.QueryDslQueryContainer | null {
+  if (queryInput.type === 'not') {
+    const resolvedQuery = generateElasticsearchQuery(
+      eventIndex,
+      queryInput.clause,
+      eventConfig
+    )
+    if (resolvedQuery === null) {
+      return null
+    }
+    return {
+      bool: {
+        must_not: resolvedQuery,
+        should: undefined
+      }
+    }
+  }
   if (queryInput.type === 'and') {
     const resolvedQueries = queryInput.clauses.map((clause) => {
       return generateElasticsearchQuery(eventIndex, clause, eventConfig)
@@ -140,7 +156,7 @@ export function generateElasticsearchQuery(
 
       return {
         match_phrase: {
-          [queryKey]: queryValue.toString()
+          [queryKey]: queryInput.options.value ?? queryValue.toString()
         }
       }
     }

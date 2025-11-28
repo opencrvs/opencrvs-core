@@ -17,8 +17,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled from 'styled-components'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
@@ -34,15 +33,6 @@ const Actions = styled.div`
   }
 `
 
-interface State {
-  phone: string
-  email: string
-  touched: boolean
-  error: boolean
-  errorMessage: string
-  notificationMethod: string
-}
-
 const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
@@ -52,10 +42,21 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
   const [notificationMethod] = useState(
     window.config.USER_NOTIFICATION_DELIVERY_METHOD
   )
-
   // <{ forgottenItem: FORGOTTEN_ITEMS }>
   const location = useLocation()
   const navigate = useNavigate()
+
+  const [forgottenItem] = useState(() => {
+    return (
+      location.state?.forgottenItem || sessionStorage.getItem('forgottenItem')
+    )
+  })
+
+  useEffect(() => {
+    if (location.state?.forgottenItem) {
+      sessionStorage.setItem('forgottenItem', location.state.forgottenItem)
+    }
+  }, [location.state?.forgottenItem])
 
   const handleMobileChange = (value: string) => {
     setPhone(value)
@@ -100,7 +101,7 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
             ? convertToMSISDN(phone, window.config.COUNTRY)
             : undefined,
         email: notificationMethod === 'email' ? email : undefined,
-        retrieveFlow: location.state.forgottenItem
+        retrieveFlow: forgottenItem
       })
 
       if (securityQuestionKey) {
@@ -108,7 +109,7 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
           state: {
             nonce,
             securityQuestionKey,
-            forgottenItem: location.state.forgottenItem
+            forgottenItem
           }
         })
       }
@@ -118,7 +119,7 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
           nonce,
           mobile: phone,
           email,
-          forgottenItem: location.state.forgottenItem
+          forgottenItem
         }
       })
     } catch (err) {
@@ -166,13 +167,13 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
             mobileTitle={intl.formatMessage(
               messages.credentialsResetFormTitle,
               {
-                forgottenItem: location.state.forgottenItem
+                forgottenItem
               }
             )}
             desktopTitle={intl.formatMessage(
               messages.credentialsResetFormTitle,
               {
-                forgottenItem: location.state.forgottenItem
+                forgottenItem
               }
             )}
           />

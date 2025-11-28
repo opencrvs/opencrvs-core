@@ -10,16 +10,17 @@
  */
 
 import { array } from 'zod'
-
 import {
   EventConfig,
   getOrThrow,
+  Location,
+  LocationType,
   logger,
+  TokenWithBearer,
   WorkqueueConfig
 } from '@opencrvs/commons'
 import { Bundle, SavedLocation } from '@opencrvs/commons/types'
 import { env } from '@events/environment'
-import { Location } from '../locations/locations'
 
 /**
  * During 1.9.0 we support only docker swarm configuration.
@@ -30,11 +31,11 @@ import { Location } from '../locations/locations'
 let inMemoryEventConfigurations: EventConfig[] | null = null
 let inMemoryWorkqueueConfigurations: WorkqueueConfig[] | null = null
 
-async function getEventConfigurations(token: string) {
+export async function getEventConfigurations(token: TokenWithBearer) {
   const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
+      Authorization: token
     }
   })
 
@@ -48,7 +49,7 @@ async function getEventConfigurations(token: string) {
 /**
  * @returns in-memory event configurations when running in production-like environment.
  */
-export async function getInMemoryEventConfigurations(token: string) {
+export async function getInMemoryEventConfigurations(token: TokenWithBearer) {
   if (!env.isProduction) {
     logger.info(
       `Running in ${process.env.NODE_ENV} mode. Fetching event configurations from API`
@@ -67,33 +68,33 @@ export async function getInMemoryEventConfigurations(token: string) {
 }
 
 async function findEventConfigurationById({
-  token,
-  eventType
+  eventType,
+  token
 }: {
-  token: string
   eventType: string
+  token: TokenWithBearer
 }) {
   const configurations = await getInMemoryEventConfigurations(token)
   return configurations.find((config) => config.id === eventType)
 }
 
 export async function getEventConfigurationById({
-  token,
-  eventType
+  eventType,
+  token
 }: {
-  token: string
   eventType: string
+  token: TokenWithBearer
 }) {
   return getOrThrow(
     await findEventConfigurationById({
-      token,
-      eventType
+      eventType,
+      token
     }),
     `No configuration found for event type: ${eventType}`
   )
 }
 
-async function getWorkqueueConfigurations(token: string) {
+async function getWorkqueueConfigurations(token: TokenWithBearer) {
   const res = await fetch(new URL('/workqueue', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json',
@@ -111,7 +112,9 @@ async function getWorkqueueConfigurations(token: string) {
 /**
  * @returns in-memory workqueue configurations when running in production-like environment.
  */
-export async function getIMemoryWorkqueueConfigurations(token: string) {
+export async function getInMemoryWorkqueueConfigurations(
+  token: TokenWithBearer
+) {
   if (!env.isProduction) {
     logger.info(
       `Running in ${process.env.NODE_ENV} mode. Fetching workqueue configurations from API`
@@ -137,9 +140,13 @@ function parsePartOf(partOf: string | undefined): string | null {
 }
 
 export async function getLocations() {
-  const types = ['ADMIN_STRUCTURE', 'CRVS_OFFICE', 'HEALTH_FACILITY']
-
-  const requests = types.map(async (type) => {
+  const requests = [
+    // Even though these are defined in the same order in the commons, we want to be explicit here.
+    // Admin structures must be seeded first in order for the parent-child relationships to be valid.
+    LocationType.enum.ADMIN_STRUCTURE,
+    LocationType.enum.CRVS_OFFICE,
+    LocationType.enum.HEALTH_FACILITY
+  ].map(async (type) => {
     const url = new URL('/locations', env.CONFIG_URL)
     url.searchParams.set('type', type)
     url.searchParams.set('_count', '0')
@@ -169,7 +176,8 @@ export async function getLocations() {
         id: entry.id,
         name: entry.name,
         parentId: parsePartOf(entry.partOf?.reference),
-        validUntil: entry.status === 'inactive' ? new Date() : null,
+        validUntil:
+          entry.status === 'inactive' ? new Date().toISOString() : null,
         locationType: entry.type?.coding ? entry.type.coding[0]?.code : null
       }
     })

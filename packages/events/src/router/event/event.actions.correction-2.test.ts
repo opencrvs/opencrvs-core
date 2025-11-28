@@ -13,7 +13,7 @@ import { http, HttpResponse } from 'msw'
 import {
   ActionType,
   and,
-  BIRTH_EVENT,
+  CHILD_ONBOARDING_EVENT,
   ConditionalType,
   defineConfig,
   defineDeclarationForm,
@@ -25,9 +25,10 @@ import {
   not,
   PageTypes,
   generateTranslationConfig,
-  EventState
+  EventState,
+  UUID
 } from '@opencrvs/commons'
-import { v2BirthEvent } from '@opencrvs/commons/fixtures'
+import { ChildOnboardingEvent } from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -142,23 +143,22 @@ const informant = defineFormPage({
   ]
 })
 
-const modiedV2BirthEvent = defineConfig({
-  ...v2BirthEvent,
+const modiedchildOnboardingEvent = defineConfig({
+  ...ChildOnboardingEvent,
   actions: [
-    ...v2BirthEvent.actions,
+    ...ChildOnboardingEvent.actions,
     {
       type: ActionType.REQUEST_CORRECTION,
       label: generateTranslationConfig('Correct record'),
       correctionForm: {
         label: generateTranslationConfig('Correct record'),
         pages: []
-      },
-      conditionals: []
+      }
     }
   ],
   declaration: defineDeclarationForm({
-    ...v2BirthEvent.declaration,
-    pages: [...v2BirthEvent.declaration.pages, informant]
+    ...ChildOnboardingEvent.declaration,
+    pages: [...ChildOnboardingEvent.declaration.pages, informant]
   })
 })
 
@@ -166,10 +166,10 @@ describe('Overwriting parent field', () => {
   it('should overwrite informant.relation via REQUEST_CORRECTION action', async () => {
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
-        return HttpResponse.json([modiedV2BirthEvent])
+        return HttpResponse.json([modiedchildOnboardingEvent])
       }),
       http.post(
-        `${env.COUNTRY_CONFIG_URL}/trigger/events/v2-birth/actions/:action`,
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/child-onboarding/actions/:action`,
         (ctx) => {
           const payload =
             ctx.params.action === ActionType.REGISTER
@@ -188,15 +188,22 @@ describe('Overwriting parent field', () => {
       'child.dob': '2020-05-15',
       'mother.name': { firstname: 'Jane', surname: 'Doe' },
       'mother.dob': '1990-03-22',
+      'mother.idType': 'NID',
       'mother.nid': 'ID123456789',
       'informant.relation': 'FATHER',
       'informant.name': { firstname: 'Rok', surname: 'Doe' },
       'informant.dob': '1988-06-12',
-      'informant.dobUnknown': false
+      'informant.dobUnknown': false,
+      'child.placeOfBirth': 'PRIVATE_HOME',
+      'child.birthLocation.privateHome': {
+        country: 'FAR',
+        addressType: 'DOMESTIC' as const,
+        administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+      }
     } satisfies EventState
 
     let event = await client.event.create(
-      generator.event.create({ type: BIRTH_EVENT })
+      generator.event.create({ type: CHILD_ONBOARDING_EVENT })
     )
 
     event = await client.event.actions.declare.request(
@@ -218,7 +225,7 @@ describe('Overwriting parent field', () => {
       })
     )
 
-    let eventState = getCurrentEventState(event, modiedV2BirthEvent)
+    let eventState = getCurrentEventState(event, modiedchildOnboardingEvent)
     expect(eventState.id).toBeDefined()
     expect(eventState.declaration['informant.dobUnknown']).toBe(false)
     expect(eventState.declaration['informant.dob']).toBe('1988-06-12')
@@ -241,7 +248,7 @@ describe('Overwriting parent field', () => {
       })
     )
 
-    eventState = getCurrentEventState(event, modiedV2BirthEvent)
+    eventState = getCurrentEventState(event, modiedchildOnboardingEvent)
     expect(eventState.declaration['informant.dobUnknown']).toBeFalsy()
     expect(eventState.declaration['informant.relation']).toBe('MOTHER')
   })

@@ -15,9 +15,11 @@ import { Stack } from '../Stack'
 import { Text } from '../Text'
 import { useWindowSize } from '../hooks'
 
+export const APP_BAR_HEIGHT = '56px'
+
 const AppBarWrapper = styled.div`
   padding: 0 16px;
-  height: 56px;
+  height: ${APP_BAR_HEIGHT};
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -112,26 +114,22 @@ export const AppBar = (props: IAppBarProps) => {
         </Actions>
       </AppBarWrapper>
     )
-  } else {
-    return (
-      <AppBarWrapper id={props.id} className={props.className}>
-        <MobileLeft>
-          {props.mobileLeft && <Stack>{props.mobileLeft}</Stack>}
-          {props.mobileTitle && (
-            <Title variant="h4" element="h1">
-              {props.mobileTitle}
-            </Title>
-          )}
-        </MobileLeft>
-
-        {!props.mobileTitle && (
-          <MobileCenter>{props.mobileCenter}</MobileCenter>
-        )}
-
-        {props.mobileRight && (
-          <Actions $flex="none">{props.mobileRight}</Actions>
-        )}
-      </AppBarWrapper>
-    )
   }
+
+  return (
+    <AppBarWrapper id={props.id} className={props.className}>
+      <MobileLeft>
+        {props.mobileLeft && <Stack>{props.mobileLeft}</Stack>}
+        {props.mobileTitle && (
+          <Title variant="h4" element="h1">
+            {props.mobileTitle}
+          </Title>
+        )}
+      </MobileLeft>
+
+      {!props.mobileTitle && <MobileCenter>{props.mobileCenter}</MobileCenter>}
+
+      {props.mobileRight && <Actions $flex="none">{props.mobileRight}</Actions>}
+    </AppBarWrapper>
+  )
 }

@@ -10,40 +10,37 @@
  */
 
 import { IncomingMessage } from 'http'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import '@opencrvs/commons/monitoring'
 import { TRPCError } from '@trpc/server'
 import {
-  getSystem,
-  getUser,
   getUserId,
   getUserTypeFromToken,
   logger,
+  REINDEX_USER_ID,
   SystemRole,
   TokenUserType,
   TokenWithBearer,
-  UUID
+  User,
+  System
 } from '@opencrvs/commons'
-import { env } from './environment'
+import { getSystem, getUser } from './service/users/api'
 
-export const UserContext = z.object({
-  id: z.string(),
-  primaryOfficeId: UUID,
-  role: z.string(),
-  signature: z
-    .string()
-    .nullish()
-    .describe('Storage key for the user signature. e.g. /ocrvs/signature.png'),
-  type: TokenUserType.extract(['user'])
+export const UserContext = User.pick({
+  id: true,
+  primaryOfficeId: true,
+  role: true,
+  signature: true,
+  type: true
 })
 export type UserContext = z.infer<typeof UserContext>
 
-export const SystemContext = z.object({
-  id: z.string(),
-  role: SystemRole,
-  type: TokenUserType.extract(['system']),
-  primaryOfficeId: z.undefined().optional(),
-  signature: z.undefined().optional()
+export const SystemContext = System.pick({
+  id: true,
+  role: true,
+  type: true,
+  primaryOfficeId: true,
+  signature: true
 })
 type SystemContext = z.infer<typeof SystemContext>
 
@@ -110,8 +107,17 @@ async function resolveUserDetails(
   }
 
   try {
-    if (userType === TokenUserType.Enum.system) {
-      const { type } = await getSystem(env.USER_MANAGEMENT_URL, userId, token)
+    if (userId === REINDEX_USER_ID) {
+      return SystemContext.parse({
+        type: TokenUserType.enum.system,
+        id: userId,
+        primaryOfficeId: undefined,
+        role: SystemRole.enum.REINDEX
+      })
+    }
+
+    if (userType === TokenUserType.enum.system) {
+      const { type } = await getSystem(userId, token)
 
       return SystemContext.parse({
         type: userType,
@@ -122,18 +128,17 @@ async function resolveUserDetails(
     }
 
     const { primaryOfficeId, role, signature, username } = await getUser(
-      env.USER_MANAGEMENT_URL,
       userId,
       token
     )
 
     if (username === SEEDER_SUPER_ADMIN) {
       logger.warn(
-        `User ${username} is used for seeding. Treating it as a ${TokenUserType.Enum.system} user type.`
+        `User ${username} is used for seeding. Treating it as a ${TokenUserType.enum.system} user type.`
       )
 
       return SuperAdminContext.parse({
-        type: TokenUserType.Enum.system,
+        type: TokenUserType.enum.system,
         id: userId,
         primaryOfficeId: undefined,
         role

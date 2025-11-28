@@ -40,15 +40,23 @@ export type ITimeFieldProps = IProps &
   Omit<ITextInputProps, 'onChange' | 'value'> &
   Omit<ISelectProps, 'onChange' | 'value'>
 
-function getFormattedValue(
+function get24HourNormalisedFormat(
   time: { hh: string; mm: string },
-  use12HourFormat: boolean,
-  amPm?: string | null
-) {
-  const formattedHours = time.hh.padStart(2, '0')
-  return use12HourFormat
-    ? `${formattedHours}:${time.mm.padStart(2, '0')} ${amPm}`
-    : `${formattedHours}:${time.mm.padStart(2, '0')}`
+  use12HourFormat: boolean
+): string {
+  let hours = parseInt(time.hh, 10)
+
+  // Convert 12-hour format to 24-hour format
+  if (use12HourFormat) {
+    if (use12HourFormat && hours === 12) {
+      hours = 0
+    } else if (use12HourFormat && hours !== 12) {
+      hours += 12
+    }
+  }
+
+  const formattedHours = hours.toString().padStart(2, '0')
+  return `${formattedHours}:${time.mm.padStart(2, '0')}`
 }
 
 function isValidMinutes(minutes: string) {
@@ -90,24 +98,34 @@ function TimeInput12(props: ITimeFieldProps) {
     mm: ''
   })
 
-  const [amPm, setAmPm] = React.useState<string>('AM') // Default to AM for 12-hour format
+  const [amPm, setAmPm] = React.useState<string>('AM')
 
   React.useEffect(() => {
     function getInitialState(time: string): IState {
-      const [hh, mm, meridiem] = time.split(/[:\s]/)
+      const [hh, mm] = time.split(':')
 
-      setAmPm(meridiem)
+      const hours24 = parseInt(hh, 10)
 
-      return { hh: hh || '', mm: mm || '' }
+      setAmPm(hours24 >= 12 ? 'PM' : 'AM')
+
+      let hours12 = hours24
+      if (hours24 === 0) {
+        hours12 = 12
+      } else if (hours24 > 12) {
+        hours12 = hours24 - 12
+      }
+
+      return { hh: hours12.toString().padStart(2, '0') || '', mm: mm || '' }
     }
 
     const isValidTime = (time: string) => {
       const cleanTime = time.replace(/\s?(AM|PM)$/i, '')
+
       const parts = cleanTime.split(':')
 
       if (parts.length !== 2) return false
 
-      return isValidHours(parts[0], true) && isValidMinutes(parts[1])
+      return isValidHours(parts[0], false) && isValidMinutes(parts[1])
     }
 
     if (props.value && isValidTime(props.value)) {
@@ -146,9 +164,9 @@ function TimeInput12(props: ITimeFieldProps) {
 
   React.useEffect(() => {
     if (isValidHours(state.hh, true) && isValidMinutes(state.mm)) {
-      onChange(getFormattedValue(state, true, amPm))
+      onChange(get24HourNormalisedFormat(state, true))
     }
-  }, [state, amPm, onChange])
+  }, [state, onChange])
 
   return (
     <Container id={id}>
@@ -284,7 +302,7 @@ function TimeInput24(props: ITimeFieldProps) {
 
   React.useEffect(() => {
     if (isValidHours(state.hh, false) && isValidMinutes(state.mm)) {
-      onChange(getFormattedValue(state, false))
+      onChange(get24HourNormalisedFormat(state, false))
     }
   }, [state, onChange])
 

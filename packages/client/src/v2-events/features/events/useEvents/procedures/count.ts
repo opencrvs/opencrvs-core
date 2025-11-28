@@ -14,7 +14,7 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { WorkqueueCountInput } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 
-export function useGetEventCounts() {
+export function useGetEventCountsByWorkqueue() {
   const trpc = useTRPC()
   return {
     useQuery: (query: WorkqueueCountInput) => {

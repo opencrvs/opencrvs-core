@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/commons",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "description": "OpenCRVS common modules and utils",
   "license": "MPL-2.0",
   "main": "./build/dist/common/index.js",
@@ -21,12 +21,46 @@
     "start": "pnpm build:watch",
     "test": "pnpm test:compilation && jest",
     "test:watch": "jest --watch",
-    "test:compilation": "tsc -b",
+    "test:compilation": "wireit",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "postinstall": "pnpm build",
-    "build": "pnpm tsc -b tsconfig.build.json",
-    "build:watch": "pnpm tsc -b --watch --preserveWatchOutput tsconfig.build.json",
-    "build:clean": "rm -rf build"
+    "build": "wireit",
+    "build:watch": "pnpm build --watch",
+    "build:clean": "rm -rf build && rm -rf ./.wireit"
+  },
+  "wireit": {
+    "build": {
+      "command": "pnpm tsc -b tsconfig.build.json --pretty",
+      "clean": "if-file-deleted",
+      "files": [
+        "src/**/*.ts",
+        "!src/**/*.test.ts",
+        "tsconfig-esm.json",
+        "tsconfig-commonjs.json",
+        "tsconfig.build.json"
+      ],
+      "output": [
+        "build/dist/common/**",
+        "build/dist/tsconfig-commonjs.tsbuildinfo",
+        "build/dist/esm/**",
+        "build/dist/tsconfig-esm.tsbuildinfo"
+      ]
+    },
+    "test:compilation": {
+      "command": "pnpm tsc -b --pretty",
+      "clean": "if-file-deleted",
+      "files": [
+        "src/**/*.test.ts",
+        "tsconfig-commonjs.json",
+        "tsconfig.json"
+      ],
+      "output": [
+        "build/dist/common/**",
+        "build/dist/tsconfig-commonjs.tsbuildinfo",
+        "build/dist/tests/**",
+        "build/dist/tsconfig-tests.tsbuildinfo"
+      ]
+    }
   },
   "private": true,
   "dependencies": {
@@ -49,9 +83,9 @@
     "pkg-up": "^3.1.0",
     "typescript": "5.6.3",
     "uuid": "^9.0.0",
-    "yaml": "^2.7.1",
-    "zod": "^3.23.8",
-    "zod-openapi": "^4.2.4"
+    "wireit": "^0.14.12",
+    "zod": "^4.1.12",
+    "zod-openapi": "^5.4.3"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.9",

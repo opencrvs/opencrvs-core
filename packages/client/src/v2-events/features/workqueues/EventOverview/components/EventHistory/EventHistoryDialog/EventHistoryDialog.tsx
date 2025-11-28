@@ -18,42 +18,37 @@ import {
   ActionType,
   EventDocument,
   getAcceptedActions,
-  UUID
+  UUID,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
-import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
-import { ActionTypeSpecificContent } from './ActionTypeSpecificContent'
-
-export const eventHistoryStatusMessage = {
-  id: `v2.events.history.status`,
-  defaultMessage:
-    '{status, select, CREATE {Draft} NOTIFY {Sent incomplete} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}'
-}
+import { EventHistoryActionDocument } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
+import { ActionTypeSpecificContent } from './components'
 
 const messages = defineMessages({
   'event.history.modal.timeFormat': {
     defaultMessage: 'MMMM dd, yyyy · hh.mm a',
-    id: 'v2.configuration.timeFormat',
+    id: 'configuration.timeFormat',
     description: 'Time format for timestamps in event history'
   },
   comment: {
     defaultMessage: 'Comment',
     description: 'Label for rejection comment',
-    id: 'v2.constants.comment'
+    id: 'constants.comment'
   },
   reason: {
     defaultMessage: 'Reason',
     description: 'Label for rejection correction reason',
-    id: 'v2.constants.reason'
+    id: 'constants.reason'
   },
   duplicateOf: {
     defaultMessage: 'Duplicate of',
     description: 'table header for `duplicate of` in record audit',
-    id: 'v2.constants.duplicateOf'
+    id: 'constants.duplicateOf'
   }
 })
 
-function prepareComments(history: ActionDocument) {
+function prepareComments(history: EventHistoryActionDocument) {
   const comments: { comment: string }[] = []
 
   if (
@@ -66,7 +61,7 @@ function prepareComments(history: ActionDocument) {
   return comments
 }
 
-function prepareReason(history: ActionDocument) {
+function prepareReason(history: EventHistoryActionDocument) {
   const reason: { message?: string } = {}
 
   if (history.type === ActionType.REJECT_CORRECTION) {
@@ -77,7 +72,7 @@ function prepareReason(history: ActionDocument) {
 }
 
 function prepareDuplicateOf(
-  history: ActionDocument,
+  history: EventHistoryActionDocument,
   fullHistory: ActionDocument[]
 ): string | null {
   if (history.type !== ActionType.MARK_AS_DUPLICATE) {
@@ -107,20 +102,19 @@ export function EventHistoryDialog({
   action,
   userName,
   close,
-  fullEvent
+  fullEvent,
+  validatorContext,
+  title
 }: {
-  action: ActionDocument
+  action: EventHistoryActionDocument
   userName: string
   close: () => void
   fullEvent: EventDocument
+  validatorContext: ValidatorContext
+  title: string
 }) {
   const intl = useIntl()
-  const { getActionTypeForHistory } = useActionForHistory()
   const history = getAcceptedActions(fullEvent)
-  const title = intl.formatMessage(eventHistoryStatusMessage, {
-    status: getActionTypeForHistory(history, action)
-  })
-
   const comments = prepareComments(action)
   const reason = prepareReason(action)
   const duplicateOf = prepareDuplicateOf(action, history)
@@ -161,7 +155,7 @@ export function EventHistoryDialog({
           ]}
           content={[
             {
-              duplicateOf: duplicateOf
+              duplicateOf
             }
           ]}
           noResultText=" "
@@ -193,7 +187,11 @@ export function EventHistoryDialog({
           noResultText=" "
         />
       )}
-      <ActionTypeSpecificContent action={action} fullEvent={fullEvent} />
+      <ActionTypeSpecificContent
+        action={action}
+        fullEvent={fullEvent}
+        validatorContext={validatorContext}
+      />
     </ResponsiveModal>
   )
 }

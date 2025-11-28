@@ -130,7 +130,7 @@ describe('Submission Controller', () => {
         profile: {
           userDetails: {},
           tokenPayload: {
-            scope: ['declare']
+            scope: []
           }
         },
         offline: {

@@ -12,8 +12,9 @@
 import * as React from 'react'
 
 import styled from 'styled-components'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons'
+import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
 import { Stack } from '@opencrvs/components'
+import { InherentFlags } from '@opencrvs/commons/client'
 import { Flex, getIconColor, Icon, IconWithName } from './IconWithName'
 
 interface IconWithNameEventProps
@@ -36,11 +37,15 @@ export function IconWithNameEvent({
   return (
     <Flex id="flex">
       <Icon>
-        <DeclarationIcon
-          color={getIconColor(status, flags)}
-          isArchive={isArchived}
-          isValidatedOnReview={isValidatedOnReview}
-        />
+        {flags?.includes(InherentFlags.POTENTIAL_DUPLICATE) ? (
+          <Duplicate />
+        ) : (
+          <DeclarationIcon
+            color={getIconColor(status, flags)}
+            isArchive={isArchived}
+            isValidatedOnReview={isValidatedOnReview}
+          />
+        )}
       </Icon>
       <Stack alignItems="flex-start" direction="column" gap={0}>
         {name}

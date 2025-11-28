@@ -11,7 +11,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
 import { findScope } from '@opencrvs/commons/client'
-import { queryClient, useTRPC } from '@client/v2-events/trpc'
+import { useTRPC } from '@client/v2-events/trpc'
 import { getScope } from '@client/profile/profileSelectors'
 
 /**

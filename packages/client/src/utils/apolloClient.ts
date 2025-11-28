@@ -25,8 +25,7 @@ import { AnyAction, Store } from 'redux'
 import * as Sentry from '@sentry/react'
 import TimeoutLink from '@client/utils/timeoutLink'
 import * as React from 'react'
-import { CachePersistor, LocalForageWrapper } from 'apollo3-cache-persist'
-import localforage from 'localforage'
+import { CachePersistor } from 'apollo3-cache-persist'
 import {
   createPersistLink,
   persistenceMapper,
@@ -34,6 +33,7 @@ import {
 } from '@client/utils/persistence'
 import { storeReloadModalVisibility } from '@client/reload/reducer'
 import { APPLICATION_VERSION } from './constants'
+import { storage } from '../storage'
 
 export let client: ApolloClient<NormalizedCacheObject>
 
@@ -110,7 +110,7 @@ async function createPersistentClient(store: Store<IStoreState, AnyAction>) {
   const cache = new InMemoryCache()
   const newPersistor = new CachePersistor({
     cache,
-    storage: new LocalForageWrapper(localforage),
+    storage,
     trigger: 'write',
     persistenceMapper
   })

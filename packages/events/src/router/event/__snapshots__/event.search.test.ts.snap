@@ -205,16 +205,183 @@ exports[`Returns relevant events in right order 2`] = `
 exports[`Throws when date field is invalid 1`] = `
 [TRPCError: [
   {
-    "code": "invalid_string",
-    "validation": "date",
-    "message": "Invalid date",
+    "code": "invalid_union",
+    "errors": [
+      [
+        {
+          "code": "invalid_union",
+          "errors": [
+            [
+              {
+                "code": "invalid_union",
+                "errors": [
+                  [
+                    {
+                      "origin": "string",
+                      "code": "invalid_format",
+                      "format": "date",
+                      "pattern": "/^(?:(?:\\\\d\\\\d[2468][048]|\\\\d\\\\d[13579][26]|\\\\d\\\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\\\d|30)|(?:02)-(?:0[1-9]|1\\\\d|2[0-8])))$/",
+                      "path": [],
+                      "message": "Invalid ISO date"
+                    }
+                  ],
+                  [
+                    {
+                      "origin": "string",
+                      "code": "invalid_format",
+                      "format": "datetime",
+                      "pattern": "/^(?:(?:\\\\d\\\\d[2468][048]|\\\\d\\\\d[13579][26]|\\\\d\\\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\\\d|30)|(?:02)-(?:0[1-9]|1\\\\d|2[0-8])))T(?:(?:[01]\\\\d|2[0-3]):[0-5]\\\\d(?::[0-5]\\\\d(?:\\\\.\\\\d+)?)?(?:Z))$/",
+                      "path": [],
+                      "message": "Invalid ISO datetime"
+                    }
+                  ]
+                ],
+                "path": [
+                  "term"
+                ],
+                "message": "Invalid input"
+              }
+            ],
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "range"
+                ],
+                "path": [
+                  "type"
+                ],
+                "message": "Invalid input: expected \\"range\\""
+              },
+              {
+                "code": "invalid_union",
+                "errors": [
+                  [
+                    {
+                      "expected": "string",
+                      "code": "invalid_type",
+                      "path": [],
+                      "message": "Invalid input: expected string, received undefined"
+                    }
+                  ],
+                  [
+                    {
+                      "expected": "string",
+                      "code": "invalid_type",
+                      "path": [],
+                      "message": "Invalid input: expected string, received undefined"
+                    }
+                  ]
+                ],
+                "path": [
+                  "gte"
+                ],
+                "message": "Invalid input"
+              },
+              {
+                "code": "invalid_union",
+                "errors": [
+                  [
+                    {
+                      "expected": "string",
+                      "code": "invalid_type",
+                      "path": [],
+                      "message": "Invalid input: expected string, received undefined"
+                    }
+                  ],
+                  [
+                    {
+                      "expected": "string",
+                      "code": "invalid_type",
+                      "path": [],
+                      "message": "Invalid input: expected string, received undefined"
+                    }
+                  ]
+                ],
+                "path": [
+                  "lte"
+                ],
+                "message": "Invalid input"
+              }
+            ],
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "timePeriod"
+                ],
+                "path": [
+                  "type"
+                ],
+                "message": "Invalid input: expected \\"timePeriod\\""
+              },
+              {
+                "code": "invalid_value",
+                "values": [
+                  "last7Days",
+                  "last30Days",
+                  "last90Days",
+                  "last365Days"
+                ],
+                "path": [
+                  "term"
+                ],
+                "message": "Invalid option: expected one of \\"last7Days\\"|\\"last30Days\\"|\\"last90Days\\"|\\"last365Days\\""
+              }
+            ]
+          ],
+          "path": [
+            "updatedAt"
+          ],
+          "message": "Invalid input"
+        }
+      ],
+      [
+        {
+          "code": "invalid_union",
+          "errors": [
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "and"
+                ],
+                "path": [],
+                "message": "Invalid input: expected \\"and\\""
+              }
+            ],
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "or"
+                ],
+                "path": [],
+                "message": "Invalid input: expected \\"or\\""
+              }
+            ]
+          ],
+          "path": [
+            "type"
+          ],
+          "message": "Invalid input"
+        },
+        {
+          "expected": "array",
+          "code": "invalid_type",
+          "path": [
+            "clauses"
+          ],
+          "message": "Invalid input: expected array, received undefined"
+        }
+      ]
+    ],
     "path": [
       "query",
       "clauses",
-      0,
-      "updatedAt",
-      "term"
-    ]
+      0
+    ],
+    "message": "Invalid input"
   }
 ]]
 `;
@@ -222,16 +389,158 @@ exports[`Throws when date field is invalid 1`] = `
 exports[`Throws when one of the date range fields has invalid date 1`] = `
 [TRPCError: [
   {
-    "code": "invalid_string",
-    "validation": "date",
-    "message": "Invalid date",
+    "code": "invalid_union",
+    "errors": [
+      [
+        {
+          "code": "invalid_union",
+          "errors": [
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "exact"
+                ],
+                "path": [
+                  "type"
+                ],
+                "message": "Invalid input: expected \\"exact\\""
+              },
+              {
+                "code": "invalid_union",
+                "errors": [
+                  [
+                    {
+                      "expected": "string",
+                      "code": "invalid_type",
+                      "path": [],
+                      "message": "Invalid input: expected string, received undefined"
+                    }
+                  ],
+                  [
+                    {
+                      "expected": "string",
+                      "code": "invalid_type",
+                      "path": [],
+                      "message": "Invalid input: expected string, received undefined"
+                    }
+                  ]
+                ],
+                "path": [
+                  "term"
+                ],
+                "message": "Invalid input"
+              }
+            ],
+            [
+              {
+                "code": "invalid_union",
+                "errors": [
+                  [
+                    {
+                      "origin": "string",
+                      "code": "invalid_format",
+                      "format": "date",
+                      "pattern": "/^(?:(?:\\\\d\\\\d[2468][048]|\\\\d\\\\d[13579][26]|\\\\d\\\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\\\d|30)|(?:02)-(?:0[1-9]|1\\\\d|2[0-8])))$/",
+                      "path": [],
+                      "message": "Invalid ISO date"
+                    }
+                  ],
+                  [
+                    {
+                      "origin": "string",
+                      "code": "invalid_format",
+                      "format": "datetime",
+                      "pattern": "/^(?:(?:\\\\d\\\\d[2468][048]|\\\\d\\\\d[13579][26]|\\\\d\\\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\\\d|30)|(?:02)-(?:0[1-9]|1\\\\d|2[0-8])))T(?:(?:[01]\\\\d|2[0-3]):[0-5]\\\\d(?::[0-5]\\\\d(?:\\\\.\\\\d+)?)?(?:Z))$/",
+                      "path": [],
+                      "message": "Invalid ISO datetime"
+                    }
+                  ]
+                ],
+                "path": [
+                  "gte"
+                ],
+                "message": "Invalid input"
+              }
+            ],
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "timePeriod"
+                ],
+                "path": [
+                  "type"
+                ],
+                "message": "Invalid input: expected \\"timePeriod\\""
+              },
+              {
+                "code": "invalid_value",
+                "values": [
+                  "last7Days",
+                  "last30Days",
+                  "last90Days",
+                  "last365Days"
+                ],
+                "path": [
+                  "term"
+                ],
+                "message": "Invalid option: expected one of \\"last7Days\\"|\\"last30Days\\"|\\"last90Days\\"|\\"last365Days\\""
+              }
+            ]
+          ],
+          "path": [
+            "updatedAt"
+          ],
+          "message": "Invalid input"
+        }
+      ],
+      [
+        {
+          "code": "invalid_union",
+          "errors": [
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "and"
+                ],
+                "path": [],
+                "message": "Invalid input: expected \\"and\\""
+              }
+            ],
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "or"
+                ],
+                "path": [],
+                "message": "Invalid input: expected \\"or\\""
+              }
+            ]
+          ],
+          "path": [
+            "type"
+          ],
+          "message": "Invalid input"
+        },
+        {
+          "expected": "array",
+          "code": "invalid_type",
+          "path": [
+            "clauses"
+          ],
+          "message": "Invalid input: expected array, received undefined"
+        }
+      ]
+    ],
     "path": [
       "query",
       "clauses",
-      0,
-      "updatedAt",
-      "gte"
-    ]
+      0
+    ],
+    "message": "Invalid input"
   }
 ]]
 `;
@@ -240,12 +549,12 @@ exports[`Throws when searching by unrelated properties 1`] = `
 [TRPCError: [
   {
     "code": "custom",
-    "message": "At least one query field must be specified.",
     "path": [
       "query",
       "clauses",
       0
-    ]
+    ],
+    "message": "At least one query field must be specified."
   }
 ]]
 `;
@@ -253,16 +562,15 @@ exports[`Throws when searching by unrelated properties 1`] = `
 exports[`Throws when searching with empty clauses 1`] = `
 [TRPCError: [
   {
+    "origin": "array",
     "code": "too_small",
     "minimum": 1,
-    "type": "array",
     "inclusive": true,
-    "exact": false,
-    "message": "At least one clause is required.",
     "path": [
       "query",
       "clauses"
-    ]
+    ],
+    "message": "At least one clause is required."
   }
 ]]
 `;
@@ -270,13 +578,12 @@ exports[`Throws when searching with empty clauses 1`] = `
 exports[`Throws when searching without payload 1`] = `
 [TRPCError: [
   {
-    "code": "invalid_type",
     "expected": "object",
-    "received": "undefined",
+    "code": "invalid_type",
     "path": [
       "query"
     ],
-    "message": "Required"
+    "message": "Invalid input: expected object, received undefined"
   }
 ]]
 `;

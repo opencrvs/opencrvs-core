@@ -139,7 +139,7 @@ import { UserDetails } from '@client/utils/userUtils'
 import {
   BulletList,
   Divider,
-  IDReader,
+  IdReader,
   InputLabel,
   Stack
 } from '@opencrvs/components'
@@ -285,7 +285,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     if (fieldDefinition.type === ID_READER) {
       return (
         <InputField {...inputFieldProps}>
-          <IDReader
+          <IdReader
             dividerLabel={fieldDefinition.dividerLabel}
             manualInputInstructionLabel={
               fieldDefinition.manualInputInstructionLabel
@@ -299,7 +299,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
               fields={fields}
               setFieldValue={setFieldValue}
             />
-          </IDReader>
+          </IdReader>
         </InputField>
       )
     }

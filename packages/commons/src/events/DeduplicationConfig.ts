@@ -8,10 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
-import { extendZodWithOpenApi } from 'zod-openapi'
-extendZodWithOpenApi(z)
 
 const FieldReference = z.string()
 
@@ -61,7 +59,11 @@ const StrictMatcher = Matcher.extend({
   type: z.literal('strict'),
   options: z
     .object({
-      boost: z.number().optional().default(1)
+      boost: z.number().optional().default(1),
+      /**
+       * The constant value to be present in the field for both records
+       */
+      value: z.string().optional()
     })
     .optional()
     .default({
@@ -88,6 +90,16 @@ export type DateRangeMatcherOptions = z.input<
   typeof DateRangeMatcher
 >['options']
 
+export type NotInput = {
+  type: 'not'
+  clause: ClauseInput
+}
+
+export type NotOutput = {
+  type: 'not'
+  clause: ClauseOutput
+}
+
 export type AndInput = {
   type: 'and'
   clauses: ClauseInput[]
@@ -108,6 +120,12 @@ export type OrOutput = {
   clauses: ClauseOutput[]
 }
 
+const Not = z.object({
+  type: z.literal('not'),
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  clause: z.lazy(() => Clause)
+})
+
 const And = z.object({
   type: z.literal('and'),
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -121,6 +139,7 @@ const Or = z.object({
 })
 
 export type ClauseInput =
+  | NotInput
   | AndInput
   | OrInput
   | z.input<typeof FuzzyMatcher>
@@ -128,6 +147,7 @@ export type ClauseInput =
   | z.input<typeof DateRangeMatcher>
 
 export type ClauseOutput =
+  | NotOutput
   | AndOutput
   | OrOutput
   | z.output<typeof FuzzyMatcher>
@@ -142,9 +162,10 @@ export type ClauseOutput =
  * Default assumption is that the ZodType is the input. Markers use default values, so we need to explicitly define output type, too.
  *
  */
-export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> = z
+export const Clause: z.ZodType<ClauseOutput, ClauseInput> = z
   .lazy(() =>
     z.discriminatedUnion('type', [
+      Not,
       And,
       Or,
       FuzzyMatcher,
@@ -152,8 +173,8 @@ export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> = z
       DateRangeMatcher
     ])
   )
-  .openapi({
-    ref: 'Clause'
+  .meta({
+    id: 'Clause'
   })
 
 export type Clause = z.infer<typeof Clause>

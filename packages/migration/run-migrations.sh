@@ -26,7 +26,39 @@ pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $HEARTH_CONFIG
 pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $HEARTH_CONFIG
 
 # events migrations
+export EVENTS_DB_USER="${EVENTS_DB_USER:-events_app}"
+MIGRATIONS_PATH=$SCRIPT_PATH/src/migrations/events
+BACKUP_PATH=$MIGRATIONS_PATH/backup
+
+mkdir -p $BACKUP_PATH
+
+FILES_TO_MIGRATE=$(ls -p $MIGRATIONS_PATH | grep -v /)
+
+# Creating a backup of the original files as they need to be
+# overwritten by the envsubst before running the migrations
+for migration_file in $FILES_TO_MIGRATE
+do
+  echo "Creating backup for $MIGRATIONS_PATH/$migration_file"
+  cp $MIGRATIONS_PATH/$migration_file $BACKUP_PATH/$migration_file
+done
+
+for migration_file in $FILES_TO_MIGRATE
+do
+  echo "Updating environment variables in $MIGRATIONS_PATH/$migration_file"
+  envsubst < $MIGRATIONS_PATH/$migration_file > $MIGRATIONS_PATH/$migration_file.tmp
+  mv $MIGRATIONS_PATH/$migration_file.tmp $MIGRATIONS_PATH/$migration_file
+done
+
 DATABASE_URL=${EVENTS_POSTGRES_URL} pnpm --dir $SCRIPT_PATH exec node-pg-migrate up --schema=app --migrations-dir=./src/migrations/events
+
+# Reverting to the original state after running the migrations
+for migration_file in $FILES_TO_MIGRATE
+do
+  echo "Reverting original file $MIGRATIONS_PATH/$migration_file"
+  mv $BACKUP_PATH/$migration_file $MIGRATIONS_PATH/$migration_file
+done
+
+rm -rf $BACKUP_PATH
 
 #openhim migrations
 pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $OPENHIM_CONFIG
@@ -44,5 +76,3 @@ pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $USER_MGNT_CONFIG
 pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $PERFORMANCE_CONFIG
 pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $PERFORMANCE_CONFIG
 
-# search migration / reindex
-pnpm --dir $SCRIPT_PATH reindex-search

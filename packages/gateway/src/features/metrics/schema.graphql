@@ -102,6 +102,7 @@ interface AuditLogItemBase {
   userAgent: String!
   action: String!
   practitionerId: String!
+  isV2: Boolean
 }
 
 type UserAuditLogItem implements AuditLogItemBase {
@@ -110,6 +111,7 @@ type UserAuditLogItem implements AuditLogItemBase {
   userAgent: String!
   action: String!
   practitionerId: String!
+  isV2: Boolean
 }
 
 type UserAuditLogItemWithComposition implements AuditLogItemBase {
@@ -119,10 +121,11 @@ type UserAuditLogItemWithComposition implements AuditLogItemBase {
   action: String!
   practitionerId: String!
   data: AdditionalIdWithCompositionId!
+  isV2: Boolean
 }
 
 union UserAuditLogResultItem =
-    UserAuditLogItemWithComposition
+  | UserAuditLogItemWithComposition
   | UserAuditLogItem
 
 type UserAuditLogResultSet {
@@ -180,7 +183,7 @@ type LocationStatisticsResponse {
 }
 
 union MixedTotalMetricsResult =
-    TotalMetricsByRegistrar
+  | TotalMetricsByRegistrar
   | TotalMetricsByLocation
   | TotalMetricsByTime
 

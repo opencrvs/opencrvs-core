@@ -8,50 +8,51 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import {
   MiddlewareFunction,
   TRPCError
 } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import {
+  ActionInputWithType,
   ActionType,
   ActionUpdate,
-  DeclarationUpdateActions,
   AnnotationActionType,
-  EventConfig,
-  isPageVisible,
-  getVisibleVerificationPageIds,
-  annotationActions,
-  findRecordActionPages,
-  DeclarationUpdateActionType,
-  getActionReviewFields,
-  getDeclaration,
+  ApproveCorrectionActionInput,
   DeclarationActions,
-  getCurrentEventState,
-  omitHiddenPaginatedFields,
+  DeclarationUpdateActionType,
+  DeclarationUpdateActions,
+  EventConfig,
   EventDocument,
-  deepMerge,
-  deepDropNulls,
-  omitHiddenFields,
   EventState,
   FieldConfig,
-  isFieldVisible,
-  errorMessages,
-  runFieldValidations,
-  ActionInputWithType,
-  ApproveCorrectionActionInput,
   RejectCorrectionActionInput,
+  annotationActions,
+  deepDropNulls,
+  deepMerge,
+  errorMessages,
+  findRecordActionPages,
+  getActionReviewFields,
+  getCurrentEventState,
+  getDeclaration,
+  getVisibleVerificationPageIds,
+  isFieldVisible,
+  isPageVisible,
+  omitHiddenFields,
+  omitHiddenPaginatedFields,
+  runFieldValidations,
   runStructuralValidations,
-  Location
+  ValidatorContext,
+  getCustomActionFields
 } from '@opencrvs/commons/events'
+
 import { getEventConfigurationById } from '@events/service/config/config'
-import { getEventById } from '@events/service/events/events'
-import { TrpcContext } from '@events/context'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
+import { getEventById } from '@events/service/events/events'
 import { isLeafLocation } from '@events/storage/postgres/events/locations'
-import { getLocations } from '@events/service/locations/locations'
+import { TrpcContext } from '@events/context'
 import {
+  getValidatorContext,
   getInvalidUpdateKeys,
   getVerificationPageErrors,
   throwWhenNotEmpty
@@ -60,11 +61,11 @@ import {
 export function getFieldErrors(
   fields: FieldConfig[],
   data: ActionUpdate,
-  declaration: EventState = {},
-  context?: { locations: Array<Location> }
+  context: ValidatorContext,
+  declaration: EventState = {}
 ) {
   const visibleFields = fields.filter((field) =>
-    isFieldVisible(field, { ...data, ...declaration })
+    isFieldVisible(field, { ...data, ...declaration }, context)
   )
 
   const visibleFieldIds = visibleFields.map((field) => field.id)
@@ -74,7 +75,8 @@ export function getFieldErrors(
       (field) =>
         // If field is not visible and not in the visible fields list, it is a hidden field
         // We need to check against the visible fields list because there might be fields with same ids, one of which is visible and others are hidden
-        !isFieldVisible(field, data) && !visibleFieldIds.includes(field.id)
+        !isFieldVisible(field, data, context) &&
+        !visibleFieldIds.includes(field.id)
     )
     .map((field) => field.id)
 
@@ -99,7 +101,7 @@ export function getFieldErrors(
       context
     })
 
-    return fieldErrors.errors.map((error) => ({
+    return fieldErrors.map((error) => ({
       message: error.message.defaultMessage,
       id: field.id,
       value: data[field.id as keyof typeof data]
@@ -121,9 +123,8 @@ function validateDeclarationUpdateAction({
   event: EventDocument
   actionType: DeclarationUpdateActionType
   declarationUpdate: ActionUpdate
-  // @TODO: annotation is always specific to action. Is there ever a need for null?
   annotation?: ActionUpdate
-  context: { locations: Array<Location> }
+  context: ValidatorContext
 }) {
   /*
    * Declaration allows partial updates. Updates are validated against primitive types (zod) and field based custom validators (JSON schema).
@@ -141,10 +142,11 @@ function validateDeclarationUpdateAction({
   const declarationConfig = getDeclaration(eventConfig)
 
   // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
-  // (e.g. when dob is unknown anduser has send the age previously.Now they only send dob, without setting dob unknown to false).
+  // (e.g. when dob is unknown and user has send the age previously. Now they only send dob, without setting dob unknown to false).
   const cleanedDeclaration = omitHiddenPaginatedFields(
     declarationConfig,
-    completeDeclaration
+    completeDeclaration,
+    context
   )
 
   // 3. When declaration update has fields that are not in the cleaned declaration, payload is invalid.
@@ -160,14 +162,14 @@ function validateDeclarationUpdateAction({
 
   // 4. Validate declaration update against conditional rules, taking into account conditional pages.
   const allVisiblePageFields = declarationConfig.pages
-    .filter((page) => isPageVisible(page, cleanedDeclaration))
+    .filter((page) => isPageVisible(page, cleanedDeclaration, context))
     .flatMap((page) => page.fields)
 
   const declarationErrors = getFieldErrors(
     allVisiblePageFields,
     cleanedDeclaration,
-    {},
-    context
+    context,
+    {}
   )
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
@@ -179,12 +181,14 @@ function validateDeclarationUpdateAction({
 
   const visibleAnnotationFields = omitHiddenFields(
     reviewFields,
-    deepDropNulls(annotation ?? {})
+    deepDropNulls(annotation ?? {}),
+    context
   )
 
   const annotationErrors = getFieldErrors(
     reviewFields,
     visibleAnnotationFields,
+    context,
     {}
   )
 
@@ -195,18 +199,21 @@ function validateActionAnnotation({
   eventConfig,
   actionType,
   annotation = {},
-  declaration = {}
+  declaration = {},
+  context
 }: {
   eventConfig: EventConfig
   actionType: AnnotationActionType
   annotation?: ActionUpdate
   declaration: EventState
+  context: ValidatorContext
 }) {
   const pages = findRecordActionPages(eventConfig, actionType)
 
   const visibleVerificationPageIds = getVisibleVerificationPageIds(
     pages,
-    annotation
+    annotation,
+    context
   )
 
   const formFields = pages.flatMap(({ fields }) =>
@@ -214,24 +221,43 @@ function validateActionAnnotation({
   )
 
   const errors = [
-    ...getFieldErrors(formFields, annotation, declaration),
+    ...getFieldErrors(formFields, annotation, context, declaration),
     ...getVerificationPageErrors(visibleVerificationPageIds, annotation)
   ]
 
   return errors
 }
 
+function validateCustomAction({
+  eventConfig,
+  annotation = {},
+  context,
+  customActionType
+}: {
+  eventConfig: EventConfig
+  annotation?: ActionUpdate
+  context: ValidatorContext
+  customActionType: string
+}) {
+  const customActionFields = getCustomActionFields(
+    eventConfig,
+    customActionType
+  )
+  return getFieldErrors(customActionFields, annotation, context, {})
+}
+
 function validateNotifyAction({
   eventConfig,
   annotation = {},
-  declaration = {}
+  declaration = {},
+  context
 }: {
   eventConfig: EventConfig
   annotation?: ActionUpdate
   declaration: ActionUpdate
+  context: ValidatorContext
 }) {
   const declarationConfig = getDeclaration(eventConfig)
-
   const formFields = declarationConfig.pages.flatMap(({ fields }) =>
     fields.flatMap((field) => field)
   )
@@ -252,10 +278,11 @@ function validateNotifyAction({
 
       const fieldErrors = runStructuralValidations({
         field,
-        values: annotation
+        values: annotation,
+        context
       })
 
-      return fieldErrors.errors.map((error) => ({
+      return fieldErrors.map((error) => ({
         message: error.message.defaultMessage,
         id: field.id,
         value: annotation[field.id]
@@ -277,10 +304,12 @@ function validateNotifyAction({
 
       const fieldErrors = runStructuralValidations({
         field: { ...field, required: false },
-        values: declaration
+        values: declaration,
+        context,
+        actionType: ActionType.NOTIFY
       })
 
-      return fieldErrors.errors.map((error) => ({
+      return fieldErrors.map((error) => ({
         message: error.message.defaultMessage,
         id: field.id,
         value: declaration[field.id]
@@ -339,22 +368,19 @@ function validateCorrectableFields({
 export const validateAction: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
-  TrpcContext,
-  TrpcContext & { isDuplicateAction?: boolean; event: EventDocument },
+  unknown,
+  unknown,
   ActionInputWithType
 > = async ({ input, next, ctx }) => {
   const actionType = input.type
 
-  const locations = await getLocations()
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
-
   const event = await getEventById(input.eventId)
   const eventConfig = await getEventConfigurationById({
-    token: ctx.token,
-    eventType: event.type
+    eventType: event.type,
+    token: ctx.token
   })
+
+  const context = await getValidatorContext(ctx.token)
 
   const declaration = getCurrentEventState(event, eventConfig).declaration
 
@@ -362,7 +388,8 @@ export const validateAction: MiddlewareFunction<
     const errors = validateNotifyAction({
       eventConfig,
       annotation: input.annotation,
-      declaration: input.declaration
+      declaration: input.declaration,
+      context
     })
 
     throwWhenNotEmpty(errors)
@@ -385,6 +412,18 @@ export const validateAction: MiddlewareFunction<
     throwIfRequestActionNotFound(event, input)
   }
 
+  if (actionType === ActionType.CUSTOM) {
+    const errors = validateCustomAction({
+      eventConfig,
+      annotation: input.annotation,
+      context,
+      customActionType: input.customActionType
+    })
+
+    throwWhenNotEmpty(errors)
+    return next()
+  }
+
   const declarationUpdateAction = DeclarationUpdateActions.safeParse(actionType)
 
   if (declarationUpdateAction.success) {
@@ -394,7 +433,7 @@ export const validateAction: MiddlewareFunction<
       declarationUpdate: input.declaration,
       annotation: input.annotation,
       actionType: declarationUpdateAction.data,
-      context: { locations: adminStructureLocations }
+      context
     })
 
     throwWhenNotEmpty(errors)
@@ -408,7 +447,8 @@ export const validateAction: MiddlewareFunction<
       eventConfig,
       annotation: input.annotation,
       actionType: annotationActionParse.data,
-      declaration
+      declaration,
+      context
     })
 
     throwWhenNotEmpty(errors)

@@ -12,6 +12,7 @@ import { NON_UNICODED_LANGUAGES } from '@notification/constants'
 import { internal } from '@hapi/boom'
 import { notifyCountryConfig } from '@notification/features/sms/service'
 import { getDefaultLanguage } from '@notification/i18n/utils'
+import { IUserName } from '@opencrvs/commons'
 
 interface IMessageIdentifier {
   [key: string]: string
@@ -27,12 +28,6 @@ export interface IEventMessageRecipient {
     sms?: string | null
     email?: string | null
   }
-}
-
-interface IUserName {
-  use: string
-  family: string
-  given: string[]
 }
 
 export interface IMessageRecipient {

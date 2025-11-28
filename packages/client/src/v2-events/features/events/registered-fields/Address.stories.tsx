@@ -27,21 +27,25 @@ import { Review } from '@client/v2-events/features/events/components/Review'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Address',
   args: { onChange: fn() },
   decorators: [
-    (Story) => (
+    (Story, context) => (
       <TRPCProvider>
-        <Story />
+        <Story {...context} />
       </TRPCProvider>
-    )
+    ),
+    withValidatorContext
   ]
 }
 
 export default meta
+
+const leafAdminStructureLocationId =
+  '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
 
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
@@ -55,6 +59,7 @@ export const EmptyAddressField: StoryObj<typeof FormFieldGenerator> = {
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={[
           {
             id: 'storybook.address',
@@ -85,6 +90,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={[
           {
             id: 'storybook.address',
@@ -97,7 +103,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
             defaultValue: {
               country: 'FAR',
               addressType: AddressType.DOMESTIC,
-              administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID
+              administrativeArea: leafAdminStructureLocationId
             },
             configuration: {
               streetAddressForm: [
@@ -105,7 +111,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
                   id: 'town',
                   required: false,
                   label: {
-                    id: 'v2.field.address.town.label',
+                    id: 'field.address.town.label',
                     defaultMessage: 'Town',
                     description: 'This is the label for the field'
                   },
@@ -115,7 +121,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
                   id: 'residentialArea',
                   required: false,
                   label: {
-                    id: 'v2.field.address.residentialArea.label',
+                    id: 'field.address.residentialArea.label',
                     defaultMessage: 'Residential Area',
                     description: 'This is the label for the field'
                   },
@@ -125,7 +131,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
                   id: 'street',
                   required: false,
                   label: {
-                    id: 'v2.field.address.street.label',
+                    id: 'field.address.street.label',
                     defaultMessage: 'Street',
                     description: 'This is the label for the field'
                   },
@@ -135,7 +141,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
                   id: 'number',
                   required: false,
                   label: {
-                    id: 'v2.field.address.number.label',
+                    id: 'field.address.number.label',
                     defaultMessage: 'Number',
                     description: 'This is the label for the field'
                   },
@@ -145,7 +151,7 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
                   id: 'zipCode',
                   required: false,
                   label: {
-                    id: 'v2.field.address.postcodeOrZip.label',
+                    id: 'field.address.postcodeOrZip.label',
                     defaultMessage: 'Postcode / Zip',
                     description: 'This is the label for the field'
                   },
@@ -168,25 +174,23 @@ const eventConfig: EventConfig = tennisClubMembershipEvent
 
 const declarationForm = getDeclaration(eventConfig)
 
-export const AddressReviewInvalid: StoryObj<typeof Review> = {
+export const AddressReviewInvalid: StoryObj<typeof FormFieldGenerator> = {
   name: 'Review output (Invalid)',
   parameters: {
     layout: 'centered'
   },
-  render: function Component() {
-    const { getLocations } = useLocations()
-    const [locations] = getLocations.useSuspenseQuery()
+  render: function Component(args) {
     return (
       <Review.Body
+        {...args}
         form={{
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
+            administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054d' as UUID // random uuid
           } as AddressFieldValue
         }}
         formConfig={declarationForm}
-        locations={locations}
         title="My address form with address output"
         // eslint-disable-next-line no-console
         onEdit={(values) => console.log(values)}
@@ -196,14 +200,15 @@ export const AddressReviewInvalid: StoryObj<typeof Review> = {
     )
   }
 }
-export const AddressReviewEmpty: StoryObj<typeof Review> = {
+export const AddressReviewEmpty: StoryObj<typeof FormFieldGenerator> = {
   name: 'Review output (Empty)',
   parameters: {
     layout: 'centered'
   },
-  render: function Component() {
+  render: function Component(args) {
     return (
       <Review.Body
+        {...args}
         form={{}}
         formConfig={declarationForm}
         title="My address form with address output"
@@ -215,25 +220,28 @@ export const AddressReviewEmpty: StoryObj<typeof Review> = {
     )
   }
 }
-export const AddressReviewChanged: StoryObj<typeof Review> = {
+export const AddressReviewChanged: StoryObj<typeof FormFieldGenerator> = {
   name: 'Review with changed address',
   parameters: {
     layout: 'centered'
   },
-  render: function Component() {
+  render: function Component(args) {
     return (
       <Review.Body
+        {...args}
         form={{
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+            administrativeArea: leafAdminStructureLocationId,
             streetLevelDetails: {
               town: 'Example Town',
               residentialArea: 'Example Residential Area',
               street: 'Example Street',
               number: '55',
-              zipCode: '123456'
+              zipCode: '123456',
+              state: 'Example State',
+              district2: 'Example District 2'
             }
           }
         }}
@@ -242,9 +250,10 @@ export const AddressReviewChanged: StoryObj<typeof Review> = {
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
-            administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+            administrativeArea: leafAdminStructureLocationId,
             streetLevelDetails: {
-              town: 'Example Village'
+              town: 'Example Village',
+              district2: 'Old District 2'
             }
           }
         }}
@@ -270,7 +279,7 @@ export const AddressInCopy: StoryObj<typeof Review> = {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: '5ef450bc-712d-48ad-93f3-8da0fa453baa' as UUID,
+        administrativeArea: leafAdminStructureLocationId,
         streetLevelDetails: {
           town: 'Example Town',
           residentialArea: 'Example Residential Area',

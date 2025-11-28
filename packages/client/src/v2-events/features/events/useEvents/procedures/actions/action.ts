@@ -20,14 +20,16 @@ import { useSyncExternalStore } from 'react'
 import { isEmpty } from 'lodash'
 import {
   ActionType,
+  ActionStatus,
   ActionUpdate,
   EventDocument,
-  getCurrentEventState,
   omitHiddenAnnotationFields,
   omitHiddenPaginatedFields,
   deepMerge,
   EventState,
-  EventConfig
+  EventConfig,
+  getCurrentEventState,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -36,12 +38,10 @@ import {
   findLocalEventDocument,
   findLocalEventIndex,
   onAssign,
+  deleteLocalEvent,
   updateLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
-import {
-  addMarkAsNotDuplicateActionOptimistically,
-  updateEventOptimistically
-} from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
+import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   createEventActionMutationFn,
   MutationType,
@@ -54,6 +54,7 @@ import {
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
 import { ToastKey } from '@client/v2-events/routes/Toaster'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 function retryUnlessConflict(
   _failureCount: number,
@@ -79,11 +80,17 @@ function errorToastOnConflict(error: TRPCClientError<AppRouter>) {
 // For example: if the correction payload contains only `informant.name`, but not `informant.relation`,
 // running omitHiddenPaginatedFields on the payload alone would remove `informant.name` (since its parent `informant.relation` is missing).
 // By merging first, we preserve such dependencies, and then run a diff to keep only the valid correction fields.
-function getCleanedDeclarationDiff(
-  eventConfiguration: EventConfig,
-  originalDeclaration?: EventState,
+function getCleanedDeclarationDiff({
+  eventConfiguration,
+  originalDeclaration,
+  declarationDiff,
+  validatorContext
+}: {
+  eventConfiguration: EventConfig
+  originalDeclaration?: EventState
   declarationDiff?: EventState
-): ActionUpdate | undefined {
+  validatorContext: ValidatorContext
+}): ActionUpdate | undefined {
   if (isEmpty(declarationDiff)) {
     return declarationDiff
   }
@@ -92,7 +99,8 @@ function getCleanedDeclarationDiff(
   if (isEmpty(originalDeclaration)) {
     return omitHiddenPaginatedFields(
       eventConfiguration.declaration,
-      declarationDiff
+      declarationDiff,
+      validatorContext
     )
   }
 
@@ -104,16 +112,27 @@ function getCleanedDeclarationDiff(
   // (Ensures we only consider fields relevant to the event configuration)
   const cleanedDeclaration = omitHiddenPaginatedFields(
     eventConfiguration.declaration,
-    merged
+    merged,
+    validatorContext
   )
 
   // From the update, keep only fields that are valid in the cleaned declaration
   // (Prevents applying updates to hidden/invalid fields)
-  const cleanedDeclarationDiff: ActionUpdate = Object.fromEntries(
+  return Object.fromEntries(
     Object.entries(declarationDiff).filter(([key]) => key in cleanedDeclaration)
   )
-  return cleanedDeclarationDiff
 }
+
+setMutationDefaults(trpcOptionsProxy.event.actions.custom.request, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.custom.request
+  ),
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEvent,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.CUSTOM }
+})
 
 setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   mutationFn: createEventActionMutationFn(
@@ -121,12 +140,14 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  onMutate: updateEventOptimistically(ActionType.DECLARE),
-  meta: {
-    actionType: ActionType.DECLARE
-  }
+  onMutate: updateEventOptimistically(
+    ActionType.DECLARE,
+    ActionStatus.Accepted,
+    true
+  ),
+  meta: { actionType: ActionType.DECLARE }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
@@ -135,11 +156,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.REGISTER
-  }
+  meta: { actionType: ActionType.REGISTER }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.notify.request, {
@@ -148,11 +167,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.notify.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.NOTIFY
-  }
+  meta: { actionType: ActionType.NOTIFY }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.validate.request, {
@@ -161,11 +178,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.validate.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.VALIDATE
-  }
+  meta: { actionType: ActionType.VALIDATE }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.reject.request, {
@@ -174,11 +189,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.reject.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.REJECT
-  }
+  meta: { actionType: ActionType.REJECT }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.archive.request, {
@@ -187,11 +200,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.archive.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.ARCHIVE
-  }
+  meta: { actionType: ActionType.ARCHIVE }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
@@ -200,11 +211,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.PRINT_CERTIFICATE
-  }
+  meta: { actionType: ActionType.PRINT_CERTIFICATE }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.correction.request.request, {
@@ -213,11 +222,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.request.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.REQUEST_CORRECTION
-  }
+  meta: { actionType: ActionType.REQUEST_CORRECTION }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve.request, {
@@ -226,11 +233,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.APPROVE_CORRECTION
-  }
+  meta: { actionType: ActionType.APPROVE_CORRECTION },
+  onMutate: updateEventOptimistically(ActionType.APPROVE_CORRECTION)
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject.request, {
@@ -239,11 +245,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject.request, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.REJECT_CORRECTION
-  }
+  meta: { actionType: ActionType.REJECT_CORRECTION }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.assignment.assign, {
@@ -254,9 +258,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.assign, {
   retryDelay,
   onSuccess: onAssign,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.ASSIGN
-  }
+  meta: { actionType: ActionType.ASSIGN }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
@@ -268,9 +270,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
   retryDelay,
   onSuccess: cleanUpOnUnassign,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.UNASSIGN
-  }
+  meta: { actionType: ActionType.UNASSIGN }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markAsDuplicate, {
@@ -279,11 +279,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markAsDuplicate, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.MARK_AS_DUPLICATE
-  }
+  meta: { actionType: ActionType.MARK_AS_DUPLICATE }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
@@ -292,14 +290,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
   ),
   retry: retryUnlessConflict,
   retryDelay,
-  onMutate: addMarkAsNotDuplicateActionOptimistically(
-    ActionType.MARK_AS_NOT_DUPLICATE
-  ),
+  onMutate: updateEventOptimistically(ActionType.MARK_AS_NOT_DUPLICATE),
   onSuccess: updateLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.MARK_AS_NOT_DUPLICATE
-  }
+  meta: { actionType: ActionType.MARK_AS_NOT_DUPLICATE }
 })
 
 type CustomMutationKeys = keyof typeof customApi
@@ -324,54 +318,61 @@ queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
   mutationFn: waitUntilEventIsCreated(customApi.validateOnDeclare),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.DECLARE
-  }
+  meta: { actionType: ActionType.DECLARE }
 })
 
 queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   mutationFn: waitUntilEventIsCreated(customApi.registerOnDeclare),
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.DECLARE
-  }
+  meta: { actionType: ActionType.DECLARE }
 })
 
 queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
   mutationFn: customApi.registerOnValidate,
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.REGISTER
-  }
+  meta: { actionType: ActionType.REGISTER }
 })
 
 queryClient.setMutationDefaults(customMutationKeys.archiveOnDuplicate, {
   mutationFn: customApi.archiveOnDuplicate,
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.MARK_AS_DUPLICATE
-  }
+  meta: { actionType: ActionType.MARK_AS_DUPLICATE }
 })
 
 queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
   mutationFn: customApi.makeCorrectionOnRequest,
   retry: retryUnlessConflict,
   retryDelay,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
-  meta: {
-    actionType: ActionType.APPROVE_CORRECTION
+  meta: { actionType: ActionType.APPROVE_CORRECTION },
+  onMutate: (variables) => {
+    // Since the 'makeCorrectionOnRequest' requires two actions (REQUEST_CORRECTION and APPROVE_CORRECTION),
+    // we need to update the event optimistically with both actions.
+    const optimisticAction = updateEventOptimistically(
+      ActionType.REQUEST_CORRECTION
+    )(variables)
+
+    if (!optimisticAction) {
+      return
+    }
+
+    // For the APPROVE_CORRECTION action, we need to pass the id of the REQUEST_CORRECTION action as 'requestId', so that the actions are properly matched.
+    updateEventOptimistically(ActionType.APPROVE_CORRECTION)({
+      ...variables,
+      requestId: optimisticAction.id
+    })
   }
 })
 
@@ -390,6 +391,8 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   trpcProcedure: P
 ) {
   const eventConfigurations = useEventConfigurations()
+  // @TODO: consider whether this should be here.
+  const validatorContext = useValidatorContext()
 
   const allOptions = {
     ...trpcProcedure.mutationOptions(),
@@ -417,7 +420,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   type ActionMutationInput = inferInput<P> & { fullEvent?: EventDocument }
 
   function getMutationPayload(params: ActionMutationInput) {
-    const { eventId } = params
+    const { eventId, fullEvent, event, context, ...restParams } = params
     const localEvent =
       /*
        * In most cases an event should be stored in browser as a full event. This applies when:
@@ -428,7 +431,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       findLocalEventDocument(eventId) || findLocalEventIndex(eventId)
 
     const eventConfiguration = eventConfigurations.find(
-      (event) => event.id === localEvent?.type
+      (e) => e.id === localEvent?.type
     )
 
     if (!eventConfiguration) {
@@ -444,25 +447,28 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         : action.type === actionType
     )
 
-    const originalDeclaration = params.fullEvent
-      ? getCurrentEventState(params.fullEvent, eventConfiguration).declaration
+    const originalDeclaration = fullEvent
+      ? getCurrentEventState(fullEvent, eventConfiguration).declaration
       : {}
 
     const annotation = actionConfiguration
       ? omitHiddenAnnotationFields(
           actionConfiguration,
           originalDeclaration,
-          params.annotation
+          restParams.annotation,
+          {}
         )
       : {}
 
     return {
-      ...params,
-      declaration: getCleanedDeclarationDiff(
+      ...restParams,
+      eventId,
+      declaration: getCleanedDeclarationDiff({
         eventConfiguration,
         originalDeclaration,
-        params.declaration
-      ),
+        declarationDiff: params.declaration,
+        validatorContext
+      }),
       annotation
     }
   }
@@ -471,7 +477,8 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     mutate: (params: ActionMutationInput) =>
       mutation.mutate(getMutationPayload(params)),
     mutateAsync: async (params: ActionMutationInput) =>
-      mutation.mutateAsync(getMutationPayload(params))
+      mutation.mutateAsync(getMutationPayload(params)),
+    isPending: mutation.isPending
   }
 }
 
@@ -479,9 +486,11 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
   mutationName: T
 ) {
   const eventConfigurations = useEventConfigurations()
+  // @TODO: consider whether this should be here.
+  const validatorContext = useValidatorContext()
   const mutationKey = customMutationKeys[mutationName]
   const mutation = useMutation({
-    mutationKey: mutationKey,
+    mutationKey,
     ...queryClient.getMutationDefaults(mutationKey)
   })
 
@@ -512,11 +521,12 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
       return mutation.mutate({
         ...params,
         eventConfiguration,
-        declaration: getCleanedDeclarationDiff(
+        declaration: getCleanedDeclarationDiff({
           eventConfiguration,
           originalDeclaration,
-          params.declaration
-        )
+          declarationDiff: params.declaration,
+          validatorContext
+        })
       })
     }
   }

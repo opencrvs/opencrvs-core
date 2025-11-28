@@ -12,7 +12,8 @@
 import { TRPCError } from '@trpc/server'
 import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
-import z from 'zod'
+import * as z from 'zod/v4'
+import { findLast } from 'lodash'
 import {
   ActionDocument,
   ActionInputWithType,
@@ -21,19 +22,25 @@ import {
   findScope,
   getAssignedUserFromActions,
   getScopes,
-  inScope,
   Scope,
   TokenUserType,
   WorkqueueCountInput,
   ConfigurableScopeType,
-  IAuthHeader,
   UUID,
   EventDocument,
   ConfigurableScopes,
-  getAuthorizedEventsFromScopes
+  getAuthorizedEventsFromScopes,
+  getTokenPayload,
+  canUserReadEvent,
+  hasScope,
+  SCOPES,
+  hasAnyOfScopes
 } from '@opencrvs/commons'
-import { getEventById } from '@events/service/events/events'
+import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
+import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
+import { getUserOrSystem } from '../../../service/users/api'
+import { isLocationUnderJurisdiction } from '../../../storage/postgres/events/locations'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -67,11 +74,11 @@ function getAuthorizedEntitiesFromScopes(scopes: ConfigurableScopes[]) {
  * @returns Object containing authorized entities (e.g. events) based on found scopes
  * @throws {TRPCError} If no matching configurable scopes are found
  */
-function inConfigurableScopes(
-  authHeader: IAuthHeader,
+function getAuthorizedEntities(
+  token: string,
   configurableScopes: ConfigurableScopeType[]
 ) {
-  const userScopes = getScopes(authHeader)
+  const userScopes = getScopes(token)
   const foundScopes = configurableScopes
     .map((scope) => findScope(userScopes, scope))
     .filter((scope) => scope !== undefined)
@@ -85,6 +92,11 @@ function inConfigurableScopes(
 
 type CtxWithAuthorizedEntities = TrpcContext & {
   authorizedEntities?: { events?: string[] }
+}
+
+function inScope(token: string, scopes: Scope[]) {
+  const tokenScopes = getScopes(token)
+  return scopes.some((scope) => tokenScopes.includes(scope))
 }
 
 /**
@@ -105,19 +117,18 @@ export function requiresAnyOfScopes(
     CtxWithAuthorizedEntities,
     unknown
   > = async (opts) => {
-    const token = setBearerForToken(opts.ctx.token)
-    const authHeader = { Authorization: token }
+    const { token } = opts.ctx
 
-    // If the user has any of the allowd plain scopes, allow access
-    if (inScope(authHeader, scopes)) {
+    // If the user has any of the allowed plain scopes, allow access
+    if (inScope(token, scopes)) {
       return opts.next()
     }
 
     // If the user has any of the allowed configurable scopes, allow the user to continue
     // and add the authorized entities to the TrpcContext which are checked in later middleware
     if (configurableScopes) {
-      const authorizedEntities = inConfigurableScopes(
-        authHeader,
+      const authorizedEntities = getAuthorizedEntities(
+        token,
         configurableScopes
       )
 
@@ -185,7 +196,7 @@ export const requireAssignment: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
   TrpcContext,
-  TrpcContext & { isDuplicateAction?: boolean; event: EventDocument },
+  TrpcContext & { existingAction?: ActionDocument; event: EventDocument },
   ActionInputWithType | DeleteActionInput | EventIdParam
 > = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
@@ -199,7 +210,7 @@ export const requireAssignment: MiddlewareFunction<
   )
 
   // System users can not perform action on assigned events
-  if (user.type === TokenUserType.Enum.system && assignedTo) {
+  if (user.type === TokenUserType.enum.system && assignedTo) {
     throw new TRPCError({
       code: 'CONFLICT',
       cause: 'System user can not perform action on assigned event'
@@ -207,7 +218,7 @@ export const requireAssignment: MiddlewareFunction<
   }
 
   // Normal users require assignment
-  if (user.type === TokenUserType.Enum.user && user.id !== assignedTo) {
+  if (user.type === TokenUserType.enum.user && user.id !== assignedTo) {
     throw new TRPCError({
       code: 'CONFLICT',
       message: 'You are not assigned to this event'
@@ -215,20 +226,18 @@ export const requireAssignment: MiddlewareFunction<
   }
 
   // Check for duplicate only when we know the user is assigned to the event. Otherwise we will effectively leak the event (allow reading it) to users who are not assigned to it.
-  if (
-    'transactionId' in input &&
-    event.actions.some(
+  if ('transactionId' in input) {
+    const existingAction = findLast(
+      event.actions,
       (action) =>
         action.transactionId === input.transactionId &&
         action.type === input.type
     )
-  ) {
     return next({
-      ctx: { ...ctx, isDuplicateAction: true, event },
+      ctx: { ...ctx, existingAction, event },
       input
     })
   }
-
   return next()
 }
 
@@ -239,8 +248,7 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
   TrpcContext,
   WorkqueueCountInput
 > = async ({ next, ctx, input }) => {
-  const scopes = getScopes({ Authorization: setBearerForToken(ctx.token) })
-
+  const scopes = getScopes(ctx.token)
   const workqueueScope = findScope(scopes, 'workqueue')
 
   if (!workqueueScope) {
@@ -253,4 +261,166 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
   return next()
+}
+
+/**
+ * Checks that the token has been exchanged for the specific `eventId` and `actionId` in the input.
+ *
+ * Registrars token can be exchanged in auth into a more specific token with `eventId` and `actionId`.
+ * This is useful when tokens need to be exposed outside of core of OpenCRVS, e.g. countryconfig or external systems.
+ */
+export const requireActionConfirmationAuthorization: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  AsyncActionConfirmationResponseSchema
+> = async ({ next, ctx, input }) => {
+  const {
+    eventId: grantedEventId,
+    actionId: grantedActionId,
+    scope
+  } = getTokenPayload(ctx.token)
+
+  const hasConfirmAndRejectScope =
+    scope.includes('record.confirm-registration') &&
+    scope.includes('record.reject-registration')
+
+  if (!hasConfirmAndRejectScope) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Missing required scopes for action confirmation'
+    })
+  }
+
+  const isActionConfirmationToken = grantedEventId && grantedActionId
+
+  if (!isActionConfirmationToken) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Missing required claims for action confirmation'
+    })
+  }
+
+  if (grantedEventId !== input.eventId || grantedActionId !== input.actionId) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  return next()
+}
+
+export const userCanReadEvent: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext & { event: EventDocument },
+  UUID
+> = async ({ next, ctx, input }) => {
+  const event = await getEventById(input)
+
+  const createAction = event.actions.find(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  if (!createAction) {
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: `Event ${event.id} is missing ${ActionType.CREATE} action`
+    })
+  }
+
+  const canRead = canUserReadEvent(
+    {
+      createdBy: createAction.createdBy,
+      type: event.type
+    },
+    {
+      userId: ctx.user.id,
+      scopes: getScopes(ctx.token)
+    }
+  )
+
+  if (canRead) {
+    return next({ ctx: { ...ctx, event } })
+  }
+
+  // Throw not found to avoid leaking the existence of the event
+  throw new EventNotFoundError(input)
+}
+
+export const userCanReadOtherUser: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext & { userId: string },
+  { userId: string }
+> = async ({ next, ctx, input }) => {
+  const { token, user: userReading } = ctx
+
+  // Throw early to avoid mistakes in the logic below.
+  // There are test cases for each but better safe than sorry.
+  const hasAnyScope = hasAnyOfScopes(
+    [
+      SCOPES.USER_READ,
+      SCOPES.USER_READ_MY_OFFICE,
+      SCOPES.USER_READ_MY_JURISDICTION,
+      SCOPES.USER_READ_ONLY_MY_AUDIT
+    ],
+    getScopes(token)
+  )
+
+  if (!hasAnyScope) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+
+  const otherUser = await getUserOrSystem(input.userId, token)
+
+  // Don't reveal the existence of the user
+  if (!otherUser) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+
+  // Not supported for system users
+  if (otherUser.type === TokenUserType.enum.system) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+
+  if (!userReading.primaryOfficeId) {
+    throw new TRPCError({ code: 'NOT_FOUND' })
+  }
+
+  if (hasScope(token, SCOPES.USER_READ)) {
+    return next()
+  }
+
+  if (
+    inScope(token, [
+      SCOPES.USER_READ_MY_OFFICE,
+      SCOPES.USER_READ_MY_JURISDICTION
+    ]) &&
+    userReading.primaryOfficeId === otherUser.primaryOfficeId
+  ) {
+    return next()
+  }
+
+  const isUnderJurisdiction = await isLocationUnderJurisdiction({
+    jurisdictionLocationId: userReading.primaryOfficeId,
+    locationToSearchId: otherUser.primaryOfficeId
+  })
+
+  if (
+    hasScope(token, SCOPES.USER_READ_MY_JURISDICTION) &&
+    isUnderJurisdiction
+  ) {
+    return next()
+  }
+
+  if (
+    hasScope(token, SCOPES.USER_READ_ONLY_MY_AUDIT) &&
+    userReading.id === otherUser.id
+  ) {
+    return next()
+  }
+
+  throw new TRPCError({ code: 'NOT_FOUND' })
 }

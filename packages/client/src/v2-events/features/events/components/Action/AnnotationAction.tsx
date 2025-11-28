@@ -27,6 +27,8 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 
+type Props = PropsWithChildren<{ actionType: Exclude<ActionType, 'DELETE'> }>
+
 /**
  * Creates a wrapper component for the annotation action.
  * Manages the state of the annotation action and its local draft.
@@ -37,10 +39,7 @@ import { NavigationStack } from '@client/v2-events/components/NavigationStack'
  *
  * This differs from DeclarationAction, which is a series of one-time actions that modify the declaration.
  */
-function AnnotationActionComponent({
-  children,
-  actionType
-}: PropsWithChildren<{ actionType: Exclude<ActionType, 'DELETE'> }>) {
+function AnnotationActionComponent({ children, actionType }: Props) {
   const params = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
 
   const { getEvent } = useEvents()
@@ -54,6 +53,7 @@ function AnnotationActionComponent({
   const activeRemoteDraft = remoteDraft
     ? findActiveDraftForEvent(event, remoteDraft)
     : undefined
+
   const localDraft = getLocalDraftOrDefault(
     activeRemoteDraft ||
       createEmptyDraft(params.eventId, createTemporaryId(), actionType)
@@ -123,7 +123,13 @@ function AnnotationActionComponent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return <NavigationStack>{children}</NavigationStack>
+  return children
 }
 
-export const AnnotationAction = withSuspense(AnnotationActionComponent)
+export const AnnotationAction = withSuspense((props: Props) => {
+  return (
+    <NavigationStack>
+      <AnnotationActionComponent {...props} />
+    </NavigationStack>
+  )
+})

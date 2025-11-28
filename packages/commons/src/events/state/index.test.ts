@@ -15,11 +15,18 @@ import { getUUID, UUID } from '../../uuid'
 import { ActionStatus, EventState } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { AddressType } from '../CompositeFieldValue'
-import { EventStatus, InherentFlags } from '../EventMetadata'
-import { generateActionDocument, generateEventDocument } from '../test.utils'
+import { EventStatus } from '../EventMetadata'
+import { InherentFlags } from '../Flag'
+import {
+  generateActionDocument,
+  generateEventDocument,
+  generateUuid,
+  TestUserRole
+} from '../test.utils'
 import { EventIndex } from '../EventIndex'
 import { TENNIS_CLUB_MEMBERSHIP } from '../Constants'
 import { TokenUserType } from '../../authentication'
+import { EventDocument } from '../EventDocument'
 
 /* eslint-disable max-lines */
 
@@ -27,7 +34,13 @@ describe('getCurrentEventState()', () => {
   test('Sets legalStatuses when event has been declared and registered', () => {
     const event = generateEventDocument({
       configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
+      actions: [
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.REGISTER }
+      ]
     })
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
@@ -78,7 +91,6 @@ describe('getCurrentEventState()', () => {
       actions,
       createdAt: new Date(Date.now()).toISOString(),
       id: getUUID(),
-
       updatedAt: new Date(Date.now()).toISOString()
     }
 
@@ -180,7 +192,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-01-01T00:00:00.000Z',
         createdBy: 'user1',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAtLocation: 'location1' as UUID,
         createdBySignature: '/ocrvs/signature.png',
         createdByRole: 'FIELD_AGENT'
@@ -195,7 +207,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Requested,
         createdAt: '2023-02-01T00:00:00.000Z',
         createdBy: 'user1',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAtLocation: 'location1' as UUID,
         createdBySignature: '/ocrvs/signature.png',
         createdByRole: 'FIELD_AGENT'
@@ -210,7 +222,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-03-01T00:00:00.000Z',
         createdBy: 'computer1',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAtLocation: 'location2' as UUID,
         createdBySignature: '/ocrvs/signature-2.png',
         createdByRole: '3RD_PARTY_API',
@@ -225,7 +237,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-04-01T00:00:00.000Z',
         createdBy: 'user2',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAtLocation: 'location3' as UUID,
         createdBySignature: '/ocrvs/signature-2.png',
         createdByRole: 'REGISTRATION_AGENT'
@@ -239,7 +251,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Requested,
         createdAt: '2023-05-01T00:00:00.000Z',
         createdBy: 'user3',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAtLocation: 'location4' as UUID,
         createdByRole: 'LOCAL_REGISTRAR',
         createdBySignature: '/ocrvs/signature-3.png'
@@ -253,7 +265,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-06-01T00:00:00.000Z',
         createdBy: 'computer2',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAtLocation: 'location5' as UUID,
         createdBySignature: '/ocrvs/signature-4.png',
         createdByRole: '3RD_PARTY_API',
@@ -335,7 +347,7 @@ describe('getCurrentEventState()', () => {
       defaults: {
         status: ActionStatus.Accepted,
         createdAt: '2023-01-01T00:00:00.000Z',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdBy: 'user1',
         createdBySignature: '/ocrvs/signature.png',
         createdAtLocation: 'location1' as UUID,
@@ -350,7 +362,7 @@ describe('getCurrentEventState()', () => {
       defaults: {
         status: ActionStatus.Accepted,
         createdAt: '2023-02-01T00:00:00.000Z',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdBy: 'user1',
         createdBySignature: '/ocrvs/signature.png',
         createdAtLocation: 'location1' as UUID,
@@ -364,7 +376,7 @@ describe('getCurrentEventState()', () => {
       defaults: {
         status: ActionStatus.Accepted,
         createdAt: '2023-04-01T00:00:00.000Z',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdBySignature: '/ocrvs/signature-2.png',
         createdBy: 'user2',
         createdAtLocation: 'location3' as UUID,
@@ -378,7 +390,7 @@ describe('getCurrentEventState()', () => {
       defaults: {
         status: ActionStatus.Accepted,
         createdAt: '2023-05-01T00:00:00.000Z',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdBy: 'user3',
         createdBySignature: '/ocrvs/signature-3.png',
         createdAtLocation: 'location4' as UUID,
@@ -451,10 +463,14 @@ describe('getCurrentEventState()', () => {
     const event1 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
       actions: [
-        ActionType.CREATE,
-        ActionType.DECLARE,
-        ActionType.REGISTER,
-        ActionType.REQUEST_CORRECTION
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.REGISTER },
+        {
+          type: ActionType.REQUEST_CORRECTION
+        }
       ]
     })
 
@@ -467,7 +483,13 @@ describe('getCurrentEventState()', () => {
 
     const event2 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
-      actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
+      actions: [
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.REGISTER }
+      ]
     })
 
     expect(
@@ -477,10 +499,14 @@ describe('getCurrentEventState()', () => {
     const event3 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
       actions: [
-        ActionType.CREATE,
-        ActionType.DECLARE,
-        ActionType.REGISTER,
-        ActionType.PRINT_CERTIFICATE
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.REGISTER },
+        {
+          type: ActionType.PRINT_CERTIFICATE
+        }
       ]
     })
 
@@ -489,21 +515,77 @@ describe('getCurrentEventState()', () => {
     ).toEqual(0)
   })
 
+  test('Ensure fields that have user conditional fields are included', () => {
+    const event = {
+      id: generateUuid(),
+      trackingId: 'VM5Y53',
+      type: tennisClubMembershipEvent.id,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      actions: [
+        generateActionDocument({
+          configuration: tennisClubMembershipEvent,
+          action: ActionType.CREATE
+        }),
+        generateActionDocument({
+          configuration: tennisClubMembershipEvent,
+          action: ActionType.DECLARE,
+          defaults: {
+            createdByRole: TestUserRole.enum.FIELD_AGENT,
+            declaration: {
+              'applicant.dob': '2025-07-22',
+              'applicant.name': {
+                surname: 'Feest',
+                firstname: 'Jordan',
+                middlename: 'Day'
+              },
+              'recommender.id': '123456789',
+              'senior-pass.id': '123123',
+              'recommender.name': {
+                surname: 'Feest',
+                firstname: 'Jordan',
+                middlename: 'Day'
+              },
+              'recommender.none': false,
+              'applicant.isRecommendedByFieldAgent': true
+            }
+          }
+        })
+      ]
+    } satisfies EventDocument
+
+    const declaration = getCurrentEventState(
+      event,
+      tennisClubMembershipEvent
+    ).declaration
+
+    // getCurrentEventState should never depend on who is calling it.
+    expect(declaration['applicant.isRecommendedByFieldAgent']).toBe(true)
+  })
+
   test('Filter hidden fields while getting current event state', () => {
     // case 1: dobUnknown = false → keep dob, drop age
     const event1 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
       actions: [
-        ActionType.CREATE,
-        ActionType.DECLARE,
-        ActionType.REGISTER,
-        ActionType.REQUEST_CORRECTION
-      ],
-      declarationOverrides: {
-        'applicant.dobUnknown': false,
-        'applicant.age': 20,
-        'applicant.dob': '2000-01-01'
-      }
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE,
+          declarationOverrides: {
+            'applicant.dobUnknown': false,
+            'applicant.age': 20,
+            'applicant.dob': '2000-01-01'
+          }
+        },
+        {
+          type: ActionType.VALIDATE,
+          declarationOverrides: {
+            'applicant.dobUnknown': false,
+            'applicant.age': 20,
+            'applicant.dob': '2000-01-01'
+          }
+        }
+      ]
     })
 
     const eventState1 = getCurrentEventState(event1, tennisClubMembershipEvent)
@@ -516,16 +598,24 @@ describe('getCurrentEventState()', () => {
     const event2 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
       actions: [
-        ActionType.CREATE,
-        ActionType.DECLARE,
-        ActionType.REGISTER,
-        ActionType.REQUEST_CORRECTION
-      ],
-      declarationOverrides: {
-        'applicant.dobUnknown': true,
-        'applicant.age': 20,
-        'applicant.dob': '2000-01-01'
-      }
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE,
+          declarationOverrides: {
+            'applicant.dobUnknown': true,
+            'applicant.age': 20,
+            'applicant.dob': '2000-01-01'
+          }
+        },
+        {
+          type: ActionType.VALIDATE,
+          declarationOverrides: {
+            'applicant.dobUnknown': true,
+            'applicant.age': 20,
+            'applicant.dob': '2000-01-01'
+          }
+        }
+      ]
     })
 
     const eventState2 = getCurrentEventState(event2, tennisClubMembershipEvent)
@@ -533,6 +623,120 @@ describe('getCurrentEventState()', () => {
     expect(eventState2.declaration['applicant.dobUnknown']).toBe(true)
     expect(eventState2.declaration['applicant.dob']).toBe(undefined)
     expect(eventState2.declaration['applicant.age']).toBe(20)
+  })
+
+  test('should correctly merge the declaration from actions even when originalActionId is not available', () => {
+    const fullEvent = {
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      createdAt: new Date(Date.now()).toISOString(),
+      id: getUUID(),
+      updatedAt: new Date(Date.now()).toISOString(),
+      actions: [
+        {
+          id: '54594a56-0d9e-405d-a069-e81f5355242e' as UUID,
+          transactionId: 'tmp-d6e326d4-19ed-4f3f-8b7f-09bca9f4c74e',
+          createdByUserType: 'user',
+          createdAt: '2025-09-22T15:07:09.898Z',
+          createdBy: '68cd35f68cb33ba093f20256',
+          createdByRole: 'SOCIAL_WORKER',
+          createdAtLocation: '480f91d2-3b97-4a0a-9920-293f7dac6391' as UUID,
+          declaration: {},
+          status: 'Accepted',
+          type: 'CREATE',
+          annotation: {}
+        },
+        {
+          id: '67ce9faa-bce4-4208-bbe5-e55148364ba5' as UUID,
+          transactionId: 'tmp-d6e326d4-19ed-4f3f-8b7f-09bca9f4c74e',
+          createdByUserType: 'user',
+          createdAt: '2025-09-22T15:07:09.898Z',
+          createdBy: '68cd35f68cb33ba093f20256',
+          createdByRole: 'SOCIAL_WORKER',
+          createdAtLocation: '480f91d2-3b97-4a0a-9920-293f7dac6391' as UUID,
+          declaration: {},
+          status: 'Accepted',
+          type: 'ASSIGN',
+          assignedTo: '68cd35f68cb33ba093f20256',
+          annotation: {}
+        },
+        {
+          id: '80e4dee3-7409-47a1-9922-a872d8c9b9ae' as UUID,
+          transactionId: 'e4249dc3-7a7a-4f57-9fd8-73bea9e2bfcb',
+          createdByUserType: 'user',
+          createdAt: '2025-09-22T15:07:29.212Z',
+          createdBy: '68cd35f68cb33ba093f20256',
+          createdByRole: 'SOCIAL_WORKER',
+          createdAtLocation: '480f91d2-3b97-4a0a-9920-293f7dac6391' as UUID,
+          declaration: {
+            'applicant.name': {
+              surname: 'sdad',
+              firstname: 'Ashikul',
+              middlename: 'sdsa'
+            }
+          },
+          status: 'Accepted',
+          // the originalActionId is an action with a `status: 'Requested'` that is not in the actions array
+          // should still merge the declaration information when originalActionId is not listed
+          originalActionId: '2c93fd07-3c54-4b7c-93a6-4b1e79506fd8' as UUID,
+          type: 'NOTIFY',
+          annotation: {}
+        },
+        {
+          id: 'f17b8a91-16a5-45f4-92e0-881c707a4213' as UUID,
+          transactionId: 'e4249dc3-7a7a-4f57-9fd8-73bea9e2bfcb',
+          createdByUserType: 'user',
+          createdAt: '2025-09-22T15:07:29.216Z',
+          createdBy: '68cd35f68cb33ba093f20256',
+          createdByRole: 'SOCIAL_WORKER',
+          createdAtLocation: '480f91d2-3b97-4a0a-9920-293f7dac6391' as UUID,
+          declaration: {},
+          status: 'Accepted',
+          type: 'UNASSIGN',
+          annotation: {}
+        },
+        {
+          id: '95367738-61e7-421f-a4d0-23974017115a' as UUID,
+          transactionId: '0736cf71-43b4-4393-a830-1b9af88ee4ee',
+          createdByUserType: 'user',
+          createdAt: '2025-09-22T15:07:55.406Z',
+          createdBy: '68cd35f68cb33ba093f2025e',
+          createdByRole: 'REGISTRATION_AGENT',
+          createdAtLocation: '480f91d2-3b97-4a0a-9920-293f7dac6391' as UUID,
+          declaration: {},
+          status: 'Accepted',
+          type: 'READ',
+          annotation: {}
+        },
+        {
+          id: '027978ce-a4b0-4d1c-9fd1-3aeda86f4ef1' as UUID,
+          transactionId: '4ae24ac6-0ec2-45e0-8e7f-ce27711646e7',
+          createdByUserType: 'user',
+          createdAt: '2025-09-22T15:07:56.135Z',
+          createdBy: '68cd35f68cb33ba093f2025e',
+          createdByRole: 'REGISTRATION_AGENT',
+          createdAtLocation: '480f91d2-3b97-4a0a-9920-293f7dac6391' as UUID,
+          declaration: {},
+          annotation: {},
+          status: 'Accepted',
+          type: 'ASSIGN',
+          assignedTo: '68cd35f68cb33ba093f2025e'
+        }
+      ]
+    } satisfies EventDocument
+
+    const eventState = getCurrentEventState(
+      fullEvent,
+      tennisClubMembershipEvent
+    )
+
+    expect(eventState.declaration).toEqual({
+      'applicant.name': {
+        surname: 'sdad',
+        firstname: 'Ashikul',
+        middlename: 'sdsa'
+      }
+    })
   })
 })
 
@@ -551,7 +755,7 @@ describe('correction requests', () => {
             createdAt: '2025-01-23T02:21:38.343Z',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
             id: '63d19916-dcc8-4cf2-8161-eab9989765e8' as UUID,
@@ -569,7 +773,7 @@ describe('correction requests', () => {
             type: 'DECLARE',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdAt: '2025-01-23T02:21:39.161Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
@@ -582,7 +786,7 @@ describe('correction requests', () => {
             type: 'REGISTER',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdAt: '2025-01-23T02:21:40.182Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
@@ -598,7 +802,7 @@ describe('correction requests', () => {
               }
             },
             type: 'REQUEST_CORRECTION',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdAt: '2025-01-23T02:21:41.206Z',
@@ -635,7 +839,7 @@ describe('correction requests', () => {
             createdAt: '2025-01-23T02:21:38.343Z',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
             id: '63d19916-dcc8-4cf2-8161-eab9989765e8' as UUID,
@@ -654,7 +858,7 @@ describe('correction requests', () => {
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdBySignature: '/ocrvs/signature.png',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdAt: '2025-01-23T02:21:39.161Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             id: 'eb4c18e5-93bc-42f6-b110-909815f6a7c8' as UUID,
@@ -667,7 +871,7 @@ describe('correction requests', () => {
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdBySignature: '/ocrvs/signature.png',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdAt: '2025-01-23T02:21:40.182Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             id: 'bec6b33a-7a5f-4acd-9638-9e77db1800e2' as UUID,
@@ -685,7 +889,7 @@ describe('correction requests', () => {
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdBySignature: '/ocrvs/signature.png',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdAt: '2025-01-23T02:21:41.206Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             id: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d' as UUID,
@@ -698,7 +902,7 @@ describe('correction requests', () => {
             type: 'APPROVE_CORRECTION',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdBySignature: '/ocrvs/signature.png',
             createdAt: '2025-01-23T02:21:42.230Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
@@ -855,5 +1059,76 @@ describe('deepDropNulls()', () => {
     expect(deepDropNulls(false)).toBe(false)
     expect(deepDropNulls(null)).toBe(null)
     expect(deepDropNulls(undefined)).toBe(undefined)
+  })
+})
+
+function reorderEventActionDates(
+  event: EventDocument,
+  baseDate: string = '2025-02-06T03:36:00.000Z'
+): EventDocument {
+  const order = ['CREATE', 'DECLARE', 'REGISTER', 'REQUEST_CORRECTION']
+
+  // Sort actions based on logical order
+  const sortedActions = [...event.actions].sort(
+    (a, b) => order.indexOf(a.type) - order.indexOf(b.type)
+  )
+
+  // Generate new actions with updated timestamps
+  const base = new Date(baseDate)
+  const updatedActions = sortedActions.map((action, i) => {
+    const newDate = new Date(base)
+    newDate.setDate(base.getDate() + i)
+    return {
+      ...action,
+      createdAt: newDate.toISOString()
+    }
+  })
+
+  // Return a new document with updated actions
+  return {
+    ...event,
+    actions: updatedActions
+  } satisfies EventDocument
+}
+
+describe('test status of a record when actions are not in order', () => {
+  it('take REGISTER action as the status of a record', () => {
+    const event = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.REGISTER },
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.REQUEST_CORRECTION
+        }
+      ]
+    })
+
+    const orderedEvent = reorderEventActionDates(event)
+
+    expect(
+      getCurrentEventState(orderedEvent, tennisClubMembershipEvent).status
+    ).toBe(EventStatus.enum.REGISTERED)
+  })
+
+  it('take DECLARE action as the status of a record', () => {
+    const event = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.CREATE }
+      ]
+    })
+
+    const orderedEvent = reorderEventActionDates(event)
+
+    expect(
+      getCurrentEventState(orderedEvent, tennisClubMembershipEvent).status
+    ).toBe(EventStatus.enum.DECLARED)
   })
 })

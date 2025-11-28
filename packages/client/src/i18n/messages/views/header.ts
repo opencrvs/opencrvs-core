@@ -8,29 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface IHeaderMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  typeRN: MessageDescriptor
-  typePhone: MessageDescriptor
-  nationalId: MessageDescriptor
-  placeHolderTrackingId: MessageDescriptor
-  placeHolderBrnDrn: MessageDescriptor
-  placeHolderPhone: MessageDescriptor
-  placeHolderNationalId: MessageDescriptor
-  placeHolderEmail: MessageDescriptor
-  placeholderId: MessageDescriptor
-  systemTitle: MessageDescriptor
-  settingsTitle: MessageDescriptor
-  helpTitle: MessageDescriptor
-  teamTitle: MessageDescriptor
-  typeName: MessageDescriptor
-  advancedSearch: MessageDescriptor
-  placeholderName: MessageDescriptor
-}
-
-const messagesToDefine: IHeaderMessages = {
+export const messages = defineMessages({
   email: {
     id: 'home.header.email',
     defaultMessage: 'Email',
@@ -45,11 +25,6 @@ const messagesToDefine: IHeaderMessages = {
     id: 'home.header.typePhone',
     defaultMessage: 'Phone No.',
     description: 'Search menu phone no type'
-  },
-  nationalId: {
-    id: 'home.header.nationalId',
-    defaultMessage: 'National ID',
-    description: 'Search menu national ID type'
   },
   placeHolderTrackingId: {
     id: 'home.header.placeHolderTrackingId',
@@ -66,11 +41,6 @@ const messagesToDefine: IHeaderMessages = {
     defaultMessage: 'Search for a phone No.',
     description: 'Search menu phone no place holder'
   },
-  placeHolderNationalId: {
-    id: 'home.header.placeHolderNationalId',
-    defaultMessage: 'Search for a national ID.',
-    description: 'Search menu national ID place holder'
-  },
   placeholderId: {
     id: 'home.header.placeHolderId',
     defaultMessage: 'Search for an ID.',
@@ -80,21 +50,6 @@ const messagesToDefine: IHeaderMessages = {
     id: 'home.header.placeHolderEmail',
     defaultMessage: 'Search for an email.',
     description: 'Search menu email place holder'
-  },
-  systemTitle: {
-    id: 'home.header.systemTitle',
-    defaultMessage: 'System',
-    description: 'System title'
-  },
-  settingsTitle: {
-    id: 'home.header.settingsTitle',
-    defaultMessage: 'Settings',
-    description: 'settings title'
-  },
-  helpTitle: {
-    id: 'home.header.helpTitle',
-    defaultMessage: 'Help',
-    description: 'Help title'
   },
   teamTitle: {
     id: 'home.header.teamTitle',
@@ -116,6 +71,4 @@ const messagesToDefine: IHeaderMessages = {
     defaultMessage: 'Search for a name',
     description: 'Search menu name placeholder'
   }
-}
-
-export const messages: IHeaderMessages = defineMessages(messagesToDefine)
+})

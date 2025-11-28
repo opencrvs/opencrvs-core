@@ -8,9 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { generateUuid, SCOPES } from '@opencrvs/commons'
+import { intersectionBy } from 'lodash'
+import {
+  createPrng,
+  generateUuid,
+  Location,
+  LocationType,
+  SCOPES
+} from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { Location } from '@events/service/locations/locations'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -26,8 +32,9 @@ test('Allows national system admin to set locations', async () => {
   const { user, generator } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
+  const locationRng = createPrng(846)
   await expect(
-    dataSeedingClient.locations.set(generator.locations.set(1))
+    dataSeedingClient.locations.set(generator.locations.set(1, locationRng))
   ).resolves.toEqual(undefined)
 })
 
@@ -44,7 +51,7 @@ test('Creates single location', async () => {
   const { user } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const initialLocations = await dataSeedingClient.locations.get()
+  const initialLocations = await dataSeedingClient.locations.list()
 
   const locationPayload: Location[] = [
     {
@@ -52,13 +59,13 @@ test('Creates single location', async () => {
       parentId: null,
       name: 'Location foobar',
       validUntil: null,
-      locationType: 'ADMIN_STRUCTURE'
+      locationType: LocationType.enum.ADMIN_STRUCTURE
     }
   ]
 
   await dataSeedingClient.locations.set(locationPayload)
 
-  const locations = await dataSeedingClient.locations.get()
+  const locations = await dataSeedingClient.locations.list()
 
   expect(locations).toHaveLength(initialLocations.length + 1)
   expect(locations).toMatchObject(initialLocations.concat(locationPayload))
@@ -69,20 +76,18 @@ test('Creates multiple locations', async () => {
 
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const initialLocations = await dataSeedingClient.locations.get()
+  const initialLocations = await dataSeedingClient.locations.list()
 
   const parentId = generateUuid(rng)
 
-  const locationPayload = generator.locations.set([
-    { id: parentId },
-    { parentId: parentId },
-    { parentId: parentId },
-    {}
-  ])
+  const locationPayload = generator.locations.set(
+    [{ id: parentId }, { parentId: parentId }, { parentId: parentId }, {}],
+    rng
+  )
 
   await dataSeedingClient.locations.set(locationPayload)
 
-  const locations = await dataSeedingClient.locations.get()
+  const locations = await dataSeedingClient.locations.list()
 
   expect(locations).toEqual(initialLocations.concat(locationPayload))
 })
@@ -91,13 +96,13 @@ test('seeding locations is additive, not destructive', async () => {
   const { user, generator } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const initialLocations = await dataSeedingClient.locations.get()
-
-  const initialPayload = generator.locations.set(5)
+  const initialLocations = await dataSeedingClient.locations.list()
+  const locationRng = createPrng(847)
+  const initialPayload = generator.locations.set(5, locationRng)
 
   await dataSeedingClient.locations.set(initialPayload)
 
-  const locationAfterInitialSeed = await dataSeedingClient.locations.get()
+  const locationAfterInitialSeed = await dataSeedingClient.locations.list()
   expect(locationAfterInitialSeed).toHaveLength(
     initialLocations.length + initialPayload.length
   )
@@ -108,9 +113,112 @@ test('seeding locations is additive, not destructive', async () => {
   await dataSeedingClient.locations.set(remainingLocationsPayload)
 
   const remainingLocationsAfterDeletion =
-    await dataSeedingClient.locations.get()
+    await dataSeedingClient.locations.list()
 
   expect(remainingLocationsAfterDeletion).toStrictEqual(
     locationAfterInitialSeed
   )
+})
+
+/** Intermediary test until we clean up locations table */
+test('administrative areas are seeded on both tables', async () => {
+  const {
+    user,
+    generator,
+    locations: initialLocations,
+    eventsDb
+  } = await setupTestCase()
+  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+
+  const locationRng = createPrng(847)
+  const locationsPayload = generator.locations.set(20, locationRng)
+
+  await dataSeedingClient.locations.set(locationsPayload)
+
+  const locationsAfterSeeding = await dataSeedingClient.locations.list()
+  expect(locationsAfterSeeding).toHaveLength(
+    initialLocations.length + locationsPayload.length
+  )
+
+  const adminAreas = await eventsDb
+    .selectFrom('administrativeAreas')
+    .selectAll()
+    .execute()
+
+  expect(adminAreas.length).toBeLessThan(locationsAfterSeeding.length)
+
+  const adminAreasInLocationTable = locationsAfterSeeding.filter(
+    (loc) => loc.locationType === LocationType.enum.ADMIN_STRUCTURE
+  )
+
+  expect(adminAreas).toHaveLength(
+    locationsAfterSeeding.filter(
+      (loc) => loc.locationType === LocationType.enum.ADMIN_STRUCTURE
+    ).length
+  )
+
+  expect(
+    intersectionBy(adminAreas, adminAreasInLocationTable, 'id')
+  ).toHaveLength(adminAreas.length)
+})
+
+/** Intermediary test until we clean up locations table */
+test('parent id is a duplicate of administrative area id in locations', async () => {
+  const { user, eventsDb } = await setupTestCase()
+  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+
+  const locationRng = createPrng(123142)
+
+  const parentAdminAreaId = generateUuid(locationRng)
+
+  const locationsPayload: Location[] = [
+    {
+      id: parentAdminAreaId,
+      parentId: null,
+      locationType: LocationType.enum.ADMIN_STRUCTURE,
+      name: 'Parent Admin Area',
+      validUntil: null
+    },
+    {
+      id: generateUuid(locationRng),
+      parentId: parentAdminAreaId,
+      locationType: LocationType.enum.ADMIN_STRUCTURE,
+      name: 'Child Admin Area',
+      validUntil: null
+    },
+    {
+      id: generateUuid(locationRng),
+      parentId: parentAdminAreaId,
+      locationType: LocationType.enum.HEALTH_FACILITY,
+      name: 'Child Health Facility',
+      validUntil: null
+    },
+    {
+      id: generateUuid(locationRng),
+      parentId: parentAdminAreaId,
+      locationType: LocationType.enum.CRVS_OFFICE,
+      name: 'Child CRVS Office',
+      validUntil: null
+    }
+  ]
+
+  await dataSeedingClient.locations.set(locationsPayload)
+  const adminAreas = await eventsDb
+    .selectFrom('administrativeAreas')
+    .select(['id', 'name', 'parentId', 'validUntil'])
+    .execute()
+
+  const locationsAfterSeeding = await eventsDb
+    .selectFrom('locations')
+    .select([
+      'id',
+      'name',
+      'parentId',
+      'validUntil',
+      'administrativeAreaId',
+      'locationType'
+    ])
+    .execute()
+
+  expect({ adminAreas, locations: locationsAfterSeeding }).toMatchSnapshot()
 })

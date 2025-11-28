@@ -15,7 +15,9 @@ import {
   DeclarationFormConfig,
   EventIndex,
   EventState,
+  FieldConfig,
   FieldType,
+  FieldTypesToHideInReview,
   isFieldDisplayedOnReview,
   isPageVisible
 } from '@opencrvs/commons/client'
@@ -32,8 +34,9 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { noop } from '@client/v2-events'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useEventConfiguration } from '../../useEventConfiguration'
-import { ValueOutput } from '../../components/Output'
+import { Output, ValueOutput } from '../../components/Output'
 import { AdministrativeArea } from '../../registered-fields'
 import { DocumentViewer } from '../../components/DocumentViewer'
 import { duplicateMessages } from './ReviewDuplicate'
@@ -102,6 +105,7 @@ function SupportingDocumentList({
 function UserFullName({ userId }: { userId: string }) {
   const intl = useIntl()
   const users = useUsers()
+
   const user = users.getUser.useQuery(userId).data
   if (!user) {
     return null
@@ -117,6 +121,8 @@ export function DuplicateComparison({
   potentialDuplicateEvent: EventIndex
 }) {
   const intl = useIntl()
+  const validatorContext = useValidatorContext()
+
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const { eventConfiguration } = useEventConfiguration(originalEvent.type)
 
@@ -129,41 +135,70 @@ export function DuplicateComparison({
   const potentialDuplicateDeclaration = potentialDuplicateEvent.declaration
 
   const hideFieldTypes = [
+    ...FieldTypesToHideInReview,
     FieldType.FILE,
-    FieldType.FILE_WITH_OPTIONS,
-    FieldType.BULLET_LIST,
-    FieldType.DIVIDER
+    FieldType.FILE_WITH_OPTIONS
   ]
 
   const comparisonData: ComparisonDeclaration[] =
     eventConfiguration.declaration.pages
       .filter(
         (page) =>
-          isPageVisible(page, originalDeclaration) ||
-          isPageVisible(page, potentialDuplicateDeclaration)
+          isPageVisible(page, originalDeclaration, validatorContext) ||
+          isPageVisible(page, potentialDuplicateDeclaration, validatorContext)
       )
       .map((page) => ({
         title: intl.formatMessage(page.title),
         data: page.fields
           .filter(
             (field) =>
-              isFieldDisplayedOnReview(field, originalDeclaration) ||
-              isFieldDisplayedOnReview(field, potentialDuplicateDeclaration)
+              isFieldDisplayedOnReview(
+                field,
+                originalDeclaration,
+                validatorContext
+              ) ||
+              isFieldDisplayedOnReview(
+                field,
+                potentialDuplicateDeclaration,
+                validatorContext
+              )
           )
           .filter(
             ({ type }) =>
               !hideFieldTypes.some((typeToHide) => type === typeToHide)
           )
+          // Refer to 'findPreviousValueWithSameLabel' in Output.tsx for explanation
+          .reduce<FieldConfig[]>((acc, field) => {
+            const fieldWithSameLabelDontExist = !acc.find(
+              (f) => f.label.id === field.label.id
+            )
+            if (fieldWithSameLabelDontExist) {
+              acc.push(field)
+            }
+            return acc
+          }, [])
           .map((field) => ({
             label: intl.formatMessage(field.label),
-            rightValue: ValueOutput({
-              config: field,
-              value: potentialDuplicateDeclaration[field.id]
-            }),
-            leftValue: ValueOutput({
-              config: field,
-              value: originalDeclaration[field.id]
-            })
+            rightValue: (
+              <Output
+                displayEmptyAsDash={true}
+                eventConfig={eventConfiguration}
+                field={field}
+                formConfig={eventConfiguration.declaration}
+                previousForm={potentialDuplicateDeclaration}
+                value={potentialDuplicateDeclaration[field.id]}
+              />
+            ),
+            leftValue: (
+              <Output
+                displayEmptyAsDash={true}
+                eventConfig={eventConfiguration}
+                field={field}
+                formConfig={eventConfiguration.declaration}
+                previousForm={originalDeclaration}
+                value={originalDeclaration[field.id]}
+              />
+            )
           }))
       }))
       .filter(({ data }) => data.length > 0)

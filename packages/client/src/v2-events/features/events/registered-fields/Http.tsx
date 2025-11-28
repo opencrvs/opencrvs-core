@@ -11,17 +11,19 @@
 
 import React, { useRef } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { isEqual } from 'lodash'
+import { get, isEqual } from 'lodash'
 import {
   FieldValue,
   getMixedPath,
   HttpField,
   HttpFieldValue,
+  isFieldReference,
   isTemplateVariable,
   SystemVariables
 } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
+import { parseFieldReferenceToValue } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 
 async function fetchWithTimeout(
   input: RequestInfo | URL,
@@ -53,7 +55,8 @@ interface HttpError extends Error {
 
 async function fetchHttpFieldValue(
   cfg: Omit<HttpField['configuration'], 'trigger'>,
-  systemVariables: SystemVariables
+  systemVariables: SystemVariables,
+  form: Record<string, FieldValue>
 ) {
   const baseUrl = window.location.origin
   const url = new URL(cfg.url, baseUrl)
@@ -66,9 +69,14 @@ async function fetchHttpFieldValue(
 
   if (cfg.body) {
     for (const [k, v] of Object.entries(cfg.body)) {
-      cfg.body[k] = isTemplateVariable(v)
-        ? (getMixedPath(systemVariables, v) ?? v)
-        : v
+      if (isTemplateVariable(v)) {
+        cfg.body[k] = getMixedPath(systemVariables, v)
+      }
+
+      if (isFieldReference(v)) {
+        cfg.body[k] = parseFieldReferenceToValue(v, form)
+      }
+      cfg.body[k] = v
     }
   }
 
@@ -85,24 +93,29 @@ async function fetchHttpFieldValue(
     throw err
   }
 
+  const contentType = res.headers.get('Content-Type') || ''
+
+  if (contentType.startsWith('text/')) {
+    return res.text()
+  }
   return res.json()
 }
 
-function HttpInput({
-  parentValue,
-  configuration,
-  onChange
-}: {
+export interface Props {
   parentValue?: FieldValue
   configuration: Omit<HttpField['configuration'], 'trigger'>
+  form: Record<string, FieldValue>
   onChange: (val: HttpFieldValue) => void
-}) {
+}
+
+function HttpInput({ parentValue, configuration, form, onChange }: Props) {
   const systemVariables = useSystemVariables()
   const firstRunRef = useRef(true)
   const prevParentRef = useRef<FieldValue | undefined>(undefined)
 
   const mutation = useMutation<unknown, HttpError>({
-    mutationFn: async () => fetchHttpFieldValue(configuration, systemVariables),
+    mutationFn: async () =>
+      fetchHttpFieldValue(configuration, systemVariables, form),
     onMutate: () => {
       onChange({ loading: true, error: null, data: null })
     },
@@ -110,11 +123,12 @@ function HttpInput({
       onChange({ loading: false, error: null, data })
     },
     onError: (error: HttpError) => {
+      const data = configuration.errorValue ?? null
       if (error.name === 'AbortError') {
         onChange({
           loading: false,
           error: { statusCode: 408, message: 'The request timed out.' },
-          data: null
+          data
         })
       } else {
         onChange({
@@ -123,7 +137,7 @@ function HttpInput({
             statusCode: error.statusCode,
             message: error.message
           },
-          data: null
+          data
         })
       }
     }
@@ -138,7 +152,10 @@ function HttpInput({
     }
 
     // 2) trigger on following mounts if the value tracked changes
-    if (!isEqual(parentValue, prevParentRef.current)) {
+    if (
+      !isEqual(parentValue, prevParentRef.current) &&
+      parentValue !== undefined
+    ) {
       prevParentRef.current = parentValue
       mutation.mutate()
     }
@@ -150,5 +167,5 @@ function HttpInput({
 export const Http = {
   Input: HttpInput,
   Output: null,
-  stringify: () => `[http response or error redacted]`
+  toCertificateVariables: (value: HttpFieldValue) => value
 }

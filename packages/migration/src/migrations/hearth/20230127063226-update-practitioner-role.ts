@@ -197,7 +197,7 @@ export const down = async (db: Db, client: MongoClient) => {
             })
           })
 
-          const roleCode = isFieldAgent ? 'SOCIAL_WORKER' : ''
+          const roleCode = isFieldAgent ? 'HOSPITAL_CLERK' : ''
 
           if (!isAutomated) {
             await db

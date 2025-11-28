@@ -69,6 +69,7 @@ function DocumentUploaderWithOption({
   onChange,
   name,
   description,
+  disabled,
   acceptedFileTypes = [],
   options,
   error,
@@ -78,6 +79,7 @@ function DocumentUploaderWithOption({
 }: {
   name: string
   description?: string
+  disabled?: boolean
   acceptedFileTypes?: MimeType[]
   options: SelectOption[]
   value: FileFieldWithOptionValue
@@ -110,7 +112,7 @@ function DocumentUploaderWithOption({
       const newFile = {
         path,
         originalFilename,
-        type: type,
+        type,
         option: id
       }
 
@@ -124,7 +126,10 @@ function DocumentUploaderWithOption({
 
   const getLabelForDocumentOption = (docType: string) => {
     const label = options.find(({ value: val }) => val === docType)?.label
-    return label && intl.formatMessage(label)
+    if (!label) {
+      return undefined
+    }
+    return typeof label === 'string' ? label : intl.formatMessage(label)
   }
 
   const onComplete = (newFile: File | null) => {
@@ -170,8 +175,13 @@ function DocumentUploaderWithOption({
       <File.Input
         acceptedFileTypes={acceptedFileTypes}
         description={description}
+        disabled={disabled}
         error={error}
-        label={intl.formatMessage(onlyOption.label)}
+        label={
+          typeof onlyOption.label === 'string'
+            ? onlyOption.label
+            : intl.formatMessage(onlyOption.label)
+        }
         maxFileSize={maxFileSize}
         name={name}
         value={value[0]}
@@ -203,6 +213,7 @@ function DocumentUploaderWithOption({
         </div>
       )}
       <DocumentListPreview
+        disabled={disabled}
         documents={files}
         dropdownOptions={options}
         processingDocuments={filesBeingProcessed}
@@ -215,6 +226,7 @@ function DocumentUploaderWithOption({
       <Flex>
         <DropdownContainer>
           <Select.Input
+            disabled={disabled}
             id={name}
             options={remainingOptions}
             type={'SELECT'}
@@ -226,10 +238,10 @@ function DocumentUploaderWithOption({
           />
         </DropdownContainer>
         <DocumentUploader
-          disabled={Boolean(error)}
+          disabled={!selectedOption || disabled}
           id={name}
           name={name}
-          onChange={error ? undefined : handleFileChange}
+          onChange={handleFileChange}
         >
           {intl.formatMessage(messages.uploadFile)}
         </DocumentUploader>
@@ -237,6 +249,7 @@ function DocumentUploaderWithOption({
 
       {previewImage && (
         <DocumentPreview
+          disableDelete={disabled}
           goBack={() => setPreviewImage(null)}
           previewImage={previewImage}
           title={getLabelForDocumentOption(previewImage.option)}
@@ -273,12 +286,16 @@ function DocumentWithOptionOutput({
   return (
     <Wrapper>
       {value.map((file) => {
-        const label = config.options.find((x) => x.value === file.option)?.label
+        const label =
+          config.options.find((x) => x.value === file.option)?.label ||
+          file.option
         return (
           <SingleDocumentPreview
             key={file.originalFilename}
             attachment={file}
-            label={label ? intl.formatMessage(label) : file.option}
+            label={
+              typeof label === 'string' ? label : intl.formatMessage(label)
+            }
             onSelect={() => setPreviewImage(file)}
           />
         )

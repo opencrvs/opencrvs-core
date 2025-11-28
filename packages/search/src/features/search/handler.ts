@@ -216,7 +216,10 @@ export async function advancedRecordSearch(
   try {
     let isExternalSearch = false
     const tokenPayload = getTokenPayload(request.headers.authorization)
-    if (tokenPayload.scope.includes(SCOPES.RECORDSEARCH)) {
+    if (
+      tokenPayload.scope.includes(SCOPES.RECORDSEARCH) &&
+      !tokenPayload.scope.includes(SCOPES.RECORD_EXPORT)
+    ) {
       isExternalSearch = true
     }
     const result = await advancedSearch(

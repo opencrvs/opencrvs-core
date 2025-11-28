@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { ActionType } from '../ActionType'
 import { orderBy, findLast } from 'lodash'
 import {
@@ -27,12 +26,11 @@ import {
   aggregateActionDeclarations,
   deepMerge,
   getAcceptedActions,
-  getCompleteActionAnnotation,
-  omitHiddenPaginatedFields
+  getCompleteActionAnnotation
 } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
-import { getFlagsFromActions } from './flags'
+import { getEventFlags } from './flags'
 import { getUUID, UUID } from '../../uuid'
 import {
   DocumentPath,
@@ -57,6 +55,7 @@ export function getStatusFromActions(actions: Array<Action>) {
           return EventStatus.enum.ARCHIVED
         case ActionType.NOTIFY:
           return EventStatus.enum.NOTIFIED
+        case ActionType.CUSTOM:
         case ActionType.PRINT_CERTIFICATE:
         case ActionType.ASSIGN:
         case ActionType.UNASSIGN:
@@ -68,6 +67,7 @@ export function getStatusFromActions(actions: Array<Action>) {
         case ActionType.MARK_AS_DUPLICATE:
         case ActionType.REJECT_CORRECTION:
         case ActionType.READ:
+        case ActionType.CUSTOM:
         default:
           return status
       }
@@ -181,14 +181,24 @@ export function extractPotentialDuplicatesFromActions(
 }
 
 /**
- * @returns the current state of the event based on the actions taken.
+ * NOTE: This function should not run field validations. It should return the state based on the actions, without considering context (users, roles, permissions, etc).
+ *
+ * If you update this function, please ensure @EventIndex type is updated accordingly.
+ * In most cases, you won't need to add new parameters to this function. Discuss with the team before doing so.
+ *
+ * @returns Calculates a snapshot summary of the event based on the actions taken on it.
  * @see EventIndex for the description of the returned object.
  */
 export function getCurrentEventState(
   event: EventDocument,
   config: EventConfig
 ): EventIndex {
-  const creationAction = event.actions.find(
+  // Always work with sorted event actions
+  const sortedActions = event.actions
+    .slice()
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+
+  const creationAction = sortedActions.find(
     (action) => action.type === ActionType.CREATE
   )
 
@@ -201,18 +211,18 @@ export function getCurrentEventState(
   )
 
   // Includes the metadata of the last action. Whether it was a 'request' by user or 'accept' by user or 3rd party.
-  const requestActionMetadata = getActionUpdateMetadata(event.actions)
+  const requestActionMetadata = getActionUpdateMetadata(sortedActions)
 
   // Includes only accepted actions metadata. Sometimes (e.g. on updatedAt) we want to show the accepted timestamp rather than the request timestamp.
   const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
 
-  const declaration = aggregateActionDeclarations(event, config)
+  const declaration = aggregateActionDeclarations(event)
 
   return deepDropNulls({
     id: event.id,
     type: event.type,
-    status: getStatusFromActions(event.actions),
-    legalStatuses: getLegalStatuses(event.actions),
+    status: getStatusFromActions(sortedActions),
+    legalStatuses: getLegalStatuses(sortedActions),
     createdAt: creationAction.createdAt,
     createdBy: creationAction.createdBy,
     createdByUserType: creationAction.createdByUserType,
@@ -223,12 +233,12 @@ export function getCurrentEventState(
     assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
     updatedBy: requestActionMetadata.createdBy,
     updatedAtLocation: requestActionMetadata.createdAtLocation,
-    declaration: omitHiddenPaginatedFields(config.declaration, declaration),
+    declaration,
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),
-    potentialDuplicates: extractPotentialDuplicatesFromActions(event.actions),
-    flags: getFlagsFromActions(event.actions)
+    potentialDuplicates: extractPotentialDuplicatesFromActions(sortedActions),
+    flags: getEventFlags(event, config)
   })
 }
 

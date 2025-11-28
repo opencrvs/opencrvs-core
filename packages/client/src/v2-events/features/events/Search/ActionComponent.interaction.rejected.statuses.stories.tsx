@@ -47,7 +47,7 @@ function createRejectedEventByStatus(status: EventStatus) {
 
   const event = generateEventDocument({
     configuration: tennisClubMembershipEvent,
-    actions: [ActionType.CREATE]
+    actions: [{ type: ActionType.CREATE }]
   })
 
   const eventQueryData = eventQueryDataGenerator(
@@ -207,80 +207,6 @@ export const DirectsRejectedDeclaredToDeclared: Story = {
         canvas.getByText(
           ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
             eventId: rejectedDeclaredEvent.event.id
-          })
-        )
-      ).toBeInTheDocument()
-    })
-  }
-}
-
-const rejectedValidatedEvent = createRejectedEventByStatus(
-  EventStatus.enum.VALIDATED
-)
-
-export const directsRejectedValidatedToValidated: Story = {
-  beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in the user's browser
-     */
-    addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(rejectedValidatedEvent.event.id, rejectedValidatedEvent.event)
-  },
-
-  args: {
-    event: rejectedValidatedEvent.eventQueryData
-  },
-  parameters: {
-    layout: 'centered',
-    chromatic: { disableSnapshot: true },
-    reactRouter: {
-      router: {
-        path: '/',
-        children: [
-          {
-            path: 'start',
-            Component: () => {
-              return (
-                <div>
-                  <ActionCta
-                    actionType={'DEFAULT'}
-                    event={rejectedValidatedEvent.eventQueryData}
-                  />
-                </div>
-              )
-            }
-          },
-          {
-            path: ROUTES.V2.EVENTS.VALIDATE.REVIEW.path,
-            Component: () => {
-              return (
-                <div>
-                  {ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-                    eventId: rejectedValidatedEvent.event.id
-                  })}
-                </div>
-              )
-            }
-          }
-        ]
-      },
-      initialPath: '/start'
-    }
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const actionButton = await canvas.findByRole('button', {
-      name: 'Review'
-    })
-
-    await userEvent.click(actionButton)
-
-    // Ensure the user is redirected to the declaration review page
-    await waitFor(async () => {
-      await expect(
-        canvas.getByText(
-          ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-            eventId: rejectedValidatedEvent.event.id
           })
         )
       ).toBeInTheDocument()

@@ -62,6 +62,7 @@ describe('when user logs in', () => {
     ],
     mobile: '+260921111111',
     role: {
+      id: 'NATIONAL_SYSTEM_ADMIN',
       label: {
         id: 'userRoles.nationalSystemAdmin',
         defaultMessage: 'National System Admin',

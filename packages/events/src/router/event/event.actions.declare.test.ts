@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { TRPCError } from '@trpc/server'
-import { http, HttpResponse } from 'msw'
+import { http, HttpResponse, HttpResponseInit } from 'msw'
 import {
   ActionStatus,
   ActionType,
@@ -21,7 +21,9 @@ import {
   UUID,
   getCurrentEventState,
   getUUID,
-  TENNIS_CLUB_MEMBERSHIP
+  TENNIS_CLUB_MEMBERSHIP,
+  ActionUpdate,
+  EventState
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -74,9 +76,9 @@ describe('Declare action', () => {
 
   test('allows access if required scope is present', async () => {
     const client = createTestClient(user, [
+      'record.create[event=death|birth|tennis-club-membership]',
       'record.declare[event=death|birth|tennis-club-membership]'
     ])
-
     await expect(
       client.event.actions.declare.request(
         generator.event.actions.declare(eventId, {})
@@ -115,10 +117,11 @@ describe('Declare action', () => {
         'applicant.address': {
           country: 'FAR',
           addressType: AddressType.DOMESTIC,
-          province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-          district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-          urbanOrRural: 'RURAL' as const,
-          village: 'Small village'
+          administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+          streetLevelDetails: {
+            state: 'state',
+            district2: 'district2'
+          }
         }
       }
     })
@@ -141,13 +144,14 @@ describe('Declare action', () => {
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
-        addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        addressType: 'DOMESTIC',
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a', // leaf level location
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
       }
-    }
+    } satisfies ActionUpdate
 
     const data = generator.event.actions.declare(eventId, {
       declaration: form
@@ -180,12 +184,13 @@ describe('Declare action', () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
       }
-    }
+    } satisfies EventState
 
     const data = generator.event.actions.declare(eventId, {
       declaration: form
@@ -212,12 +217,13 @@ describe('Declare action', () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
       }
-    }
+    } satisfies EventState
 
     const data = generator.event.actions.declare(eventId, {
       declaration: form
@@ -250,12 +256,13 @@ describe('Declare action', () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'RURAL' as const,
-        village: 'Small village'
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
       }
-    }
+    } satisfies EventState
 
     const payload = generator.event.actions.declare(eventId, {
       declaration: form
@@ -276,7 +283,26 @@ describe('Declare action', () => {
           ActionType.DECLARE,
           () => 0.1
         ),
-        'recommender.firstname': 'this should not be here'
+        'recommender.name': { firstname: 'John', surname: 'Doe' }
+      }
+    })
+
+    await expect(
+      client.event.actions.declare.request(data)
+    ).rejects.matchSnapshot()
+  })
+
+  test('validation prevents including miscellaneous fields', async () => {
+    const client = createTestClient(user)
+
+    const data = generator.event.actions.declare(eventId, {
+      declaration: {
+        ...generateActionDeclarationInput(
+          tennisClubMembershipEvent,
+          ActionType.DECLARE,
+          () => 0.1
+        ),
+        'foo.bar': { firstname: 'John', surname: 'Doe' }
       }
     })
 
@@ -310,7 +336,7 @@ describe('Declare action', () => {
     ])
   })
 
-  test(`${ActionType.DECLARE} is idempotent`, async () => {
+  test(`DECLARE is idempotent`, async () => {
     const client = createTestClient(user)
 
     const data = generator.event.actions.declare(eventId, {
@@ -322,9 +348,40 @@ describe('Declare action', () => {
 
     expect(firstResponse).toEqual(secondResponse)
   })
+
+  test(`DECLARE action can be resubmitted after it fails in country config`, async () => {
+    const spy = vi.fn()
+    mswServer.use(
+      http.post(
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/DECLARE`,
+        () => {
+          spy()
+          return new HttpResponse(null, { status: 500 } as HttpResponseInit)
+        }
+      )
+    )
+    const client = createTestClient(user)
+
+    const data = generator.event.actions.declare(eventId, {
+      keepAssignment: true
+    })
+
+    await expect(client.event.actions.declare.request(data)).rejects.toThrow()
+    mswServer.use(
+      http.post(
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/DECLARE`,
+        () => {
+          spy()
+          return HttpResponse.json()
+        }
+      )
+    )
+    await client.event.actions.declare.request(data)
+    expect(spy).toHaveBeenCalledTimes(2)
+  })
 })
 
-test('deduplication check is performed after declaration', async () => {
+test('deduplication and annotation check is performed after declaration', async () => {
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
       return HttpResponse.json([
@@ -347,7 +404,8 @@ test('deduplication check is performed after declaration', async () => {
     {
       'applicant.dobUnknown': false
     }
-  )
+  ) as Partial<EventState>
+
   const existingEventIndex = eventQueryDataGenerator({
     id: existingEventId,
     declaration
@@ -368,6 +426,17 @@ test('deduplication check is performed after declaration', async () => {
       declaration: existingEventIndex.declaration
     })
   )
+
+  const lastAction = declaredEvent.actions.at(-1)
+  if (!lastAction) {
+    throw new Error('No action found')
+  }
+
+  expect(lastAction.type).toBe(ActionType.DUPLICATE_DETECTED)
+  expect(lastAction).toHaveProperty('annotation')
+  // @ts-expect-error - type not narrowed for duplicate action
+  expect(lastAction.annotation).toBeDefined()
+
   expect(
     getCurrentEventState(declaredEvent, tennisClubMembershipEvent)
       .potentialDuplicates

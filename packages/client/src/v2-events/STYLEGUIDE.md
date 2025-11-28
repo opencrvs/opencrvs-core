@@ -144,7 +144,6 @@ good:
 # Coding conventions, definition of done
 
 - When introducing a new `MessageDescriptor` create a new row in `client.csv`
-- Each message used under events should have `v2.`-prefix
 
 # Input / Output Components
 

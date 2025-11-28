@@ -132,7 +132,7 @@ const IDVerifierComponent = (props: IIDVerifierProps & IntlShapeProps) => {
   }
 
   const { positiveAction, negativeAction } = actionProps
-  const isIssueUrl = window.location.href.includes('issue')
+  const isIssueUrl = window.location.pathname.includes('issue')
   const modalTitle = isIssueUrl
     ? intl.formatMessage(issueMessages.idCheckWithoutVerify)
     : intl.formatMessage(certificateMessages.idCheckDialogTitle)

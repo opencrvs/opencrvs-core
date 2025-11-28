@@ -47,18 +47,25 @@ const StyledPill = styled.span<{
     ${type === 'default' ? theme.colors.primaryLight : ''}
   `};
 
+  --mediumShade: ${({ type, theme }) => `
+  ${type === 'active' ? theme.colors.green : ''}
+  ${type === 'inactive' ? theme.colors.red : ''}
+  ${type === 'pending' ? theme.colors.orange : ''}
+  ${type === 'default' ? theme.colors.primary : ''}
+`};
+
   --darkerShade: ${({ type, theme }) => `
-  ${type === 'active' ? theme.colors.positiveDarker : ''}
-  ${type === 'inactive' ? theme.colors.negativeDarker : ''}
-  ${type === 'pending' ? theme.colors.neutralDarker : ''}
-  ${type === 'default' ? theme.colors.primaryDarker : ''}
+  ${type === 'active' ? theme.colors.greenDark : ''}
+  ${type === 'inactive' ? theme.colors.redDark : ''}
+  ${type === 'pending' ? theme.colors.orangeDark : ''}
+  ${type === 'default' ? theme.colors.primaryDark : ''}
 `};
 
   ${({ pillTheme }) =>
     pillTheme === 'dark'
       ? `
-    --color: var(--lighterShade);
-    --background-color: var(--darkerShade);
+    --color: white;
+    --background-color: var(--mediumShade);
     `
       : `
     --color: var(--darkerShade);

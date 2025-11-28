@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { ShowConditional } from '../Conditional'
 import { TranslationConfig } from '../TranslationConfig'
 
@@ -34,7 +34,7 @@ export const CertificateConfig = z.object({
     delayed: z.number()
   }),
   svgUrl: z.string(),
-  fonts: z.record(FontFamily).optional(),
+  fonts: z.record(z.string(), FontFamily).optional(),
   conditionals: z.array(ShowConditional).optional()
 })
 

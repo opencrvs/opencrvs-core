@@ -18,16 +18,20 @@ import {
   ConditionalParameters,
   UserConditionalParameters,
   EventConditionalParameters,
-  FormConditionalParameters
+  FormConditionalParameters,
+  EventStateConditionalParameters,
+  flag,
+  status
 } from './conditionals'
 import { formatISO } from 'date-fns'
 import { SCOPES } from '../scopes'
 import { ActionType } from '../events/ActionType'
-import { ActionStatus } from '../events/ActionDocument'
+import { ActionStatus, EventState } from '../events/ActionDocument'
 import { field } from '../events/field'
 import { event } from '../events/event'
 import { TokenUserType } from '../authentication'
 import { UUID } from '../uuid'
+import { EventStatus, InherentFlags } from '../client'
 
 /*  eslint-disable max-lines */
 
@@ -37,7 +41,7 @@ const DEFAULT_FORM = {
   'applicant.address': {
     country: 'FAR',
     addressType: 'DOMESTIC',
-    administrativeArea: undefined,
+    administrativeArea: 'f1e14eed-3420-49df-9e2f-0b362e854cff',
     streetLevelDetails: {
       addressLine1: 'Example Town',
       addressLine2: 'Example Residential Area',
@@ -46,33 +50,21 @@ const DEFAULT_FORM = {
       addressLine5: '123456'
     }
   }
-}
+} satisfies EventState
 
-function getFieldParams(form: Record<string, unknown> = DEFAULT_FORM) {
+function getFieldParams(form: EventState = DEFAULT_FORM) {
   return {
     $form: form,
     $now: formatISO(new Date(), { representation: 'date' }),
-    $locations: [
+    $leafAdminStructureLocationIds: [
       {
-        id: 'e15d54b0-8c74-45f0-aa35-e1b0501b38dc' as UUID,
-        name: 'Embe',
-        parentId: 'e2e6dfcf-2603-458c-983f-abb1b31a617a' as UUID,
-        locationType: 'ADMIN_STRUCTURE',
-        validUntil: null
+        id: 'e15d54b0-8c74-45f0-aa35-e1b0501b38dc' as UUID
       },
       {
-        id: 'e2e6dfcf-2603-458c-983f-abb1b31a617a' as UUID,
-        name: 'Irundu',
-        parentId: '7352c963-9427-4a9e-89d2-89e6f2a744b2' as UUID,
-        locationType: 'ADMIN_STRUCTURE',
-        validUntil: null
+        id: 'e2e6dfcf-2603-458c-983f-abb1b31a617a' as UUID
       },
       {
-        id: 'f1e14eed-3420-49df-9e2f-0b362e854cff' as UUID,
-        name: 'Afue',
-        parentId: null,
-        locationType: 'ADMIN_STRUCTURE',
-        validUntil: null
+        id: 'f1e14eed-3420-49df-9e2f-0b362e854cff' as UUID
       }
     ],
     $online: false
@@ -216,11 +208,11 @@ describe('object combinator', () => {
     expect(
       validate(
         field('child.details').object({
-          dob: field('dob').isBefore().now()
+          data: field('data').isBefore().now()
         }),
         getFieldParams({
           'child.details': {
-            dob: new Date('2125-01-01').toISOString().split('T')[0]
+            data: new Date('2125-01-01').toISOString().split('T')[0]
           }
         })
       )
@@ -229,11 +221,11 @@ describe('object combinator', () => {
     expect(
       validate(
         field('child.details').object({
-          dob: field('dob').isBefore().now()
+          data: field('data').isBefore().now()
         }),
         getFieldParams({
           'child.details': {
-            dob: new Date('2020-01-01').toISOString().split('T')[0]
+            data: new Date('2020-01-01').toISOString().split('T')[0]
           }
         })
       )
@@ -242,12 +234,12 @@ describe('object combinator', () => {
     expect(
       validate(
         field('child.details').object({
-          nested: field('nested').isEqualTo(field('random'))
+          data: field('data').isEqualTo(field('random'))
         }),
         getFieldParams({
           random: 'value',
           'child.details': {
-            nested: 'value1'
+            data: 'value1'
           }
         })
       )
@@ -256,12 +248,12 @@ describe('object combinator', () => {
     expect(
       validate(
         field('child.details').object({
-          nested: field('nested').isEqualTo(field('random'))
+          data: field('data').isEqualTo(field('random'))
         }),
         getFieldParams({
           random: 'value',
           'child.details': {
-            nested: 'value'
+            data: 'value'
           }
         })
       )
@@ -318,6 +310,288 @@ describe('date comparisons', () => {
         }),
         $now: '1990-06-06'
       })
+    ).toBe(false)
+  })
+})
+
+describe('age asDob comparisons', () => {
+  it('validates comparisons where dob from age field is expected to be before a certain time', () => {
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isBefore()
+          .days(18 * 365)
+          .inPast(),
+        {
+          ...getFieldParams({
+            // dob is 1970-01-01
+            'applicant.age': { age: 20, asOfDateRef: 'some.field' }
+          }),
+          $now: '1990-01-01'
+        }
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isBefore()
+          .days(18 * 365)
+          .inPast(),
+        {
+          ...getFieldParams({
+            // dob is 1973-01-01
+            'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+          }),
+          $now: '1990-01-01'
+        }
+      )
+    ).toBe(false)
+  })
+
+  it('validates comparisons where dob from age field is expected to be after a certain time', () => {
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isAfter()
+          .days(18 * 365)
+          .inPast(),
+        {
+          ...getFieldParams({
+            // dob is 1973-01-01
+            'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+          }),
+          $now: '1990-01-01'
+        }
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isAfter()
+          .days(18 * 365)
+          .inPast(),
+        {
+          ...getFieldParams({
+            // dob is 1971-01-01
+            'applicant.age': { age: 19, asOfDateRef: 'some.field' }
+          }),
+          $now: '1990-01-01'
+        }
+      )
+    ).toBe(false)
+  })
+
+  it('validates comparisons where dob from age field is expected to be after a certain date', () => {
+    expect(
+      validate(field('applicant.age').asDob().isAfter().date('1970-01-01'), {
+        ...getFieldParams({
+          // dob is 1973-01-01
+          'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01'
+      })
+    ).toBe(true)
+
+    expect(
+      validate(field('applicant.age').asDob().isAfter().date('1970-01-01'), {
+        ...getFieldParams({
+          // dob is 1963-01-01
+          'applicant.age': { age: 27, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01'
+      })
+    ).toBe(false)
+  })
+
+  it('validates comparisons where dob from age field is expected to be before a certain date', () => {
+    expect(
+      validate(field('applicant.age').asDob().isBefore().date('1980-01-01'), {
+        ...getFieldParams({
+          // dob is 1973-01-01
+          'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01'
+      })
+    ).toBe(true)
+
+    expect(
+      validate(field('applicant.age').asDob().isBefore().date('1970-01-01'), {
+        ...getFieldParams({
+          // dob is 1973-01-01
+          'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01'
+      })
+    ).toBe(false)
+  })
+
+  it('validates comparisons where dob from age field is expected to be before dob from another age field', () => {
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isBefore()
+          .date(field('referrer.age').asDob()),
+        {
+          ...getFieldParams({
+            // dob is 1973-01-01
+            'applicant.age': {
+              age: 17,
+              asOfDateRef: 'reference.dob.one'
+            },
+            // dob is 1970-01-01
+            'referrer.age': {
+              age: 20,
+              asOfDateRef: 'reference.dob.two'
+            },
+            'reference.dob.one': '1990-01-01',
+            'reference.dob.two': '1995-01-01'
+          }),
+          $now: '1990-01-01'
+        }
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age')
+          .asDob()
+          .isBefore()
+          .date(field('referrer.age').asDob()),
+        {
+          ...getFieldParams({
+            // dob is 1973-01-01
+            'applicant.age': {
+              age: 17,
+              asOfDateRef: 'reference.dob.one'
+            },
+            // dob is 1970-01-01
+            'referrer.age': {
+              age: 25,
+              asOfDateRef: 'reference.dob.two'
+            },
+            'reference.dob.one': '1990-01-01',
+            'reference.dob.two': '1995-01-01'
+          }),
+          $now: '1990-01-01'
+        }
+      )
+    ).toBe(false)
+  })
+})
+
+describe('age asAge comparisons', () => {
+  it('validates comparisons where age is expected to be equal to a certain value', () => {
+    expect(
+      validate(
+        field('applicant.age').asAge().isEqualTo(20),
+        getFieldParams({
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age').asAge().isEqualTo(20),
+        getFieldParams({
+          'applicant.age': { age: 22, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(false)
+  })
+
+  it('validates comparisons where age is expected to be equal to another age field', () => {
+    expect(
+      validate(
+        field('applicant.age').asAge().isEqualTo(field('referrer.age').asAge()),
+        getFieldParams({
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' },
+          'referrer.age': { age: 20, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age').asAge().isEqualTo(field('referrer.age').asAge()),
+        getFieldParams({
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' },
+          'referrer.age': { age: 25, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(false)
+  })
+
+  it('validates comparisons where age is expected to be less than a certain value', () => {
+    expect(
+      validate(
+        field('applicant.age').asAge().isLessThan(25),
+        getFieldParams({
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age').asAge().isLessThan(25),
+        getFieldParams({
+          'applicant.age': { age: 30, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(false)
+  })
+
+  it('validates comparisons where age is expected to be less than another age field', () => {
+    expect(
+      validate(
+        field('applicant.age')
+          .asAge()
+          .isLessThan(field('referrer.age').asAge()),
+        getFieldParams({
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' },
+          'referrer.age': { age: 22, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age')
+          .asAge()
+          .isLessThan(field('referrer.age').asAge()),
+        getFieldParams({
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' },
+          'referrer.age': { age: 18, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(false)
+  })
+
+  it('validates comparisons where age is expected to be between a certain value range', () => {
+    expect(
+      validate(
+        field('applicant.age').asAge().isBetween(16, 25),
+        getFieldParams({
+          'applicant.age': { age: 20, asOfDateRef: 'some.field' }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('applicant.age').asAge().isBetween(16, 25),
+        getFieldParams({
+          'applicant.age': { age: 30, asOfDateRef: 'some.field' }
+        })
+      )
     ).toBe(false)
   })
 })
@@ -646,7 +920,7 @@ describe('"field" conditionals', () => {
         }
       },
       $now: formatISO(new Date(), { representation: 'date' }),
-      $locations: [],
+      $leafAdminStructureLocationIds: [],
       $online: false
     } satisfies FormConditionalParameters
 
@@ -676,12 +950,43 @@ describe('"field" conditionals', () => {
       )
     ).toBe(true)
   })
+
+  it('validates "field.isFalsy" conditional with null in parent when using `.get`', () => {
+    const falsyFormParams = {
+      $form: {
+        'deep.nonvalue': null,
+        'deep.value': {
+          some: {
+            value: null
+          }
+        }
+      },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $leafAdminStructureLocationIds: [],
+      $online: false
+    }
+
+    expect(
+      validate(field('deep.nonvalue').get('foo.bar').isFalsy(), falsyFormParams)
+    ).toBe(true)
+
+    expect(
+      validate(field('deep.value').get('some.value').isFalsy(), falsyFormParams)
+    ).toBe(true)
+
+    expect(
+      validate(field('deep.value').get('some').isFalsy(), falsyFormParams)
+    ).toBe(false)
+
+    expect(validate(field('deep.value').isFalsy(), falsyFormParams)).toBe(false)
+  })
 })
 
 describe('"user" conditionals', () => {
   const userParams = {
     $user: {
       scope: ['record.register', 'record.registration-correct'],
+      role: 'LOCAL_REGISTRAR',
       exp: '1739881718',
       algorithm: 'RS256',
       userType: TokenUserType.enum.user,
@@ -697,7 +1002,9 @@ describe('"user" conditionals', () => {
   }
 
   it('validates "user.hasScope" conditional', () => {
-    expect(validate(user.hasScope(SCOPES.VALIDATE), userParams)).toBe(false)
+    expect(validate(user.hasScope(SCOPES.BYPASSRATELIMIT), userParams)).toBe(
+      false
+    )
 
     expect(validate(user.hasScope(SCOPES.RECORD_REGISTER), userParams)).toBe(
       true
@@ -707,6 +1014,78 @@ describe('"user" conditionals', () => {
   it('validates "user.isOnline" conditional', () => {
     expect(validate(user.isOnline(), userParams)).toBe(true)
     expect(validate(user.isOnline(), offlineUserParams)).toBe(false)
+  })
+
+  it('validates "user.hasRole" conditional', () => {
+    expect(validate(user.hasRole('LOCAL_REGISTRAR'), userParams)).toBe(true)
+    expect(validate(user.hasRole('FAKE_ROLE'), offlineUserParams)).toBe(false)
+  })
+})
+
+describe('"flag" conditionals', () => {
+  it('validates "flag()" conditional', () => {
+    const params = {
+      $flags: [InherentFlags.CORRECTION_REQUESTED],
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    } satisfies EventStateConditionalParameters
+
+    expect(validate(flag(InherentFlags.INCOMPLETE), params)).toBe(false)
+    expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
+      true
+    )
+  })
+
+  it('validation fails if flags array is empty', () => {
+    const params = {
+      $flags: [],
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    } satisfies EventStateConditionalParameters
+
+    expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
+      false
+    )
+  })
+
+  it('validation fails if params dont include flags', () => {
+    const params = {
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    }
+
+    // @ts-expect-error testing missing flags param
+    expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
+      false
+    )
+  })
+})
+
+describe('"status" conditionals', () => {
+  it('validates "status()" conditional', () => {
+    const params = {
+      $flags: [],
+      $status: EventStatus.enum.REGISTERED,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    } satisfies EventStateConditionalParameters
+
+    expect(validate(status('VALIDATED'), params)).toBe(false)
+    expect(validate(status('REGISTERED'), params)).toBe(true)
+  })
+
+  it('validation fails if params dont include status', () => {
+    const params = {
+      $flags: [],
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: true
+    }
+
+    // @ts-expect-error testing missing status param
+    expect(validate(status('REGISTERED'), params)).toBe(false)
   })
 })
 
@@ -727,7 +1106,7 @@ describe('"event" conditionals', () => {
             type: ActionType.DECLARE,
             createdAt: now,
             createdBy: '12345',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdByRole: 'some-role',
             declaration: {},
             createdAtLocation: '123456' as UUID,
@@ -766,7 +1145,7 @@ describe('"event" conditionals', () => {
             createdAt: now,
             status: ActionStatus.Accepted,
             transactionId: 'tx1',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdBy: 'user1',
             createdByRole: 'role1',
             createdAtLocation: 'loc1' as UUID,
@@ -779,7 +1158,7 @@ describe('"event" conditionals', () => {
             createdAt: now,
             status: ActionStatus.Accepted,
             transactionId: 'tx2',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdBy: 'user2',
             createdByRole: 'role2',
             createdAtLocation: 'loc2' as UUID,
@@ -866,12 +1245,43 @@ describe('"event" conditionals', () => {
 
 describe('"valid name" conditionals', () => {
   describe('Valid names', () => {
+    it('Only firstname and surname', () => {
+      const params = {
+        $form: { 'child.firstname': 'Mike', 'child.surname': 'Ross' },
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $locations: [],
+        $online: false
+      }
+      expect(
+        validate(
+          and(
+            field('child').get('firstname').isValidEnglishName(),
+            field('child').get('middlename').isValidEnglishName(),
+            field('child').get('surname').isValidEnglishName()
+          ),
+          params
+        )
+      ).toBe(true)
+    })
+    it('should pass for empty string', () => {
+      const validName = ''
+      const params = {
+        $form: { 'child.firstName': validName },
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $locations: [],
+        $online: false
+      }
+      expect(
+        validate(field('child.firstName').isValidEnglishName(), params)
+      ).toBe(true)
+    })
+
     it('should pass for a single-word name', () => {
       const validName = 'John'
       const params = {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -884,7 +1294,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -897,7 +1307,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -910,7 +1320,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -923,7 +1333,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -936,7 +1346,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -949,7 +1359,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -962,7 +1372,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -975,7 +1385,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -988,7 +1398,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1001,7 +1411,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': validName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1016,7 +1426,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1029,7 +1439,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1042,7 +1452,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1055,7 +1465,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1068,7 +1478,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1081,7 +1491,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1094,7 +1504,7 @@ describe('"valid name" conditionals', () => {
       const params = {
         $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1111,7 +1521,7 @@ describe('"range number" conditional', () => {
       const params = {
         $form: { 'child.weightAtBirth': validRange },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1124,7 +1534,7 @@ describe('"range number" conditional', () => {
       const params = {
         $form: { 'child.weightAtBirth': validRange },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1137,7 +1547,7 @@ describe('"range number" conditional', () => {
       const params = {
         $form: { 'child.weightAtBirth': validRange },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1152,7 +1562,7 @@ describe('"range number" conditional', () => {
       const params = {
         $form: { 'child.weightAtBirth': invalidRange },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1165,7 +1575,7 @@ describe('"range number" conditional', () => {
       const params = {
         $form: { 'child.weightAtBirth': invalidRange },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1180,7 +1590,7 @@ describe('"range number" conditional', () => {
       const params = {
         $form: { 'child.weightAtBirth': validRange },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1193,7 +1603,7 @@ describe('"range number" conditional', () => {
       const params = {
         $form: { 'child.weightAtBirth': invalidRange },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1206,7 +1616,7 @@ describe('"range number" conditional', () => {
       const params = {
         $form: { 'child.weightAtBirth': invalidRange },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1221,7 +1631,7 @@ describe('"range number" conditional', () => {
       const params = {
         $form: { 'adult.heightInFeet': validRange },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1234,7 +1644,7 @@ describe('"range number" conditional', () => {
       const params = {
         $form: { 'adult.heightInFeet': invalidRange },
         $now: formatISO(new Date(), { representation: 'date' }),
-        $locations: [],
+        $leafAdminStructureLocationIds: [],
         $online: false
       }
       expect(
@@ -1250,7 +1660,7 @@ describe('Matches conditional validation', () => {
     const params = {
       $form: { 'applicant.phoneNo': '0733445566' },
       $now: formatISO(new Date(), { representation: 'date' }),
-      $locations: [],
+      $leafAdminStructureLocationIds: [],
       $online: false
     }
     expect(
@@ -1262,7 +1672,7 @@ describe('Matches conditional validation', () => {
     const params = {
       $form: { 'applicant.phoneNo': '0933445566' },
       $now: formatISO(new Date(), { representation: 'date' }),
-      $locations: [],
+      $leafAdminStructureLocationIds: [],
       $online: false
     }
     expect(
@@ -1274,7 +1684,7 @@ describe('Matches conditional validation', () => {
     const params = {
       $form: { 'applicant.phoneNo': '0533445566' },
       $now: formatISO(new Date(), { representation: 'date' }),
-      $locations: [],
+      $leafAdminStructureLocationIds: [],
       $online: false
     }
     expect(
@@ -1286,7 +1696,7 @@ describe('Matches conditional validation', () => {
     const params = {
       $form: { 'applicant.phoneNo': '07334455' }, // Only 8 digits
       $now: formatISO(new Date(), { representation: 'date' }),
-      $locations: [],
+      $leafAdminStructureLocationIds: [],
       $online: false
     }
     expect(
@@ -1298,7 +1708,7 @@ describe('Matches conditional validation', () => {
     const params = {
       $form: { 'applicant.phoneNo': '073344556677' }, // 12 digits
       $now: formatISO(new Date(), { representation: 'date' }),
-      $locations: [],
+      $leafAdminStructureLocationIds: [],
       $online: false
     }
     expect(
@@ -1310,7 +1720,7 @@ describe('Matches conditional validation', () => {
     const params = {
       $form: { 'applicant.phoneNo': '733445566' }, // Missing leading 0
       $now: formatISO(new Date(), { representation: 'date' }),
-      $locations: [],
+      $leafAdminStructureLocationIds: [],
       $online: false
     }
     expect(
@@ -1322,7 +1732,7 @@ describe('Matches conditional validation', () => {
     const params = {
       $form: { 'applicant.phoneNo': '07A3445566' }, // Contains a letter
       $now: formatISO(new Date(), { representation: 'date' }),
-      $locations: [],
+      $leafAdminStructureLocationIds: [],
       $online: false
     }
     expect(
@@ -1334,7 +1744,7 @@ describe('Matches conditional validation', () => {
     const params = {
       $form: { 'applicant.phoneNo': '08334455667' }, // Invalid prefix
       $now: formatISO(new Date(), { representation: 'date' }),
-      $locations: [],
+      $leafAdminStructureLocationIds: [],
       $online: false
     }
     expect(
@@ -1346,7 +1756,7 @@ describe('Matches conditional validation', () => {
     const params = {
       $form: { 'applicant.phoneNo': '073344556' }, // 9 digits only
       $now: formatISO(new Date(), { representation: 'date' }),
-      $locations: [],
+      $leafAdminStructureLocationIds: [],
       $online: false
     }
     expect(
@@ -1358,7 +1768,7 @@ describe('Matches conditional validation', () => {
     const params = {
       $form: { 'applicant.phoneNo': '073344556677' }, // 12 digits
       $now: formatISO(new Date(), { representation: 'date' }),
-      $locations: [],
+      $leafAdminStructureLocationIds: [],
       $online: false
     }
     expect(
@@ -1370,7 +1780,7 @@ describe('Matches conditional validation', () => {
     const params = {
       $form: { 'applicant.phoneNo': '07 334455667' }, // Spaces not allowed
       $now: formatISO(new Date(), { representation: 'date' }),
-      $locations: [],
+      $leafAdminStructureLocationIds: [],
       $online: false
     }
     expect(
@@ -1382,7 +1792,7 @@ describe('Matches conditional validation', () => {
     const params = {
       $form: { 'applicant.phoneNo': '07A34455667' }, // Contains letter
       $now: formatISO(new Date(), { representation: 'date' }),
-      $locations: [],
+      $leafAdminStructureLocationIds: [],
       $online: false
     }
     expect(
@@ -1396,11 +1806,244 @@ describe('Subfield nesting', () => {
     const params = {
       $form: { 'applicant.http': { success: true } },
       $now: formatISO(new Date(), { representation: 'date' }),
-      $locations: [],
+      $leafAdminStructureLocationIds: [],
       $online: false
     }
     expect(
       validate(field('applicant.http').get('success').isEqualTo(true), params)
     ).toBe(true)
+  })
+
+  it('is supported by other conditionals', () => {
+    expect(
+      validate(
+        or(
+          field('applicant.name').get('firstname').isValidEnglishName(),
+          field('applicant.name').get('middlename').isValidEnglishName(),
+          field('applicant.name').get('surname').isValidEnglishName()
+        ),
+        {
+          $form: {
+            'applicant.name': { firstname: '', middlename: '', surname: '' }
+          },
+          $now: formatISO(new Date(), { representation: 'date' }),
+          $leafAdminStructureLocationIds: [],
+          $online: false
+        }
+      )
+    ).toBe(true)
+    expect(
+      validate(
+        or(
+          field('applicant.name').get('firstname').isValidEnglishName(),
+          field('applicant.name').get('middlename').isValidEnglishName(),
+          field('applicant.name').get('surname').isValidEnglishName()
+        ),
+        {
+          $form: {
+            'applicant.name': { firstname: '', middlename: 'Riku', surname: '' }
+          },
+          $now: formatISO(new Date(), { representation: 'date' }),
+          $leafAdminStructureLocationIds: [],
+          $online: false
+        }
+      )
+    ).toBe(true)
+    expect(
+      validate(
+        and(
+          field('applicant.name').get('firstname').isValidEnglishName(),
+          field('applicant.name').get('middlename').isValidEnglishName(),
+          field('applicant.name').get('surname').isValidEnglishName()
+        ),
+        {
+          $form: {
+            'applicant.name': { firstname: '', middlename: 'Riku', surname: '' }
+          },
+          $now: formatISO(new Date(), { representation: 'date' }),
+          $leafAdminStructureLocationIds: [],
+          $online: false
+        }
+      )
+    ).toBe(true)
+    expect(
+      validate(
+        and(
+          field('applicant.name').get('firstname').isValidEnglishName(),
+          field('applicant.name').get('middlename').isValidEnglishName(),
+          field('applicant.name').get('surname').isValidEnglishName()
+        ),
+        {
+          $form: {
+            'applicant.name': {
+              firstname: 'Riku',
+              middlename: 'Riku',
+              surname: 'Riku'
+            }
+          },
+          $now: formatISO(new Date(), { representation: 'date' }),
+          $leafAdminStructureLocationIds: [],
+          $online: false
+        }
+      )
+    ).toBe(true)
+  })
+})
+
+describe('isGreaterThan and isLessThan conditionals', () => {
+  // --------- isGreaterThan with another field ----------
+  it('should fail validation when numberOfChildren is not greater than numberOfDependents', () => {
+    const params = {
+      $form: {
+        'family.numberOfChildren': 2,
+        'family.numberOfDependents': 3
+      },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $leafAdminStructureLocationIds: [],
+      $online: false
+    }
+
+    expect(
+      validate(
+        field('family.numberOfChildren').isGreaterThan({
+          $$field: 'family.numberOfDependents',
+          $$subfield: []
+        }),
+        params
+      )
+    ).toBe(false)
+  })
+
+  it('should pass validation when numberOfChildren is greater than numberOfDependents', () => {
+    const params = {
+      $form: {
+        'family.numberOfChildren': 5,
+        'family.numberOfDependents': 3
+      },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $leafAdminStructureLocationIds: [],
+      $online: false
+    }
+
+    expect(
+      validate(
+        field('family.numberOfChildren').isGreaterThan({
+          $$field: 'family.numberOfDependents',
+          $$subfield: []
+        }),
+        params
+      )
+    ).toBe(true)
+  })
+
+  // --------- isGreaterThan with a number ----------
+  it('should fail validation when salary is not greater than 10000', () => {
+    const params = {
+      $form: { 'employee.salary': 8000 },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $leafAdminStructureLocationIds: [],
+      $online: false
+    }
+
+    expect(
+      validate(field('employee.salary').isGreaterThan(10000), params)
+    ).toBe(false)
+  })
+
+  it('should pass validation when salary is greater than 10000', () => {
+    const params = {
+      $form: { 'employee.salary': 15000 },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $leafAdminStructureLocationIds: [],
+      $online: false
+    }
+
+    expect(
+      validate(field('employee.salary').isGreaterThan(10000), params)
+    ).toBe(true)
+  })
+
+  // --------- isLessThan with another field ----------
+  it('should fail validation when yearsMarried is not less than yearsSinceGraduation', () => {
+    const params = {
+      $form: {
+        'person.yearsMarried': 15,
+        'person.yearsSinceGraduation': 10
+      },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $leafAdminStructureLocationIds: [],
+      $online: false
+    }
+
+    expect(
+      validate(
+        field('person.yearsMarried').isLessThan({
+          $$field: 'person.yearsSinceGraduation',
+          $$subfield: []
+        }),
+        params
+      )
+    ).toBe(false)
+  })
+
+  it('should pass validation when yearsMarried is less than yearsSinceGraduation', () => {
+    const params = {
+      $form: {
+        'person.yearsMarried': 5,
+        'person.yearsSinceGraduation': 10
+      },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $leafAdminStructureLocationIds: [],
+      $online: false
+    }
+
+    expect(
+      validate(
+        field('person.yearsMarried').isLessThan({
+          $$field: 'person.yearsSinceGraduation',
+          $$subfield: []
+        }),
+        params
+      )
+    ).toBe(true)
+  })
+
+  // --------- isLessThan with a number ----------
+  it('should fail validation when vacationDays is not less than 30', () => {
+    const params = {
+      $form: { 'employee.vacationDays': 45 },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $leafAdminStructureLocationIds: [],
+      $online: false
+    }
+
+    expect(
+      validate(field('employee.vacationDays').isLessThan(30), params)
+    ).toBe(false)
+  })
+
+  it('should pass validation when vacationDays is less than 30', () => {
+    const params = {
+      $form: { 'employee.vacationDays': 15 },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $leafAdminStructureLocationIds: [],
+      $online: false
+    }
+
+    expect(
+      validate(field('employee.vacationDays').isLessThan(30), params)
+    ).toBe(true)
+  })
+
+  it('should fail validation when salary is equal to 10000', () => {
+    const params = {
+      $form: { 'employee.salary': 10000 },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $leafAdminStructureLocationIds: [],
+      $online: false
+    }
+    expect(
+      validate(field('employee.salary').isGreaterThan(10000), params)
+    ).toBe(false)
   })
 })

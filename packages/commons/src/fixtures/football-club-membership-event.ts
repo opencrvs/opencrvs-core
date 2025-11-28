@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineConditional } from '../conditionals/conditionals'
 import { defineConfig } from '../events/defineConfig'
 import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
@@ -34,7 +33,7 @@ export const footballClubMembershipEvent = defineConfig({
   title: {
     defaultMessage: '{applicant.name.firstname} {applicant.name.surname}',
     description: 'This is the title of the summary',
-    id: 'v2.event.football-club-membership.title'
+    id: 'event.football-club-membership.title'
   },
   summary: {
     fields: [
@@ -61,7 +60,7 @@ export const footballClubMembershipEvent = defineConfig({
         label: {
           defaultMessage: "Applicant's last name",
           description: 'Label for surname',
-          id: 'v2.event.football-club-membership.summary.field.surname.label'
+          id: 'event.football-club-membership.summary.field.surname.label'
         }
       },
       {
@@ -73,7 +72,7 @@ export const footballClubMembershipEvent = defineConfig({
     {
       type: ActionType.READ,
       label: {
-        id: 'v2.event.football-club-membership.action.read.label',
+        id: 'event.football-club-membership.action.read.label',
         defaultMessage: 'Read',
         description: 'Title of the read only page'
       },
@@ -96,8 +95,7 @@ export const footballClubMembershipEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.football-club-membership.action.validate.label'
-      },
-      review: TENNIS_CLUB_DECLARATION_REVIEW
+      }
     },
     {
       type: ActionType.REGISTER,
@@ -106,8 +104,7 @@ export const footballClubMembershipEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.football-club-membership.action.register.label'
-      },
-      review: TENNIS_CLUB_DECLARATION_REVIEW
+      }
     },
     {
       type: ActionType.REQUEST_CORRECTION,
@@ -148,7 +145,7 @@ export const footballClubMembershipEvent = defineConfig({
                 id: 'correction.requester.relationship',
                 type: 'RADIO_GROUP',
                 label: {
-                  id: 'v2.correction.corrector.title',
+                  id: 'correction.corrector.title',
                   defaultMessage: 'Who is requesting a change to this record?',
                   description: 'The title for the corrector form'
                 },
@@ -157,7 +154,7 @@ export const footballClubMembershipEvent = defineConfig({
                   {
                     value: 'INFORMANT',
                     label: {
-                      id: 'v2.correction.corrector.informant',
+                      id: 'informant.name',
                       defaultMessage: 'Informant',
                       description:
                         'Label for informant option in certificate correction form'
@@ -166,7 +163,7 @@ export const footballClubMembershipEvent = defineConfig({
                   {
                     value: 'ANOTHER_AGENT',
                     label: {
-                      id: 'v2.correction.corrector.anotherAgent',
+                      id: 'correction.corrector.anotherAgent',
                       defaultMessage:
                         'Another registration agent or field agent',
                       description:
@@ -176,7 +173,7 @@ export const footballClubMembershipEvent = defineConfig({
                   {
                     value: 'REGISTRAR',
                     label: {
-                      id: 'v2.correction.corrector.me',
+                      id: 'correction.corrector.me',
                       defaultMessage: 'Me (Registrar)',
                       description:
                         'Label for registrar option in certificate correction form'
@@ -185,7 +182,7 @@ export const footballClubMembershipEvent = defineConfig({
                   {
                     value: 'OTHER',
                     label: {
-                      id: 'v2.correction.corrector.others',
+                      id: 'correction.corrector.others',
                       defaultMessage: 'Someone else',
                       description:
                         'Label for someone else option in certificate correction form'
@@ -326,80 +323,14 @@ export const footballClubMembershipEvent = defineConfig({
       }
     },
     {
-      type: ActionType.APPROVE_CORRECTION,
-      label: {
-        defaultMessage: 'Approve correction',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.football-club-membership.action.correction.approve.label'
-      }
-    },
-    {
       type: ActionType.PRINT_CERTIFICATE,
       label: {
-        id: 'v2.event.football-club-membership.action.collect-certificate.label',
+        id: 'event.football-club-membership.action.collect-certificate.label',
         defaultMessage: 'Print certificate',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
       },
-      printForm: PRINT_CERTIFICATE_FORM,
-      conditionals: [
-        {
-          type: 'SHOW',
-          conditional: defineConditional({
-            type: 'object',
-            properties: {
-              $event: {
-                type: 'object',
-                properties: {
-                  actions: {
-                    type: 'array',
-                    contains: {
-                      type: 'object',
-                      properties: {
-                        type: {
-                          const: 'REGISTER'
-                        },
-                        draft: {
-                          type: 'boolean'
-                        }
-                      },
-                      required: ['type'],
-                      not: {
-                        properties: {
-                          draft: {
-                            const: true
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                required: ['actions']
-              }
-            },
-            required: ['$event']
-          })
-        }
-      ]
-    },
-    {
-      type: ActionType.ARCHIVE,
-      label: {
-        id: 'v2.event.football-club-membership.action.archive.label',
-        defaultMessage: 'Archive',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from'
-      }
-    },
-    {
-      type: ActionType.REJECT,
-      label: {
-        id: 'v2.event.football-club-membership.action.reject.label',
-        defaultMessage: 'Reject',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from'
-      }
+      printForm: PRINT_CERTIFICATE_FORM
     }
   ],
   advancedSearch: [
@@ -407,7 +338,7 @@ export const footballClubMembershipEvent = defineConfig({
       title: {
         defaultMessage: 'Registration details',
         description: 'The title of Registration details accordion',
-        id: 'v2.advancedSearch.form.registrationDetails'
+        id: 'advancedSearch.form.registrationDetails'
       },
       fields: [
         event('legalStatuses.REGISTERED.createdAtLocation').exact(),
@@ -420,7 +351,7 @@ export const footballClubMembershipEvent = defineConfig({
       title: {
         defaultMessage: "Applicant's details",
         description: 'Applicant details search field section title',
-        id: 'v2.event.football-club-membership.search.applicants'
+        id: 'event.football-club-membership.search.applicants'
       },
       fields: [
         field('applicant.name').fuzzy(),
@@ -432,7 +363,7 @@ export const footballClubMembershipEvent = defineConfig({
       title: {
         defaultMessage: "Recommender's details",
         description: 'Recommender details search field section title',
-        id: 'v2.event.football-club-membership.search.recommender'
+        id: 'event.football-club-membership.search.recommender'
       },
       fields: [field('recommender.name').fuzzy()]
     }

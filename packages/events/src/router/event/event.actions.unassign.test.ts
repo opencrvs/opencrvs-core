@@ -13,14 +13,16 @@ import { TRPCError } from '@trpc/server'
 import { ActionStatus, ActionType, getUUID, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
-describe(`Without scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}`, () => {
-  test(`Can not unassign record that is assigned to someone else`, async () => {
+describe('Without scope: record.unassign-others', () => {
+  test('Can not unassign record that is assigned to someone else', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, [
+      'record.create[event=birth|death|tennis-club-membership]',
       'record.declare[event=birth|death|tennis-club-membership]'
     ])
     const { user: user2 } = await setupTestCase()
     const client2 = createTestClient(user2, [
+      'record.create[event=birth|death|tennis-club-membership]',
       'record.declare[event=birth|death|tennis-club-membership]'
     ])
     const payload = generator.event.create()
@@ -38,10 +40,11 @@ describe(`Without scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}`, () => {
     )
   })
 
-  describe(`If assigned to self`, () => {
+  describe('If assigned to self', () => {
     test(`If there is no ${ActionType.UNASSIGN} action after last ${ActionType.ASSIGN} action, should not throw error and should add unassign action`, async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
+        'record.create[event=birth|death|tennis-club-membership]',
         'record.declare[event=birth|death|tennis-club-membership]'
       ])
       const originalEvent = await client.event.create(generator.event.create())
@@ -60,6 +63,7 @@ describe(`Without scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}`, () => {
     test(`If there is ${ActionType.UNASSIGN} action after last ${ActionType.ASSIGN} action, should not throw error and should not add unassign action`, async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
+        'record.create[event=birth|death|tennis-club-membership]',
         'record.declare[event=birth|death|tennis-club-membership]'
       ])
       const originalEvent = await client.event.create(generator.event.create())
@@ -84,6 +88,7 @@ describe(`Without scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}`, () => {
 test(`Can unassign record that is assigned to someone else, if user has ${SCOPES.RECORD_UNASSIGN_OTHERS} scope`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
+    'record.create[event=birth|death|tennis-club-membership]',
     'record.declare[event=birth|death|tennis-club-membership]'
   ])
   const { user: user2 } = await setupTestCase()
@@ -103,6 +108,7 @@ test(`Can unassign record that is assigned to someone else, if user has ${SCOPES
 test(`${ActionType.UNASSIGN} action deletes draft`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
+    'record.create[event=birth|death|tennis-club-membership]',
     'record.declare[event=birth|death|tennis-club-membership]'
   ])
 
@@ -144,6 +150,7 @@ test(`${ActionType.UNASSIGN} action deletes draft`, async () => {
 test(`${ActionType.UNASSIGN} is idempotent`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
+    'record.create[event=birth|death|tennis-club-membership]',
     'record.declare[event=birth|death|tennis-club-membership]'
   ])
 

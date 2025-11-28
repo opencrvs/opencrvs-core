@@ -17,7 +17,9 @@ import {
   getAcceptedActions,
   getUUID,
   SCOPES,
-  TENNIS_CLUB_MEMBERSHIP
+  TENNIS_CLUB_MEMBERSHIP,
+  createPrng,
+  AddressType
 } from '@opencrvs/commons'
 import {
   createSystemTestClient,
@@ -51,6 +53,7 @@ describe('event.actions.notify', () => {
     test('disallows access with API scope with incorrect event type', async () => {
       const { user, generator } = await setupTestCase()
       const eventCreateClient = createTestClient(user, [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
@@ -70,6 +73,7 @@ describe('event.actions.notify', () => {
     test('allows access with API scope with correct event type', async () => {
       const { user } = await setupTestCase()
       const client = createTestClient(user, [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
@@ -121,12 +125,14 @@ describe('event.actions.notify', () => {
       transactionId: getUUID(),
       annotation: {},
       declaration: {
-        'applicant.name': { firstname: 999999, surname: '999999' }
+        'applicant.name': {
+          firstname: 999999,
+          surname: '999999'
+        }
       }
     }
 
     await expect(
-      // @ts-expect-error -- Intentionally passing incorrect type
       client.event.actions.notify.request(payload)
     ).rejects.toMatchSnapshot()
   })
@@ -208,17 +214,19 @@ describe('event.actions.notify', () => {
 
       const parentId = generateUuid(rng)
 
-      const locationPayload = generator.locations.set([
-        { id: parentId },
-        { parentId: parentId },
-        { parentId: parentId }
-      ])
+      const locationRng = createPrng(843)
+
+      const locationPayload = generator.locations.set(
+        [{ id: parentId }, { parentId: parentId }, { parentId: parentId }],
+        locationRng
+      )
 
       await dataSeedingClient.locations.set(locationPayload)
 
-      const locations = await dataSeedingClient.locations.get()
+      const locations = await dataSeedingClient.locations.list()
 
       const client = createSystemTestClient('test-system', [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
@@ -273,12 +281,14 @@ describe('event.actions.notify', () => {
       const { generator } = await setupTestCase()
 
       let client = createSystemTestClient('test-system', [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
       const event = await client.event.create(generator.event.create())
 
       client = createSystemTestClient('test-system-2', [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
@@ -315,6 +325,7 @@ describe('event.actions.notify', () => {
       const event = await client.event.create(generator.event.create())
 
       client = createSystemTestClient('test-system-2', [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
@@ -332,6 +343,7 @@ describe('event.actions.notify', () => {
     let client = createTestClient(user)
 
     client = createSystemTestClient('test-system-2', [
+      `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
       `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
     ])
 
@@ -349,5 +361,83 @@ describe('event.actions.notify', () => {
         annotation: {}
       })
     ).rejects.toMatchSnapshot()
+  })
+
+  test('Can not create a record with partial address when addressType is missing', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+
+    await expect(
+      client.event.actions.notify.request({
+        eventId: event.id,
+        transactionId: generateUuid(),
+        type: 'NOTIFY',
+        declaration: {
+          'applicant.address': {
+            country: 'FAR'
+          }
+        },
+        annotation: {}
+      })
+    ).rejects.toMatchSnapshot()
+  })
+
+  test('Can create a record with partial address', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+
+    const response = await client.event.actions.notify.request({
+      eventId: event.id,
+      transactionId: generateUuid(),
+      type: 'NOTIFY',
+      declaration: {
+        'applicant.address': {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC
+        }
+      },
+      annotation: {}
+    })
+
+    const activeActions = getAcceptedActions(response)
+    expect(
+      activeActions.find((action) => action.type === ActionType.NOTIFY)
+        ?.declaration
+    ).toMatchSnapshot()
+
+    expect(
+      activeActions.find((action) => action.type === ActionType.UNASSIGN)
+    ).toBeDefined()
+  })
+
+  test('Can create a record with mixed address', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+    const event = await client.event.create(generator.event.create())
+
+    const response = await client.event.actions.notify.request({
+      eventId: event.id,
+      transactionId: generateUuid(),
+      type: 'NOTIFY',
+      declaration: {
+        'applicant.address': {
+          country: 'FAR',
+          addressType: AddressType.INTERNATIONAL,
+          administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a' // it goes away when AddressFieldValue parses it
+        }
+      },
+      annotation: {}
+    })
+    const activeActions = getAcceptedActions(response)
+    expect(
+      activeActions.find((action) => action.type === ActionType.NOTIFY)
+        ?.declaration
+    ).toMatchSnapshot()
+
+    expect(
+      activeActions.find((action) => action.type === ActionType.UNASSIGN)
+    ).toBeDefined()
   })
 })

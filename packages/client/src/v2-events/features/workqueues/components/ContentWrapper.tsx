@@ -13,11 +13,9 @@ import styled from 'styled-components'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { NoResultText } from '@opencrvs/components/lib/Workqueue'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import {
-  LoadingIndicator,
-  OnlineStatusProps,
-  withOnlineStatus
-} from '@client/v2-events/components/LoadingIndicator'
+import { Text } from '@opencrvs/components'
+import { LoadingIndicator } from '@client/v2-events/components/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 
 /**
  * Based on packages/client/src/views/OfficeHome/WQContentWrapper.tsx
@@ -37,7 +35,7 @@ const PaginationLoaderContainer = styled.div<{ isShowPagination?: boolean }>`
   height: auto;
 `
 
-interface BodyProps extends OnlineStatusProps {
+interface BodyProps {
   isShowPagination?: boolean
   paginationId?: number
   totalPages?: number
@@ -64,11 +62,11 @@ function Body({
   onPageChange,
   loading,
   error,
-  isOnline,
   noContent,
   noResultText,
   children
 }: BodyProps) {
+  const isOnline = useOnlineStatus()
   return (
     <>
       {children}
@@ -97,7 +95,11 @@ function Body({
   )
 }
 
-function WQContentWrapperComp({
+const MobileTitle = styled(Text)`
+  padding-top: 12px;
+`
+
+export function WQContentWrapper({
   isMobileSize,
   tabBarContent,
   title,
@@ -107,7 +109,6 @@ function WQContentWrapperComp({
   loading,
   noContent,
   isShowPagination,
-  isOnline,
   onPageChange,
   paginationId,
   totalPages,
@@ -118,11 +119,17 @@ function WQContentWrapperComp({
     <>
       {isMobileSize ? (
         <>
-          {tabBarContent && <TabBarContainer>{tabBarContent}</TabBarContainer>}
+          {tabBarContent && (
+            <TabBarContainer>
+              <MobileTitle element="h3" variant="h3">
+                {title}
+              </MobileTitle>
+              {tabBarContent}
+            </TabBarContainer>
+          )}
           <MobileChildrenContainer>
             <Body
               error={error}
-              isOnline={isOnline}
               isShowPagination={isShowPagination}
               loading={loading}
               noContent={noContent}
@@ -145,7 +152,6 @@ function WQContentWrapperComp({
         >
           <Body
             error={error}
-            isOnline={isOnline}
             isShowPagination={isShowPagination}
             loading={loading}
             noContent={noContent}
@@ -161,5 +167,3 @@ function WQContentWrapperComp({
     </>
   )
 }
-
-export const WQContentWrapper = withOnlineStatus(WQContentWrapperComp)

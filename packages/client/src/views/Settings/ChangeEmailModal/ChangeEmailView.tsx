@@ -21,13 +21,13 @@ import { GET_USER_BY_EMAIL } from '@client/views/Settings/queries'
 import { useDispatch, useSelector } from 'react-redux'
 import { sendVerifyCode } from '@client/profile/profileActions'
 import { isAValidEmailAddressFormat } from '@client/utils/validate'
-import { NotificationEvent } from '@client/profile/serviceApi'
 import { getLanguage } from '@client/i18n/selectors'
 import { convertToMSISDN } from '@client/forms/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { useLazyQuery } from '@apollo/client'
 import { GetUserByEmailQuery } from '@client/utils/gateway'
+import { TriggerEvent } from '@opencrvs/commons/client'
 
 interface IProps {
   show: boolean
@@ -82,7 +82,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
     const emailExists = userData?.getUserByEmail
 
     if (!emailExists) {
-      const notificationEvent = NotificationEvent.CHANGE_EMAIL_ADDRESS
+      const notificationEvent = TriggerEvent.CHANGE_EMAIL_ADDRESS
       dispatch(
         sendVerifyCode(
           [

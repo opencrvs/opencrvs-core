@@ -10,11 +10,23 @@
  */
 
 import { UUID } from '../uuid'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, difference } from 'lodash'
 import { Action } from './ActionDocument'
 import { ActionType } from './ActionType'
-import { findLastAssignmentAction, getMixedPath } from './utils'
+import {
+  findLastAssignmentAction,
+  getDeclaration,
+  getDeclarationFields,
+  getMixedPath,
+  getPendingAction,
+  omitHiddenPaginatedFields
+} from './utils'
 import { TokenUserType } from '../authentication'
+import {
+  createPrng,
+  fieldConfigsToActionPayload,
+  tennisClubMembershipEvent
+} from '../client'
 
 const commonAction = {
   status: 'Requested' as const,
@@ -36,7 +48,7 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
       {
         ...commonAction,
         type: ActionType.CREATE,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T00:00:00Z'
       }
     ],
@@ -47,13 +59,13 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
       {
         ...commonAction,
         type: ActionType.CREATE,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T00:00:00Z'
       },
       {
         ...commonAction,
         type: ActionType.ASSIGN,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T01:00:00Z',
         assignedTo: 'user-id-2'
       }
@@ -61,7 +73,7 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
     expected: {
       ...commonAction,
       type: ActionType.ASSIGN,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-01-01T01:00:00Z',
       assignedTo: 'user-id-2'
     }
@@ -71,27 +83,27 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
       {
         ...commonAction,
         type: ActionType.CREATE,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T00:00:00Z'
       },
       {
         ...commonAction,
         type: ActionType.ASSIGN,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T01:00:00Z',
         assignedTo: 'user-id-2'
       },
       {
         ...commonAction,
         type: ActionType.UNASSIGN,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T02:00:00Z'
       }
     ],
     expected: {
       ...commonAction,
       type: ActionType.UNASSIGN,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-01-01T02:00:00Z'
     }
   },
@@ -100,26 +112,26 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
       {
         ...commonAction,
         type: ActionType.CREATE,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T00:00:00Z'
       },
       {
         ...commonAction,
         type: ActionType.ASSIGN,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T01:00:00Z',
         assignedTo: 'user-id-2'
       },
       {
         ...commonAction,
         type: ActionType.UNASSIGN,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T02:00:00Z'
       },
       {
         ...commonAction,
         type: ActionType.ASSIGN,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T03:00:00Z',
         assignedTo: 'user-id-4'
       }
@@ -127,7 +139,7 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
     expected: {
       ...commonAction,
       type: ActionType.ASSIGN,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-01-01T03:00:00Z',
       assignedTo: 'user-id-4'
     }
@@ -342,5 +354,205 @@ describe('deepMerge', () => {
     // Make sure the method is not mutating the payload.
     expect(obj1).toEqual(cloneObj1)
     expect(obj2).toEqual(cloneObj2)
+  })
+})
+
+describe('getPendingAction', () => {
+  it('throws when it finds more than one pending action', () => {
+    const created = {
+      ...commonAction,
+      type: ActionType.CREATE,
+      createdByUserType: TokenUserType.enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Accepted' as const
+    }
+
+    const requested1 = {
+      ...commonAction,
+      id: 'action-id-2' as UUID,
+      type: ActionType.DECLARE,
+      createdByUserType: TokenUserType.enum.user,
+      createdAt: '2023-02-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    const requested2 = {
+      ...commonAction,
+      id: 'action-id-3' as UUID,
+      type: ActionType.REQUEST_CORRECTION,
+      createdByUserType: TokenUserType.enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    expect(() =>
+      getPendingAction([created, requested1, requested2])
+    ).toThrowError(
+      'Expected exactly one pending action, but found action-id-2, action-id-3'
+    )
+  })
+
+  it('finds the pending action', () => {
+    const created = {
+      ...commonAction,
+      type: ActionType.CREATE,
+      createdByUserType: TokenUserType.enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Accepted' as const
+    }
+
+    const requested1 = {
+      ...commonAction,
+      id: 'action-id-2' as UUID,
+      type: ActionType.DECLARE,
+      createdByUserType: TokenUserType.enum.user,
+      createdAt: '2023-02-01T00:00:00Z',
+      status: 'Accepted' as const
+    }
+
+    const requested2 = {
+      ...commonAction,
+      id: 'action-id-3' as UUID,
+      type: ActionType.REQUEST_CORRECTION,
+      createdByUserType: TokenUserType.enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    expect(getPendingAction([created, requested1, requested2])).toMatchObject(
+      requested2
+    )
+  })
+
+  it('handles the history having already a Requested & Accepted pair: still finds the one pending', () => {
+    const creates = {
+      ...commonAction,
+      type: ActionType.CREATE,
+      createdByUserType: TokenUserType.enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Accepted' as const
+    }
+
+    const requests = {
+      ...commonAction,
+      id: 'action-id-2' as UUID,
+      type: ActionType.DECLARE,
+      createdByUserType: TokenUserType.enum.user,
+      createdAt: '2023-02-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    const accepts = {
+      ...commonAction,
+      id: 'action-id-4' as UUID,
+      type: ActionType.DECLARE,
+      createdByUserType: TokenUserType.enum.user,
+      createdAt: '2023-02-01T00:00:00Z',
+      status: 'Accepted' as const,
+      originalActionId: 'action-id-2' as UUID
+    }
+
+    const requestsAgain = {
+      ...commonAction,
+      id: 'action-id-3' as UUID,
+      type: ActionType.REQUEST_CORRECTION,
+      createdByUserType: TokenUserType.enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    expect(
+      getPendingAction([creates, requests, accepts, requestsAgain])
+    ).toMatchObject(requestsAgain)
+  })
+
+  it('handles the history having already a Requested & Accepted pair: still throws on two requested', () => {
+    const creates = {
+      ...commonAction,
+      type: ActionType.CREATE,
+      createdByUserType: TokenUserType.enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Accepted' as const
+    }
+
+    const requests = {
+      ...commonAction,
+      id: 'action-id-2' as UUID,
+      type: ActionType.DECLARE,
+      createdByUserType: TokenUserType.enum.user,
+      createdAt: '2023-02-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    const accepts = {
+      ...commonAction,
+      id: 'action-id-3' as UUID,
+      type: ActionType.DECLARE,
+      createdByUserType: TokenUserType.enum.user,
+      createdAt: '2023-02-01T00:00:00Z',
+      status: 'Accepted' as const,
+      originalActionId: 'action-id-2' as UUID
+    }
+
+    const requestsAgain = {
+      ...commonAction,
+      id: 'action-id-4' as UUID,
+      type: ActionType.REQUEST_CORRECTION,
+      createdByUserType: TokenUserType.enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    const requestsOnceTooMany = {
+      ...commonAction,
+      id: 'action-id-5' as UUID,
+      type: ActionType.REGISTER,
+      createdByUserType: TokenUserType.enum.user,
+      createdAt: '2023-01-01T00:00:00Z',
+      status: 'Requested' as const
+    }
+
+    expect(() =>
+      getPendingAction([
+        creates,
+        requests,
+        accepts,
+        requestsAgain,
+        requestsOnceTooMany
+      ])
+    ).toThrowError(
+      'Expected exactly one pending action, but found action-id-4, action-id-5'
+    )
+  })
+})
+
+describe('omitHiddenPaginatedFields', () => {
+  it('removes fields that are hidden by field conditionals when page conditional is true', () => {
+    const rng = createPrng(101)
+
+    const fields = getDeclarationFields(tennisClubMembershipEvent)
+
+    const declarationConfig = getDeclaration(tennisClubMembershipEvent)
+
+    const declaration = fieldConfigsToActionPayload(fields, rng)
+    const declarationWithoutHiddenFields = omitHiddenPaginatedFields(
+      declarationConfig,
+      declaration,
+      {}
+    )
+
+    const missingKeys = difference(
+      Object.keys(declaration),
+      Object.keys(declarationWithoutHiddenFields)
+    )
+
+    expect(missingKeys).toEqual([
+      'applicant.dob', // dobUnknown is true
+      'applicant.isRecommendedByFieldAgent', // user is not field agent
+      'senior-pass.id', // dob is not before the threshhold
+      'senior-pass.recommender', // dob is not before threshhold
+      'recommender.name', // recommender.none is true
+      'recommender.id' // recommender.none is true
+    ])
   })
 })

@@ -44,7 +44,7 @@ function QuickSearchComponent({
       queryData={queryData.results}
       title={intl.formatMessage(
         {
-          id: 'v2.search.quickSearch.result.title',
+          id: 'search.quickSearch.result.title',
           description: 'Title for search result page',
           defaultMessage: 'Search result for “{searchTerm}”'
         },

@@ -27,16 +27,6 @@ services:
     environment:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
       - GATEWAY_URL_INTERNAL=http://gateway:7070
-  dashboards:
-    image: ghcr.io/opencrvs/ocrvs-dashboards:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/dashboards/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
-
   login:
     image: ghcr.io/opencrvs/ocrvs-login:${VERSION}
     #platform: linux/amd64
@@ -299,3 +289,6 @@ services:
       - base
     deploy:
       replicas: 0
+    environment:
+      - EVENTS_URL=http://events:5555/
+      - AUTH_URL=http://auth:4040/

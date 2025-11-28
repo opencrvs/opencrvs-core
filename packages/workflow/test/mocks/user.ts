@@ -32,18 +32,18 @@ export const user = {
     labels: [
       {
         lang: 'en',
-        label: 'Social Worker'
+        label: 'Hospital Clerk'
       },
       {
         lang: 'fr',
-        label: 'Travailleur social'
+        label: "Commis d'hôpital"
       }
     ],
     updatedAt: '2023-11-29T07:02:37.399Z'
   },
   practitionerId: '4651d1cc-6072-4e34-bf20-b583f421a9f1',
   primaryOfficeId: 'ce73938d-a188-4a78-9d19-35dfd4ca6957',
-  scope: ['declare', 'demo'],
+  scope: ['demo'],
   status: 'active',
   securityQuestionAnswers: [],
   creationDate: 1701241360173,

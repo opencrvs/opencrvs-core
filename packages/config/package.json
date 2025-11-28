@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/config",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "description": "OpenCRVS public configuration microservice",
   "license": "MPL-2.0",
   "scripts": {
@@ -12,14 +12,12 @@
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "test:compilation": "tsc --noEmit",
     "build": "tsc && copyfiles 'src/**/*.json' build/dist",
-    "build:clean": "rm -rf build",
-    "extract:translations": "bash extract-translations.sh"
+    "build:clean": "rm -rf build"
   },
   "dependencies": {
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.2.1",
-    "@opencrvs/commons": "^1.7.0",
-    "@types/jest": "^26.0.24",
+    "@opencrvs/commons": "^1.9.0",
     "cross-env": "^7.0.0",
     "date-fns": "^4.1.0",
     "envalid": "^8.0.0",
@@ -37,8 +35,7 @@
     "mongoose": "^6.11.3",
     "pino": "^7.0.0",
     "tsconfig-paths": "^3.13.0",
-    "uuid": "^11.1.0",
-    "zod": "^3.17.3",
+    "zod": "^4.1.12",
     "zod-validation-error": "^1.3.1"
   },
   "devDependencies": {

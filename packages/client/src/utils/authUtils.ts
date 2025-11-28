@@ -12,14 +12,7 @@ import decode from 'jwt-decode'
 import * as Sentry from '@sentry/react'
 import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
-import { Scope } from '@opencrvs/commons/client'
-
-export interface ITokenPayload {
-  sub: string
-  exp: string
-  algorithm: string
-  scope: Scope[]
-}
+import { ITokenPayload } from '@opencrvs/commons/client'
 
 export const isTokenStillValid = (decoded: ITokenPayload) => {
   return Number(decoded.exp) * 1000 > Date.now()

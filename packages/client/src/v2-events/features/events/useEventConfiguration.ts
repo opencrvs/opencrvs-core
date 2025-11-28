@@ -42,5 +42,6 @@ export function useEventConfiguration(eventIdentifier: string): {
   if (!eventConfiguration) {
     throw new Error('Event configuration not found')
   }
+
   return { eventConfiguration }
 }

@@ -71,7 +71,11 @@ export const SearchResultIndex = () => {
    * re-evaluated, which leads to an infinite loop.
    */
   const queryData = searchEvent.useQuery({
-    query: toAdvancedSearchQueryType(searchQuery, eventType),
+    query: toAdvancedSearchQueryType(
+      searchQuery,
+      eventConfig.advancedSearch.flatMap((section) => section.fields),
+      eventType
+    ),
     ...typedSearchParams
   }).data ?? {
     results: [],
@@ -92,7 +96,7 @@ export const SearchResultIndex = () => {
       }
       title={intl.formatMessage(
         {
-          id: 'v2.search.advancedSearch.result.title',
+          id: 'search.advancedSearch.result.title',
           description: 'Advanced search result title',
           defaultMessage: 'Search results ({count})'
         },

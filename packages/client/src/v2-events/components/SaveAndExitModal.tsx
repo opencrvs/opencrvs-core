@@ -17,12 +17,12 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 
 const saveAndExitModalMessages = defineMessages({
   saveDeclarationConfirmModalTitle: {
-    id: 'v2.saveAndExit.title.saveDeclarationConfirm',
+    id: 'saveAndExit.title.saveDeclarationConfirm',
     defaultMessage: 'Save & exit?',
     description: 'Title for save declaration confirmation modal'
   },
   saveDeclarationConfirmModalDescription: {
-    id: 'v2.saveAndExit.desc.saveDeclarationConfirm',
+    id: 'saveAndExit.desc.saveDeclarationConfirm',
     defaultMessage:
       'All inputted data will be kept secure for future editing. Are you ready to save any changes to this declaration form?',
     description: 'Description for save declaration confirmation modal'
@@ -30,12 +30,12 @@ const saveAndExitModalMessages = defineMessages({
   cancel: {
     defaultMessage: 'Cancel',
     description: 'Cancel button text in the modal',
-    id: 'v2.buttons.cancel'
+    id: 'buttons.cancel'
   },
   confirm: {
     defaultMessage: 'Confirm',
     description: 'Confirm button text',
-    id: 'v2.buttons.confirm'
+    id: 'buttons.confirm'
   }
 })
 

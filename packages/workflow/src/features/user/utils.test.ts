@@ -53,16 +53,12 @@ describe('Verify getLoggedInPractitionerResource', () => {
       )
     )
 
-    const token = jwt.sign(
-      { scope: ['declare'] },
-      readFileSync('./test/cert.key'),
-      {
-        subject: '5bdc55ece42c82de9a529c36',
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
+    const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+      subject: '5bdc55ece42c82de9a529c36',
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:workflow-user'
+    })
     const location = await getLoggedInPractitionerResource(token)
     expect(location).toEqual({
       resourceType: 'Practitioner',
@@ -89,18 +85,13 @@ describe('Verify getLoggedInPractitionerResource', () => {
         }
       )
     )
-    const token = jwt.sign(
-      { scope: ['declare'] },
-      readFileSync('./test/cert.key'),
-      {
-        subject: '5bdc55ece42c82de9a529c36',
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
-
-    await expect(getLoggedInPractitionerResource(token)).rejects.toThrowError()
+    const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+      subject: '5bdc55ece42c82de9a529c36',
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:workflow-user'
+    })
+    expect(getLoggedInPractitionerResource(token)).rejects.toThrowError()
   })
 })
 describe('Verify getUser', () => {

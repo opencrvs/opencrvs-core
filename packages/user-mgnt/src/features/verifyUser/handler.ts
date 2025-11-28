@@ -8,16 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { fetchJSON, joinUrl, Roles } from '@opencrvs/commons'
+import { fetchJSON, joinUrl, Roles, IUserName } from '@opencrvs/commons'
 import { env } from '@user-mgnt/environment'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized, conflict, badRequest } from '@hapi/boom'
-import User, {
-  IUserModel,
-  ISecurityQuestionAnswer,
-  IUserName
-} from '@user-mgnt/model/user'
+import User, { ISecurityQuestionAnswer } from '@user-mgnt/model/user'
 import {
   isNonEmptyArray,
   NonEmptyArray
@@ -46,17 +42,15 @@ export default async function verifyUserHandler(
 ) {
   const { mobile, email } = request.payload as IVerifyPayload
 
-  let user: IUserModel | null
-
   if (!email && !mobile) {
     return badRequest()
   }
 
-  if (mobile) {
-    user = await User.findOne({ mobile })
-  } else {
-    user = await User.findOne({ emailForNotification: email })
-  }
+  const query = email
+    ? { emailForNotification: email.toLowerCase() }
+    : { mobile }
+
+  const user = await User.findOne(query)
 
   if (!user) {
     // Don't return a 404 as this gives away that this user account exists

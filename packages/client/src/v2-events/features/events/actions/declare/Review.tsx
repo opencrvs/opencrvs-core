@@ -11,7 +11,6 @@
 
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { v4 as uuid } from 'uuid'
 import {
   useTypedParams,
   useTypedSearchParams
@@ -19,9 +18,9 @@ import {
 import {
   ActionType,
   EventStatus,
-  getActionReview,
   getCurrentEventState,
-  getDeclaration
+  getDeclaration,
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -30,19 +29,16 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
-import {
-  REJECT_ACTIONS,
-  RejectionState,
-  Review as ReviewComponent
-} from '@client/v2-events/features/events/components/Review'
+import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useRejectionModal } from '../reject/useRejectionModal'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
@@ -53,12 +49,13 @@ export function Review() {
   const events = useEvents()
   const drafts = useDrafts()
   const navigate = useNavigate()
+  const { rejectionModal, handleRejection } = useRejectionModal(eventId)
+
+  const validatorContext = useValidatorContext()
   const [modal, openModal] = useModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const { closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
 
   const event = events.getEvent.getFromCache(eventId)
 
@@ -67,7 +64,15 @@ export function Review() {
   const currentEventState = getCurrentEventState(event, config)
 
   const formConfig = getDeclaration(config)
-  const reviewConfig = getActionReview(config, ActionType.DECLARE)
+
+  const actionConfiguration = config.actions.find(
+    (a) => a.type === ActionType.DECLARE
+  )
+  if (!actionConfiguration) {
+    throw new Error('Action configuration not found')
+  }
+
+  const reviewConfig = actionConfiguration.review
 
   const form = useEventFormData((state) => state.getFormValues())
 
@@ -76,17 +81,13 @@ export function Review() {
 
   const { isActionAllowed } = useUserAllowedActions(event.type)
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
-
   const reviewActionConfiguration = useReviewActionConfig({
     eventType: event.type,
     formConfig,
     declaration: form,
     annotation,
     reviewFields: reviewConfig.fields,
-    locations: adminStructureLocations
+    validatorContext
   })
 
   async function handleEdit({
@@ -148,45 +149,6 @@ export function Review() {
     }
   }
 
-  async function handleRejection() {
-    const confirmedRejection = await openModal<RejectionState | null>(
-      (close) => <ReviewComponent.ActionModal.Reject close={close} />
-    )
-    if (confirmedRejection) {
-      const { rejectAction, message, isDuplicate } = confirmedRejection
-
-      if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
-        if (isDuplicate) {
-          events.customActions.archiveOnDuplicate.mutate({
-            eventId,
-            declaration: {},
-            transactionId: uuid(),
-            content: { reason: message }
-          })
-        } else {
-          events.actions.reject.mutate({
-            eventId,
-            declaration: {},
-            transactionId: uuid(),
-            annotation: {},
-            content: { reason: message }
-          })
-        }
-      }
-
-      if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
-        events.actions.archive.mutate({
-          eventId,
-          declaration: {},
-          transactionId: uuid(),
-          annotation: {},
-          content: { reason: message }
-        })
-      }
-      closeActionView(slug)
-    }
-  }
-
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}
@@ -201,9 +163,9 @@ export function Review() {
         annotation={annotation}
         form={form}
         formConfig={formConfig}
-        locations={adminStructureLocations}
         reviewFields={reviewConfig.fields}
         title={formatMessage(reviewConfig.title, form)}
+        validatorContext={validatorContext}
         onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       >
@@ -215,13 +177,15 @@ export function Review() {
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleDeclaration}
           onReject={
-            currentEventState.status === EventStatus.enum.NOTIFIED
-              ? handleRejection
+            currentEventState.status === EventStatus.enum.NOTIFIED &&
+            !currentEventState.flags.includes(InherentFlags.REJECTED)
+              ? async () => handleRejection(() => closeActionView(slug))
               : undefined
           }
         />
       </ReviewComponent.Body>
       {modal}
+      {rejectionModal}
       {saveAndExitModal}
     </FormLayout>
   )

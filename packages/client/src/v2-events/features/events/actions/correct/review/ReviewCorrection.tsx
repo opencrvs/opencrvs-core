@@ -16,12 +16,12 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import {
   ActionType,
   EventState,
   generateTransactionId,
-  RequestedCorrectionAction
+  RequestedCorrectionAction,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import {
@@ -39,44 +39,43 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { getScope } from '@client/profile/profileSelectors'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 
 const reviewCorrectionMessages = defineMessages({
   actionModalCancel: {
-    id: 'v2.actionModal.cancel',
+    id: 'actionModal.cancel',
     defaultMessage: 'Cancel',
     description: 'The label for cancel button of action modal'
   },
   actionModalDescription: {
-    id: 'v2.actionModal.description',
+    id: 'actionModal.description',
     defaultMessage:
       'The informant will be notified of this decision and a record of this decision will be recorded',
     description: 'The description for action modal'
   },
   approveCorrection: {
-    id: 'v2.modal.approveCorrection',
+    id: 'modal.approveCorrection',
     defaultMessage: 'Approve correction?',
     description: 'The title for approve correction modal'
   },
   rejectCorrection: {
-    id: 'v2.modal.rejectCorrection',
+    id: 'modal.rejectCorrection',
     defaultMessage: 'Reject correction?',
     description: 'The title for reject correction modal'
   },
   actionModalConfirm: {
-    id: 'v2.actionModal.confirm',
+    id: 'actionModal.confirm',
     defaultMessage: 'Confirm',
     description: 'The label for confirm button of action modal'
   },
   correctionRequest: {
-    id: 'v2-events.correction.correctionRequest',
+    id: 'correction.correctionRequest',
     defaultMessage: 'Correction request',
     description: 'Correction request text'
   },
   rejectReason: {
-    id: 'v2-events.correction.correctionReject.reason',
+    id: 'correction.correctionReject.reason',
     defaultMessage: 'Reason for rejection',
     description: 'Correction request rejection reason'
   }
@@ -209,12 +208,24 @@ function RejectModal({
   )
 }
 
+// Content has 'height: 100%' on mobile, which breaks the page layout if there is anything on the page after the Content.
+// We don't want that.
+const StyledContent = styled(Content)`
+  height: auto;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-bottom: 28px;
+  }
+`
+
 export function ReviewCorrection({
   form,
-  correctionRequestAction
+  correctionRequestAction,
+  validatorContext
 }: {
   form: EventState
   correctionRequestAction: RequestedCorrectionAction
+  validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
   const { getAnnotation } = useActionAnnotation()
@@ -241,12 +252,15 @@ export function ReviewCorrection({
             requestId: correctionRequestAction.id,
             annotation
           })
-          return navigate(
-            ROUTES.V2.EVENTS.OVERVIEW.buildPath(
-              { eventId },
-              { workqueue: searchParams.workqueue }
+          if (searchParams.workqueue) {
+            return navigate(
+              ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
+                slug: searchParams.workqueue
+              })
             )
-          )
+          } else {
+            return navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
+          }
         }}
       />
     ))
@@ -264,12 +278,20 @@ export function ReviewCorrection({
             annotation,
             content: { reason }
           })
-          return navigate(
-            ROUTES.V2.EVENTS.OVERVIEW.buildPath(
-              { eventId },
-              { workqueue: searchParams.workqueue }
+          if (searchParams.workqueue) {
+            return navigate(
+              ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
+                slug: searchParams.workqueue
+              })
             )
-          )
+          } else {
+            return navigate(
+              ROUTES.V2.EVENTS.EVENT.buildPath(
+                { eventId },
+                { workqueue: searchParams.workqueue }
+              )
+            )
+          }
         }}
       />
     ))
@@ -302,7 +324,8 @@ export function ReviewCorrection({
   )
 
   return (
-    <Content
+    <StyledContent
+      showTitleOnMobile={true}
       size={ContentSize.LARGE}
       title={intl.formatMessage(reviewCorrectionMessages.correctionRequest)}
     >
@@ -312,12 +335,13 @@ export function ReviewCorrection({
         event={event}
         form={form}
         requesting={!isActionAllowed(ActionType.APPROVE_CORRECTION)}
+        validatorContext={validatorContext}
       />
       <Row background="white" position="left">
         {rejectButton}
         {approveButton}
       </Row>
       {modal}
-    </Content>
+    </StyledContent>
   )
 }

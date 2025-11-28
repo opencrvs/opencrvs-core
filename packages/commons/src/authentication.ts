@@ -8,13 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { IAuthHeader } from './http'
 import decode from 'jwt-decode'
 import { Nominal } from './nominal'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 import { RawScopes, Scope, SCOPES } from './scopes'
+import { UUID } from './uuid'
 export * from './scopes'
 
 export const DEFAULT_ROLES_DEFINITION = [
@@ -26,6 +25,7 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.fieldAgent'
     },
     scopes: [
+      `record.create[event=birth|death|tennis-club-membership]`,
       'record.declare[event=birth|death|tennis-club-membership]',
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
@@ -45,8 +45,7 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.registrationAgent'
     },
     scopes: [
-      SCOPES.PERFORMANCE,
-      SCOPES.CERTIFY,
+      `record.create[event=birth|death|tennis-club-membership]`,
       'record.declare[event=birth|death|tennis-club-membership]',
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
@@ -56,11 +55,7 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.RECORD_DECLARATION_ARCHIVE,
       SCOPES.RECORD_DECLARATION_REINSTATE,
       SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-      SCOPES.RECORD_REGISTRATION_PRINT,
-      SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
-      SCOPES.RECORD_EXPORT_RECORDS,
       SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
-      SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.ORGANISATION_READ_LOCATIONS,
@@ -78,23 +73,19 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.localRegistrar'
     },
     scopes: [
-      SCOPES.PERFORMANCE,
-      SCOPES.CERTIFY,
+      `record.create[event=birth|death|tennis-club-membership]`,
       'record.declare[event=birth|death|tennis-club-membership]',
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
       SCOPES.RECORD_SUBMIT_FOR_UPDATES,
       SCOPES.RECORD_REVIEW_DUPLICATES,
+      'record.declared.review-duplicates[event=birth|death|tennis-club-membership]',
       SCOPES.RECORD_DECLARATION_ARCHIVE,
       SCOPES.RECORD_DECLARATION_REINSTATE,
       SCOPES.RECORD_REGISTER,
       SCOPES.RECORD_REGISTRATION_CORRECT,
-      SCOPES.RECORD_REGISTRATION_PRINT,
-      SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
-      SCOPES.RECORD_EXPORT_RECORDS,
       SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
-      SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.ORGANISATION_READ_LOCATIONS,
@@ -113,7 +104,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.localSystemAdmin'
     },
     scopes: [
-      SCOPES.SYSADMIN,
       SCOPES.USER_READ_MY_OFFICE,
       SCOPES.USER_CREATE_MY_JURISDICTION,
       SCOPES.USER_UPDATE_MY_JURISDICTION,
@@ -132,8 +122,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.nationalSystemAdmin'
     },
     scopes: [
-      SCOPES.SYSADMIN,
-      SCOPES.NATLSYSADMIN,
       SCOPES.USER_CREATE,
       SCOPES.USER_READ,
       SCOPES.USER_UPDATE,
@@ -141,7 +129,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
-      // 'organisation.read-users' ?
     ]
   },
   {
@@ -152,7 +139,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.performanceManager'
     },
     scopes: [
-      SCOPES.PERFORMANCE,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
@@ -177,24 +163,30 @@ export interface ITokenPayload {
   exp: string
   algorithm: string
   scope: Scope[]
+  role: string
   userType: TokenUserType
+  eventId?: UUID
+  actionId?: UUID
 }
 
-export function getScopes(authHeader: IAuthHeader): RawScopes[] {
-  if (!authHeader || !authHeader.Authorization) {
-    return []
-  }
+/**
+ * Depending on how the API is called, there might or might not be Bearer keyword in the header.
+ * To allow for usage with both direct HTTP calls and TRPC, ensure it's present to be able to use shared scope auth functions.
+ */
+export function setBearerForToken(token: string) {
+  const bearer = 'Bearer'
+  return token.startsWith(bearer) ? token : `${bearer} ${token}`
+}
+
+export function getScopes(token: string): RawScopes[] {
+  const authHeader = { Authorization: setBearerForToken(token) }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+
   return tokenPayload.scope || []
 }
 
-export function hasScope(authHeader: IAuthHeader, scope: Scope) {
-  return getScopes(authHeader).includes(scope)
-}
-
-export function inScope(authHeader: IAuthHeader, scopes: Scope[]) {
-  const tokenScopes = getScopes(authHeader)
-  return scopes.some((scope) => tokenScopes.includes(scope))
+export function hasScope(token: string, scope: Scope) {
+  return getScopes(token).includes(scope)
 }
 
 export const getTokenPayload = (token: string): ITokenPayload => {

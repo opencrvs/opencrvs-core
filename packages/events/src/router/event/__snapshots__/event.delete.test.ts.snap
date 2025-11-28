@@ -1,5 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`declared event can not be deleted 1`] = `[TRPCError: Action 'DELETE' cannot be performed on an event in 'DECLARED' state with [] flags. Available actions: READ, VALIDATE, ARCHIVE, REJECT.]`;
+exports[`declared event can not be deleted 1`] = `[TRPCError: Action 'DELETE' cannot be performed on an event in 'DECLARED' state with [] flags. Available actions: READ, VALIDATE, ARCHIVE, REJECT, CUSTOM.]`;
 
 exports[`should return 404 if event does not exist 1`] = `[TRPCError: Event not found with ID: 00000000-0000-0000-0000-000000000000]`;

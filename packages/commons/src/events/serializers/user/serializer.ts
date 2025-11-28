@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { User } from '../../User'
-import { z } from 'zod'
+import { User } from '../../../users/User'
+import * as z from 'zod/v4'
 
 export const SerializedUserField = z.object({
   $userField: z.enum([

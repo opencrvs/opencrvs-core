@@ -112,6 +112,7 @@ export function SimpleDocumentUploader({
       )}
       <Preview
         attachment={file}
+        disabled={disabled}
         label={label}
         onDelete={onDelete}
         onSelect={selectForPreview}

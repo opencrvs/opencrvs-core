@@ -70,6 +70,7 @@ export const GET_USER_AUDIT_LOG = gql`
           practitionerId
           ipAddress
           action
+          isV2
         }
         ... on UserAuditLogItemWithComposition {
           time
@@ -77,6 +78,7 @@ export const GET_USER_AUDIT_LOG = gql`
           practitionerId
           ipAddress
           action
+          isV2
           data {
             compositionId
             trackingId

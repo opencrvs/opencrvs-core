@@ -1,0 +1,197 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Returns both normal users and system users 1`] = `
+[
+  {
+    "avatar": undefined,
+    "fullHonorificName": undefined,
+    "id": "[sanitized]",
+    "name": [
+      {
+        "family": "Doe",
+        "given": [
+          "John",
+        ],
+        "use": "en",
+      },
+    ],
+    "primaryOfficeId": "27160bbd-32d1-4625-812f-860226bfb92a",
+    "role": "REGISTRATION_AGENT",
+    "signature": undefined,
+    "type": "user",
+  },
+  {
+    "avatar": undefined,
+    "fullHonorificName": undefined,
+    "id": "[sanitized]",
+    "name": [
+      {
+        "family": "Doe",
+        "given": [
+          "John",
+        ],
+        "use": "en",
+      },
+    ],
+    "primaryOfficeId": "fe99b4fc-5c4f-4a2d-a9ff-27ffad4a5c8b",
+    "role": "REGISTRATION_AGENT",
+    "signature": undefined,
+    "type": "user",
+  },
+  {
+    "avatar": undefined,
+    "fullHonorificName": undefined,
+    "id": "[sanitized]",
+    "name": [
+      {
+        "family": "Doe",
+        "given": [
+          "John",
+        ],
+        "use": "en",
+      },
+    ],
+    "primaryOfficeId": "6ba32aee-f566-4993-972f-5989eb23b915",
+    "role": "REGISTRATION_AGENT",
+    "signature": undefined,
+    "type": "user",
+  },
+  {
+    "avatar": undefined,
+    "fullHonorificName": undefined,
+    "id": "[sanitized]",
+    "name": [
+      {
+        "family": "Doe",
+        "given": [
+          "John",
+        ],
+        "use": "en",
+      },
+    ],
+    "primaryOfficeId": "25bb4f42-d1c1-478f-b001-2def8aa07f2a",
+    "role": "REGISTRATION_AGENT",
+    "signature": undefined,
+    "type": "user",
+  },
+  {
+    "avatar": undefined,
+    "fullHonorificName": undefined,
+    "id": "[sanitized]",
+    "name": [
+      {
+        "family": "Doe",
+        "given": [
+          "John",
+        ],
+        "use": "en",
+      },
+    ],
+    "primaryOfficeId": "94230bc4-dc41-4ef4-a3e4-577305ad7fd3",
+    "role": "REGISTRATION_AGENT",
+    "signature": undefined,
+    "type": "user",
+  },
+  {
+    "id": "[sanitized]",
+    "name": "My health system integration",
+    "role": "HEALTH",
+    "type": "system",
+  },
+]
+`;
+
+exports[`Returns multiple users with honorifics 1`] = `
+[
+  {
+    "avatar": undefined,
+    "fullHonorificName": "4th Class Registration Officer, John Doe",
+    "id": "[sanitized]",
+    "name": [
+      {
+        "family": "Doe",
+        "given": [
+          "John",
+        ],
+        "use": "en",
+      },
+    ],
+    "primaryOfficeId": "27160bbd-32d1-4625-812f-860226bfb92a",
+    "role": "REGISTRATION_AGENT",
+    "signature": undefined,
+    "type": "user",
+  },
+  {
+    "avatar": undefined,
+    "fullHonorificName": "5th Class Registration Officer, John Doe",
+    "id": "[sanitized]",
+    "name": [
+      {
+        "family": "Doe",
+        "given": [
+          "John",
+        ],
+        "use": "en",
+      },
+    ],
+    "primaryOfficeId": "fe99b4fc-5c4f-4a2d-a9ff-27ffad4a5c8b",
+    "role": "REGISTRATION_AGENT",
+    "signature": undefined,
+    "type": "user",
+  },
+  {
+    "avatar": undefined,
+    "fullHonorificName": "6th Class Registration Officer, John Doe",
+    "id": "[sanitized]",
+    "name": [
+      {
+        "family": "Doe",
+        "given": [
+          "John",
+        ],
+        "use": "en",
+      },
+    ],
+    "primaryOfficeId": "6ba32aee-f566-4993-972f-5989eb23b915",
+    "role": "REGISTRATION_AGENT",
+    "signature": undefined,
+    "type": "user",
+  },
+  {
+    "avatar": undefined,
+    "fullHonorificName": "7th Class Registration Officer, John Doe",
+    "id": "[sanitized]",
+    "name": [
+      {
+        "family": "Doe",
+        "given": [
+          "John",
+        ],
+        "use": "en",
+      },
+    ],
+    "primaryOfficeId": "25bb4f42-d1c1-478f-b001-2def8aa07f2a",
+    "role": "REGISTRATION_AGENT",
+    "signature": undefined,
+    "type": "user",
+  },
+  {
+    "avatar": undefined,
+    "fullHonorificName": "8th Class Registration Officer, John Doe",
+    "id": "[sanitized]",
+    "name": [
+      {
+        "family": "Doe",
+        "given": [
+          "John",
+        ],
+        "use": "en",
+      },
+    ],
+    "primaryOfficeId": "94230bc4-dc41-4ef4-a3e4-577305ad7fd3",
+    "role": "REGISTRATION_AGENT",
+    "signature": undefined,
+    "type": "user",
+  },
+]
+`;

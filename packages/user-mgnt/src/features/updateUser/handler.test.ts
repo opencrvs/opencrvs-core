@@ -356,7 +356,7 @@ describe('updateUser handler with config.update:all scope to update primary offi
         ],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        role: 'SOCIAL_WORKER',
+        role: 'HOSPITAL_CLERK',
         primaryOfficeId: '322',
         deviceId: 'D444'
       },
@@ -406,7 +406,7 @@ describe('updateUser handler without config.update:all scope', () => {
         ],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        role: 'SOCIAL_WORKER',
+        role: 'HOSPITAL_CLERK',
         primaryOfficeId: '123456',
         deviceId: 'D444'
       },
@@ -447,7 +447,7 @@ describe('updateUser handler without config.update:all scope', () => {
         ],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        role: 'SOCIAL_WORKER',
+        role: 'HOSPITAL_CLERK',
         primaryOfficeId: '321',
         deviceId: 'D444'
       },

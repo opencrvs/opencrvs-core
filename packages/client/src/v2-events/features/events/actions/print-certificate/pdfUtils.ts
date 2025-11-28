@@ -19,11 +19,9 @@ import type {
   TFontFamilyTypes
 } from 'pdfmake/interfaces'
 import pdfMake from 'pdfmake/build/pdfmake'
-import { Location } from '@events/service/locations/locations'
-import { isEqual } from 'lodash'
+import { isEqual, isNil } from 'lodash'
 import {
   EventState,
-  User,
   LanguageConfig,
   EventConfig,
   getMixedPath,
@@ -31,7 +29,10 @@ import {
   EventStatus,
   DEFAULT_DATE_OF_EVENT_PROPERTY,
   ActionDocument,
-  ActionStatus
+  ActionStatus,
+  Location,
+  UserOrSystem,
+  UUID
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -39,7 +40,7 @@ import { isMobileDevice } from '@client/utils/commonUtils'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { LocationSearch } from '@client/v2-events/features/events/registered-fields'
-import { IAdminStructureItem } from '@client/utils/referenceApi'
+import { AdminStructureItem } from '@client/utils/referenceApi'
 
 interface FontFamilyTypes {
   normal: string
@@ -52,19 +53,21 @@ type CertificateConfiguration = Partial<{
   fonts: Record<string, FontFamilyTypes>
 }>
 
-function findUserById(userId: string, users: User[]) {
+function findUserById(userId: string, users: UserOrSystem[]) {
   const user = users.find((u) => u.id === userId)
 
   if (!user) {
     return {
       name: '',
-      signature: ''
+      signature: '',
+      fullHonorificName: ''
     }
   }
 
   return {
     name: getUsersFullName(user.name, 'en'),
-    signature: user.signature ?? ''
+    signature: user.signature ?? '',
+    fullHonorificName: user.fullHonorificName ?? ''
   }
 }
 
@@ -72,7 +75,8 @@ export const stringifyEventMetadata = ({
   metadata,
   intl,
   locations,
-  users
+  users,
+  adminLevels
 }: {
   metadata: NonNullable<
     EventMetadata & {
@@ -81,8 +85,9 @@ export const stringifyEventMetadata = ({
     }
   >
   intl: IntlShape
-  locations: Location[]
-  users: User[]
+  locations: Map<UUID, Location>
+  users: UserOrSystem[]
+  adminLevels: AdminStructureItem[]
 }) => {
   return {
     modifiedAt: DateField.toCertificateVariables(metadata.modifiedAt, {
@@ -112,7 +117,8 @@ export const stringifyEventMetadata = ({
       metadata.createdAtLocation,
       {
         intl,
-        locations
+        locations,
+        adminLevels
       }
     ),
     updatedAt: DateField.toCertificateVariables(metadata.updatedAt, {
@@ -131,7 +137,8 @@ export const stringifyEventMetadata = ({
       metadata.updatedAtLocation,
       {
         intl,
-        locations
+        locations,
+        adminLevels
       }
     ),
     flags: [],
@@ -148,7 +155,7 @@ export const stringifyEventMetadata = ({
             ),
             createdAtLocation: LocationSearch.toCertificateVariables(
               metadata.legalStatuses.DECLARED.createdAtLocation,
-              { intl, locations }
+              { intl, locations, adminLevels }
             ),
             acceptedAt: DateField.toCertificateVariables(
               metadata.legalStatuses.DECLARED.acceptedAt,
@@ -171,7 +178,7 @@ export const stringifyEventMetadata = ({
             ),
             createdAtLocation: LocationSearch.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.createdAtLocation,
-              { intl, locations }
+              { intl, locations, adminLevels }
             ),
             acceptedAt: DateField.toCertificateVariables(
               metadata.legalStatuses.REGISTERED.acceptedAt,
@@ -226,8 +233,8 @@ export function compileSvg({
   }
   $actions: ActionDocument[]
   $declaration: EventState
-  locations: Location[]
-  users: User[]
+  locations: Map<UUID, Location>
+  users: UserOrSystem[]
   /**
    * Indicates whether certificate is reviewed or actually printed
    * in V1 "preview" was used. In V2, "review" is used to remain consistent with action terminology (review of print action rather than preview of certificate).
@@ -235,7 +242,7 @@ export function compileSvg({
   review: boolean
   language: LanguageConfig
   config: EventConfig
-  adminLevels: IAdminStructureItem[]
+  adminLevels: AdminStructureItem[]
 }): string {
   const intl = createIntl(
     {
@@ -324,14 +331,15 @@ export function compileSvg({
         metadata: $metadata,
         intl,
         locations,
-        users
+        users,
+        adminLevels
       })
 
       if (isEqual($metadata, obj)) {
         return getMixedPath(resolvedMetadata, propertyPath)
       }
 
-      if (isEqual(resolvedDeclaration, obj)) {
+      if (isEqual($declaration, obj)) {
         return getMixedPath(resolvedDeclaration, propertyPath)
       }
 
@@ -351,7 +359,8 @@ export function compileSvg({
             action.data.createdAtLocation,
             {
               intl,
-              locations
+              locations,
+              adminLevels
             }
           ),
           createdByRole: action.data.createdByRole
@@ -415,13 +424,12 @@ export function compileSvg({
       this: any,
       ...args: [...(string | undefined)[], Handlebars.HelperOptions]
     ) {
-      // If even one of the parts is undefined, then return empty string
+      // If even one of the parts is undefined or null, then return empty string
       const idParts = args.slice(0, -1)
-      if (idParts.some((part) => part === undefined)) {
+      if (idParts.some((part) => isNil(part))) {
         return ''
       }
 
-      // NOTE: If you are having isues with casing mismatch, please ensure that you are using lookup helper rather than $lookup. Former returns actual values, latter stringified ones.
       const id = idParts.map((part) => part?.toString()).join('.')
 
       return intl.formatMessage({
@@ -556,7 +564,7 @@ export function compileSvg({
   const template = Handlebars.compile(templateString)
 
   const data = {
-    $declaration: resolvedDeclaration,
+    $declaration,
     $metadata,
     $review: review,
     $references: {

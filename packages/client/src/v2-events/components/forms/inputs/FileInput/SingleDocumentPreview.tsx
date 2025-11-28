@@ -47,6 +47,7 @@ interface Props {
   onSelect: (document: FieldValue | FileFieldValue) => void
   dropdownOptions?: ISelectOption[]
   onDelete?: (image: FieldValue | FileFieldValue) => void
+  disabled?: boolean
 }
 
 export function SingleDocumentPreview({
@@ -56,6 +57,7 @@ export function SingleDocumentPreview({
   onSelect,
   dropdownOptions,
   onDelete,
+  disabled,
   ...props
 }: Props) {
   function getFormattedLabelForDocType(docType: string) {
@@ -70,13 +72,14 @@ export function SingleDocumentPreview({
         <Container>
           <Label>
             <Icon color="grey600" name="Paperclip" size="medium" />
-            <Link onClick={() => onSelect(attachment)}>
+            <Link disabled={disabled} onClick={() => onSelect(attachment)}>
               <span>{getFormattedLabelForDocType(label) || label}</span>
             </Link>
           </Label>
           {onDelete && (
             <Button
               aria-label="Delete attachment"
+              disabled={disabled}
               id="preview_delete"
               size="small"
               type="icon"

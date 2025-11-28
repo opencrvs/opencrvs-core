@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import {
   findScope,
@@ -22,7 +22,7 @@ import {
 import { router, publicProcedure } from '@events/router/trpc'
 import {
   getInMemoryEventConfigurations,
-  getIMemoryWorkqueueConfigurations
+  getInMemoryWorkqueueConfigurations
 } from '@events/service/config/config'
 import { getEventCount } from '@events/service/indexing/indexing'
 import { requireScopeForWorkqueues } from '@events/router/middleware'
@@ -33,16 +33,15 @@ export const workqueueRouter = router({
       .input(z.void())
       .output(z.array(WorkqueueConfig))
       .query(async (options) => {
-        return getIMemoryWorkqueueConfigurations(options.ctx.token)
+        return getInMemoryWorkqueueConfigurations(options.ctx.token)
       })
   }),
   count: publicProcedure
     .input(WorkqueueCountInput)
     .use(requireScopeForWorkqueues)
     .output(WorkqueueCountOutput)
-    .query(async (options) => {
-      const scopes = getScopes({ Authorization: options.ctx.token })
-
+    .query(async ({ ctx, input }) => {
+      const scopes = getScopes(ctx.token)
       const searchScope = findScope(scopes, 'search')
       // Only to satisfy type checking, as findScope will return undefined if no scope is found
       if (!searchScope) {
@@ -52,11 +51,12 @@ export const workqueueRouter = router({
         string,
         SearchScopeAccessLevels
       >
+
       return getEventCount(
-        options.input,
-        await getInMemoryEventConfigurations(options.ctx.token),
+        input,
+        await getInMemoryEventConfigurations(ctx.token),
         searchScopeOptions,
-        options.ctx.user.primaryOfficeId
+        ctx.user.primaryOfficeId
       )
     })
 })

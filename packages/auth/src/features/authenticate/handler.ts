@@ -75,7 +75,8 @@ export default async function authenticateHandler(
       result.userId,
       scopes,
       WEB_USER_JWT_AUDIENCES,
-      JWT_ISSUER
+      JWT_ISSUER,
+      role
     )
   } else {
     await storeUserInformation(
@@ -84,7 +85,8 @@ export default async function authenticateHandler(
       result.userId,
       scopes,
       result.mobile,
-      result.email
+      result.email,
+      role
     )
 
     const notificationEvent = NotificationEvent.TWO_FACTOR_AUTHENTICATION

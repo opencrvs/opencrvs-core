@@ -11,4 +11,4 @@ RUN pnpm install -r --offline --filter ./packages/data-seeder...
 
 COPY --chown=node:node packages/data-seeder /app/packages/data-seeder
 
-ENTRYPOINT [ "pnpm","seed:prod" ]
+ENTRYPOINT [ "sh", "-c", "pnpm seed:prod" ]

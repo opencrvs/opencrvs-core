@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { eventQueryDataGenerator } from '@opencrvs/commons/events'
+import { eventQueryDataGenerator, EventState } from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   decodeEventIndex,
@@ -62,12 +62,11 @@ describe('EventIndex utils', () => {
         'applicant.dob': '1990-01-01',
         'applicant.address': {
           addressType: 'DOMESTIC',
-          district: 'District',
-          country: 'Country',
-          province: 'Province',
-          urbanOrRural: 'URBAN'
+          country: 'GB',
+          administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+          streetLevelDetails: {}
         }
-      }
+      } satisfies EventState
     })
     expect(
       removeSecuredFields(eventConfig, eventIndexWithSecuredData).declaration

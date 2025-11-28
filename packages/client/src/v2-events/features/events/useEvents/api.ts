@@ -8,15 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { matchMutation, Query } from '@tanstack/react-query'
+import { matchMutation } from '@tanstack/react-query'
 import {
   DecorateQueryProcedure,
   inferInput,
   inferOutput
 } from '@trpc/tanstack-react-query'
 import {
-  ActionType,
   Draft,
   EventConfig,
   EventDocument,
@@ -105,12 +103,18 @@ export function findLocalEventIndex(id: string): EventIndex | undefined {
     .flatMap(([, data]) => data?.results || [])[0]
 }
 
-export function setEventListData(
-  updater: (eventIndices: EventIndex[] | undefined) => EventIndex[] | undefined
-) {
-  return queryClient.setQueryData(
-    trpcOptionsProxy.event.list.queryKey(),
-    updater
+function setEventSearchQuery(updatedEventIndex: EventIndex | undefined) {
+  if (!updatedEventIndex) {
+    return
+  }
+  queryClient.setQueryData(
+    trpcOptionsProxy.event.search.queryKey({
+      query: {
+        type: 'and',
+        clauses: [{ id: updatedEventIndex.id }]
+      }
+    }),
+    () => ({ results: [updatedEventIndex], total: 1 })
   )
 }
 
@@ -124,13 +128,7 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
   }
   const updatedEventIndex = getCurrentEventState(updatedEvent, config)
   // Update the local event index with the updated event
-  setEventListData((eventIndices) =>
-    eventIndices?.map((eventIndex) =>
-      eventIndex.id === id
-        ? { ...eventIndex, ...updatedEventIndex }
-        : eventIndex
-    )
-  )
+  setEventSearchQuery(updatedEventIndex)
 
   /*
    * Ensure there exists a local cached search query for this event
@@ -145,20 +143,40 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
     }),
     () => ({ results: [updatedEventIndex], total: 1 })
   )
-  /*
-   * Update all searches where this event is present
+
+  /**
+   * Keeps the cache in sync when an event is updated.
+   *
+   * - Iterates through all cached queries e.g. - workqueue queries.
+   * - If cached data exists, replaces the matching event in `results`
+   *   while preserving the original `total`.
+   * - If no cached data exists, seeds the cache with a minimal entry
+   *   containing the updated event.
+   *
+   * Ensures components depending on these queries re-render with fresh data.
    */
-  getQueriesData(trpcOptionsProxy.event.search).forEach(([queryKey, data]) => {
-    const { results } = data || { results: [] }
+  getQueriesData(trpcOptionsProxy.event.search).forEach(([queryKey]) => {
     queryClient.setQueryData<inferOutput<typeof trpcOptionsProxy.event.search>>(
       queryKey,
-      {
-        total: results.length,
-        results: results.map((eventIndex) =>
-          eventIndex.id === id
-            ? { ...eventIndex, ...updatedEventIndex }
-            : eventIndex
-        )
+      (oldData) => {
+        // In theory, this handles a cache miss. In practice, it should never run here since
+        // we only update events after the corresponding search query has already been fetched and cached for workqueues.
+        // Included here to satisfy typescript.
+        if (!oldData) {
+          return {
+            results: [updatedEventIndex],
+            total: 1
+          }
+        }
+
+        return {
+          ...oldData,
+          results: oldData.results.map((eventIndex) =>
+            eventIndex.id === id
+              ? { ...eventIndex, ...updatedEventIndex }
+              : eventIndex
+          )
+        }
       }
     )
   })
@@ -213,7 +231,17 @@ export function setEventData(id: string, data: EventDocument) {
   updateDraftsWithEvent(id, data)
 }
 
-export async function refetchEventsList() {
+export async function refetchSearchQuery(eventId: string) {
+  await queryClient.refetchQueries({
+    queryKey: trpcOptionsProxy.event.search.queryKey({
+      query: {
+        type: 'and',
+        clauses: [{ id: eventId }]
+      }
+    })
+  })
+}
+export async function refetchAllSearchQueries() {
   /*
    * Invalidate search queries
    */
@@ -226,10 +254,6 @@ export async function refetchEventsList() {
       }
     )
   )
-
-  return queryClient.refetchQueries({
-    queryKey: trpcOptionsProxy.event.list.queryKey()
-  })
 }
 
 async function deleteEventData(updatedEvent: EventDocument) {
@@ -242,10 +266,14 @@ async function deleteEventData(updatedEvent: EventDocument) {
   await removeCachedFiles(updatedEvent)
 }
 
-export async function updateLocalEvent(updatedEvent: EventDocument) {
+export function updateLocalEvent(data: EventDocument) {
+  setEventData(data.id, data)
+}
+
+export async function deleteLocalEvent(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
   await invalidateWorkqueues()
-  return refetchEventsList()
+  return refetchAllSearchQueries()
 }
 
 export async function onAssign(updatedEvent: EventDocument) {
@@ -256,17 +284,6 @@ export async function onAssign(updatedEvent: EventDocument) {
 
   if (!lastAssignment) {
     return
-  }
-
-  if (lastAssignment.type === ActionType.ASSIGN) {
-    const { assignedTo } = lastAssignment
-    return setEventListData((eventIndices) =>
-      eventIndices?.map((eventIndex) =>
-        eventIndex.id === updatedEvent.id
-          ? { ...eventIndex, assignedTo }
-          : eventIndex
-      )
-    )
   }
 }
 

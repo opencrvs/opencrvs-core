@@ -34,10 +34,31 @@ exports[`deduplication query input conversion > should convert exactNamedChild t
 }
 `;
 
-exports[`deduplication query input conversion > should convert sameMotherNid to strict query 1`] = `
+exports[`deduplication query input conversion > should convert motherIdMatchesIfGiven to strict query 1`] = `
 {
-  "match_phrase": {
-    "declaration.mother____nid": "1232314352",
+  "bool": {
+    "should": [
+      {
+        "bool": {
+          "must_not": {
+            "match_phrase": {
+              "declaration.mother____idType": "NID",
+            },
+          },
+          "should": undefined,
+        },
+      },
+      {
+        "match_phrase": {
+          "declaration.mother____idType": "NONE",
+        },
+      },
+      {
+        "match_phrase": {
+          "declaration.mother____nid": "1232314352",
+        },
+      },
+    ],
   },
 }
 `;

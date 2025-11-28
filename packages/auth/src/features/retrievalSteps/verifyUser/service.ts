@@ -11,7 +11,7 @@
 import { env } from '@auth/environment'
 import { resolve } from 'url'
 import { redis } from '@auth/database'
-import { IUserName } from '@auth/features/authenticate/service'
+import { IUserName } from '@opencrvs/commons'
 
 export const RETRIEVAL_FLOW_USER_NAME = 'username'
 export const RETRIEVAL_FLOW_PASSWORD = 'password'

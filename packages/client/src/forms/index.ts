@@ -758,7 +758,7 @@ export interface ILinkButtonFormField extends IFormFieldBase {
   }
 }
 
-export interface QRReaderType {
+export interface QrReaderType {
   type: 'QR'
   validation: {
     rule: unknown
@@ -766,7 +766,7 @@ export interface QRReaderType {
   }
 }
 
-export type ReaderType = QRReaderType | ILinkButtonFormField
+export type ReaderType = QrReaderType | ILinkButtonFormField
 export interface IDReaderFormField extends IFormFieldBase {
   type: typeof ID_READER
   dividerLabel: MessageDescriptor

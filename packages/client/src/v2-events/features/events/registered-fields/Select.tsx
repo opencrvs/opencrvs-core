@@ -26,23 +26,39 @@ export type SelectInputProps = Omit<
   onChange: (newValue: string) => void
   value?: string
   label?: TranslationConfig
+  disabled?: boolean
+  noOptionsMessage?: TranslationConfig
 } & { 'data-testid'?: string }
 
-function SelectInput({ onChange, value, ...props }: SelectInputProps) {
+function SelectInput({
+  onChange,
+  noOptionsMessage,
+  value,
+  ...props
+}: SelectInputProps) {
   const intl = useIntlWithFormData()
   const { options } = props
   const selectedOption = options.find((option) => option.value === value)
   const formattedOptions = options.map((option: SelectOption) => ({
     value: option.value,
-    label: intl.formatMessage(option.label)
+    label:
+      typeof option.label === 'string'
+        ? option.label
+        : intl.formatMessage(option.label)
   }))
 
   const inputValue = selectedOption?.value ?? ''
+
+  const formattedNoOptionsMessage = noOptionsMessage
+    ? ({ inputValue: input }: { inputValue: string }) =>
+        intl.formatMessage(noOptionsMessage, { input })
+    : undefined
 
   return (
     <SelectComponent
       {...props}
       data-testid={props['data-testid'] || `select__${props.id}`}
+      noOptionsMessage={formattedNoOptionsMessage}
       options={formattedOptions}
       value={inputValue}
       onChange={onChange}
@@ -60,7 +76,13 @@ function SelectOutput({
   const intl = useIntlWithFormData()
   const selectedOption = options.find((option) => option.value === value)
 
-  return selectedOption ? intl.formatMessage(selectedOption.label) : ''
+  if (!selectedOption) {
+    return ''
+  }
+
+  return typeof selectedOption.label === 'string'
+    ? selectedOption.label
+    : intl.formatMessage(selectedOption.label)
 }
 
 function stringify(value: string, context: StringifierContext<SelectField>) {
@@ -78,7 +100,9 @@ function stringify(value: string, context: StringifierContext<SelectField>) {
     return value
   }
 
-  return context.intl.formatMessage(option.label)
+  return typeof option.label === 'string'
+    ? option.label
+    : context.intl.formatMessage(option.label)
 }
 
 export const Select = {

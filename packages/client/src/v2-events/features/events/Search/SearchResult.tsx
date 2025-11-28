@@ -31,11 +31,9 @@ import {
   SORT_ORDER,
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
-import { Link as TextButton } from '@opencrvs/components'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
-import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
@@ -47,9 +45,7 @@ import { deserializeSearchParams, serializeSearchParams } from './utils'
 import { ActionCta } from './ActionCta'
 import { SearchResultItemTitle } from './SearchResultItemTitle'
 
-const WithTestId = styled.div.attrs({
-  'data-testid': 'search-result'
-})``
+const WithTestId = styled.div.attrs({ 'data-testid': 'search-result' })``
 
 const COLUMNS = {
   ICON_WITH_NAME: 'iconWithName',
@@ -143,51 +139,40 @@ function changeSortedColumn(
   }
 
   return {
-    newSortedCol: newSortedCol,
-    newSortOrder: newSortOrder
+    newSortedCol,
+    newSortOrder
   }
 }
 
 const messages = defineMessages({
   noRecord: {
-    id: 'v2.search.noRecord',
+    id: 'search.noRecord',
     defaultMessage:
       'No records {slug, select, draft {in my draft} outbox {require processing} other {{title}}}',
     description: 'The no record text'
   },
   noResult: {
-    id: 'v2.search.noResult',
+    id: 'search.noResult',
     defaultMessage: 'No result',
     description: 'The no result text'
   },
   noResultFor: {
-    id: 'v2.search.noResultFor',
+    id: 'search.noResultForSearchTerm',
     defaultMessage: 'No results for "{searchTerm}"',
     description: 'The no result text'
   },
-  noResultsOutbox: {
-    defaultMessage: 'No records require processing',
-    description: 'Text to display if there is no items in outbox',
-    id: 'v2.constants.noResultsOutbox'
-  },
-  searchResult: {
-    defaultMessage: 'Search results',
-    description:
-      'The label for search result header in advancedSearchResult page',
-    id: 'v2.advancedSearchResult.table.searchResult'
-  },
   eventStatus: {
-    id: `v2.events.status`,
+    id: 'events.status',
     defaultMessage:
       '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARK_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
   },
   waitingForAction: {
-    id: `v2.events.outbox.waitingForAction`,
+    id: 'events.outbox.waitingForAction',
     defaultMessage:
       'Waiting to {action, select, DECLARE {send} REGISTER {register} VALIDATE {send for approval} NOTIFY {send} REJECT {send for updates} ARCHIVE {archive} PRINT_CERTIFICATE {certify} REQUEST_CORRECTION {request correction} APPROVE_CORRECTION {approve correction} REJECT_CORRECTION {reject correction} ASSIGN {assign} UNASSIGN {unassign} other {action}}'
   },
   processingAction: {
-    id: `v2.events.outbox.processingAction`,
+    id: 'events.outbox.processingAction',
     defaultMessage:
       '{action, select, DECLARE {Sending} REGISTER {Registering} VALIDATE {Sending for approval} NOTIFY {Sending} REJECT {Sending for updates} ARCHIVE {Archiving} PRINT_CERTIFICATE {Certifying} REQUEST_CORRECTION {Requesting correction} APPROVE_CORRECTION {Approving correction} REJECT_CORRECTION {Rejecting correction} ASSIGN {Assigning} UNASSIGN {Unassigning} other {Processing action}}'
   }
@@ -278,6 +263,7 @@ export const SearchResultComponent = ({
       setSortOrder(newSortOrder)
     }
   }
+
   const mapEventsToResultRows = (
     eventsWithDraft: (EventIndex & {
       title: string | null
@@ -358,9 +344,12 @@ export const SearchResultComponent = ({
             type={type}
             onClick={() => {
               return navigate(
-                ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-                  eventId: event.id
-                })
+                ROUTES.V2.EVENTS.EVENT.buildPath(
+                  {
+                    eventId: event.id
+                  },
+                  { workqueue: slug }
+                )
               )
             }}
           />
@@ -448,11 +437,9 @@ export const SearchResultComponent = ({
 
   const sortedResult = orderBy(dataWithTitle, sortedCol, sortOrder)
 
-  const allResults = mapEventsToResultRows(sortedResult)
+  const rows = mapEventsToResultRows(sortedResult)
 
   const currentPageNumber = Math.floor(offset / limit) + 1
-
-  const paginatedData = allResults
 
   const totalPages = totalResults ? Math.ceil(totalResults / limit) : 0
 
@@ -513,7 +500,7 @@ export const SearchResultComponent = ({
       >
         <Workqueue
           columns={responsiveColumns}
-          content={paginatedData}
+          content={rows}
           hideLastBorder={!isShowPagination}
           sortOrder={sortOrder}
         />

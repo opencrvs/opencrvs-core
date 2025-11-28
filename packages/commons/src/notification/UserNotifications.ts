@@ -11,7 +11,7 @@
 
 import { joinUrl } from '../url'
 import { NameFieldValue } from '../events'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 export const TriggerEvent = {
   USER_CREATED: 'user-created',
@@ -20,7 +20,9 @@ export const TriggerEvent = {
   RESET_PASSWORD: 'reset-password',
   RESET_PASSWORD_BY_ADMIN: 'reset-password-by-admin',
   TWO_FA: '2fa',
-  ALL_USER_NOTIFICATION: 'all-user-notification'
+  ALL_USER_NOTIFICATION: 'all-user-notification',
+  CHANGE_PHONE_NUMBER: 'change-phone-number',
+  CHANGE_EMAIL_ADDRESS: 'change-email-address'
 } as const
 
 export type TriggerEvent = (typeof TriggerEvent)[keyof typeof TriggerEvent]
@@ -69,6 +71,12 @@ export const TriggerPayload = {
   [TriggerEvent.ALL_USER_NOTIFICATION]: BasePayload.extend({
     subject: z.string(),
     body: z.string()
+  }),
+  [TriggerEvent.CHANGE_PHONE_NUMBER]: BasePayload.extend({
+    code: z.string()
+  }),
+  [TriggerEvent.CHANGE_EMAIL_ADDRESS]: BasePayload.extend({
+    code: z.string()
   })
 } as const
 

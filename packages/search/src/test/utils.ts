@@ -2775,7 +2775,7 @@ export const mockOperationHistory = [
     operatorOfficeName: 'Ibombo District Office',
     operatorOfficeAlias: ['Ibombo District Office'],
     operationType: 'DECLARED',
-    operatorRole: 'Social Worker'
+    operatorRole: 'Hospital Clerk'
   },
   {
     operatedOn: '2024-01-30T09:23:00.918Z',

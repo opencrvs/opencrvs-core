@@ -8,17 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { ActionConfig } from './ActionConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
 import { findAllFields, getDeclarationFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
-import { extendZodWithOpenApi } from 'zod-openapi'
+
 import { FieldType } from './FieldType'
 import { FieldReference } from './FieldConfig'
-extendZodWithOpenApi(z)
+import { FlagConfig } from './Flag'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -30,18 +30,45 @@ export const EventConfig = z
     id: z
       .string()
       .describe(
-        'A machine-readable identifier for the event, e.g. "birth" or "death"'
+        'Machine-readable identifier of the event (e.g. "birth", "death").'
       ),
-    dateOfEvent: FieldReference.optional(),
-    title: TranslationConfig,
-    fallbackTitle: TranslationConfig.optional().describe(
-      'This is a fallback title if actual title resolves to empty string'
+    dateOfEvent: FieldReference.optional().describe(
+      'Reference to the field capturing the date of the event (e.g. date of birth). Defaults to the event creation date if unspecified.'
     ),
-    summary: SummaryConfig,
-    label: TranslationConfig,
-    actions: z.array(ActionConfig),
-    declaration: DeclarationFormConfig,
-    advancedSearch: z.array(AdvancedSearchConfig).optional().default([])
+    title: TranslationConfig.describe(
+      'Title template for the singular event, supporting variables (e.g. "{applicant.name.firstname} {applicant.name.surname}").'
+    ),
+    fallbackTitle: TranslationConfig.optional().describe(
+      'Fallback title shown when the main title resolves to an empty value.'
+    ),
+    summary: SummaryConfig.describe(
+      'Summary information displayed in the event overview.'
+    ),
+    label: TranslationConfig.describe(
+      'Human-readable label for the event type.'
+    ),
+    actions: z
+      .array(ActionConfig)
+      .describe(
+        'Configuration of system-defined actions associated with the event.'
+      ),
+    declaration: DeclarationFormConfig.describe(
+      'Configuration of the form used to gather event data.'
+    ),
+    advancedSearch: z
+      .array(AdvancedSearchConfig)
+      .optional()
+      .default([])
+      .describe(
+        'Configuration of fields available in the advanced search feature.'
+      ),
+    flags: z
+      .array(FlagConfig)
+      .optional()
+      .default([])
+      .describe(
+        'Configuration of flags associated with the actions of this event type.'
+      )
   })
   .superRefine((event, ctx) => {
     const allFields = findAllFields(event)
@@ -68,7 +95,10 @@ export const EventConfig = z
         (field) =>
           !(
             fieldIds.includes(field.fieldId) ||
-            (EventFieldId.options as string[]).includes(field.fieldId)
+            (EventFieldId.options as string[]).includes(field.fieldId) ||
+            (field.config.searchFields &&
+              field.config.searchFields.length > 0 &&
+              field.config.searchFields.every((sf) => fieldIds.includes(sf)))
           )
       )
     )
@@ -103,9 +133,26 @@ export const EventConfig = z
         })
       }
     }
+
+    // Validate that all referenced action flags are configured in the event flags array.
+    const configuredFlagIds = event.flags.map((flag) => flag.id)
+    const actionFlagIds = event.actions.flatMap((action) =>
+      action.flags.map((flag) => flag.id)
+    )
+
+    for (const actionFlagId of actionFlagIds) {
+      if (!configuredFlagIds.includes(actionFlagId)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Action flag id must match a configured flag in the flags array. Invalid action flag ID for event '${event.id}': '${actionFlagId}'`,
+          path: ['actions']
+        })
+      }
+    }
   })
-  .openapi({
-    ref: 'EventConfig'
+  .meta({
+    id: 'EventConfig'
   })
+  .describe('Configuration defining an event type.')
 
 export type EventConfig = z.infer<typeof EventConfig>

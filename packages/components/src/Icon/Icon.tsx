@@ -27,6 +27,7 @@ export type IconProps = {
   size?: keyof typeof IconSize
   color?: IconColor
   weight?: IconWeight
+  disabled?: boolean
 }
 
 export function Icon({
@@ -34,12 +35,14 @@ export function Icon({
   size = 'medium',
   color = 'currentColor',
   weight = 'bold',
+  disabled = false,
   ...rest
 }: IconProps) {
   const IconComponent = icons[name]
   return (
     <IconComponent
       color={color === 'currentColor' ? 'currentColor' : colors[color]}
+      opacity={disabled ? 0.5 : 1}
       size={IconSize[size]}
       weight={weight}
       {...rest}

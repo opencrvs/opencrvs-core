@@ -25,6 +25,7 @@ import {
   RegisterSystemMutation,
   RegisterSystemMutationVariables,
   System,
+  SystemType,
   UpdatePermissionsMutation,
   UpdatePermissionsMutationVariables,
   WebhookPermission
@@ -37,8 +38,8 @@ import * as mutations from './mutations'
 /** Handles the user input when creating a new system in a modal */
 function useNewSystemDraft() {
   const [newClientName, setNewClientName] = useState(EMPTY_STRING)
-  const [newSystemType, setNewSystemType] = useState<SystemRole>(
-    SystemRole.enum.HEALTH
+  const [newSystemType, setNewSystemType] = useState<SystemType>(
+    SystemType.Health
   )
 
   const onChangeClientName = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +49,7 @@ function useNewSystemDraft() {
 
   const clearNewSystemDraft = () => {
     setNewClientName(EMPTY_STRING)
-    setNewSystemType(SystemRole.enum.HEALTH)
+    setNewSystemType(SystemType.Health)
   }
 
   return {

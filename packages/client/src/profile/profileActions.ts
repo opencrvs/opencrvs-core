@@ -12,7 +12,7 @@
 import { ApolloQueryResult } from '@apollo/client'
 import { FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { NotificationEvent } from './serviceApi'
+import { TriggerEvent } from '@opencrvs/commons/client'
 
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH' as const
 export const REDIRECT_TO_AUTHENTICATION =
@@ -57,7 +57,9 @@ type SendVerifyCode = {
       family: string
       given: string[]
     }[]
-    notificationEvent: NotificationEvent
+    notificationEvent:
+      | typeof TriggerEvent.CHANGE_PHONE_NUMBER
+      | typeof TriggerEvent.CHANGE_EMAIL_ADDRESS
     phoneNumber?: string
     email?: string
   }
@@ -145,7 +147,9 @@ export const sendVerifyCode = (
     family: string
     given: string[]
   }[],
-  notificationEvent: NotificationEvent,
+  notificationEvent:
+    | typeof TriggerEvent.CHANGE_PHONE_NUMBER
+    | typeof TriggerEvent.CHANGE_EMAIL_ADDRESS,
   phoneNumber?: string,
   email?: string
 ): SendVerifyCode => {

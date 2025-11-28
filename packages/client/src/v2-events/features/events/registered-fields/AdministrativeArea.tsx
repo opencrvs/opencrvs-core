@@ -8,81 +8,114 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import { useSelector } from 'react-redux'
-import { Location } from '@events/service/locations/locations'
-import { FieldPropsWithoutReferenceValue } from '@opencrvs/commons/client'
-import { getAdminStructureLocations } from '@client/offline/selectors'
+import React, { useMemo } from 'react'
+import {
+  Location,
+  FieldPropsWithoutReferenceValue,
+  LocationType,
+  UUID
+} from '@opencrvs/commons/client'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { Select } from './Select'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { SearchableSelect } from '../../../components/forms/inputs/SearchableSelect'
 import { LocationSearch } from './LocationSearch'
 
-function useAdminLocations(partOf: string) {
-  const locationMap = useSelector(getAdminStructureLocations)
+function useAdministrativeArea(
+  searchableLocationType: LocationType,
+  parentId?: string | null
+) {
+  const { getLocations } = useLocations()
+  const allLocations = getLocations.useSuspenseQuery({})
 
-  const locations = Object.values(locationMap)
+  return React.useMemo(() => {
+    return [...allLocations.values()]
+      .filter((location) => {
+        if (!location.locationType) {
+          return false
+        }
 
-  const filteredLocations = locations.filter(
-    (location) => location.partOf === 'Location/' + partOf
-  )
+        if (searchableLocationType !== location.locationType) {
+          return false
+        }
 
-  return filteredLocations.map((location) => ({
-    value: location.id,
-    label: {
-      id: 'v2.location.' + location.id,
-      description: 'Label for location: ' + location.name,
-      defaultMessage: location.name
-    }
-  }))
+        if (parentId === undefined) {
+          return true
+        }
+
+        return location.parentId === parentId
+      })
+      .map((location) => ({
+        label: location.name,
+        value: location.id
+      }))
+  }, [searchableLocationType, allLocations, parentId])
 }
 
 function AdministrativeAreaInput({
   onChange,
   value,
   partOf,
-  ...props
+  id,
+  disabled
 }: FieldPropsWithoutReferenceValue<'ADMINISTRATIVE_AREA'> & {
-  onChange: (val: string | undefined) => void
+  onChange: (val: string | null) => void
   partOf: string | null
-  value?: string
+  value?: string | null
+  disabled?: boolean
 }) {
-  const options = useAdminLocations(partOf ?? '0')
+  const options = useAdministrativeArea(
+    LocationType.enum.ADMIN_STRUCTURE,
+    partOf
+  )
+
+  const selectedLocation = useMemo(
+    () => options.find((o) => o.value === value) ?? null,
+    [options, value]
+  )
 
   return (
-    <Select.Input
-      {...props}
-      data-testid={`location__${props.id}`}
+    <SearchableSelect
+      data-testid={'location__' + id}
+      disabled={disabled}
+      id={id}
       options={options}
-      type="SELECT"
-      value={value}
-      onChange={onChange}
+      value={selectedLocation}
+      onChange={(opt) => {
+        onChange(opt?.value ?? null)
+      }}
     />
   )
 }
 
 function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
 
-  const location = value.toString()
-    ? locations.find((l) => l.id === value.toString())
-    : null
+  const locationId = UUID.safeParse(value.toString()).data
+
+  const location = locationId && locations.get(locationId)
 
   return location ? location.name : ''
 }
 
-function stringify(value: string, context: { locations: Location[] }) {
-  const location = context.locations.find((l) => l.id === value)
+function stringify(value: string, context: { locations: Map<UUID, Location> }) {
+  const locationId = UUID.safeParse(value).data
+  const location = locationId && context.locations.get(locationId)
 
   const name = location?.name
   return name ?? EMPTY_TOKEN
 }
 
+function isAdministrativeAreaEmpty(value: Stringifiable) {
+  return !value.toString()
+}
+
 export const AdministrativeArea = {
-  Input: AdministrativeAreaInput,
+  Input: withSuspense(AdministrativeAreaInput),
   Output: AdministrativeAreaOutput,
   stringify,
-  toCertificateVariables: LocationSearch.toCertificateVariables
+  toCertificateVariables: LocationSearch.toCertificateVariables,
+  isEmptyValue: isAdministrativeAreaEmpty
 }

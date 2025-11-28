@@ -12,7 +12,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { defineMessages, IntlShape, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import format from 'date-fns/format'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Text } from '@opencrvs/components/lib/Text'
@@ -21,40 +20,44 @@ import {
   ActionType,
   EventDocument,
   EventState,
-  getCurrentEventState,
-  getDeclaration,
-  isFieldDisplayedOnReview,
   isFieldVisible,
   isPageVisible,
+  Location,
   PageConfig,
   PageTypes,
+  RequestedCorrectionAction,
   TranslationConfig,
-  User
+  User,
+  UUID,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment, Link } from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { Output } from '@client/v2-events/features/events/components/Output'
+import {
+  isEmptyValue,
+  Output
+} from '@client/v2-events/features/events/components/Output'
 import { ROUTES } from '@client/v2-events/routes'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
-import { getLocations } from '@client/offline/selectors'
-import { hasFieldChanged } from '../../utils'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { DeclarationComparisonTable } from './DeclarationComparisonTable'
 
 const messages = defineMessages({
   correctionSubmittedBy: {
-    id: 'v2.correction.submittedBy',
+    id: 'correction.submittedBy',
     defaultMessage: 'Submitter',
     description: 'Correction submitted by label'
   },
   correctionRequesterOffice: {
-    id: 'v2.correction.requesterOffice',
+    id: 'correction.requesterOffice',
     defaultMessage: 'Office',
     description: 'Correction requester office label'
   },
   correctionSubmittedOn: {
-    id: 'v2.correction.submittedOn',
+    id: 'correction.submittedOn',
     defaultMessage: 'Submitted on',
     description: 'Correction submitted on label'
   }
@@ -70,12 +73,6 @@ const Label = styled.label`
   ${({ theme }) => theme.fonts.bold14}
 `
 
-const TableHeader = styled.th`
-  text-transform: uppercase;
-  ${({ theme }) => theme.fonts.bold12}
-  display: inline-block;
-`
-
 /*
  * If this correction was already requested, prepend metadata about the request itself.
  * These entries (submitter, office, and submission date) are shown before the
@@ -84,14 +81,13 @@ const TableHeader = styled.th`
 function getRequestActionDetails(
   correctionRequestAction: Action,
   users: User[],
-  locations: ReturnType<typeof getLocations>,
+  locations: Map<UUID, Location>,
   intl: IntlShape
 ): CorrectionDetail[] {
   const user = users.find((u) => u.id === correctionRequestAction.createdBy)
   const location =
     correctionRequestAction.createdAtLocation &&
-    locations[correctionRequestAction.createdAtLocation]
-
+    locations.get(correctionRequestAction.createdAtLocation)
   return [
     {
       label: messages.correctionSubmittedBy,
@@ -120,11 +116,12 @@ function buildCorrectionDetails(
   form: EventState,
   intl: IntlShape,
   users: User[],
-  locations: ReturnType<typeof getLocations>,
+  locations: Map<UUID, Location>,
+  validatorContext: ValidatorContext,
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
   const details: CorrectionDetail[] = correctionFormPages
-    .filter((page) => isPageVisible(page, annotation))
+    .filter((page) => isPageVisible(page, annotation, validatorContext))
     .flatMap((page) => {
       if (page.type === PageTypes.enum.VERIFICATION) {
         const value = !!annotation[page.id]
@@ -132,27 +129,26 @@ function buildCorrectionDetails(
           {
             id: page.id,
             label: page.title,
-            valueDisplay: value
-              ? intl.formatMessage(correctionMessages.verifyIdentity)
-              : intl.formatMessage(correctionMessages.cancelVerifyIdentity),
+            valueDisplay: value ? (
+              <>{intl.formatMessage(correctionMessages.verifyIdentity)}</>
+            ) : (
+              <>{intl.formatMessage(correctionMessages.cancelVerifyIdentity)}</>
+            ),
             pageId: page.id
           }
         ]
       }
-
       return page.fields
-        .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
+        .filter((f) =>
+          isFieldVisible(f, { ...form, ...annotation }, validatorContext)
+        )
+        .filter((f) => !isEmptyValue(f, { ...form, ...annotation }[f.id]))
         .map((field) => ({
           label: field.label,
           id: field.id,
-          valueDisplay: Output({
-            field,
-            value: annotation[field.id],
-            showPreviouslyMissingValuesAsChanged: false
-          }),
+          valueDisplay: <Output field={field} value={annotation[field.id]} />,
           pageId: page.id
         }))
-        .filter((f) => f.valueDisplay)
     })
 
   if (correctionRequestAction) {
@@ -197,26 +193,27 @@ export function CorrectionDetails({
   requesting,
   editable = false,
   workqueue,
-  correctionRequestAction
+  correctionRequestAction,
+  validatorContext
 }: {
   event: EventDocument
   form: EventState
   annotation: EventState
   requesting: boolean
-  correctionRequestAction?: Action
+  correctionRequestAction?: RequestedCorrectionAction
   editable?: boolean
   workqueue?: string
+  validatorContext: ValidatorContext
 }) {
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(event.type)
 
-  const eventIndex = getCurrentEventState(event, eventConfiguration)
-  const previousFormValues = eventIndex.declaration
-  const formConfig = getDeclaration(eventConfiguration)
   const navigate = useNavigate()
   const { getUser } = useUsers()
   const users = getUser.getAllCached()
-  const locations = useSelector(getLocations)
+
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
 
   const correctionFormPages =
     eventConfiguration.actions.find(
@@ -230,6 +227,7 @@ export function CorrectionDetails({
     intl,
     users,
     locations,
+    validatorContext,
     correctionRequestAction
   )
 
@@ -296,79 +294,14 @@ export function CorrectionDetails({
           ? intl.formatMessage(correctionMessages.correctionSectionTitle)
           : intl.formatMessage(correctionMessages.makeCorrectionSectionTitle)}
       </CorrectionSectionTitle>
-
-      {formConfig.pages.map((page) => {
-        const changedFields = page.fields
-          .filter((field) => isFieldDisplayedOnReview(field, form))
-          .filter((f) => hasFieldChanged(f, form, previousFormValues))
-          .map((f) => {
-            const original = Output({
-              field: f,
-              value: previousFormValues[f.id],
-              showPreviouslyMissingValuesAsChanged: false,
-              previousForm: previousFormValues,
-              formConfig,
-              displayEmptyAsDash: true
-            })
-
-            const correction = Output({
-              field: f,
-              value: form[f.id],
-              showPreviouslyMissingValuesAsChanged: false,
-              displayEmptyAsDash: true
-            })
-
-            return {
-              fieldLabel: intl.formatMessage(f.label),
-              original,
-              correction
-            }
-          })
-
-        if (changedFields.length === 0) {
-          return
-        }
-
-        return (
-          <Table
-            key={`corrections-table-${page.id}`}
-            columns={[
-              {
-                label: (
-                  <TableHeader>{intl.formatMessage(page.title)}</TableHeader>
-                ),
-                width: 34,
-                key: 'fieldLabel'
-              },
-              {
-                label: (
-                  <TableHeader>
-                    {intl.formatMessage(
-                      correctionMessages.correctionSummaryOriginal
-                    )}
-                  </TableHeader>
-                ),
-                width: 33,
-                key: 'original'
-              },
-              {
-                label: (
-                  <TableHeader>
-                    {intl.formatMessage(
-                      correctionMessages.correctionSummaryCorrection
-                    )}
-                  </TableHeader>
-                ),
-                width: 33,
-                key: 'correction'
-              }
-            ]}
-            content={changedFields}
-            hideTableBottomBorder={true}
-            id={`corrections-table-${page.id}`}
-          ></Table>
-        )
-      })}
+      <DeclarationComparisonTable
+        action={correctionRequestAction}
+        eventConfig={eventConfiguration}
+        form={form}
+        fullEvent={event}
+        id={'corrections-table'}
+        validatorContext={validatorContext}
+      />
     </>
   )
 }

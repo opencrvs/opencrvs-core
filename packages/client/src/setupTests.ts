@@ -55,7 +55,7 @@ const config = {
     {
       id: 'province',
       label: {
-        id: 'v2.field.address.province.label',
+        id: 'field.address.province.label',
         defaultMessage: 'Province',
         description: 'Label for province in address'
       }
@@ -63,13 +63,25 @@ const config = {
     {
       id: 'district',
       label: {
-        id: 'v2.field.address.district.label',
+        id: 'field.address.district.label',
         defaultMessage: 'District',
         description: 'Label for district in address'
       }
     }
   ],
+  DASHBOARDS: [
+    {
+      id: 'test',
+      title: {
+        id: 'navigation.dashboard',
+        defaultMessage: 'Test Dashboard',
+        description: 'Title for the test dashboard'
+      },
+      url: '/'
+    }
+  ],
   FEATURES: {
+    V2_EVENTS: false,
     DEATH_REGISTRATION: true,
     MARRIAGE_REGISTRATION: true,
     EXTERNAL_VALIDATION_WORKQUEUE: false,
@@ -101,6 +113,7 @@ import {
   getItem,
   setItem
 } from './tests/util'
+import { DASHBOARD } from './navigation/routes'
 
 vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
   createUserForm: mockOfflineData.userForms
@@ -180,8 +193,10 @@ Object.defineProperty(document, 'hidden', {
 
 const storageGetItemMock = vi.fn()
 const storageSetItemMock = vi.fn()
+const storageRemoveItemMock = vi.fn()
 storage.getItem = storageGetItemMock
 storage.setItem = storageSetItemMock
+storage.removeItem = storageRemoveItemMock
 
 /*
  * Console
@@ -236,6 +251,7 @@ beforeEach(() => {
   getItem.mockReturnValue(validToken)
   storageGetItemMock.mockReset()
   storageSetItemMock.mockReset()
+  storageRemoveItemMock.mockReset()
   warn.mockReset()
   error.mockReset()
   debug.mockReset()

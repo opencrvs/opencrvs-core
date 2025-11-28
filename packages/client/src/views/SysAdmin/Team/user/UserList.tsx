@@ -171,7 +171,9 @@ type BaseProps = {
   offlineCountryConfig: IOfflineData
 }
 
-type IProps = BaseProps & IntlShapeProps & IOnlineStatusProps
+type IProps = BaseProps &
+  IntlShapeProps &
+  IOnlineStatusProps & { hideNavigation?: boolean }
 
 interface IStatusProps {
   status: string
@@ -633,137 +635,133 @@ function UserListComponent(props: IProps) {
       const userContent = generateUserContents(data, locationId, userDetails)
 
       return (
-        <>
-          <UserTable id="user_list">
-            {userContent.length <= 0 ? (
-              <NoRecord id="no-record">
-                {intl.formatMessage(constantsMessages.noResults)}
-              </NoRecord>
-            ) : (
-              <ListUser
-                rows={userContent.map((content) => ({
-                  avatar: content.image,
-                  label: content.label,
-                  value: content.value,
-                  actions: content.actions ? [content.actions] : []
-                }))}
-                labelHeader={intl.formatMessage(constantsMessages.user)}
-                valueHeader={intl.formatMessage(constantsMessages.labelRole)}
-              />
-            )}
-            {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
-              <Pagination
-                currentPage={currentPageNumber}
-                totalPages={Math.ceil(
-                  totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
-                )}
-                onPageChange={(currentPage: number) =>
-                  setCurrentPageNumber(currentPage)
-                }
-              />
-            )}
-            {toggleActivation.selectedUser?.id ? (
-              <UserAuditActionModal
-                show={toggleActivation.modalVisible}
-                userId={toggleActivation.selectedUser.id}
-                onClose={() => toggleUserActivationModal()}
-                onConfirmRefetchQueries={[
-                  {
-                    query: SEARCH_USERS,
-                    variables: {
-                      primaryOfficeId: locationId,
-                      count: recordCount
-                    }
-                  }
-                ]}
-              />
-            ) : null}
-
-            <ResponsiveModal
-              id="username-reminder-modal"
-              show={toggleUsernameReminder.modalVisible}
-              handleClose={() => toggleUsernameReminderModal()}
-              title={intl.formatMessage(
-                messages.sendUsernameReminderInviteModalTitle
-              )}
-              actions={[
-                <Button
-                  type="tertiary"
-                  id="username-reminder-cancel"
-                  key="username-reminusernameSMSReminderder-cancel"
-                  onClick={() => toggleUsernameReminderModal()}
-                >
-                  {intl.formatMessage(buttonMessages.cancel)}
-                </Button>,
-                <Button
-                  type="primary"
-                  id="username-reminder-send"
-                  key="username-reminder-send"
-                  onClick={() => {
-                    if (toggleUsernameReminder.selectedUser?.id) {
-                      usernameReminder(toggleUsernameReminder.selectedUser.id)
-                    }
-                    toggleUsernameReminderModal()
-                  }}
-                >
-                  {intl.formatMessage(buttonMessages.send)}
-                </Button>
-              ]}
-              responsive={false}
-              autoHeight={true}
-            >
-              {intl.formatMessage(
-                messages.sendUsernameReminderInviteModalMessage,
+        <UserTable id="user_list">
+          {userContent.length <= 0 ? (
+            <NoRecord id="no-record">
+              {intl.formatMessage(constantsMessages.noResults)}
+            </NoRecord>
+          ) : (
+            <ListUser
+              rows={userContent.map((content) => ({
+                avatar: content.image,
+                label: content.label,
+                value: content.value,
+                actions: content.actions ? [content.actions] : []
+              }))}
+              labelHeader={intl.formatMessage(constantsMessages.user)}
+              valueHeader={intl.formatMessage(constantsMessages.labelRole)}
+            />
+          )}
+          {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
+            <Pagination
+              currentPage={currentPageNumber}
+              totalPages={Math.ceil(totalData / DEFAULT_FIELD_AGENT_LIST_SIZE)}
+              onPageChange={(currentPage: number) =>
+                setCurrentPageNumber(currentPage)
+              }
+            />
+          )}
+          {toggleActivation.selectedUser?.id ? (
+            <UserAuditActionModal
+              show={toggleActivation.modalVisible}
+              userId={toggleActivation.selectedUser.id}
+              onClose={() => toggleUserActivationModal()}
+              onConfirmRefetchQueries={[
                 {
-                  recipient:
-                    deliveryMethod === 'sms'
-                      ? toggleUsernameReminder.selectedUser?.mobile
-                      : toggleUsernameReminder.selectedUser?.email,
-                  deliveryMethod
+                  query: SEARCH_USERS,
+                  variables: {
+                    primaryOfficeId: locationId,
+                    count: recordCount
+                  }
                 }
-              )}
-            </ResponsiveModal>
-            <ResponsiveModal
-              id="user-reset-password-modal"
-              show={toggleResetPassword.modalVisible}
-              handleClose={() => toggleUserResetPasswordModal()}
-              title={intl.formatMessage(messages.resetUserPasswordModalTitle)}
-              actions={[
-                <Button
-                  type="tertiary"
-                  id="reset-password-cancel"
-                  key="reset-password-cancel"
-                  onClick={() => toggleUserResetPasswordModal()}
-                >
-                  {intl.formatMessage(buttonMessages.cancel)}
-                </Button>,
-                <Button
-                  type="primary"
-                  id="reset-password-send"
-                  key="reset-password-send"
-                  onClick={() => {
-                    if (toggleResetPassword.selectedUser?.id) {
-                      resetPassword(toggleResetPassword.selectedUser.id)
-                    }
-                    toggleUserResetPasswordModal()
-                  }}
-                >
-                  {intl.formatMessage(buttonMessages.send)}
-                </Button>
               ]}
-              responsive={false}
-              autoHeight={true}
-            >
-              {intl.formatMessage(messages.resetUserPasswordModalMessage, {
-                deliveryMethod,
+            />
+          ) : null}
+
+          <ResponsiveModal
+            id="username-reminder-modal"
+            show={toggleUsernameReminder.modalVisible}
+            handleClose={() => toggleUsernameReminderModal()}
+            title={intl.formatMessage(
+              messages.sendUsernameReminderInviteModalTitle
+            )}
+            actions={[
+              <Button
+                type="tertiary"
+                id="username-reminder-cancel"
+                key="username-reminusernameSMSReminderder-cancel"
+                onClick={() => toggleUsernameReminderModal()}
+              >
+                {intl.formatMessage(buttonMessages.cancel)}
+              </Button>,
+              <Button
+                type="primary"
+                id="username-reminder-send"
+                key="username-reminder-send"
+                onClick={() => {
+                  if (toggleUsernameReminder.selectedUser?.id) {
+                    usernameReminder(toggleUsernameReminder.selectedUser.id)
+                  }
+                  toggleUsernameReminderModal()
+                }}
+              >
+                {intl.formatMessage(buttonMessages.send)}
+              </Button>
+            ]}
+            responsive={false}
+            autoHeight={true}
+          >
+            {intl.formatMessage(
+              messages.sendUsernameReminderInviteModalMessage,
+              {
                 recipient:
                   deliveryMethod === 'sms'
-                    ? toggleResetPassword.selectedUser?.mobile
-                    : toggleResetPassword.selectedUser?.email
-              })}
-            </ResponsiveModal>
-          </UserTable>
-        </>
+                    ? toggleUsernameReminder.selectedUser?.mobile
+                    : toggleUsernameReminder.selectedUser?.email,
+                deliveryMethod
+              }
+            )}
+          </ResponsiveModal>
+          <ResponsiveModal
+            id="user-reset-password-modal"
+            show={toggleResetPassword.modalVisible}
+            handleClose={() => toggleUserResetPasswordModal()}
+            title={intl.formatMessage(messages.resetUserPasswordModalTitle)}
+            actions={[
+              <Button
+                type="tertiary"
+                id="reset-password-cancel"
+                key="reset-password-cancel"
+                onClick={() => toggleUserResetPasswordModal()}
+              >
+                {intl.formatMessage(buttonMessages.cancel)}
+              </Button>,
+              <Button
+                type="primary"
+                id="reset-password-send"
+                key="reset-password-send"
+                onClick={() => {
+                  if (toggleResetPassword.selectedUser?.id) {
+                    resetPassword(toggleResetPassword.selectedUser.id)
+                  }
+                  toggleUserResetPasswordModal()
+                }}
+              >
+                {intl.formatMessage(buttonMessages.send)}
+              </Button>
+            ]}
+            responsive={false}
+            autoHeight={true}
+          >
+            {intl.formatMessage(messages.resetUserPasswordModalMessage, {
+              deliveryMethod,
+              recipient:
+                deliveryMethod === 'sms'
+                  ? toggleResetPassword.selectedUser?.mobile
+                  : toggleResetPassword.selectedUser?.email
+            })}
+          </ResponsiveModal>
+        </UserTable>
       )
     },
     [
@@ -801,6 +799,7 @@ function UserListComponent(props: IProps) {
       }
       isCertificatesConfigPage={true}
       hideBackground={true}
+      isHidden={props.hideNavigation}
     >
       {isOnline ? (
         <Query<SearchUsersQuery>

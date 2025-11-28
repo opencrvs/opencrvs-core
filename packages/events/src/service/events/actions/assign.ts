@@ -10,15 +10,16 @@
  */
 
 import { TRPCError } from '@trpc/server'
+import { TokenWithBearer } from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
   AssignActionInput,
   findLastAssignmentAction
 } from '@opencrvs/commons/events'
-import { processAction, getEventById } from '@events/service/events/events'
 import { TrpcUserContext } from '@events/context'
 import { getEventConfigurationById } from '@events/service/config/config'
+import { getEventById, processAction } from '@events/service/events/events'
 
 export async function assignRecord({
   user,
@@ -26,7 +27,7 @@ export async function assignRecord({
   input
 }: {
   user: TrpcUserContext
-  token: string
+  token: TokenWithBearer
   input: AssignActionInput
 }) {
   const storedEvent = await getEventById(input.eventId)

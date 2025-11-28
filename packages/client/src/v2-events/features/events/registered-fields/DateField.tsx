@@ -26,7 +26,7 @@ import { StringifierContext } from './RegisteredField'
 const messages = defineMessages({
   dateFormat: {
     defaultMessage: 'd MMMM y',
-    id: 'v2.configuration.dateFormat',
+    id: 'configuration.dateFormat',
     description: 'Default format for date values'
   }
 })
@@ -108,6 +108,6 @@ function stringify(
 export const DateField = {
   Input: DateInput,
   Output: DateOutput,
-  stringify: stringify,
+  stringify,
   toCertificateVariables: stringify
 }

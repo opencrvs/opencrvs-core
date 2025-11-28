@@ -45,6 +45,7 @@ export async function clientCredentialsHandler(
   }
 
   const isNotificationAPIUser = result.scope.includes(SCOPES.NOTIFICATION_API)
+  const isImportExportClient = result.scope.includes(SCOPES.RECORD_IMPORT)
 
   const token = await createToken(
     result.systemId,
@@ -53,9 +54,9 @@ export async function clientCredentialsHandler(
       ? WEB_USER_JWT_AUDIENCES.concat([NOTIFICATION_API_USER_AUDIENCE])
       : WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER,
-    true,
+    undefined,
+    !isImportExportClient,
     TokenUserType.enum.system
   )
-
   return oauthResponse.success(h, token)
 }

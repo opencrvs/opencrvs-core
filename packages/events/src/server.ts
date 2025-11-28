@@ -16,6 +16,7 @@ import '@opencrvs/commons/monitoring'
 import { logger } from '@opencrvs/commons'
 import { appRouter } from './router/router'
 import { createContext } from './context'
+import { handleHealthCheckResponse } from './service/health'
 
 function stringifyRequest(req: IncomingMessage) {
   const url = new URL(req.url || '', `http://${req.headers.host}`)
@@ -60,12 +61,22 @@ export function server() {
       return
     }
 
+    if (req.url === '/ping') {
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ status: 'ok' }))
+      return
+    }
+
+    if (req.url === '/health/ready') {
+      void handleHealthCheckResponse(res)
+      return
+    }
+
     // If it's a tRPC request, handle it with the tRPC server
     if (isTrpcRequest(req)) {
       trpcServer(req, res)
     } else {
       // If it's a REST request, handle it with the REST server
-
       // Ensure Content-Type is set, otherwise default to JSON. Fixes trpc-to-openapi crashing as it only supports 'application/json'
       if (!req.headers['content-type']) {
         req.headers['content-type'] = 'application/json'

@@ -8,12 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Location } from '@events/service/locations/locations'
 import { IntlShape, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { EventState, FieldConfig, FieldValue } from '@opencrvs/commons/client'
+import {
+  EventState,
+  FieldConfig,
+  FieldValue,
+  Location,
+  UUID
+} from '@opencrvs/commons/client'
 import { getRegisteredFieldByFieldConfig } from '@client/v2-events/features/events/registered-fields'
-import { IAdminStructureItem } from '@client/utils/referenceApi'
+import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getOfflineData } from '@client/offline/selectors'
 import { useLocations } from './useLocations'
 interface RecursiveStringRecord {
@@ -54,8 +59,8 @@ function formDataStringifierFactory(stringifier: FieldStringifier) {
  */
 export const getFormDataStringifier = (
   intl: IntlShape,
-  locations: Location[],
-  adminLevels?: IAdminStructureItem[]
+  locations: Map<UUID, Location>,
+  adminLevels?: AdminStructureItem[]
 ) => {
   const stringifier = (fieldConfig: FieldConfig, value: FieldValue) => {
     const field = getRegisteredFieldByFieldConfig(fieldConfig)
@@ -87,7 +92,7 @@ export const getFormDataStringifier = (
 export function useFormDataStringifier() {
   const intl = useIntl()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
   const { config } = useSelector(getOfflineData)
   const adminLevels = config.ADMIN_STRUCTURE
 

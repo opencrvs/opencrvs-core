@@ -42,7 +42,7 @@ describe('User type resolvers', () => {
     username: 'tamim.iqlbal',
     mobile: '+8801711111111',
     email: 'test@test.org',
-    scope: ['certify', 'profile.electronic-signature'],
+    scope: ['profile.electronic-signature'],
     status: 'active',
     practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
     primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',

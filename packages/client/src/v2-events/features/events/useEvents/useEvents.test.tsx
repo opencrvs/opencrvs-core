@@ -28,7 +28,6 @@ import {
   UUID
 } from '@opencrvs/commons/client'
 import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
-import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
 import { storage } from '@client/storage'
 import { useEvents } from './useEvents'
 
@@ -114,9 +113,6 @@ const server = setupServer(
 
   tRPCMsw.event.config.get.query(() => {
     return [tennisClubMembershipEvent]
-  }),
-  tRPCMsw.event.list.query(() => {
-    return [tennisClubMembershipEventIndex]
   })
 )
 

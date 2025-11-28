@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,6 +10,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { http, HttpResponse } from 'msw'
+import { TRPCError } from '@trpc/server'
 import {
   ActionStatus,
   ActionType,
@@ -20,13 +22,19 @@ import {
   getCurrentEventState,
   getUUID,
   PageTypes,
-  PrintCertificateAction
+  PrintCertificateAction,
+  ActionUpdate,
+  TestUserRole,
+  AddressType,
+  deepMerge
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
+  createEvent,
   createTestClient,
   sanitizeForSnapshot,
   setupTestCase,
+  TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
 import { mswServer } from '../../tests/msw'
@@ -282,17 +290,6 @@ describe('Action updates', () => {
       http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
         return HttpResponse.json([multiFileConfig, tennisClubMembershipEvent])
       }),
-      http.post(
-        `${env.COUNTRY_CONFIG_URL}/events/multi-file-event/actions/:action`,
-        (ctx) => {
-          const payload =
-            ctx.params.action === ActionType.REGISTER
-              ? { registrationNumber: `ABC${Number(new Date())}` }
-              : {}
-
-          return HttpResponse.json(payload)
-        }
-      ),
       http.head(`${env.DOCUMENTS_URL}/files/:filePath*`, (req) => {
         fileExistsMock(
           typeof req.params.filePath === 'string'
@@ -301,7 +298,6 @@ describe('Action updates', () => {
         )
         return HttpResponse.json({ ok: true })
       }),
-
       http.delete(`${env.DOCUMENTS_URL}/files/:filePath*`, (req) => {
         deleteFileMock(
           typeof req.params.filePath === 'string'
@@ -370,9 +366,84 @@ describe('Action updates', () => {
     expect(eventState.declaration).toMatchSnapshot()
   })
 
+  it('declaration including hidden fields throws error', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+
+    const originalEvent = await client.event.create(generator.event.create())
+
+    const getDeclarationWithHiddenField = (declaration: ActionUpdate) => {
+      return {
+        ...declaration,
+        'applicant.dobUnknown': true,
+        'applicant.age': 19,
+        'applicant.dob': '2000-01-01' // dob can't be known and unknown at the same time.
+      }
+    }
+
+    const declarePayload = generator.event.actions.declare(originalEvent.id)
+    const declarationWithHiddenField = getDeclarationWithHiddenField(
+      declarePayload.declaration
+    )
+
+    const expectedError = new TRPCError({
+      code: 'BAD_REQUEST',
+      message: JSON.stringify([
+        {
+          message: 'Hidden or disabled field should not receive a value',
+          id: 'applicant.dob',
+          value: '2000-01-01'
+        }
+      ])
+    })
+
+    await expect(
+      client.event.actions.declare.request({
+        ...declarePayload,
+        declaration: declarationWithHiddenField
+      })
+    ).rejects.toMatchObject(expectedError)
+
+    const declaredEvent = await createEvent(client, generator, [
+      ActionType.DECLARE
+    ])
+    const validatePayload = generator.event.actions.validate(declaredEvent.id)
+    const validateDeclarationWithHiddenField = getDeclarationWithHiddenField(
+      validatePayload.declaration
+    )
+
+    await expect(
+      client.event.actions.validate.request({
+        ...validatePayload,
+        declaration: validateDeclarationWithHiddenField
+      })
+    ).rejects.toMatchObject(expectedError)
+
+    const validatedEvent = await createEvent(client, generator, [
+      ActionType.DECLARE,
+      ActionType.VALIDATE
+    ])
+
+    const registerPayload = generator.event.actions.register(validatedEvent.id)
+    const registerDeclarationWithHiddenField = getDeclarationWithHiddenField(
+      registerPayload.declaration
+    )
+
+    await expect(
+      client.event.actions.register.request({
+        ...registerPayload,
+        declaration: registerDeclarationWithHiddenField
+      })
+    ).rejects.toMatchObject(expectedError)
+  })
+
   it('File references are removed with explicit null', async () => {
     const { user } = await setupTestCase()
-    const client = createTestClient(user)
+
+    const client = createTestClient(user, [
+      ...TEST_USER_DEFAULT_SCOPES,
+      `search[event=${multiFileConfig.id},access=all]`
+    ])
 
     const originalEvent = await client.event.create({
       transactionId: generateTransactionId(),
@@ -387,7 +458,19 @@ describe('Action updates', () => {
       keepAssignment: true
     })
 
-    const [eventAfterDeclare] = await client.event.list()
+    const { results } = await client.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            id: originalEvent.id,
+            eventType: originalEvent.type
+          }
+        ]
+      }
+    })
+
+    const [eventAfterDeclare] = results
 
     expect(eventAfterDeclare.declaration['documents.singleFile']).toBeDefined()
     expect(eventAfterDeclare.declaration['documents.multiFile']).toHaveLength(2)
@@ -405,7 +488,18 @@ describe('Action updates', () => {
       keepAssignment: true
     })
 
-    const [eventAfterValidate] = await client.event.list()
+    const { results: resultsAfterValidate } = await client.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            id: originalEvent.id
+          }
+        ]
+      }
+    })
+
+    const [eventAfterValidate] = resultsAfterValidate
 
     expect(
       eventAfterValidate.declaration['documents.singleFile']
@@ -417,8 +511,10 @@ describe('Action updates', () => {
 
   it('file with option references are removed with empty array', async () => {
     const { user } = await setupTestCase()
-    const client = createTestClient(user)
-
+    const client = createTestClient(user, [
+      ...TEST_USER_DEFAULT_SCOPES,
+      `search[event=${multiFileConfig.id},access=all]`
+    ])
     const originalEvent = await client.event.create({
       transactionId: generateTransactionId(),
       type: multiFileConfig.id
@@ -432,7 +528,18 @@ describe('Action updates', () => {
       keepAssignment: true
     })
 
-    const [eventAfterDeclare] = await client.event.list()
+    const { results } = await client.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            id: originalEvent.id
+          }
+        ]
+      }
+    })
+
+    const [eventAfterDeclare] = results
 
     expect(eventAfterDeclare.declaration['documents.singleFile']).toBeDefined()
     expect(eventAfterDeclare.declaration['documents.multiFile']).toHaveLength(2)
@@ -452,8 +559,19 @@ describe('Action updates', () => {
 
     // No files should be deleted, only references removed
     expect(deleteFileMock.mock.calls).toHaveLength(0)
-    const [eventAfterValidate] = await client.event.list()
 
+    const { results: resultsAfterValidate } = await client.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            id: originalEvent.id
+          }
+        ]
+      }
+    })
+
+    const [eventAfterValidate] = resultsAfterValidate
     expect(
       eventAfterValidate.declaration['documents.singleFile']
     ).not.toBeDefined()
@@ -586,4 +704,179 @@ test('Can not add action with same [transactionId, type, status]', async () => {
     }),
     expect.objectContaining({ type: ActionType.UNASSIGN })
   ])
+})
+
+describe('Conditionals based on user role', () => {
+  const baseDeclarationWithoutAddress = {
+    'applicant.dob': '2025-07-22',
+    'applicant.name': {
+      surname: 'Feest',
+      firstname: 'Jordan',
+      middlename: 'Day'
+    },
+    'recommender.id': '123456789',
+    'recommender.name': {
+      surname: 'Feest',
+      firstname: 'Jordan',
+      middlename: 'Day'
+    },
+    'recommender.none': false,
+    'applicant.isRecommendedByFieldAgent': true
+  }
+
+  it('SHOW Conditionals are evaluated for user roles', async () => {
+    const { generator, seed, locations } = await setupTestCase()
+
+    const declarationPayload = {
+      ...baseDeclarationWithoutAddress,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: locations[0].id,
+        streetLevelDetails: {
+          town: 'Example Village',
+          state: 'State',
+          district2: 'District2'
+        }
+      }
+    }
+
+    const users = TestUserRole.options.map((role) => {
+      return seed.user({
+        primaryOfficeId: locations[0].id,
+        name: [
+          {
+            use: 'en',
+            family: role,
+            given: ['John']
+          }
+        ],
+        role
+      })
+    })
+
+    expect(users).toHaveLength(7)
+    for (const u of users) {
+      const userClient = createTestClient(u)
+
+      const event = await userClient.event.create(generator.event.create())
+
+      if (u.role === TestUserRole.enum.FIELD_AGENT) {
+        await expect(
+          userClient.event.actions.declare.request(
+            generator.event.actions.declare(event.id, {
+              declaration: declarationPayload
+            })
+          )
+        ).resolves.toBeDefined()
+      } else {
+        await expect(
+          userClient.event.actions.declare.request(
+            generator.event.actions.declare(event.id, {
+              declaration: declarationPayload
+            })
+          )
+        ).rejects.toMatchObject(
+          new TRPCError({
+            code: 'BAD_REQUEST',
+            message:
+              '[{"message":"Hidden or disabled field should not receive a value","id":"applicant.isRecommendedByFieldAgent","value":true}]'
+          })
+        )
+      }
+    }
+  })
+
+  it('Indexed result is not affected by SHOW conditionals', async () => {
+    const { generator, seed, locations } = await setupTestCase()
+    const fieldAgent = seed.user({
+      primaryOfficeId: locations[0].id,
+      name: [
+        {
+          use: 'en',
+          family: TestUserRole.enum.FIELD_AGENT,
+          given: ['John']
+        }
+      ],
+      role: TestUserRole.enum.FIELD_AGENT
+    })
+
+    const declarationPayload = deepMerge(baseDeclarationWithoutAddress, {
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: locations[0].id,
+        streetLevelDetails: {
+          town: 'Example Village',
+          state: 'State',
+          district2: 'District2'
+        }
+      }
+    })
+
+    const fieldAgentClient = createTestClient(fieldAgent)
+
+    const event = await fieldAgentClient.event.create(generator.event.create())
+
+    await expect(
+      fieldAgentClient.event.actions.declare.request(
+        generator.event.actions.declare(event.id, {
+          declaration: declarationPayload
+        })
+      )
+    ).resolves.toBeDefined()
+
+    const registrationAgent = seed.user({
+      primaryOfficeId: locations[0].id,
+      name: [
+        {
+          use: 'en',
+          family: TestUserRole.enum.REGISTRATION_AGENT,
+          given: ['Jane']
+        }
+      ],
+      role: TestUserRole.enum.FIELD_AGENT
+    })
+
+    const registrationAgentClient = createTestClient(registrationAgent, [
+      ...TEST_USER_DEFAULT_SCOPES,
+      `search[event=${tennisClubMembershipEvent.id},access=all]`
+    ])
+
+    await registrationAgentClient.event.actions.assignment.assign({
+      eventId: event.id,
+      assignedTo: registrationAgent.id,
+      transactionId: getUUID(),
+      type: ActionType.ASSIGN
+    })
+
+    await expect(
+      registrationAgentClient.event.actions.validate.request({
+        type: ActionType.VALIDATE,
+        declaration: {},
+        eventId: event.id,
+        transactionId: getUUID()
+      })
+    ).resolves.toBeDefined()
+
+    const indexedEvent = await registrationAgentClient.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            id: event.id
+          }
+        ]
+      }
+    })
+
+    // Address is secured field.
+    expect(indexedEvent.results[0].declaration).toEqual(
+      baseDeclarationWithoutAddress
+    )
+
+    expect(
+      indexedEvent.results[0].declaration['applicant.isRecommendedByFieldAgent']
+    ).toEqual(true)
+  })
 })

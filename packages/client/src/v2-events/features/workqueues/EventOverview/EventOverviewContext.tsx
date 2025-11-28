@@ -10,27 +10,12 @@
  */
 
 import React, { createContext, useContext } from 'react'
-import { ResolvedUser } from '@opencrvs/commons/client'
-import { ILocation } from '@client/offline/reducer'
-import { IndexMap } from '@client/utils'
+import { Location, User, UUID } from '@opencrvs/commons/client'
 
 const EventOverviewContext = createContext<{
-  getUser: (id: string) => ResolvedUser
-  getLocation: (id: string) => ILocation | undefined
+  findUser: (id: string) => User | undefined
+  getLocation: (id: UUID) => Location | undefined
 } | null>(null)
-
-const MISSING_USER = {
-  id: 'ID_MISSING',
-  name: [
-    {
-      use: 'en',
-      given: ['Missing'],
-      family: 'user'
-    }
-  ],
-  role: '-',
-  primaryOfficeId: 'ID_MISSING'
-} satisfies ResolvedUser
 
 /**
  * Provides methods for resolving users and locations within the event.
@@ -41,20 +26,19 @@ export const EventOverviewProvider = ({
   users
 }: {
   children: React.ReactNode
-  users: ResolvedUser[]
-  locations: IndexMap<ILocation>
+  users: User[]
+  locations: Map<UUID, Location>
 }) => {
-  const getUser = (id: string) => {
-    const user = users.find((u) => u.id === id)
-    return user ?? MISSING_USER
+  const findUser = (id: string) => {
+    return users.find((u) => u.id === id)
   }
 
-  const getLocation = (id: string) => {
-    return locations[id]
+  const getLocation = (id: UUID) => {
+    return locations.get(id)
   }
 
   return (
-    <EventOverviewContext.Provider value={{ getUser, getLocation }}>
+    <EventOverviewContext.Provider value={{ findUser, getLocation }}>
       {children}
     </EventOverviewContext.Provider>
   )

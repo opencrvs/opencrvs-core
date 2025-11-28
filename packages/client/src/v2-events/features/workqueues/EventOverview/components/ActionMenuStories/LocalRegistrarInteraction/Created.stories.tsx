@@ -18,7 +18,9 @@ import {
   createStoriesFromScenarios,
   AssertType,
   Scenario,
-  UserRoles
+  UserRoles,
+  getMockEvent,
+  createdByOtherUserScenario
 } from '../ActionMenu.common'
 
 export default {
@@ -33,9 +35,8 @@ const createdScenariosForLocalRegistrar: Scenario[] = [
     actions: [ActionType.CREATE, AssignmentStatus.ASSIGNED_TO_SELF],
     expected: {
       ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.DECLARE]: AssertType.ENABLED,
-      [ActionType.DELETE]: AssertType.ENABLED
+      ['Declare']: AssertType.ENABLED,
+      ['Delete']: AssertType.ENABLED
     }
   }
 ]
@@ -46,3 +47,16 @@ const stories = createStoriesFromScenarios(
 )
 
 export const AssignedToSelf = stories['AssignedToSelf']
+
+// Created by some other user
+const event = getMockEvent([ActionType.CREATE], UserRoles.REGISTRATION_AGENT)
+
+export const CreatedByOtherUser = createdByOtherUserScenario({
+  event,
+  role: UserRoles.LOCAL_REGISTRAR,
+  expected: {
+    ...getHiddenActions(),
+    ['Declare']: AssertType.DISABLED,
+    ['Delete']: AssertType.DISABLED
+  }
+})

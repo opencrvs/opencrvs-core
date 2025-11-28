@@ -9,17 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { omit } from 'lodash'
-import { EventDocument, getUUID } from '@opencrvs/commons'
+import { EventDocument, getUUID, TokenWithBearer } from '@opencrvs/commons'
 import { upsertEventWithActions } from '@events/storage/postgres/events/import'
-import { getEventConfigurationById } from '../config/config'
-import { indexEvent } from '../indexing/indexing'
+import { getInMemoryEventConfigurations } from '../config/config'
+import { indexEventsInBulk, type BulkResponse } from '../indexing/indexing'
 
-export async function importEvent(eventDocument: EventDocument, token: string) {
-  const transactionId = getUUID()
-  const { actions, ...event } = eventDocument
-
-  const eventType = event.type
-  const eventActions = actions.map(({ type, ...action }) => ({
+function mapEventActions(actions: EventDocument['actions']) {
+  return actions.map(({ type, ...action }) => ({
     ...omit(action, 'type'),
     actionType: type,
 
@@ -32,22 +28,36 @@ export async function importEvent(eventDocument: EventDocument, token: string) {
     registrationNumber: (action as any).registrationNumber ?? undefined,
     assignedTo: (action as any).assignedTo ?? undefined,
     requestId: (action as any).requestId ?? undefined,
-    /* eslint-enable @typescript-eslint/no-explicit-any */
     createdAtLocation: action.createdAtLocation ?? null,
     originalActionId: action.originalActionId ?? null,
-    createdBySignature: action.createdBySignature ?? null
+    createdBySignature: action.createdBySignature ?? null,
+    customActionType: (action as any).customActionType ?? null
+    /* eslint-enable @typescript-eslint/no-explicit-any */
   }))
+}
 
-  const createdEvent = await upsertEventWithActions(
-    { ...omit(event, 'type'), eventType, transactionId },
-    eventActions
-  )
+export async function bulkImportEvents(
+  events: EventDocument[],
+  token: TokenWithBearer
+): Promise<BulkResponse> {
+  const toIndex = []
 
-  const config = await getEventConfigurationById({
-    token,
-    eventType: event.type
-  })
-  await indexEvent(createdEvent, config)
+  const eventConfigs = await getInMemoryEventConfigurations(token)
 
-  return createdEvent
+  for (const eventDocument of events) {
+    const transactionId = getUUID()
+    const { actions, ...event } = eventDocument
+
+    const eventType = event.type
+    const eventActions = mapEventActions(actions)
+
+    const createdEvent = await upsertEventWithActions(
+      { ...omit(event, 'type'), eventType, transactionId },
+      eventActions
+    )
+
+    toIndex.push(createdEvent)
+  }
+
+  return indexEventsInBulk(toIndex, eventConfigs)
 }

@@ -10,40 +10,46 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { z } from 'zod'
 import { NoResultError } from 'kysely'
+import * as z from 'zod/v4'
+import { TokenUserType, TokenWithBearer, UUID } from '@opencrvs/commons'
 import {
   ActionInputWithType,
   ActionStatus,
+  ActionType,
   ActionUpdate,
-  Draft,
+  AsyncRejectActionDocument,
+  DisplayableAction,
+  EventConfig,
   EventDocument,
   EventInput,
+  EventStatus,
   FieldType,
   FieldUpdateValue,
   FileFieldValue,
-  getDeclarationFields,
   getAcceptedActions,
-  AsyncRejectActionDocument,
-  ActionType,
-  isWriteAction,
-  getStatusFromActions,
-  EventConfig,
-  EventStatus,
+  getActionConfig,
   getAvailableActionsForEvent,
   getCurrentEventState,
-  DisplayableAction
+  getDeclarationFields,
+  getStatusFromActions,
+  isActionVisible,
+  isActionEnabled,
+  isWriteAction
 } from '@opencrvs/commons/events'
-import { TokenUserType, UUID } from '@opencrvs/commons'
-import { getEventConfigurationById } from '@events/service/config/config'
-import { deleteFile, fileExists } from '@events/service/files'
-import { indexEvent } from '@events/service/indexing/indexing'
-import * as eventsRepo from '@events/storage/postgres/events/events'
-import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { TrpcUserContext } from '@events/context'
-import { getUnreferencedDraftFiles } from '../files/utils'
+import { getEventConfigurationById } from '@events/service/config/config'
+import {
+  cleanupUnreferencedFiles,
+  deleteFile,
+  fileExists
+} from '@events/service/files'
+import { indexEvent } from '@events/service/indexing/indexing'
+import * as draftsRepo from '@events/storage/postgres/events/drafts'
+import * as eventsRepo from '@events/storage/postgres/events/events'
+import { getValidatorContext } from '@events/router/middleware/validate/utils'
 
-class EventNotFoundError extends TRPCError {
+export class EventNotFoundError extends TRPCError {
   constructor(id: string) {
     super({
       code: 'NOT_FOUND',
@@ -78,10 +84,13 @@ function getValidFileValue(
   return validFieldValue.data
 }
 
-async function deleteEventAttachments(token: string, event: EventDocument) {
+async function deleteEventAttachments(
+  token: TokenWithBearer,
+  event: EventDocument
+) {
   const configuration = await getEventConfigurationById({
-    token,
-    eventType: event.type
+    eventType: event.type,
+    token
   })
 
   const actions = getAcceptedActions(event)
@@ -100,17 +109,26 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
   }
 }
 
+/**
+ * Ensure that an action is allowed depending on the current event state. This does two checks:
+ * 1. Check that the action is allowed in the current event status and flags
+ * 2. Check that any conditionals defined for the action are met
+ *
+ * If any of the checks fail, a tRPC HTTP 409 Conflict error is thrown.
+ */
 export async function throwConflictIfActionNotAllowed(
   eventId: UUID,
   actionType: ActionType,
-  token: string
+  token: TokenWithBearer,
+  customActionType?: string
 ) {
   const event = await getEventById(eventId)
-  const eventConfig = await getEventConfigurationById({
-    token,
-    eventType: event.type
+  const eventConfiguration = await getEventConfigurationById({
+    eventType: event.type,
+    token
   })
-  const eventIndex = getCurrentEventState(event, eventConfig)
+
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
 
   const allowedActions: DisplayableAction[] =
     getAvailableActionsForEvent(eventIndex)
@@ -121,9 +139,36 @@ export async function throwConflictIfActionNotAllowed(
       message: `Action '${actionType}' cannot be performed on an event in '${eventIndex.status}' state with [${eventIndex.flags.join(', ')}] flags. Available actions: ${allowedActions.join(', ')}.`
     })
   }
+
+  const actionConfig = getActionConfig({
+    actionType,
+    eventConfiguration,
+    customActionType
+  })
+
+  // If no action config found, we are executing an action which does not have conditionals
+  if (!actionConfig) {
+    return
+  }
+
+  const context = await getValidatorContext(token)
+  const actionIsEnabled = isActionEnabled(actionConfig, eventIndex, context)
+  const actionIsAvailable = isActionVisible(actionConfig, eventIndex, context)
+
+  if (!actionIsEnabled || !actionIsAvailable) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `Conditions for action: ${actionType} were not met, action cannot be performed`
+    })
+  }
+
+  return
 }
 
-export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
+export async function deleteEvent(
+  eventId: UUID,
+  { token }: { token: TokenWithBearer }
+) {
   const event = await getEventById(eventId)
   const eventStatus = getStatusFromActions(event.actions)
 
@@ -207,42 +252,6 @@ function extractFileValues(
   return fileValues
 }
 
-/**
- *
- * Deletes files from external source that are referenced in previous drafts but not in the current draft.
- *
- */
-export async function deleteUnreferencedFilesFromPreviousDrafts(
-  token: string,
-  {
-    event,
-    currentDraft,
-    previousDraft,
-    configuration
-  }: {
-    event: EventDocument
-    currentDraft?: Draft
-    previousDraft: Draft
-    configuration: EventConfig
-  }
-): Promise<void> {
-  const unreferencedFiles = getUnreferencedDraftFiles({
-    event,
-    currentDraft,
-    previousDraft,
-    configuration
-  })
-
-  for (const file of unreferencedFiles) {
-    const isDeleted = await deleteFile(file.value, token)
-
-    if (!isDeleted) {
-      // eslint-disable-next-line no-console
-      console.error(`Unable to delete unused file: ${JSON.stringify(file)}`)
-    }
-  }
-}
-
 export function buildAction(
   input: ActionInputWithType,
   status: ActionStatus,
@@ -296,14 +305,9 @@ export function buildAction(
         requestId: input.requestId
       }
     }
-    case ActionType.DUPLICATE_DETECTED:
-      return {
-        ...commonAttributes,
-        createdBy: 'system',
-        createdByUserType: TokenUserType.enum.system,
-        createdByRole: '',
-        createdAtLocation: undefined
-      }
+    case ActionType.CUSTOM: {
+      return { ...commonAttributes, customActionType: input.customActionType }
+    }
     case ActionType.REJECT:
     case ActionType.ARCHIVE:
     case ActionType.PRINT_CERTIFICATE:
@@ -312,12 +316,11 @@ export function buildAction(
     case ActionType.NOTIFY:
     case ActionType.DECLARE:
     case ActionType.VALIDATE:
+    case ActionType.DUPLICATE_DETECTED:
     case ActionType.MARK_AS_NOT_DUPLICATE:
     case ActionType.MARK_AS_DUPLICATE:
     case ActionType.REQUEST_CORRECTION: {
-      return {
-        ...commonAttributes
-      }
+      return commonAttributes
     }
   }
 }
@@ -346,7 +349,7 @@ export async function addAction(
   }: {
     event: EventDocument
     user: TrpcUserContext
-    token: string
+    token: TokenWithBearer
     status: ActionStatus
     configuration: EventConfig
   }
@@ -399,22 +402,9 @@ export async function addAction(
 
   const updatedEvent = await getEventById(eventId)
 
-  const previousDraft = await draftsRepo.findLatestDraftForAction(
-    event.id,
-    user.id,
-    input.type
-  )
-
   if (input.type !== ActionType.READ && input.type !== ActionType.ASSIGN) {
     await draftsRepo.deleteDraftsByEventId(input.eventId)
-  }
-
-  if (previousDraft) {
-    await deleteUnreferencedFilesFromPreviousDrafts(token, {
-      event: updatedEvent,
-      configuration,
-      previousDraft
-    })
+    await cleanupUnreferencedFiles(updatedEvent, token)
   }
 
   return updatedEvent
@@ -453,7 +443,7 @@ export async function processAction(
   }: {
     event: EventDocument
     user: TrpcUserContext
-    token: string
+    token: TokenWithBearer
     status: ActionStatus
     configuration: EventConfig
   }
@@ -480,7 +470,7 @@ type AsyncRejectActionInput = Omit<
   originalActionId: UUID
   createdAtLocation?: UUID
   createdByUserType: TokenUserType
-  token: string
+  token: TokenWithBearer
   eventType: string
 }
 
@@ -493,12 +483,12 @@ export async function addAsyncRejectAction({
   createdByRole,
   createdByUserType,
   createdAtLocation,
-  token,
-  eventType
+  eventType,
+  token
 }: AsyncRejectActionInput) {
   const configuration = await getEventConfigurationById({
-    token,
-    eventType
+    eventType,
+    token
   })
 
   await eventsRepo.createAction({

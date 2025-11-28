@@ -18,7 +18,9 @@ import {
   EventDocument,
   EventConfig,
   ArchiveActionInput,
-  MarkAsDuplicateActionInput
+  MarkAsDuplicateActionInput,
+  ActionStatus,
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
 
@@ -34,6 +36,7 @@ export interface CustomMutationParams {
 
 export interface CorrectionRequestParams extends CustomMutationParams {
   event: EventDocument
+  context: ValidatorContext
 }
 
 export interface ArchiveOnDuplicateParams extends CustomMutationParams {
@@ -219,7 +222,8 @@ export async function makeCorrectionOnRequest({
   annotation: declarationMixedUpAnnotation,
   transactionId,
   event,
-  eventConfiguration
+  eventConfiguration,
+  context
 }: CorrectionRequestParams) {
   // Let's find the REQUEST_CORRECTION action configuration. Because the annotation passed down here is mixed up
   // with declaration in the REQUEST_CORRECTION page form, we need to cleanup the annotation from declaration
@@ -237,9 +241,11 @@ export async function makeCorrectionOnRequest({
       ? omitHiddenAnnotationFields(
           actionConfiguration,
           originalDeclaration,
-          declarationMixedUpAnnotation
+          declarationMixedUpAnnotation,
+          context
         )
       : {}
+
   const response =
     await trpcClient.event.actions.correction.request.request.mutate({
       eventId,
@@ -248,14 +254,18 @@ export async function makeCorrectionOnRequest({
       annotation,
       keepAssignment: true
     })
+
   const requestId = response.actions.find(
-    (a) => a.transactionId === transactionId
+    (a) =>
+      a.transactionId === transactionId && a.status === ActionStatus.Accepted
   )?.id
+
   if (!requestId) {
     throw new Error(
       `Request ID not found in response for eventId: ${eventId}, transactionId: ${transactionId}`
     )
   }
+
   return trpcClient.event.actions.correction.approve.request.mutate({
     type: ActionType.APPROVE_CORRECTION,
     transactionId: getUUID(),

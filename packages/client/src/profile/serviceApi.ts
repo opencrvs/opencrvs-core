@@ -11,11 +11,7 @@
 import { getToken } from '@client/utils/authUtils'
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import * as Sentry from '@sentry/react'
-
-export enum NotificationEvent {
-  CHANGE_PHONE_NUMBER = 'CHANGE_PHONE_NUMBER',
-  CHANGE_EMAIL_ADDRESS = 'CHANGE_EMAIL_ADDRESS'
-}
+import { TriggerEvent } from '@opencrvs/commons/client'
 
 interface ISendVerifyCodeData {
   userFullName: {
@@ -23,7 +19,9 @@ interface ISendVerifyCodeData {
     family: string
     given: string[]
   }[]
-  notificationEvent: NotificationEvent
+  notificationEvent:
+    | typeof TriggerEvent.CHANGE_PHONE_NUMBER
+    | typeof TriggerEvent.CHANGE_EMAIL_ADDRESS
   phoneNumber?: string
   email?: string
 }

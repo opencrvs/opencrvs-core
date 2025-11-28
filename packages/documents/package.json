@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/documents",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "description": "OpenCRVS Documents service",
   "license": "MPL-2.0",
   "private": true,
@@ -18,7 +18,7 @@
   "dependencies": {
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.0.1",
-    "@opencrvs/commons": "^1.7.0",
+    "@opencrvs/commons": "^1.9.0",
     "app-module-path": "^2.2.0",
     "date-fns": "^2.28.0",
     "envalid": "^8.0.0",
@@ -34,7 +34,7 @@
     "pino": "^7.0.0",
     "tsconfig-paths": "^3.13.0",
     "uuid": "^3.2.1",
-    "zod": "^3.23.8"
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/archiver": "^3.0.0",

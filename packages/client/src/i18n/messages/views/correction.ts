@@ -369,33 +369,33 @@ const messagesToDefine = {
 
   // V2
   correctionSectionTitle: {
-    id: 'v2.correction.summary.section.title',
+    id: 'correction.summary.section.title',
     defaultMessage: 'Request correction(s)',
     description: 'Corrections section title'
   },
   makeCorrectionSectionTitle: {
-    id: 'v2.record-corrected.summary.section.title',
+    id: 'record-corrected.summary.section.title',
     defaultMessage: 'Correction(s)',
     description: 'Make corrections section title'
   },
   change: {
-    id: 'v2.correction.summary.change',
+    id: 'correction.summary.change',
     defaultMessage: 'Change',
     description: 'Change link label'
   },
   correctionApprovalDialogTitle: {
-    id: 'v2.correction.correctionForApprovalDialog.title',
+    id: 'correction.correctionForApprovalDialog.title',
     defaultMessage: 'Send record correction for approval?',
     description:
       'The title for the dialog when record correction sent by registration agent for approval'
   },
   verifyIdentity: {
-    id: 'v2.correction.label.verifyIdentity.confirm',
+    id: 'correction.label.verifyIdentity.confirm',
     defaultMessage: 'Yes',
     description: 'Label for verification of identity in correction request'
   },
   cancelVerifyIdentity: {
-    id: 'v2.correction.label.verifyIdentity.cancel',
+    id: 'correction.label.verifyIdentity.cancel',
     defaultMessage: 'No',
     description:
       'Label for cancellation of identity verificationin correction request'

@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { SCOPES } from '@opencrvs/commons'
+import { SCOPES, TestUserRole } from '@opencrvs/commons'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { createTestToken } from '@events/tests/utils'
+import { TrpcContext } from '@events/context'
 import { requiresAnyOfScopes } from '.'
 
 describe('requiresScopes()', () => {
@@ -24,12 +25,14 @@ describe('requiresScopes()', () => {
     // missing all of the required scopes
     const mockOpts = {
       ctx: {
-        token: createTestToken('test-user-id', [
-          'record.declare[event=birth|death|tennis-club-membership]'
-        ])
+        token: createTestToken({
+          userId: 'test-user-id',
+          scopes: ['record.declare[event=birth|death|tennis-club-membership]'],
+          role: TestUserRole.enum.REGISTRATION_AGENT
+        })
       },
       next: vi.fn()
-    } as unknown as MiddlewareOptions
+    } as unknown as MiddlewareOptions<TrpcContext>
 
     await expect(middleware(mockOpts)).rejects.toMatchObject({
       code: 'FORBIDDEN'
@@ -47,12 +50,14 @@ describe('requiresScopes()', () => {
     // has one of the required scopes
     const mockOpts = {
       ctx: {
-        token: createTestToken('test-user-id', [
-          SCOPES.RECORD_CONFIRM_REGISTRATION
-        ])
+        token: createTestToken({
+          userId: 'test-user-id',
+          scopes: [SCOPES.RECORD_CONFIRM_REGISTRATION],
+          role: TestUserRole.enum.REGISTRATION_AGENT
+        })
       },
       next: vi.fn()
-    } as unknown as MiddlewareOptions
+    } as unknown as MiddlewareOptions<TrpcContext>
 
     await middleware(mockOpts)
 

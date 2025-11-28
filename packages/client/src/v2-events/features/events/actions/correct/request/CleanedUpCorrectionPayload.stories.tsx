@@ -26,7 +26,8 @@ import {
   defineDeclarationForm,
   generateUuid,
   generateActionDocument,
-  generateTranslationConfig
+  generateTranslationConfig,
+  FieldUpdateValue
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -248,7 +249,7 @@ export const CleanedUpCorrectionPayload: Story = {
         children: [
           router,
           {
-            path: ROUTES.V2.EVENTS.OVERVIEW.path,
+            path: ROUTES.V2.EVENTS.EVENT.path,
             element: (
               <EventOverviewLayout>
                 <EventOverviewIndex />
@@ -287,8 +288,14 @@ export const CleanedUpCorrectionPayload: Story = {
                     configuration: overriddenEventConfig,
                     action: ActionType.REQUEST_CORRECTION,
                     defaults: {
-                      annotation: payload.annotation,
-                      declaration: payload.declaration
+                      annotation: payload.annotation as Record<
+                        string,
+                        FieldUpdateValue
+                      >,
+                      declaration: payload.declaration as Record<
+                        string,
+                        FieldUpdateValue
+                      >
                     }
                   })
                 ]

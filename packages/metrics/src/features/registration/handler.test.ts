@@ -31,15 +31,11 @@ jest.mock('@metrics/features/performance/viewRefresher', () => {
 const fetch = fetchAny as any
 const fetchTaskHistory = api.fetchTaskHistory as jest.Mock
 
-const token = jwt.sign(
-  { scope: ['declare'] },
-  readFileSync('./test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:metrics-user'
-  }
-)
+const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+  algorithm: 'RS256',
+  issuer: 'opencrvs:auth-service',
+  audience: 'opencrvs:metrics-user'
+})
 
 jest.mock('../metrics/utils', () => {
   const originalModule = jest.requireActual('../metrics//utils')

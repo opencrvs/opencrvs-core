@@ -9,23 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { SearchScopeAccessLevels } from './events'
 
 export const SCOPES = {
   // TODO v1.8 legacy scopes
-  NATLSYSADMIN: 'natlsysadmin',
   BYPASSRATELIMIT: 'bypassratelimit',
 
-  DECLARE: 'declare',
   REGISTER: 'register',
-  VALIDATE: 'validate',
 
   DEMO: 'demo',
-  CERTIFY: 'certify',
-  PERFORMANCE: 'performance',
-  SYSADMIN: 'sysadmin',
-  TEAMS: 'teams',
   CONFIG: 'config',
 
   // systems / integrations
@@ -34,7 +27,8 @@ export const SCOPES = {
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
   RECORD_IMPORT: 'record.import',
-  REINDEX: 'record.reindex',
+  RECORD_EXPORT: 'record.export',
+  RECORD_REINDEX: 'record.reindex',
 
   // declare
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
@@ -60,22 +54,12 @@ export const SCOPES = {
 
   // register
   RECORD_REGISTER: 'record.register',
-
-  // certify
-  RECORD_EXPORT_RECORDS: 'record.export-records',
-  RECORD_DECLARATION_PRINT: 'record.declaration-print',
-  RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS:
-    'record.declaration-print-supporting-documents',
-  RECORD_REGISTRATION_PRINT: 'record.registration-print', // v1.8
   /**
    * This scope is used to **print and **issue certified copies of a record
    * after it has been registered. Previously Registrars had this permission.
    */
   RECORD_PRINT_ISSUE_CERTIFIED_COPIES:
     'record.registration-print&issue-certified-copies',
-  RECORD_PRINT_CERTIFIED_COPIES: 'record.registration-print-certified-copies', // v1.8
-  RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES:
-    'record.registration-verify-certified-copies', // v1.8
 
   // correct
   RECORD_REGISTRATION_REQUEST_CORRECTION:
@@ -96,7 +80,6 @@ export const SCOPES = {
   RECORD_READ: 'record.read',
 
   // profile
-  PROFILE_UPDATE: 'profile.update', //v1.8
   PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
 
   // performance
@@ -130,16 +113,9 @@ export const SCOPES = {
 
 // Legacy scopes
 const LegacyScopes = z.union([
-  z.literal(SCOPES.NATLSYSADMIN),
   z.literal(SCOPES.BYPASSRATELIMIT),
-  z.literal(SCOPES.DECLARE),
   z.literal(SCOPES.REGISTER),
-  z.literal(SCOPES.VALIDATE),
   z.literal(SCOPES.DEMO),
-  z.literal(SCOPES.CERTIFY),
-  z.literal(SCOPES.PERFORMANCE),
-  z.literal(SCOPES.SYSADMIN),
-  z.literal(SCOPES.TEAMS),
   z.literal(SCOPES.CONFIG)
 ])
 
@@ -153,8 +129,8 @@ const IntegrationScopes = z.union([
 
 // Internal operations
 const InternalOperationsScopes = z.union([
-  z.literal(SCOPES.RECORD_IMPORT),
-  z.literal(SCOPES.REINDEX)
+  z.literal(SCOPES.RECORD_REINDEX),
+  z.literal(SCOPES.RECORD_IMPORT)
 ])
 
 // Declare
@@ -184,17 +160,6 @@ const ValidateScopes = z.union([
 // Register
 const RegisterScope = z.literal(SCOPES.RECORD_REGISTER)
 
-// Certify
-const CertifyScopes = z.union([
-  z.literal(SCOPES.RECORD_EXPORT_RECORDS),
-  z.literal(SCOPES.RECORD_DECLARATION_PRINT),
-  z.literal(SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS),
-  z.literal(SCOPES.RECORD_REGISTRATION_PRINT),
-  z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
-  z.literal(SCOPES.RECORD_PRINT_CERTIFIED_COPIES),
-  z.literal(SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES)
-])
-
 // Correct
 const CorrectionScopes = z.union([
   z.literal(SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION),
@@ -215,12 +180,6 @@ export const SearchScopes = z.union([
 
 // Audit
 const AuditScopes = z.literal(SCOPES.RECORD_READ)
-
-// Profile
-const ProfileScopes = z.union([
-  z.literal(SCOPES.PROFILE_UPDATE),
-  z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE)
-])
 
 // Performance
 const PerformanceScopes = z.union([
@@ -262,11 +221,11 @@ const LiteralScopes = z.union([
   DeclareScopes,
   ValidateScopes,
   RegisterScope,
-  CertifyScopes,
+  z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
   CorrectionScopes,
   SearchScopes,
   AuditScopes,
-  ProfileScopes,
+  z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
   PerformanceScopes,
   OrganisationScopes,
   UserScopes,
@@ -315,33 +274,56 @@ const SearchScope = z.object({
 
 export type SearchScope = z.infer<typeof SearchScope>
 
-// These scopes are used to check if the user has the necessary permissions to perform actions on a record.
-// Each of these is configured with allowed event types (ids), e.g. 'birth', 'death', 'tennis-club-membership'.
-const RecordScope = z.object({
-  type: z.enum([
-    'record.read',
-    'record.declare',
-    'record.notify',
-    'record.declared.validate',
-    'record.declared.reject',
-    'record.declared.archive',
-    'record.declared.review-duplicates',
-    'record.register',
-    'record.registered.print-certified-copies',
-    'record.registered.request-correction',
-    'record.registered.correct'
-  ]),
+export const RecordScopeType = z.enum([
+  'record.create',
+  'record.read',
+  'record.declare',
+  'record.notify',
+  'record.declared.validate',
+  'record.declared.reject',
+  'record.declared.archive',
+  'record.declared.review-duplicates',
+  'record.register',
+  'record.registered.print-certified-copies',
+  'record.registered.request-correction',
+  'record.registered.correct',
+  'record.unassign-others'
+])
+export type RecordScopeType = z.infer<typeof RecordScopeType>
+
+export const RecordScope = z
+  .object({
+    type: RecordScopeType,
+    options: z.object({
+      event: z.array(z.string()).describe('Event type, e.g. birth, death')
+    })
+  })
+  .describe(
+    "Scopes used to check user's permission to perform actions on a record."
+  )
+export type RecordScope = z.infer<typeof RecordScope>
+
+export const CustomActionScope = z.object({
+  type: z.literal('record.custom-action'),
   options: z.object({
-    event: z.array(z.string())
+    event: z
+      .array(z.string())
+      .describe('Allowed event type, e.g. birth, death'),
+    customActionType: z
+      .array(z.string())
+      .describe('Allowed custom action types')
   })
 })
+
+export type CustomActionScope = z.infer<typeof CustomActionScope>
 
 const ConfigurableRawScopes = z.discriminatedUnion('type', [
   SearchScope,
   CreateUserScope,
   EditUserScope,
   WorkqueueScope,
-  RecordScope
+  RecordScope,
+  CustomActionScope
 ])
 
 type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
@@ -509,6 +491,7 @@ export const scopes: Scope[] = Object.values(SCOPES)
 export type ParsedScopes = NonNullable<
   ReturnType<typeof parseConfigurableScope>
 >
+
 export type RawScopes = z.infer<typeof LiteralScopes> | (string & {})
 
 // for backwards compatibility
@@ -518,7 +501,7 @@ export const ActionScopes = z.union([
   DeclareScopes,
   ValidateScopes,
   RegisterScope,
-  CertifyScopes,
+  z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
   CorrectionScopes
 ])
 

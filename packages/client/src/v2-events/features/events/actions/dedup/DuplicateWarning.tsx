@@ -18,7 +18,7 @@ const messages = {
     defaultMessage: 'Potential duplicate of record {trackingId}',
     description:
       'The warning message shown when a declaration has potential duplicates',
-    id: 'v2.duplicates.warning'
+    id: 'duplicates.warning'
   }
 }
 

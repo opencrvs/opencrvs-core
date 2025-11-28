@@ -14,7 +14,9 @@ import { http, HttpResponse } from 'msw'
 import {
   ActionStatus,
   ActionType,
+  createPrng,
   EventDocument,
+  EventIndex,
   generateEventDocument,
   getUUID,
   SCOPES,
@@ -42,16 +44,28 @@ const postHandler = http.post(
 )
 
 let event: EventDocument
+let rngNumber = 949
 
 beforeEach(async () => {
   mswServer.use(postHandler)
   spy.mockReset()
   const { user, eventsDb } = await setupTestCase()
+  const rng = createPrng(rngNumber)
+  rngNumber++
 
   event = generateEventDocument({
-    user,
     configuration: tennisClubMembershipEvent,
-    actions: [ActionType.CREATE, ActionType.DECLARE]
+    rng,
+    actions: [
+      { type: ActionType.CREATE, user },
+      { type: ActionType.DECLARE, user }
+    ]
+  })
+
+  const draftDocument = generateEventDocument({
+    configuration: tennisClubMembershipEvent,
+    rng,
+    actions: [{ type: ActionType.CREATE, user }]
   })
 
   const eventInDb = await eventsDb
@@ -81,6 +95,50 @@ beforeEach(async () => {
       transactionId: getUUID()
     })
     .execute()
+
+  await eventsDb
+    .insertInto('eventActions')
+    .values({
+      id: getUUID(),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      eventId: eventInDb!.id,
+      actionType: ActionType.DECLARE,
+      createdBy: user.id,
+      createdAt: event.createdAt,
+      status: ActionStatus.Accepted,
+      createdByRole: user.role,
+      createdByUserType: 'user',
+      transactionId: getUUID()
+    })
+    .execute()
+
+  const drafteventInDb = await eventsDb
+    .insertInto('events')
+    .values({
+      eventType: draftDocument.type,
+      transactionId: getUUID(),
+      trackingId: draftDocument.trackingId,
+      createdAt: draftDocument.createdAt,
+      updatedAt: draftDocument.updatedAt
+    })
+    .returning('id')
+    .executeTakeFirst()
+
+  await eventsDb
+    .insertInto('eventActions')
+    .values({
+      id: getUUID(),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      eventId: drafteventInDb!.id,
+      actionType: ActionType.CREATE,
+      createdBy: user.id,
+      createdAt: event.createdAt,
+      status: ActionStatus.Accepted,
+      createdByRole: user.role,
+      createdByUserType: 'user',
+      transactionId: getUUID()
+    })
+    .execute()
 })
 
 test(`prevents forbidden access if missing required scope`, async () => {
@@ -92,13 +150,13 @@ test(`prevents forbidden access if missing required scope`, async () => {
 })
 
 test('allows access with reindex scope', async () => {
-  const client = createSystemTestClient('test-system', [SCOPES.REINDEX])
+  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
 
   await expect(client.event.reindex()).resolves.not.toThrow()
 })
 
 test('reindexing indexes all events into Elasticsearch', async () => {
-  const client = createSystemTestClient('test-system', [SCOPES.REINDEX])
+  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
 
   await expect(client.event.reindex()).resolves.not.toThrow()
 
@@ -120,11 +178,12 @@ test('reindexing indexes all events into Elasticsearch', async () => {
   })
 
   expect(spy.mock.calls[0]).toHaveLength(1)
+  // Does not reindex draftDocument - thus only one record is indexed
   expect(body.hits.hits).toHaveLength(1)
 })
 
 test('reindexing twice', async () => {
-  const client = createSystemTestClient('test-system', [SCOPES.REINDEX])
+  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
 
   await expect(client.event.reindex()).resolves.not.toThrow()
   await expect(client.event.reindex()).resolves.not.toThrow()
@@ -146,5 +205,10 @@ test('reindexing twice', async () => {
   })
 
   expect(postHandler.isUsed).toBe(true)
+
+  // Does not reindex draftDocument - thus only one record is indexed
   expect(body.hits.hits).toHaveLength(1)
+  expect((body.hits.hits[0]._source as EventIndex).trackingId).toEqual(
+    event.trackingId
+  )
 })

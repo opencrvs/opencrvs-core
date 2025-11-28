@@ -18,7 +18,7 @@ import {
   mockOfflineDataDispatch,
   fetchUserMock
 } from '@client/tests/util'
-import { waitForElement } from '@client/tests/wait-for-element'
+import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
 import { ReactWrapper } from 'enzyme'
 import { stringify } from 'query-string'
@@ -264,7 +264,10 @@ describe('for user with update my jurisdiction scope', () => {
       })
     )
     component.update()
-    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
+
+    await waitFor(() => {
+      return component.find('#user-item-0-menu').length >= 1
+    })
   })
 
   it('should not show edit user button if the other user has update all scope even if under jurisdiction', async () => {
@@ -361,8 +364,11 @@ describe('for user with update scope', () => {
         networkStatus: NetworkStatus.ready
       })
     )
-    component.update()
-    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
+    await flushPromises()
+    await waitFor(() => {
+      component.update()
+      return component.find('#user-item-0-menu').length >= 1
+    })
   })
 
   it('should show edit user button even if the other user has update all scope', async () => {
@@ -391,7 +397,10 @@ describe('for user with update scope', () => {
       })
     )
     component.update()
-    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
+    await flushPromises()
+    await waitFor(() => {
+      return component.find('#user-item-0-menu').length >= 1
+    })
   })
 
   it('should show edit user button even if office is not under jurisdiction', async () => {
@@ -420,7 +429,9 @@ describe('for user with update scope', () => {
       })
     )
     component.update()
-    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
+    await waitFor(() => {
+      return component.find('#user-item-0-menu').length >= 1
+    })
   })
 })
 
@@ -461,7 +472,9 @@ describe('for user with defined scope that can edit only reg agent users', () =>
   })
 
   it('should show edit user buttons for reg agent user', () => {
-    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
+    return waitFor(() => {
+      return component.find('#user-item-0-menu').length >= 1
+    })
   })
 
   it('should not show edit user buttons for national system admin', () => {

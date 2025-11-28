@@ -12,7 +12,6 @@ misconfigurations:
     paths:
       - 'packages/client/Dockerfile'
       - 'packages/components/Dockerfile'
-      - 'packages/dashboards/Dockerfile'
       - 'packages/login/Dockerfile'
       - 'packages/scheduler/Dockerfile'
       - '/usr/local/share/.cache'
@@ -24,22 +23,6 @@ vulnerabilities:
   - id: CVE-2020-8231
     statement: curl vuln scheduler - low prio
   - id: CVE-2022-42003
-    statement: Dashboards vulns (java libs)
-  - id: CVE-2022-42004
-    statement: Dashboards vulns (java libs)
-  - id: CVE-2022-3509
-    statement: Dashboards vulns (java libs)
-  - id: CVE-2022-3510
-    statement: Dashboards vulns (java libs)
-  - id: CVE-2022-35010
-    statement: Dashboards vulns (java libs)
-  - id: CVE-2023-24998
-    statement: Dashboards vulns (java libs)
-  - id: CVE-2023-32697
-    statement: Dashboards vulns (java libs)
-  - id: CVE-2022-1471
-    statement: Dashboards vulns (java libs)
-  - id: CVE-2024-4068
     statement: Transitive dependency of jest and msw. Not running in production. Likely fixed by upgrading.
   - id: CVE-2024-37890
     statement: ws vulnerability, transitive dependency of jest, storybook, graphql-codegen, not running in production.

@@ -54,7 +54,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.register, {
   ),
   retry: true,
   retryDelay: 10000,
-  onSuccess: updateLocalEvent,
+  onSuccess: deleteLocalEvent,
   meta: {
     actionType: ActionType.REGISTER
   }

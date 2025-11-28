@@ -132,7 +132,13 @@ export function ListUser({ rows, labelHeader, valueHeader }: IListUserProps) {
               {row.status && <td>{row.status}</td>}
               {row.actions ? (
                 <td>
-                  <ActionsContainer>{row.actions}</ActionsContainer>
+                  <ActionsContainer>
+                    {row.actions?.map((action, actionIndex) => (
+                      <React.Fragment key={actionIndex}>
+                        {action}
+                      </React.Fragment>
+                    ))}
+                  </ActionsContainer>
                 </td>
               ) : (
                 row.actions && <td></td>

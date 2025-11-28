@@ -13,7 +13,10 @@ import React from 'react'
 import { Meta, StoryFn } from '@storybook/react'
 import { TRPCClientError } from '@trpc/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { TRPCErrorBoundary } from '@client/v2-events/routes/TRPCErrorBoundary'
+import {
+  throwStructuredError,
+  TRPCErrorBoundary
+} from '@client/v2-events/routes/TRPCErrorBoundary'
 
 const meta: Meta<typeof TRPCErrorBoundary> = {
   title: 'Components/TRPCErrorBoundary',
@@ -66,6 +69,19 @@ export const UnauthorizedError: StoryFn<typeof TRPCErrorBoundary> = () => (
         })
         throw error
       })()
+    })()}
+  </TRPCErrorBoundary>
+)
+
+// Story for structured error message
+export const WithStructuredError: StoryFn<typeof TRPCErrorBoundary> = () => (
+  <TRPCErrorBoundary>
+    {(() => {
+      return throwStructuredError({
+        message:
+          'This is a structured error message. The redirect button label and redirect path are provided.',
+        redirection: { label: 'Home', path: '/' }
+      })
     })()}
   </TRPCErrorBoundary>
 )

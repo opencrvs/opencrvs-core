@@ -9,10 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Location } from '@events/service/locations/locations'
 import { IntlShape } from 'react-intl'
-import { FieldConfigInput, User } from '@opencrvs/commons/client'
-import { IAdminStructureItem } from '@client/utils/referenceApi'
+import {
+  FieldConfigInput,
+  Location,
+  User,
+  UUID
+} from '@opencrvs/commons/client'
+import { AdminStructureItem } from '@client/utils/referenceApi'
 
 export interface RegisteredFieldModule<T extends FieldConfigInput> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,8 +35,8 @@ export interface RegisteredFieldModule<T extends FieldConfigInput> {
 
 export interface StringifierContext<F extends FieldConfigInput> {
   intl: IntlShape
-  locations: Location[]
+  locations: Map<UUID, Location>
   users?: User[]
   config?: F
-  adminLevels?: IAdminStructureItem[]
+  adminLevels?: AdminStructureItem[]
 }

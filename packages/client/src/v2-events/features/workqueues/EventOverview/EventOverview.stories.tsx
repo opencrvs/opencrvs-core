@@ -14,17 +14,25 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React from 'react'
 import superjson from 'superjson'
+import { userEvent, within } from '@storybook/test'
+import addDays from 'date-fns/addDays'
 import {
   ActionType,
   generateEventDraftDocument,
   ActionStatus,
   getUUID,
   createPrng,
-  getRandomDatetime,
+  generateRandomDatetime,
   tennisClubMembershipEvent,
   getCurrentEventState,
   UUID,
-  SystemRole
+  SystemRole,
+  TestUserRole,
+  generateActionDocument,
+  ActionDocument,
+  generateUuid,
+  generateTrackingId,
+  generateRandomSignature
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -36,6 +44,9 @@ import { EventOverviewIndex } from './EventOverview'
 const meta: Meta<typeof EventOverviewIndex> = {
   title: 'EventOverview',
   component: EventOverviewIndex,
+  parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR
+  },
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -57,6 +68,8 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const refData = testDataGenerator()
+
 const defaultEvent = {
   ...tennisClubMembershipEventDocument,
   actions: tennisClubMembershipEventDocument.actions.filter(
@@ -71,7 +84,7 @@ export const Overview: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: defaultEvent.id
       })
     },
@@ -112,7 +125,7 @@ export const WithAcceptedRegisterEvent: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -151,7 +164,7 @@ export const WithRejectedAction: Story = {
           transactionId: getUUID(),
           createdAt: new Date().toISOString(),
           createdByUserType: 'user',
-          createdBy: testDataGenerator().user.id.localRegistrar,
+          createdBy: refData.user.id.localRegistrar,
           createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
           createdByRole: 'LOCAL_REGISTRAR',
           declaration: {},
@@ -164,7 +177,7 @@ export const WithRejectedAction: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -192,7 +205,7 @@ export const WithSystemUserActions: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-01-01'),
             new Date('2024-02-01')
@@ -209,7 +222,7 @@ export const WithSystemUserActions: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-02-01'),
             new Date('2024-03-01')
@@ -226,7 +239,7 @@ export const WithSystemUserActions: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -242,7 +255,7 @@ export const WithSystemUserActions: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-04-01'),
             new Date('2024-05-01')
@@ -259,12 +272,12 @@ export const WithSystemUserActions: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-05-01'),
             new Date('2024-06-01')
           ),
-          createdBy: testDataGenerator().user.id.localRegistrar,
+          createdBy: refData.user.id.localRegistrar,
           createdByUserType: 'user' as const,
           createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
           createdByRole: 'LOCAL_REGISTRAR',
@@ -275,12 +288,12 @@ export const WithSystemUserActions: Story = {
           status: ActionStatus.Accepted,
           declaration: {},
           type: ActionType.ASSIGN,
-          createdBy: testDataGenerator().user.id.localRegistrar,
+          createdBy: refData.user.id.localRegistrar,
           createdByRole: 'LOCAL_REGISTRAR',
           createdByUserType: 'user' as const,
           createdAt: '2025-01-23T05:35:27.689Z',
           createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-          assignedTo: testDataGenerator().user.id.localRegistrar,
+          assignedTo: refData.user.id.localRegistrar,
           transactionId: 'aasdk342-asdkj3423-kn234k26'
         }
       ]
@@ -290,7 +303,7 @@ export const WithSystemUserActions: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -329,12 +342,12 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-01-01'),
             new Date('2024-02-01')
           ),
-          createdBy: testDataGenerator().user.id.localRegistrar, // not necessary for this test
+          createdBy: refData.user.id.localRegistrar, // not necessary for this test
           createdAtLocation: 'loc-001' as UUID,
           createdByUserType: 'user' as const,
           createdByRole: 'LOCAL_REGISTRAR', // testing role
@@ -345,15 +358,15 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-02-01'),
             new Date('2024-03-01')
           ),
-          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdBy: refData.user.id.fieldAgent,
           createdAtLocation: 'loc-002' as UUID,
           createdByUserType: 'user' as const,
-          createdByRole: 'SOCIAL_WORKER',
+          createdByRole: 'HOSPITAL_CLERK',
           assignedTo: '010101',
           declaration: {}
         },
@@ -362,7 +375,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -378,7 +391,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-05-01'),
             new Date('2024-06-01')
@@ -386,7 +399,7 @@ export const WithVariousUserRoles: Story = {
           createdBy: 'system-123',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.IMPORT,
+          createdByRole: SystemRole.enum.IMPORT_EXPORT,
           declaration: {}
         },
         {
@@ -394,7 +407,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -410,87 +423,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
-            rng,
-            new Date('2024-03-01'),
-            new Date('2024-04-01')
-          ),
-          createdBy: testDataGenerator().user.id.fieldAgent,
-          createdAtLocation: 'loc-003' as UUID,
-          createdByUserType: 'user' as const,
-          createdByRole: 'LOCAL_LEADER',
-          declaration: {}
-        },
-        {
-          type: ActionType.READ,
-          status: ActionStatus.Accepted,
-          id: getUUID(),
-          transactionId: getUUID(),
-          createdAt: getRandomDatetime(
-            rng,
-            new Date('2024-03-01'),
-            new Date('2024-04-01')
-          ),
-          createdBy: testDataGenerator().user.id.fieldAgent,
-          createdAtLocation: 'loc-003' as UUID,
-          createdByUserType: 'user' as const,
-          createdByRole: 'HOSPITAL_CLERK',
-          declaration: {}
-        },
-        {
-          type: ActionType.READ,
-          status: ActionStatus.Accepted,
-          id: getUUID(),
-          transactionId: getUUID(),
-          createdAt: getRandomDatetime(
-            rng,
-            new Date('2024-03-01'),
-            new Date('2024-04-01')
-          ),
-          createdBy: testDataGenerator().user.id.fieldAgent,
-          createdAtLocation: 'loc-003' as UUID,
-          createdByUserType: 'user' as const,
-          createdByRole: 'LOCAL_SYSTEM_ADMIN',
-          declaration: {}
-        },
-        {
-          type: ActionType.READ,
-          status: ActionStatus.Accepted,
-          id: getUUID(),
-          transactionId: getUUID(),
-          createdAt: getRandomDatetime(
-            rng,
-            new Date('2024-03-01'),
-            new Date('2024-04-01')
-          ),
-          createdBy: testDataGenerator().user.id.fieldAgent,
-          createdAtLocation: 'loc-003' as UUID,
-          createdByUserType: 'user' as const,
-          createdByRole: 'NATIONAL_REGISTRAR',
-          declaration: {}
-        },
-        {
-          type: ActionType.READ,
-          status: ActionStatus.Accepted,
-          id: getUUID(),
-          transactionId: getUUID(),
-          createdAt: getRandomDatetime(
-            rng,
-            new Date('2024-03-01'),
-            new Date('2024-04-01')
-          ),
-          createdBy: testDataGenerator().user.id.fieldAgent,
-          createdAtLocation: 'loc-003' as UUID,
-          createdByUserType: 'user' as const,
-          createdByRole: 'NATIONAL_SYSTEM_ADMIN',
-          declaration: {}
-        },
-        {
-          type: ActionType.READ,
-          status: ActionStatus.Accepted,
-          id: getUUID(),
-          transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -506,7 +439,87 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'HOSPITAL_CLERK',
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: generateRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'LOCAL_SYSTEM_ADMIN',
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: generateRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'NATIONAL_REGISTRAR',
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: generateRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'NATIONAL_SYSTEM_ADMIN',
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: generateRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'COMMUNITY_LEADER',
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -522,7 +535,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -538,7 +551,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -554,7 +567,7 @@ export const WithVariousUserRoles: Story = {
           status: ActionStatus.Accepted,
           id: getUUID(),
           transactionId: getUUID(),
-          createdAt: getRandomDatetime(
+          createdAt: generateRandomDatetime(
             rng,
             new Date('2024-03-01'),
             new Date('2024-04-01')
@@ -585,7 +598,7 @@ export const WithVariousUserRoles: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -605,6 +618,315 @@ export const WithVariousUserRoles: Story = {
                 }
               })
             ]
+          })
+        ]
+      }
+    }
+  }
+}
+
+const actionDefaults = {
+  createdAt: generateRandomDatetime(
+    createPrng(73),
+    new Date('2024-03-01'),
+    new Date('2024-04-01')
+  ),
+  createdBy: refData.user.id.localRegistrar,
+  createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
+  createdAtLocation: refData.user.localRegistrar().v2.primaryOfficeId,
+  transactionId: getUUID()
+} satisfies Partial<ActionDocument>
+
+const duplicateEvent = {
+  ...tennisClubMembershipEventDocument,
+  actions: [
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE,
+      defaults: actionDefaults
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.ASSIGN,
+      defaults: {
+        ...actionDefaults,
+        assignedTo: refData.user.id.localRegistrar
+      }
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: actionDefaults
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DUPLICATE_DETECTED,
+      defaults: actionDefaults
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.ASSIGN,
+      defaults: {
+        ...actionDefaults,
+        assignedTo: refData.user.id.localRegistrar
+      }
+    })
+  ]
+}
+export const WithDuplicateDetectedAction: Story = {
+  parameters: {
+    offline: {
+      events: [duplicateEvent]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        eventId: duplicateEvent.id
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(duplicateEvent, tennisClubMembershipEvent)
+              ],
+              total: 1
+            }
+          })
+        ]
+      }
+    }
+  }
+}
+
+export const WithDuplicateDetectedActionModal: Story = {
+  parameters: {
+    offline: {
+      events: [duplicateEvent]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({
+        eventId: duplicateEvent.id
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(duplicateEvent, tennisClubMembershipEvent)
+              ],
+              total: 1
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(
+      await canvas.findByRole('button', {
+        name: 'Flagged as potential duplicate'
+      })
+    )
+  }
+}
+
+const rng = createPrng(33123)
+const validateActionUuid = generateUuid(rng)
+
+const annotationUpdateOnValidateEvent = {
+  id: getUUID(),
+  type: 'tennis-club-membership',
+  actions: [
+    generateActionDocument({
+      action: ActionType.CREATE,
+      configuration: tennisClubMembershipEvent,
+      defaults: {
+        ...actionDefaults,
+        createdAt: actionDefaults.createdAt
+      }
+    }),
+    generateActionDocument({
+      action: ActionType.DECLARE,
+      configuration: tennisClubMembershipEvent,
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 1).toISOString(),
+        annotation: {
+          'review.signature': generateRandomSignature(rng)
+        }
+      }
+    }),
+    generateActionDocument({
+      action: ActionType.VALIDATE,
+      configuration: tennisClubMembershipEvent,
+      declarationOverrides: {},
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString(),
+        id: validateActionUuid,
+        status: ActionStatus.Requested,
+        annotation: {
+          'review.signature': generateRandomSignature(rng)
+        }
+      }
+    }),
+    generateActionDocument({
+      action: ActionType.VALIDATE,
+      configuration: tennisClubMembershipEvent,
+      declarationOverrides: {},
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString(),
+        status: ActionStatus.Accepted,
+        originalActionId: validateActionUuid
+      }
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.ASSIGN,
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 3).toISOString(),
+        assignedTo: refData.user.id.localRegistrar
+      }
+    })
+  ],
+  trackingId: generateTrackingId(rng),
+  updatedAt: actionDefaults.createdAt,
+  createdAt: actionDefaults.createdAt
+}
+
+export const WithAnnotationChangeOnValidate: Story = {
+  parameters: {
+    offline: {
+      events: [annotationUpdateOnValidateEvent]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        eventId: annotationUpdateOnValidateEvent.id
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(
+                  annotationUpdateOnValidateEvent,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
+          })
+        ]
+      }
+    }
+  }
+}
+
+const registerActionUuid = generateUuid(rng)
+const annotationChangeDuringRegisterEvent = {
+  id: getUUID(),
+  type: 'tennis-club-membership',
+  actions: [
+    generateActionDocument({
+      action: ActionType.CREATE,
+      configuration: tennisClubMembershipEvent,
+      defaults: actionDefaults
+    }),
+    generateActionDocument({
+      action: ActionType.DECLARE,
+      configuration: tennisClubMembershipEvent,
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 1).toISOString(),
+        annotation: {
+          'review.signature': generateRandomSignature(rng)
+        }
+      }
+    }),
+    generateActionDocument({
+      action: ActionType.VALIDATE,
+      configuration: tennisClubMembershipEvent,
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString()
+      },
+      declarationOverrides: {}
+    }),
+    generateActionDocument({
+      action: ActionType.REGISTER,
+      configuration: tennisClubMembershipEvent,
+      declarationOverrides: {},
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 3).toISOString(),
+        id: registerActionUuid,
+        status: ActionStatus.Requested,
+        annotation: {
+          'review.signature': generateRandomSignature(rng)
+        }
+      }
+    }),
+    generateActionDocument({
+      action: ActionType.REGISTER,
+      configuration: tennisClubMembershipEvent,
+      declarationOverrides: {},
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 3).toISOString(),
+        originalActionId: registerActionUuid
+      }
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.ASSIGN,
+      defaults: {
+        ...actionDefaults,
+        createdAt: addDays(new Date(actionDefaults.createdAt), 3).toISOString(),
+        assignedTo: refData.user.id.localRegistrar
+      }
+    })
+  ],
+  trackingId: generateTrackingId(rng),
+  updatedAt: actionDefaults.createdAt,
+  createdAt: actionDefaults.createdAt
+}
+
+export const WithAnnotationChangeOnRegister: Story = {
+  parameters: {
+    offline: {
+      events: [annotationChangeDuringRegisterEvent]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        eventId: annotationChangeDuringRegisterEvent.id
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(
+                  annotationChangeDuringRegisterEvent,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
           })
         ]
       }

@@ -13,6 +13,7 @@ import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { VitePWA } from 'vite-plugin-pwa'
 import dns from 'node:dns'
+import { IncomingMessage, ServerResponse } from 'node:http'
 
 // fixes issue where Cypress was not able to resolve Vite's localhost
 // https://github.com/cypress-io/cypress/issues/25397#issuecomment-1775454875
@@ -140,6 +141,66 @@ export default defineConfig(({ mode }) => {
           target: 'http://localhost:7070',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
+        },
+        '/health/ready': {
+          target: 'http://localhost:3040',
+          changeOrigin: true,
+          rewrite: (path: string) => path.replace(/^\/health\/ready/, '/ping'),
+          configure: (proxy, _options) => {
+            proxy.on('proxyRes', (proxyRes, req, res) => {
+              if (req.url === '/health/ready') {
+                // Transform the response to health check format
+                if (proxyRes.statusCode === 200) {
+                  res.writeHead(200, { 'Content-Type': 'application/json' })
+                  res.end(
+                    JSON.stringify({
+                      status: 'ok',
+                      checks: {
+                        countryconfig: { status: 'ok' }
+                      }
+                    })
+                  )
+                } else {
+                  res.writeHead(500, { 'Content-Type': 'application/json' })
+                  res.end(
+                    JSON.stringify({
+                      status: 'error',
+                      checks: {
+                        countryconfig: {
+                          status: 'error',
+                          error: 'Country config service unavailable'
+                        }
+                      }
+                    })
+                  )
+                }
+              }
+            })
+
+            proxy.on(
+              'error',
+              (
+                _err: Error,
+                req: IncomingMessage,
+                res: ServerResponse<IncomingMessage>
+              ) => {
+                if (req.url === '/health/ready') {
+                  res.writeHead(500, { 'Content-Type': 'application/json' })
+                  res.end(
+                    JSON.stringify({
+                      status: 'error',
+                      checks: {
+                        countryconfig: {
+                          status: 'error',
+                          error: 'Country config service unavailable'
+                        }
+                      }
+                    })
+                  )
+                }
+              }
+            )
+          }
         }
       }
     },

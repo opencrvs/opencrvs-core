@@ -65,5 +65,6 @@ echo "Running migrations"
 echo
 
 pnpm --dir "$DIR/packages/migration" start
-
+echo
+pnpm reindex
 echo

@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-
 import {
+  ActionType,
   QueryType,
   SearchQuery,
   UUID,
@@ -25,7 +25,6 @@ import {
 import { useTRPC } from '@client/v2-events/trpc'
 import { useDrafts } from '../../drafts/useDrafts'
 import { useEventConfigurations } from '../useEventConfiguration'
-import { prefetchPotentialDuplicates } from '../actions/dedup/getDuplicates'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
@@ -35,8 +34,7 @@ import {
   useEventCustomAction,
   useIsMutating
 } from './procedures/actions/action'
-import { useGetEvents } from './procedures/list'
-import { useGetEventCounts } from './procedures/count'
+import { useGetEventCountsByWorkqueue } from './procedures/count'
 import { findLocalEventDocument, findLocalEventIndex } from './api'
 import { QueryOptions } from './procedures/utils'
 
@@ -74,7 +72,6 @@ function buildDraftedEventResult(
 export function useEvents() {
   const trpc = useTRPC()
   const getEvent = useGetEvent()
-  const getEvents = useGetEvents()
   const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
   const eventConfigs = useEventConfigurations()
   const { getRemoteDraftByEventId } = useDrafts()
@@ -83,8 +80,7 @@ export function useEvents() {
     createEvent: useCreateEvent,
     /** Returns an event with full history. If you only need the state of the event, use getEventState. */
     getEvent,
-    getEvents,
-    useGetEventCounts,
+    useGetEventCountsByWorkqueue,
     deleteEvent: {
       useMutation: useDeleteEvent
     },
@@ -198,6 +194,7 @@ export function useEvents() {
       }
     },
     actions: {
+      custom: useEventAction(trpc.event.actions.custom.request),
       validate: useEventAction(trpc.event.actions.validate.request),
       reject: useEventAction(trpc.event.actions.reject.request),
       archive: useEventAction(trpc.event.actions.archive.request),
@@ -227,12 +224,12 @@ export function useEvents() {
             /**This makes sure all the files and users referenced in the event document is prefetched to be used even in offline */
             await refetchEvent()
 
-            await assignMutation.mutateAsync({
+            return assignMutation.mutate({
+              type: ActionType.ASSIGN,
               eventId,
               transactionId: getUUID(),
               assignedTo
             })
-            await prefetchPotentialDuplicates(eventId)
           }
         },
         unassign: useEventAction(trpc.event.actions.assignment.unassign)

@@ -59,6 +59,7 @@ export function EmailAddress() {
         value={<ValueContainer>{email}</ValueContainer>}
         actions={
           <DynamicHeightLinkButton
+            data-testid="change-email-address"
             onClick={toggleChangeEmailModal}
             disabled={!isOnline}
           >

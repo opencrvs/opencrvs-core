@@ -43,8 +43,6 @@ import {
   isNumberFieldType,
   isEmailFieldType,
   isDataFieldType,
-  EventConfig,
-  getDeclarationFields,
   isNameFieldType,
   isPhoneFieldType,
   isIdFieldType,
@@ -54,13 +52,24 @@ import {
   SelectDateRangeValue,
   isTimeFieldType,
   isButtonFieldType,
-  isHttpFieldType
+  isPrintButtonFieldType,
+  isHttpFieldType,
+  isSearchFieldType,
+  isLinkButtonFieldType,
+  isVerificationStatusType,
+  isQueryParamReaderFieldType,
+  ValidatorContext,
+  isIdReaderFieldType,
+  isQrReaderFieldType,
+  isLoaderFieldType,
+  isAgeFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
 import {
   BulletList,
   Checkbox,
+  AgeField,
   DateField,
   RadioGroup,
   LocationSearch,
@@ -75,23 +84,43 @@ import {
   SelectDateRangeField,
   TimeField,
   Button,
-  Http
+  AlphaPrintButton,
+  Http,
+  LinkButton,
+  VerificationStatus
 } from '@client/v2-events/features/events/registered-fields'
-
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
-import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
+import { Search } from '@client/v2-events/features/events/registered-fields/Search'
+import { IdReader } from '@client/v2-events/features/events/registered-fields/IdReader'
+import { QrReader } from '@client/v2-events/features/events/registered-fields/QrReader'
+import { QueryParamReader } from '@client/v2-events/features/events/registered-fields/QueryParamReader'
+import { Loader } from '@client/v2-events/features/events/registered-fields/Loader'
+import {
+  makeFormFieldIdFormikCompatible,
+  makeFormikFieldIdOpenCRVSCompatible
+} from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
-import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
+import {
+  makeFormikFieldIdsOpenCRVSCompatible,
+  parseFieldReferencesInConfiguration
+} from './utils'
 
 interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
   /** non-native onChange. Updates Formik state by updating the value and its dependencies */
   onFieldValueChange: (name: string, value: FieldValue | undefined) => void
+  /** Optional callback that is called whenever any field value changes.
+   * This is useful for cases where the parent component needs to know about
+   * changes in the form state.
+   */
+  onBatchFieldValueChange: (
+    values: Array<{ name: string; value: FieldValue | undefined }>
+  ) => void
   /**
    * onBlur is used to set the touched state of the field
    */
@@ -104,21 +133,24 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   error: string
   form: EventState
   disabled?: boolean
-  eventConfig?: EventConfig
   readonlyMode?: boolean
+  allKnownFields: FieldConfig[]
+  validatorContext: ValidatorContext
 }
 
 export const GeneratedInputField = React.memo(
   <T extends FieldConfig>({
     fieldDefinition,
+    validatorContext,
     onBlur,
     onFieldValueChange,
+    onBatchFieldValueChange,
     error,
     touched,
+    allKnownFields,
     value,
     form,
     disabled,
-    eventConfig,
     readonlyMode
   }: GeneratedInputFieldProps<T>) => {
     const intl = useIntl()
@@ -132,7 +164,10 @@ export const GeneratedInputField = React.memo(
       id: fieldDefinition.id,
       // If label is hidden or default message is empty, we don't need to render label
       label,
-      required: fieldDefinition.required,
+      required:
+        typeof fieldDefinition.required === 'boolean'
+          ? fieldDefinition.required
+          : !!fieldDefinition.required,
       disabled: readonlyMode,
       helperText: fieldDefinition.helperText
         ? intl.formatMessage(fieldDefinition.helperText)
@@ -187,8 +222,10 @@ export const GeneratedInputField = React.memo(
         <InputField {...omit(field.inputFieldProps, 'error')}>
           <Name.Input
             configuration={field.config.configuration}
+            disabled={disabled}
             id={fieldDefinition.id}
             validation={validation}
+            validatorContext={validatorContext}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
@@ -201,7 +238,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...field.inputFieldProps}>
           <Text.Input
             {...inputProps}
-            isDisabled={disabled}
+            isDisabled={inputProps.disabled}
             type="text"
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -215,7 +252,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...field.inputFieldProps}>
           <Text.Input
             {...inputProps}
-            isDisabled={disabled}
+            isDisabled={inputProps.disabled}
             type="text"
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -238,11 +275,35 @@ export const GeneratedInputField = React.memo(
       )
     }
 
+    if (isAgeFieldType(field)) {
+      return (
+        <InputField
+          {...inputFieldProps}
+          postfix={
+            field.config.configuration.postfix &&
+            intl.formatMessage(field.config.configuration.postfix)
+          }
+          prefix={
+            field.config.configuration.prefix &&
+            intl.formatMessage(field.config.configuration.prefix)
+          }
+        >
+          <AgeField.Input
+            {...inputProps}
+            asOfDateRef={field.config.configuration.asOfDate.$$field}
+            value={field.value?.age}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
     if (isTimeFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
           <TimeField.Input
             {...inputProps}
+            use12HourFormat={field.config.configuration?.use12HourFormat}
             value={field.value}
             onChange={(val: string) =>
               onFieldValueChange(fieldDefinition.id, val)
@@ -428,6 +489,8 @@ export const GeneratedInputField = React.memo(
           <Address.Input
             {...field.config}
             configuration={field.config.configuration}
+            disabled={disabled}
+            validatorContext={validatorContext}
             value={field.value}
             //@TODO: We need to come up with a general solution for complex types.
             // @ts-ignore
@@ -441,6 +504,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <Select.Input
             {...field.config}
+            disabled={disabled}
             value={field.value}
             onChange={(val: string) =>
               onFieldValueChange(fieldDefinition.id, val)
@@ -454,6 +518,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <SelectCountry.Input
             {...field.config}
+            disabled={disabled}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
@@ -464,6 +529,7 @@ export const GeneratedInputField = React.memo(
       return (
         <Checkbox.Input
           {...field.config}
+          disabled={disabled}
           value={field.value}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
@@ -474,6 +540,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <RadioGroup.Input
             {...field.config}
+            disabled={disabled}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
@@ -484,11 +551,13 @@ export const GeneratedInputField = React.memo(
     if (isSignatureFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <SignatureField
+          <SignatureField.Input
             {...field.config}
+            disabled={disabled}
             maxFileSize={field.config.configuration.maxFileSize}
             modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
             name={fieldDefinition.id}
+            required={inputFieldProps.required}
             value={field.value}
             onChange={(val) => handleFileChange(val)}
           />
@@ -503,9 +572,10 @@ export const GeneratedInputField = React.memo(
         partOfRef && makeFormikFieldIdsOpenCRVSCompatible(form)[partOfRef]
 
       return (
-        <InputField {...inputFieldProps}>
+        <InputField {...inputFieldProps} htmlFor={fieldDefinition.id}>
           <AdministrativeArea.Input
             {...field.config}
+            disabled={disabled}
             partOf={typeof partOf === 'string' ? partOf : null}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -519,8 +589,8 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <LocationSearch.Input
             {...field.config}
+            disabled={disabled}
             searchableResource={
-              field.config.configuration?.searchableResource &&
               field.config.configuration.searchableResource.length > 0
                 ? field.config.configuration.searchableResource
                 : ['locations']
@@ -538,6 +608,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <LocationSearch.Input
             {...field.config}
+            disabled={disabled}
             searchableResource={['offices']}
             value={field.value}
             onBlur={onBlur}
@@ -552,6 +623,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <LocationSearch.Input
             {...field.config}
+            disabled={disabled}
             searchableResource={['facilities']}
             value={field.value}
             onBlur={onBlur}
@@ -581,17 +653,25 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isDataFieldType(field)) {
-      // If no event config or declare form fields found, don't render the data field.
-      // This should never actually happen, but we don't want to throw an error either.
-      if (!eventConfig) {
-        return null
-      }
-
       return (
         <Data.Input
           {...field.config}
-          declarationFields={getDeclarationFields(eventConfig)}
+          allKnownFields={allKnownFields}
           formData={form}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isPrintButtonFieldType(field)) {
+      return (
+        <AlphaPrintButton.Input
+          buttonLabel={field.config.configuration.buttonLabel}
+          disabled={disabled}
+          id={fieldDefinition.id}
+          template={field.config.configuration.template}
+          value={field.value}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )
     }
@@ -618,9 +698,104 @@ export const GeneratedInputField = React.memo(
       return (
         <Http.Input
           key={fieldDefinition.id}
-          configuration={field.config.configuration}
+          configuration={parseFieldReferencesInConfiguration(
+            field.config.configuration,
+            form
+          )}
+          form={form}
           parentValue={form[field.config.configuration.trigger.$$field]}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+    if (isSearchFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <Search.Input
+            key={fieldDefinition.id}
+            configuration={field.config.configuration}
+            form={form}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isLinkButtonFieldType(field)) {
+      return (
+        <LinkButton.Input
+          configuration={field.config.configuration}
+          disabled={inputProps.disabled}
+          id={field.config.id}
+        />
+      )
+    }
+
+    if (isVerificationStatusType(field)) {
+      return (
+        <VerificationStatus.Input
+          configuration={field.config.configuration}
+          id={field.config.id}
+          value={field.value}
+          onReset={() => {
+            if (Array.isArray(fieldDefinition.parent)) {
+              onBatchFieldValueChange([
+                ...fieldDefinition.parent.map((parentField) => ({
+                  name: makeFormFieldIdFormikCompatible(parentField.$$field),
+                  value: undefined
+                })),
+                { name: fieldDefinition.id, value: null }
+              ])
+            } else if (fieldDefinition.parent) {
+              onBatchFieldValueChange([
+                {
+                  name: makeFormFieldIdFormikCompatible(
+                    fieldDefinition.parent.$$field
+                  ),
+                  value: undefined
+                },
+                { name: fieldDefinition.id, value: null }
+              ])
+            }
+          }}
+        />
+      )
+    }
+
+    if (isQueryParamReaderFieldType(field)) {
+      return (
+        <QueryParamReader.Input
+          configuration={field.config.configuration}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isIdReaderFieldType(field)) {
+      return (
+        <IdReader.Input
+          id={field.config.id}
+          methods={field.config.methods}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isQrReaderFieldType(field)) {
+      return (
+        <QrReader.Input
+          configuration={field.config.configuration}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isLoaderFieldType(field)) {
+      return (
+        <Loader.Input
+          configuration={field.config.configuration}
+          id={field.config.id}
         />
       )
     }

@@ -15,15 +15,11 @@ import * as fetchMock from 'jest-fetch-mock'
 import * as mockingoose from 'mockingoose'
 import vsExport from '@metrics/models/vsExports'
 
-const token = jwt.sign(
-  { scope: ['natlsysadmin'] },
-  readFileSync('./test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:metrics-user'
-  }
-)
+const token = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+  algorithm: 'RS256',
+  issuer: 'opencrvs:auth-service',
+  audience: 'opencrvs:metrics-user'
+})
 const fetch = fetchMock as fetchMock.FetchMock
 const vsExportMockResponse = [
   {

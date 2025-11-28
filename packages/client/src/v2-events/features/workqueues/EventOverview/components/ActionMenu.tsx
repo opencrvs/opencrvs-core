@@ -12,6 +12,7 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 
+import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -20,6 +21,10 @@ import { getOrThrow } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
 import { useAuthentication } from '@client/utils/userUtils'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { getUsersFullName } from '@client/v2-events/utils'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { ROUTES } from '@client/v2-events/routes'
 import { useAllowedActionConfigurations } from './useAllowedActionConfigurations'
 
 export function ActionMenu({
@@ -30,6 +35,10 @@ export function ActionMenu({
   onAction?: () => void
 }) {
   const intl = useIntl()
+  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
+  const { getUser } = useUsers()
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
   const { searchEventById } = useEvents()
 
   const maybeAuth = useAuthentication()
@@ -45,14 +54,25 @@ export function ActionMenu({
   if (eventResults.total === 0) {
     throw new Error(`Event ${eventId} not found`)
   }
-  const eventIndex = eventResults.results[0]
+  const eventState = eventResults.results[0]
 
-  const eventState = eventIndex
+  const assignedToUser = getUser.useQuery(eventState.assignedTo || '', {
+    enabled: !!eventState.assignedTo
+  }).data
+  const assignedUserFullName = assignedToUser
+    ? getUsersFullName(assignedToUser.name, intl.locale)
+    : ''
+  const assignedOffice = assignedToUser?.primaryOfficeId
+  const assignedOfficeName =
+    (assignedOffice && locations.get(assignedOffice)?.name) || ''
 
-  const [modal, actionMenuItems] = useAllowedActionConfigurations(
+  const [modals, actionMenuItems] = useAllowedActionConfigurations(
     eventState,
     auth
   )
+
+  const assignedToOther =
+    eventState.assignedTo && eventState.assignedTo !== auth.sub
 
   return (
     <>
@@ -61,18 +81,30 @@ export function ActionMenu({
           <PrimaryButton
             data-testid="action-dropdownMenu"
             icon={() => <CaretDown />}
+            size="medium"
           >
             {intl.formatMessage(messages.action)}
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
+          {assignedToOther && (
+            <>
+              <DropdownMenu.Label>
+                {intl.formatMessage(messages.assignedTo, {
+                  name: assignedUserFullName,
+                  officeName: assignedOfficeName
+                })}
+              </DropdownMenu.Label>
+              <DropdownMenu.Separator />
+            </>
+          )}
           {actionMenuItems.map((action) => {
             return (
               <DropdownMenu.Item
                 key={action.type}
                 disabled={'disabled' in action ? action.disabled : false}
                 onClick={async () => {
-                  await action.onClick()
+                  await action.onClick(workqueue)
                   onAction?.()
                 }}
               >
@@ -83,7 +115,7 @@ export function ActionMenu({
           })}
         </DropdownMenu.Content>
       </DropdownMenu>
-      {modal}
+      {modals}
     </>
   )
 }

@@ -12,7 +12,8 @@ import {
   and,
   defineConditional,
   never,
-  not
+  not,
+  user
 } from '../conditionals/conditionals'
 import {
   defineActionForm,
@@ -29,7 +30,7 @@ import { EventStatus } from '../events/EventMetadata'
 /** @knipignore */
 export const PRINT_CERTIFICATE_FORM = defineActionForm({
   label: {
-    id: 'v2.event.tennis-club-membership.action.certificate.form.label',
+    id: 'event.tennis-club-membership.action.certificate.form.label',
     defaultMessage: 'Tennis club membership certificate collector',
     description: 'This is what this form is referred as in the system'
   },
@@ -38,7 +39,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
       id: 'collector',
       type: PageTypes.enum.FORM,
       title: {
-        id: 'v2.event.tennis-club-membership.action.certificate.form.section.who.title',
+        id: 'event.tennis-club-membership.action.certificate.form.section.who.title',
         defaultMessage: 'Print certified copy',
         description: 'This is the title of the section'
       },
@@ -47,7 +48,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           id: 'collector.requesterId',
           required: true,
           label: {
-            id: 'v2.event.tennis-club-membership.action.certificate.form.section.requester.label',
+            id: 'event.tennis-club-membership.action.certificate.form.section.requester.label',
             defaultMessage: 'Requester',
             description: 'This is the label for the field'
           },
@@ -56,7 +57,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
             {
               value: 'INFORMANT',
               label: {
-                id: 'v2.event.tennis-club-membership.action.certificate.form.section.requester.informant.label',
+                id: 'event.tennis-club-membership.action.certificate.form.section.requester.informant.label',
                 defaultMessage: 'Print and issue Informant',
                 description: 'This is the label for the field'
               }
@@ -64,7 +65,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
             {
               value: 'OTHER',
               label: {
-                id: 'v2.event.tennis-club-membership.action.certificate.form.section.requester.other.label',
+                id: 'event.tennis-club-membership.action.certificate.form.section.requester.other.label',
                 defaultMessage: 'Print and issue someone else',
                 description: 'This is the label for the field'
               }
@@ -72,7 +73,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
             {
               value: 'PRINT_IN_ADVANCE',
               label: {
-                id: 'v2.event.tennis-club-membership.action.certificate.form.section.requester.printInAdvance.label',
+                id: 'event.tennis-club-membership.action.certificate.form.section.requester.printInAdvance.label',
                 defaultMessage: 'Print in advance',
                 description: 'This is the label for the field'
               }
@@ -124,7 +125,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           ],
           required: true,
           label: {
-            id: 'v2.event.tennis-club-membership.action.form.section.idType.label',
+            id: 'event.tennis-club-membership.action.form.section.idType.label',
             defaultMessage: 'Select Type of ID',
             description: 'This is the label for selecting the type of ID'
           },
@@ -133,7 +134,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
             {
               value: 'PASSPORT',
               label: {
-                id: 'v2.event.tennis-club-membership.action.form.section.idType.passport.label',
+                id: 'event.tennis-club-membership.action.form.section.idType.passport.label',
                 defaultMessage: 'Passport',
                 description: 'Option for selecting Passport as the ID type'
               }
@@ -141,16 +142,16 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
             {
               value: 'DRIVING_LICENSE',
               label: {
-                id: 'v2.event.tennis-club-membership.action.form.section.idType.drivingLicense.label',
+                id: 'event.tennis-club-membership.action.form.section.idType.drivingLicense.label',
                 defaultMessage: 'Driving License',
                 description:
                   'Option for selecting Driving License as the ID type'
               }
             },
             {
-              value: 'REFUGEE_NUMBER',
+              value: 'REFUGEE-NUMBER',
               label: {
-                id: 'v2.event.tennis-club-membership.action.form.section.idType.refugeeNumber.label',
+                id: 'event.tennis-club-membership.action.form.section.idType.refugeeNumber.label',
                 defaultMessage: 'Refugee Number',
                 description:
                   'Option for selecting Refugee Number as the ID type'
@@ -159,7 +160,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
             {
               value: 'ALIEN_NUMBER',
               label: {
-                id: 'v2.event.tennis-club-membership.action.form.section.idType.alienNumber.label',
+                id: 'event.tennis-club-membership.action.form.section.idType.alienNumber.label',
                 defaultMessage: 'Alien Number',
                 description: 'Option for selecting Alien Number as the ID type'
               }
@@ -167,7 +168,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
             {
               value: 'OTHER',
               label: {
-                id: 'v2.event.tennis-club-membership.action.form.section.idType.other.label',
+                id: 'event.tennis-club-membership.action.form.section.idType.other.label',
                 defaultMessage: 'Other',
                 description: 'Option for selecting Other as the ID type'
               }
@@ -175,7 +176,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
             {
               value: 'NO_ID',
               label: {
-                id: 'v2.event.tennis-club-membership.action.form.section.idType.noId.label',
+                id: 'event.tennis-club-membership.action.form.section.idType.noId.label',
                 defaultMessage: 'No ID',
                 description: 'Option for selecting No ID as the ID type'
               }
@@ -227,14 +228,14 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           ],
           required: true,
           label: {
-            id: 'v2.event.tennis-club-membership.action.form.section.passportDetails.label',
+            id: 'event.tennis-club-membership.action.form.section.passportDetails.label',
             defaultMessage: 'Passport Details',
             description: 'Field for entering Passport details'
           },
           type: FieldType.TEXT
         },
         {
-          id: 'collector.DRIVING_LICENSE.details',
+          id: 'collector.DRIVING-LICENSE.details',
           conditionals: [
             {
               type: ConditionalType.SHOW,
@@ -278,14 +279,14 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           ],
           required: true,
           label: {
-            id: 'v2.event.tennis-club-membership.action.form.section.drivingLicenseDetails.label',
+            id: 'event.tennis-club-membership.action.form.section.drivingLicenseDetails.label',
             defaultMessage: 'Driving License Details',
             description: 'Field for entering Driving License details'
           },
           type: FieldType.TEXT
         },
         {
-          id: 'collector.REFUGEE_NUMBER.details',
+          id: 'collector.REFUGEE-NUMBER.details',
           conditionals: [
             {
               type: ConditionalType.SHOW,
@@ -329,14 +330,14 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           ],
           required: true,
           label: {
-            id: 'v2.event.tennis-club-membership.action.form.section.refugeeNumberDetails.label',
+            id: 'event.tennis-club-membership.action.form.section.refugeeNumberDetails.label',
             defaultMessage: 'Refugee Number Details',
             description: 'Field for entering Refugee Number details'
           },
           type: FieldType.TEXT
         },
         {
-          id: 'collector.ALIEN_NUMBER.details',
+          id: 'collector.ALIEN-NUMBER.details',
           conditionals: [
             {
               type: ConditionalType.SHOW,
@@ -380,7 +381,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           ],
           required: true,
           label: {
-            id: 'v2.event.tennis-club-membership.action.form.section.alienNumberDetails.label',
+            id: 'event.tennis-club-membership.action.form.section.alienNumberDetails.label',
             defaultMessage: 'Alien Number Details',
             description: 'Field for entering Alien Number details'
           },
@@ -431,7 +432,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           ],
           required: true,
           label: {
-            id: 'v2.event.tennis-club-membership.action.form.section.idTypeOther.label',
+            id: 'event.tennis-club-membership.action.form.section.idTypeOther.label',
             defaultMessage: 'Other ID Type (if applicable)',
             description: 'Field for entering ID type if "Other" is selected'
           },
@@ -482,7 +483,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           ],
           required: true,
           label: {
-            id: 'v2.event.tennis-club-membership.action.form.section.firstName.label',
+            id: 'event.tennis-club-membership.action.form.section.firstName.label',
             defaultMessage: 'First Name',
             description: 'This is the label for the first name field'
           },
@@ -533,7 +534,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           ],
           required: true,
           label: {
-            id: 'v2.event.tennis-club-membership.action.form.section.lastName.label',
+            id: 'event.tennis-club-membership.action.form.section.lastName.label',
             defaultMessage: 'Last Name',
             description: 'This is the label for the last name field'
           },
@@ -584,7 +585,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           ],
           required: true,
           label: {
-            id: 'v2.event.tennis-club-membership.action.form.section.relationshipToMember.label',
+            id: 'event.tennis-club-membership.action.form.section.relationshipToMember.label',
             defaultMessage: 'Relationship to Member',
             description:
               'This is the label for the relationship to member field'
@@ -636,7 +637,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           ],
           required: false,
           label: {
-            id: 'v2.event.tennis-club-membership.action.form.section.signedAffidavit.label',
+            id: 'event.tennis-club-membership.action.form.section.signedAffidavit.label',
             defaultMessage: 'Signed Affidavit (Optional)',
             description: 'This is the label for uploading a signed affidavit'
           },
@@ -659,7 +660,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
           label: {
             defaultMessage: 'Verified',
             description: 'This is the label for the verification button',
-            id: 'v2.event.tennis-club-membership.action.certificate.form.verify'
+            id: 'event.tennis-club-membership.action.certificate.form.verify'
           }
         },
         cancel: {
@@ -667,21 +668,21 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
             defaultMessage: 'Identity does not match',
             description:
               'This is the label for the verification cancellation button',
-            id: 'v2.event.tennis-club-membership.action.certificate.form.cancel'
+            id: 'event.tennis-club-membership.action.certificate.form.cancel'
           },
           confirmation: {
             title: {
               defaultMessage: 'Print without proof of ID?',
               description:
                 'This is the title for the verification cancellation modal',
-              id: 'v2.event.tennis-club-membership.action.certificate.form.cancel.confirmation.title'
+              id: 'event.tennis-club-membership.action.certificate.form.cancel.confirmation.title'
             },
             body: {
               defaultMessage:
                 'Please be aware that if you proceed, you will be responsible for issuing a certificate without the necessary proof of ID from the collector',
               description:
                 'This is the body for the verification cancellation modal',
-              id: 'v2.event.tennis-club-membership.action.certificate.form.cancel.confirmation.body'
+              id: 'event.tennis-club-membership.action.certificate.form.cancel.confirmation.body'
             }
           }
         }
@@ -692,7 +693,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
 
 export const TENNIS_CLUB_DECLARATION_REVIEW = {
   title: {
-    id: 'v2.event.tennis-club-membership.action.declare.form.review.title',
+    id: 'event.tennis-club-membership.action.declare.form.review.title',
     defaultMessage:
       '{applicant.name.firstname, select, __EMPTY__ {Member declaration} other {{applicant.name.surname, select, __EMPTY__ {Member declaration for {applicant.name.firstname}} other {Member declaration for {applicant.name.firstname} {applicant.name.surname}}}}}',
     description: 'Title of the review page'
@@ -703,7 +704,7 @@ export const TENNIS_CLUB_DECLARATION_REVIEW = {
       type: FieldType.TEXTAREA,
       label: {
         defaultMessage: 'Comment',
-        id: 'v2.event.birth.action.declare.form.review.comment.label',
+        id: 'event.birth.action.declare.form.review.comment.label',
         description: 'Label for the comment field in the review section'
       }
     },
@@ -712,11 +713,11 @@ export const TENNIS_CLUB_DECLARATION_REVIEW = {
       id: 'review.signature',
       label: {
         defaultMessage: 'Signature of informant',
-        id: 'v2.event.birth.action.declare.form.review.signature.label',
+        id: 'event.birth.action.declare.form.review.signature.label',
         description: 'Label for the signature field in the review section'
       },
       signaturePromptLabel: {
-        id: 'v2.signature.upload.modal.title',
+        id: 'signature.upload.modal.title',
         defaultMessage: 'Draw signature',
         description: 'Title for the modal to draw signature'
       }
@@ -741,7 +742,7 @@ function isDomesticAddress() {
 }
 export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
   label: {
-    id: 'v2.event.tennis-club-membership.action.declare.form.label',
+    id: 'event.tennis-club-membership.action.declare.form.label',
     defaultMessage: 'Tennis club membership application',
     description: 'This is what this form is referred as in the system'
   },
@@ -749,7 +750,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
     {
       id: 'applicant',
       title: {
-        id: 'v2.event.tennis-club-membership.action.declare.form.section.who.title',
+        id: 'event.tennis-club-membership.action.declare.form.section.who.title',
         defaultMessage: 'Who is applying for the membership?',
         description: 'This is the title of the section'
       },
@@ -763,7 +764,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           label: {
             defaultMessage: "Applicant's name",
             description: 'This is the label for the field',
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.firstname.label'
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.firstname.label'
           },
           configuration: {
             name: {
@@ -782,7 +783,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                 defaultMessage:
                   "Input contains invalid characters. Please use only letters (a-z, A-Z), numbers (0-9), hyphens (-), apostrophes(') and underscores (_)",
                 description: 'This is the error message for invalid name',
-                id: 'v2.error.invalidName'
+                id: 'error.invalidName'
               }
             }
           ]
@@ -796,7 +797,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           label: {
             defaultMessage: "Applicant's email",
             description: 'This is the label for the field',
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.email.label'
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.email.label'
           }
         },
         {
@@ -809,7 +810,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               message: {
                 defaultMessage: 'Please enter a valid date',
                 description: 'This is the error message for invalid date',
-                id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.dob.error'
+                id: 'event.tennis-club-membership.action.declare.form.section.who.field.dob.error'
               },
               validator: field('applicant.dob').isBefore().now()
             }
@@ -823,7 +824,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           label: {
             defaultMessage: "Applicant's date of birth",
             description: 'This is the label for the field',
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.dob.label'
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.dob.label'
           }
         },
         {
@@ -833,7 +834,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           label: {
             defaultMessage: 'Exact date of birth unknown',
             description: 'This is the label for the field',
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.dobUnknown.label'
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.dobUnknown.label'
           },
           conditionals: [
             {
@@ -850,7 +851,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           label: {
             defaultMessage: 'Age of tennis-member',
             description: 'This is the label for the field',
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.age.label'
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.age.label'
           },
           conditionals: [
             {
@@ -867,7 +868,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           label: {
             defaultMessage: "Applicant's profile picture",
             description: 'This is the label for the field',
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.image.label'
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.image.label'
           }
         },
         {
@@ -879,14 +880,14 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           label: {
             defaultMessage: "Applicant's address",
             description: 'This is the label for the field',
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.address.label'
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.address.label'
           },
           validation: [
             {
               message: {
                 defaultMessage: 'Invalid input',
                 description: 'Error message when generic field is invalid',
-                id: 'v2.error.invalid'
+                id: 'error.invalid'
               },
               validator:
                 field('applicant.address').isValidAdministrativeLeafLevel()
@@ -899,7 +900,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                 required: false,
                 parent: field('country'),
                 label: {
-                  id: 'v2.field.address.town.label',
+                  id: 'field.address.town.label',
                   defaultMessage: 'Town',
                   description: 'This is the label for the field'
                 },
@@ -919,7 +920,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                 required: false,
                 parent: field('country'),
                 label: {
-                  id: 'v2.field.address.residentialArea.label',
+                  id: 'field.address.residentialArea.label',
                   defaultMessage: 'Residential Area',
                   description: 'This is the label for the field'
                 },
@@ -939,7 +940,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                 required: false,
                 parent: field('country'),
                 label: {
-                  id: 'v2.field.address.street.label',
+                  id: 'field.address.street.label',
                   defaultMessage: 'Street',
                   description: 'This is the label for the field'
                 },
@@ -959,7 +960,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                 required: false,
                 parent: field('country'),
                 label: {
-                  id: 'v2.field.address.number.label',
+                  id: 'field.address.number.label',
                   defaultMessage: 'Number',
                   description: 'This is the label for the field'
                 },
@@ -979,7 +980,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                 required: false,
                 parent: field('country'),
                 label: {
-                  id: 'v2.field.address.postcodeOrZip.label',
+                  id: 'field.address.postcodeOrZip.label',
                   defaultMessage: 'Postcode / Zip',
                   description: 'This is the label for the field'
                 },
@@ -1005,7 +1006,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                 parent: field('country'),
                 required: true,
                 label: {
-                  id: 'v2.field.address.state.label',
+                  id: 'field.address.state.label',
                   defaultMessage: 'State',
                   description: 'This is the label for the field'
                 },
@@ -1022,7 +1023,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                 ],
                 required: true,
                 label: {
-                  id: 'v2.field.address.district2.label',
+                  id: 'field.address.district2.label',
                   defaultMessage: 'District',
                   description: 'This is the label for the field'
                 },
@@ -1039,7 +1040,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                 ],
                 required: false,
                 label: {
-                  id: 'v2.field.address.cityOrTown.label',
+                  id: 'field.address.cityOrTown.label',
                   defaultMessage: 'City / Town',
                   description: 'This is the label for the field'
                 },
@@ -1056,7 +1057,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                 ],
                 required: false,
                 label: {
-                  id: 'v2.field.address.addressLine1.label',
+                  id: 'field.address.addressLine1.label',
                   defaultMessage: 'Address Line 1',
                   description: 'This is the label for the field'
                 },
@@ -1073,7 +1074,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                 ],
                 required: false,
                 label: {
-                  id: 'v2.field.address.addressLine2.label',
+                  id: 'field.address.addressLine2.label',
                   defaultMessage: 'Address Line 2',
                   description: 'This is the label for the field'
                 },
@@ -1090,7 +1091,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                 ],
                 required: false,
                 label: {
-                  id: 'v2.field.address.addressLine3.label',
+                  id: 'field.address.addressLine3.label',
                   defaultMessage: 'Address Line 3',
                   description: 'This is the label for the field'
                 },
@@ -1107,7 +1108,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                 ],
                 required: false,
                 label: {
-                  id: 'v2.field.address.postcodeOrZip.label',
+                  id: 'field.address.postcodeOrZip.label',
                   defaultMessage: 'Postcode / Zip',
                   description: 'This is the label for the field'
                 },
@@ -1115,6 +1116,24 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               }
             ]
           }
+        },
+        {
+          id: 'applicant.isRecommendedByFieldAgent',
+          type: FieldType.CHECKBOX,
+          analytics: true,
+          required: false,
+          label: {
+            defaultMessage:
+              'Field shown when field agent is submitting application.',
+            description: 'This is the label for the field',
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.isRecommendedByFieldAgent.label'
+          },
+          conditionals: [
+            {
+              type: ConditionalType.SHOW,
+              conditional: user.hasRole('FIELD_AGENT')
+            }
+          ]
         }
       ]
     },
@@ -1122,7 +1141,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
       id: 'senior-pass',
       conditional: field('applicant.dob').isBefore().date('1950-01-01'),
       title: {
-        id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.title',
+        id: 'event.tennis-club-membership.action.declare.form.section.senior-pass.title',
         defaultMessage: 'Assign senior pass for applicant',
         description: 'This is the title of the section'
       },
@@ -1134,7 +1153,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           label: {
             defaultMessage: 'Senior pass ID',
             description: 'This is the label for the field',
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.field.id.label'
+            id: 'event.tennis-club-membership.action.declare.form.section.senior-pass.field.id.label'
           }
         },
         {
@@ -1147,7 +1166,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           label: {
             defaultMessage: 'Does recommender have senior pass?',
             description: 'This is the label for the field',
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.field.recommender'
+            id: 'event.tennis-club-membership.action.declare.form.section.senior-pass.field.recommender'
           }
         }
       ]
@@ -1155,7 +1174,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
     {
       id: 'recommender',
       title: {
-        id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.title',
+        id: 'event.tennis-club-membership.action.declare.form.section.recommender.title',
         defaultMessage: 'Who is recommending the applicant?',
         description: 'This is the title of the section'
       },
@@ -1168,7 +1187,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           label: {
             defaultMessage: 'No recommender',
             description: 'This is the label for the field',
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.none.label'
+            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.none.label'
           }
         },
 
@@ -1186,7 +1205,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           label: {
             defaultMessage: "Recommender's name",
             description: 'This is the label for the field',
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label'
+            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label'
           }
         },
         {
@@ -1202,10 +1221,11 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           label: {
             defaultMessage: "Recommender's membership ID",
             description: 'This is the label for the field',
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.id.label'
+            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.id.label'
           }
         }
-      ]
+      ],
+      conditional: not(never()) // Intentional always-true page conditional to exercise interactions between page-level and field-level conditionals in tests
     }
   ]
 })
@@ -1216,7 +1236,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Any status',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusAny'
+      id: 'advancedSearch.form.recordStatusAny'
     }
   },
   {
@@ -1224,7 +1244,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Draft',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusCreated'
+      id: 'advancedSearch.form.recordStatusCreated'
     }
   },
   {
@@ -1232,7 +1252,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Notified',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusNotified'
+      id: 'advancedSearch.form.recordStatusNotified'
     }
   },
   {
@@ -1240,7 +1260,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Declared',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusDeclared'
+      id: 'advancedSearch.form.recordStatusDeclared'
     }
   },
   {
@@ -1248,7 +1268,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Validated',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusValidated'
+      id: 'advancedSearch.form.recordStatusValidated'
     }
   },
   {
@@ -1256,7 +1276,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Registered',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusRegistered'
+      id: 'advancedSearch.form.recordStatusRegistered'
     }
   },
   {
@@ -1264,7 +1284,7 @@ export const statusOptions = [
     label: {
       defaultMessage: 'Archived',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusArchived'
+      id: 'advancedSearch.form.recordStatusArchived'
     }
   }
 ]

@@ -59,6 +59,7 @@ export function PhoneNumber() {
         value={<ValueContainer>{mobile}</ValueContainer>}
         actions={
           <DynamicHeightLinkButton
+            data-testid="change-phone-button"
             onClick={toggleChangePhoneModal}
             disabled={!isOnline}
           >

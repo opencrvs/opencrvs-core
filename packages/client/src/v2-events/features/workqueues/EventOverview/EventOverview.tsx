@@ -10,7 +10,6 @@
  */
 import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import {
   EventDocument,
@@ -19,7 +18,6 @@ import {
   EventIndex,
   applyDraftToEventIndex,
   deepDropNulls,
-  EventStatus,
   getOrThrow
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -28,7 +26,6 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import {
   AssignmentStatus,
@@ -37,29 +34,15 @@ import {
   getUsersFullName
 } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
-import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
-import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
-import { ActionMenu } from './components/ActionMenu'
-import { EventOverviewProvider } from './EventOverviewContext'
 
 /**
- * File is based on packages/client/src/views/RecordAudit/RecordAudit.tsx
+ * Renders the event overview page which shows a summary of the event.
  */
-
-/**
- * Renders the event overview page, including the event summary and history.
- */
-function EventOverviewFull({
-  event,
-  onAction
-}: {
-  event: EventDocument
-  onAction: () => void
-}) {
+function EventOverviewFull({ event }: { event: EventDocument }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
@@ -67,6 +50,7 @@ function EventOverviewFull({
   const draft = getRemoteDraftByEventId(eventIndex.id, {
     refetchOnMount: 'always'
   })
+
   const eventWithDrafts = draft
     ? dangerouslyGetCurrentEventStateWithDrafts({
         event,
@@ -105,21 +89,12 @@ function EventOverviewFull({
       size={ContentSize.LARGE}
       title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
-      topActionButtons={[
-        <ActionMenu key={event.id} eventId={event.id} onAction={onAction} />,
-        <DownloadButton
-          key={`DownloadButton-${eventIndex.id}`}
-          event={eventIndex}
-          isDraft={eventIndex.status === EventStatus.Values.CREATED}
-        />
-      ]}
     >
       <EventSummary
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
-        flags={flags}
+        eventIndex={eventIndex}
       />
-      <EventHistory fullEvent={event} />
     </Content>
   )
 }
@@ -127,13 +102,7 @@ function EventOverviewFull({
 /**
  * Renders the protected event overview page with PII hidden in the event summary
  */
-function EventOverviewProtected({
-  eventIndex,
-  onAction
-}: {
-  eventIndex: EventIndex
-  onAction: () => void
-}) {
+function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
   const { eventConfiguration } = useEventConfiguration(eventIndex.type)
   const { status } = eventIndex
   const { getRemoteDraftByEventId } = useDrafts()
@@ -174,48 +143,30 @@ function EventOverviewProtected({
       size={ContentSize.LARGE}
       title={title}
       titleColor={eventIndex.id ? 'copy' : 'grey600'}
-      topActionButtons={[
-        <ActionMenu
-          key={eventIndex.id}
-          eventId={eventIndex.id}
-          onAction={onAction}
-        />,
-        <DownloadButton
-          key={`DownloadButton-${eventIndex.id}`}
-          event={eventIndex}
-          isDraft={eventIndex.status === EventStatus.Values.CREATED}
-        />
-      ]}
     >
       <EventSummary
         hideSecuredFields
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
-        flags={flags}
+        eventIndex={eventIndex}
       />
-      <EventHistorySkeleton />
     </Content>
   )
 }
 
 function EventOverviewContainer() {
-  const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
+  const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
   const { searchEventById } = useEvents()
   const { getEvent } = useEvents()
-  const { getUser } = useUsers()
-  const users = getUser.getAllCached()
   const maybeAuth = useAuthentication()
   const authentication = getOrThrow(
     maybeAuth,
     'Authentication is not available but is required'
   )
 
-  const locations = useSelector(getLocations)
-
   // Suspense query is not used here because we want to refetch when an event action is performed
   const getEventQuery = searchEventById.useQuery(params.eventId)
   const eventIndex = getEventQuery.data?.results[0]
-
   const fullEvent = getEvent.findFromCache(params.eventId).data
 
   if (!eventIndex) {
@@ -227,7 +178,7 @@ function EventOverviewContainer() {
     fullEvent && assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
 
   return (
-    <EventOverviewProvider locations={locations} users={users}>
+    <>
       {eventIndex.potentialDuplicates.length > 0 && (
         <DuplicateWarning
           duplicateTrackingIds={eventIndex.potentialDuplicates.map(
@@ -236,14 +187,15 @@ function EventOverviewContainer() {
         />
       )}
       {shouldShowFullOverview ? (
-        <EventOverviewFull event={fullEvent} onAction={getEventQuery.refetch} />
+        <EventOverviewFull event={fullEvent} />
       ) : (
         <EventOverviewProtected
           eventIndex={eventIndex}
-          onAction={getEventQuery.refetch}
+          // @TODO: Is this needed after new event overview UI?
+          // onAction={getEventQuery.refetch}
         />
       )}
-    </EventOverviewProvider>
+    </>
   )
 }
 

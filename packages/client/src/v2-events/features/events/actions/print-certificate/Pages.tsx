@@ -31,6 +31,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -48,6 +49,7 @@ export function Pages() {
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
+  const validatorContext = useValidatorContext()
   const eventIndex = getCurrentEventState(event, configuration)
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
     event.type,
@@ -106,6 +108,7 @@ export function Pages() {
         setFormData={(data) => setAnnotation(data)}
         showReviewButton={searchParams.from === 'review'}
         validateBeforeNextPage={true}
+        validatorContext={validatorContext}
         onPageChange={(nextPageId: string) => {
           return navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath(

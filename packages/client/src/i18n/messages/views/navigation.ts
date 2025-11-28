@@ -162,16 +162,6 @@ const messagesToDefine: INavigationMessages = {
     description: 'Analytic Group',
     id: 'navigation.analytic'
   },
-  statistics: {
-    defaultMessage: 'Statistics',
-    description: 'Statistics Dashboard Section',
-    id: 'navigation.performanceStatistics'
-  },
-  leaderboards: {
-    defaultMessage: 'Leaderboards',
-    description: 'Leaderboards Dashboard Section',
-    id: 'navigation.leaderboards'
-  },
   dashboard: {
     defaultMessage: 'Dashboard',
     description: 'Dashboard Section',

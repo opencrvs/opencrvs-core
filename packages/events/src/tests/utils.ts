@@ -93,28 +93,62 @@ const { createCallerFactory } = t
 
 export const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_READ, // @TODO: this can be removed after unnecessary .list endpoint is removed
-  SCOPES.RECORD_UNASSIGN_OTHERS,
   SCOPES.SEARCH_BIRTH,
   'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
-  'record.read[event=birth|death|tennis-club-membership]',
-  'record.notify[event=birth|death|tennis-club-membership]',
-  'record.declare[event=birth|death|tennis-club-membership]',
-  'record.declared.validate[event=birth|death|tennis-club-membership]',
-  'record.declared.reject[event=birth|death|tennis-club-membership]',
-  'record.declared.archive[event=birth|death|tennis-club-membership]',
-  'record.register[event=birth|death|tennis-club-membership]',
-  'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]',
-  'record.registered.request-correction[event=birth|death|tennis-club-membership]',
-  'record.registered.correct[event=birth|death|tennis-club-membership]'
+  'record.create[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.read[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.notify[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.declare[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.declared.validate[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.declared.reject[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.declared.archive[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.register[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.registered.print-certified-copies[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.registered.request-correction[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.registered.correct[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.unassign-others[event=birth|death|tennis-club-membership|child-onboarding]'
 ]
 
-export function createTestToken(
+export function createTestToken({
+  userId,
+  scopes,
+  userType,
+  role
+}: {
+  userId: string
+  scopes: Scope[]
+  userType?: TokenUserType
+  role: string
+}): TokenWithBearer {
+  const token = jwt.sign(
+    { scope: scopes, sub: userId, userType, role },
+    readFileSync(join(__dirname, './cert.key')),
+    {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:events-user'
+    }
+  )
+
+  return `Bearer ${token}`
+}
+
+function createTokenExchangeTestToken(
   userId: string,
-  scopes: Scope[],
-  userType: TokenUserType = TokenUserType.enum.user
+  eventId: string,
+  actionId: string
 ): TokenWithBearer {
   const token = jwt.sign(
-    { scope: scopes, sub: userId, userType },
+    {
+      scope: [
+        SCOPES.RECORD_CONFIRM_REGISTRATION,
+        SCOPES.RECORD_REJECT_REGISTRATION
+      ],
+      sub: userId,
+      userType: TokenUserType.enum.user,
+      eventId,
+      actionId
+    },
     readFileSync(join(__dirname, './cert.key')),
     {
       algorithm: 'RS256',
@@ -131,7 +165,12 @@ export function createSystemTestClient(
   scopes: string[] = TEST_USER_DEFAULT_SCOPES
 ) {
   const createCaller = createCallerFactory(appRouter)
-  const token = createTestToken(systemId, scopes, TokenUserType.enum.system)
+  const token = createTestToken({
+    userId: systemId,
+    scopes,
+    role: 'TEST_SYSTEM_ROLE',
+    userType: TokenUserType.enum.system
+  })
 
   const caller = createCaller({
     user: SystemContext.parse({
@@ -151,7 +190,33 @@ export function createTestClient(
   scopes: string[] = TEST_USER_DEFAULT_SCOPES
 ) {
   const createCaller = createCallerFactory(appRouter)
-  const token = createTestToken(user.id, scopes)
+  const token = createTestToken({
+    userId: user.id,
+    scopes,
+    userType: TokenUserType.enum.user,
+    role: user.role
+  })
+
+  const caller = createCaller({
+    user: {
+      ...user,
+      type: TokenUserType.enum.user
+    },
+    token
+  })
+  return caller
+}
+
+/**
+ * The token that is passed to country config needs to have been exchanged for the specific eventId and actionId.
+ */
+export function createCountryConfigClient(
+  user: CreatedUser,
+  eventId: string,
+  actionId: string
+) {
+  const createCaller = createCallerFactory(appRouter)
+  const token = createTokenExchangeTestToken(user.id, eventId, actionId)
 
   const caller = createCaller({
     user: {
@@ -175,7 +240,8 @@ export const setupTestCase = async (
   const eventsDb = getClient()
 
   const seed = seeder()
-  await seed.locations(generator.locations.set(5))
+  const locationRng = createPrng(10123)
+  await seed.locations(generator.locations.set(5, locationRng))
 
   const locations = await getLocations()
 
@@ -284,6 +350,7 @@ function actionToClientAction(
     case ActionType.MARK_AS_DUPLICATE:
     case ActionType.REJECT_CORRECTION:
     case ActionType.DELETE:
+    case ActionType.CUSTOM:
     case ActionType.READ:
     default:
       throw new Error(

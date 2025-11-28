@@ -43,6 +43,7 @@ const users: UserDetails[] = [
       signature: undefined
     },
     role: {
+      id: 'ENTREPRENEUR',
       label: {
         id: 'userRoles.entrepreneur',
         defaultMessage: 'Entrepreneur',
@@ -72,6 +73,7 @@ const users: UserDetails[] = [
     ],
     username: 'np.huq',
     role: {
+      id: 'MAYOR',
       label: {
         id: 'userRoles.mayor',
         defaultMessage: 'Mayor',
