@@ -28,14 +28,17 @@ export async function setLocations(locations: Location[]) {
   await locationsRepo.addAdministrativeAreas(administrativeAreas)
 
   await locationsRepo.setLocations(
-    locations.map(({ id, name, parentId, validUntil, locationType }) => ({
-      id,
-      name,
-      parentId,
-      administrativeAreaId: parentId,
-      validUntil: validUntil ? new Date(validUntil).toISOString() : null,
-      locationType
-    }))
+    locations.map(
+      ({ id, name, parentId, validUntil, locationType, externalId }) => ({
+        id,
+        name,
+        parentId,
+        administrativeAreaId: parentId,
+        validUntil: validUntil ? new Date(validUntil).toISOString() : null,
+        locationType,
+        externalId
+      })
+    )
   )
 }
 

@@ -18,7 +18,8 @@ import {
   Location,
   LocationType,
   generateUuid,
-  pickRandom
+  pickRandom,
+  generateTrackingId
 } from '@opencrvs/commons'
 import { setLocations } from '../service/locations/locations'
 
@@ -68,6 +69,7 @@ export function payloadGenerator(
           name: `Location name ${i}`,
           parentId: null,
           validUntil: null,
+          externalId: generateTrackingId(prng) + generateTrackingId(prng),
           locationType: pickRandom(prng, LocationType.options)
         })) as Location[]
       }
@@ -77,6 +79,9 @@ export function payloadGenerator(
         name: location.name ?? `Location name ${i}`,
         parentId: location.parentId ?? null,
         validUntil: null,
+        externalId:
+          location.externalId ??
+          generateTrackingId(prng) + generateTrackingId(prng),
         locationType: LocationType.enum.ADMIN_STRUCTURE
       })) as Location[]
     }

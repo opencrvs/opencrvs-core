@@ -59,7 +59,8 @@ test('Creates single location', async () => {
       parentId: null,
       name: 'Location foobar',
       validUntil: null,
-      locationType: LocationType.enum.ADMIN_STRUCTURE
+      locationType: LocationType.enum.ADMIN_STRUCTURE,
+      externalId: 'abc123xyz456'
     }
   ]
 
@@ -177,28 +178,32 @@ test('parent id is a duplicate of administrative area id in locations', async ()
       parentId: null,
       locationType: LocationType.enum.ADMIN_STRUCTURE,
       name: 'Parent Admin Area',
-      validUntil: null
+      validUntil: null,
+      externalId: 'abc123xyz456'
     },
     {
       id: generateUuid(locationRng),
       parentId: parentAdminAreaId,
       locationType: LocationType.enum.ADMIN_STRUCTURE,
       name: 'Child Admin Area',
-      validUntil: null
+      validUntil: null,
+      externalId: 'abc123xyz467'
     },
     {
       id: generateUuid(locationRng),
       parentId: parentAdminAreaId,
       locationType: LocationType.enum.HEALTH_FACILITY,
       name: 'Child Health Facility',
-      validUntil: null
+      validUntil: null,
+      externalId: 'abc123xyz468'
     },
     {
       id: generateUuid(locationRng),
       parentId: parentAdminAreaId,
       locationType: LocationType.enum.CRVS_OFFICE,
       name: 'Child CRVS Office',
-      validUntil: null
+      validUntil: null,
+      externalId: 'abc123xyz469'
     }
   ]
 
