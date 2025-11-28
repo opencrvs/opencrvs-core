@@ -69,6 +69,7 @@ import reindexingTokenHandler, {
   responseSchema as reindexResponseSchema
 } from './features/reindexToken/handler'
 import { Boom, badRequest } from '@hapi/boom'
+import { openidCredentialIssuerHandler } from './features/openid4vc/well-known-openid-credentials'
 
 export type AuthServer = {
   server: Hapi.Server
@@ -128,7 +129,15 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/.well-known',
-    handler: getPublicKey,
+    handler: (_, h) => h.response(getPublicKey()).type('text/plain'),
+    options: {
+      tags: ['api']
+    }
+  })
+  server.route({
+    method: 'GET',
+    path: '/.well-known/openid-credential-issuer',
+    handler: openidCredentialIssuerHandler,
     options: {
       tags: ['api']
     }

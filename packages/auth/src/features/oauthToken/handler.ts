@@ -12,6 +12,12 @@ import * as Hapi from '@hapi/hapi'
 import { clientCredentialsHandler } from './client-credentials'
 import * as oauthResponse from './responses'
 import { tokenExchangeHandler } from './token-exchange'
+import { preAuthorizedCodeHandler } from './pre-authorized-code'
+
+const CLIENT_CREDENTIALS = 'client_credentials'
+const TOKEN_EXCHANGE = 'urn:opencrvs:oauth:grant-type:token-exchange'
+const PRE_AUTHORIZED_CODE_GRANT =
+  'urn:ietf:params:oauth:grant-type:pre-authorized_code'
 
 export async function tokenHandler(
   request: Hapi.Request,
@@ -19,12 +25,16 @@ export async function tokenHandler(
 ) {
   const grantType = request.query.grant_type
 
-  if (grantType === 'client_credentials') {
+  if (grantType === CLIENT_CREDENTIALS) {
     return clientCredentialsHandler(request, h)
   }
 
-  if (grantType === 'urn:opencrvs:oauth:grant-type:token-exchange') {
+  if (grantType === TOKEN_EXCHANGE) {
     return tokenExchangeHandler(request, h)
+  }
+
+  if (grantType === PRE_AUTHORIZED_CODE_GRANT) {
+    return preAuthorizedCodeHandler(request, h)
   }
 
   return oauthResponse.invalidGrantType(h)

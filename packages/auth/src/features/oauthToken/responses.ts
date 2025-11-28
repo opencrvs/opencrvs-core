@@ -10,12 +10,14 @@
  */
 import * as Hapi from '@hapi/hapi'
 
-export const invalidRequest = (h: Hapi.ResponseToolkit) =>
+export const invalidRequest = (
+  h: Hapi.ResponseToolkit,
+  description = 'Invalid request. Check that all required parameters have been provided.'
+) =>
   h
     .response({
       error: 'invalid_request',
-      error_description:
-        'Invalid request. Check that all required parameters have been provided.',
+      error_description: description,
       error_uri:
         'Refer to https://documentation.opencrvs.org/technology/interoperability/authenticate-a-client'
     })
@@ -59,6 +61,19 @@ export const success = (h: Hapi.ResponseToolkit, token: string) =>
     .response({
       access_token: token,
       token_type: 'Bearer'
+    })
+    .header('Cache-Control', 'no-store')
+    .code(200)
+
+export const preAuthorizedCodeSuccess = (
+  h: Hapi.ResponseToolkit,
+  token: string
+) =>
+  h
+    .response({
+      access_token: token,
+      token_type: 'Bearer',
+      expires_in: 300 // 5 minutes
     })
     .header('Cache-Control', 'no-store')
     .code(200)

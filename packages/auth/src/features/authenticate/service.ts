@@ -178,6 +178,41 @@ export async function createTokenForActionConfirmation(
   )
 }
 
+export async function createTokenForVerifiableCredentialIssuance(
+  eventId: UUID,
+  userId: string
+) {
+  return sign(
+    {
+      scope: ['record.issue-vc'],
+      eventId,
+      userType: TokenUserType.enum.user
+    },
+    cert,
+    {
+      subject: userId,
+      algorithm: 'RS256',
+      expiresIn: '5 minutes',
+      audience: [
+        'opencrvs:gateway-user',
+        'opencrvs:user-mgnt-user',
+        'opencrvs:auth-user',
+        'opencrvs:hearth-user',
+        'opencrvs:notification-user',
+        'opencrvs:workflow-user',
+        'opencrvs:search-user',
+        'opencrvs:metrics-user',
+        'opencrvs:countryconfig-user',
+        'opencrvs:webhooks-user',
+        'opencrvs:config-user',
+        'opencrvs:documents-user',
+        'opencrvs:notification-api-user'
+      ],
+      issuer: JWT_ISSUER
+    }
+  )
+}
+
 export async function storeUserInformation(
   nonce: string,
   userFullName: IUserName[],

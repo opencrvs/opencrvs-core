@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-/* eslint-disable import/no-named-as-default-member */
+
 import { APPLICATION_CONFIG_URL, AUTH_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import { rateLimitedRoute } from '@gateway/rate-limit'
@@ -49,6 +49,7 @@ export const catchAllProxy = {
       }
     }
   },
+
   /** @deprecated old naming strategy from Hearth.
    * These are included for backwards compability but `locationS` should be preferred */
   location: {
@@ -203,6 +204,30 @@ export const authProxy = {
         output: 'data',
         parse: false
       }
+    }
+  },
+  wellKnown: {
+    method: 'GET',
+    path: '/.well-known',
+    handler: (_, h) =>
+      h.proxy({
+        uri: `${AUTH_URL}/.well-known`,
+        passThrough: true
+      }),
+    options: {
+      auth: false
+    }
+  },
+  wellKnownDirectory: {
+    method: 'GET',
+    path: '/.well-known/{suffix}',
+    handler: (_, h) =>
+      h.proxy({
+        uri: `${AUTH_URL}/.well-known/{suffix}`,
+        passThrough: true
+      }),
+    options: {
+      auth: false
     }
   }
 } satisfies Record<string, ServerRoute>
