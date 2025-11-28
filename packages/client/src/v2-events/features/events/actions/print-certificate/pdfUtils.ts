@@ -31,7 +31,8 @@ import {
   ActionDocument,
   ActionStatus,
   Location,
-  UserOrSystem
+  UserOrSystem,
+  UUID
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -84,7 +85,7 @@ export const stringifyEventMetadata = ({
     }
   >
   intl: IntlShape
-  locations: Location[]
+  locations: Map<UUID, Location>
   users: UserOrSystem[]
   adminLevels: AdminStructureItem[]
 }) => {
@@ -232,7 +233,7 @@ export function compileSvg({
   }
   $actions: ActionDocument[]
   $declaration: EventState
-  locations: Location[]
+  locations: Map<UUID, Location>
   users: UserOrSystem[]
   /**
    * Indicates whether certificate is reviewed or actually printed

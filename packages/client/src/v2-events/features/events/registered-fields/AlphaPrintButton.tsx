@@ -71,7 +71,7 @@ export const AlphaPrintButton = {
     const actions = getAcceptedActions(event)
     const users = getUser.getAllCached()
 
-    const [locations] = getLocations.useSuspenseQuery()
+    const locations = getLocations.useSuspenseQuery()
     const { eventConfiguration } = useEventConfiguration(event.type)
     const formDeclaration = useEventFormData((state) => state.getFormValues())
 
