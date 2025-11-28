@@ -2,8 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict UETTfaWWE6hmDZY9ujM3LlliXuHPuLpcPRqmCRInoBDnT3NJ3aeHP9Ug7gFdmAJ
-
 -- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
 -- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
 
@@ -485,6 +483,4 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 --
 -- PostgreSQL database dump complete
 --
-
-\unrestrict UETTfaWWE6hmDZY9ujM3LlliXuHPuLpcPRqmCRInoBDnT3NJ3aeHP9Ug7gFdmAJ
 
