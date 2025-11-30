@@ -45,7 +45,18 @@ import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { useRejectionModal } from '../reject/useRejectionModal'
 import { useEventConfiguration } from '../../useEventConfiguration'
-import { useReviewActionConfig } from './useReviewActionConfig'
+
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { reviewMessages } from '@client/v2-events/features/events/actions/messages'
+
+// @TODO: These should be made configurable in action config, so that different event types can have different copy
+// This will be implemented as part of https://github.com/opencrvs/opencrvs-core/issues/10900
+const actionModalMessages = {
+  [ActionType.NOTIFY]: reviewMessages.incomplete.declare,
+  [ActionType.DECLARE]: reviewMessages.complete.declare,
+  [ActionType.VALIDATE]: reviewMessages.complete.validate,
+  [ActionType.REGISTER]: reviewMessages.complete.register
+}
 
 /**
  * Declaration actions contain actions available on the review page of the declare flow. This can include:
@@ -60,7 +71,11 @@ import { useReviewActionConfig } from './useReviewActionConfig'
 function useDeclarationActions(event: EventDocument) {
   const eventType = event.type
   const drafts = useDrafts()
-  const { closeActionView, deleteDeclaration } = useEventFormNavigation()
+  const {
+    closeActionView,
+    deleteDeclaration,
+    modal: deleteDeclarationModal
+  } = useEventFormNavigation()
   const { eventConfiguration } = useEventConfiguration(eventType)
   const formConfig = getDeclaration(eventConfiguration)
   const validatorContext = useValidatorContext()
@@ -92,14 +107,12 @@ function useDeclarationActions(event: EventDocument) {
 
   const reviewConfig = actionConfiguration.review
 
-  // @TODO CIHAN: can we clean up useReviewActionConfig?
-  const reviewActionConfiguration = useReviewActionConfig({
-    eventType,
+  const incomplete = validationErrorsInActionFormExist({
     formConfig,
-    declaration,
+    form: declaration,
     annotation,
-    reviewFields: reviewConfig.fields,
-    validatorContext
+    context: validatorContext,
+    reviewFields: reviewConfig.fields
   })
 
   const { isActionAllowed } = useUserAllowedActions(eventType)
@@ -111,24 +124,16 @@ function useDeclarationActions(event: EventDocument) {
 
   async function handleDeclaration(actionType: keyof typeof mutateFns) {
     const mutateFn = mutateFns[actionType]
-
+    const msgs = actionModalMessages[actionType]
     const confirmedDeclaration = await openModal<boolean | null>((close) => {
-      if (reviewActionConfiguration.messages.modal === undefined) {
-        // eslint-disable-next-line no-console
-        console.error(
-          'Tried to render declare modal without message definitions.'
-        )
-        return null
-      }
-
       return (
         <Review.ActionModal.Accept
           action="Declare"
           close={close}
           copy={{
-            // @TODO: make these configurable in action config?
+            // @TODO: make the messages configurable in action config?
             // Will be implemented as part of https://github.com/opencrvs/opencrvs-core/issues/10900
-            ...reviewActionConfiguration.messages.modal,
+            ...msgs.modal,
             onConfirm: actionLabels[actionType],
             eventLabel: eventConfiguration.label
           }}
@@ -245,32 +250,28 @@ function useDeclarationActions(event: EventDocument) {
   }
 
   return {
-    modals: [modal, rejectionModal, saveAndExitModal],
+    modals: [modal, rejectionModal, saveAndExitModal, deleteDeclarationModal],
     actions: [
       {
         icon: 'Check' as const,
         label: actionLabels[ActionType.REGISTER],
         onClick: async () => handleDeclaration(ActionType.REGISTER),
         hidden: !isActionAllowed(ActionType.REGISTER),
-        disabled:
-          reviewActionConfiguration.incomplete ||
-          !isDirectActionPossible(ActionType.REGISTER)
+        disabled: incomplete || !isDirectActionPossible(ActionType.REGISTER)
       },
       {
         icon: 'PaperPlaneTilt' as const,
         label: actionLabels[ActionType.VALIDATE],
         onClick: async () => handleDeclaration(ActionType.VALIDATE),
         hidden: !isActionAllowed(ActionType.VALIDATE),
-        disabled:
-          reviewActionConfiguration.incomplete ||
-          !isDirectActionPossible(ActionType.VALIDATE)
+        disabled: incomplete || !isDirectActionPossible(ActionType.VALIDATE)
       },
       {
         icon: 'UploadSimple' as const,
         label: actionLabels[ActionType.DECLARE],
         onClick: async () => handleDeclaration(ActionType.DECLARE),
         hidden: !isActionAllowed(ActionType.DECLARE),
-        disabled: reviewActionConfiguration.incomplete
+        disabled: incomplete
       },
       {
         icon: 'UploadSimple' as const,
@@ -282,7 +283,6 @@ function useDeclarationActions(event: EventDocument) {
       {
         icon: 'FileX' as const,
         label: actionLabels[ActionType.REJECT],
-        // @TODO: ensure this works
         onClick: async () => handleRejection(() => closeActionView(slug)),
         hidden: eventIndex.status !== EventStatus.enum.NOTIFIED
       },
@@ -299,7 +299,7 @@ function useDeclarationActions(event: EventDocument) {
       {
         icon: 'Trash' as const,
         label: formHeaderMessages.deleteDeclaration,
-        onClick: () => onDelete,
+        onClick: () => onDelete(),
         hidden: false
       }
     ].filter((a) => !a.hidden)
