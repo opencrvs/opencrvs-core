@@ -41,13 +41,12 @@ import { actionLabels } from '@client/v2-events/features/workqueues/EventOvervie
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { Review } from '@client/v2-events/features/events/components/Review'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { reviewMessages } from '@client/v2-events/features/events/actions/messages'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { useRejectionModal } from '../reject/useRejectionModal'
 import { useEventConfiguration } from '../../useEventConfiguration'
-
-import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
-import { reviewMessages } from '@client/v2-events/features/events/actions/messages'
 
 // @TODO: These should be made configurable in action config, so that different event types can have different copy
 // This will be implemented as part of https://github.com/opencrvs/opencrvs-core/issues/10900
@@ -299,7 +298,7 @@ function useDeclarationActions(event: EventDocument) {
       {
         icon: 'Trash' as const,
         label: formHeaderMessages.deleteDeclaration,
-        onClick: () => onDelete(),
+        onClick: async () => onDelete(),
         hidden: false
       }
     ].filter((a) => !a.hidden)
