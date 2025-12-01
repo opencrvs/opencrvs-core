@@ -93,18 +93,13 @@ export const AdvancedSearchStory: Story = {
     })
 
     await step('Search button disabled with incomplete fields', async () => {
-      const searchButton = (
-        await canvas.findAllByRole('button', { name: 'Search' })
-      ).find((btn) => btn.id === 'search')
+      const searchButton = await canvas.findByTestId('search')
+
       await expect(searchButton).toBeVisible()
       await expect(searchButton).toBeDisabled()
     })
 
     await step('Fill in required fields and enable search', async () => {
-      const searchButton = (
-        await canvas.findAllByRole('button', { name: 'Search' })
-      ).find((btn) => btn.id === 'search')
-
       const accordion = await canvas.findByTestId(
         'accordion-advancedSearch.form.registrationDetails'
       )
@@ -120,6 +115,8 @@ export const AdvancedSearchStory: Story = {
         'Ibombo District Office'
       )
       await userEvent.click(locationOption[0])
+      const searchButton = await canvas.findByTestId('search')
+
       await expect(searchButton).toBeDisabled()
 
       const statusWrapper = await canvas.findByTestId('select__event____status')
@@ -127,10 +124,11 @@ export const AdvancedSearchStory: Story = {
       await userEvent.click(statusWrapper)
       await selectEvent.select(statusWrapper, 'Any status')
 
-      await expect(searchButton).toBeEnabled()
-      if (searchButton) {
-        await userEvent.click(searchButton)
-      }
+      await waitFor(async () => {
+        await expect(canvas.getByTestId('search')).toBeEnabled()
+      })
+
+      await userEvent.click(searchButton)
     })
   }
 }
