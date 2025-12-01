@@ -55,6 +55,7 @@
     "packages/events/.kanelrc.js",
     "packages/dashboards/data/metabase/*",
     "packages/events/src/tests/extract-dump.sh",
+    "packages/toolkit/build.sh",
     ".kube"
   ],
   "license": "license-header.txt",
