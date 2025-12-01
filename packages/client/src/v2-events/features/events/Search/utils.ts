@@ -812,7 +812,9 @@ function tryParse(value: unknown): unknown {
 export function deserializeSearchParams(
   queryParams: string
 ): Record<string, unknown> {
-  const parsedParams = parseQuery(queryParams)
+  const parsedParams = parseQuery(queryParams, {
+    ignoreQueryPrefix: true
+  })
 
   const deserialized = Object.entries(parsedParams).reduce(
     (acc, [key, value]) => {

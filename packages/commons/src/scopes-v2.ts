@@ -104,6 +104,7 @@ export const encodeScope = (scope: AnyScope): string => {
 
 export const decodeScope = (query: string) => {
   const scope = qs.parse(query, {
+    ignoreQueryPrefix: true,
     comma: true,
     allowDots: true
   })

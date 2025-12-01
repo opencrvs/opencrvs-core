@@ -15,6 +15,7 @@ import { userEvent, within, expect } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { waitFor } from '@testing-library/dom'
+import * as selectEvent from 'react-select-event'
 import {
   ActionType,
   footballClubMembershipEvent,
@@ -122,10 +123,9 @@ export const AdvancedSearchStory: Story = {
       await expect(searchButton).toBeDisabled()
 
       const statusWrapper = await canvas.findByTestId('select__event____status')
-      const statusInput = within(statusWrapper).getByRole('textbox')
-      await userEvent.click(statusInput)
-      const statusOption = await canvas.findAllByText('Any status')
-      await userEvent.click(statusOption[0])
+
+      await userEvent.click(statusWrapper)
+      await selectEvent.select(statusWrapper, 'Any status')
 
       await expect(searchButton).toBeEnabled()
       if (searchButton) {
