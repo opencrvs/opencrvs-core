@@ -775,7 +775,7 @@ export function serializeSearchParams(
     (acc, [key, value]) => {
       const serialized = serializeValue(value)
       // If we don't care about the empty objects, we might be able to keep it as simple as this:
-      if (!isNil(serialized)) {
+      if (!isNil(serialized) && !(serialized === '')) {
         acc[key] = serialized
       }
 
@@ -783,7 +783,11 @@ export function serializeSearchParams(
     },
     {} as Record<string, unknown>
   )
-  return stringify(simplifiedValue, { skipEmptyString: true })
+  return stringify(simplifiedValue, {
+    // Configs are to match query-string behavior. qs adds indices by default for arrays. Otherwise they are arbitrary.
+    indices: false,
+    sort: (a, b) => a.localeCompare(b)
+  })
 }
 
 function tryParse(value: unknown): unknown {

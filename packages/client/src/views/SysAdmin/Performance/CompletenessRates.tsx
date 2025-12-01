@@ -244,9 +244,9 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
 
   const { intl } = props
 
-  const { locationId, timeStart, timeEnd, time } = parse(
-    location.search
-  ) as unknown as ISearchParams
+  const { locationId, timeStart, timeEnd, time } = parse(location.search, {
+    ignoreQueryPrefix: true
+  }) as unknown as ISearchParams
 
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)

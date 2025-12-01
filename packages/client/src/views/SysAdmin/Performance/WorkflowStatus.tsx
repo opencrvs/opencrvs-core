@@ -191,9 +191,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   const location = useLocation()
 
   const { intl } = props
-  const { locationId, status, event } = parse(
-    location.search
-  ) as unknown as ISearchParams
+  const { locationId, status, event } = parse(location.search, {
+    ignoreQueryPrefix: true
+  }) as unknown as ISearchParams
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>(

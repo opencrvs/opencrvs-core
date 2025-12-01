@@ -228,7 +228,9 @@ function UserListComponent(props: IProps) {
   const { intl, userDetails, offlineOffices, isOnline, offlineCountryConfig } =
     props
 
-  const { locationId } = parse(location.search) as unknown as ISearchParams
+  const { locationId } = parse(location.search, {
+    ignoreQueryPrefix: true
+  }) as unknown as ISearchParams
   const [toggleUsernameReminder, setToggleUsernameReminder] =
     useState<ToggleModal>({
       modalVisible: false,

@@ -155,7 +155,9 @@ function FieldAgentListComponent(props: IProps) {
     locationId,
     timeStart,
     timeEnd
-  } = parse(location.search) as unknown as ISearchParams
+  } = parse(location.search, {
+    ignoreQueryPrefix: true
+  }) as unknown as ISearchParams
 
   const [status, setStatus] = useState<STATUS_OPTIONS>(STATUS_OPTIONS.ACTIVE)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)

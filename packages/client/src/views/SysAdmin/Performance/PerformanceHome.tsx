@@ -227,7 +227,9 @@ const PerformanceHomeComponent = (props: Props) => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const parsedSearch = parse(location.search) as unknown as ISearchParams
+  const parsedSearch = parse(location.search, {
+    ignoreQueryPrefix: true
+  }) as unknown as ISearchParams
 
   const searchParams = {
     locationId: parsedSearch.locationId,

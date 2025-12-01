@@ -136,7 +136,9 @@ const HeaderComponent = (props: IFullProps) => {
   const canDoAdvanceSearch = canSearchBirthRecords || canSearchDeathRecords
 
   const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
-    const locationId = parse(router.location.search).locationId as string
+    const locationId = parse(router.location.search, {
+      ignoreQueryPrefix: true
+    }).locationId as string
     if (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE) {
       return {
         mobileLeft: [

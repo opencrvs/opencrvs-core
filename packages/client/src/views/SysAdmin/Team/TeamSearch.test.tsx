@@ -94,7 +94,9 @@ describe('Team search test', () => {
       app.update()
       flushPromises()
 
-      expect(parse(router.state.location.search)).toEqual({
+      expect(
+        parse(router.state.location.search, { ignoreQueryPrefix: true })
+      ).toEqual({
         locationId: '0d8474da-0361-4d32-979e-af91f012340a'
       })
       expect(router.state.location.pathname).toContain('/team/users')

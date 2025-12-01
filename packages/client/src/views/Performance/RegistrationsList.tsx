@@ -151,7 +151,9 @@ function RegistrationListComponent(props: IProps) {
     event = EVENT_OPTIONS.BIRTH,
     filterBy = FILTER_BY_OPTIONS.BY_TIME,
     currentPageNumber = '1'
-  } = parse(location.search) as unknown as ISearchParams
+  } = parse(location.search, {
+    ignoreQueryPrefix: true
+  }) as unknown as ISearchParams
 
   const isOfficeSelected = isLocationOffice(locationId)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
