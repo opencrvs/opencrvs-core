@@ -100,6 +100,8 @@ export async function reindex(token: TokenWithBearer) {
       // Converts object stream to JSON string stream so that it can
       // be sent to the country config reindex endpoint
       body: new JsonStreamStringify(eventDocumentStreamForCountryConfig),
+      // Ensure HTTP socket of previous GET /events request is not reused
+      // to avoid connections being closed preemptively by Node.js
       agent: new Agent({ keepAlive: false })
     }
   ).then((response) => {
