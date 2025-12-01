@@ -171,10 +171,7 @@ export async function getEventIndexWithLocationHierarchy(
       return locationHierarchyCache.get(locationId) || [locationId]
     }
     const hierarchyRows = await getLocationHierarchyRaw(locationId)
-    locationHierarchyCache.set(
-      locationId,
-      hierarchyRows.map((row) => row.id)
-    )
+    locationHierarchyCache.set(locationId, hierarchyRows)
     return locationHierarchyCache.get(locationId) || [locationId]
   }
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */

@@ -258,80 +258,45 @@ export async function isLocationUnderJurisdiction({
 
 type LocationHierarchyRow = {
   id: string
-  name: string
-  parent_id: string | null
-  administrative_area_id: string | null
-  type: 'location' | 'administrative_area'
 }
 
-// Given a location ID, this retrieves its full parent chain from `locations`.
-// Once the top location with a non-null administrative_area_id is reached,
-// it then retrieves the full parent chain from `administrative_areas`.
-// The final result combines both chains into a single ordered hierarchy.
-export async function getLocationHierarchyRaw(
-  locationId: string
-): Promise<LocationHierarchyRow[]> {
+// Given a location ID, this function retrieves the full chain of parent administrative areas
+// from `administrative_areas` corresponding to the location's `administrative_area_id`.
+// Returns an array of IDs representing the location's hierarchy, from top-level parent down to the location itself.
+export async function getLocationHierarchyRaw(locationId: string) {
   const db = getClient()
 
   const rawQuery = sql<LocationHierarchyRow[]>`
-    WITH RECURSIVE location_chain AS (
-    SELECT 
-        id,
-        name,
-        parent_id,
-        administrative_area_id,
-        'location'::text AS type,
-        0 AS depth
-    FROM app.locations
-    WHERE id = ${locationId}
-
-    UNION ALL
-
-    SELECT
-        l.id,
-        l.name,
-        l.parent_id,
-        l.administrative_area_id,
-        'location'::text,
-        lc.depth + 1
-    FROM app.locations l
-    JOIN location_chain lc ON lc.parent_id = l.id
-    WHERE lc.administrative_area_id IS NULL
-    ),
-    administrative_chain AS (
-        SELECT 
+    WITH RECURSIVE area_chain AS (
+        SELECT
             aa.id,
-            aa.name,
             aa.parent_id,
-            NULL::uuid AS administrative_area_id,
-            'administrative_area'::text AS type,
-            0 AS depth
-        FROM app.administrative_areas aa
-        JOIN location_chain lc ON lc.administrative_area_id = aa.id
-        WHERE lc.administrative_area_id IS NOT NULL
+            1 AS depth
+        FROM app.locations l
+        JOIN app.administrative_areas aa
+            ON aa.id = l.administrative_area_id
+        WHERE l.id = ${locationId}
 
         UNION ALL
 
-        SELECT 
-            aa.id,
-            aa.name,
-            aa.parent_id,
-            NULL::uuid,
-            'administrative_area'::text,
+        SELECT
+            parent_aa.id,
+            parent_aa.parent_id,
             ac.depth + 1
-        FROM app.administrative_areas aa
-        JOIN administrative_chain ac ON ac.parent_id = aa.id
+        FROM app.administrative_areas parent_aa
+        JOIN area_chain ac ON ac.parent_id = parent_aa.id
     )
-    SELECT *
-    FROM (
-        SELECT * FROM location_chain
-        UNION ALL
-        SELECT * FROM administrative_chain
-    ) AS combined
-    ORDER BY type, depth DESC;
+
+    SELECT id
+    FROM area_chain
+    ORDER BY depth DESC;
   `
 
   const result = await db.executeQuery(rawQuery.compile(db))
+  const hierarchyIds = (result.rows as unknown as LocationHierarchyRow[]).map(
+    (x) => x.id
+  )
+  hierarchyIds.push(locationId)
 
-  return result.rows as unknown as LocationHierarchyRow[]
+  return hierarchyIds
 }

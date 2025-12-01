@@ -138,7 +138,7 @@ test('records are indexed with full location hierarchy', async () => {
   expect(results[0].legalStatuses.DECLARED?.createdAtLocation).toEqual(
     childLocation.id
   )
-  expect(results[0].declaration.applicant____address).toEqual(undefined)
+  expect(results[0].declaration.applicant____address).toEqual(undefined) // address is stripped of from api response
 
   // --- Modify & re-search, hierarchy must STILL be stripped -----------------
   await client.event.actions.register.request({
@@ -163,7 +163,7 @@ test('records are indexed with full location hierarchy', async () => {
   expect(results2[0].legalStatuses.DECLARED?.createdAtLocation).toEqual(
     childLocation.id
   )
-  expect(results2[0].declaration.applicant____address).toEqual(undefined)
+  expect(results2[0].declaration.applicant____address).toEqual(undefined) // address is stripped of from api response
 })
 
 const RANDOM_UUID = '650a711b-a725-48f9-a92f-794b4a04fea6'
