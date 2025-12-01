@@ -23,6 +23,7 @@ import { RequestCorrection } from './RequestCorrection'
 import { PrintCertificate } from './PrintCertificate'
 import { DeclarationUpdate } from './DeclarationUpdate'
 import { CustomActionContent } from './CustomAction'
+import { DetectedDuplicate } from './DetectedDuplicate'
 
 const SyntheticDeclarationActionTypes = z.enum([DECLARATION_ACTION_UPDATE])
 
@@ -69,6 +70,10 @@ export function ActionTypeSpecificContent({
         validatorContext={validatorContext}
       />
     )
+  }
+
+  if (type === ActionType.DUPLICATE_DETECTED) {
+    return <DetectedDuplicate action={action} />
   }
 
   if (type === ActionType.CUSTOM) {
