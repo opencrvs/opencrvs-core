@@ -165,7 +165,7 @@ export const InvalidValue_NoRecordsFound: StoryObj<typeof FormFieldGenerator> =
         handlers: {
           nidApi: [
             http.post('/api/events/events/search', async () => {
-              await new Promise((resolve) => setTimeout(resolve, 2000))
+              await new Promise((resolve) => setTimeout(resolve, 2500))
               return HttpResponse.json({
                 results: [],
                 total: 0
