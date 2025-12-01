@@ -515,8 +515,8 @@ export const ReviewForIncompleteNameInteraction: Story = {
         await canvas.findByRole('button', { name: 'Action' })
       )
 
-      expect(
-        await canvas.getByText('Declare', { selector: 'li[disabled]' })
+      await expect(
+        canvas.getByText('Declare', { selector: 'li[disabled]' })
       ).toBeInTheDocument()
 
       await userEvent.click(await canvas.findByText('Notify'))
