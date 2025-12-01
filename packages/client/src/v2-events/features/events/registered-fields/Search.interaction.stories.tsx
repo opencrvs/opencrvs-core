@@ -178,8 +178,6 @@ export const InvalidValue_NoRecordsFound: StoryObj<typeof FormFieldGenerator> =
     play: async ({ canvasElement }) => {
       const canvas = within(canvasElement)
 
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
       await userEvent.type(
         await canvas.findByTestId('text__firstname'),
         'firstname'
