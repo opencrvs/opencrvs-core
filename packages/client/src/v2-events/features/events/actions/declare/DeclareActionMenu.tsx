@@ -106,7 +106,14 @@ function useDeclarationActions(event: EventDocument) {
 
   const reviewConfig = actionConfiguration.review
 
-  const incomplete = validationErrorsInActionFormExist({
+  /**
+   * hasValidationErrors is true if:
+   * - the form has any field validation errors or
+   * - the form is incomplete
+   *
+   * If hasValidationErrors is true, the user is still able to Notify an event (if they have the required scope)
+   */
+  const hasValidationErrors = validationErrorsInActionFormExist({
     formConfig,
     form: declaration,
     annotation,
@@ -256,21 +263,23 @@ function useDeclarationActions(event: EventDocument) {
         label: actionLabels[ActionType.REGISTER],
         onClick: async () => handleDeclaration(ActionType.REGISTER),
         hidden: !isActionAllowed(ActionType.REGISTER),
-        disabled: incomplete || !isDirectActionPossible(ActionType.REGISTER)
+        disabled:
+          hasValidationErrors || !isDirectActionPossible(ActionType.REGISTER)
       },
       {
         icon: 'PaperPlaneTilt' as const,
         label: actionLabels[ActionType.VALIDATE],
         onClick: async () => handleDeclaration(ActionType.VALIDATE),
         hidden: !isActionAllowed(ActionType.VALIDATE),
-        disabled: incomplete || !isDirectActionPossible(ActionType.VALIDATE)
+        disabled:
+          hasValidationErrors || !isDirectActionPossible(ActionType.VALIDATE)
       },
       {
         icon: 'UploadSimple' as const,
         label: actionLabels[ActionType.DECLARE],
         onClick: async () => handleDeclaration(ActionType.DECLARE),
         hidden: !isActionAllowed(ActionType.DECLARE),
-        disabled: incomplete
+        disabled: hasValidationErrors
       },
       {
         icon: 'UploadSimple' as const,
