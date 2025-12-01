@@ -62,7 +62,8 @@ import {
   isIdReaderFieldType,
   isQrReaderFieldType,
   isLoaderFieldType,
-  isAgeFieldType
+  isAgeFieldType,
+  isImageFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -87,7 +88,8 @@ import {
   AlphaPrintButton,
   Http,
   LinkButton,
-  VerificationStatus
+  VerificationStatus,
+  Image
 } from '@client/v2-events/features/events/registered-fields'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
@@ -797,6 +799,17 @@ export const GeneratedInputField = React.memo(
           configuration={field.config.configuration}
           id={field.config.id}
         />
+      )
+    }
+
+    if (isImageFieldType(field)) {
+      return (
+        field.value && (
+          <Image.Input
+            alt={field.config.configuration.alt}
+            value={field.value}
+          />
+        )
       )
     }
 

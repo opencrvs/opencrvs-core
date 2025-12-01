@@ -50,7 +50,8 @@ import {
   QrReaderField,
   IdReaderField,
   LoaderField,
-  AgeField
+  AgeField,
+  ImageField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -159,6 +160,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.VERIFICATION_STATUS:
     case FieldType.ID:
     case FieldType.LOADER:
+    case FieldType.IMAGE:
       schema = field.required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
@@ -250,6 +252,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.QR_READER:
     case FieldType.ID_READER:
     case FieldType.LOADER:
+    case FieldType.IMAGE:
       return null
     case FieldType.ADDRESS:
       return {
@@ -555,6 +558,13 @@ export const isLoaderFieldType = (field: {
   return field.config.type === FieldType.LOADER
 }
 
+export const isImageFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: string | undefined; config: ImageField } => {
+  return field.config.type === FieldType.IMAGE
+}
+
 export type NonInteractiveFieldType =
   | Divider
   | PageHeader
@@ -582,6 +592,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.HTTP ||
     field.type === FieldType.LINK_BUTTON ||
     field.type === FieldType.QUERY_PARAM_READER ||
-    field.type === FieldType.LOADER
+    field.type === FieldType.LOADER ||
+    field.type === FieldType.IMAGE
   )
 }

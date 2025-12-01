@@ -846,6 +846,18 @@ const LoaderField = BaseField.extend({
 
 export type LoaderField = z.infer<typeof LoaderField>
 
+const ImageField = BaseField.extend({
+  type: z.literal(FieldType.IMAGE),
+  defaultValue: z.string().optional().describe('Source URL of the image'),
+  configuration: z.object({
+    alt: TranslationConfig.describe('Alternative text for the image')
+  })
+}).describe(
+  'A non-interactive field that displays an image in the form such as a QR code or logo'
+)
+
+export type ImageField = z.infer<typeof ImageField>
+
 export const FieldConfig = z
   .discriminatedUnion('type', [
     Address,
@@ -886,7 +898,8 @@ export const FieldConfig = z
     IdReaderField,
     QueryParamReaderField,
     LoaderField,
-    SearchField
+    SearchField,
+    ImageField
   ])
   .meta({
     description: 'Form field configuration',
