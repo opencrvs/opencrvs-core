@@ -50,7 +50,8 @@ export const FieldType = {
   QUERY_PARAM_READER: 'QUERY_PARAM_READER',
   QR_READER: 'QR_READER',
   ID_READER: 'ID_READER',
-  LOADER: 'LOADER'
+  LOADER: 'LOADER',
+  IMAGE: 'IMAGE'
 } as const
 
 /**
