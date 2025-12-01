@@ -214,6 +214,10 @@ export const V2_DEFAULT_MOCK_LOCATIONS = [
   }
 ]
 
+export const V2_DEFAULT_MOCK_LOCATIONS_MAP = new Map(
+  V2_DEFAULT_MOCK_LOCATIONS.map((l) => [l.id, l])
+)
+
 export const handlers = {
   drafts: [
     tRPCMsw.event.draft.list.query(() => {

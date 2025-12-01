@@ -226,16 +226,17 @@ function useViewableActionConfigurations(
   const intl = useIntl()
   const { getUser } = useUsers()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
   const assignedToUser = getUser.useQuery(event.assignedTo || '', {
     enabled: !!event.assignedTo
   })
   const assignedUserFullName = assignedToUser.data
     ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
-  const assignedOffice = assignedToUser.data?.primaryOfficeId || ''
+
+  const assignedOffice = assignedToUser.data?.primaryOfficeId
   const assignedOfficeName =
-    locations.find((l) => l.id === assignedOffice)?.name || ''
+    (assignedOffice && locations.get(assignedOffice)?.name) || ''
 
   const { modal: deleteModal, deleteDeclaration } = useEventFormNavigation()
   const onDelete = useCallback(
