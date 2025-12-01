@@ -12,7 +12,8 @@ import React, { useMemo } from 'react'
 import {
   Location,
   FieldPropsWithoutReferenceValue,
-  LocationType
+  LocationType,
+  UUID
 } from '@opencrvs/commons/client'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
@@ -26,10 +27,10 @@ function useAdministrativeArea(
   parentId?: string | null
 ) {
   const { getLocations } = useLocations()
-  const [allLocations] = getLocations.useSuspenseQuery({})
+  const allLocations = getLocations.useSuspenseQuery({})
 
   return React.useMemo(() => {
-    return allLocations
+    return [...allLocations.values()]
       .filter((location) => {
         if (!location.locationType) {
           return false
@@ -90,17 +91,18 @@ function AdministrativeAreaInput({
 
 function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
 
-  const location = value.toString()
-    ? locations.find((l) => l.id === value.toString())
-    : null
+  const locationId = UUID.safeParse(value.toString()).data
+
+  const location = locationId && locations.get(locationId)
 
   return location ? location.name : ''
 }
 
-function stringify(value: string, context: { locations: Location[] }) {
-  const location = context.locations.find((l) => l.id === value)
+function stringify(value: string, context: { locations: Map<UUID, Location> }) {
+  const locationId = UUID.safeParse(value).data
+  const location = locationId && context.locations.get(locationId)
 
   const name = location?.name
   return name ?? EMPTY_TOKEN
