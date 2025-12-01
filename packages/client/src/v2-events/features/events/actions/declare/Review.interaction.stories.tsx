@@ -170,15 +170,15 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           await canvas.findByRole('button', { name: 'Action' })
         )
         await userEvent.click(await canvas.findByText('Register'))
-
-        await canvas.findByRole('button', { name: 'Cancel' })
-
-        await userEvent.click(
-          await canvas.findByRole('button', {
-            name: 'Register'
-          })
-        )
       })
+
+      await canvas.findByRole('button', { name: 'Cancel' })
+
+      await userEvent.click(
+        await canvas.findByRole('button', {
+          name: 'Register'
+        })
+      )
     })
 
     await step('Confirm action triggers scope based actions', async () => {
