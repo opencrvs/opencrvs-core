@@ -287,7 +287,8 @@ function validateNotifyAction({
       const fieldErrors = runStructuralValidations({
         field: { ...field, required: false },
         values: declaration,
-        context
+        context,
+        actionType: ActionType.NOTIFY
       })
 
       return fieldErrors.map((error) => ({

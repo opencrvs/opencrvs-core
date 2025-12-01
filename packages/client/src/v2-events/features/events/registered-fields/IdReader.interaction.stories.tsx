@@ -118,7 +118,7 @@ const fields = [
         'Content-Type': 'application/json'
       },
       params: {
-        nidReverse: field(`storybook.query-params`).get('nid-reverse')
+        nidReverse: field(`storybook.query-params`).get('data.nid-reverse')
       },
       errorValue: {
         verificationStatus: 'failed'

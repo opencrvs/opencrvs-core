@@ -43,7 +43,7 @@ export const user = {
   },
   practitionerId: '4651d1cc-6072-4e34-bf20-b583f421a9f1',
   primaryOfficeId: 'ce73938d-a188-4a78-9d19-35dfd4ca6957',
-  scope: ['declare', 'demo'],
+  scope: ['demo'],
   status: 'active',
   securityQuestionAnswers: [],
   creationDate: 1701241360173,

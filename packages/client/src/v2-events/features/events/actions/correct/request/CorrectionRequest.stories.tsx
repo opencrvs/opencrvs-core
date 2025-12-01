@@ -18,7 +18,8 @@ import {
   TokenUserType,
   generateUuid,
   createPrng,
-  Draft
+  Draft,
+  EventState
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { router } from './router'
@@ -54,21 +55,21 @@ const declarationActionWithAge = generateActionDocument({
       'applicant.address': {
         country: 'FAR',
         addressType: 'DOMESTIC',
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '27160bbd-32d1-4625-812f-860226bfb92a',
-        urbanOrRural: 'URBAN',
-        town: 'Example Town',
-        residentialArea: 'Example Residential Area',
-        street: 'Example Street',
-        number: '55',
-        zipCode: '123456'
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          town: 'Example Town',
+          residentialArea: 'Example Residential Area',
+          street: 'Example Street',
+          number: '55',
+          zipCode: '123456'
+        }
       },
       'recommender.name': {
         firstname: 'Euan',
         surname: 'Millar'
       },
       'recommender.id': '123456789'
-    }
+    } satisfies EventState
   }
 })
 

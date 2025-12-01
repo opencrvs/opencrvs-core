@@ -734,7 +734,9 @@ describe('Conditionals based on user role', () => {
         addressType: AddressType.DOMESTIC,
         administrativeArea: locations[0].id,
         streetLevelDetails: {
-          town: 'Example Village'
+          town: 'Example Village',
+          state: 'State',
+          district2: 'District2'
         }
       }
     }
@@ -805,7 +807,9 @@ describe('Conditionals based on user role', () => {
         addressType: AddressType.DOMESTIC,
         administrativeArea: locations[0].id,
         streetLevelDetails: {
-          town: 'Example Village'
+          town: 'Example Village',
+          state: 'State',
+          district2: 'District2'
         }
       }
     })

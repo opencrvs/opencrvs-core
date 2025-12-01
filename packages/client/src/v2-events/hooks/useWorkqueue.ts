@@ -10,6 +10,7 @@
  */
 
 import { useSelector } from 'react-redux'
+import { useCallback } from 'react'
 import {
   deserializeQuery,
   User,
@@ -97,39 +98,38 @@ export function useWorkqueues() {
   const workqueues = useCountryConfigWorkqueueConfigurations()
   const trpc = useTRPC()
 
-  return {
-    prefetch: async () => {
-      return Promise.all(
-        workqueues.map(async (workqueueConfig) => {
-          const deserializedQuery = getDeserializedQuery(workqueueConfig, user)
+  const prefetch = useCallback(async () => {
+    return Promise.all(
+      workqueues.map(async (workqueueConfig) => {
+        const deserializedQuery = getDeserializedQuery(workqueueConfig, user)
 
-          const key = trpc.event.search.queryKey({
+        const key = trpc.event.search.queryKey({
+          query: deserializedQuery,
+          offset: 0,
+          limit: 10,
+          sort: [{ field: 'updatedAt', direction: 'desc' }]
+        })
+
+        const data = queryClient.getQueryData(key)
+        const isFetching = queryClient.isFetching({ queryKey: key }) > 0
+
+        if (data || isFetching) {
+          return
+        }
+
+        return queryClient.prefetchQuery({
+          ...trpc.event.search.queryOptions({
             query: deserializedQuery,
             offset: 0,
             limit: 10,
             sort: [{ field: 'updatedAt', direction: 'desc' }]
           })
-
-          const data = queryClient.getQueryData(key)
-          const isFetching =
-            queryClient.isFetching({
-              queryKey: key
-            }) > 0
-
-          if (data || isFetching) {
-            return
-          }
-
-          return queryClient.prefetchQuery({
-            ...trpc.event.search.queryOptions({
-              query: deserializedQuery,
-              offset: 0,
-              limit: 10,
-              sort: [{ field: 'updatedAt', direction: 'desc' }]
-            })
-          })
         })
-      )
-    }
+      })
+    )
+  }, [workqueues, user, trpc])
+
+  return {
+    prefetch
   }
 }

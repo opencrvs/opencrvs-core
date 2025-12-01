@@ -8,31 +8,55 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import localForage from 'localforage'
+import { createStore, get, set, del, entries, clear } from 'idb-keyval'
 import { validateApplicationVersion } from '@client/utils'
 
-function configStorage(dbName: string) {
-  localForage.config({
-    driver: localForage.INDEXEDDB,
-    name: dbName
-  })
+const DATABASE_NAME = 'OpenCRVS'
+const STORE_NAME = 'keyvaluepairs'
+
+/**
+ * Create store when module is first loaded.
+ *
+ * Previously store was created on-demand, initiated at application root. (index.tsx).
+ * However, files are executed during import. React renders after everything is imported.
+ *
+ * There is no guarantee that application root is executed before other files that might use storage (e.g. useDrafts).
+ */
+let store = createStore(DATABASE_NAME, STORE_NAME)
+
+function configStorage() {
+  if (!store) {
+    store = createStore(DATABASE_NAME, STORE_NAME)
+  }
+
   validateApplicationVersion()
 }
 
 async function getItem<T = string>(key: string): Promise<T | null> {
-  return await localForage.getItem<T>(key)
+  if (!store) {
+    // eslint-disable-next-line no-console
+    console.error('IDB store not initialized before getItem:', key)
+    return null
+  }
+
+  return (await get<T>(key, store)) || null
 }
 
 async function setItem<T = string>(key: string, value: T) {
-  return await localForage.setItem(key, value)
+  return await set(key, value, store)
 }
 
 async function removeItem(key: string) {
-  return await localForage.removeItem(key)
+  return await del(key, store)
+}
+
+async function clearStorage() {
+  return clear(store)
 }
 
 export const storage = {
   configStorage,
+  clearStorage,
   getItem,
   setItem,
   removeItem

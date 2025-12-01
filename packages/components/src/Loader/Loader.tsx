@@ -16,6 +16,7 @@ export interface ILoader {
   id: string
   loadingText?: string
   marginPercent?: number
+  innerMargin?: number
   spinnerDiameter?: number
   flexDirection?: 'row' | 'column' | 'row-reverse' | 'column-reverse'
 }
@@ -23,10 +24,10 @@ export interface IDiaMeter {
   diameter: number | undefined
 }
 
-const StyledSpinner = styled(Spinner)`
+const StyledSpinner = styled(Spinner)<ILoader>`
   width: 100%;
   height: 100%;
-  margin: 24px 0;
+  margin: ${({ innerMargin }) => innerMargin}px 0;
 `
 const LoadingContainer = styled.div<ILoader>`
   width: 100%;
@@ -45,6 +46,7 @@ export const Loader = ({
   id,
   loadingText,
   marginPercent,
+  innerMargin = 24,
   spinnerDiameter,
   flexDirection
 }: ILoader) => (
@@ -53,7 +55,11 @@ export const Loader = ({
     marginPercent={marginPercent}
     flexDirection={flexDirection}
   >
-    <StyledSpinner id={id + '_spinner'} size={spinnerDiameter} />
+    <StyledSpinner
+      id={id + '_spinner'}
+      size={spinnerDiameter}
+      innerMargin={innerMargin}
+    />
     {loadingText && <LoadingTextContainer>{loadingText}</LoadingTextContainer>}
   </LoadingContainer>
 )

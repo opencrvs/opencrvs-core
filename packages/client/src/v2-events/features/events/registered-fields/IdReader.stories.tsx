@@ -14,7 +14,6 @@ import React, { useEffect, useState } from 'react'
 import { fn } from '@storybook/test'
 import styled from 'styled-components'
 import QRCode from 'qrcode'
-import { config } from 'localforage'
 import {
   ConditionalType,
   field,

@@ -50,7 +50,7 @@ export function makeFormikFieldIdsOpenCRVSCompatible<T>(
   )
 }
 
-function parseFieldReferenceToValue(
+export function parseFieldReferenceToValue(
   fieldReference: FieldReference,
   fieldValues: Record<string, FieldValue>
 ) {

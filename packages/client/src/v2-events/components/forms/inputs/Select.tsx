@@ -9,10 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { default as ReactSelect, components } from 'react-select'
+import {
+  DropdownIndicatorProps,
+  GroupBase,
+  default as ReactSelect,
+  components
+} from 'react-select'
 import styled from 'styled-components'
 import { Props } from 'react-select/lib/Select'
-import { IndicatorProps } from 'react-select/lib/components/indicators'
 import { isEqual } from 'lodash'
 import { Icon } from '@opencrvs/components'
 import { Option } from '@client/v2-events/utils'
@@ -27,13 +31,13 @@ interface StyledSelectProps extends Props<Option> {
   placeholder?: string
 }
 
-function DropdownIndicator(props: IndicatorProps<Option>) {
+function DropdownIndicator(
+  props: DropdownIndicatorProps<Option, false, GroupBase<Option>>
+) {
   return (
-    components.DropdownIndicator && (
-      <components.DropdownIndicator {...props}>
-        <Icon color="grey600" name="CaretDown" size="small" />
-      </components.DropdownIndicator>
-    )
+    <components.DropdownIndicator {...props}>
+      <Icon color="grey600" name="CaretDown" size="small" />
+    </components.DropdownIndicator>
   )
 }
 
@@ -159,23 +163,6 @@ export interface SelectProps<T>
   value: T | undefined
 }
 
-type ControlProps = React.ComponentProps<typeof components.Control>
-
-function CustomControl(props: ControlProps) {
-  const { innerProps, selectProps } = props
-  return (
-    <components.Control
-      {...props}
-      innerProps={
-        {
-          ...innerProps,
-          'data-testid': selectProps['data-testid']
-        } as ControlProps['innerProps'] & { 'data-testid': string }
-      }
-    />
-  )
-}
-
 export function Select<T>({
   onChange,
   searchableLength = 10,
@@ -190,8 +177,9 @@ export function Select<T>({
   return (
     <StyledSelect
       classNamePrefix="react-select"
-      components={{ DropdownIndicator, Control: CustomControl }}
+      components={{ DropdownIndicator, IndicatorSeparator: () => null }}
       error={error}
+      innerProps={{ 'data-testid': props['data-testid'] }}
       isDisabled={disabled}
       isSearchable={options.length > length}
       options={options}

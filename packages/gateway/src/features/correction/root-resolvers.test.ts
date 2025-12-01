@@ -33,15 +33,11 @@ describe('Correction root resolvers', () => {
         audience: 'opencrvs:gateway-user'
       }
     )
-    declareToken = jwt.sign(
-      { scope: ['declare'] },
-      readFileSync('./test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:gateway-user'
-      }
-    )
+    declareToken = jwt.sign({ scope: [] }, readFileSync('./test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:gateway-user'
+    })
 
     birthDetails = {
       child: {

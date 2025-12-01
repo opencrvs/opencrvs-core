@@ -152,8 +152,7 @@ export function generateQueryForAddressField(
     return { bool: { must: [] } }
   }
 
-  const { country, addressType, administrativeArea, streetLevelDetails } =
-    address.data
+  const { country, addressType, streetLevelDetails } = address.data
   const mustMatches = []
 
   const declarationKey = declarationReference(encodeFieldId(fieldId))
@@ -163,6 +162,7 @@ export function generateQueryForAddressField(
     })
   }
   if (addressType === AddressType.DOMESTIC) {
+    const administrativeArea = address.data.administrativeArea
     if (administrativeArea) {
       mustMatches.push({
         term: {

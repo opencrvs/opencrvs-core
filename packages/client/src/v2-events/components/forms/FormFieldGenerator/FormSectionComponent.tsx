@@ -459,9 +459,9 @@ export function FormSectionComponent({
             <Field name={field.id}>
               {({ field: formikField }: FieldProps) => (
                 <GeneratedInputField
+                  allKnownFields={allFieldsWithDotSeparator}
                   disabled={isDisabled}
                   error={isDisabled ? '' : error}
-                  eventConfig={eventConfig}
                   fieldDefinition={field}
                   form={completeForm}
                   readonlyMode={readonlyMode}

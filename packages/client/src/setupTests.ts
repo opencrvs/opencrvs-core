@@ -193,8 +193,10 @@ Object.defineProperty(document, 'hidden', {
 
 const storageGetItemMock = vi.fn()
 const storageSetItemMock = vi.fn()
+const storageRemoveItemMock = vi.fn()
 storage.getItem = storageGetItemMock
 storage.setItem = storageSetItemMock
+storage.removeItem = storageRemoveItemMock
 
 /*
  * Console
@@ -249,6 +251,7 @@ beforeEach(() => {
   getItem.mockReturnValue(validToken)
   storageGetItemMock.mockReset()
   storageSetItemMock.mockReset()
+  storageRemoveItemMock.mockReset()
   warn.mockReset()
   error.mockReset()
   debug.mockReset()

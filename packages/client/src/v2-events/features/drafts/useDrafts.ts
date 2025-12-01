@@ -231,13 +231,14 @@ export function useDrafts() {
 
       createDraft.mutate({
         eventId: localDraft.eventId,
-        declaration: deepDropNulls(localDraft.action.declaration),
+        declaration: localDraft.action.declaration,
         annotation: deepDropNulls(localDraft.action.annotation),
         transactionId: localDraft.transactionId,
         type: localDraft.action.type,
         status: localDraft.action.status
       })
     },
+    isLocalDraftSubmitted: createDraft.isSuccess,
     getAllRemoteDrafts,
     getRemoteDraftByEventId: function useDraftList(
       eventId: string,

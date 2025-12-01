@@ -224,8 +224,10 @@ export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
+    await canvas.findByText('Upload your captured photo')
+
     const fileInput = await canvas.findByRole('button', {
-      name: 'Upload'
+      name: /upload/i
     })
 
     const input = canvasElement.querySelector(

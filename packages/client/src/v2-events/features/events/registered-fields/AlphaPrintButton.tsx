@@ -117,8 +117,6 @@ export const AlphaPrintButton = {
       language
     })
 
-    const alreadyPrinted = Boolean(value)
-
     const handlePrint = async () => {
       if (!certificateConfig || !language || !preparePdfCertificate) {
         return
@@ -141,7 +139,7 @@ export const AlphaPrintButton = {
 
     return (
       <Button
-        disabled={disabled || !certificateConfig || alreadyPrinted}
+        disabled={disabled || !certificateConfig}
         id={id}
         size="medium"
         type="secondary"

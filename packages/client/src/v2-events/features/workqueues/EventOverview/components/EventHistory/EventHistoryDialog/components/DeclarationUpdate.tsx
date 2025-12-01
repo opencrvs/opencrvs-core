@@ -24,7 +24,7 @@ import { EventHistoryActionDocument } from '@client/v2-events/features/events/ac
  *
  * Displays diff between declaration and update of it.
  */
-export function DeclarationUpdateComponent({
+function DeclarationUpdateComponent({
   action,
   fullEvent,
   validatorContext

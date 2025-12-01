@@ -20,7 +20,7 @@ import { checkUserAssignment } from './authorisation'
 describe('checkUserAssignment()', () => {
   const fetch = fetchMock as fetchMock.FetchMock
   const registerCertifyToken = jwt.sign(
-    { scope: ['register', 'certify'] },
+    { scope: ['register'] },
     readFileSync('./test/cert.key'),
     {
       subject: '121221',

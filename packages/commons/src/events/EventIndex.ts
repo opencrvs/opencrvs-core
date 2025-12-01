@@ -203,30 +203,34 @@ export const QueryExpression = z
     ref: 'QueryExpression'
   })
 
-export const QueryType = z
-  .object({
-    type: z.literal('and').or(z.literal('or')).openapi({ default: 'and' }),
-    clauses: z
-      .array(QueryExpression)
-      .nonempty('At least one clause is required.')
-      .openapi({
-        default: [
-          {
-            eventType: TENNIS_CLUB_MEMBERSHIP,
-            status: {
-              type: 'anyOf',
-              terms: EventStatus.options
-            },
-            updatedAt: {
-              type: 'range',
-              gte: '2025-05-22',
-              lte: '2025-05-29'
-            },
-            data: {}
-          }
-        ]
-      })
-  })
+// Use `ZodType` here to avoid locking the output type prematurely —
+// this keeps recursive inference intact and allows `z.infer<typeof QueryType>` to work correctly.
+export const QueryType: ZodType = z
+  .lazy(() =>
+    z.object({
+      type: z.literal('and').or(z.literal('or')).openapi({ default: 'and' }),
+      clauses: z
+        .array(z.union([QueryExpression, QueryType]))
+        .nonempty('At least one clause is required.')
+        .openapi({
+          default: [
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              status: {
+                type: 'anyOf',
+                terms: EventStatus.options
+              },
+              updatedAt: {
+                type: 'range',
+                gte: '2025-05-22',
+                lte: '2025-05-29'
+              },
+              data: {}
+            }
+          ]
+        })
+    })
+  )
   .openapi({
     ref: 'QueryType'
   })

@@ -14,18 +14,11 @@ import { SearchScopeAccessLevels } from './events'
 
 export const SCOPES = {
   // TODO v1.8 legacy scopes
-  NATLSYSADMIN: 'natlsysadmin',
   BYPASSRATELIMIT: 'bypassratelimit',
 
-  DECLARE: 'declare',
   REGISTER: 'register',
-  VALIDATE: 'validate',
 
   DEMO: 'demo',
-  CERTIFY: 'certify',
-  PERFORMANCE: 'performance',
-  SYSADMIN: 'sysadmin',
-  TEAMS: 'teams',
   CONFIG: 'config',
 
   // systems / integrations
@@ -61,22 +54,12 @@ export const SCOPES = {
 
   // register
   RECORD_REGISTER: 'record.register',
-
-  // certify
-  RECORD_EXPORT_RECORDS: 'record.export-records',
-  RECORD_DECLARATION_PRINT: 'record.declaration-print',
-  RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS:
-    'record.declaration-print-supporting-documents',
-  RECORD_REGISTRATION_PRINT: 'record.registration-print', // v1.8
   /**
    * This scope is used to **print and **issue certified copies of a record
    * after it has been registered. Previously Registrars had this permission.
    */
   RECORD_PRINT_ISSUE_CERTIFIED_COPIES:
     'record.registration-print&issue-certified-copies',
-  RECORD_PRINT_CERTIFIED_COPIES: 'record.registration-print-certified-copies', // v1.8
-  RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES:
-    'record.registration-verify-certified-copies', // v1.8
 
   // correct
   RECORD_REGISTRATION_REQUEST_CORRECTION:
@@ -97,7 +80,6 @@ export const SCOPES = {
   RECORD_READ: 'record.read',
 
   // profile
-  PROFILE_UPDATE: 'profile.update', //v1.8
   PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
 
   // performance
@@ -131,16 +113,9 @@ export const SCOPES = {
 
 // Legacy scopes
 const LegacyScopes = z.union([
-  z.literal(SCOPES.NATLSYSADMIN),
   z.literal(SCOPES.BYPASSRATELIMIT),
-  z.literal(SCOPES.DECLARE),
   z.literal(SCOPES.REGISTER),
-  z.literal(SCOPES.VALIDATE),
   z.literal(SCOPES.DEMO),
-  z.literal(SCOPES.CERTIFY),
-  z.literal(SCOPES.PERFORMANCE),
-  z.literal(SCOPES.SYSADMIN),
-  z.literal(SCOPES.TEAMS),
   z.literal(SCOPES.CONFIG)
 ])
 
@@ -185,17 +160,6 @@ const ValidateScopes = z.union([
 // Register
 const RegisterScope = z.literal(SCOPES.RECORD_REGISTER)
 
-// Certify
-const CertifyScopes = z.union([
-  z.literal(SCOPES.RECORD_EXPORT_RECORDS),
-  z.literal(SCOPES.RECORD_DECLARATION_PRINT),
-  z.literal(SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS),
-  z.literal(SCOPES.RECORD_REGISTRATION_PRINT),
-  z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
-  z.literal(SCOPES.RECORD_PRINT_CERTIFIED_COPIES),
-  z.literal(SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES)
-])
-
 // Correct
 const CorrectionScopes = z.union([
   z.literal(SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION),
@@ -216,12 +180,6 @@ export const SearchScopes = z.union([
 
 // Audit
 const AuditScopes = z.literal(SCOPES.RECORD_READ)
-
-// Profile
-const ProfileScopes = z.union([
-  z.literal(SCOPES.PROFILE_UPDATE),
-  z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE)
-])
 
 // Performance
 const PerformanceScopes = z.union([
@@ -263,11 +221,11 @@ const LiteralScopes = z.union([
   DeclareScopes,
   ValidateScopes,
   RegisterScope,
-  CertifyScopes,
+  z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
   CorrectionScopes,
   SearchScopes,
   AuditScopes,
-  ProfileScopes,
+  z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
   PerformanceScopes,
   OrganisationScopes,
   UserScopes,
@@ -527,7 +485,7 @@ export const ActionScopes = z.union([
   DeclareScopes,
   ValidateScopes,
   RegisterScope,
-  CertifyScopes,
+  z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
   CorrectionScopes
 ])
 

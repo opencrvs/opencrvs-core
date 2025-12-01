@@ -273,21 +273,40 @@ async function buildClause(
   return must
 }
 
+async function buildClauseOrQuery(
+  clause: QueryExpression | QueryType,
+  eventConfigs: EventConfig[]
+): Promise<estypes.QueryDslQueryContainer> {
+  // Check if query is nested
+  if ('clauses' in clause) {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    return buildElasticQueryFromSearchPayload(clause, eventConfigs)
+  } else {
+    const must = await buildClause(clause, eventConfigs)
+    return {
+      bool: {
+        must,
+        should: undefined
+      }
+    }
+  }
+}
+
 export async function buildElasticQueryFromSearchPayload(
   input: QueryType,
   eventConfigs: EventConfig[]
 ): Promise<estypes.QueryDslQueryContainer> {
-  const mustResults = await Promise.all(
-    input.clauses.map(async (clause) => buildClause(clause, eventConfigs))
-  )
-
-  const must = mustResults.flat()
-
   switch (input.type) {
     case 'and': {
+      const mustResults = await Promise.all(
+        input.clauses.map(async (clause: QueryExpression | QueryType) =>
+          buildClauseOrQuery(clause, eventConfigs)
+        )
+      )
+
       return {
         bool: {
-          must,
+          must: mustResults,
           // Explicitly setting `should` to `undefined` to satisfy QueryDslBoolQuery type requirements
           // when no `should` clauses are provided.
           should: undefined
@@ -295,20 +314,16 @@ export async function buildElasticQueryFromSearchPayload(
       }
     }
     case 'or': {
-      const should = await Promise.all(
-        input.clauses.map(async (clause) => ({
-          bool: {
-            must: await buildClause(clause, eventConfigs),
-            // Explicitly setting `should` to `undefined` to satisfy QueryDslBoolQuery type requirements
-            // when no `should` clauses are provided.
-            should: undefined
-          }
-        }))
+      const shouldResults = await Promise.all(
+        input.clauses.map(async (clause: QueryExpression | QueryType) =>
+          buildClauseOrQuery(clause, eventConfigs)
+        )
       )
 
       return {
         bool: {
-          should
+          should: shouldResults,
+          minimum_should_match: 1
         }
       }
     }

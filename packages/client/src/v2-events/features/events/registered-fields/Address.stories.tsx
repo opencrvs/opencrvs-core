@@ -239,7 +239,9 @@ export const AddressReviewChanged: StoryObj<typeof FormFieldGenerator> = {
               residentialArea: 'Example Residential Area',
               street: 'Example Street',
               number: '55',
-              zipCode: '123456'
+              zipCode: '123456',
+              state: 'Example State',
+              district2: 'Example District 2'
             }
           }
         }}
@@ -250,7 +252,8 @@ export const AddressReviewChanged: StoryObj<typeof FormFieldGenerator> = {
             addressType: AddressType.DOMESTIC,
             administrativeArea: leafAdminStructureLocationId,
             streetLevelDetails: {
-              town: 'Example Village'
+              town: 'Example Village',
+              district2: 'Old District 2'
             }
           }
         }}

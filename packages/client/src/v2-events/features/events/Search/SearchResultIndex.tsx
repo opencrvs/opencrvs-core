@@ -71,7 +71,11 @@ export const SearchResultIndex = () => {
    * re-evaluated, which leads to an infinite loop.
    */
   const queryData = searchEvent.useQuery({
-    query: toAdvancedSearchQueryType(searchQuery, eventType),
+    query: toAdvancedSearchQueryType(
+      searchQuery,
+      eventConfig.advancedSearch.flatMap((section) => section.fields),
+      eventType
+    ),
     ...typedSearchParams
   }).data ?? {
     results: [],

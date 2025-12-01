@@ -59,7 +59,6 @@ echo -e "\033[32m:::::::: OpenCRVS Core is running, now we must checkout a confi
 echo -e "\033[32m:::::::::::::::::: Preparing database ::::::::::::::::::\033[0m"
 echo
 cd ../opencrvs-core
-yarn db:clear:all
 
 echo
 echo -e "\033[32m::::::::::::::::::::: Starting Farajaland Config Server :::::::::::::::::::::\033[0m"

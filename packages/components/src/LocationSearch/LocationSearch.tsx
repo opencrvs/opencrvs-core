@@ -120,6 +120,7 @@ interface IProps {
   buttonLabel: string
   disabled?: boolean
 }
+
 export class LocationSearch extends React.Component<IProps, IState> {
   searchTimeout: NodeJS.Timeout | undefined
   constructor(props: IProps) {

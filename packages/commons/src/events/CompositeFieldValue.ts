@@ -41,8 +41,8 @@ export const NameFieldValue = z.object({
 
 export const NameFieldUpdateValue = z
   .object({
-    firstname: z.string(),
-    surname: z.string(),
+    firstname: z.string().nullish(),
+    surname: z.string().nullish(),
     middlename: z.string().nullish()
   })
   .or(z.null())
@@ -51,35 +51,64 @@ export const NameFieldUpdateValue = z
 export type NameFieldValue = z.infer<typeof NameFieldValue>
 export type NameFieldUpdateValue = z.infer<typeof NameFieldUpdateValue>
 
-export const StreetLevelDetailsValue = z
-  .record(z.string(), z.string())
-  .optional()
+const StreetLevelDetailsValue = z.record(z.string(), z.string()).optional()
 
-export const AddressFieldValue = z.object({
+export const StreetLevelDetailsUpdateValue = z
+  .record(z.string(), z.string().nullable())
+  .nullish()
+
+const BaseAddressFieldValue = z.object({
   country: z.string(),
-  addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL]),
-  administrativeArea: z
-    .string()
-    .uuid()
-    .optional() /* Leaf level admin structure */,
   streetLevelDetails: StreetLevelDetailsValue
 })
 
-export const StreetLevelDetailsUpdateValue = z
-  .record(z.string(), z.string())
-  .nullish()
-
-export const AddressFieldUpdateValue = z.object({
-  country: z.string(),
-  addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL]),
-  administrativeArea: z
-    .string()
-    .uuid()
-    .nullish() /* Leaf level admin structure */,
+const BaseAddressFieldUpdateValue = z.object({
+  country: z.string().nullish(),
   streetLevelDetails: StreetLevelDetailsUpdateValue
 })
 
+export const DomesticAddressFieldValue = BaseAddressFieldValue.extend({
+  addressType: z.literal(AddressType.DOMESTIC),
+  administrativeArea: z.string().uuid()
+})
+
+export type DomesticAddressFieldValue = z.infer<
+  typeof DomesticAddressFieldValue
+>
+
+const InternationalAddressFieldValue = BaseAddressFieldValue.extend({
+  addressType: z.literal(AddressType.INTERNATIONAL)
+})
+
+export const AddressFieldValue = z.discriminatedUnion('addressType', [
+  DomesticAddressFieldValue,
+  InternationalAddressFieldValue
+])
+
 export type AddressFieldValue = z.infer<typeof AddressFieldValue>
+
+const DomesticAddressUpdateFieldValue = BaseAddressFieldUpdateValue.extend({
+  addressType: z.literal(AddressType.DOMESTIC),
+  administrativeArea: z
+    .string()
+    .uuid()
+    .nullish() /* Leaf level admin structure */
+})
+
+const InternationalAddressUpdateFieldValue = BaseAddressFieldUpdateValue.extend(
+  {
+    addressType: z.literal(AddressType.INTERNATIONAL)
+  }
+)
+
+export const AddressFieldUpdateValue = z
+  .discriminatedUnion('addressType', [
+    DomesticAddressUpdateFieldValue,
+    InternationalAddressUpdateFieldValue
+  ])
+  .nullish()
+
+export type AddressFieldUpdateValue = z.infer<typeof AddressFieldUpdateValue>
 
 export const FileFieldValueWithOption = z.object({
   path: FullDocumentPath,
@@ -109,13 +138,18 @@ export const HttpFieldUpdateValue = z
   .or(z.undefined())
 
 export const QueryParamReaderFieldValue = z
-  .record(z.string(), z.string())
+  .object({
+    data: z.record(z.string(), z.string())
+  })
   .nullish()
+
 export type QueryParamReaderFieldValue = z.infer<
   typeof QueryParamReaderFieldValue
 >
 
-export const QueryParamReaderFieldUpdateValue = z.record(z.string(), z.string())
+export const QueryParamReaderFieldUpdateValue = z.object({
+  data: z.record(z.string(), z.string())
+})
 
 const ReadDataValue = z.object({
   data: z.any()

@@ -396,14 +396,6 @@ export const routesConfig = turnOffV2Events
             element: <RegistrationList />
           },
           {
-            path: routes.DASHBOARD,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
-                <PerformanceDashboard />
-              </ProtectedRoute>
-            )
-          },
-          {
             path: routes.PERFORMANCE_FIELD_AGENT_LIST,
             element: <FieldAgentList />
           },

@@ -11,7 +11,11 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import React from 'react'
-import { FieldType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  FieldType,
+  FieldValue,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { Output } from './Output'
@@ -309,12 +313,74 @@ export const DataOutput: Story = {
       }
     },
     value: {
-      'applicant.name': {
-        firstname: 'John',
-        surname: 'Malkovich'
+      data: {
+        'applicant.name': {
+          firstname: 'John',
+          surname: 'Malkovich'
+        },
+        ['static.text']: 'Some static text here',
+        ['some-other-static-data']: 'Some other static text here'
+      }
+    } satisfies FieldValue
+  }
+}
+
+export const VerificationStatusOutputWhenStatusIsVerified: Story = {
+  args: {
+    value: 'verified',
+    field: {
+      type: FieldType.VERIFICATION_STATUS,
+      id: 'applicant.verificationStatus',
+      label: {
+        id: 'applicant.verificationStatus',
+        defaultMessage: 'Verification Status',
+        description: 'The verification status of the applicant'
       },
-      ['static.text']: 'Some static text here',
-      ['some-other-static-data']: 'Some other static text here'
+      configuration: {
+        status: {
+          id: 'verified.status.text',
+          defaultMessage:
+            '{value, select, authenticated {ID Authenticated} verified {ID Verified} failed {Unverified ID} pending {Pending verification} other {Invalid value}}',
+          description:
+            'Status text shown on the pill on both form declaration and review page'
+        },
+        description: {
+          id: 'verified.status.description',
+          defaultMessage:
+            "{value, select, authenticated {This identity has been successfully authenticated with the Farajaland’s National ID System. To make edits, please remove the authentication first.} verified {This identity data has been successfully verified with the Farajaland’s National ID System. Please note that their identity has not been authenticated using the individual's biometrics. To make edits, please remove the verification first.} pending {Identity pending verification with Farajaland’s National ID system} failed {The identity data does not match an entry in Farajaland’s National ID System} other {Invalid value}}",
+          description: 'Description text of the status'
+        }
+      }
+    }
+  }
+}
+
+export const VerificationStatusOutputWhenStatusIsNull: Story = {
+  args: {
+    value: null,
+    field: {
+      type: FieldType.VERIFICATION_STATUS,
+      id: 'applicant.verificationStatus',
+      label: {
+        id: 'applicant.verificationStatus',
+        defaultMessage: 'Verification Status',
+        description: 'The verification status of the applicant'
+      },
+      configuration: {
+        status: {
+          id: 'verified.status.text',
+          defaultMessage:
+            '{value, select, authenticated {ID Authenticated} verified {ID Verified} failed {Unverified ID} pending {Pending verification} other {Invalid value}}',
+          description:
+            'Status text shown on the pill on both form declaration and review page'
+        },
+        description: {
+          id: 'verified.status.description',
+          defaultMessage:
+            "{value, select, authenticated {This identity has been successfully authenticated with the Farajaland’s National ID System. To make edits, please remove the authentication first.} verified {This identity data has been successfully verified with the Farajaland’s National ID System. Please note that their identity has not been authenticated using the individual's biometrics. To make edits, please remove the verification first.} pending {Identity pending verification with Farajaland’s National ID system} failed {The identity data does not match an entry in Farajaland’s National ID System} other {Invalid value}}",
+          description: 'Description text of the status'
+        }
+      }
     }
   }
 }

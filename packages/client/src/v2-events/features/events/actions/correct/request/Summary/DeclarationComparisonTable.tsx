@@ -32,7 +32,7 @@ import {
   hasFieldChanged
 } from '@client/v2-events/features/events/actions/correct/utils'
 import {
-  expandWithUpdateActions,
+  expandWithClientSpecificActions,
   EventHistoryActionDocument,
   EventHistoryDocument,
   getCurrentEventStateSafe
@@ -105,7 +105,7 @@ function DeclarationComparisonTableComponent({
   id,
   validatorContext
 }: DeclarationComparisonTableProps) {
-  const historyWithUpdatedActions = expandWithUpdateActions(
+  const historyWithUpdatedActions = expandWithClientSpecificActions(
     fullEventWithoutUpdatedAction,
     validatorContext,
     eventConfig

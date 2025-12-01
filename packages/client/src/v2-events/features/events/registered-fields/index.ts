@@ -31,6 +31,7 @@ import { SelectCountry } from './SelectCountry'
 import { SelectDateRangeField } from './SelectDateRangeField'
 import { Text } from './Text'
 import { TimeField } from './TimeField'
+import { Search } from './Search'
 import { AlphaPrintButton } from './AlphaPrintButton'
 import { LinkButton } from './LinkButton'
 import { VerificationStatus } from './VerificationStatus'
@@ -106,6 +107,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return Name
     case FieldType.SELECT_DATE_RANGE:
       return SelectDateRangeField
+    case FieldType.SEARCH:
+      return Search
     case FieldType.HTTP:
       return Http
     case FieldType.LINK_BUTTON:

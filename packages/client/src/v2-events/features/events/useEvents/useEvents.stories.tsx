@@ -10,7 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import superjson from 'superjson'
-import React, { Suspense } from 'react'
+import React from 'react'
 import { within } from '@storybook/testing-library'
 import { waitFor, expect } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
@@ -35,6 +35,7 @@ import {
 } from '@client/v2-events/cache'
 import { ROUTES } from '@client/v2-events/routes'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { storage } from '@client/storage'
 import { useDrafts } from '../../drafts/useDrafts'
 import { useEvents } from './useEvents'
 
@@ -143,6 +144,7 @@ export const GetEventHook: Story = {
     actionType: ActionType.DECLARE
   },
   loaders: [
+    storage.clearStorage,
     async () => {
       spies.draftList = 0
       spies.eventGet = 0

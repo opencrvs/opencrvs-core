@@ -12,7 +12,6 @@
 import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
 import { zod } from 'react-router-typesafe-routes/zod'
 import * as z from 'zod'
-import { config } from '@client/config'
 import {
   requestRoutes as correctionRequestRoutes,
   reviewRoutes as correctionReviewRoutes
@@ -158,6 +157,9 @@ export const ROUTES = {
           REVIEW_CORRECTION: correctionReviewRoutes
         }
       ),
+      DASHBOARD: route('performance/dashboard/:id', {
+        params: { id: string().defined() }
+      }),
       WORKQUEUES: workqueueRoutes,
       ADVANCED_SEARCH: route('advanced-search'),
       SEARCH_RESULT: route('search-result/:eventType', {

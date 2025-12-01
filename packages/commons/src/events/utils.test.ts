@@ -10,15 +10,23 @@
  */
 
 import { UUID } from '../uuid'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, difference } from 'lodash'
 import { Action } from './ActionDocument'
 import { ActionType } from './ActionType'
 import {
   findLastAssignmentAction,
+  getDeclaration,
+  getDeclarationFields,
   getMixedPath,
-  getPendingAction
+  getPendingAction,
+  omitHiddenPaginatedFields
 } from './utils'
 import { TokenUserType } from '../authentication'
+import {
+  createPrng,
+  fieldConfigsToActionPayload,
+  tennisClubMembershipEvent
+} from '../client'
 
 const commonAction = {
   status: 'Requested' as const,
@@ -515,5 +523,36 @@ describe('getPendingAction', () => {
     ).toThrowError(
       'Expected exactly one pending action, but found action-id-4, action-id-5'
     )
+  })
+})
+
+describe('omitHiddenPaginatedFields', () => {
+  it('removes fields that are hidden by field conditionals when page conditional is true', () => {
+    const rng = createPrng(101)
+
+    const fields = getDeclarationFields(tennisClubMembershipEvent)
+
+    const declarationConfig = getDeclaration(tennisClubMembershipEvent)
+
+    const declaration = fieldConfigsToActionPayload(fields, rng)
+    const declarationWithoutHiddenFields = omitHiddenPaginatedFields(
+      declarationConfig,
+      declaration,
+      {}
+    )
+
+    const missingKeys = difference(
+      Object.keys(declaration),
+      Object.keys(declarationWithoutHiddenFields)
+    )
+
+    expect(missingKeys).toEqual([
+      'applicant.dob', // dobUnknown is true
+      'applicant.isRecommendedByFieldAgent', // user is not field agent
+      'senior-pass.id', // dob is not before the threshhold
+      'senior-pass.recommender', // dob is not before threshhold
+      'recommender.name', // recommender.none is true
+      'recommender.id' // recommender.none is true
+    ])
   })
 })

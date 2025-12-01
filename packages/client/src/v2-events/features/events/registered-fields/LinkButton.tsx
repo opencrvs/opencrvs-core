@@ -9,10 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { LinkButtonField, TranslationConfig } from '@opencrvs/commons/client'
 import { Button, Icon } from '@opencrvs/components'
+import { useDrafts } from '../../drafts/useDrafts'
 import { throwIfUnsupportedIcon } from './Button'
 
 function setRedirectURI(url: string) {
