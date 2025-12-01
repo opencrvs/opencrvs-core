@@ -31,7 +31,7 @@ const UserFilter = z
   .enum(['user'])
   .describe('Filters based on the user. Limits to self.')
 
-export const RecordAction = z.enum([
+const RecordAction = z.enum([
   'recoed.search',
   'record.create',
   'record.read',
@@ -48,7 +48,7 @@ export const RecordAction = z.enum([
   'record.unassign-others'
 ])
 
-export const RecordScope = z
+const RecordScope = z
   .object({
     type: RecordAction,
     options: z
@@ -86,7 +86,7 @@ const flattenScope = (scope: AnyScope) => ({
   ...scope.options
 })
 
-const unflattenScope = (input: AnyScope) => {
+const unflattenScope = (input: Record<string, unknown>) => {
   const { type, ...options } = input
   return { type, options }
 }
@@ -108,9 +108,8 @@ export const decodeScope = (query: string) => {
     allowDots: true
   })
 
-  const parsed = AnyScope.parse(scope)
-
-  return unflattenScope(parsed)
+  const unflattenedScope = unflattenScope(scope)
+  return AnyScope.parse(unflattenedScope)
 }
 
 type LegacyScopeType = ConfigurableScopeType

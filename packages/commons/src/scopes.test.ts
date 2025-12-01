@@ -202,10 +202,10 @@ describe('2.0 scopes', () => {
   })
 
   it('decodeScope()', () => {
-    const decodedScope =
+    const encodedScope =
       'type=record.create&event=birth,death&declaredBy=user&declaredIn=administrativeArea'
 
-    expect(decodeScope(decodedScope)).toEqual({
+    expect(decodeScope(encodedScope)).toEqual({
       type: 'record.create',
       options: {
         event: ['birth', 'death'],
