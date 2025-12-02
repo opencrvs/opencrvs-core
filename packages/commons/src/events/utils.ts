@@ -550,7 +550,11 @@ export function getPendingAction(actions: Action[]): ActionDocument {
       )
   )
 
-  if (pendingActions.length !== 1) {
+  if (pendingActions.length === 0) {
+    throw new Error(`Expected exactly one pending action, but found none`)
+  }
+
+  if (pendingActions.length > 1) {
     throw new Error(
       `Expected exactly one pending action, but found ${pendingActions.map(({ id }) => id).join(', ')}`
     )
