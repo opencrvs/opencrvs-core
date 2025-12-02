@@ -39,6 +39,8 @@ import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'querystring'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { Location } from '@opencrvs/commons/client'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 
@@ -101,27 +103,21 @@ export function AdministrativeLevels({
   const { locationId } = useParams<IRouteProps>()
   const { canAccessOffice } = usePermissions()
   const navigate = useNavigate()
+  const { getLocations } = useLocations()
 
   const getNewLevel =
     (currentlySelectedLocation?: string) =>
     (store: IStoreState): IGetNewLevel => {
-      const location = currentlySelectedLocation ?? '0'
-      const locations = store.offline.offlineData.locations as {
-        [key: string]: ILocation
-      }
-      const offices = store.offline.offlineData.offices as {
-        [key: string]: ILocation
-      }
+      const location = currentlySelectedLocation ?? null
 
-      const childLocations = Object.values(locations)
-        .filter(
-          (s) => s.status === 'active' && s.partOf === `Location/${location}`
-        )
-        .concat(
-          Object.values(offices).filter(
-            (s) => s.status === 'active' && s.partOf === `Location/${location}`
-          )
-        )
+      const locations = getLocations.useSuspenseQuery()
+
+      const childLocations = [...locations.values()].filter(
+        ({ parentId, validUntil, locationType }) =>
+          (validUntil === null || new Date(validUntil) > new Date()) &&
+          parentId === location &&
+          ['ADMIN_STRUCTURE', 'CRVS_OFFICE'].includes(locationType)
+      )
 
       let dataOfBreadCrumb: IBreadCrumbData[] = [
         {
@@ -199,20 +195,20 @@ export function AdministrativeLevels({
                   (currentPageNumber - 1) * DEFAULT_PAGINATION_LIST_SIZE,
                   currentPageNumber * DEFAULT_PAGINATION_LIST_SIZE
                 )
-                .map((level: ILocation, index: number) => (
+                .map((level: Location, index: number) => (
                   <ListViewItemSimplified
                     key={index}
                     label={
-                      level.type === 'ADMIN_STRUCTURE' ? (
+                      level.locationType === 'ADMIN_STRUCTURE' ? (
                         <Link
                           onClick={(e) => {
                             setCurrentPageNumber(1)
                             changeLevelAction(e, level.id)
                           }}
                         >
-                          {getLocalizedLocationName(intl, level)}
+                          {level.name}
                         </Link>
-                      ) : level.type === 'CRVS_OFFICE' ? (
+                      ) : level.locationType === 'CRVS_OFFICE' ? (
                         <Link
                           disabled={!canAccessOffice(level)}
                           onClick={() =>
@@ -224,7 +220,7 @@ export function AdministrativeLevels({
                             })
                           }
                         >
-                          {getLocalizedLocationName(intl, level)}
+                          {level.name}
                         </Link>
                       ) : null
                     }
