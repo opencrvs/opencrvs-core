@@ -19,10 +19,8 @@ import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
-  ActionConfigTypes,
   ActionType,
   isActionConfigType,
-  ActionConfig,
   EventDocument,
   getActionConfig
 } from '@opencrvs/commons/client'
@@ -516,7 +514,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 export function EventHistoryIndex() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.AUDIT)
   const { getEvent } = useEvents()
-  const fullEvent = getEvent.findFromCache(eventId).data
+  const fullEvent = getEvent.useFindEventFromCache(eventId).data
 
   if (!fullEvent) {
     return <EventHistorySkeleton />
