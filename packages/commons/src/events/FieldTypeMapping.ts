@@ -592,7 +592,6 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.HTTP ||
     field.type === FieldType.LINK_BUTTON ||
     field.type === FieldType.QUERY_PARAM_READER ||
-    field.type === FieldType.LOADER ||
-    field.type === FieldType.IMAGE
+    field.type === FieldType.LOADER
   )
 }
