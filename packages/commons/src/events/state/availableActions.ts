@@ -139,7 +139,6 @@ function getAvailableActionsWithoutFlagFilters(
         )
           .filter((action) => action !== ActionType.DELETE)
           .concat(ActionType.ARCHIVE)
-          .concat(ActionType.VALIDATE)
       }
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
