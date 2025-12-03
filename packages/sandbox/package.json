@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ai-sdk/react": "^2.0.106",
     "@textea/json-viewer": "^4.0.1",
     "@types/prismjs": "^1.26.5",
     "@vafanassieff/msw-trpc": "0.0.1",

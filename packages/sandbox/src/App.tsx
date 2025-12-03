@@ -1,8 +1,10 @@
 import { App as OpenCRVSApp, routesConfig } from '@opencrvs/client/App'
 import { createStore } from '@opencrvs/client/store'
 import { queryClient, trpcOptionsProxy } from '@opencrvs/client/v2-events/trpc'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
-import { highlight, languages } from 'prismjs'
+import {
+  EventConfig,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import 'prismjs/components/prism-json'
 // import 'prismjs/themes/prism.css'
 import 'prismjs/themes/prism-tomorrow.css'
@@ -10,8 +12,9 @@ import React, { useEffect, useState } from 'react'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import { createBrowserRouter } from 'react-router-dom'
 
+import { JsonEditor } from 'json-edit-react'
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
-import { JsonEditor, githubLightTheme } from 'json-edit-react'
+import * as z from 'zod'
 
 import 'react-tabs/style/react-tabs.css'
 import './App.css'
@@ -43,6 +46,12 @@ async function persistToURL(code: string) {
   window.history.replaceState({}, '', url.toString())
 }
 
+function clearUrl() {
+  const url = new URL(window.location.href)
+  url.searchParams.delete('code')
+  window.history.replaceState({}, '', url.toString())
+}
+
 async function retrieveCodeFromURL(): Promise<string | null> {
   const url = new URL(window.location.href)
   const compressed = url.searchParams.get('code')
@@ -66,10 +75,11 @@ async function retrieveCodeFromURL(): Promise<string | null> {
 const App: React.FC = () => {
   const [code, setCode] = useState('')
 
-  function resetToDefault() {
+  async function resetToDefault() {
     setCode(JSON.stringify(tennisClubMembershipEvent, null, 2))
-    persistToURL(JSON.stringify(tennisClubMembershipEvent, null, 2))
     updateAppState(JSON.stringify(tennisClubMembershipEvent, null, 2))
+    clearUrl()
+    window.location.reload()
   }
 
   useEffect(() => {
@@ -92,18 +102,27 @@ const App: React.FC = () => {
   )
 
   function updateAppState(code: string) {
-    if (debounceTimeout) {
+    // If no timeout exists, execute immediately
+    if (!debounceTimeout) {
+      queryClient.setQueryData(trpcOptionsProxy.event.config.get.queryKey(), [
+        JSON.parse(code)
+      ])
+    } else {
+      // Clear existing timeout if one exists
       clearTimeout(debounceTimeout)
     }
 
+    // Set new timeout for subsequent calls
     const timeout = setTimeout(() => {
       queryClient.setQueryData(trpcOptionsProxy.event.config.get.queryKey(), [
         JSON.parse(code)
       ])
+      setDebounceTimeout(null) // Reset timeout state
     }, 300)
 
     setDebounceTimeout(timeout)
   }
+  console.log(z.toJSONSchema(EventConfig))
 
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100vw' }}>
@@ -136,7 +155,7 @@ const App: React.FC = () => {
                 <span
                   style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                 >
-                  📝 Code
+                  Configuration
                 </span>
               </Tab>
               <Tab>AI</Tab>
@@ -153,11 +172,12 @@ const App: React.FC = () => {
             >
               <div>
                 <button onClick={resetToDefault}>Reset</button>
+                <button onClick={resetToDefault}>Share</button>
+                <button onClick={resetToDefault}>Export</button>
               </div>
               <div style={{ overflow: 'auto' }}>
                 <div>
                   <JsonEditor
-                    // theme={githubLightTheme}
                     collapse={true}
                     enableClipboard={false}
                     data={code && JSON.parse(code)}
@@ -168,28 +188,6 @@ const App: React.FC = () => {
                     }}
                   />
                 </div>
-                {/* <Editor.default
-                value={code}
-                  onValueChange={(code) => {
-                    setCode(code)
-                    persistToURL(code)
-                    try {
-                      JSON.parse(code)
-                    } catch (error) {
-                      return
-                    }
-
-                    updateAppState(code)
-                  }}
-                  highlight={(code: string) =>
-                    highlight(code, languages.json, 'json')
-                  }
-                  padding={10}
-                  style={{
-                    fontFamily: '"Fira code", "Fira Mono", monospace',
-                    fontSize: 12
-                  }}
-                /> */}
               </div>
             </TabPanel>
             <TabPanel>

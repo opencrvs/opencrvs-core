@@ -170,13 +170,26 @@ export function TRPCProvider({
   waitForClientRestored = true,
   // In cases where multiple Storybooks are running against the same origin, when run in parallel, they may interfere with each other
   // When tests are fast. Generate UUID to isolate storage for each Storybook instance. App uses userId for this purpose.
-  storeIdentifier = `DEFAULT_IDENTIFIER_FOR_TESTS_ONLY__THIS_SHOULD_NEVER_SHOW_OUTSIDE_STORYBOOK_${getUUID()}`
+  storeIdentifier = `DEFAULT_IDENTIFIER_FOR_TESTS_ONLY__THIS_SHOULD_NEVER_SHOW_OUTSIDE_STORYBOOK_${getUUID()}`,
+
+  // This is for use cases where persistence is not wanted
+  // Sandbox is one of these places
+  persistence = true
 }: {
   children: React.ReactNode
   storeIdentifier?: string
   waitForClientRestored?: boolean
+  persistence?: boolean
 }) {
   const [queriesRestored, setQueriesRestored] = React.useState(false)
+
+  if (!persistence) {
+    return (
+      <TRPCProviderRaw queryClient={queryClient} trpcClient={trpcClient}>
+        {children}
+      </TRPCProviderRaw>
+    )
+  }
 
   return (
     <PersistQueryClientProvider

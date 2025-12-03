@@ -18,7 +18,6 @@ import { getScope } from '@client/profile/profileSelectors'
 /**
  * @returns a list of workqueue configurations
  */
-const q = []
 export function useCountryConfigWorkqueueConfigurations() {
   const trpc = useTRPC()
 
@@ -31,7 +30,6 @@ export function useCountryConfigWorkqueueConfigurations() {
   const availableWorkqueues = useMemo(() => {
     return findScope(scopes ?? [], 'workqueue')?.options.id ?? []
   }, [scopes])
-  console.log({ config, scopes: findScope(scopes ?? [], 'workqueue') })
 
   const workqueues = useMemo(() => {
     return config.filter(({ slug }) => availableWorkqueues.includes(slug))

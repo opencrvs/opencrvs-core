@@ -19,7 +19,7 @@ window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
 
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <TRPCProvider>
+      <TRPCProvider persistence={false}>
         <App />
       </TRPCProvider>
     </StrictMode>
