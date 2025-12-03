@@ -40,6 +40,7 @@ test('records are not indexed when they are created', async () => {
 
   expect(body.hits.hits).toHaveLength(0)
 })
+
 const RANDOM_UUID = '650a711b-a725-48f9-a92f-794b4a04fea6'
 const exactStatusPayload: QueryType = {
   type: 'and',
