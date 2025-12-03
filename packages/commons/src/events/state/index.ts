@@ -66,6 +66,7 @@ export function getStatusFromActions(actions: Array<Action>) {
         case ActionType.REJECT_CORRECTION:
         case ActionType.READ:
         case ActionType.CUSTOM:
+        case ActionType.VALIDATE:
         default:
           return status
       }
