@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { MapPin, Location, Cross } from '@opencrvs/components/lib/icons'
+import {
+  MapPin,
+  Location as LocationIcon,
+  Cross
+} from '@opencrvs/components/lib/icons'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { generateLocations } from '@client/utils/locationUtils'
@@ -33,6 +37,7 @@ import {
 import styled from 'styled-components'
 import { ILocation } from '@client/offline/reducer'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { Location } from '@opencrvs/commons/client'
 
 const { useState, useEffect } = React
 
@@ -46,7 +51,7 @@ interface IBaseProps {
   selectedLocationId?: string
   disabled?: boolean
   onChangeLocation: (locationId: string) => void
-  locationFilter?: (location: ILocation) => boolean
+  locationFilter?: (location: Location) => boolean
 }
 
 type LocationPickerProps = IBaseProps & IConnectProps & WrappedComponentProps
@@ -165,7 +170,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
           <ModalContainer id="picker-modal">
             <ModalHeader>
               <TitleContent>
-                <Location />
+                <LocationIcon />
                 <span>{intl.formatMessage(constantsMessages.location)}</span>
               </TitleContent>
               <CircleButton

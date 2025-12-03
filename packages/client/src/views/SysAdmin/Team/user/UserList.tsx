@@ -617,7 +617,7 @@ function UserListComponent(props: IProps) {
             setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
           }}
           locationFilter={(location) =>
-            location.type === 'CRVS_OFFICE' && canAccessOffice(location)
+            location.locationType === 'CRVS_OFFICE' && canAccessOffice(location)
           }
         />
       )
