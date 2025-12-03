@@ -31,7 +31,9 @@ async function setupElasticSearchServer() {
 }
 
 async function setupPostgresServer() {
-  return new PostgreSqlContainer('postgres:17.6')
+  return new PostgreSqlContainer(
+    'docker.io/chumaky/postgres_mongo_fdw:17.6_fdw5.5.2'
+  )
     .withUsername('postgres')
     .withPassword('postgres')
     .withDatabase('postgres')
