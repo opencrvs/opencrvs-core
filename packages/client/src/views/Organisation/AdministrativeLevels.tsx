@@ -224,29 +224,6 @@ export function AdministrativeLevels({
                         </Link>
                       ) : null
                     }
-                    actions={
-                      <Button
-                        type="icon"
-                        size="small"
-                        onClick={() => {
-                          navigate(
-                            generatePerformanceHomeUrl({
-                              timeStart: startOfMonth(
-                                subMonths(new Date(Date.now()), 11)
-                              ),
-                              timeEnd: new Date(Date.now()),
-                              locationId: level.id
-                            })
-                          )
-                        }}
-                      >
-                        <Icon
-                          name="Activity"
-                          color="currentColor"
-                          size="medium"
-                        />
-                      </Button>
-                    }
                   />
                 ))
             ) : (

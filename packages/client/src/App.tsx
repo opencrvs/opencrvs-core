@@ -300,14 +300,6 @@ export const routesConfig = turnOffV2Events
             element: <FieldAgentList />
           },
           {
-            path: routes.PERFORMANCE_HOME,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ]}>
-                <PerformanceHome />
-              </ProtectedRoute>
-            )
-          },
-          {
             path: routes.EVENT_COMPLETENESS_RATES,
             element: <CompletenessRates />
           },
@@ -398,14 +390,6 @@ export const routesConfig = turnOffV2Events
           {
             path: routes.PERFORMANCE_FIELD_AGENT_LIST,
             element: <FieldAgentList />
-          },
-          {
-            path: routes.PERFORMANCE_HOME,
-            element: (
-              <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ]}>
-                <PerformanceHome />
-              </ProtectedRoute>
-            )
           },
           {
             path: routes.EVENT_COMPLETENESS_RATES,
