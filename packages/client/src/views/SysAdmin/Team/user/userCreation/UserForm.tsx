@@ -47,7 +47,7 @@ import {
   withRouter
 } from '@client/components/WithRouterProps'
 import * as routes from '@client/navigation/routes'
-import { stringify } from 'query-string'
+import { stringify } from 'qs'
 
 export const Action = styled.div`
   margin-top: 32px;

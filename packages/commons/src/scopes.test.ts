@@ -15,6 +15,7 @@ import {
   parseLiteralScope,
   SCOPES
 } from './scopes'
+import { decodeScope, encodeScope, v1ScopeToV2Scope } from './scopes-v2'
 
 describe('findScope()', () => {
   const userScopes = [
@@ -182,4 +183,148 @@ describe('parseConfigurableScope()', () => {
     const mergedScopes = findScope([scope1, scope2, scope3], 'search')
     expect(mergedScopes).toEqual(undefined)
   })
+})
+
+describe('2.0 scopes', () => {
+  it('encodeScope()', () => {
+    const encodedScope = encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death'],
+        declaredBy: 'user',
+        declaredIn: 'administrativeArea'
+      }
+    })
+
+    expect(encodedScope).toBe(
+      'type=record.create&event=birth,death&declaredBy=user&declaredIn=administrativeArea'
+    )
+  })
+
+  it('decodeScope()', () => {
+    const encodedScope =
+      'type=record.create&event=birth,death&declaredBy=user&declaredIn=administrativeArea'
+
+    expect(decodeScope(encodedScope)).toEqual({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death'],
+        declaredBy: 'user',
+        declaredIn: 'administrativeArea'
+      }
+    })
+  })
+})
+
+it('transform v1 scope to v2', () => {
+  const scopes = {
+    /**
+     * scopes are same as countryconfig/src/data-seeding/roles/roles.ts
+     * except for workque scope that has an extra workqueue: all-events
+     */
+    localRegistrar: [
+      SCOPES.RECORD_DECLARATION_EDIT,
+      SCOPES.RECORD_REVIEW_DUPLICATES,
+      SCOPES.RECORD_DECLARATION_REINSTATE,
+      SCOPES.RECORD_CONFIRM_REGISTRATION,
+      SCOPES.RECORD_REJECT_REGISTRATION,
+      SCOPES.PERFORMANCE_READ,
+      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+      SCOPES.SEARCH_BIRTH,
+      SCOPES.SEARCH_DEATH,
+      SCOPES.SEARCH_MARRIAGE,
+      'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
+      'search[event=birth,access=all]',
+      'search[event=death,access=all]',
+      'search[event=tennis-club-membership,access=all]',
+      'search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]',
+      SCOPES.USER_READ_ONLY_MY_AUDIT,
+      'record.create[event=birth|death|tennis-club-membership]',
+      'record.read[event=birth|death|tennis-club-membership]',
+      'record.declare[event=birth|death|tennis-club-membership]',
+      'record.declared.reject[event=birth|death|tennis-club-membership]',
+      'record.declared.archive[event=birth|death|tennis-club-membership]',
+      'record.register[event=birth|death|tennis-club-membership]',
+      'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]',
+      'record.registered.correct[event=birth|death|tennis-club-membership]',
+      'record.unassign-others[event=birth|death|tennis-club-membership]',
+      'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
+    ],
+    registrationAgent: [
+      SCOPES.RECORD_DECLARATION_EDIT,
+      SCOPES.RECORD_DECLARATION_REINSTATE,
+      SCOPES.PERFORMANCE_READ,
+      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+      SCOPES.USER_READ_ONLY_MY_AUDIT,
+      SCOPES.SEARCH_BIRTH,
+      SCOPES.SEARCH_DEATH,
+      SCOPES.SEARCH_MARRIAGE,
+      'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]',
+      'search[event=birth,access=all]',
+      'search[event=death,access=all]',
+      'search[event=tennis-club-membership,access=all]',
+      'search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]',
+      'record.create[event=birth|death|tennis-club-membership]',
+      'record.read[event=birth|death|tennis-club-membership]',
+      'record.declare[event=birth|death|tennis-club-membership]',
+      'record.declared.validate[event=birth|death|tennis-club-membership]',
+      'record.declared.reject[event=birth|death|tennis-club-membership]',
+      'record.declared.archive[event=birth|death|tennis-club-membership]',
+      'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]',
+      'record.registered.request-correction[event=birth|death|tennis-club-membership]'
+    ],
+    fieldAgent: [
+      SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+      SCOPES.SEARCH_BIRTH,
+      SCOPES.SEARCH_DEATH,
+      SCOPES.SEARCH_MARRIAGE,
+      'workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]',
+      'search[event=birth,access=all]',
+      'search[event=death,access=all]',
+      'search[event=tennis-club-membership,access=all]',
+      'search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]',
+      'record.create[event=birth|death|tennis-club-membership]',
+      'record.declare[event=birth|death|tennis-club-membership]',
+      'record.notify[event=birth|death|tennis-club-membership]'
+    ],
+    localSystemAdmin: [
+      SCOPES.USER_READ_MY_OFFICE,
+      SCOPES.USER_READ_MY_JURISDICTION,
+      SCOPES.USER_UPDATE_MY_JURISDICTION,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
+      SCOPES.PERFORMANCE_READ,
+      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+      'user.create[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]',
+      'user.edit[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]'
+    ],
+    nationalSystemAdmin: [
+      SCOPES.CONFIG_UPDATE_ALL,
+      SCOPES.ORGANISATION_READ_LOCATIONS,
+      SCOPES.USER_CREATE,
+      SCOPES.USER_UPDATE,
+      SCOPES.USER_READ,
+      SCOPES.PERFORMANCE_READ,
+      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
+      SCOPES.RECORD_REINDEX,
+      'user.create[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]',
+      'user.edit[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]'
+    ]
+  }
+
+  const scopeMapping = Object.fromEntries(
+    Object.entries(scopes).map(([role, roleScopes]) => {
+      return [
+        role,
+        roleScopes.map((s) => ({ v2: v1ScopeToV2Scope(s as string), v1: s }))
+      ] as const
+    })
+  )
+
+  expect(scopeMapping).toMatchSnapshot()
 })

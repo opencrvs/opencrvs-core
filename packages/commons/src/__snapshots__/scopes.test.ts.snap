@@ -1,0 +1,348 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`transform v1 scope to v2 1`] = `
+{
+  "fieldAgent": [
+    {
+      "v1": "record.declaration-submit-for-review",
+      "v2": "type=record.declaration-submit-for-review",
+    },
+    {
+      "v1": "search.birth",
+      "v2": "type=search.birth",
+    },
+    {
+      "v1": "search.death",
+      "v2": "type=search.death",
+    },
+    {
+      "v1": "search.marriage",
+      "v2": "type=search.marriage",
+    },
+    {
+      "v1": "workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]",
+      "v2": "type=workqueue&id=all-events,assigned-to-you,recent,requires-updates,sent-for-review",
+    },
+    {
+      "v1": "search[event=birth,access=all]",
+      "v2": "type=record.search&event=birth&access=all",
+    },
+    {
+      "v1": "search[event=death,access=all]",
+      "v2": "type=record.search&event=death&access=all",
+    },
+    {
+      "v1": "search[event=tennis-club-membership,access=all]",
+      "v2": "type=record.search&event=tennis-club-membership&access=all",
+    },
+    {
+      "v1": "search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]",
+      "v2": "type=record.search&event=FOOTBALL_CLUB_MEMBERSHIP&access=all",
+    },
+    {
+      "v1": "record.create[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.create&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.declare[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.declare&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.notify[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.notify&event=birth,death,tennis-club-membership",
+    },
+  ],
+  "localRegistrar": [
+    {
+      "v1": "record.declaration-edit",
+      "v2": "type=record.declaration-edit",
+    },
+    {
+      "v1": "record.review-duplicates",
+      "v2": "type=record.review-duplicates",
+    },
+    {
+      "v1": "record.declaration-reinstate",
+      "v2": "type=record.declaration-reinstate",
+    },
+    {
+      "v1": "record.confirm-registration",
+      "v2": "type=record.confirm-registration",
+    },
+    {
+      "v1": "record.reject-registration",
+      "v2": "type=record.reject-registration",
+    },
+    {
+      "v1": "performance.read",
+      "v2": "type=performance.read",
+    },
+    {
+      "v1": "performance.read-dashboards",
+      "v2": "type=performance.read-dashboards",
+    },
+    {
+      "v1": "profile.electronic-signature",
+      "v2": "type=profile.electronic-signature",
+    },
+    {
+      "v1": "organisation.read-locations:my-office",
+      "v2": "type=organisation.read-locations:my-office",
+    },
+    {
+      "v1": "search.birth",
+      "v2": "type=search.birth",
+    },
+    {
+      "v1": "search.death",
+      "v2": "type=search.death",
+    },
+    {
+      "v1": "search.marriage",
+      "v2": "type=search.marriage",
+    },
+    {
+      "v1": "workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]",
+      "v2": "type=workqueue&id=all-events,assigned-to-you,recent,requires-completion,requires-updates,in-review-all,in-external-validation,ready-to-print,ready-to-issue",
+    },
+    {
+      "v1": "search[event=birth,access=all]",
+      "v2": "type=record.search&event=birth&access=all",
+    },
+    {
+      "v1": "search[event=death,access=all]",
+      "v2": "type=record.search&event=death&access=all",
+    },
+    {
+      "v1": "search[event=tennis-club-membership,access=all]",
+      "v2": "type=record.search&event=tennis-club-membership&access=all",
+    },
+    {
+      "v1": "search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]",
+      "v2": "type=record.search&event=FOOTBALL_CLUB_MEMBERSHIP&access=all",
+    },
+    {
+      "v1": "user.read:only-my-audit",
+      "v2": "type=user.read:only-my-audit",
+    },
+    {
+      "v1": "record.create[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.create&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.read[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.read&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.declare[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.declare&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.declared.reject[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.reject&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.declared.archive[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.archive&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.register[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.register&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.registered.print-certified-copies[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.print-certified-copies&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.registered.correct[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.correct&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.unassign-others[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.unassign-others&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.declared.review-duplicates[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.review-duplicates&event=birth,death,tennis-club-membership",
+    },
+  ],
+  "localSystemAdmin": [
+    {
+      "v1": "user.read:my-office",
+      "v2": "type=user.read:my-office",
+    },
+    {
+      "v1": "user.read:my-jurisdiction",
+      "v2": "type=user.read:my-jurisdiction",
+    },
+    {
+      "v1": "user.update:my-jurisdiction",
+      "v2": "type=user.update:my-jurisdiction",
+    },
+    {
+      "v1": "organisation.read-locations:my-jurisdiction",
+      "v2": "type=organisation.read-locations:my-jurisdiction",
+    },
+    {
+      "v1": "performance.read",
+      "v2": "type=performance.read",
+    },
+    {
+      "v1": "performance.read-dashboards",
+      "v2": "type=performance.read-dashboards",
+    },
+    {
+      "v1": "performance.vital-statistics-export",
+      "v2": "type=performance.vital-statistics-export",
+    },
+    {
+      "v1": "organisation.read-locations:my-office",
+      "v2": "type=organisation.read-locations:my-office",
+    },
+    {
+      "v1": "user.create[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]",
+      "v2": "type=user.create&role=FIELD_AGENT,POLICE_OFFICER,SOCIAL_WORKER,HEALTHCARE_WORKER,LOCAL_LEADER,REGISTRATION_AGENT,LOCAL_REGISTRAR",
+    },
+    {
+      "v1": "user.edit[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]",
+      "v2": "type=user.edit&role=FIELD_AGENT,POLICE_OFFICER,SOCIAL_WORKER,HEALTHCARE_WORKER,LOCAL_LEADER,REGISTRATION_AGENT,LOCAL_REGISTRAR",
+    },
+  ],
+  "nationalSystemAdmin": [
+    {
+      "v1": "config.update:all",
+      "v2": "type=config.update:all",
+    },
+    {
+      "v1": "organisation.read-locations:all",
+      "v2": "type=organisation.read-locations:all",
+    },
+    {
+      "v1": "user.create:all",
+      "v2": "type=user.create:all",
+    },
+    {
+      "v1": "user.update:all",
+      "v2": "type=user.update:all",
+    },
+    {
+      "v1": "user.read:all",
+      "v2": "type=user.read:all",
+    },
+    {
+      "v1": "performance.read",
+      "v2": "type=performance.read",
+    },
+    {
+      "v1": "performance.read-dashboards",
+      "v2": "type=performance.read-dashboards",
+    },
+    {
+      "v1": "performance.vital-statistics-export",
+      "v2": "type=performance.vital-statistics-export",
+    },
+    {
+      "v1": "record.reindex",
+      "v2": "type=record.reindex",
+    },
+    {
+      "v1": "user.create[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]",
+      "v2": "type=user.create&role=FIELD_AGENT,HOSPITAL_CLERK,COMMUNITY_LEADER,REGISTRATION_AGENT,LOCAL_REGISTRAR,NATIONAL_REGISTRAR,LOCAL_SYSTEM_ADMIN,NATIONAL_SYSTEM_ADMIN,PERFORMANCE_MANAGER",
+    },
+    {
+      "v1": "user.edit[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]",
+      "v2": "type=user.edit&role=FIELD_AGENT,HOSPITAL_CLERK,COMMUNITY_LEADER,REGISTRATION_AGENT,LOCAL_REGISTRAR,NATIONAL_REGISTRAR,LOCAL_SYSTEM_ADMIN,NATIONAL_SYSTEM_ADMIN,PERFORMANCE_MANAGER",
+    },
+  ],
+  "registrationAgent": [
+    {
+      "v1": "record.declaration-edit",
+      "v2": "type=record.declaration-edit",
+    },
+    {
+      "v1": "record.declaration-reinstate",
+      "v2": "type=record.declaration-reinstate",
+    },
+    {
+      "v1": "performance.read",
+      "v2": "type=performance.read",
+    },
+    {
+      "v1": "performance.read-dashboards",
+      "v2": "type=performance.read-dashboards",
+    },
+    {
+      "v1": "organisation.read-locations:my-office",
+      "v2": "type=organisation.read-locations:my-office",
+    },
+    {
+      "v1": "user.read:only-my-audit",
+      "v2": "type=user.read:only-my-audit",
+    },
+    {
+      "v1": "search.birth",
+      "v2": "type=search.birth",
+    },
+    {
+      "v1": "search.death",
+      "v2": "type=search.death",
+    },
+    {
+      "v1": "search.marriage",
+      "v2": "type=search.marriage",
+    },
+    {
+      "v1": "workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]",
+      "v2": "type=workqueue&id=all-events,assigned-to-you,recent,requires-completion,requires-updates,in-review,sent-for-approval,in-external-validation,ready-to-print,ready-to-issue",
+    },
+    {
+      "v1": "search[event=birth,access=all]",
+      "v2": "type=record.search&event=birth&access=all",
+    },
+    {
+      "v1": "search[event=death,access=all]",
+      "v2": "type=record.search&event=death&access=all",
+    },
+    {
+      "v1": "search[event=tennis-club-membership,access=all]",
+      "v2": "type=record.search&event=tennis-club-membership&access=all",
+    },
+    {
+      "v1": "search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]",
+      "v2": "type=record.search&event=FOOTBALL_CLUB_MEMBERSHIP&access=all",
+    },
+    {
+      "v1": "record.create[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.create&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.read[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.read&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.declare[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.declare&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.declared.validate[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.validate&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.declared.reject[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.reject&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.declared.archive[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.archive&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.registered.print-certified-copies[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.print-certified-copies&event=birth,death,tennis-club-membership",
+    },
+    {
+      "v1": "record.registered.request-correction[event=birth|death|tennis-club-membership]",
+      "v2": "type=record.request-correction&event=birth,death,tennis-club-membership",
+    },
+  ],
+}
+`;
