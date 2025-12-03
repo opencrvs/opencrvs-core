@@ -10562,20 +10562,6 @@ components:
                   - conditional
                 additionalProperties: false
             type: object
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
-          additionalProperties: false
         type:
           type: string
           const: REJECT
