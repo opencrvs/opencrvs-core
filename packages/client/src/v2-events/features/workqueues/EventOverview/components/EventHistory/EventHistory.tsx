@@ -22,7 +22,6 @@ import {
   ActionType,
   isActionConfigType,
   EventDocument,
-  getOrThrow,
   getActionConfig
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
@@ -45,9 +44,7 @@ import {
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
-import { useAuthentication } from '@client/utils/userUtils'
+import { useEventOverviewInfo } from '../useEventOverviewInfo'
 import { UserAvatar } from './UserAvatar'
 import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
 
@@ -516,30 +513,10 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
 export function EventHistoryIndex() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.AUDIT)
-  const { getEvent, searchEventById } = useEvents()
-  const { useFindEventFromCache } = getEvent
-  const fullEvent = useFindEventFromCache(eventId).data
+  const { fullEvent, shouldShowFullOverview: shouldShowHistory } =
+    useEventOverviewInfo(eventId)
 
-  const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
-  const maybeAuth = useAuthentication()
-  const authentication = getOrThrow(
-    maybeAuth,
-    'Authentication is not available but is required'
-  )
-
-  // Suspense query is not used here because we want to refetch when an event action is performed
-  const getEventQuery = searchEventById.useQuery(params.eventId)
-  const eventIndex = getEventQuery.data?.results[0]
-
-  if (!eventIndex) {
-    return
-  }
-  const assignmentStatus = getAssignmentStatus(eventIndex, authentication.sub)
-
-  const shouldShowFullOverview =
-    fullEvent && assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
-
-  if (!shouldShowFullOverview) {
+  if (!shouldShowHistory) {
     return <EventHistorySkeleton />
   }
 
