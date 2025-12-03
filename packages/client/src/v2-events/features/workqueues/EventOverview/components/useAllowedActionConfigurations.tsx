@@ -65,7 +65,6 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
   EventStatus.enum.DECLARED,
-  EventStatus.enum.VALIDATED,
   EventStatus.enum.REGISTERED,
   EventStatus.enum.ARCHIVED
 ]

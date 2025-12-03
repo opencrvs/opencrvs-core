@@ -41,14 +41,14 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.REJECT,
     ActionType.CUSTOM
   ],
-  [EventStatus.enum.VALIDATED]: [
-    ActionType.READ,
-    ActionType.REGISTER,
-    ActionType.MARK_AS_DUPLICATE,
-    ActionType.ARCHIVE,
-    ActionType.REJECT,
-    ActionType.CUSTOM
-  ],
+  // [EventStatus.enum.VALIDATED]: [
+  //   ActionType.READ,
+  //   ActionType.REGISTER,
+  //   ActionType.MARK_AS_DUPLICATE,
+  //   ActionType.ARCHIVE,
+  //   ActionType.REJECT,
+  //   ActionType.CUSTOM
+  // ],
   [EventStatus.enum.REGISTERED]: [
     ActionType.READ,
     ActionType.PRINT_CERTIFICATE,
@@ -149,15 +149,15 @@ function getAvailableActionsWithoutFlagFilters(
       }
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
-    case EventStatus.enum.VALIDATED: {
-      if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActionsWithoutFlagFilters(
-          EventStatus.enum.DECLARED,
-          flags.filter((flag) => flag !== InherentFlags.REJECTED)
-        )
-      }
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
+    // case EventStatus.enum.VALIDATED: {
+    //   if (flags.includes(InherentFlags.REJECTED)) {
+    //     return getAvailableActionsWithoutFlagFilters(
+    //       EventStatus.enum.DECLARED,
+    //       flags.filter((flag) => flag !== InherentFlags.REJECTED)
+    //     )
+    //   }
+    //   return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
+    // }
     case EventStatus.enum.REGISTERED: {
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }

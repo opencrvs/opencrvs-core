@@ -95,7 +95,7 @@ const anyOfStatusPayload: QueryType = {
   type: 'and',
   clauses: [
     {
-      status: { type: 'anyOf', terms: ['REGISTERED', 'VALIDATED'] }
+      status: { type: 'anyOf', terms: ['REGISTERED', 'DECLARED'] }
     }
   ]
 }
@@ -328,7 +328,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
         },
         {
           eventType: 'bar',
-          status: { type: 'exact', term: 'VALIDATED' }
+          status: { type: 'exact', term: 'DECLARED' }
         }
       ]
     }
@@ -352,7 +352,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
             bool: {
               must: [
                 { term: { type: 'bar' } },
-                { term: { status: 'VALIDATED' } }
+                { term: { status: 'DECLARED' } }
               ],
               should: undefined
             }
