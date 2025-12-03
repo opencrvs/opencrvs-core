@@ -289,6 +289,7 @@ export const RecordScopeType = z.enum([
   'record.registered.correct',
   'record.unassign-others'
 ])
+
 export type RecordScopeType = z.infer<typeof RecordScopeType>
 
 export const RecordScope = z

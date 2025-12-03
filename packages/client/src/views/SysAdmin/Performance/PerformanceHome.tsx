@@ -18,7 +18,7 @@ import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import React, { useState, useEffect, useCallback } from 'react'
-import { parse } from 'query-string'
+import { parse } from 'qs'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
 import { connect } from 'react-redux'
@@ -227,7 +227,9 @@ const PerformanceHomeComponent = (props: Props) => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const parsedSearch = parse(location.search) as unknown as ISearchParams
+  const parsedSearch = parse(location.search, {
+    ignoreQueryPrefix: true
+  }) as unknown as ISearchParams
 
   const searchParams = {
     locationId: parsedSearch.locationId,
