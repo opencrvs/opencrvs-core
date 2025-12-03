@@ -1,19 +1,20 @@
 import { App as OpenCRVSApp, routesConfig } from '@opencrvs/client/App'
 import { createStore } from '@opencrvs/client/store'
-import { useEventConfigurations } from '@opencrvs/client/v2-events/features/events/useEventConfiguration'
 import { queryClient, trpcOptionsProxy } from '@opencrvs/client/v2-events/trpc'
-import type { EventConfig } from '@opencrvs/commons/client'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { highlight, languages } from 'prismjs'
 import 'prismjs/components/prism-json'
 // import 'prismjs/themes/prism.css'
 import 'prismjs/themes/prism-tomorrow.css'
 import React, { useEffect, useState } from 'react'
-import { createBrowserRouter } from 'react-router-dom'
-import Editor from 'react-simple-code-editor'
-import './App.css'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
+import { createBrowserRouter } from 'react-router-dom'
+
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
+import { JsonEditor, githubLightTheme } from 'json-edit-react'
+
 import 'react-tabs/style/react-tabs.css'
+import './App.css'
 
 const { store } = createStore()
 
@@ -63,21 +64,46 @@ async function retrieveCodeFromURL(): Promise<string | null> {
 }
 
 const App: React.FC = () => {
-  const configs = useEventConfigurations()
   const [code, setCode] = useState('')
+
+  function resetToDefault() {
+    setCode(JSON.stringify(tennisClubMembershipEvent, null, 2))
+    persistToURL(JSON.stringify(tennisClubMembershipEvent, null, 2))
+    updateAppState(JSON.stringify(tennisClubMembershipEvent, null, 2))
+  }
 
   useEffect(() => {
     retrieveCodeFromURL().then((urlCode) => {
       if (urlCode) {
         setCode(urlCode)
+        updateAppState(urlCode)
       } else {
-        setCode(JSON.stringify(configs[0], null, 2))
+        setCode(JSON.stringify(tennisClubMembershipEvent, null, 2))
+        updateAppState(JSON.stringify(tennisClubMembershipEvent, null, 2))
       }
     })
     router.subscribe(() => {
       persistToURL(code)
     })
   }, [])
+
+  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
+    null
+  )
+
+  function updateAppState(code: string) {
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout)
+    }
+
+    const timeout = setTimeout(() => {
+      queryClient.setQueryData(trpcOptionsProxy.event.config.get.queryKey(), [
+        JSON.parse(code)
+      ])
+    }, 300)
+
+    setDebounceTimeout(timeout)
+  }
 
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100vw' }}>
@@ -119,34 +145,41 @@ const App: React.FC = () => {
               style={{
                 display: 'flex',
                 flex: 1,
+                flexDirection: 'column',
                 position: 'relative',
+                justifyContent: 'flex-start',
                 overflow: 'auto'
               }}
             >
+              <div>
+                <button onClick={resetToDefault}>Reset</button>
+              </div>
               <div style={{ overflow: 'auto' }}>
-                <Editor.default
-                  value={code}
+                <div>
+                  <JsonEditor
+                    // theme={githubLightTheme}
+                    collapse={true}
+                    enableClipboard={false}
+                    data={code && JSON.parse(code)}
+                    setData={(code) => {
+                      setCode(JSON.stringify(code))
+                      persistToURL(JSON.stringify(code))
+                      updateAppState(JSON.stringify(code))
+                    }}
+                  />
+                </div>
+                {/* <Editor.default
+                value={code}
                   onValueChange={(code) => {
                     setCode(code)
                     persistToURL(code)
-
                     try {
                       JSON.parse(code)
                     } catch (error) {
                       return
                     }
 
-                    const currentConfigs =
-                      queryClient.getQueryData<EventConfig[]>(
-                        trpcOptionsProxy.event.config.get.queryKey()
-                      ) || []
-
-                    queryClient.setQueryData(
-                      trpcOptionsProxy.event.config.get.queryKey(),
-                      currentConfigs.map((cfg, index) =>
-                        index === 0 ? JSON.parse(code) : cfg
-                      )
-                    )
+                    updateAppState(code)
                   }}
                   highlight={(code: string) =>
                     highlight(code, languages.json, 'json')
@@ -156,7 +189,7 @@ const App: React.FC = () => {
                     fontFamily: '"Fira code", "Fira Mono", monospace',
                     fontSize: 12
                   }}
-                />
+                /> */}
               </div>
             </TabPanel>
             <TabPanel>

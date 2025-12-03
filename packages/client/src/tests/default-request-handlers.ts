@@ -229,6 +229,14 @@ export const handlers = {
       return { id: '123' as UUID }
     })
   ],
+  createEvent: [
+    tRPCMsw.event.create.mutation(() => {
+      return {
+        id: '123',
+        actions: []
+      }
+    })
+  ],
   events: [
     tRPCMsw.event.config.get.query(() => {
       return [
