@@ -23,6 +23,7 @@ export const register: QuickActionConfig = {
   onConfirm: ({ event, actions, customActions }) => {
     // @TODO: This is a temporary measure, until the VALIDATE-action is turned in to a custom action.
     // At that point we should remove all logic and mentions of the validate action in core.
+    // Related issue: https://github.com/opencrvs/opencrvs-core/issues/11225
     if (!event.flags.includes('validated')) {
       return customActions.registerOnValidate.mutate({
         eventId: event.id,
