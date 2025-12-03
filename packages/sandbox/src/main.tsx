@@ -16,7 +16,6 @@ const generator = testDataGenerator()
 window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
 ;(async () => {
   await server.start()
-  console.log(Object.values(handlers).flat())
 
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
