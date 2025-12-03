@@ -656,7 +656,6 @@ components:
                   - CREATED
                   - NOTIFIED
                   - DECLARED
-                  - VALIDATED
                   - REGISTERED
                   - ARCHIVED
               updatedAt:
@@ -736,7 +735,6 @@ components:
               - CREATED
               - NOTIFIED
               - DECLARED
-              - VALIDATED
               - REGISTERED
               - ARCHIVED
       required:
@@ -754,7 +752,6 @@ components:
             - CREATED
             - NOTIFIED
             - DECLARED
-            - VALIDATED
             - REGISTERED
             - ARCHIVED
       required:
@@ -10385,7 +10382,6 @@ components:
                             - CREATED
                             - NOTIFIED
                             - DECLARED
-                            - VALIDATED
                             - REGISTERED
                             - ARCHIVED
                         updatedAt:
@@ -11768,7 +11764,6 @@ components:
             - CREATED
             - NOTIFIED
             - DECLARED
-            - VALIDATED
             - REGISTERED
             - ARCHIVED
         legalStatuses:
@@ -12451,7 +12446,6 @@ components:
                   - CREATED
                   - NOTIFIED
                   - DECLARED
-                  - VALIDATED
                   - REGISTERED
                   - ARCHIVED
               updatedAt:
@@ -12533,7 +12527,6 @@ components:
               - CREATED
               - NOTIFIED
               - DECLARED
-              - VALIDATED
               - REGISTERED
               - ARCHIVED
       required:
@@ -12552,7 +12545,6 @@ components:
             - CREATED
             - NOTIFIED
             - DECLARED
-            - VALIDATED
             - REGISTERED
             - ARCHIVED
       required:
