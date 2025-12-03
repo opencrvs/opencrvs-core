@@ -63,14 +63,13 @@ export function payloadGenerator(
     /** Create test data by providing count or desired locations */
     set: (input: Array<Partial<Location>> | number, prng: () => number) => {
       if (typeof input === 'number') {
-        const generateLocations = Array.from({ length: input }).map((_, i) => ({
+        return Array.from({ length: input }).map((_, i) => ({
           id: generateUuid(prng),
           name: `Location name ${i}`,
           parentId: null,
           validUntil: null,
           locationType: pickRandom(prng, LocationType.options)
         })) as Location[]
-        return generateLocations
       }
 
       return input.map((location, i) => ({

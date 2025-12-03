@@ -162,7 +162,7 @@ export async function getEventIndexWithLocationHierarchy(
   event: EventIndex
 ) {
   const buildFullLocationHierarchy = async (
-    locationId?: UUID | null | string
+    locationId: UUID
   ): Promise<string[]> => {
     if (!locationId) {
       return []
@@ -177,21 +177,25 @@ export async function getEventIndexWithLocationHierarchy(
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const tempEvent = { ...event, declaration: { ...event.declaration } } as any
   // Normalize top-level locations
-  tempEvent.createdAtLocation = await buildFullLocationHierarchy(
-    event.createdAtLocation
-  )
-  tempEvent.updatedAtLocation = await buildFullLocationHierarchy(
-    event.updatedAtLocation
-  )
+  if (event.createdAtLocation) {
+    tempEvent.createdAtLocation = await buildFullLocationHierarchy(
+      event.createdAtLocation
+    )
+  }
+  if (event.updatedAtLocation) {
+    tempEvent.updatedAtLocation = await buildFullLocationHierarchy(
+      event.updatedAtLocation
+    )
+  }
 
-  if (event.legalStatuses.DECLARED) {
+  if (event.legalStatuses.DECLARED?.createdAtLocation) {
     tempEvent.legalStatuses.DECLARED.createdAtLocation =
       await buildFullLocationHierarchy(
         event.legalStatuses.DECLARED.createdAtLocation
       )
   }
 
-  if (event.legalStatuses.REGISTERED) {
+  if (event.legalStatuses.REGISTERED?.createdAtLocation) {
     tempEvent.legalStatuses.REGISTERED.createdAtLocation =
       await buildFullLocationHierarchy(
         event.legalStatuses.REGISTERED.createdAtLocation
