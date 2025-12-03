@@ -32,6 +32,7 @@ import {
 } from '@client/components/DateRangePicker'
 import styled from 'styled-components'
 import { ILocation } from '@client/offline/reducer'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 
 const { useState, useEffect } = React
 
@@ -110,8 +111,11 @@ function LocationPickerComponent(props: LocationPickerProps) {
   } = props
   const [modalVisible, setModalVisible] = useState<boolean>(false)
 
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
+
   const offlineSearchableLocations = generateLocations(
-    { ...offlineLocations, ...offlineOffices },
+    locations,
     intl,
     locationFilter
   )

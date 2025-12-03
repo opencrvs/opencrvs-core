@@ -26,21 +26,17 @@ import {
   Icon
 } from '@opencrvs/components/lib'
 import { IBreadCrumbData } from '@opencrvs/components/src/Breadcrumb'
-import { useSelector } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { ILocation } from '@client/offline/reducer'
 import { useParams, useNavigate } from 'react-router-dom'
 import { formatUrl, generatePerformanceHomeUrl } from '@client/navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import styled from 'styled-components'
-import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'querystring'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { Location } from '@opencrvs/commons/client'
+import { Location, UUID } from '@opencrvs/commons/client'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 
@@ -49,7 +45,7 @@ type IRouteProps = {
 }
 
 type IGetNewLevel = {
-  childLocations: ILocation[]
+  childLocations: Location[]
   breadCrumb: IBreadCrumbData[]
 }
 
@@ -105,59 +101,56 @@ export function AdministrativeLevels({
   const navigate = useNavigate()
   const { getLocations } = useLocations()
 
-  const getNewLevel =
-    (currentlySelectedLocation?: string) =>
-    (store: IStoreState): IGetNewLevel => {
-      const location = currentlySelectedLocation ?? null
+  const getNewLevel = (
+    currentlySelectedLocation: UUID | null
+  ): IGetNewLevel => {
+    const location = currentlySelectedLocation ?? null
 
-      const locations = getLocations.useSuspenseQuery()
+    const locations = getLocations.useSuspenseQuery()
 
-      const childLocations = [...locations.values()].filter(
-        ({ parentId, validUntil, locationType }) =>
-          (validUntil === null || new Date(validUntil) > new Date()) &&
-          parentId === location &&
-          ['ADMIN_STRUCTURE', 'CRVS_OFFICE'].includes(locationType)
-      )
+    const childLocations = [...locations.values()].filter(
+      ({ parentId, validUntil, locationType }) =>
+        (validUntil === null || new Date(validUntil) > new Date()) &&
+        parentId === location &&
+        locationType &&
+        ['ADMIN_STRUCTURE', 'CRVS_OFFICE'].includes(locationType)
+    )
 
-      let dataOfBreadCrumb: IBreadCrumbData[] = [
-        {
-          label: intl.formatMessage(constantsMessages.countryName),
-          paramId: ''
+    let dataOfBreadCrumb: IBreadCrumbData[] = [
+      {
+        label: intl.formatMessage(constantsMessages.countryName),
+        paramId: ''
+      }
+    ]
+
+    if (currentlySelectedLocation) {
+      let currentLocationId: UUID | null = currentlySelectedLocation
+      const LocationBreadCrumb: IBreadCrumbData[] | null = []
+      do {
+        const currentOffice = locations.get(currentLocationId)
+
+        if (currentOffice) {
+          LocationBreadCrumb.push({
+            label: currentOffice.name,
+            paramId: currentOffice.id
+          })
+          currentLocationId = currentOffice.parentId
+        } else {
+          currentLocationId = null
         }
-      ]
+      } while (currentLocationId !== null)
 
-      if (currentlySelectedLocation) {
-        let currentLocationId = currentlySelectedLocation
-        const LocationBreadCrumb: IBreadCrumbData[] | null = []
-        do {
-          const currentOffice = locations[currentLocationId]
-
-          if (currentOffice) {
-            LocationBreadCrumb.push({
-              label: getLocalizedLocationName(intl, currentOffice),
-              paramId: currentOffice.id
-            })
-            currentLocationId = currentOffice.partOf.split('/')[1]
-          } else {
-            currentLocationId = ''
-          }
-        } while (currentLocationId !== '')
-
-        dataOfBreadCrumb = [
-          ...dataOfBreadCrumb,
-          ...LocationBreadCrumb.reverse()
-        ]
-      }
-
-      return {
-        breadCrumb: dataOfBreadCrumb,
-        childLocations
-      }
+      dataOfBreadCrumb = [...dataOfBreadCrumb, ...LocationBreadCrumb.reverse()]
     }
 
-  const dataLocations = useSelector<IStoreState, IGetNewLevel>(
-    getNewLevel(locationId)
-  )
+    return {
+      breadCrumb: dataOfBreadCrumb,
+      childLocations
+    }
+  }
+
+  const dataLocations = getNewLevel(UUID.safeParse(locationId).data ?? null)
+
   const totalNumber = dataLocations.childLocations.length
   const [currentPageNumber, setCurrentPageNumber] = React.useState<number>(1)
 

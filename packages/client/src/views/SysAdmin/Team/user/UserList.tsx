@@ -256,8 +256,9 @@ function UserListComponent(props: IProps) {
 
   const parsedId = UUID.safeParse(locationId)
 
-  const searchedLocation: Location | undefined =
-    parsedId.success && locations.get(parsedId.data)
+  const searchedLocation: Location | undefined = parsedId.success
+    ? locations.get(parsedId.data)
+    : undefined
 
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
@@ -860,7 +861,7 @@ function UserListComponent(props: IProps) {
                     <LocationInfo>
                       {searchedLocation && (
                         <LocationInfoValue>
-                          {getAddressName(locations, searchedLocation.parentId)}
+                          {getAddressName(locations, searchedLocation)}
                         </LocationInfoValue>
                       )}
                     </LocationInfo>
