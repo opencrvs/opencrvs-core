@@ -166,7 +166,9 @@ exports[`Returns relevant events in right order 1`] = `
       },
       "recommender.none": true,
     },
-    "flags": [],
+    "flags": [
+      "validated",
+    ],
     "id": "[sanitized]",
     "legalStatuses": {
       "DECLARED": {
@@ -262,6 +264,7 @@ exports[`Returns relevant events in right order 2`] = `
   },
   "flags": [
     "pending-certification",
+    "validated",
   ],
   "id": "[sanitized]",
   "legalStatuses": {

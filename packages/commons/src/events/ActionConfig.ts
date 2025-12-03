@@ -73,6 +73,12 @@ const DeclareConfig = DeclarationActionBase.extend(
   }).shape
 )
 
+const RejectConfig = DeclarationActionBase.extend(
+  z.object({
+    type: z.literal(ActionType.REJECT)
+  }).shape
+)
+
 const ValidateConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.VALIDATE)
@@ -123,6 +129,7 @@ export const ActionConfig = z
      */
     ReadActionConfig.meta({ id: 'ReadActionConfig' }),
     DeclareConfig.meta({ id: 'DeclareActionConfig' }),
+    RejectConfig.meta({ id: 'RejectActionConfig' }),
     ValidateConfig.meta({ id: 'ValidateActionConfig' }),
     RegisterConfig.meta({ id: 'RegisterActionConfig' }),
     PrintCertificateActionConfig.meta({
