@@ -73,7 +73,7 @@ const DeclareConfig = DeclarationActionBase.extend(
   }).shape
 )
 
-const RejectConfig = DeclarationActionBase.extend(
+const RejectConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REJECT)
   }).shape
