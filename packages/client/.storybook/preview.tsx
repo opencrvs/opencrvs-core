@@ -31,7 +31,7 @@ import {
 } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 import WebFont from 'webfontloader'
-import { handlers } from './default-request-handlers'
+import { handlers } from '../src/tests/default-request-handlers'
 import { NavigationHistoryProvider } from '@client/v2-events/components/NavigationStack'
 import {
   addUserToQueryData,

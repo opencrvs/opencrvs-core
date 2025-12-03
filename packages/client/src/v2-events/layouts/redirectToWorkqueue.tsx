@@ -22,6 +22,7 @@ export const RedirectToWorkqueue = () => {
   const { path } = useHomePage()
 
   useEffect(() => {
+    console.log({ workqueues })
     if (workqueues.length) {
       navigate(
         ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueues[0].slug }),

@@ -12,14 +12,14 @@
 import { http, graphql, HttpResponse } from 'msw'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { mockOfflineData } from '../src/tests/mock-offline-data'
-import forms from '../src/tests/forms.json'
-import { AppRouter } from '../src/v2-events/trpc'
+import { mockOfflineData } from './mock-offline-data'
+import forms from './forms.json'
+import { AppRouter } from '../v2-events/trpc'
 import {
   tennisClubMembershipEventDocument,
   TestImage
-} from '../src/v2-events/features/events/fixtures'
-import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
+} from '../v2-events/features/events/fixtures'
+import { tennisClubMembershipCertifiedCertificateTemplate } from '../../.storybook/tennisClubMembershipCertifiedCertificateTemplate'
 import {
   generateWorkqueues,
   TENNIS_CLUB_MEMBERSHIP,
@@ -1354,6 +1354,8 @@ export const handlers = {
       })
     }),
     graphql.query('fetchUser', (input) => {
+      console.log('BLAAA')
+
       const userId = input.variables.userId
       const generator = testDataGenerator()
       let response
@@ -1377,6 +1379,8 @@ export const handlers = {
       })
     }),
     graphql.query('getUser', (input) => {
+      console.log('ddrpeprp')
+
       const userId = input.variables.userId
       const generator = testDataGenerator()
       let response

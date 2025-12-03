@@ -24,7 +24,8 @@
     "codegen.ts",
     "vite.config.ts",
     ".storybook/**/*",
-    "../preview.tsx"
+    "../preview.tsx",
+    "test/default-request-handlers.ts"
   ],
   "extends": "./tsconfig.paths.json"
 }

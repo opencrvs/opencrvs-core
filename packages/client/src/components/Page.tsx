@@ -90,6 +90,8 @@ class Component extends React.Component<IFullProps> {
       }, 0)
     }
     if (this.props.loadingError && isNavigatorOnline()) {
+      console.log('DERP')
+
       this.props.showConfigurationErrorNotification()
     }
     if (prevProps.loadingError && !this.props.loadingError) {

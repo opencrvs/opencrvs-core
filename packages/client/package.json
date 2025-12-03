@@ -35,6 +35,9 @@
     ],
     "src/**/*.json": "prettier --write"
   },
+  "exports": {
+    "./App": "./src/App.tsx"
+  },
   "dependencies": {
     "@apollo/client": "^3.7.0",
     "@craco/craco": "^6.4.3",

@@ -134,12 +134,16 @@ export const getStorageUserDetailsFailed =
 
 export const redirectToAuthentication = (
   redirectBack = false
-): RedirectToAuthenticationAction => ({
-  type: REDIRECT_TO_AUTHENTICATION,
-  payload: {
-    redirectBack
+): RedirectToAuthenticationAction => {
+  debugger
+  return {
+    type: REDIRECT_TO_AUTHENTICATION,
+
+    payload: {
+      redirectBack
+    }
   }
-})
+}
 
 export const sendVerifyCode = (
   userFullName: {

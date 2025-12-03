@@ -10,6 +10,7 @@
  */
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
+import { useMemo } from 'react'
 import { findScope } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 import { getScope } from '@client/profile/profileSelectors'
@@ -17,6 +18,7 @@ import { getScope } from '@client/profile/profileSelectors'
 /**
  * @returns a list of workqueue configurations
  */
+const q = []
 export function useCountryConfigWorkqueueConfigurations() {
   const trpc = useTRPC()
 
@@ -26,8 +28,14 @@ export function useCountryConfigWorkqueueConfigurations() {
   }).data
 
   const scopes = useSelector(getScope)
-  const availableWorkqueues =
-    findScope(scopes ?? [], 'workqueue')?.options.id ?? []
+  const availableWorkqueues = useMemo(() => {
+    return findScope(scopes ?? [], 'workqueue')?.options.id ?? []
+  }, [scopes])
+  console.log({ config, scopes: findScope(scopes ?? [], 'workqueue') })
 
-  return config.filter(({ slug }) => availableWorkqueues.includes(slug))
+  const workqueues = useMemo(() => {
+    return config.filter(({ slug }) => availableWorkqueues.includes(slug))
+  }, [config, availableWorkqueues])
+
+  return workqueues
 }

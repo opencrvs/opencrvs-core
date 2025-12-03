@@ -19,7 +19,7 @@ import {
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { getLeafLocationIds } from '@client/v2-events/hooks/useLocations'
-import { V2_DEFAULT_MOCK_LOCATIONS_MAP } from '../.storybook/default-request-handlers'
+import { V2_DEFAULT_MOCK_LOCATIONS_MAP } from '../src/tests/default-request-handlers'
 
 const generator = testDataGenerator()
 

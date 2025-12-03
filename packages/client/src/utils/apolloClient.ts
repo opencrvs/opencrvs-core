@@ -80,6 +80,7 @@ export const createClient = (
       } = context
 
       const gatewayVersion = headers.get('X-version')
+      console.log(APPLICATION_VERSION, gatewayVersion)
 
       if (gatewayVersion !== APPLICATION_VERSION) {
         store.dispatch(storeReloadModalVisibility(true))

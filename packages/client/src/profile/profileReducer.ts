@@ -73,6 +73,7 @@ export const profileReducer: LoopReducer<
             Cmd.run(() => removeUserDetails()),
             Cmd.run(
               (getState: () => IStoreState) => {
+                debugger
                 if (shouldRedirectBack) {
                   const baseUrl = window.location.origin
                   const restUrl = window.location.href.replace(baseUrl, '')
