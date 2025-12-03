@@ -62,11 +62,21 @@ const AuditDescriptionMapping: {
 }
 
 export const getAddressName = (
+  offlineCountryConfig: IOfflineData,
+  { name, partOf }: ILocation
+): string => {
+  const parentLocationId = partOf.split('/')[1]
+  if (parentLocationId === '0') return name
+  const parentLocation = offlineCountryConfig?.locations[parentLocationId]
+  return `${name}, ${getAddressName(offlineCountryConfig, parentLocation)}`
+}
+
+export const getAddressNameV2 = (
   locations: Map<UUID, Location>,
   { name, parentId }: Location
 ): string => {
   if (!parentId) return name
-  return `${name}, ${getAddressName(locations, locations.get(parentId)!)}`
+  return `${name}, ${getAddressNameV2(locations, locations.get(parentId)!)}`
 }
 
 export function getUserAuditDescription(

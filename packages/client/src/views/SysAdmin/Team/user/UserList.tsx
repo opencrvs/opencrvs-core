@@ -25,7 +25,7 @@ import { SEARCH_USERS } from '@client/user/queries'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap, getLocalisedName } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { getAddressName, UserStatus } from '@client/views/SysAdmin/Team/utils'
+import { getAddressNameV2, UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Pill } from '@opencrvs/components/lib/Pill'
@@ -863,7 +863,7 @@ function UserListComponent(props: IProps) {
                     <LocationInfo>
                       {searchedLocation && (
                         <LocationInfoValue>
-                          {getAddressName(locations, searchedLocation)}
+                          {getAddressNameV2(locations, searchedLocation)}
                         </LocationInfoValue>
                       )}
                     </LocationInfo>

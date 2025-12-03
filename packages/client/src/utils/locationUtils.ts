@@ -117,13 +117,68 @@ export function generateFullLocation(
 }
 
 export function generateSearchableLocations(
+  locations: ILocation[],
+  offlineLocations: { [key: string]: ILocation },
+  intl: IntlShape,
+  officeId?: UUID
+) {
+  const filteredLocations = officeId
+    ? getAssociatedLocationsAndOffices(officeId, locations)
+    : locations
+
+  const generated: ISearchLocation[] = filteredLocations.map(
+    (location: ILocation) => {
+      let locationName = generateLocationName(location, intl)
+
+      if (
+        location.partOf &&
+        location.partOf !== 'Location/0' &&
+        location.type !== 'CRVS_OFFICE'
+      ) {
+        const locRef = location.partOf.split('/')[1]
+        let parent
+        if (
+          (parent =
+            offlineLocations[locRef] &&
+            generateLocationName(offlineLocations[locRef], intl))
+        ) {
+          locationName += `, ${parent}`
+        }
+      }
+
+      return {
+        id: location.id,
+        searchableText: getLocalizedLocationName(intl, location),
+        displayLabel: locationName
+      }
+    }
+  )
+  return generated
+}
+
+export function generateLocations(
+  locations: { [key: string]: ILocation },
+  intl: IntlShape,
+  filter?: (location: ILocation) => boolean,
+  officeId?: UUID
+) {
+  let locationArray = Object.values(locations)
+
+  if (filter) {
+    locationArray = locationArray.filter(filter)
+  }
+
+  return generateSearchableLocations(locationArray, locations, intl, officeId)
+}
+
+export function generateSearchableLocationsV2(
   locations: Location[],
   offlineLocations: Map<UUID, Location>,
   intl: IntlShape,
   officeId?: UUID
 ) {
   const filteredLocations = officeId
-    ? getAssociatedLocationsAndOffices(officeId, locations)
+    ? getAssociatedLocationsAndOfficesV2(officeId, locations)
     : locations
 
   const generated: ISearchLocation[] = filteredLocations.map(
@@ -147,7 +202,7 @@ export function generateSearchableLocations(
   return generated
 }
 
-export function generateLocations(
+export function generateLocationsV2(
   locations: Map<UUID, Location>,
   intl: IntlShape,
   filter?: (location: Location) => boolean,
@@ -159,7 +214,7 @@ export function generateLocations(
     locationArray = locationArray.filter(filter)
   }
 
-  return generateSearchableLocations(locationArray, locations, intl, officeId)
+  return generateSearchableLocationsV2(locationArray, locations, intl, officeId)
 }
 
 export function getJurisidictionType(
@@ -265,6 +320,37 @@ export function isOfficeUnderJurisdiction(
 }
 
 function getAssociatedLocationsAndOffices(
+  officeId: string,
+  locations: ILocation[]
+): ILocation[] {
+  const office = locations.find(
+    (location) => location.id === officeId && location.type === 'CRVS_OFFICE'
+  )
+
+  if (!office) {
+    return []
+  }
+
+  const associatedLocations: ILocation[] = locations.filter((location) => {
+    let currentLocationId = office.partOf.split('/').at(1)
+
+    while (currentLocationId) {
+      const targetLocationId = currentLocationId
+      if (location.id === currentLocationId) {
+        return true
+      }
+
+      const nextLocation = locations.find((loc) => loc.id === targetLocationId)
+      currentLocationId = nextLocation?.partOf.split('/').at(1)
+    }
+
+    return false
+  })
+
+  return [office, ...associatedLocations]
+}
+
+function getAssociatedLocationsAndOfficesV2(
   officeId: string,
   locations: Location[]
 ): Location[] {

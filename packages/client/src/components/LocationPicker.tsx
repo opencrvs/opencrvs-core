@@ -16,7 +16,7 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import { generateLocations } from '@client/utils/locationUtils'
+import { generateLocationsV2 } from '@client/utils/locationUtils'
 import {
   ISearchLocation,
   LocationSearch
@@ -119,7 +119,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
 
-  const offlineSearchableLocations = generateLocations(
+  const offlineSearchableLocations = generateLocationsV2(
     locations,
     intl,
     locationFilter
