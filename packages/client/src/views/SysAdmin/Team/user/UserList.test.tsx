@@ -21,7 +21,7 @@ import {
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
 import { ReactWrapper } from 'enzyme'
-import { stringify } from 'query-string'
+import { stringify } from 'qs'
 import * as React from 'react'
 import { UserList } from './UserList'
 import { userMutations } from '@client/user/mutations'

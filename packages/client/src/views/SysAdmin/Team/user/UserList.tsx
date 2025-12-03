@@ -42,7 +42,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { parse } from 'query-string'
+import { parse } from 'qs'
 import {
   injectIntl,
   useIntl,
@@ -235,7 +235,9 @@ function UserListComponent(props: IProps) {
 
   const { intl, userDetails, isOnline, offlineCountryConfig } = props
 
-  const { locationId } = parse(location.search) as unknown as ISearchParams
+  const { locationId } = parse(location.search, {
+    ignoreQueryPrefix: true
+  }) as unknown as ISearchParams
   const [toggleUsernameReminder, setToggleUsernameReminder] =
     useState<ToggleModal>({
       modalVisible: false,
