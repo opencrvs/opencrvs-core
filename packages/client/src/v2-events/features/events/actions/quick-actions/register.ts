@@ -21,7 +21,7 @@ export const register: QuickActionConfig = {
     }
   },
   onConfirm: ({ event, actions, customActions }) => {
-    if (event.status === EventStatus.enum.DECLARED) {
+    if (!event.flags.includes('validated')) {
       return customActions.registerOnValidate.mutate({
         eventId: event.id,
         declaration: event.declaration,
