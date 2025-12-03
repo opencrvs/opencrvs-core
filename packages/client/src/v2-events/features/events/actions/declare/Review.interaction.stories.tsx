@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -165,20 +166,18 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
       const canvas = within(canvasElement)
 
       await waitFor(async () => {
-        const registerButton = await canvas.findByRole('button', {
-          name: 'Register'
-        })
-
-        await expect(registerButton).toBeEnabled()
-        await userEvent.click(registerButton)
+        await userEvent.click(
+          await canvas.findByRole('button', { name: 'Action' })
+        )
+        await userEvent.click(await canvas.findByText('Register'))
       })
 
-      const modal = within(await canvas.findByRole('dialog'))
+      await canvas.findByRole('button', { name: 'Cancel' })
 
-      await modal.findByText('Register the tennis club membership application?')
-      await modal.findByRole('button', { name: 'Cancel' })
       await userEvent.click(
-        await modal.findByRole('button', { name: 'Register' })
+        await canvas.findByRole('button', {
+          name: 'Register'
+        })
       )
     })
 
@@ -262,18 +261,19 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     msw
   },
   play: async ({ canvasElement, step }) => {
-    await step('Modal has scope based content', async () => {
+    await step('User can validate', async () => {
       const canvas = within(canvasElement)
       await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for approval' })
+        await canvas.findByRole('button', { name: 'Action' })
       )
+      await userEvent.click(await canvas.findByText('Validate'))
 
-      const modal = within(await canvas.findByRole('dialog'))
+      await canvas.findByRole('button', { name: 'Cancel' })
 
-      await modal.findByText('Send for approval?')
-      await modal.findByRole('button', { name: 'Cancel' })
       await userEvent.click(
-        await modal.findByRole('button', { name: 'Confirm' })
+        await canvas.findByRole('button', {
+          name: 'Validate'
+        })
       )
     })
 
@@ -319,19 +319,19 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
     msw
   },
   play: async ({ canvasElement, step }) => {
-    await step('Modal has scope based content', async () => {
+    await step('User can perform declare action', async () => {
       const canvas = within(canvasElement)
       await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for review' })
+        await canvas.findByRole('button', { name: 'Action' })
       )
+      await userEvent.click(await canvas.findByText('Declare'))
 
-      const modal = within(await canvas.findByRole('dialog'))
+      await canvas.findByRole('button', { name: 'Cancel' })
 
-      await modal.findByText('Send for review?')
-      await modal.findByText('This declaration will be sent for review')
-      await modal.findByRole('button', { name: 'Cancel' })
       await userEvent.click(
-        await modal.findByRole('button', { name: 'Confirm' })
+        await canvas.findByRole('button', {
+          name: 'Declare'
+        })
       )
     })
 
@@ -434,18 +434,16 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
     await step('Modal has scope based content', async () => {
       const canvas = within(canvasElement)
       await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for review' })
+        await canvas.findByRole('button', { name: 'Action' })
       )
+      await userEvent.click(await canvas.findByText('Notify'))
 
-      const modal = within(await canvas.findByRole('dialog'))
+      await canvas.findByRole('button', { name: 'Cancel' })
 
-      await modal.findByText('Send for review?')
-      await modal.findByRole('button', { name: 'Cancel' })
-      await modal.findByText(
-        'This incomplete declaration will be sent for review.'
-      )
       await userEvent.click(
-        await modal.findByRole('button', { name: 'Confirm' })
+        await canvas.findByRole('button', {
+          name: 'Notify'
+        })
       )
     })
 
@@ -513,7 +511,22 @@ export const ReviewForIncompleteNameInteraction: Story = {
 
       const backToReviewButton = await canvas.findByText('Back to review')
       await userEvent.click(backToReviewButton)
-      await canvas.findByText('Declaration incomplete')
+
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Action' })
+      )
+
+      await expect(
+        canvas.getByText('Declare', { selector: 'li[disabled]' })
+      ).toBeInTheDocument()
+
+      await userEvent.click(await canvas.findByText('Notify'))
+
+      await userEvent.click(
+        await canvas.findByRole('button', {
+          name: 'Notify'
+        })
+      )
     })
   }
 }

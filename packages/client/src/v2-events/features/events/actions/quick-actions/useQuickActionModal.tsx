@@ -159,14 +159,14 @@ export function useQuickActionModal(event: EventIndex) {
   ) => {
     const config = quickActions[actionType]
     const label = actionLabels[actionType]
-    const confirmed = await openModal((close) => (
+    const { result } = await openModal<ModalResult>((close) => (
       <QuickActionModal close={close} config={{ label, ...config.modal }} />
     ))
 
     // On confirmed modal, we will:
     // - Execute the configured onConfirm() for the action
     // - Redirect the user to the workqueue they arrived from if provided, or the home page if not
-    if (confirmed) {
+    if (result) {
       void config.onConfirm({
         event,
         actions,
