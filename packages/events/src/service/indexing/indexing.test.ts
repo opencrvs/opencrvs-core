@@ -257,7 +257,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
         must: [
           {
             bool: {
-              must: [{ terms: { status: ['REGISTERED', 'VALIDATED'] } }],
+              must: [{ terms: { status: ['REGISTERED', 'DECLARED'] } }],
               should: undefined
             }
           }

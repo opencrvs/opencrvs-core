@@ -460,7 +460,7 @@ test('deduplication check is skipped if the event has been marked as not duplica
   expect(
     getCurrentEventState(validatedEvent, tennisClubMembershipEvent)
   ).toMatchObject({
-    status: 'VALIDATED',
+    status: 'DECLARED',
     potentialDuplicates: []
   })
 })
