@@ -8,6 +8,10 @@
 
 HTTP input now accepts `field('..')` references in the HTTP body definition.
 
+#### Jurisdiction
+
+- Elasticsearch now stores location IDs as a full administrative hierarchy, with the leaf representing the actual event location. This enables searching events by any jurisdiction level (district, province, office, health facility etc.).
+
 ### Improvements
 
 - Refactor the tRPC context to allow defining public procedures that don't require authentication.

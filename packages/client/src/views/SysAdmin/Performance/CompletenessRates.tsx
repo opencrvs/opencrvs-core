@@ -28,7 +28,7 @@ import {
 } from '@client/views/SysAdmin/Performance/utils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import type { GQLMonthWiseEstimationMetric } from '@client/utils/gateway-deprecated-do-not-use'
-import { parse } from 'query-string'
+import { parse } from 'qs'
 import * as React from 'react'
 import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl'
 import {
@@ -244,9 +244,9 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
 
   const { intl } = props
 
-  const { locationId, timeStart, timeEnd, time } = parse(
-    location.search
-  ) as unknown as ISearchParams
+  const { locationId, timeStart, timeEnd, time } = parse(location.search, {
+    ignoreQueryPrefix: true
+  }) as unknown as ISearchParams
 
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
