@@ -1976,3 +1976,67 @@ test('Returns events using nested AND/OR query combinations', async () => {
   expect(matchingFirstnames).toContain('Bob')
   expect(matchingEmails).toContain('bob@example.com')
 })
+
+test('Search response contains single UUIDs for location fields, not arrays', async () => {
+  const { user, generator } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    'search[event=tennis-club-membership,access=all]',
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
+  ])
+  const initialData = {
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
+    'applicant.dob': '2000-01-01',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id, {
+      declaration: initialData
+    })
+  )
+
+  const { results } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.name': { type: 'fuzzy', term: 'John' }
+          }
+        }
+      ]
+    }
+  })
+
+  expect(results).toHaveLength(1)
+  const result = results[0]
+
+  // --- ASSERTIONS ---
+
+  // createdAtLocation must be a string UUID
+  expect(typeof result.createdAtLocation).toBe('string')
+  expect(result.createdAtLocation).toMatch(/^[0-9a-fA-F-]{36}$/)
+
+  // updatedAtLocation must be a string UUID (or null if nothing updated)
+  if (result.updatedAtLocation) {
+    expect(typeof result.updatedAtLocation).toBe('string')
+    expect(result.updatedAtLocation).toMatch(/^[0-9a-fA-F-]{36}$/)
+  }
+})

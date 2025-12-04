@@ -276,3 +276,45 @@ export async function getLocationById(locationId: UUID) {
     }>()
     .executeTakeFirst()
 }
+
+/**
+ * Given a location ID, this function retrieves the full chain of parent administrative areas
+ * from `administrative_areas` corresponding to the location's `administrative_area_id`.
+ * Returns an array of IDs representing the location's hierarchy, from top-level parent down to the location itself.
+ *
+ * @param locationId
+ * @returns The list of location hierarchy ids, ex: [admin_area_1_id, admin_area_2_id, locationId]
+ */
+export async function getLocationHierarchyRaw(locationId: string) {
+  const db = getClient()
+
+  const query = sql<{ ids: string[] }>`
+    WITH RECURSIVE area_chain AS (
+        -- Base case: Start with the location itself
+        SELECT
+            l.id,
+            l.administrative_area_id AS parent_id,
+            0 AS depth
+
+        FROM app.locations l
+        WHERE l.id = ${locationId}
+
+        UNION ALL
+
+        -- Recursive case: Get administrative areas
+        SELECT
+            aa.id,
+            aa.parent_id,
+            ac.depth + 1
+
+        FROM app.administrative_areas aa
+        JOIN area_chain ac
+            ON ac.parent_id = aa.id
+    )
+    SELECT array_agg(id ORDER BY depth DESC) AS ids FROM area_chain;
+  `
+
+  const result = await db.executeQuery(query.compile(db))
+
+  return result.rows.length > 0 ? result.rows[0].ids : []
+}

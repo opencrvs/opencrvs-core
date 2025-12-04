@@ -14,13 +14,15 @@ import { http, HttpResponse } from 'msw'
 import {
   ActionStatus,
   ActionType,
-  createPrng,
   EventDocument,
   EventIndex,
   generateEventDocument,
   getUUID,
+  LocationType,
   SCOPES,
-  TENNIS_CLUB_MEMBERSHIP
+  TENNIS_CLUB_MEMBERSHIP,
+  generateUuid,
+  createPrng
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createSystemTestClient, setupTestCase } from '@events/tests/utils'
@@ -30,6 +32,7 @@ import {
 } from '@events/storage/elasticsearch'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
+import { getLocations } from '../locations/locations'
 
 const spy = vi.fn()
 
@@ -49,8 +52,38 @@ let rngNumber = 949
 beforeEach(async () => {
   mswServer.use(postHandler)
   spy.mockReset()
-  const { user, eventsDb } = await setupTestCase()
+  const { user, eventsDb, seed } = await setupTestCase()
+
   const rng = createPrng(rngNumber)
+
+  const adminLevel1Id = generateUuid(rng)
+  const adminLevel2Id = generateUuid(rng)
+  const crvsOfficeId = generateUuid(rng)
+
+  await seed.locations([
+    {
+      name: 'Adming level 1',
+      parentId: null,
+      locationType: LocationType.enum.ADMIN_STRUCTURE,
+      id: adminLevel1Id,
+      validUntil: null
+    },
+    {
+      name: 'Admin level 2',
+      parentId: adminLevel1Id,
+      locationType: LocationType.enum.ADMIN_STRUCTURE,
+      id: adminLevel2Id,
+      validUntil: null
+    },
+    {
+      name: 'Admin level 2',
+      parentId: adminLevel2Id,
+      locationType: LocationType.enum.CRVS_OFFICE,
+      id: crvsOfficeId,
+      validUntil: null
+    }
+  ])
+
   rngNumber++
 
   event = generateEventDocument({
@@ -61,6 +94,9 @@ beforeEach(async () => {
       { type: ActionType.DECLARE, user }
     ]
   })
+
+  const locations = await getLocations()
+  const crvsOffice = locations.find((x) => x.id === crvsOfficeId)
 
   const draftDocument = generateEventDocument({
     configuration: tennisClubMembershipEvent,
@@ -89,6 +125,7 @@ beforeEach(async () => {
       actionType: ActionType.CREATE,
       createdBy: user.id,
       createdAt: event.createdAt,
+      createdAtLocation: crvsOffice?.id,
       status: ActionStatus.Accepted,
       createdByRole: user.role,
       createdByUserType: 'user',
@@ -105,6 +142,7 @@ beforeEach(async () => {
       actionType: ActionType.DECLARE,
       createdBy: user.id,
       createdAt: event.createdAt,
+      createdAtLocation: crvsOffice?.id,
       status: ActionStatus.Accepted,
       createdByRole: user.role,
       createdByUserType: 'user',
@@ -132,6 +170,7 @@ beforeEach(async () => {
       eventId: drafteventInDb!.id,
       actionType: ActionType.CREATE,
       createdBy: user.id,
+      createdAtLocation: crvsOffice?.id,
       createdAt: event.createdAt,
       status: ActionStatus.Accepted,
       createdByRole: user.role,
@@ -180,6 +219,12 @@ test('reindexing indexes all events into Elasticsearch', async () => {
   expect(spy.mock.calls[0]).toHaveLength(1)
   // Does not reindex draftDocument - thus only one record is indexed
   expect(body.hits.hits).toHaveLength(1)
+
+  // EventIndex locations contains locations hierarchy
+  const eventIndex = body.hits.hits[0]._source as EventIndex
+  expect(eventIndex.legalStatuses.DECLARED?.createdAtLocation).toHaveLength(3)
+  expect(eventIndex.createdAtLocation).toHaveLength(3)
+  expect(eventIndex.updatedAtLocation).toHaveLength(3)
 })
 
 test('reindexing twice', async () => {
@@ -208,7 +253,11 @@ test('reindexing twice', async () => {
 
   // Does not reindex draftDocument - thus only one record is indexed
   expect(body.hits.hits).toHaveLength(1)
-  expect((body.hits.hits[0]._source as EventIndex).trackingId).toEqual(
-    event.trackingId
-  )
+
+  // EventIndex locations contains locations hierarchy
+  const eventIndex = body.hits.hits[0]._source as EventIndex
+  expect(eventIndex.legalStatuses.DECLARED?.createdAtLocation).toHaveLength(3)
+  expect(eventIndex.createdAtLocation).toHaveLength(3)
+  expect(eventIndex.updatedAtLocation).toHaveLength(3)
+  expect(eventIndex.trackingId).toEqual(event.trackingId)
 })
