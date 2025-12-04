@@ -356,60 +356,85 @@ export function withJurisdictionFilters({
   // Scopes v2 take precedence over v1 options
 
   if (scopesV2) {
-    const must: estypes.QueryDslQueryContainer[] = []
+    const scopeQueries: estypes.QueryDslQueryContainer[] = scopesV2
+      .map((scope) => {
+        const must: estypes.QueryDslQueryContainer[] = []
 
-    for (const scope of scopesV2) {
-      for (const [filterProperty, value] of Object.entries(
-        scope.options ?? {}
-      )) {
-        if (!value) {
-          continue
+        for (const [filterProperty, value] of Object.entries(
+          scope.options ?? {}
+        )) {
+          if (!value) {
+            continue
+          }
+
+          switch (filterProperty) {
+            case 'event':
+              must.push({
+                terms: {
+                  type: Array.isArray(value) ? value : [value]
+                }
+              })
+              break
+
+            case 'eventLocation':
+              must.push({
+                term: { createdAtLocation: value }
+              })
+              break
+
+            case 'declaredIn':
+              must.push({
+                term: {
+                  'legalStatuses.DECLARED.createdAtLocation': value
+                }
+              })
+              break
+
+            case 'registeredIn':
+              must.push({
+                term: {
+                  'legalStatuses.REGISTERED.createdAtLocation': value
+                }
+              })
+              break
+
+            case 'declaredBy':
+              must.push({
+                term: { 'legalStatuses.DECLARED.createdBy': value }
+              })
+              break
+
+            case 'registeredBy':
+              must.push({
+                term: {
+                  'legalStatuses.REGISTERED.createdBy': value
+                }
+              })
+              break
+
+            default:
+              throw new Error(`Unsupported filter property: ${filterProperty}`)
+          }
         }
 
-        switch (filterProperty) {
-          case 'event':
-            must.push({ term: { type: value } })
-            break
+        // If this scope had no active filters, ignore it
+        if (!must.length) {
+          return null
+        }
 
-          // @TODO: this should refer to placeOfEvent once ready.
-          case 'eventLocation':
-            must.push({
-              term: { createdAtLocation: value }
-            })
-            break
+        return {
+          bool: {
+            must
+          }
+        }
+      })
+      .filter((q): q is estypes.QueryDslQueryContainer => q !== null)
 
-          case 'declaredIn':
-            must.push({
-              term: {
-                'legalStatuses.DECLARED.createdAtLocation': value
-              }
-            })
-            break
-
-          case 'registeredIn':
-            must.push({
-              term: {
-                'legalStatuses.REGISTERED.createdAtLocation': value
-              }
-            })
-            break
-
-          case 'declaredBy':
-            must.push({
-              term: { 'legalStatuses.DECLARED.createdBy': value }
-            })
-            break
-
-          case 'registeredBy':
-            must.push({
-              term: {
-                'legalStatuses.REGISTERED.createdBy': value
-              }
-            })
-            break
-
-          default:
-            throw new Error(`Unsupported filter property: ${filterProperty}`)
+    if (!scopeQueries.length) {
+      // No scopes → just return base query
+      return {
+        bool: {
+          must: [query]
         }
       }
     }
@@ -417,13 +442,12 @@ export function withJurisdictionFilters({
     return {
       bool: {
         must: [query],
-        filter: must.length
-          ? {
-              bool: {
-                must: must
-              }
-            }
-          : undefined
+        filter: {
+          bool: {
+            should: scopeQueries,
+            minimum_should_match: 1
+          }
+        }
       }
     }
   }
