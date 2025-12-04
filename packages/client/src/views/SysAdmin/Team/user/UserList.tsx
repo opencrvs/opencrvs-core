@@ -863,7 +863,12 @@ function UserListComponent(props: IProps) {
                     <LocationInfo>
                       {searchedLocation && (
                         <LocationInfoValue>
-                          {getAddressNameV2(locations, searchedLocation)}
+                          {getAddressNameV2(
+                            locations,
+                            searchedLocation.parentId
+                              ? locations.get(searchedLocation.parentId)
+                              : undefined
+                          )}
                         </LocationInfoValue>
                       )}
                     </LocationInfo>

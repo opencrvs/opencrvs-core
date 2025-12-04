@@ -73,10 +73,12 @@ export const getAddressName = (
 
 export const getAddressNameV2 = (
   locations: Map<UUID, Location>,
-  { name, parentId }: Location
+  location?: Location
 ): string => {
+  if (!location) return ''
+  const { name, parentId } = location
   if (!parentId) return name
-  return `${name}, ${getAddressNameV2(locations, locations.get(parentId)!)}`
+  return `${name}, ${getAddressNameV2(locations, locations.get(parentId))}`
 }
 
 export function getUserAuditDescription(
