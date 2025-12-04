@@ -539,18 +539,19 @@ function useViewableActionConfigurations(
   }
 }
 
+const ALL_ACTIONS = [
+  ...Object.values(ActionType),
+  ...Object.values(ClientSpecificAction)
+]
+
 export function useUserAllowedActions(eventType: string) {
   const scopes = useSelector(getScope)
-
-  const actions = Object.values(ActionType)
-  const clientSpecificActions = Object.values(ClientSpecificAction)
-
   const allowedActions = useMemo(
     () =>
-      [...actions, ...clientSpecificActions].filter((action) =>
+      ALL_ACTIONS.filter((action) =>
         isActionInScope(scopes ?? [], action, eventType)
       ),
-    [scopes, eventType, actions, clientSpecificActions]
+    [scopes, eventType]
   )
 
   return {
@@ -671,29 +672,40 @@ export function useAllowedActionConfigurations(
     openDraft
   )
 
-  const availableAssignmentActions = getAvailableAssignmentActions(
-    event,
-    authentication
-  )
+  const availableAssignmentActions = useMemo(() => {
+    return getAvailableAssignmentActions(event, authentication)
+  }, [event, authentication])
 
-  const availableEventActions = getAvailableActionsForEvent(event)
-  const openDraftAction = openDraft ? [openDraft.action.type] : []
+  const availableEventActions = useMemo(() => {
+    return getAvailableActionsForEvent(event)
+  }, [event])
 
-  const allowedActionConfigs: ActionMenuItem[] = [
-    ...availableAssignmentActions,
-    ...availableEventActions,
-    ...openDraftAction
-  ]
-    // deduplicate after adding the draft
-    .filter((action, index, self) => self.indexOf(action) === index)
-    .filter(
-      (action): action is ActionMenuActionType =>
-        ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
-        workqueueActions.safeParse(action).success
+  const allowedActionConfigs: ActionMenuItem[] = useMemo(() => {
+    const openDraftAction = openDraft ? [openDraft.action.type] : []
+    return (
+      [
+        ...availableAssignmentActions,
+        ...availableEventActions,
+        ...openDraftAction
+      ]
+        // deduplicate after adding the draft
+        .filter((action, index, self) => self.indexOf(action) === index)
+        .filter(
+          (action): action is ActionMenuActionType =>
+            ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
+            workqueueActions.safeParse(action).success
+        )
+        .filter((action) => isActionAllowed(action))
+        // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
+        .map((a) => ({ ...config[a], type: a }))
     )
-    .filter((action) => isActionAllowed(action))
-    // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
-    .map((a) => ({ ...config[a], type: a }))
+  }, [
+    availableAssignmentActions,
+    availableEventActions,
+    openDraft,
+    config,
+    isActionAllowed
+  ])
 
   const { customActionModal, customActionConfigs } = useCustomActionConfigs(
     event,
