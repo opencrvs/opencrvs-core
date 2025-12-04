@@ -288,7 +288,7 @@ function DeclarationActionContainer({
 
   const navigate = useNavigate()
   const { redirectToEventOverviewPage } = useToastAndRedirect()
-  const event = events.getEvent.findFromCache(eventId).data
+  const event = events.getEvent.useFindEventFromCache(eventId).data
 
   // Missing event should not happen in "regular" application flow.
   // 1. User clicks browser 'back' button after completing flow.
