@@ -18,7 +18,7 @@ import { DeclarationFormConfig } from './FormConfig'
 
 import { FieldType } from './FieldType'
 import { FieldReference } from './FieldConfig'
-import { FlagConfig } from './Flag'
+import { FlagConfig, InherentFlags } from './Flag'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -141,7 +141,10 @@ export const EventConfig = z
     )
 
     for (const actionFlagId of actionFlagIds) {
-      if (!configuredFlagIds.includes(actionFlagId)) {
+      if (
+        !configuredFlagIds.includes(actionFlagId) ||
+        !Object.keys(InherentFlags).includes(actionFlagId)
+      ) {
         ctx.addIssue({
           code: 'custom',
           message: `Action flag id must match a configured flag in the flags array. Invalid action flag ID for event '${event.id}': '${actionFlagId}'`,
