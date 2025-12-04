@@ -149,7 +149,6 @@ async function resolveUserDetails(
 
     // @TODO: We should get this from a single source. Waiting for user migration.
     const location = await getLocationById(primaryOfficeId)
-    console.log('location', location)
     return UserContext.parse({
       type: userType,
       id: userId,

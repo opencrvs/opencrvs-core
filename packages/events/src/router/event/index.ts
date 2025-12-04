@@ -350,7 +350,6 @@ export const eventRouter = router({
       })
     )
     .query(async ({ input, ctx }) => {
-      console.log('ctx.user', ctx.user)
       const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
       const scopes = getScopes(ctx.token)
       const isRecordSearchSystemClient = scopes.includes(SCOPES.RECORDSEARCH)
@@ -367,18 +366,16 @@ export const eventRouter = router({
         )
       }
 
-      console.log('ctx.acceptedScopes', ctx.acceptedScopes)
       if (ctx.acceptedScopes) {
         const resolvedScopes = ctx.acceptedScopes
-          ? ctx.acceptedScopes.map((scope) =>
-              scopeJurisdictionToLocationIds(
+          ? ctx.acceptedScopes.map((scope) => ({
+              type: scope.type,
+              options: scopeJurisdictionToLocationIds(
                 scope.options as any,
                 ctx.user as any
               )
-            )
+            }))
           : undefined
-
-        console.log('resolvedScopes', resolvedScopes)
 
         return findRecordsByQuery(
           input,

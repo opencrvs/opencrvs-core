@@ -346,80 +346,84 @@ export function withJurisdictionFilters({
   query,
   options,
   userOfficeId,
-  optionsV2,
   scopesV2
 }: {
   query: estypes.QueryDslQueryContainer
   options: Record<string, SearchScopeAccessLevels>
   userOfficeId: string | undefined
-  optionsV2?: RecordScopeV2['options'][]
   scopesV2?: RecordScopeV2[]
 }): estypes.QueryDslQueryContainer {
   // Scopes v2 take precedence over v1 options
 
   if (scopesV2) {
-    console.log('scopesV2', scopesV2)
-    const filteredQueries = scopesV2.flatMap((scope) => {
-      return Object.entries(scope.options ?? {}).flatMap(
-        ([filterProperty, value]) => {
-          const must: estypes.QueryDslQueryContainer[] = []
-          if (!value) {
-            return must
-          }
+    const must: estypes.QueryDslQueryContainer[] = []
 
-          switch (filterProperty) {
-            case 'event':
-              must.push({ term: { type: value } })
-              break
-            case 'eventLocation':
-              // @TODO: this should refer to placeOfEvent once ready.
-              must.push({ term: { createdAtLocation: value } })
-              break
-            case 'declaredIn':
-              must.push({
-                term: { 'legalStatuses.DECLARED.createdAt': value }
-              })
-              break
-            case 'registeredIn':
-              must.push({
-                term: {
-                  'legalStatuses.REGISTERED.createdAt': value
-                }
-              })
-              break
-            case 'declaredBy':
-              {
-                must.push({
-                  term: { 'legalStatuses.DECLARED.createdBy': value }
-                })
-              }
-              break
-            case 'registeredBy':
-              must.push({
-                term: {
-                  'legalStatuses.REGISTERED.createdBy': value
-                }
-              })
-              break
-            default:
-              throw new Error(`Unsupported filter property: ${filterProperty}`)
-          }
-
-          return must
+    for (const scope of scopesV2) {
+      for (const [filterProperty, value] of Object.entries(
+        scope.options ?? {}
+      )) {
+        if (!value) {
+          continue
         }
-      )
-    })
+
+        switch (filterProperty) {
+          case 'event':
+            must.push({ term: { type: value } })
+            break
+
+          // @TODO: this should refer to placeOfEvent once ready.
+          case 'eventLocation':
+            must.push({
+              term: { createdAtLocation: value }
+            })
+            break
+
+          case 'declaredIn':
+            must.push({
+              term: {
+                'legalStatuses.DECLARED.createdAtLocation': value
+              }
+            })
+            break
+
+          case 'registeredIn':
+            must.push({
+              term: {
+                'legalStatuses.REGISTERED.createdAtLocation': value
+              }
+            })
+            break
+
+          case 'declaredBy':
+            must.push({
+              term: { 'legalStatuses.DECLARED.createdBy': value }
+            })
+            break
+
+          case 'registeredBy':
+            must.push({
+              term: {
+                'legalStatuses.REGISTERED.createdBy': value
+              }
+            })
+            break
+
+          default:
+            throw new Error(`Unsupported filter property: ${filterProperty}`)
+        }
+      }
+    }
 
     return {
       bool: {
         must: [query],
-        should: undefined,
-        filter: {
-          bool: {
-            should: filteredQueries,
-            minimum_should_match: 1
-          }
-        }
+        filter: must.length
+          ? {
+              bool: {
+                must: must
+              }
+            }
+          : undefined
       }
     }
   }

@@ -17,16 +17,14 @@ import {
   LocationType,
   TENNIS_CLUB_MEMBERSHIP,
   TestUserRole,
+  UserFilter,
   createPrng,
   encodeScope,
   generateUuid,
+  joinValues,
   pickRandom
 } from '@opencrvs/commons'
-import {
-  createTestClient,
-  sanitizeForSnapshot,
-  setupTestCase
-} from '@events/tests/utils'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { payloadGenerator } from '../../tests/generators'
 
 test.only('User without any search scopes should not see any events', async () => {
@@ -108,12 +106,14 @@ function generateOfficeLocations(
   })
 }
 
-test.only('foo2', async () => {
+test.only('Single scope, multi-filter combinations', async () => {
   const { seed } = await setupTestCase()
 
   const rng = createPrng(1234)
 
   const generator = payloadGenerator(rng)
+
+  // 1. Setup administrative areas. 3 branches, some with children, some "skipping" levels.
 
   const provinceA = {
     name: 'Province A',
@@ -163,7 +163,7 @@ test.only('foo2', async () => {
     validUntil: null
   } satisfies Location
 
-  const adminAreas = [
+  const administrativeAreas = [
     provinceA,
     provinceB,
     districtC,
@@ -171,14 +171,19 @@ test.only('foo2', async () => {
     villageA,
     villageB
   ]
-  await seed.locations(adminAreas)
+  await seed.locations(administrativeAreas)
 
-  const offices = generateOfficeLocations(adminAreas, rng)
+  // 2. Setup offices/health facilities under each admin area.
+  const offices = generateOfficeLocations(administrativeAreas, rng)
   await seed.locations(offices)
 
+  expect(administrativeAreas.length).toBe(6)
+  expect(offices.length).toBe(12) // 6 admin areas x 2 offices each
+
+  // 3. Create user each office.
   const users = offices.map((office) =>
     seed.user({
-      administrativeAreaId: adminAreas.find((aa) => {
+      administrativeAreaId: administrativeAreas.find((aa) => {
         return aa.id === office.parentId
       })?.id,
       primaryOfficeId: office.id,
@@ -189,6 +194,7 @@ test.only('foo2', async () => {
     })
   )
 
+  // 4. Each user creates and declares an event using duplicate data.
   for (const user of users) {
     const testClient = createTestClient(user, [
       'record.create[event=birth|death|tennis-club-membership|child-onboarding]',
@@ -209,7 +215,7 @@ test.only('foo2', async () => {
         'applicant.address': {
           country: 'FAR',
           addressType: AddressType.DOMESTIC,
-          administrativeArea: adminAreas.find((aa) => {
+          administrativeArea: administrativeAreas.find((aa) => {
             const office = offices.find((o) => o.id === user.primaryOfficeId)
             return aa.id === office?.parentId
           })?.id,
@@ -224,28 +230,31 @@ test.only('foo2', async () => {
     await testClient.event.actions.declare.request(data)
   }
 
-  const cartesian = (...a: any[]) =>
-    a.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())))
+  // 5. We generate combinations of users and jurisdiction filters to test search results.
+  const cartesian = (...a: unknown[][]) =>
+    a.reduce((b, c) =>
+      b.flatMap((d: unknown) => c.map((e: unknown) => [d, e].flat()))
+    )
 
   const combinations = cartesian(
     users, // user
-    JurisdictionFilter.options, // eventLocation
-    JurisdictionFilter.options // declaredIn
+    JurisdictionFilter.options, // declaredIn,
+    [UserFilter.enum.user, undefined] // declaredBy
   )
 
-  for (const [user, eventLocation, declaredIn] of combinations) {
-    const searchScopes = [
-      encodeScope({
-        type: 'record.search',
-        options: {
-          event: [TENNIS_CLUB_MEMBERSHIP],
-          eventLocation,
-          declaredIn
-        }
-      })
-    ]
+  const combinationResults = []
+  // 6. Each user searches with each combination and we snapshot the results.
+  for (const [user, declaredIn, declaredBy] of combinations) {
+    const searchScope = encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        declaredIn,
+        declaredBy
+      }
+    })
 
-    const testClient = createTestClient(user, searchScopes)
+    const testClient = createTestClient(user, [searchScope])
 
     const searchResult = await testClient.event.search({
       query: {
@@ -261,16 +270,40 @@ test.only('foo2', async () => {
       }
     })
 
-    expect({
-      searchResult: sanitizeForSnapshot(searchResult, [
-        'id',
-        'createdAt',
-        'updatedAt',
-        'trackingId',
-        'acceptedAt'
-      ]),
-      user,
-      searchScopes
-    }).toMatchSnapshot()
+    // 7. We want to see 1) jurisdiction scope limits search results. 2) combining jurisdiction filter and user is treated as AND.
+    const cleanedResults = searchResult.results.map((r) => ({
+      type: r.type,
+      legalStatuses: {
+        DECLARED: {
+          createdAtLocation: r.legalStatuses.DECLARED?.createdAtLocation,
+          readableLocation: offices.find(
+            (o) => o.id === r.legalStatuses.DECLARED?.createdAtLocation
+          )?.name,
+          createdBy: r.legalStatuses.DECLARED?.createdBy
+        }
+      }
+    }))
+
+    const snapshot = {
+      scope: searchScope,
+      total: cleanedResults.length,
+      user: {
+        id: user.id,
+        primaryOfficeId: user.primaryOfficeId,
+        administrativeAreaId: user.administrativeAreaId,
+        locations: `${offices.find((o) => o.id === user.primaryOfficeId)?.name}, ${
+          administrativeAreas.find((aa) => aa.id === user.administrativeAreaId)
+            ?.name
+        }`
+      },
+      results: cleanedResults
+    }
+
+    combinationResults.push(snapshot)
   }
+
+  // Group by scope for easier snapshot reading
+  const resultsByScope = _.groupBy(combinationResults, (r) => r.scope)
+
+  expect(resultsByScope).toMatchSnapshot()
 })
