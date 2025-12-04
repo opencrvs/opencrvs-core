@@ -10,7 +10,16 @@
  */
 
 import * as z from 'zod/v4'
-import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
+import {
+  getScopes,
+  getUUID,
+  SCOPES,
+  UUID,
+  findScope,
+  JurisdictionFilter,
+  RecordScopeV2,
+  UserFilter
+} from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
@@ -59,6 +68,41 @@ import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 import { customActionProcedures } from './actions/custom'
+
+function getLocationIdsFromScopeOptions(
+  filter: string | undefined,
+  user: {
+    primaryOfficeId: UUID
+    administrativeAreaId?: UUID | null
+    id: string
+  }
+) {
+  // eslint-disable-next-line no-nested-ternary
+  return filter === JurisdictionFilter.enum.all
+    ? undefined
+    : // eslint-disable-next-line no-nested-ternary
+      filter === JurisdictionFilter.enum.location
+      ? user.primaryOfficeId
+      : filter === JurisdictionFilter.enum.administrativeArea
+        ? user.administrativeAreaId
+        : undefined
+}
+
+function scopeJurisdictionToLocationIds(
+  options: RecordScopeV2['options'],
+  user: { primaryOfficeId: UUID; administrativeAreaId: UUID; id: string }
+) {
+  return {
+    event: options.event,
+    eventLocation: getLocationIdsFromScopeOptions(options.eventLocation, user),
+    declaredIn: getLocationIdsFromScopeOptions(options.declaredIn, user),
+    declaredBy:
+      options.declaredBy === UserFilter.enum.user ? user.id : undefined,
+    registeredIn: getLocationIdsFromScopeOptions(options.registeredIn, user),
+    registeredBy:
+      options.registeredBy === UserFilter.enum.user ? user.id : undefined
+  }
+}
 
 export const eventRouter = router({
   config: router({
@@ -295,7 +339,9 @@ export const eventRouter = router({
       }
     })
     // @todo: remove legacy scopes once all users are configured with new search scopes
-    .use(requiresAnyOfScopes([SCOPES.RECORDSEARCH], ['search']))
+    .use(
+      requiresAnyOfScopes([SCOPES.RECORDSEARCH], ['search'], ['record.search'])
+    )
     .input(SearchQuery)
     .output(
       z.object({
@@ -304,6 +350,7 @@ export const eventRouter = router({
       })
     )
     .query(async ({ input, ctx }) => {
+      console.log('ctx.user', ctx.user)
       const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
       const scopes = getScopes(ctx.token)
       const isRecordSearchSystemClient = scopes.includes(SCOPES.RECORDSEARCH)
@@ -320,12 +367,35 @@ export const eventRouter = router({
         )
       }
 
+      console.log('ctx.acceptedScopes', ctx.acceptedScopes)
+      if (ctx.acceptedScopes) {
+        const resolvedScopes = ctx.acceptedScopes
+          ? ctx.acceptedScopes.map((scope) =>
+              scopeJurisdictionToLocationIds(
+                scope.options as any,
+                ctx.user as any
+              )
+            )
+          : undefined
+
+        console.log('resolvedScopes', resolvedScopes)
+
+        return findRecordsByQuery(
+          input,
+          eventConfigs,
+          { birth: 'all' },
+          ctx.user.primaryOfficeId,
+          resolvedScopes
+        )
+      }
+
       const searchScope = findScope(scopes, 'search')
 
       // Only to satisfy type checking, as findScope will return undefined if no scope is found
       if (!searchScope) {
         throw new Error('No search scope provided')
       }
+
       return findRecordsByQuery(
         input,
         eventConfigs,

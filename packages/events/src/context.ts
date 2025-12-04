@@ -25,10 +25,12 @@ import {
   System
 } from '@opencrvs/commons'
 import { getSystem, getUser } from './service/users/api'
+import { getLocationById } from './service/locations/locations'
 
 export const UserContext = User.pick({
   id: true,
   primaryOfficeId: true,
+  administrativeAreaId: true,
   role: true,
   signature: true,
   type: true
@@ -145,10 +147,14 @@ async function resolveUserDetails(
       })
     }
 
+    // @TODO: We should get this from a single source. Waiting for user migration.
+    const location = await getLocationById(primaryOfficeId)
+    console.log('location', location)
     return UserContext.parse({
       type: userType,
       id: userId,
       primaryOfficeId,
+      administrativeAreaId: location.administrativeAreaId,
       signature,
       role
     })

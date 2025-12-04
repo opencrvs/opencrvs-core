@@ -882,17 +882,17 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
             description: 'This is the label for the field',
             id: 'event.tennis-club-membership.action.declare.form.section.who.field.address.label'
           },
-          validation: [
-            {
-              message: {
-                defaultMessage: 'Invalid input',
-                description: 'Error message when generic field is invalid',
-                id: 'error.invalid'
-              },
-              validator:
-                field('applicant.address').isValidAdministrativeLeafLevel()
-            }
-          ],
+          // validation: [
+          //   {
+          //     message: {
+          //       defaultMessage: 'Invalid input',
+          //       description: 'Error message when generic field is invalid',
+          //       id: 'error.invalid'
+          //     },
+          //     validator:
+          //       field('applicant.address').isValidAdministrativeLeafLevel()
+          //   }
+          // ],
           configuration: {
             streetAddressForm: [
               {

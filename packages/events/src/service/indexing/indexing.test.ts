@@ -476,7 +476,11 @@ describe('withJurisdictionFilters', () => {
   test('returns original query if no my-jurisdiction and no userOfficeId', () => {
     const options = { birth: 'all' as const }
 
-    const result = withJurisdictionFilters(baseQuery, options, undefined)
+    const result = withJurisdictionFilters({
+      query: baseQuery,
+      options,
+      userOfficeId: undefined
+    })
 
     expect(result).toEqual({
       bool: {
@@ -508,7 +512,11 @@ describe('withJurisdictionFilters', () => {
   test('returns original query if no my-jurisdiction scopes are available for multiple events', () => {
     const options = { birth: 'all' as const, death: 'all' as const }
 
-    const result = withJurisdictionFilters(baseQuery, options, undefined)
+    const result = withJurisdictionFilters({
+      query: baseQuery,
+      options,
+      userOfficeId: undefined
+    })
 
     expect(result).toEqual({
       bool: {
@@ -540,7 +548,11 @@ describe('withJurisdictionFilters', () => {
       death: 'all' as const
     }
 
-    const result = withJurisdictionFilters(baseQuery, options, 'office-123')
+    const result = withJurisdictionFilters({
+      query: baseQuery,
+      options,
+      userOfficeId: 'office-123'
+    })
 
     expect(result).toEqual({
       bool: {
@@ -575,7 +587,11 @@ describe('withJurisdictionFilters', () => {
       death: 'my-jurisdiction' as const
     }
 
-    const result = withJurisdictionFilters(baseQuery, options, 'office-123')
+    const result = withJurisdictionFilters({
+      query: baseQuery,
+      options,
+      userOfficeId: 'office-123'
+    })
 
     expect(result).toEqual({
       bool: {
@@ -613,7 +629,11 @@ describe('withJurisdictionFilters', () => {
       death: 'all' as const
     }
 
-    const result = withJurisdictionFilters(baseQuery, options, 'office-123')
+    const result = withJurisdictionFilters({
+      query: baseQuery,
+      options,
+      userOfficeId: 'office-123'
+    })
 
     expect(result).toEqual({
       bool: {

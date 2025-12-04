@@ -255,3 +255,24 @@ export async function isLocationUnderJurisdiction({
 
   return !!result.rows[0].isChild
 }
+
+export async function getLocationById(locationId: UUID) {
+  const db = getClient()
+
+  return db
+    .selectFrom('locations')
+    .select([
+      'id',
+      'name',
+      'administrativeAreaId',
+      'validUntil',
+      'locationType'
+    ])
+    .where('id', '=', locationId)
+    .where('deletedAt', 'is', null)
+    .$narrowType<{
+      deletedAt: null
+      validUntil: Location['validUntil']
+    }>()
+    .executeTakeFirst()
+}

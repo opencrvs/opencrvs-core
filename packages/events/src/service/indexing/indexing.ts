@@ -438,17 +438,21 @@ export async function findRecordsByQuery(
   search: SearchQuery,
   eventConfigs: EventConfig[],
   options: Record<string, SearchScopeAccessLevels>,
-  userOfficeId: string | undefined
+  userOfficeId: string | undefined,
+  resolvedScopes?: any[]
 ) {
   const esClient = getOrCreateClient()
 
   const { query, limit, offset } = search
 
-  const esQuery = withJurisdictionFilters(
-    await buildElasticQueryFromSearchPayload(query, eventConfigs),
+  const esQuery = withJurisdictionFilters({
+    query: await buildElasticQueryFromSearchPayload(query, eventConfigs),
     options,
-    userOfficeId
-  )
+    userOfficeId,
+    scopesV2: resolvedScopes
+  })
+
+  console.log(JSON.stringify(esQuery))
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
@@ -510,7 +514,7 @@ export async function getEventCount(
   )
 
   const filteredQueries = (await Promise.all(esQueries)).map((query) =>
-    withJurisdictionFilters(query, options, userOfficeId)
+    withJurisdictionFilters({ query, options, userOfficeId })
   )
   const { responses } = await esClient.msearch({
     searches: filteredQueries.flatMap((query) => [
