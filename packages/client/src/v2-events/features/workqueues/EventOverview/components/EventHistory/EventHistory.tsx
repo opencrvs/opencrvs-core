@@ -19,10 +19,8 @@ import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
-  ActionConfigTypes,
   ActionType,
   isActionConfigType,
-  ActionConfig,
   EventDocument,
   getActionConfig
 } from '@opencrvs/commons/client'
@@ -46,7 +44,7 @@ import {
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useEventOverviewInfo } from '../useEventOverviewInfo'
 import { UserAvatar } from './UserAvatar'
 import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
 
@@ -515,10 +513,10 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
 export function EventHistoryIndex() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.AUDIT)
-  const { getEvent } = useEvents()
-  const fullEvent = getEvent.findFromCache(eventId).data
+  const { fullEvent, shouldShowFullOverview: shouldShowHistory } =
+    useEventOverviewInfo(eventId)
 
-  if (!fullEvent) {
+  if (!shouldShowHistory) {
     return <EventHistorySkeleton />
   }
 

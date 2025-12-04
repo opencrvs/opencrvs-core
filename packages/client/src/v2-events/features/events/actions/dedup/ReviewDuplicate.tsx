@@ -131,7 +131,7 @@ function ReviewDuplicate() {
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
-  const event = events.getEvent.findFromCache(eventId).data
+  const event = events.getEvent.useFindEventFromCache(eventId).data
 
   useEffect(() => {
     if (!event) {
