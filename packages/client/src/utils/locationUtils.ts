@@ -298,6 +298,23 @@ export function getLocationHierarchy(
   })
 }
 
+export function getLocationHierarchyV2(
+  locationId: UUID,
+  locations: Map<UUID, Location>
+): UUID[] {
+  const parentLocation = locations.get(locationId)
+  if (!parentLocation) {
+    return [locationId]
+  }
+  const { parentId } = parentLocation
+
+  if (!parentId) {
+    return [locationId]
+  }
+
+  return [locationId, ...getLocationHierarchyV2(parentId, locations)]
+}
+
 export function isOfficeUnderJurisdiction(
   officeId: string,
   otherOfficeId: string,
@@ -317,6 +334,25 @@ export function isOfficeUnderJurisdiction(
   }
   const hierarchy = getLocationHierarchy(otherOfficeLocationId, locations)
   return Object.values(hierarchy).includes(parentLocation.id)
+}
+export function isOfficeUnderJurisdictionV2(
+  officeId: string,
+  otherOfficeId: string,
+  locations: Map<UUID, Location>
+) {
+  const office = locations.get(UUID.parse(officeId))
+  const otherOffice = locations.get(UUID.parse(otherOfficeId))
+  const officeLocationId = office?.parentId
+  const otherOfficeLocationId = otherOffice?.parentId
+  if (!officeLocationId || !otherOfficeLocationId) {
+    return false
+  }
+  const parentLocation = locations.get(officeLocationId)
+  if (!parentLocation) {
+    return false
+  }
+  const hierarchy = getLocationHierarchyV2(otherOfficeLocationId, locations)
+  return hierarchy.includes(parentLocation.id)
 }
 
 function getAssociatedLocationsAndOffices(
