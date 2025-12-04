@@ -143,11 +143,12 @@ export const EventConfig = z
     for (const actionFlagId of actionFlagIds) {
       if (
         !configuredFlagIds.includes(actionFlagId) ||
-        !Object.keys(InherentFlags).includes(actionFlagId)
+        // @ts-expect-error - actionFlagIds shouldn't match inherent flags types
+        !Object.values(InherentFlags).includes(actionFlagId)
       ) {
         ctx.addIssue({
           code: 'custom',
-          message: `Action flag id must match a configured flag in the flags array. Invalid action flag ID for event '${event.id}': '${actionFlagId}'`,
+          message: `Action flag id must match an inherent flag or a configured flag in the flags array. Invalid action flag ID for event '${event.id}': '${actionFlagId}'`,
           path: ['actions']
         })
       }
