@@ -11909,65 +11909,10 @@ components:
             - type: "null"
         placeOfEvent:
           anyOf:
-            - anyOf:
-                - type: string
-                  format: uuid
-                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                - type: "null"
-            - anyOf:
-                - oneOf:
-                    - type: object
-                      properties:
-                        country:
-                          anyOf:
-                            - type: string
-                            - type: "null"
-                        streetLevelDetails:
-                          anyOf:
-                            - type: object
-                              propertyNames:
-                                type: string
-                              additionalProperties:
-                                anyOf:
-                                  - type: string
-                                  - type: "null"
-                            - type: "null"
-                        addressType:
-                          type: string
-                          const: DOMESTIC
-                        administrativeArea:
-                          anyOf:
-                            - type: string
-                              format: uuid
-                              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                            - type: "null"
-                      required:
-                        - addressType
-                      additionalProperties: false
-                    - type: object
-                      properties:
-                        country:
-                          anyOf:
-                            - type: string
-                            - type: "null"
-                        streetLevelDetails:
-                          anyOf:
-                            - type: object
-                              propertyNames:
-                                type: string
-                              additionalProperties:
-                                anyOf:
-                                  - type: string
-                                  - type: "null"
-                            - type: "null"
-                        addressType:
-                          type: string
-                          const: INTERNATIONAL
-                      required:
-                        - addressType
-                      additionalProperties: false
-                  type: object
-                - type: "null"
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
         createdBy:
           description: ID of the user who created the event.
           type: string
