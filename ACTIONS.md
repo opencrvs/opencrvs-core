@@ -40,7 +40,9 @@ All custom actions are configurable.
 
 ## Action configurations
 
-Actions are always configured on a per–event-type basis, meaning different event types do not share action configurations.
+All custom actions and certain core actions are configurable.
+
+Actions are configured on a per–event-type basis, meaning different event types do not share action configurations.
 
 Below we describe two configuration options: flag configurations and action conditionals. It is important to note that additional configuration options are available and that many core actions have configuration options specific to their action type.
 
