@@ -4,6 +4,10 @@
 
 ### New features
 
+#### NUMBER_WITH_UNIT Input
+
+Introduce a NUMBER_WITH_UNIT input which is a number input with a configurable selectable unit of measurement.
+
 #### HTTP Input
 
 HTTP input now accepts `field('..')` references in the HTTP body definition.
