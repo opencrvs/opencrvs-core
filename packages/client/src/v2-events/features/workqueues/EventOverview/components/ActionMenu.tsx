@@ -11,7 +11,6 @@
 
 import React from 'react'
 import { useIntl } from 'react-intl'
-
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
@@ -97,6 +96,11 @@ export function ActionMenu({
               </DropdownMenu.Label>
               <DropdownMenu.Separator />
             </>
+          )}
+          {!actionMenuItems.length && (
+            <DropdownMenu.Label>
+              <i>{intl.formatMessage(messages.noActionsAvailable)}</i>
+            </DropdownMenu.Label>
           )}
           {actionMenuItems.map((action) => {
             return (
