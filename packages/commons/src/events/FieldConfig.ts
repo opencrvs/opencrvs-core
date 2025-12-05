@@ -32,6 +32,7 @@ import {
   FileFieldWithOptionValue,
   HttpFieldValue,
   IdReaderFieldValue,
+  NumberWithUnitFieldValue,
   QrReaderFieldValue
 } from './CompositeFieldValue'
 import { extendZodWithOpenApi } from 'zod-openapi'
@@ -399,6 +400,23 @@ export const SelectOption = z.object({
     .union([z.string(), TranslationConfig])
     .describe('The label of the option')
 })
+
+const NumberWithUnitField = BaseField.extend({
+  type: z.literal(FieldType.NUMBER_WITH_UNIT),
+  defaultValue: NumberWithUnitFieldValue.optional(),
+  options: z
+    .array(SelectOption)
+    .describe('A list of options for the unit select'),
+  configuration: z
+    .object({
+      min: z.number().optional().describe('Minimum value of the number field'),
+      max: z.number().optional().describe('Maximum value of the number field'),
+      numberFieldPlaceholder: TranslationConfig.optional().describe(
+        'Placeholder for the number field'
+      )
+    })
+    .optional()
+}).describe('Number with unit input')
 
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
@@ -941,6 +959,7 @@ export const FieldConfig: z.ZodType<
     Address,
     TextField,
     NumberField,
+    NumberWithUnitField,
     TextAreaField,
     AgeField,
     DateField,
@@ -991,6 +1010,7 @@ export type LocationField = z.infer<typeof LocationInput>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
 export type NumberField = z.infer<typeof NumberField>
+export type NumberWithUnitField = z.infer<typeof NumberWithUnitField>
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type FieldPropsWithoutReferenceValue<T extends FieldType> = Omit<
   Extract<FieldConfig, { type: T }>,

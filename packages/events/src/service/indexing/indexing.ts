@@ -90,6 +90,7 @@ function mapFieldTypeToElasticsearch(
       return { type: 'date' }
     case FieldType.DATE_RANGE:
     case FieldType.TEXT:
+    case FieldType.NUMBER_WITH_UNIT:
     case FieldType.TEXTAREA:
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:

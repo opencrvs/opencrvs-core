@@ -16,6 +16,8 @@ import {
   FileFieldWithOptionValue,
   NameFieldValue,
   NameFieldUpdateValue,
+  NumberWithUnitFieldValue,
+  NumberWithUnitFieldUpdateValue,
   HttpFieldUpdateValue,
   HttpFieldValue,
   QueryParamReaderFieldValue,
@@ -109,6 +111,8 @@ const FieldValuesWithoutDataField = z.union([
   SelectDateRangeValue,
   CheckboxFieldValue,
   NumberFieldValue,
+  NumberWithUnitFieldValue,
+  NumberWithUnitFieldUpdateValue,
   FileFieldValue,
   FileFieldWithOptionValue,
   NameFieldValue,
@@ -153,6 +157,7 @@ const PRIORITY_ORDER = [
   'SelectDateRangeValue',
   'CheckboxFieldValue',
   'NumberFieldValue',
+  'NumberWithUnitFieldUpdateValue',
   'FileFieldValue',
   'FileFieldWithOptionValue',
   'DataFieldValue'
@@ -214,6 +219,7 @@ export type FieldUpdateValue =
   | z.infer<typeof SelectDateRangeValue>
   | z.infer<typeof CheckboxFieldValue>
   | z.infer<typeof NumberFieldValue>
+  | z.infer<typeof NumberWithUnitFieldUpdateValue>
   | z.infer<typeof FileFieldValue>
   | z.infer<typeof FileFieldWithOptionValue>
   | z.infer<typeof DataFieldValue>
@@ -233,6 +239,7 @@ export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
   SelectDateRangeValue.describe('SelectDateRangeValue'),
   CheckboxFieldValue.describe('CheckboxFieldValue'),
   NumberFieldValue.describe('NumberFieldValue'),
+  NumberWithUnitFieldUpdateValue.describe('NumberWithUnitFieldUpdateValue'),
   FileFieldValue.describe('FileFieldValue'),
   FileFieldWithOptionValue.describe('FileFieldWithOptionValue'),
   DataFieldValue.describe('DataFieldValue'),
@@ -250,6 +257,7 @@ export type FieldValueSchema =
   | typeof CheckboxFieldValue
   | typeof AddressFieldValue
   | typeof NumberFieldValue
+  | typeof NumberWithUnitFieldValue
   | typeof DataFieldValue
   | typeof NameFieldValue
   | z.ZodString
@@ -268,6 +276,7 @@ export type FieldUpdateValueSchema =
   | typeof CheckboxFieldValue
   | typeof AddressFieldUpdateValue
   | typeof NumberFieldValue
+  | typeof NumberWithUnitFieldUpdateValue
   | typeof DataFieldValue
   | typeof NameFieldValue
   | typeof NameFieldUpdateValue
