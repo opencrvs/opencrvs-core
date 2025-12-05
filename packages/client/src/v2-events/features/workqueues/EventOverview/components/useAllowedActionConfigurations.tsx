@@ -218,8 +218,8 @@ function useViewableActionConfigurations(
   const isOnline = useOnlineStatus()
   const { clearEphemeralFormState } = useEventFormNavigation()
 
-  const { findFromCache } = useEvents().getEvent
-  const isDownloaded = Boolean(findFromCache(event.id).data)
+  const { useFindEventFromCache } = useEvents().getEvent
+  const isDownloaded = Boolean(useFindEventFromCache(event.id).data)
 
   const [assignModal, openAssignModal] = useModal()
   const intl = useIntl()
@@ -250,7 +250,9 @@ function useViewableActionConfigurations(
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
    * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
    */
-  const { refetch: refetchEvent } = events.getEvent.findFromCache(event.id)
+  const { refetch: refetchEvent } = events.getEvent.useFindEventFromCache(
+    event.id
+  )
 
   const { eventConfiguration } = useEventConfiguration(event.type)
 
@@ -568,8 +570,8 @@ function useCustomActionConfigs(
   const scopes = useSelector(getScope) ?? []
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(event)
-  const { findFromCache } = useEvents().getEvent
-  const isDownloaded = Boolean(findFromCache(event.id).data)
+  const { useFindEventFromCache } = useEvents().getEvent
+  const isDownloaded = Boolean(useFindEventFromCache(event.id).data)
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
   const isDownloadedAndAssignedToUser =

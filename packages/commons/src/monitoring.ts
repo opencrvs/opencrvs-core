@@ -30,7 +30,9 @@ function init() {
       containerId: process.env.HOSTNAME,
       hostname: process.env.APN_NODE_NAME || require('os').hostname(),
       environment:
-        process.env.APN_ENVIRONMENT || process.env.NODE_ENV || 'development'
+        process.env.APN_ENVIRONMENT || process.env.NODE_ENV || 'development',
+      transactionIgnoreUrls: ['/health/ready', '/ping'],
+      ignoreUrls: ['/health/ready', '/ping']
     })
   }
 }
