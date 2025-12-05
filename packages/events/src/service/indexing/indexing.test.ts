@@ -112,7 +112,7 @@ test('records are indexed with full location hierarchy', async () => {
   expect(searchResponse.hits.hits[0]._source).toMatchObject({
     id: createdEvent.id,
     type: TENNIS_CLUB_MEMBERSHIP,
-    status: 'VALIDATED',
+    status: 'DECLARED',
     createdAtLocation: [parentLocation.id, childLocation.id],
     updatedAtLocation: [parentLocation.id, childLocation.id],
     legalStatuses: {
@@ -221,7 +221,7 @@ const anyOfStatusPayload: QueryType = {
   type: 'and',
   clauses: [
     {
-      status: { type: 'anyOf', terms: ['REGISTERED', 'VALIDATED'] }
+      status: { type: 'anyOf', terms: ['REGISTERED', 'DECLARED'] }
     }
   ]
 }
@@ -383,7 +383,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
         must: [
           {
             bool: {
-              must: [{ terms: { status: ['REGISTERED', 'VALIDATED'] } }],
+              must: [{ terms: { status: ['REGISTERED', 'DECLARED'] } }],
               should: undefined
             }
           }
@@ -454,7 +454,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
         },
         {
           eventType: 'bar',
-          status: { type: 'exact', term: 'VALIDATED' }
+          status: { type: 'exact', term: 'DECLARED' }
         }
       ]
     }
@@ -478,7 +478,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
             bool: {
               must: [
                 { term: { type: 'bar' } },
-                { term: { status: 'VALIDATED' } }
+                { term: { status: 'DECLARED' } }
               ],
               should: undefined
             }

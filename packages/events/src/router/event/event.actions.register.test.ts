@@ -1191,7 +1191,7 @@ test('deduplication check is performed before register when configured', async (
   expect(
     getCurrentEventState(stillValidated, tennisClubMembershipEvent)
   ).toMatchObject({
-    status: 'VALIDATED',
+    status: 'DECLARED',
     potentialDuplicates: [
       { id: existingEvent.id, trackingId: existingEvent.trackingId }
     ]

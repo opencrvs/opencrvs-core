@@ -65,7 +65,6 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
   EventStatus.enum.DECLARED,
-  EventStatus.enum.VALIDATED,
   EventStatus.enum.REGISTERED,
   EventStatus.enum.ARCHIVED
 ]
@@ -441,7 +440,8 @@ function useViewableActionConfigurations(
           navigate(
             ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
           ),
-        disabled: !isDownloadedAndAssignedToUser
+        disabled: !isDownloadedAndAssignedToUser,
+        hidden: !event.flags.includes('validated')
       },
       [ActionType.MARK_AS_DUPLICATE]: {
         label: actionLabels[ActionType.MARK_AS_DUPLICATE],

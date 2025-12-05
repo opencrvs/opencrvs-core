@@ -1073,7 +1073,6 @@ describe('"status" conditionals', () => {
       $online: true
     } satisfies EventStateConditionalParameters
 
-    expect(validate(status('VALIDATED'), params)).toBe(false)
     expect(validate(status('REGISTERED'), params)).toBe(true)
   })
 

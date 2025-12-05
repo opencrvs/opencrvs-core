@@ -22,7 +22,8 @@ import {
   TokenUserType,
   UUID,
   isActionAvailable,
-  getActionConfig
+  getActionConfig,
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -292,7 +293,9 @@ function useDeclarationActions(event: EventDocument) {
         icon: 'FileX' as const,
         label: actionLabels[ActionType.REJECT],
         onClick: async () => handleRejection(() => closeActionView(slug)),
-        hidden: eventIndex.status !== EventStatus.enum.NOTIFIED
+        hidden:
+          eventIndex.status !== EventStatus.enum.NOTIFIED ||
+          eventIndex.flags.includes(InherentFlags.REJECTED)
       },
       {
         icon: 'FloppyDisk' as const,

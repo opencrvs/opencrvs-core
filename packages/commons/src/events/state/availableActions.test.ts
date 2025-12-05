@@ -21,8 +21,7 @@ describe('getAvailableActions', () => {
 
   const REJECTABLE_STATUSES = [
     EventStatus.enum.NOTIFIED,
-    EventStatus.enum.DECLARED,
-    EventStatus.enum.VALIDATED
+    EventStatus.enum.DECLARED
   ]
 
   for (const status of REJECTABLE_STATUSES) {
