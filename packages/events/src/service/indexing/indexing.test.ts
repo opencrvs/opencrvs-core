@@ -112,7 +112,7 @@ test('records are indexed with full location hierarchy', async () => {
   expect(searchResponse.hits.hits[0]._source).toMatchObject({
     id: createdEvent.id,
     type: TENNIS_CLUB_MEMBERSHIP,
-    status: 'VALIDATED',
+    status: 'DECLARED',
     createdAtLocation: [parentLocation.id, childLocation.id],
     updatedAtLocation: [parentLocation.id, childLocation.id],
     legalStatuses: {
