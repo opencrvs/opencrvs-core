@@ -68,6 +68,8 @@ Action conditionals determine whether an action should be visible or enabled bas
 
 Action conditionals support two different types of conditional types: `ConditionalType.SHOW` & `ConditionalType.ENABLE`.
 
+When executing an action, our backend also checks that the action conditions are met: if `SHOW` or `ENABLE` condition is not met, the backend will return HTTP 409.
+
 **Example:** Showing an action only when the record has the approval-required-for-late-registration flag:
 
 ```js
