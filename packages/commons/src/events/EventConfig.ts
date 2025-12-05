@@ -134,6 +134,9 @@ export const EventConfig = z
       }
     }
 
+    const isInherentFlag = (value: unknown): value is InherentFlags =>
+      Object.values(InherentFlags).includes(value as InherentFlags)
+
     // Validate that all referenced action flags are configured in the event flags array.
     const configuredFlagIds = event.flags.map((flag) => flag.id)
     const actionFlagIds = event.actions.flatMap((action) =>
@@ -142,10 +145,7 @@ export const EventConfig = z
 
     for (const actionFlagId of actionFlagIds) {
       const isConfigured = configuredFlagIds.includes(actionFlagId)
-      const isInherent = Object.values(InherentFlags).includes(
-        // @ts-expect-error - actionFlagId can be a inherent flag or any string
-        actionFlagId
-      )
+      const isInherent = isInherentFlag(actionFlagId)
 
       if (!isConfigured && !isInherent) {
         ctx.addIssue({
