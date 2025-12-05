@@ -1,10 +1,10 @@
-## Actions
+# Actions
 
-Actions represent operations performed on an event record, such as a birth declaration. They determine the resulting state of the record and may include, for example, form data submitted to that record.
+Actions represent operations performed on an event record, such as a birth declaration. They determine the resulting state of the record and include, for example, form data submitted to that record.
 
-### Core actions
+## Core actions
 
-Core actions, as the name suggests, are defined within the core system and are available for all event types. They often contain specific UI elements or logic. In v2.0, the available core actions are:
+Core actions, as the name suggests, are defined within the core and are available for all event types. They often contain specific UI elements or logic. In v2.0, the available core actions are:
 
 - `CREATE`
 - `READ`
@@ -17,7 +17,8 @@ Core actions, as the name suggests, are defined within the core system and are a
 - `PRINT_CERTIFICATE`\*
 - `REQUEST_CORRECTION`\*, `APPROVE_CORRECTION` & `REJECT_CORRECTION`
 - `DUPLICATE_DETECTED`, `MARK_AS_DUPLICATE` & `MARK_AS_NOT_DUPLICATE`
-  _\* are configurable core actions, this is related to flag configurations and action conditionals below_
+
+_\* are configurable core actions, this is related to the flag configurations and action conditionals below_
 
 Core actions can also change the event’s status, which custom actions cannot do.  
 In v2.0, the available event statuses are:
@@ -26,13 +27,13 @@ In v2.0, the available event statuses are:
 
 The status is applied by the corresponding action.
 
-### Custom actions
+## Custom actions
 
 Custom actions are non-core actions that are defined only in the country configuration using `ActionType.CUSTOM`. All custom actions are “quick actions”, executed via a dialog on the event overview page. They can be configured with flag configurations, action conditionals, and a custom form displayed in the dialog.
 
 <!-- TODO: add screenshot of custom action dialog here -->
 
-### Flag configurations
+## Flag configurations
 
 Flag configurations define flags that should be added to or removed from a record when an action is executed. They can be applied either unconditionally (if no conditionals are specified) or conditionally based on factors such as form data, the role of the executing user, or the record’s current status or flags.
 
@@ -52,7 +53,7 @@ flags: [
 ]
 ```
 
-### Action conditionals
+## Action conditionals
 
 Action conditionals determine whether an action should be visible or enabled based on the record’s status or flags.
 
@@ -69,7 +70,7 @@ conditionals: [
 ]
 ```
 
-### Beyond v2.0
+## Beyond v2.0
 
 After the release of v2.0, we will review which core actions could be removed and implemented instead as custom actions within our Farajaland configuration. We expect the following actions may be transitioned to custom actions:
 
