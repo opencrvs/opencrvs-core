@@ -672,15 +672,12 @@ export function useAllowedActionConfigurations(
     openDraft
   )
 
-  const availableAssignmentActions = useMemo(() => {
-    return getAvailableAssignmentActions(event, authentication)
-  }, [event, authentication])
-
-  const availableEventActions = useMemo(() => {
-    return getAvailableActionsForEvent(event)
-  }, [event])
-
   const allowedActionConfigs: ActionMenuItem[] = useMemo(() => {
+    const availableAssignmentActions = getAvailableAssignmentActions(
+      event,
+      authentication
+    )
+    const availableEventActions = getAvailableActionsForEvent(event)
     const openDraftAction = openDraft ? [openDraft.action.type] : []
     return (
       [
@@ -699,13 +696,7 @@ export function useAllowedActionConfigurations(
         // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
         .map((a) => ({ ...config[a], type: a }))
     )
-  }, [
-    availableAssignmentActions,
-    availableEventActions,
-    openDraft,
-    config,
-    isActionAllowed
-  ])
+  }, [openDraft, config, isActionAllowed, event, authentication])
 
   const { customActionModal, customActionConfigs } = useCustomActionConfigs(
     event,
