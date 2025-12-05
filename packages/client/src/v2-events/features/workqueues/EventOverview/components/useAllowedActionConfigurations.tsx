@@ -441,7 +441,7 @@ function useViewableActionConfigurations(
             ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
           ),
         disabled: !isDownloadedAndAssignedToUser,
-        hidden: !event.flags.includes('validated') && userMayRegister
+        hidden: !event.flags.includes('validated')
       },
       [ActionType.MARK_AS_DUPLICATE]: {
         label: actionLabels[ActionType.MARK_AS_DUPLICATE],
