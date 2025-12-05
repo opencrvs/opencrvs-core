@@ -11,8 +11,17 @@
  */
 
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { QueryType, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/events'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createPrng,
+  LocationType,
+  QueryType,
+  TENNIS_CLUB_MEMBERSHIP
+} from '@opencrvs/commons/events'
+import {
+  createTestClient,
+  setupTestCase,
+  TEST_USER_DEFAULT_SCOPES
+} from '@events/tests/utils'
 import {
   getEventIndexName,
   getOrCreateClient
@@ -39,6 +48,122 @@ test('records are not indexed when they are created', async () => {
   })
 
   expect(body.hits.hits).toHaveLength(0)
+})
+
+test('records are indexed with full location hierarchy', async () => {
+  const { user, generator, seed } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    `search[event=${TENNIS_CLUB_MEMBERSHIP},access=all]`
+  ])
+  const esClient = getOrCreateClient()
+
+  // --- Setup locations -------------------------------------------------------
+  const locationRng = createPrng(842)
+
+  const parentLocation = {
+    ...generator.locations.set(1, locationRng)[0],
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    name: 'Parent location'
+  }
+
+  const childLocation = {
+    ...generator.locations.set(1, locationRng)[0],
+    id: user.primaryOfficeId,
+    parentId: parentLocation.id,
+    name: 'Child location',
+    locationType: LocationType.enum.CRVS_OFFICE
+  }
+
+  await seed.locations([parentLocation, childLocation])
+
+  // --- Create & move event through lifecycle --------------------------------
+  const createdEvent = await client.event.create(
+    generator.event.create({ type: TENNIS_CLUB_MEMBERSHIP })
+  )
+
+  const event = generator.event.actions.declare(createdEvent.id, {
+    keepAssignment: true
+  })
+
+  await client.event.actions.declare.request({
+    ...generator.event.actions.declare(createdEvent.id, {
+      declaration: event.declaration,
+      keepAssignment: true
+    })
+  })
+
+  await client.event.actions.validate.request(
+    generator.event.actions.validate(createdEvent.id, {
+      declaration: event.declaration,
+      keepAssignment: true
+    })
+  )
+
+  // --- Verify indexed ES document contains full hierarchy -------------------
+  const searchResponse = await esClient.search({
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    body: { query: { match_all: {} } }
+  })
+
+  expect(searchResponse.hits.hits).toHaveLength(1)
+
+  expect(searchResponse.hits.hits[0]._source).toMatchObject({
+    id: createdEvent.id,
+    type: TENNIS_CLUB_MEMBERSHIP,
+    status: 'VALIDATED',
+    createdAtLocation: [parentLocation.id, childLocation.id],
+    updatedAtLocation: [parentLocation.id, childLocation.id],
+    legalStatuses: {
+      DECLARED: {
+        createdAtLocation: [parentLocation.id, childLocation.id]
+      }
+    },
+    declaration: {
+      applicant____address: {
+        administrativeArea: [parentLocation.id, childLocation.id]
+      }
+    }
+  })
+
+  // --- Search API result must NOT contain hierarchy -------------------------
+  const { results } = await client.event.search({
+    query: { type: 'and', clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }] }
+  })
+
+  expect(results).toHaveLength(1)
+  expect(results[0].createdAtLocation).toEqual(childLocation.id)
+  expect(results[0].updatedAtLocation).toEqual(childLocation.id)
+  expect(results[0].legalStatuses.DECLARED?.createdAtLocation).toEqual(
+    childLocation.id
+  )
+  expect(results[0].declaration.applicant____address).toEqual(undefined) // address is stripped of from api response
+
+  // --- Modify & re-search, hierarchy must STILL be stripped -----------------
+  await client.event.actions.register.request({
+    ...generator.event.actions.register(createdEvent.id, {
+      declaration: {
+        ...event.declaration,
+        'applicant.name': {
+          firstname: 'John',
+          surname: 'Doe'
+        }
+      }
+    })
+  })
+
+  const { results: results2 } = await client.event.search({
+    query: { type: 'and', clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }] }
+  })
+
+  expect(results2).toHaveLength(1)
+  expect(results2[0].createdAtLocation).toEqual(childLocation.id)
+  expect(results2[0].updatedAtLocation).toEqual(childLocation.id)
+  expect(results2[0].legalStatuses.DECLARED?.createdAtLocation).toEqual(
+    childLocation.id
+  )
+  expect(results2[0].declaration.applicant____address).toEqual(undefined) // address is stripped of from api response
 })
 
 const RANDOM_UUID = '650a711b-a725-48f9-a92f-794b4a04fea6'
