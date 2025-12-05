@@ -20,7 +20,7 @@ import {
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
-import { EventStatus, ZodDate } from '../EventMetadata'
+import { EventMetadata, EventStatus, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
 import {
   aggregateActionDeclarations,
@@ -37,6 +37,10 @@ import {
   FullDocumentPath,
   FullDocumentUrl
 } from '../../documents'
+import { mapFieldTypeToZod } from '../FieldTypeMapping'
+import { FieldType } from '../FieldType'
+import { AddressFieldUpdateValue, AddressType } from '../CompositeFieldValue'
+import { isFieldVisible, LOCATIONS_FIELD_TYPES } from '..'
 
 export function getStatusFromActions(actions: Array<Action>) {
   return actions
@@ -162,6 +166,69 @@ export function resolveDateOfEvent(
   return parsedDate.success ? parsedDate.data : undefined
 }
 
+export const DEFAULT_PLACE_OF_EVENT_PROPERTY =
+  'createdAtLocation' satisfies keyof EventMetadata
+
+function getParsedUUID(id: unknown) {
+  const parsed = UUID.safeParse(id)
+  return parsed.success ? parsed.data : undefined
+}
+
+export function resolvePlaceOfEvent(
+  eventMetadata: {
+    createdAtLocation?: UUID | null | undefined
+  },
+  declaration: EventState,
+  config: EventConfig
+): UUID | undefined {
+  if (!config.placeOfEvent || config.placeOfEvent.length === 0) {
+    return getParsedUUID(eventMetadata.createdAtLocation)
+  }
+  const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
+
+  // Find first valid location from configured fields
+  for (const { $$field } of config.placeOfEvent) {
+    const value = declaration[$$field]
+    if (value === null || value === undefined) {
+      continue
+    }
+
+    const fieldConfig = fieldConfigs.find((f) => f.id === $$field)
+
+    if (!fieldConfig) {
+      continue
+    }
+    if (
+      !(LOCATIONS_FIELD_TYPES as readonly FieldType[]).includes(
+        fieldConfig.type
+      )
+    ) {
+      continue
+    }
+    if (!isFieldVisible(fieldConfig, declaration, {})) {
+      continue
+    }
+
+    // Try parsing as address field first (domestic addresses use administrative area)
+    const addressField = AddressFieldUpdateValue.safeParse(value)
+    if (
+      addressField.success &&
+      addressField.data?.addressType === AddressType.DOMESTIC
+    ) {
+      return getParsedUUID(addressField.data.administrativeArea)
+    }
+
+    // Otherwise parse as standard location field
+    const zodType = mapFieldTypeToZod(fieldConfig, ActionType.CREATE)
+    const parsed = zodType.safeParse(value)
+    if (parsed.success) {
+      return getParsedUUID(parsed.data)
+    }
+  }
+  // When no value can not be resolved, it defaults again to registrar office location, (ex: AddressType.DOMESTIC etc)
+  return getParsedUUID(eventMetadata.createdAtLocation)
+}
+
 export function extractPotentialDuplicatesFromActions(
   actions: Action[]
 ): PotentialDuplicate[] {
@@ -181,6 +248,7 @@ export function extractPotentialDuplicatesFromActions(
 
 /**
  * NOTE: This function should not run field validations. It should return the state based on the actions, without considering context (users, roles, permissions, etc).
+createdAtLocation: CreatedAtLocation
  *
  * If you update this function, please ensure @EventIndex type is updated accordingly.
  * In most cases, you won't need to add new parameters to this function. Discuss with the team before doing so.
@@ -236,6 +304,11 @@ export function getCurrentEventState(
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),
+    placeOfEvent: resolvePlaceOfEvent(
+      { createdAtLocation: creationAction.createdAtLocation },
+      declaration,
+      config
+    ),
     potentialDuplicates: extractPotentialDuplicatesFromActions(sortedActions),
     flags: getEventFlags(event, config)
   })
@@ -300,6 +373,11 @@ export function applyDeclarationToEventIndex(
   return {
     ...eventIndex,
     dateOfEvent: resolveDateOfEvent(
+      eventIndex,
+      updatedDeclaration,
+      eventConfiguration
+    ),
+    placeOfEvent: resolvePlaceOfEvent(
       eventIndex,
       updatedDeclaration,
       eventConfiguration

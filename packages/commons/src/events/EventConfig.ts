@@ -15,9 +15,8 @@ import { TranslationConfig } from './TranslationConfig'
 import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
 import { findAllFields, getDeclarationFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
-
 import { FieldType } from './FieldType'
-import { FieldReference } from './FieldConfig'
+import { FieldReference, LOCATIONS_FIELD_TYPES } from './FieldConfig'
 import { FlagConfig, InherentFlags } from './Flag'
 
 /**
@@ -35,6 +34,12 @@ export const EventConfig = z
     dateOfEvent: FieldReference.optional().describe(
       'Reference to the field capturing the date of the event (e.g. date of birth). Defaults to the event creation date if unspecified.'
     ),
+    placeOfEvent: z
+      .array(FieldReference)
+      .optional()
+      .describe(
+        'Reference to the field capturing the place of the event (e.g. place of birth). Defaults to the meta.createdAtLocation if unspecified.'
+      ),
     title: TranslationConfig.describe(
       'Title template for the singular event, supporting variables (e.g. "{applicant.name.firstname} {applicant.name.surname}").'
     ),
@@ -130,6 +135,33 @@ export const EventConfig = z
           code: 'custom',
           message: `Field specified for date of event is of type: ${eventDateFieldId.type}, but it needs to be of type: ${FieldType.DATE}`,
           path: ['dateOfEvent.fieldType']
+        })
+      }
+    }
+
+    if (event.placeOfEvent) {
+      const eventPlaceFieldId = getDeclarationFields(event).find(
+        ({ id }) =>
+          Array.isArray(event.placeOfEvent) &&
+          event.placeOfEvent.find((config) => config.$$field === id)
+      )
+      if (!eventPlaceFieldId) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Place of event field id must match a field id in fields array.
+          Invalid place of event field ID for event ${event.id}: ${event.placeOfEvent.map((x) => x.$$field).toString()}`,
+          path: ['placeOfEvent']
+        })
+      } else if (
+        !(LOCATIONS_FIELD_TYPES as readonly FieldType[]).includes(
+          eventPlaceFieldId.type
+        )
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Field specified for place of event is of type: ${eventPlaceFieldId.type}, 
+          but it needs to be any one of these type: ${LOCATIONS_FIELD_TYPES.join(', ')}`,
+          path: ['placeOfEvent.fieldType']
         })
       }
     }

@@ -10,13 +10,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { http, HttpResponse } from 'msw'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
+  ActionType,
+  AddressType,
   createPrng,
+  EventConfig,
+  field,
+  FieldConditional,
+  FieldType,
+  generateActionDeclarationInput,
   LocationType,
   QueryType,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons/events'
+import { getUUID } from '@opencrvs/commons'
 import {
   createTestClient,
   setupTestCase,
@@ -26,6 +35,8 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
+import { mswServer } from '@events/tests/msw'
+import { env } from '@events/environment'
 import {
   buildElasticQueryFromSearchPayload,
   withJurisdictionFilters
@@ -115,6 +126,7 @@ test('records are indexed with full location hierarchy', async () => {
     status: 'DECLARED',
     createdAtLocation: [parentLocation.id, childLocation.id],
     updatedAtLocation: [parentLocation.id, childLocation.id],
+    placeOfEvent: [parentLocation.id, childLocation.id],
     legalStatuses: {
       DECLARED: {
         createdAtLocation: [parentLocation.id, childLocation.id]
@@ -135,6 +147,7 @@ test('records are indexed with full location hierarchy', async () => {
   expect(results).toHaveLength(1)
   expect(results[0].createdAtLocation).toEqual(childLocation.id)
   expect(results[0].updatedAtLocation).toEqual(childLocation.id)
+  expect(results[0].placeOfEvent).toEqual(childLocation.id)
   expect(results[0].legalStatuses.DECLARED?.createdAtLocation).toEqual(
     childLocation.id
   )
@@ -159,6 +172,7 @@ test('records are indexed with full location hierarchy', async () => {
 
   expect(results2).toHaveLength(1)
   expect(results2[0].createdAtLocation).toEqual(childLocation.id)
+  expect(results2[0].placeOfEvent).toEqual(childLocation.id)
   expect(results2[0].updatedAtLocation).toEqual(childLocation.id)
   expect(results2[0].legalStatuses.DECLARED?.createdAtLocation).toEqual(
     childLocation.id
@@ -831,4 +845,249 @@ test('builds Address field query', async () => {
       should: undefined
     }
   })
+})
+
+test('placeOfEvent resolves from conditional address fields and returns leaf-level locations in search results', async () => {
+  // Setup: Generate location IDs upfront
+  const parentLocationId = getUUID()
+
+  // Setup: Configure event with conditional address fields
+  const createAddressField = (
+    id: string,
+    conditionals?: FieldConditional[]
+  ) => ({
+    id,
+    type: FieldType.ADDRESS,
+    label: {
+      id: 'storybook.address.label',
+      defaultMessage: 'Address',
+      description: 'The title for the address input'
+    },
+    defaultValue: {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: parentLocationId
+    },
+    conditionals,
+    configuration: {
+      streetAddressForm: [
+        {
+          id: 'town',
+          required: false,
+          label: {
+            id: 'field.address.town.label',
+            defaultMessage: 'Town',
+            description: 'This is the label for the field'
+          },
+          type: FieldType.TEXT
+        }
+      ]
+    }
+  })
+
+  const modifiedEventConfig: EventConfig = {
+    ...tennisClubMembershipEvent,
+    declaration: {
+      ...tennisClubMembershipEvent.declaration,
+      pages: tennisClubMembershipEvent.declaration.pages.map((page, i) => {
+        if (i !== 0) {
+          return page
+        }
+
+        return {
+          ...page,
+          fields: [
+            ...page.fields,
+            {
+              id: 'addressType',
+              type: FieldType.TEXT,
+              label: {
+                id: 'addressType.label',
+                defaultMessage: 'Address Type',
+                description: ''
+              },
+              defaultValue: 'homeAddress'
+            },
+            createAddressField('homeAddress', [
+              {
+                type: 'SHOW',
+                conditional: field('addressType').isEqualTo('homeAddress')
+              }
+            ]),
+            createAddressField('officeAddress', [
+              {
+                type: 'SHOW',
+                conditional: field('addressType').isEqualTo('officeAddress')
+              }
+            ])
+          ]
+        }
+      })
+    },
+    placeOfEvent: [field('homeAddress'), field('officeAddress')]
+  }
+
+  const { user, generator, seed } = await setupTestCase(
+    100,
+    modifiedEventConfig
+  )
+
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      return HttpResponse.json([modifiedEventConfig])
+    })
+  )
+
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    `search[event=${TENNIS_CLUB_MEMBERSHIP},access=all]`
+  ])
+  const esClient = getOrCreateClient()
+
+  // Setup: Create location hierarchy (grandparent -> parent -> child office)
+  const locationRng = createPrng(842)
+  const grandParentLocation = {
+    ...generator.locations.set(1, locationRng)[0],
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    name: 'Grand Parent location'
+  }
+  const parentLocation = {
+    ...generator.locations.set(1, locationRng)[0],
+    id: parentLocationId,
+    parentId: grandParentLocation.id,
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    name: 'Parent location'
+  }
+  const childOffice = {
+    ...generator.locations.set(1, locationRng)[0],
+    id: user.primaryOfficeId,
+    parentId: parentLocation.id,
+    name: 'Child location',
+    locationType: LocationType.enum.CRVS_OFFICE
+  }
+
+  await seed.locations([grandParentLocation, parentLocation, childOffice])
+
+  // Test Part 1: Declare event with homeAddress, verify ES contains full hierarchy
+  const createdEvent = await client.event.create(
+    generator.event.create({ type: TENNIS_CLUB_MEMBERSHIP })
+  )
+
+  const declarationWithHomeAddress = {
+    ...generateActionDeclarationInput(
+      modifiedEventConfig,
+      ActionType.DECLARE,
+      createPrng(100)
+    ),
+    addressType: 'homeAddress',
+    homeAddress: {
+      country: 'FAR',
+      streetLevelDetails: { town: 'Gazipur' },
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: parentLocation.id
+    }
+  }
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(createdEvent.id, {
+      declaration: declarationWithHomeAddress,
+      keepAssignment: true
+    })
+  )
+
+  await client.event.actions.validate.request(
+    generator.event.actions.validate(createdEvent.id, {
+      declaration: declarationWithHomeAddress,
+      keepAssignment: true
+    })
+  )
+
+  // Verify: Elasticsearch document contains full location hierarchies
+  const esSearchResponse = await esClient.search({
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    body: { query: { match_all: {} } }
+  })
+
+  expect(esSearchResponse.hits.hits).toHaveLength(1)
+  expect(esSearchResponse.hits.hits[0]._source).toMatchObject({
+    id: createdEvent.id,
+    type: TENNIS_CLUB_MEMBERSHIP,
+    status: 'VALIDATED',
+    createdAtLocation: [
+      grandParentLocation.id,
+      parentLocation.id,
+      childOffice.id
+    ],
+    updatedAtLocation: [
+      grandParentLocation.id,
+      parentLocation.id,
+      childOffice.id
+    ],
+    placeOfEvent: [grandParentLocation.id, parentLocation.id],
+    legalStatuses: {
+      DECLARED: {
+        createdAtLocation: [
+          grandParentLocation.id,
+          parentLocation.id,
+          childOffice.id
+        ]
+      }
+    },
+    declaration: {
+      applicant____address: {
+        administrativeArea: [
+          grandParentLocation.id,
+          parentLocation.id,
+          childOffice.id
+        ]
+      }
+    }
+  })
+
+  // Verify: Search API returns only leaf-level locations (no hierarchy)
+  const { results } = await client.event.search({
+    query: { type: 'and', clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }] }
+  })
+
+  expect(results).toHaveLength(1)
+  expect(results[0].createdAtLocation).toEqual(childOffice.id)
+  expect(results[0].updatedAtLocation).toEqual(childOffice.id)
+  expect(results[0].placeOfEvent).toEqual(parentLocation.id)
+  expect(results[0].legalStatuses.DECLARED?.createdAtLocation).toEqual(
+    childOffice.id
+  )
+
+  // Test Part 2: Register event with officeAddress, verify placeOfEvent updates correctly
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { homeAddress, ...declarationWithoutHomeAddress } =
+    declarationWithHomeAddress
+
+  await client.event.actions.register.request(
+    generator.event.actions.register(createdEvent.id, {
+      declaration: {
+        ...declarationWithoutHomeAddress,
+        addressType: 'officeAddress',
+        officeAddress: {
+          country: 'FAR',
+          streetLevelDetails: { town: 'Dhaka' },
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: grandParentLocation.id
+        }
+      }
+    })
+  )
+
+  // Verify: Search results still return leaf-level locations after update
+  const { results: updatedResults } = await client.event.search({
+    query: { type: 'and', clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }] }
+  })
+
+  expect(updatedResults).toHaveLength(1)
+  expect(updatedResults[0].createdAtLocation).toEqual(childOffice.id)
+  expect(updatedResults[0].updatedAtLocation).toEqual(childOffice.id)
+  expect(updatedResults[0].placeOfEvent).toEqual(grandParentLocation.id)
+  expect(updatedResults[0].legalStatuses.DECLARED?.createdAtLocation).toEqual(
+    childOffice.id
+  )
 })

@@ -193,7 +193,7 @@ describe('getCurrentEventState()', () => {
         createdAt: '2023-01-01T00:00:00.000Z',
         createdBy: 'user1',
         createdByUserType: TokenUserType.enum.user,
-        createdAtLocation: 'location1' as UUID,
+        createdAtLocation: getUUID(),
         createdBySignature: '/ocrvs/signature.png',
         createdByRole: 'FIELD_AGENT'
       }
@@ -208,7 +208,7 @@ describe('getCurrentEventState()', () => {
         createdAt: '2023-02-01T00:00:00.000Z',
         createdBy: 'user1',
         createdByUserType: TokenUserType.enum.user,
-        createdAtLocation: 'location1' as UUID,
+        createdAtLocation: getUUID(),
         createdBySignature: '/ocrvs/signature.png',
         createdByRole: 'FIELD_AGENT'
       }
@@ -312,7 +312,8 @@ describe('getCurrentEventState()', () => {
         declareRequestAction.declaration
       ) as EventState,
       dateOfEvent: event.createdAt.split('T')[0],
-      flags: [InherentFlags.PENDING_CERTIFICATION, 'validated'],
+      placeOfEvent: createAction.createdAtLocation,
+      flags: [InherentFlags.PENDING_CERTIFICATION],
       potentialDuplicates: [],
       legalStatuses: {
         [EventStatus.enum.DECLARED]: {
@@ -350,7 +351,7 @@ describe('getCurrentEventState()', () => {
         createdByUserType: TokenUserType.enum.user,
         createdBy: 'user1',
         createdBySignature: '/ocrvs/signature.png',
-        createdAtLocation: 'location1' as UUID,
+        createdAtLocation: getUUID(),
         createdByRole: 'FIELD_AGENT'
       }
     })
@@ -365,7 +366,7 @@ describe('getCurrentEventState()', () => {
         createdByUserType: TokenUserType.enum.user,
         createdBy: 'user1',
         createdBySignature: '/ocrvs/signature.png',
-        createdAtLocation: 'location1' as UUID,
+        createdAtLocation: getUUID(),
         createdByRole: 'FIELD_AGENT'
       }
     })
@@ -432,6 +433,7 @@ describe('getCurrentEventState()', () => {
       updatedAtLocation: registerAcceptAction.createdAtLocation,
       declaration: deepDropNulls(declareAcceptAction.declaration) as EventState,
       dateOfEvent: event.createdAt.split('T')[0],
+      placeOfEvent: createAction.createdAtLocation,
       flags: [InherentFlags.PENDING_CERTIFICATION, 'validated'],
       potentialDuplicates: [],
       legalStatuses: {

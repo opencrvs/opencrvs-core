@@ -932,3 +932,12 @@ export type FieldTypeToFieldConfig<T extends FieldType> = Extract<
   FieldConfigInput,
   { type: T }
 >
+
+export const LOCATIONS_FIELD_TYPES = [
+  FieldType.ADMINISTRATIVE_AREA,
+  FieldType.FACILITY,
+  FieldType.OFFICE,
+  FieldType.LOCATION,
+  FieldType.COUNTRY,
+  FieldType.ADDRESS
+] as const

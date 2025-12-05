@@ -11,6 +11,7 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 #### Jurisdiction
 
 - Elasticsearch now stores location IDs as a full administrative hierarchy, with the leaf representing the actual event location. This enables searching events by any jurisdiction level (district, province, office, health facility etc.).
+- Added configurable placeOfEvent in EventConfig, allowing multiple location fields to be defined, with only one becoming the active place of event per document (based on conditionals), enabling jurisdiction-specific search by event location (e.g., birth location, child’s home address, death location).
 
 ### Improvements
 
