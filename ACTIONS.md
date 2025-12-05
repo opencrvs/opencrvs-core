@@ -50,8 +50,6 @@ Below we describe two configuration options: flag configurations and action cond
 
 Flag configurations define flags that should be added to or removed from a record when an action is executed. They can be applied either unconditionally (if no conditionals are specified) or conditionally based on factors such as form data, the role of the executing user, or the record’s current status or flags.
 
-An example of a flag configuration, where the flag `approval-required-for-late-registration` is added if the `child.dob` form value is over 365 days in the past:
-
 **Example:** Adding the flag `approval-required-for-late-registration` when `child.dob` is more than 365 days in the past:
 
 ```js
