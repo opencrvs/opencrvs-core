@@ -68,6 +68,8 @@ flags: [
 
 Action conditionals determine whether an action should be visible or enabled based on the record’s status or flags.
 
+Action conditionals support two different types of conditional types: `ConditionalType.SHOW` & `ConditionalType.ENABLE`.
+
 **Example:** Showing an action only when the record has the approval-required-for-late-registration flag:
 
 ```js
